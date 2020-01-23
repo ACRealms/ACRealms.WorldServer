@@ -1051,9 +1051,6 @@ namespace ACE.Server.WorldObjects
                             }
                         }
 
-                        if (summonLoc != null)
-                            summonLoc.LandblockId = new LandblockId(summonLoc.GetCell());
-
                         if (!SummonPortal(portalId, summonLoc, spell.PortalLifetime) && player != null)
                             player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.YouFailToSummonPortal));
 
@@ -1245,8 +1242,6 @@ namespace ACE.Server.WorldObjects
             return spell.SpreadAngle / (spell.NumProjectiles - 1);
         }
 
-        public static readonly Quaternion OneEighty = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.PI);
-
         /// <summary>
         /// Calculates the spell projectile velocity in global space
         /// </summary>
@@ -1265,7 +1260,7 @@ namespace ACE.Server.WorldObjects
             var crossLandblock = !strikeSpell && Location.Landblock != target.Location.Landblock;
 
             var startPos = strikeSpell ? target.Location.Pos : crossLandblock ? Location.ToGlobal(false) : Location.Pos;
-            startPos += Vector3.Transform(origin, strikeSpell ? Location.Rotation * OneEighty : Location.Rotation);
+            startPos += Vector3.Transform(origin, strikeSpell ? Location.Rotation * Position.OneEighty : Location.Rotation);
 
             var endPos = crossLandblock ? target.Location.ToGlobal(false) : target.Location.Pos;
             endPos.Z += target.Height * 0.5f;
@@ -1312,7 +1307,7 @@ namespace ACE.Server.WorldObjects
                 sp.Setup(spell, spellType);
 
                 sp.Location = strikeSpell ? new Position(target.Location) : new Position(Location);
-                sp.Location.Pos += Vector3.Transform(origin, strikeSpell ? Location.Rotation * OneEighty : Location.Rotation);
+                sp.Location.Pos += Vector3.Transform(origin, strikeSpell ? Location.Rotation * Position.OneEighty : Location.Rotation);
 
                 sp.Velocity = velocity;
 

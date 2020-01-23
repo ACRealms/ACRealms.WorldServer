@@ -315,7 +315,7 @@ namespace ACE.Server.Entity
 
             // offset from generator location
             else
-                obj.Location = new ACE.Entity.Position(Generator.Location.Cell, Generator.Location.PositionX + Biota.OriginX ?? 0, Generator.Location.PositionY + Biota.OriginY ?? 0, Generator.Location.PositionZ + Biota.OriginZ ?? 0, Biota.AnglesX ?? 0, Biota.AnglesY ?? 0, Biota.AnglesZ ?? 0, Biota.AnglesW ?? 0);
+                obj.Location = new ACE.Entity.Position(Generator.Location.ObjCellID, Generator.Location.Pos.X + Biota.OriginX ?? 0, Generator.Location.Pos.Y + Biota.OriginY ?? 0, Generator.Location.Pos.Z + Biota.OriginZ ?? 0, Biota.AnglesX ?? 0, Biota.AnglesY ?? 0, Biota.AnglesZ ?? 0, Biota.AnglesW ?? 0);
 
             if (!VerifyLandblock(obj) || !VerifyWalkableSlope(obj))
                 return false;

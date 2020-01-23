@@ -867,25 +867,26 @@ namespace ACE.Server.WorldObjects.Managers
 
                     if (creature != null)
                     {
-                        var newPos = new Position(creature.Home);
-                        newPos.Pos += new Vector3(emote.OriginX ?? 0, emote.OriginY ?? 0, emote.OriginZ ?? 0);      // uses relative position
+                        // uses relative position to home
+                        var newPos = creature.Home.Pos + new Vector3(emote.OriginX ?? 0, emote.OriginY ?? 0, emote.OriginZ ?? 0);
+
+                        var newRotation = creature.Home.Rotation;
 
                         // ensure valid quaternion - all 0s for example can lock up physics engine
                         if (emote.AnglesX != null && emote.AnglesY != null && emote.AnglesZ != null && emote.AnglesW != null &&
                            (emote.AnglesX != 0    || emote.AnglesY != 0    || emote.AnglesZ != 0    || emote.AnglesW != 0) )
                         {
                             // also relative, or absolute?
-                            newPos.Rotation *= new Quaternion(emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value);  
+                            newRotation *= new Quaternion(emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value);  
                         }
 
-                        if (Debug)
-                            Console.WriteLine(newPos.ToLOCString());
+                        var newPosition = new Position(creature.Home.ObjCellID, newPos, newRotation, true);
 
-                        // get new cell
-                        newPos.LandblockId = new LandblockId(PositionExtensions.GetCell(newPos));
+                        if (Debug)
+                            Console.WriteLine(newPosition.ToLOCString());
 
                         // TODO: handle delay for this?
-                        creature.MoveTo(newPos, creature.GetRunRate(), true, null, emote.Extent);
+                        creature.MoveTo(newPosition, creature.GetRunRate(), true, null, emote.Extent);
                     }
                     break;
 
@@ -928,16 +929,15 @@ namespace ACE.Server.WorldObjects.Managers
                         var currentPos = creature.Location;
 
                         var newPos = new Position();
-                        newPos.LandblockId = new LandblockId(currentPos.LandblockId.Raw);
+
+                        newPos.ObjCellID = emote.ObjCellId ?? currentPos.ObjCellID;
+
                         newPos.Pos = new Vector3(emote.OriginX ?? currentPos.Pos.X, emote.OriginY ?? currentPos.Pos.Y, emote.OriginZ ?? currentPos.Pos.Z);
 
                         if (emote.AnglesX == null || emote.AnglesY == null || emote.AnglesZ == null || emote.AnglesW == null)
-                            newPos.Rotation = new Quaternion(currentPos.Rotation.X, currentPos.Rotation.Y, currentPos.Rotation.Z, currentPos.Rotation.W);
+                            newPos.Rotation = currentPos.Rotation;
                         else
                             newPos.Rotation = new Quaternion(emote.AnglesX ?? 0, emote.AnglesY ?? 0, emote.AnglesZ ?? 0, emote.AnglesW ?? 1);
-
-                        if (emote.ObjCellId != null)
-                            newPos.LandblockId = new LandblockId(emote.ObjCellId.Value);
 
                         // TODO: handle delay for this?
                         creature.MoveTo(newPos, creature.GetRunRate(), true, null, emote.Extent);

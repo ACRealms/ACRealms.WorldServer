@@ -357,7 +357,7 @@ namespace ACE.Server.WorldObjects
 
                         if (!Teleporting)
                         {
-                            var blockDist = PhysicsObj.GetBlockDist(Location.Cell, newPosition.Cell);
+                            var blockDist = PhysicsObj.GetBlockDist(Location.ObjCellID, newPosition.ObjCellID);
 
                             // verify movement
                             if (distSq > MaxSpeedSq && blockDist > 1)
@@ -368,17 +368,17 @@ namespace ACE.Server.WorldObjects
                             }
 
                             // verify z-pos
-                            if (blockDist == 0 && LastGroundPos != null && newPosition.PositionZ - LastGroundPos.PositionZ > 10 && DateTime.UtcNow - LastJumpTime > TimeSpan.FromSeconds(1))
+                            if (blockDist == 0 && LastGroundPos != null && newPosition.Pos.Z - LastGroundPos.Pos.Z > 10 && DateTime.UtcNow - LastJumpTime > TimeSpan.FromSeconds(1))
                                 verifyContact = true;
                         }
 
-                        var curCell = LScape.get_landcell(newPosition.Cell);
+                        var curCell = LScape.get_landcell(newPosition.ObjCellID);
                         if (curCell != null)
                         {
                             //if (PhysicsObj.CurCell == null || curCell.ID != PhysicsObj.CurCell.ID)
                                 //PhysicsObj.change_cell_server(curCell);
 
-                            PhysicsObj.set_request_pos(newPosition.Pos, newPosition.Rotation, curCell, Location.LandblockId.Raw);
+                            PhysicsObj.set_request_pos(newPosition.Pos, newPosition.Rotation, curCell, Location.ObjCellID);
                             if (FastTick)
                                 success = PhysicsObj.update_object_server_new();
                             else
@@ -408,7 +408,7 @@ namespace ACE.Server.WorldObjects
 
                 if (!success) return false;
 
-                var landblockUpdate = Location.Cell >> 16 != newPosition.Cell >> 16;
+                var landblockUpdate = Location.Landblock != newPosition.Landblock;
 
                 Location = newPosition;
 
@@ -444,39 +444,19 @@ namespace ACE.Server.WorldObjects
             if (CurrentLandblock == null)
                 return false;
 
-            if (!Teleporting && Location.Landblock != newPosition.Cell >> 16)
+            if (!Teleporting && Location.Landblock != newPosition.Landblock)
             {
-                if ((Location.Cell & 0xFFFF) >= 0x100 && (newPosition.Cell & 0xFFFF) >= 0x100)
+                if (Location.Indoors && newPosition.Indoors)
                     return false;
 
                 if (CurrentLandblock.IsDungeon)
                 {
-                    var destBlock = LScape.get_landblock(newPosition.Cell);
+                    var destBlock = LScape.get_landblock(newPosition.ObjCellID);
                     if (destBlock != null && destBlock.IsDungeon)
                         return false;
                 }
             }
             return true;
-        }
-
-
-        public bool SyncLocationWithPhysics()
-        {
-            if (PhysicsObj.CurCell == null)
-            {
-                Console.WriteLine($"{Name}.SyncLocationWithPhysics(): CurCell is null!");
-                return false;
-            }
-
-            var blockcell = PhysicsObj.Position.ObjCellID;
-            var pos = PhysicsObj.Position.Frame.Origin;
-            var rotate = PhysicsObj.Position.Frame.Orientation;
-
-            var landblockUpdate = blockcell << 16 != CurrentLandblock.Id.Landblock;
-
-            Location = new ACE.Entity.Position(blockcell, pos, rotate);
-
-            return landblockUpdate;
         }
 
         private bool gagNoticeSent = false;

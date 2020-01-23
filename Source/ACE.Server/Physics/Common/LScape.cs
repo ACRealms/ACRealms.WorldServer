@@ -57,8 +57,7 @@ namespace ACE.Server.Physics.Common
 
             if (PhysicsEngine.Instance.Server)
             {
-                var lbid = new LandblockId(landblockID);
-                var lbmLandblock = LandblockManager.GetLandblock(lbid, false, false);
+                var lbmLandblock = LandblockManager.GetLandblock(landblockID, false, false);
 
                 return lbmLandblock.PhysicsLandblock;
             }

@@ -64,7 +64,6 @@ namespace ACE.Server.WorldObjects
             TreasureCorpse = false;
             ExpirationTime = DateTime.UtcNow + TimeSpan.FromSeconds(45);
             Location = player.Location.InFrontOf(5f);
-            Location.LandblockId = new LandblockId(Location.GetCell());
             Name = player.Name + "'s " + Name;
             P_PetOwner = player;
             PetOwner = player.Guid.Full;

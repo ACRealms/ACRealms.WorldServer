@@ -267,7 +267,7 @@ namespace ACE.Server.WorldObjects
 
                 // bludgeon damage
                 // impact damage
-                if (damage > 0.0f && (FastTick || StartJump == null || StartJump.PositionZ - PhysicsObj.Position.Frame.Origin.Z > 10.0f))
+                if (damage > 0.0f && (FastTick || StartJump == null || StartJump.Pos.Z - PhysicsObj.Position.Frame.Origin.Z > 10.0f))
                     TakeDamage_Falling(damage);
             }
         }

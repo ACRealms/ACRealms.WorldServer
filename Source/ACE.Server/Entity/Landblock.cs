@@ -40,15 +40,13 @@ namespace ACE.Server.Entity
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static float AdjacencyLoadRange { get; } = 96f;
-        public static float OutdoorChatRange { get; } = 75f;
-        public static float IndoorChatRange { get; } = 25f;
-        public static float MaxXY { get; } = 192f;
-        public static float MaxObjectRange { get; } = 192f;
-        public static float MaxObjectGhostRange { get; } = 250f;
+        public uint Id { get; }
 
+        public ushort ShortId => (ushort)(Id >> 16);
 
-        public LandblockId Id { get; }
+        public byte X => (byte)(Id >> 24);
+
+        public byte Y => (byte)(Id >> 16);
 
         /// <summary>
         /// Flag indicates if this landblock is permanently loaded (for example, towns on high-traffic servers)
@@ -155,18 +153,19 @@ namespace ACE.Server.Entity
         }
 
 
-        public Landblock(LandblockId id)
+        public Landblock(uint objCellID)
         {
-            //log.Debug($"Landblock({(id.Raw | 0xFFFF):X8})");
+            Id = objCellID | 0xFFFF;
 
-            Id = id;
+            //log.Debug($"Landblock({Id:X8})");
 
-            CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id.Raw >> 16 | 0xFFFF);
-            LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>((uint)Id.Landblock << 16 | 0xFFFE);
+            CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id);
+            LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>(Id & 0xFFFF0000 | 0xFFFE);
 
             lastActiveTime = DateTime.UtcNow;
 
-            var cellLandblock = DBObj.GetCellLandblock(Id.Raw | 0xFFFF);
+            // load physics landblock
+            var cellLandblock = DBObj.GetCellLandblock(Id);
             PhysicsLandblock = new Physics.Common.Landblock(cellLandblock);
         }
 
@@ -192,8 +191,10 @@ namespace ACE.Server.Entity
         /// </summary>
         private void CreateWorldObjects()
         {
-            var objects = DatabaseManager.World.GetCachedInstancesByLandblock(Id.Landblock);
-            var shardObjects = DatabaseManager.Shard.GetStaticObjectsByLandblock(Id.Landblock);
+            var shortId = (ushort)(Id >> 16);
+
+            var objects = DatabaseManager.World.GetCachedInstancesByLandblock(shortId);
+            var shardObjects = DatabaseManager.Shard.GetStaticObjectsByLandblock(shortId);
             var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects);
 
             actionQueue.EnqueueAction(new ActionEventDelegate(() =>
@@ -241,7 +242,9 @@ namespace ACE.Server.Entity
         /// </summary>
         private void SpawnDynamicShardObjects()
         {
-            var dynamics = DatabaseManager.Shard.GetDynamicObjectsByLandblock(Id.Landblock);
+            var shortId = (ushort)(Id >> 16);
+
+            var dynamics = DatabaseManager.Shard.GetDynamicObjectsByLandblock(shortId);
             var factoryShardObjects = WorldObjectFactory.CreateWorldObjects(dynamics);
 
             actionQueue.EnqueueAction(new ActionEventDelegate(() =>
@@ -257,8 +260,10 @@ namespace ACE.Server.Entity
         /// </summary>
         private void SpawnEncounters()
         {
+            var shortId = (ushort)(Id >> 16);
+
             // get the encounter spawns for this landblock
-            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(Id.Landblock);
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(shortId);
 
             foreach (var encounter in encounters)
             {
@@ -270,7 +275,7 @@ namespace ACE.Server.Entity
                 var yPos = Math.Clamp(encounter.CellY * 24.0f, 0.5f, 191.5f);
 
                 var pos = new Physics.Common.Position();
-                pos.ObjCellID = (uint)(Id.Landblock << 16) | 1;
+                pos.ObjCellID = Id & 0xFFFF0000 | 1;
                 pos.Frame = new Physics.Animation.AFrame(new Vector3(xPos, yPos, 0), Quaternion.Identity);
                 pos.adjust_to_outside();
 
@@ -994,8 +999,6 @@ namespace ACE.Server.Entity
         /// </summary>
         public void Unload()
         {
-            var landblockID = Id.Raw | 0xFFFF;
-
             //log.Debug($"Landblock.Unload({landblockID:X8})");
 
             ProcessPendingWorldObjectAdditionsAndRemovals();
@@ -1016,7 +1019,7 @@ namespace ACE.Server.Entity
             actionQueue.Clear();
 
             // remove physics landblock
-            LScape.unload_landblock(landblockID);
+            LScape.unload_landblock(Id);
         }
 
         private void SaveDB()

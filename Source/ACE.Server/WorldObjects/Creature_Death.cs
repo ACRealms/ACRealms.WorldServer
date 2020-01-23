@@ -292,7 +292,7 @@ namespace ACE.Server.WorldObjects
                 if (dropped.Count > 0)
                     saveCorpse = true;
 
-                if ((player.Location.Cell & 0xFFFF) < 0x100)
+                if (!player.Location.Indoors)
                 {
                     player.SetPosition(PositionType.LastOutsideDeath, new Position(corpse.Location));
                     player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePosition(player, PositionType.LastOutsideDeath, corpse.Location));

@@ -37,7 +37,7 @@ namespace ACE.Server.Network.Structure
         {
             WorldObject = wo;
 
-            Origin = new Origin(wo.Location.Cell, wo.Location.Pos);
+            Origin = new Origin(wo.Location.ObjCellID, wo.Location.Pos);
             Rotation = wo.Location.Rotation;
             Velocity = wo.PhysicsObj != null ? wo.PhysicsObj.Velocity : Vector3.Zero;  // average or instantaneous?
             PlacementID = wo.Placement;

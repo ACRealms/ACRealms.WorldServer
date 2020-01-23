@@ -312,7 +312,7 @@ namespace ACE.Server.WorldObjects
                 if (isMoved || isDying)
                 {
                     if (curCell.ID != cellBefore)
-                        Location.LandblockId = new LandblockId(curCell.ID);
+                        Location.ObjCellID = curCell.ID;
 
                     Location.Pos = newPos;
                     Location.Rotation = PhysicsObj.Position.Frame.Orientation;

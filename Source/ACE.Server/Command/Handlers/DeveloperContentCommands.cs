@@ -315,9 +315,9 @@ namespace ACE.Server.Command.Handlers.Processors
 
             uint? parentGuid = null;
 
-            var landblock = session.Player.CurrentLandblock.Id.Landblock;
+            var landblock = session.Player.CurrentLandblock.ShortId;
 
-            var firstStaticGuid = 0x70000000 | (uint)landblock << 12;
+            var firstStaticGuid = (uint)(0x70000000 | landblock << 12);
 
             if (parameters.Length > 1)
             {
@@ -456,7 +456,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             // even on flat ground, objects can sometimes fail to spawn at the player's current Z
             // Position.Z has some weird thresholds when moving around, but i guess the same logic doesn't apply when trying to spawn in...
-            wo.Location.PositionZ += 0.05f;
+            wo.Location._pos.Z += 0.05f;
 
             var isLinkChild = parentInstance != null;
 
@@ -544,16 +544,16 @@ namespace ACE.Server.Command.Handlers.Processors
 
             instance.WeenieClassId = wo.WeenieClassId;
 
-            instance.ObjCellId = wo.Location.Cell;
+            instance.ObjCellId = wo.Location.ObjCellID;
 
-            instance.OriginX = wo.Location.PositionX;
-            instance.OriginY = wo.Location.PositionY;
-            instance.OriginZ = wo.Location.PositionZ;
+            instance.OriginX = wo.Location.Pos.X;
+            instance.OriginY = wo.Location.Pos.Y;
+            instance.OriginZ = wo.Location.Pos.Z;
 
-            instance.AnglesW = wo.Location.RotationW;
-            instance.AnglesX = wo.Location.RotationX;
-            instance.AnglesY = wo.Location.RotationY;
-            instance.AnglesZ = wo.Location.RotationZ;
+            instance.AnglesW = wo.Location.Rotation.W;
+            instance.AnglesX = wo.Location.Rotation.X;
+            instance.AnglesY = wo.Location.Rotation.Y;
+            instance.AnglesZ = wo.Location.Rotation.Z;
 
             instance.IsLinkChild = isLinkChild;
 
@@ -709,14 +709,14 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var pos = session.Player.Location;
 
-            if ((pos.Cell & 0xFFFF) >= 0x100)
+            if (pos.Indoors)
             {
                 session.Network.EnqueueSend(new GameMessageSystemChat("You must be outdoors to create an encounter!", ChatMessageType.Broadcast));
                 return;
             }
 
-            var cellX = (int)pos.PositionX / 24;
-            var cellY = (int)pos.PositionY / 24;
+            var cellX = (int)pos.Pos.X / 24;
+            var cellY = (int)pos.Pos.Y / 24;
 
             // spawn encounter
             var wo = SpawnEncounter(weenie, cellX, cellY, pos, session);
@@ -765,7 +765,7 @@ namespace ACE.Server.Command.Handlers.Processors
             var yPos = Math.Clamp(cellY * 24.0f, 0.5f, 191.5f);
 
             var newPos = new Physics.Common.Position();
-            newPos.ObjCellID = pos.Cell;
+            newPos.ObjCellID = pos.ObjCellID;
             newPos.Frame = new Physics.Animation.AFrame(new Vector3(xPos, yPos, 0), Quaternion.Identity);
             newPos.adjust_to_outside();
 

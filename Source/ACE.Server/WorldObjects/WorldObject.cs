@@ -179,7 +179,7 @@ namespace ACE.Server.WorldObjects
             // exclude linkspots from spawning
             if (WeenieClassId == 10762) return true;
 
-            var cell = LScape.get_landcell(Location.Cell);
+            var cell = LScape.get_landcell(Location.ObjCellID);
             if (cell == null)
             {
                 PhysicsObj.DestroyObject();
@@ -214,7 +214,7 @@ namespace ACE.Server.WorldObjects
 
         public void SyncLocation()
         {
-            Location.LandblockId = new LandblockId(PhysicsObj.Position.ObjCellID);
+            Location.ObjCellID = PhysicsObj.Position.ObjCellID;
             Location.Pos = PhysicsObj.Position.Frame.Origin;
             Location.Rotation = PhysicsObj.Position.Frame.Orientation;
         }
@@ -722,17 +722,17 @@ namespace ACE.Server.WorldObjects
         {
             if (pos == null) return false;
 
-            var landblock = LScape.get_landblock(pos.Cell);
+            var landblock = LScape.get_landblock(pos.ObjCellID);
             if (landblock == null || !landblock.HasDungeon) return false;
 
-            var dungeonID = pos.Cell >> 16;
+            var dungeonID = pos.ObjCellID >> 16;
 
             var adjustCell = AdjustCell.Get(dungeonID);
             var cellID = adjustCell.GetCell(pos.Pos);
 
-            if (cellID != null && pos.Cell != cellID.Value)
+            if (cellID != null && pos.ObjCellID != cellID.Value)
             {
-                pos.LandblockId = new LandblockId(cellID.Value);
+                pos.ObjCellID = cellID.Value;
                 return true;
             }
             return false;
@@ -743,10 +743,10 @@ namespace ACE.Server.WorldObjects
         {
             if (pos == null) return false;
 
-            var landblock = LScape.get_landblock(pos.Cell);
+            var landblock = LScape.get_landblock(pos.ObjCellID);
             if (landblock == null || !landblock.HasDungeon) return false;
 
-            var dungeonID = pos.Cell >> 16;
+            var dungeonID = pos.ObjCellID >> 16;
 
             var adjusted = AdjustPos.Adjust(dungeonID, pos);
             return adjusted;
@@ -937,8 +937,8 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public Quadrant GetRelativeDir(WorldObject target)
         {
-            var sourcePos = new Vector3(Location.PositionX, Location.PositionY, 0);
-            var targetPos = new Vector3(target.Location.PositionX, target.Location.PositionY, 0);
+            var sourcePos = new Vector3(Location.Pos.X, Location.Pos.Y, 0);
+            var targetPos = new Vector3(target.Location.Pos.X, target.Location.Pos.Y, 0);
             var targetDir = new AFrame(target.Location.Pos, target.Location.Rotation).get_vector_heading();
 
             targetDir.Z = 0;
