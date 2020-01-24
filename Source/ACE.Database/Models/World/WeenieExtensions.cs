@@ -99,7 +99,7 @@ namespace ACE.Database.Models.World
             if (result == null)
                 return null;
 
-            return new Position(result.ObjCellId, result.OriginX, result.OriginY, result.OriginZ, result.AnglesX, result.AnglesY, result.AnglesZ, result.AnglesW);
+            return new Position(result.ObjCellId, result.OriginX, result.OriginY, result.OriginZ, result.AnglesX, result.AnglesY, result.AnglesZ, result.AnglesW, result.Instance);
         }
 
         public static WeeniePropertiesSkill GetProperty(this Weenie weenie, Skill skill)
@@ -448,6 +448,7 @@ namespace ACE.Database.Models.World
                     ObjectId = biota.Id,
                     PositionType = value.PositionType,
                     ObjCellId = value.ObjCellId,
+                    Instance = value.Instance,
                     OriginX = value.OriginX,
                     OriginY = value.OriginY,
                     OriginZ = value.OriginZ,

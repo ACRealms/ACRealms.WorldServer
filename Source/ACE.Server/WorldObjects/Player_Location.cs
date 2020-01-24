@@ -615,7 +615,7 @@ namespace ACE.Server.WorldObjects
             if (UnderLifestoneProtection)
                 LifestoneProtectionDispel();
 
-            UpdatePlayerPosition(new Position(newPosition), true);
+            UpdatePlayerPosition(newPosition, true);
         }
 
         public void DoPreTeleportHide()

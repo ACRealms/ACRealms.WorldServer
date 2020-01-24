@@ -102,7 +102,7 @@ namespace ACE.Database.Models.Shard
                 if (result == null)
                     return null;
 
-                return new Position(result.ObjCellId, result.OriginX, result.OriginY, result.OriginZ, result.AnglesX, result.AnglesY, result.AnglesZ, result.AnglesW);
+                return new Position(result.ObjCellId, result.OriginX, result.OriginY, result.OriginZ, result.AnglesX, result.AnglesY, result.AnglesZ, result.AnglesW, result.Instance);
             }
             finally
             {
@@ -119,7 +119,7 @@ namespace ACE.Database.Models.Shard
 
                 foreach (var value in biota.BiotaPropertiesPosition)
                 {
-                    var position = new Position(value.ObjCellId, value.OriginX, value.OriginY, value.OriginZ, value.AnglesX, value.AnglesY, value.AnglesZ, value.AnglesW);
+                    var position = new Position(value.ObjCellId, value.OriginX, value.OriginY, value.OriginZ, value.AnglesX, value.AnglesY, value.AnglesZ, value.AnglesW, value.Instance);
 
                     results.Add((PositionType)value.PositionType, position);
                 }

@@ -4,6 +4,7 @@ using ACE.Database.Models.Shard;
 using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
 using ACE.Server.Managers;
 using ACE.Server.Network.Enum;
@@ -192,6 +193,7 @@ namespace ACE.Server.WorldObjects
         public void SetRequestedLocation(Position pos, bool broadcast = true)
         {
             RequestedLocation = pos;
+            RequestedLocation.Instance = Location.Instance;
             RequestedLocationBroadcast = broadcast;
         }
 

@@ -212,5 +212,20 @@ namespace ACE.Server.WorldObjects
 
             actionChain.EnqueueChain();
         }
+
+        public void ClearInstance(ulong iBlockCell)
+        {
+            var landblock = BlockCell.GetLandblock(iBlockCell);
+            var instance = BlockCell.GetInstance(iBlockCell);
+
+            var deleteObjs = PhysicsObj.ObjMaint.GetKnownObjectsValuesWhere(i => (i.CurCell?.ID | 0xFFFF) == landblock && i.CurCell.CurLandblock.Instance == instance);
+
+            foreach (var deleteObj in deleteObjs)
+            {
+                //Console.WriteLine($"Clearing {deleteObj.Name} ({deleteObj.ID:X8})");
+                RemoveTrackedObject(deleteObj.WeenieObj.WorldObject, false);
+                PhysicsObj.ObjMaint.RemoveObject(deleteObj);
+            }
+        }
     }
 }

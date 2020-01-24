@@ -95,7 +95,8 @@ namespace ACE.Server.Physics
             MovementManager.MotionInterpreter.InterpretedState.HasCommands();
 
         // server
-        public Position RequestPos;
+        public Position RequestPos { get; set; }
+        public byte RequestInstance { get; set; }
 
         public string Name
         {
@@ -222,7 +223,7 @@ namespace ACE.Server.Physics
             }
         }
 
-        public ObjCell AdjustPosition(Position position, Vector3 low_pt, bool dontCreateCells, bool searchCells)
+        public ObjCell AdjustPosition(Position position, Vector3 low_pt, bool dontCreateCells, bool searchCells, byte instance)
         {
             var cellID = position.ObjCellID & 0xFFFF;
 
@@ -235,7 +236,7 @@ namespace ACE.Server.Physics
                 return ObjCell.GetVisible(position.ObjCellID);
             }
 
-            var visibleCell = (EnvCell)ObjCell.GetVisible(position.ObjCellID);
+            var visibleCell = (EnvCell)ObjCell.GetVisible(position.ObjCellID, instance);
             if (visibleCell == null) return null;
 
             var point = position.LocalToGlobal(low_pt);
@@ -530,7 +531,7 @@ namespace ACE.Server.Physics
             if (CurCell != newCell)
             {
                 change_cell(newCell);
-                calc_cross_cells();
+                calc_cross_cells(newCell.CurLandblock.Instance);
             }
             return SetPositionError.OK;
         }
@@ -1271,7 +1272,7 @@ namespace ACE.Server.Physics
         {
             if (CurCell == null) prepare_to_enter_world();
 
-            var newCell = AdjustPosition(pos, transition.SpherePath.LocalSphere[0].Center, setPos.Flags.HasFlag(SetPositionFlags.DontCreateCells), true);
+            var newCell = AdjustPosition(pos, transition.SpherePath.LocalSphere[0].Center, setPos.Flags.HasFlag(SetPositionFlags.DontCreateCells), true, setPos.Instance);
 
             if (newCell == null)
             {
@@ -2042,7 +2043,7 @@ namespace ACE.Server.Physics
             }
         }
 
-        public void calc_cross_cells()
+        public void calc_cross_cells(byte? instance = null)
         {
             CellArray.SetDynamic();
 
@@ -2056,7 +2057,7 @@ namespace ACE.Server.Physics
                 {
                     // added sorting sphere null check
                     var sphere = PartArray != null && PartArray.Setup.SortingSphere != null ? PartArray.GetSortingSphere() : PhysicsGlobals.DummySphere;
-                    ObjCell.find_cell_list(Position, sphere, CellArray, null);
+                    ObjCell.find_cell_list(Position, sphere, CellArray, null, instance);
                 }
             }
             remove_shadows_from_cells();
@@ -2303,7 +2304,7 @@ namespace ACE.Server.Physics
 
             if (!DatObject && newCell != null)
             {
-                CurLandblock = LScape.get_landblock(newCell.ID);
+                CurLandblock = LScape.get_landblock(newCell.ID, newCell.CurLandblock.Instance);
                 if (CurLandblock != null)
                     CurLandblock.add_server_object(this);
             }
@@ -2343,19 +2344,19 @@ namespace ACE.Server.Physics
 
         public bool entering_world;
 
-        public bool enter_world(Position pos)
+        public bool enter_world(Position pos, byte instance)
         {
             entering_world = true;
 
             store_position(pos);
             bool slide = ProjectileTarget == null || WeenieObj.WorldObject is SpellProjectile;
-            var result = enter_world(slide);
+            var result = enter_world(slide, instance);
 
             entering_world = false;
             return result;
         }
 
-        public bool enter_world(bool slide)
+        public bool enter_world(bool slide, byte instance)
         {
             if (Parent != null) return false;
 
@@ -2363,6 +2364,7 @@ namespace ACE.Server.Physics
 
             var setPos = new SetPosition();
             setPos.Pos = Position;
+            setPos.Instance = instance;
             setPos.Flags = SetPositionFlags.Placement;
 
             if (slide)
@@ -3381,14 +3383,14 @@ namespace ACE.Server.Physics
             return (TransientState & TransientStateFlags.Active) != 0;
         }
 
-        public void set_current_pos(Position newPos)
+        public void set_current_pos(Position newPos, byte instance)
         {
             Position.ObjCellID = newPos.ObjCellID;
             Position.Frame = new AFrame(newPos.Frame);
 
-            if (CurCell == null || CurCell.ID != Position.ObjCellID)
+            if (CurCell == null || CurCell.ID != Position.ObjCellID || CurCell.CurLandblock.Instance != instance)
             {
-                var newCell = LScape.get_landcell(newPos.ObjCellID);
+                var newCell = LScape.get_landcell(newPos.ObjCellID, instance);
                 change_cell_server(newCell);
             }
         }
@@ -3788,14 +3790,16 @@ namespace ACE.Server.Physics
         /// Sets the requested position to the AutonomousPosition
         /// received from the client
         /// </summary>
-        public void set_request_pos(Vector3 pos, Quaternion rotation, ObjCell cell, uint blockCellID)
+        public void set_request_pos(Vector3 pos, Quaternion rotation, byte instance, ObjCell cell, uint blockCellID)
         {
             RequestPos.Frame.Origin = pos;
             RequestPos.Frame.Orientation = rotation;
 
+            RequestInstance = instance;
+
             if (CurCell == null)
             {
-                CurCell = LScape.get_landcell(blockCellID);
+                CurCell = LScape.get_landcell(blockCellID, instance);
                 if (CurCell == null)
                     return;
             }
@@ -4155,7 +4159,7 @@ namespace ACE.Server.Physics
                 success = UpdateObjectInternalServer(deltaTime);
 
             if (forcePos && success)
-                set_current_pos(RequestPos);
+                set_current_pos(RequestPos, RequestInstance);
 
             // temp for players
             if ((TransientState & TransientStateFlags.Contact) != 0)
@@ -4221,7 +4225,7 @@ namespace ACE.Server.Physics
             }
 
             if (forcePos && success)
-                set_current_pos(RequestPos);
+                set_current_pos(RequestPos, RequestInstance);
 
             // for teleport, use SetPosition?
             if (isTeleport)
@@ -4230,6 +4234,7 @@ namespace ACE.Server.Physics
 
                 var setPosition = new SetPosition();
                 setPosition.Pos = RequestPos;
+                setPosition.Instance = RequestInstance;
                 setPosition.Flags = SetPositionFlags.SendPositionEvent | SetPositionFlags.Slide | SetPositionFlags.Placement | SetPositionFlags.Teleport;
 
                 SetPosition(setPosition);

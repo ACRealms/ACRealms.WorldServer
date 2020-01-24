@@ -280,6 +280,8 @@ namespace ACE.Server.WorldObjects
 
             PhysicsObj.update_object();
 
+            // handle landblock update?
+
             // sync ace position?
 
             // this fixes some differences between client movement (DoMotion/StopMotion) and server movement (apply_raw_movement)
@@ -372,13 +374,13 @@ namespace ACE.Server.WorldObjects
                                 verifyContact = true;
                         }
 
-                        var curCell = LScape.get_landcell(newPosition.ObjCellID);
+                        var curCell = LScape.get_landcell(newPosition.LongObjCellID);
                         if (curCell != null)
                         {
                             //if (PhysicsObj.CurCell == null || curCell.ID != PhysicsObj.CurCell.ID)
                                 //PhysicsObj.change_cell_server(curCell);
 
-                            PhysicsObj.set_request_pos(newPosition.Pos, newPosition.Rotation, curCell, Location.ObjCellID);
+                            PhysicsObj.set_request_pos(newPosition.Pos, newPosition.Rotation, newPosition.Instance, curCell, Location.ObjCellID);
                             if (FastTick)
                                 success = PhysicsObj.update_object_server_new();
                             else
@@ -421,7 +423,15 @@ namespace ACE.Server.WorldObjects
                     Session.Network.EnqueueSend(new GameMessageUpdatePosition(this));
 
                 if (!InUpdate)
+                {
+                    // todo: improve this logic
+                    if (CurrentLandblock.Instance > 0)
+                    {
+                        ClearInstance(CurrentLandblock.LongId);
+                    }
+
                     LandblockManager.RelocateObjectForPhysics(this, true);
+                }
 
                 return landblockUpdate;
             }

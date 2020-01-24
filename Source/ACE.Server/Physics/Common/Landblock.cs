@@ -9,7 +9,6 @@ using ACE.Entity;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.BSP;
 using ACE.Server.Physics.Extensions;
-using ACE.Server.Managers;
 
 namespace ACE.Server.Physics.Common
 {
@@ -33,6 +32,8 @@ namespace ACE.Server.Physics.Common
         public List<PhysicsObj> Scenery;
         public List<PhysicsObj> ServerObjects { get; set; }
 
+        public byte Instance;
+
         public static bool UseSceneFiles = true;
 
         public Landblock() : base()
@@ -40,7 +41,7 @@ namespace ACE.Server.Physics.Common
             Init();
         }
 
-        public Landblock(CellLandblock landblock)
+        public Landblock(CellLandblock landblock, byte instance)
             : base(landblock)
         {
             Init();
@@ -53,6 +54,8 @@ namespace ACE.Server.Physics.Common
             BlockCoord = LandDefs.blockid_to_lcoord(landblock.Id).Value;
             _landblock = landblock;
             get_land_limits();
+
+            Instance = instance;
         }
 
         public new void Init()
@@ -68,6 +71,13 @@ namespace ACE.Server.Physics.Common
 
         public void PostInit()
         {
+            var lbid = ID & 0xFFFF0000;
+            for (uint i = 1; i <= 64; i++)
+            {
+                var landcell = LScape.get_landcell(lbid | i, Instance);
+                landcell.CurLandblock = this;
+            }
+
             init_buildings();
             init_static_objs();
         }

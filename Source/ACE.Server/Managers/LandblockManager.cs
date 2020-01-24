@@ -31,7 +31,7 @@ namespace ACE.Server.Managers
         /// A table of all the landblocks in the world map
         /// Landblocks which aren't currently loaded will be null here
         /// </summary>
-        private static readonly Landblock[,] landblocks = new Landblock[255, 255];
+        private static readonly Dictionary<ulong, Landblock> landblocks = new Dictionary<ulong, Landblock>();
 
         /// <summary>
         /// A lookup table of all the currently loaded landblocks
@@ -333,7 +333,7 @@ namespace ACE.Server.Managers
         /// <param name="loadAdjacents">If TRUE, ensures all of the adjacent landblocks for this WorldObject are loaded</param>
         public static bool AddObject(WorldObject worldObject, bool loadAdjacents = false)
         {
-            var block = GetLandblock(worldObject.Location.ObjCellID, loadAdjacents);
+            var block = GetLandblock(worldObject.Location.LongObjCellID, loadAdjacents);
 
             return block.AddWorldObject(worldObject);
         }
@@ -344,7 +344,7 @@ namespace ACE.Server.Managers
         public static void RelocateObjectForPhysics(WorldObject worldObject, bool adjacencyMove)
         {
             var oldBlock = worldObject.CurrentLandblock;
-            var newBlock = GetLandblock(worldObject.Location.ObjCellID, true);
+            var newBlock = GetLandblock(worldObject.Location.LongObjCellID, true);
             // Remove from the old landblock -- force
             if (oldBlock != null)
                 oldBlock.RemoveWorldObjectForPhysics(worldObject.Guid, adjacencyMove);
@@ -352,21 +352,16 @@ namespace ACE.Server.Managers
             newBlock.AddWorldObjectForPhysics(worldObject);
         }
 
-        public static bool IsLoaded(uint objCellID)
+        public static bool IsLoaded(ulong objCellID)
         {
             lock (landblockMutex)
-            {
-                var lbx = (byte)(objCellID >> 24);
-                var lby = (byte)(objCellID >> 16);
-
-                return landblocks[lbx, lby] != null;
-            }
+                return landblocks.ContainsKey(objCellID | 0xFFFF);
         }
 
         /// <summary>
         /// Returns a reference to a landblock, loading the landblock if not already active
         /// </summary>
-        public static Landblock GetLandblock(uint objCellID, bool loadAdjacents, bool permaload = false)
+        public static Landblock GetLandblock(ulong objCellID, bool loadAdjacents, bool permaload = false)
         {
             Landblock landblock;
 
@@ -374,15 +369,13 @@ namespace ACE.Server.Managers
             {
                 bool setAdjacents = false;
 
-                var lbx = (byte)(objCellID >> 24);
-                var lby = (byte)(objCellID >> 16);
-
-                landblock = landblocks[lbx, lby];
+                landblocks.TryGetValue(objCellID | 0xFFFF, out landblock);
 
                 if (landblock == null)
                 {
                     // load up this landblock
-                    landblock = landblocks[lbx, lby] = new Landblock(objCellID);
+                    landblock = new Landblock(objCellID | 0xFFFF);
+                    landblocks.Add(objCellID | 0xFFFF, landblock);
 
                     if (!loadedLandblocks.Add(landblock))
                     {
@@ -432,16 +425,17 @@ namespace ACE.Server.Managers
         /// </summary>
         private static List<Landblock> GetAdjacents(Landblock landblock)
         {
-            var adjacentIDs = GetAdjacentIDs(landblock);
-
             var adjacents = new List<Landblock>();
+
+            // dungeons never have any adjacents
+            if (landblock.IsDungeon)
+                return adjacents;
+
+            var adjacentIDs = GetAdjacentIDs(landblock);
 
             foreach (var adjacentID in adjacentIDs)
             {
-                var lbx = (byte)(adjacentID >> 24);
-                var lby = (byte)(adjacentID >> 16);
-
-                var adjacent = landblocks[lbx, lby];
+                landblocks.TryGetValue(adjacentID, out var adjacent);
                 if (adjacent != null)
                     adjacents.Add(adjacent);
             }
@@ -580,7 +574,7 @@ namespace ACE.Server.Managers
                         // remove from list of managed landblocks
                         if (loadedLandblocks.Remove(landblock))
                         {
-                            landblocks[landblock.X, landblock.Y] = null;
+                            landblocks.Remove(landblock.Id);
 
                             // remove from landblock group
                             for (int i = landblockGroups.Count - 1; i >= 0 ; i--)

@@ -120,7 +120,7 @@ namespace ACE.Server.Physics.Common
             {
                 var blockCellID = ID & 0xFFFF0000 | visibleCellID;
                 if (VisibleCells.ContainsKey(blockCellID)) continue;
-                var cell = (EnvCell)LScape.get_landcell(blockCellID);
+                var cell = (EnvCell)LScape.get_landcell(blockCellID, CurLandblock.Instance);
                 VisibleCells.Add(visibleCellID, cell);
             }
         }
@@ -219,7 +219,7 @@ namespace ACE.Server.Physics.Common
             return null;
         }
 
-        public new EnvCell GetVisible(uint cellID)
+        public EnvCell GetVisible(uint cellID)
         {
             EnvCell envCell = null;
             VisibleCells.TryGetValue(cellID, out envCell);

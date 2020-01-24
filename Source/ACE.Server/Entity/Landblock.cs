@@ -40,13 +40,25 @@ namespace ACE.Server.Entity
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public uint Id { get; }
+        public uint Id;
 
         public ushort ShortId => (ushort)(Id >> 16);
 
         public byte X => (byte)(Id >> 24);
 
         public byte Y => (byte)(Id >> 16);
+
+        public byte Instance;
+
+        public ulong LongId
+        {
+            get => (ulong)Instance << 32 | Id;
+            set
+            {
+                Id = (uint)value;
+                Instance = (byte)(value >> 32);
+            }
+        }
 
         /// <summary>
         /// Flag indicates if this landblock is permanently loaded (for example, towns on high-traffic servers)
@@ -153,11 +165,17 @@ namespace ACE.Server.Entity
         }
 
 
-        public Landblock(uint objCellID)
+        public Landblock(ulong objCellID)
         {
-            Id = objCellID | 0xFFFF;
+            if ((objCellID | 0xFFFF) == 0x1D9FFFF)
+            {
+                Console.WriteLine(System.Environment.StackTrace);
+                var debug = true;
+            }
 
-            //log.Debug($"Landblock({Id:X8})");
+            LongId = objCellID | 0xFFFF;
+
+            log.Info($"Landblock({LongId:X})");
 
             CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id);
             LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>(Id & 0xFFFF0000 | 0xFFFE);
@@ -166,7 +184,7 @@ namespace ACE.Server.Entity
 
             // load physics landblock
             var cellLandblock = DBObj.GetCellLandblock(Id);
-            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock);
+            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock, Instance);
         }
 
         public void Init()
@@ -774,6 +792,8 @@ namespace ACE.Server.Entity
         private bool AddWorldObjectInternal(WorldObject wo)
         {
             wo.CurrentLandblock = this;
+
+            wo.Location.Instance = Instance;
 
             if (wo.PhysicsObj == null)
                 wo.InitPhysicsObj();

@@ -174,12 +174,18 @@ namespace ACE.Server.WorldObjects
             if (PhysicsObj.CurCell != null)
                 return false;
 
+            /*if ((Location.LongObjCellID | 0xFFFF) == 0x1D9FFFF)
+            {
+                Console.WriteLine($"{Name}");
+                var debug = true;
+            }*/
+
             AdjustDungeon(Location);
 
             // exclude linkspots from spawning
             if (WeenieClassId == 10762) return true;
 
-            var cell = LScape.get_landcell(Location.ObjCellID);
+            var cell = LScape.get_landcell(Location.LongObjCellID);
             if (cell == null)
             {
                 PhysicsObj.DestroyObject();
@@ -194,7 +200,7 @@ namespace ACE.Server.WorldObjects
             location.Frame.Origin = Location.Pos;
             location.Frame.Orientation = Location.Rotation;
 
-            var success = PhysicsObj.enter_world(location);
+            var success = PhysicsObj.enter_world(location, Location.Instance);
 
             if (!success || PhysicsObj.CurCell == null)
             {
@@ -276,7 +282,7 @@ namespace ACE.Server.WorldObjects
                 ephemeralPositions.TryAdd((PositionType)x, null);
 
             foreach (var x in Biota.BiotaPropertiesPosition.Where(i => EphemeralProperties.PositionTypes.Contains(i.PositionType)).ToList())
-                ephemeralPositions[(PositionType)x.PositionType] = new Position(x.ObjCellId, x.OriginX, x.OriginY, x.OriginZ, x.AnglesX, x.AnglesY, x.AnglesZ, x.AnglesW);
+                ephemeralPositions[(PositionType)x.PositionType] = new Position(x.ObjCellId, x.OriginX, x.OriginY, x.OriginZ, x.AnglesX, x.AnglesY, x.AnglesZ, x.AnglesW, x.Instance);
 
             ObjectDescriptionFlags = ObjectDescriptionFlag.Attackable;
 
@@ -698,6 +704,9 @@ namespace ACE.Server.WorldObjects
             if (Location == null)
                 return false;
 
+            if (Generator != null)
+                Location.Instance = Generator.Location.Instance;
+
             if (!LandblockManager.AddObject(this))
                 return false;
 
@@ -722,10 +731,15 @@ namespace ACE.Server.WorldObjects
         {
             if (pos == null) return false;
 
-            var landblock = LScape.get_landblock(pos.ObjCellID);
+            /*if ((pos.LongObjCellID | 0xFFFF) == 0x1D9FFFF)
+            {
+                var debug = true;
+            }*/
+
+            var landblock = LScape.get_landblock(pos.LongObjCellID);
             if (landblock == null || !landblock.HasDungeon) return false;
 
-            var dungeonID = pos.ObjCellID >> 16;
+            var dungeonID = pos.LongObjCellID >> 16;
 
             var adjustCell = AdjustCell.Get(dungeonID);
             var cellID = adjustCell.GetCell(pos.Pos);
@@ -741,9 +755,14 @@ namespace ACE.Server.WorldObjects
         // todo: This should really be an extension method for Position, or a static method within Position, or even AdjustPos
         public static bool AdjustDungeonPos(Position pos)
         {
+            /*if ((pos.LongObjCellID | 0xFFFF) == 0x1D9FFFF)
+            {
+                var debug = true;
+            }*/
+
             if (pos == null) return false;
 
-            var landblock = LScape.get_landblock(pos.ObjCellID);
+            var landblock = LScape.get_landblock(pos.LongObjCellID);
             if (landblock == null || !landblock.HasDungeon) return false;
 
             var dungeonID = pos.ObjCellID >> 16;
