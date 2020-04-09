@@ -107,7 +107,7 @@ namespace ACE.Entity.Models
                 return null;
 
             if (weenie.PropertiesPosition.TryGetValue(property, out var value))
-                return new Position(value.ObjCellId, value.PositionX, value.PositionY, value.PositionZ, value.RotationX, value.RotationY, value.RotationZ, value.RotationW);
+                return new Position(value.ObjCellId, value.PositionX, value.PositionY, value.PositionZ, value.RotationX, value.RotationY, value.RotationZ, value.RotationW, value.Instance);
 
             return null;
         }

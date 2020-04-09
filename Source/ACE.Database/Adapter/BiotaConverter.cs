@@ -80,7 +80,7 @@ namespace ACE.Database.Adapter
                         RotationX = record.AnglesX,
                         RotationY = record.AnglesY,
                         RotationZ = record.AnglesZ,
-
+                        Instance = record.Instance,
                     };
 
                     result.PropertiesPosition[(PositionType)record.PositionType] = newEntity;
@@ -525,7 +525,7 @@ namespace ACE.Database.Adapter
             {
                 foreach (var kvp in biota.PropertiesPosition)
                 {
-                    var entity = new BiotaPropertiesPosition { ObjectId = biota.Id, PositionType = (ushort)kvp.Key, ObjCellId = kvp.Value.ObjCellId, OriginX = kvp.Value.PositionX, OriginY = kvp.Value.PositionY, OriginZ = kvp.Value.PositionZ, AnglesW = kvp.Value.RotationW, AnglesX = kvp.Value.RotationX, AnglesY = kvp.Value.RotationY, AnglesZ = kvp.Value.RotationZ };
+                    var entity = new BiotaPropertiesPosition { ObjectId = biota.Id, PositionType = (ushort)kvp.Key, ObjCellId = kvp.Value.ObjCellId, OriginX = kvp.Value.PositionX, OriginY = kvp.Value.PositionY, OriginZ = kvp.Value.PositionZ, AnglesW = kvp.Value.RotationW, AnglesX = kvp.Value.RotationX, AnglesY = kvp.Value.RotationY, AnglesZ = kvp.Value.RotationZ, Instance = kvp.Value.Instance };
 
                     result.BiotaPropertiesPosition.Add(entity);
                 }

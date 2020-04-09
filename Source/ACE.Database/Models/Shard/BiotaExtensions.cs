@@ -60,7 +60,7 @@ namespace ACE.Database.Models.Shard
             if (result == null)
                 return null;
 
-            return new Position(result.ObjCellId, result.OriginX, result.OriginY, result.OriginZ, result.AnglesX, result.AnglesY, result.AnglesZ, result.AnglesW);
+            return new Position(result.ObjCellId, result.OriginX, result.OriginY, result.OriginZ, result.AnglesX, result.AnglesY, result.AnglesZ, result.AnglesW, result.Instance);
         }
 
 
@@ -181,10 +181,11 @@ namespace ACE.Database.Models.Shard
                 result.AnglesX = position.Rotation.X;
                 result.AnglesY = position.Rotation.Y;
                 result.AnglesZ = position.Rotation.Z;
+                result.Instance = position.Instance;
             }
             else
             {
-                var entity = new BiotaPropertiesPosition { ObjectId = biota.Id, PositionType = (ushort)positionType, ObjCellId = position.Cell, OriginX = position.Pos.X, OriginY = position.Pos.Y, OriginZ = position.Pos.Z, AnglesW = position.Rotation.W, AnglesX = position.Rotation.X, AnglesY = position.Rotation.Y, AnglesZ = position.Rotation.Z, Object = biota };
+                var entity = new BiotaPropertiesPosition { ObjectId = biota.Id, PositionType = (ushort)positionType, ObjCellId = position.Cell, OriginX = position.Pos.X, OriginY = position.Pos.Y, OriginZ = position.Pos.Z, AnglesW = position.Rotation.W, AnglesX = position.Rotation.X, AnglesY = position.Rotation.Y, AnglesZ = position.Rotation.Z, Instance = position.Instance, Object = biota };
 
                 biota.BiotaPropertiesPosition.Add(entity);
             }

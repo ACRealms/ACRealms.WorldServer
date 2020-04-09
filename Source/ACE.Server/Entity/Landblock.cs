@@ -167,6 +167,12 @@ namespace ACE.Server.Entity
 
         public Landblock(ulong objCellID)
         {
+            if ((objCellID | 0xFFFF) == 0x1D9FFFF)
+            {
+                Console.WriteLine(System.Environment.StackTrace);
+                var debug = true;
+            }
+
             LongId = objCellID | 0xFFFF;
 
             log.Info($"Landblock({LongId:X})");

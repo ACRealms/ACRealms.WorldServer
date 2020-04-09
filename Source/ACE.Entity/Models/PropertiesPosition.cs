@@ -12,6 +12,7 @@ namespace ACE.Entity.Models
         public float RotationX { get; set; }
         public float RotationY { get; set; }
         public float RotationZ { get; set; }
+        public byte? Instance { get; set; }
 
         public PropertiesPosition Clone()
         {
@@ -25,6 +26,7 @@ namespace ACE.Entity.Models
                 RotationX = RotationX,
                 RotationY = RotationY,
                 RotationZ = RotationZ,
+                Instance = Instance,
             };
 
             return result;

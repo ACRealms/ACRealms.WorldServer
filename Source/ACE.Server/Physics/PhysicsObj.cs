@@ -3427,7 +3427,7 @@ namespace ACE.Server.Physics
 
             if (CurCell == null || CurCell.ID != Position.ObjCellID || CurCell.CurLandblock.Instance != instance)
             {
-                var newCell = LScape.get_landcell(newPos.ObjCellID);
+                var newCell = LScape.get_landcell(newPos.ObjCellID, instance);
 
                 if (WeenieObj.WorldObject is Player player && player.LastContact && newCell is LandCell landCell)
                 {
