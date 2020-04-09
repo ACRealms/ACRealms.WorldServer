@@ -4223,6 +4223,7 @@ namespace ACE.Server.Physics
 
                 var setPosition = new SetPosition();
                 setPosition.Pos = RequestPos;
+                setPosition.Instance = RequestInstance;
                 setPosition.Flags = SetPositionFlags.SendPositionEvent | SetPositionFlags.Slide | SetPositionFlags.Placement | SetPositionFlags.Teleport;
 
                 SetPosition(setPosition);
