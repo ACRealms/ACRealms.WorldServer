@@ -251,7 +251,7 @@ namespace ACE.Server.Entity
 
         public static Physics.Common.Position PhysPosition(this Position pos)
         {
-            return new Physics.Common.Position(pos.Cell, new Physics.Animation.AFrame(pos.Pos, pos.Rotation));
+            return new Physics.Common.Position(pos.ObjCellID, new Physics.Animation.AFrame(pos.Pos, pos.Rotation));
         }
     }
 }

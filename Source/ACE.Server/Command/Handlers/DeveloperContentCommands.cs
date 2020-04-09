@@ -1274,7 +1274,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             instance.WeenieClassId = wo.WeenieClassId;
 
-            instance.ObjCellId = wo.Location.Cell;
+            instance.ObjCellId = wo.Location.ObjCellID;
 
             instance.OriginX = wo.Location.Pos.X;
             instance.OriginY = wo.Location.Pos.Y;
@@ -1439,7 +1439,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var pos = session.Player.Location;
 
-            if ((pos.Cell & 0xFFFF) >= 0x100)
+            if ((pos.ObjCellID & 0xFFFF) >= 0x100)
             {
                 session.Network.EnqueueSend(new GameMessageSystemChat("You must be outdoors to create an encounter!", ChatMessageType.Broadcast));
                 return;
@@ -1495,7 +1495,7 @@ namespace ACE.Server.Command.Handlers.Processors
             var yPos = Math.Clamp(cellY * 24.0f, 0.5f, 191.5f);
 
             var newPos = new Physics.Common.Position();
-            newPos.ObjCellID = pos.Cell;
+            newPos.ObjCellID = pos.ObjCellID;
             newPos.Frame = new Physics.Animation.AFrame(new Vector3(xPos, yPos, 0), Quaternion.Identity);
             newPos.adjust_to_outside();
 
