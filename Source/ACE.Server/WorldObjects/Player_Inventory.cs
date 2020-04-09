@@ -7,6 +7,7 @@ using ACE.DatLoader.FileTypes;
 using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Entity.Models;
 using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
 using ACE.Server.Factories;
@@ -224,7 +225,7 @@ namespace ACE.Server.WorldObjects
             //Console.WriteLine($"{Name}.TryStanceShuffle({wieldedLocation})");
 
             // do the appropriate combat stance shuffling, based on the item types
-            // todo: instead of switching the weapon immediately, the weapon should be swpped in the middle of the animation chain
+            // todo: instead of switching the weapon immediately, the weapon should be swapped in the middle of the animation chain
 
             if (CombatMode != CombatMode.NonCombat && CombatMode != CombatMode.Undef)
             {
@@ -232,27 +233,15 @@ namespace ACE.Server.WorldObjects
                 {
                     case EquipMask.MissileWeapon:
 
-                        var animTime = SetCombatMode(CombatMode.Missile, out var queueTime);
-
-                        var equippedAmmo = GetEquippedAmmo();
-
-                        if (equippedAmmo == null)
-                        {
-                            Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You are out of ammunition!"));
-
-                            var actionChain = new ActionChain();
-                            actionChain.AddDelaySeconds(animTime - queueTime);
-                            actionChain.AddAction(this, () => SetCombatMode(CombatMode.NonCombat));
-                            actionChain.EnqueueChain();
-                        }
+                        HandleActionChangeCombatMode(CombatMode.Missile);
                         break;
 
                     case EquipMask.Held:
-                        SetCombatMode(CombatMode.Magic);
+                        HandleActionChangeCombatMode(CombatMode.Magic);
                         break;
 
                     default:
-                        SetCombatMode(CombatMode.Melee);
+                        HandleActionChangeCombatMode(CombatMode.Melee);
                         break;
                 }
             }
@@ -288,15 +277,15 @@ namespace ACE.Server.WorldObjects
                     return true;
                 }
 
-                foreach (var spell in item.Biota.BiotaPropertiesSpellBook)
+                foreach (var spell in item.Biota.GetKnownSpellsIds(BiotaDatabaseLock))
                 {
-                    if (item.HasProcSpell((uint)spell.Spell))
+                    if (item.HasProcSpell((uint)spell))
                         continue;
 
-                    if (spell.Spell == item.SpellDID)
+                    if (spell == item.SpellDID)
                         continue;
 
-                    var enchantmentStatus = CreateItemSpell(item, (uint)spell.Spell);
+                    var enchantmentStatus = CreateItemSpell(item, (uint)spell);
                     if (enchantmentStatus.Success)
                         item.IsAffecting = true;
                 }
@@ -352,18 +341,6 @@ namespace ACE.Server.WorldObjects
                 new GameMessagePickupEvent(item),
                 new GameMessageSound(Guid, Sound.UnwieldObject));
 
-            // If item has any spells, remove them from the registry on unequip
-            if (item.Biota.BiotaPropertiesSpellBook != null)
-            {
-                foreach (var spell in item.Biota.BiotaPropertiesSpellBook)
-                {
-                    if (item.HasProcSpell((uint)spell.Spell))
-                        continue;
-
-                    RemoveItemSpell(item, (uint)spell.Spell, true);
-                }
-            }
-
             // handle equipment sets
             if (item.HasItemSet)
                 DequipItemFromSet(item);
@@ -394,14 +371,14 @@ namespace ACE.Server.WorldObjects
             {
                 if (CombatMode == CombatMode.Missile && wieldedLocation == (int)EquipMask.MissileAmmo)
                 {
-                    SetCombatMode(CombatMode.NonCombat);
+                    HandleActionChangeCombatMode(CombatMode.NonCombat);
                     return true;
                 }
 
                 if (CombatMode == CombatMode.NonCombat || (wieldedLocation != (int)EquipMask.MeleeWeapon && wieldedLocation != (int)EquipMask.MissileWeapon && wieldedLocation != (int)EquipMask.Held && wieldedLocation != (int)EquipMask.Shield && !item.IsTwoHanded))
                     return true;
 
-                SetCombatMode(CombatMode.Melee);
+                HandleActionChangeCombatMode(CombatMode.Melee);
             }
 
             return true;
@@ -715,6 +692,13 @@ namespace ACE.Server.WorldObjects
         {
             //Console.WriteLine($"{Name}.HandleActionPutItemInContainer({itemGuid:X8}, {containerGuid:X8}, {placement})");
 
+            if (suicideInProgress)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YoureTooBusy));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
+                return;
+            }
+
             if (IsBusy)
             {
                 if (PickupState != PickupState.Return || NextPickup != null)
@@ -799,7 +783,7 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
-            if ((itemRootOwner == this && containerRootOwner != this)  || (itemRootOwner != this && containerRootOwner == this)) // Movement is between the player and the world
+            if ((itemRootOwner == this && containerRootOwner != this) || (itemRootOwner != this && containerRootOwner == this)) // Movement is between the player and the world
             {
                 if (itemRootOwner is Vendor)
                 {
@@ -880,39 +864,61 @@ namespace ACE.Server.WorldObjects
                             return;
                         }
 
-                        var questSolve = false;
-                        var isFromMyCorpse = false;
+                        //var questSolve = false;
+                        //var isFromMyCorpse = false;
+                        //var isFromAPlayerCorpse = false;
+                        //var isFromMyHook = false;
+                        //var isFromMyStorage = false;
+
+                        //if (itemRootOwner != this && containerRootOwner == this && item.Quest != null) // We're picking up a quest item
+                        //{
+                        //    if ( itemRootOwner != null && (itemRootOwner.WeenieType == WeenieType.Corpse || itemRootOwner.WeenieType == WeenieType.Hook || itemRootOwner.WeenieType == WeenieType.Storage))
+                        //    {
+                        //        if (itemRootOwner is Corpse && itemRootOwner.VictimId.HasValue && itemRootOwner.VictimId.Value == Guid.Full)
+                        //            isFromMyCorpse = true;
+                        //        if (itemRootOwner is Hook && itemRootOwner.HouseOwner.HasValue && itemRootOwner.HouseOwner.Value == Guid.Full)
+                        //            isFromMyHook = true;
+                        //        if (itemRootOwner is Storage && itemRootOwner.HouseOwner.HasValue && itemRootOwner.HouseOwner.Value == Guid.Full)
+                        //            isFromMyStorage = true;
+                        //    }
+
+                        //    if (!QuestManager.CanSolve(item.Quest) && !isFromMyCorpse && !isFromMyHook && !isFromMyStorage)
+                        //    {
+                        //        QuestManager.HandleSolveError(item.Quest);
+                        //        EnqueuePickupDone(pickupMotion);
+                        //        return;
+                        //    }
+                        //    else
+                        //    {
+                        //        if (!isFromMyCorpse && !isFromMyHook && !isFromMyStorage)
+                        //            questSolve = true;
+                        //    }
+                        //}
+
+                        var itemFoundOnCorpse = itemRootOwner is Corpse;
+
                         var isFromAPlayerCorpse = false;
-                        var isFromMyHook = false;
-                        var isFromMyStorage = false;
+                        if (itemFoundOnCorpse && itemRootOwner.Level > 0)
+                            isFromAPlayerCorpse = true;
 
-                        if (itemRootOwner != this && containerRootOwner == this && item.Quest != null) // We're picking up a quest item
+                        var questSolve = false;
+                        if (item.Quest != null) // We're picking up an item with a quest stamp that can also be a timer/limiter
                         {
-                            if ( itemRootOwner != null && (itemRootOwner.WeenieType == WeenieType.Corpse || itemRootOwner.WeenieType == WeenieType.Hook || itemRootOwner.WeenieType == WeenieType.Storage))
+                            var itemFoundOnMyCorpse = itemFoundOnCorpse && (itemRootOwner.VictimId == Guid.Full);
+                            if (item.GeneratorId != null || (itemFoundOnCorpse && !itemFoundOnMyCorpse)) // item is controlled by a generator or is on a corpse that is not my own
                             {
-                                if (itemRootOwner is Corpse && itemRootOwner.VictimId.HasValue && itemRootOwner.VictimId.Value == Guid.Full)
-                                    isFromMyCorpse = true;
-                                if (itemRootOwner is Hook && itemRootOwner.HouseOwner.HasValue && itemRootOwner.HouseOwner.Value == Guid.Full)
-                                    isFromMyHook = true;
-                                if (itemRootOwner is Storage && itemRootOwner.HouseOwner.HasValue && itemRootOwner.HouseOwner.Value == Guid.Full)
-                                    isFromMyStorage = true;
-                            }
-
-                            if (!QuestManager.CanSolve(item.Quest) && !isFromMyCorpse && !isFromMyHook && !isFromMyStorage)
-                            {
-                                QuestManager.HandleSolveError(item.Quest);
-                                EnqueuePickupDone(pickupMotion);
-                                return;
-                            }
-                            else
-                            {
-                                if (!isFromMyCorpse && !isFromMyHook && !isFromMyStorage)
+                                if (QuestManager.CanSolve(item.Quest))
+                                {
                                     questSolve = true;
+                                }
+                                else
+                                {
+                                    QuestManager.HandleSolveError(item.Quest);
+                                    EnqueuePickupDone(pickupMotion);
+                                    return;
+                                }
                             }
                         }
-
-                        if (itemRootOwner is Corpse && itemRootOwner.Level.HasValue)
-                            isFromAPlayerCorpse = true;
 
                         if (DoHandleActionPutItemInContainer(item, itemRootOwner, itemWasEquipped, container, containerRootOwner, placement))
                         {
@@ -1075,7 +1081,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void HandleActionDropItem(uint itemGuid)
         {
-            if (IsBusy)
+            if (IsBusy || Teleporting || suicideInProgress)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YoureTooBusy));
                 Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
@@ -2263,7 +2269,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void HandleActionGiveObjectRequest(uint targetGuid, uint itemGuid, int amount)
         {
-            if (IsBusy)
+            if (IsBusy || Teleporting || suicideInProgress)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YoureTooBusy));
                 Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
@@ -2454,7 +2460,7 @@ namespace ACE.Server.WorldObjects
 
             if (target.HasGiveOrRefuseEmoteForItem(item, out var emoteResult) || acceptAll)
             {
-                if (acceptAll || emoteResult.Category == (uint)EmoteCategory.Give)
+                if (acceptAll || emoteResult.Category == EmoteCategory.Give)
                 {
                     var isStackable = item is Stackable;
 
@@ -2494,7 +2500,7 @@ namespace ACE.Server.WorldObjects
                         }
                     }
                 }
-                else if (emoteResult.Category == (uint)EmoteCategory.Refuse)
+                else if (emoteResult.Category == EmoteCategory.Refuse)
                 {
                     // Item rejected by npc
                     Session.Network.EnqueueSend(new GameMessageSystemChat($"You allow {target.Name} to examine your {item.NameWithMaterial}.", ChatMessageType.Broadcast));
@@ -2880,6 +2886,20 @@ namespace ACE.Server.WorldObjects
                 }
             }
             return true;
+        }
+
+        public void AuditEquippedItems()
+        {
+            // fixes any 'invisible' equipped items, where CurrentWieldedLocation is None
+            // not sure how items could have gotten into this state, possibly from legacy bugs
+
+            var dequipItems = EquippedObjects.Values.Where(i => i.CurrentWieldedLocation == EquipMask.None);
+
+            foreach (var dequipItem in dequipItems)
+            {
+                log.Warn($"{Name}.AuditEquippedItems() - dequipping {dequipItem.Name} ({dequipItem.Guid})");
+                HandleActionPutItemInContainer(dequipItem.Guid.Full, Guid.Full);
+            }
         }
     }
 }
