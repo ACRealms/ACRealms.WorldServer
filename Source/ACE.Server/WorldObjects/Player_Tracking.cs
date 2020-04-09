@@ -50,7 +50,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void TrackObject(WorldObject worldObject, bool delay = false)
         {
-            //Console.WriteLine($"TrackObject({worldObject.Name}, {delay})");
+            //Console.WriteLine($"{Name}.TrackObject({worldObject.Name} {worldObject.Guid})");
 
             if (worldObject == null || worldObject.Guid == Guid)
                 return;
@@ -103,7 +103,10 @@ namespace ACE.Server.WorldObjects
                     Session.Network.EnqueueSend(new GameMessageParentEvent(wo.Wielder, wo));
             }
             else
+            {
+                //Console.WriteLine($"{Name}.DeleteObject({wo.Name} ({wo.Guid})");
                 Session.Network.EnqueueSend(new GameMessageDeleteObject(wo));
+            }
 
             if (wo is Creature creature)
             {
@@ -251,12 +254,14 @@ namespace ACE.Server.WorldObjects
             // a DO and then a CO is the only thing that fixes this issue (/objsend can help with this)
             // this part probably deviates from retail a bit, but is the equivalent automated fix
 
-            var fixLevel = PropertyManager.GetLong("teleport_visibility_fix").Item;
+            //var fixLevel = PropertyManager.GetLong("teleport_visibility_fix").Item;
+
+            var fixLevel = 3;   // instanced mode always uses level 3
 
             // disabled by default
             if (fixLevel < 1) return;
 
-            if (Location.Cell == newPosition.Cell)
+            if (Location.LongObjCellID == newPosition.LongObjCellID)
                 return;
 
             var knownObjs = GetKnownObjects();

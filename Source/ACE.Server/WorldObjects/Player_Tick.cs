@@ -438,10 +438,10 @@ namespace ACE.Server.WorldObjects
                 if (!InUpdate)
                 {
                     // todo: improve this logic
-                    if (CurrentLandblock.Instance > 0)
+                    /*if (CurrentLandblock.Instance > 0)
                     {
                         ClearInstance(CurrentLandblock.LongId);
-                    }
+                    }*/
 
                     LandblockManager.RelocateObjectForPhysics(this, true);
                 }

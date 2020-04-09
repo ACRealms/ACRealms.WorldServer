@@ -175,7 +175,7 @@ namespace ACE.Server.Entity
 
             LongId = objCellID | 0xFFFF;
 
-            log.Info($"Landblock({LongId:X})");
+            log.Info($"Landblock({LongId:X8})");
 
             CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id);
             LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>(Id & 0xFFFF0000 | 0xFFFE);

@@ -261,7 +261,7 @@ namespace ACE.Server.WorldObjects
 
             // use the physics location for accuracy,
             // especially while jumping
-            corpse.Location = PhysicsObj.Position.ACEPosition();
+            corpse.Location = PhysicsObj.Position.ACEPosition(Location);
 
             corpse.VictimId = Guid.Full;
             corpse.Name = $"{prefix} of {Name}";

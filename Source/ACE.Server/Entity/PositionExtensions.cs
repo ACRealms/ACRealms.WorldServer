@@ -241,9 +241,12 @@ namespace ACE.Server.Entity
             return HouseCell.HouseCells.ContainsKey(cell);
         }
 
-        public static Position ACEPosition(this Physics.Common.Position pos)
+        public static Position ACEPosition(this Physics.Common.Position pos, Position source)
         {
-            return new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation);
+            var newPos = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation);
+            newPos.Instance = source.Instance;
+
+            return newPos;
         }
 
         public static Physics.Common.Position PhysPosition(this Position pos)
