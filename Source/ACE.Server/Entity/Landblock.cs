@@ -164,18 +164,26 @@ namespace ACE.Server.Entity
             set => fogColor = value;
         }
 
+        // this is used for debugging the instancing branch
+        // if you are in an instanced version of a dungeon (instance > 0)
+        // the base instance should never load
+
+        public static HashSet<ulong> TestDungeons = new HashSet<ulong>()
+        {
+            0x01D9FFFF,
+        };
 
         public Landblock(ulong objCellID)
         {
-            if ((objCellID | 0xFFFF) == 0x1D9FFFF)
-            {
-                Console.WriteLine(System.Environment.StackTrace);
-                var debug = true;
-            }
-
             LongId = objCellID | 0xFFFF;
 
             log.Info($"Landblock({LongId:X8})");
+
+            if (TestDungeons.Contains(LongId))
+            {
+                log.Error($"Landblock({objCellID:X8}): base instance is loading!");
+                log.Error(System.Environment.StackTrace);
+            }
 
             CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id);
             LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>(Id & 0xFFFF0000 | 0xFFFE);
