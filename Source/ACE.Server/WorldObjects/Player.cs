@@ -19,7 +19,9 @@ using ACE.Server.Managers;
 using ACE.Server.Network;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Network.Sequence;
 using ACE.Server.Network.Structure;
+using ACE.Server.Physics;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.Common;
 using ACE.Server.WorldObjects.Managers;
@@ -42,7 +44,21 @@ namespace ACE.Server.WorldObjects
         public ContractManager ContractManager;
 
         public bool LastContact = true;
-        public bool IsJumping = false;
+
+        public bool IsJumping
+        {
+            get
+            {
+                if (FastTick)
+                    return !PhysicsObj.TransientState.HasFlag(TransientStateFlags.OnWalkable);
+                else
+                {
+                    // for npks only, fixes a bug where OnWalkable can briefly lose state for 1 AutoPos frame
+                    // a good repro for this is collision w/ monsters near the top of ramps
+                    return !PhysicsObj.TransientState.HasFlag(TransientStateFlags.OnWalkable) && Velocity != Vector3.Zero;
+                }
+            }
+        }
 
         public DateTime LastJumpTime;
 
@@ -441,6 +457,8 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public bool PKLogout;
 
+        public bool IsLoggingOut;
+
         /// <summary>
         /// Do the player log out work.<para />
         /// If you want to force a player to logout, use Session.LogOffPlayer().
@@ -469,6 +487,8 @@ namespace ACE.Server.WorldObjects
 
         public void LogOut_Inner(bool clientSessionTerminatedAbruptly = false)
         {
+            IsLoggingOut = true;
+
             if (Fellowship != null)
                 FellowshipQuit(false);
 
@@ -482,14 +502,19 @@ namespace ACE.Server.WorldObjects
 
             if (!clientSessionTerminatedAbruptly)
             {
-                // Thie retail server sends a ChatRoomTracker 0x0295 first, then the status message, 0x028B. It does them one at a time for each individual channel.
-                // The ChatRoomTracker message doesn't seem to change at all.
-                // For the purpose of ACE, we simplify this process.
-                var general = new GameEventWeenieErrorWithString(Session, WeenieErrorWithString.YouHaveLeftThe_Channel, "General");
-                var trade = new GameEventWeenieErrorWithString(Session, WeenieErrorWithString.YouHaveLeftThe_Channel, "Trade");
-                var lfg = new GameEventWeenieErrorWithString(Session, WeenieErrorWithString.YouHaveLeftThe_Channel, "LFG");
-                var roleplay = new GameEventWeenieErrorWithString(Session, WeenieErrorWithString.YouHaveLeftThe_Channel, "Roleplay");
-                Session.Network.EnqueueSend(general, trade, lfg, roleplay);
+                if (PropertyManager.GetBool("use_turbine_chat").Item)
+                {
+                    if (GetCharacterOption(CharacterOption.ListenToGeneralChat))
+                        LeaveTurbineChatChannel("General");
+                    if (GetCharacterOption(CharacterOption.ListenToTradeChat))
+                        LeaveTurbineChatChannel("Trade");
+                    if (GetCharacterOption(CharacterOption.ListenToLFGChat))
+                        LeaveTurbineChatChannel("LFG");
+                    if (GetCharacterOption(CharacterOption.ListenToRoleplayChat))
+                        LeaveTurbineChatChannel("Roleplay");
+                    if (GetCharacterOption(CharacterOption.ListenToAllegianceChat) && Allegiance != null)
+                        LeaveTurbineChatChannel("Allegiance");
+                }
             }
 
             if (CurrentActivePet != null)
@@ -825,12 +850,9 @@ namespace ACE.Server.WorldObjects
                 jump.Velocity.Z = velocityZ;
             }*/
 
-            IsJumping = true;
             LastJumpTime = DateTime.UtcNow;
 
             UpdateVitalDelta(Stamina, -staminaCost);
-
-            IsJumping = false;
 
             //Console.WriteLine($"Jump velocity: {jump.Velocity}");
 
@@ -1039,6 +1061,29 @@ namespace ACE.Server.WorldObjects
 
             actionChain.AddAction(this, () =>
             {
+                if (PropertyManager.GetBool("allow_pkl_bump").Item)
+                {
+                    // check for collisions
+                    PlayerKillerStatus = PlayerKillerStatus.PKLite;
+
+                    var colliding = PhysicsObj.ethereal_check_for_collisions();
+
+                    if (colliding)
+                    {
+                        // try initial placement
+                        var result = PhysicsObj.SetPositionSimple(PhysicsObj.Position, true);
+
+                        if (result == SetPositionError.OK)
+                        {
+                            // handle landblock update?
+                            SyncLocation();
+
+                            // force broadcast
+                            Sequences.GetNextSequence(SequenceType.ObjectForcePosition);
+                            SendUpdatePosition();
+                        }
+                    }
+                }
                 UpdateProperty(this, PropertyInt.PlayerKillerStatus, (int)PlayerKillerStatus.PKLite, true);
 
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouAreNowPKLite));

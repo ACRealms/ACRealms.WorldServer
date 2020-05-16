@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 using ACE.Database;
@@ -245,18 +244,11 @@ namespace ACE.Server.WorldObjects
                 // Pull and save objdesc for correct corpse apperance at time of death
                 var objDesc = CalculateObjDesc();
 
-                if (corpse.Biota.PropertiesAnimPart == null)
-                    corpse.Biota.PropertiesAnimPart = new List<PropertiesAnimPart>();
-                corpse.Biota.PropertiesAnimPart.Add(objDesc.AnimPartChanges, BiotaDatabaseLock);
+                corpse.Biota.PropertiesAnimPart = objDesc.AnimPartChanges.Clone(corpse.BiotaDatabaseLock);
 
-                if (corpse.Biota.PropertiesPalette == null)
-                    corpse.Biota.PropertiesPalette = new Collection<PropertiesPalette>();
-                corpse.Biota.PropertiesPalette.Add(objDesc.SubPalettes, BiotaDatabaseLock);
+                corpse.Biota.PropertiesPalette = objDesc.SubPalettes.Clone(corpse.BiotaDatabaseLock);
 
-                if (corpse.Biota.PropertiesTextureMap == null)
-                    corpse.Biota.PropertiesTextureMap = new List<PropertiesTextureMap>();
-                foreach (var textureChange in objDesc.TextureChanges)
-                    corpse.Biota.PropertiesTextureMap.Add(new PropertiesTextureMap { PartIndex = textureChange.PartIndex, OldTexture = textureChange.OldTexture, NewTexture = textureChange.NewTexture });
+                corpse.Biota.PropertiesTextureMap = objDesc.TextureChanges.Clone(corpse.BiotaDatabaseLock);
             }
 
             // use the physics location for accuracy,
@@ -310,14 +302,20 @@ namespace ACE.Server.WorldObjects
                         player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your corpse is located at ({corpse.Location.GetMapCoordStr()}).", ChatMessageType.Broadcast));
                 }
 
-                if (!player.IsPKDeath(killer) && !player.IsPKLiteDeath(killer))
+                var isPKdeath = player.IsPKDeath(killer);
+                var isPKLdeath = player.IsPKLiteDeath(killer);
+
+                if (isPKdeath)
+                    corpse.PkLevel = PKLevel.PK;
+
+                if (!isPKdeath && !isPKLdeath)
                 {
                     var miserAug = player.AugmentationLessDeathItemLoss * 5;
                     if (miserAug > 0)
                         player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your augmentation has reduced the number of items you can lose by {miserAug}!", ChatMessageType.Broadcast));
                 }
 
-                if (dropped.Count == 0 && !player.IsPKLiteDeath(killer))
+                if (dropped.Count == 0 && !isPKLdeath)
                     player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You have retained all your items. You do not need to recover your corpse!", ChatMessageType.Broadcast));
             }
             else
@@ -334,16 +332,18 @@ namespace ACE.Server.WorldObjects
                     else
                     {
                         var killerPlayer = killer.TryGetAttacker();
-                        if (killerPlayer != null && Level >= killerPlayer.Level + 5)
+                        if (killerPlayer != null && Level > killerPlayer.Level)
                             CanGenerateRare = true;
                     }
                 }
+                else
+                    CanGenerateRare = false;
             }
 
             corpse.RemoveProperty(PropertyInt.Value);
 
             if (CanGenerateRare && killer != null)
-                corpse.GenerateRare(killer);
+                corpse.TryGenerateRare(killer);
 
             corpse.InitPhysicsObj();
 

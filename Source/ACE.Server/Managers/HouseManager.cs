@@ -587,7 +587,7 @@ namespace ACE.Server.Managers
 
             var rank = allegianceNode != null ? allegianceNode.Rank : 0;
 
-            if (allegiance == null || rank < allegianceMinLevel)
+            if (allegianceMinLevel > 0 && (allegiance == null || rank < allegianceMinLevel))
             {
                 log.Debug($"[HOUSE] {playerHouse.PlayerName}.HasRequirements() - allegiance rank {rank} < {allegianceMinLevel}");
                 return false;
@@ -714,6 +714,12 @@ namespace ACE.Server.Managers
                     RegisterCallback(house, callback);
                 else
                     callback(house);
+            }
+            else if (!loaded.CreateWorldObjectsCompleted)
+            {
+                var houseBiota = House.Load(houseGuid);
+
+                RegisterCallback(houseBiota, callback);
             }
             else
                 log.Error($"HouseManager.GetHouse({houseGuid:X8}): couldn't find house on loaded landblock");

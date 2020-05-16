@@ -512,7 +512,7 @@ namespace ACE.Server.WorldObjects
                         sb.AppendLine($"{prop.Name} = {obj.ContainerType.ToString()}" + " (" + (uint)obj.ContainerType + ")");
                         break;
                     case "usable":
-                        sb.AppendLine($"{prop.Name} = {obj.Usable.ToString()}" + " (" + (uint)obj.Usable + ")");
+                        sb.AppendLine($"{prop.Name} = {obj.ItemUseable.ToString()}" + " (" + (uint)obj.ItemUseable + ")");
                         break;
                     case "radarbehavior":
                         sb.AppendLine($"{prop.Name} = {obj.RadarBehavior.ToString()}" + " (" + (uint)obj.RadarBehavior + ")");
@@ -1028,16 +1028,6 @@ namespace ACE.Server.WorldObjects
         }
 
         public virtual void OnMoveComplete(WeenieError status)
-        {
-            // empty base
-        }
-
-        public virtual void OnSticky()
-        {
-            // empty base
-        }
-
-        public virtual void OnUnsticky()
         {
             // empty base
         }

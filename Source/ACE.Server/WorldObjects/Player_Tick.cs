@@ -6,6 +6,7 @@ using ACE.Common;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
+using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
 using ACE.Server.Factories;
 using ACE.Server.Managers;
@@ -292,6 +293,19 @@ namespace ACE.Server.WorldObjects
 
             if (!FastTick) return;
 
+            // ensure PKLogout position is synced up for other players
+            if (PKLogout)
+            {
+                EnqueueBroadcast(new GameMessageUpdateMotion(this, new Motion(MotionStance.NonCombat, MotionCommand.Ready)));
+                PhysicsObj.StopCompletely(true);
+
+                if (!PhysicsObj.IsMovingOrAnimating)
+                {
+                    SyncLocation();
+                    EnqueueBroadcast(new GameMessageUpdatePosition(this));
+                }
+            }
+
             // this fixes some differences between client movement (DoMotion/StopMotion) and server movement (apply_raw_movement)
             //
             // scenario: start casting a self-spell, and then immediately start holding the run forward key during the windup
@@ -402,7 +416,7 @@ namespace ACE.Server.WorldObjects
                                 PhysicsObj.CurCell = curCell;
                             }
 
-                            if (verifyContact && !PhysicsObj.TransientState.HasFlag(TransientStateFlags.OnWalkable))
+                            if (verifyContact && IsJumping)
                             {
                                 log.Warn($"z-pos hacking detected for {Name}, lastGroundPos: {LastGroundPos.ToLOCString()} - requestPos: {newPosition.ToLOCString()}");
                                 Location = new ACE.Entity.Position(LastGroundPos);

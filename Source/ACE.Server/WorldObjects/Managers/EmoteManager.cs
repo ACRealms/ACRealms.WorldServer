@@ -155,7 +155,7 @@ namespace ACE.Server.WorldObjects.Managers
                 case EmoteType.AwardSkillXP:
 
                     if (player != null)
-                        player.AwardSkillXP((Skill)emote.Stat, (uint)emote.Amount);
+                        player.AwardSkillXP((Skill)emote.Stat, (uint)emote.Amount, true);
                     break;
 
                 case EmoteType.AwardTrainingCredits:
@@ -199,7 +199,8 @@ namespace ACE.Server.WorldObjects.Managers
                         }
 
                         var preCastTime = creature.PreCastMotion(targetObject);
-                        delay = preCastTime * 2.0f;
+
+                        delay = preCastTime + creature.GetPostCastTime();
 
                         var castChain = new ActionChain();
                         castChain.AddDelaySeconds(preCastTime);
@@ -316,20 +317,12 @@ namespace ACE.Server.WorldObjects.Managers
                     if (player != null)
                     {
                         var fellowship = player.Fellowship;
-                        if (fellowship == null)
+
+                        if (fellowship != null)
                         {
                             text = Replace(emote.Message, WorldObject, player, emoteSet.Quest);
-                            player.Session.Network.EnqueueSend(new GameMessageSystemChat(text, ChatMessageType.Broadcast));
-                        }
-                        else
-                        {
-                            var fellowshipMembers = fellowship.GetFellowshipMembers();
 
-                            foreach (var fellow in fellowshipMembers.Values)
-                            {
-                                text = Replace(emote.Message, WorldObject, fellow, emoteSet.Quest);
-                                fellow.Session.Network.EnqueueSend(new GameMessageSystemChat(text, ChatMessageType.Broadcast));
-                            }
+                            fellowship.BroadcastToFellow(text);
                         }
                     }
                     break;
@@ -1242,20 +1235,11 @@ namespace ACE.Server.WorldObjects.Managers
                     if (player != null)
                     {
                         var fellowship = player.Fellowship;
-                        if (fellowship == null)
+                        if (fellowship != null)
                         {
-                            message = Replace(emote.Message, WorldObject, player, emoteSet.Quest);
-                            player.Session.Network.EnqueueSend(new GameMessageHearDirectSpeech(WorldObject, message, player, ChatMessageType.Tell));
-                        }
-                        else
-                        {
-                            var fellowshipMembers = fellowship.GetFellowshipMembers();
+                            text = Replace(emote.Message, WorldObject, player, emoteSet.Quest);
 
-                            foreach (var fellow in fellowshipMembers.Values)
-                            {
-                                message = Replace(emote.Message, WorldObject, fellow, emoteSet.Quest);
-                                player.Session.Network.EnqueueSend(new GameMessageHearDirectSpeech(WorldObject, message, fellow, ChatMessageType.Tell));
-                            }
+                            fellowship.TellFellow(WorldObject, text);
                         }
                     }
                     break;
@@ -1317,6 +1301,8 @@ namespace ACE.Server.WorldObjects.Managers
                             {
                                 // update existing quest
                                 var canSolve = player.Fellowship.QuestManager.CanSolve(questName);
+                                if (canSolve)
+                                    player.Fellowship.QuestManager.Stamp(questName);
                                 ExecuteEmoteSet(canSolve ? EmoteCategory.QuestSuccess : EmoteCategory.QuestFailure, emote.Message, targetObject, true);
                             }
                         }
@@ -1347,6 +1333,8 @@ namespace ACE.Server.WorldObjects.Managers
                         {
                             // update existing quest
                             var canSolve = questTarget.QuestManager.CanSolve(questName);
+                            if (canSolve)
+                                questTarget.QuestManager.Stamp(questName);
                             ExecuteEmoteSet(canSolve ? EmoteCategory.QuestSuccess : EmoteCategory.QuestFailure, emote.Message, targetObject, true);
                         }
                     }

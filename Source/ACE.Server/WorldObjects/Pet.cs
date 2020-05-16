@@ -44,7 +44,7 @@ namespace ACE.Server.WorldObjects
         {
             Ethereal = true;
             RadarBehavior = ACE.Entity.Enum.RadarBehavior.ShowNever;
-            Usable = ACE.Entity.Enum.Usable.No;
+            ItemUseable = ACE.Entity.Enum.Usable.No;
 
             SuppressGenerateEffect = true;
         }
@@ -199,7 +199,7 @@ namespace ACE.Server.WorldObjects
 
             var motion = new Motion(this, target, MovementType.MoveToObject);
 
-            motion.MoveToParameters.MovementParameters |= MovementParams.CanCharge | MovementParams.StopCompletely;
+            motion.MoveToParameters.MovementParameters |= MovementParams.CanCharge;
             motion.MoveToParameters.DistanceToObject = MinDistance;
             motion.MoveToParameters.WalkRunThreshold = 0.0f;
 

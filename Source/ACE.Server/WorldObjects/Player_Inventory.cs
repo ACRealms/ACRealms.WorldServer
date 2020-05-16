@@ -15,6 +15,7 @@ using ACE.Server.Managers;
 using ACE.Server.Network;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Physics;
 
 namespace ACE.Server.WorldObjects
 {
@@ -565,6 +566,18 @@ namespace ACE.Server.WorldObjects
         private MotionCommand GetPickupMotion(WorldObject objectWereReachingToward)
         {
             if (objectWereReachingToward.Location == null)
+                return MotionCommand.Invalid;
+
+            // hack for jump looting --
+
+            // in retail, this bug was a result of actions running on motion callbacks,
+            // when the motions exited the animation queue
+
+            // since a 'crouch down' motion cannot be performed while jumping,
+            // this crouch down motion exited the animation queue immediately
+
+            // here we are just skipping the animation if the player is jumping
+            if (IsJumping && PropertyManager.GetBool("allow_jump_loot").Item)
                 return MotionCommand.Invalid;
 
             MotionCommand pickupMotion;
@@ -1771,6 +1784,16 @@ namespace ACE.Server.WorldObjects
                         }
 
                         var newStack = WorldObjectFactory.CreateNewWorldObject(stack.WeenieClassId);
+
+                        if (newStack == null)
+                        {
+                            // this should never happen under normal circumstances,
+                            // but can happen if the player has an item in their inventory that is no longer in the world database
+                            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, stackId, WeenieError.ActionCancelled));
+                            EnqueuePickupDone(pickupMotion);
+                            return;
+                        }
+
                         newStack.SetStackSize(amount);
 
                         if (DoHandleActionStackableSplitToContainer(stack, stackFoundInContainer, stackRootOwner, container, containerRootOwner, newStack, placementPosition, amount))
@@ -1795,6 +1818,15 @@ namespace ACE.Server.WorldObjects
             else // This is a self-contained movement
             {
                 var newStack = WorldObjectFactory.CreateNewWorldObject(stack.WeenieClassId);
+
+                if (newStack == null)
+                {
+                    // this should never happen under normal circumstances,
+                    // but can happen if the player has an item in their inventory that is no longer in the world database
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, stackId));
+                    return;
+                }
+
                 newStack.SetStackSize(amount);
 
                 DoHandleActionStackableSplitToContainer(stack, stackFoundInContainer, stackRootOwner, container, containerRootOwner, newStack, placementPosition, amount);
@@ -1906,6 +1938,15 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(new GameMessageSetStackSize(stack));
 
                 var newStack = WorldObjectFactory.CreateNewWorldObject(stack.WeenieClassId);
+
+                if (newStack == null)
+                {
+                    // this should never happen under normal circumstances,
+                    // but can happen if the player has an item in their inventory that is no longer in the world database
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, stackId, WeenieError.ActionCancelled));
+                    return;
+                }
+
                 newStack.SetStackSize(amount);
 
                 Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
@@ -2605,6 +2646,16 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(new GameMessageSetStackSize(item));
 
                 var newStack = WorldObjectFactory.CreateNewWorldObject(item.WeenieClassId);
+
+                if (newStack == null)
+                {
+                    // this should never happen under normal circumstances,
+                    // but can happen if the player has an item in their inventory that is no longer in the world database
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
+                    itemToGive = null;
+                    return false;
+                }
+
                 newStack.SetStackSize(amount);
 
                 Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
@@ -2827,8 +2878,11 @@ namespace ACE.Server.WorldObjects
             {
                 log.Warn($"Player.GiveFromEmote: itemStacks <= 0: emoter: {emoter.Name} (0x{emoter.Guid}) - {emoter.WeenieClassId} | weenieClassId: {weenieClassId} | amount: {amount}");
 
-                var item = PlayerFactory.CreateIOU(weenieClassId);
-                TryCreateForGive(emoter, item);
+                if (PropertyManager.GetBool("iou_trades").Item)
+                {
+                    var item = PlayerFactory.CreateIOU(weenieClassId);
+                    TryCreateForGive(emoter, item);
+                }
             }
         }
 
