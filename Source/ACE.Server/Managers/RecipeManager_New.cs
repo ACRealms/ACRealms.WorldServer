@@ -264,6 +264,9 @@ namespace ACE.Server.Managers
                 case WeenieClassName.W_MATERIALRAREFOOLPROOFPERIDOT_CLASS:
                 case WeenieClassName.W_MATERIALRAREFOOLPROOFYELLOWTOPAZ_CLASS:
                 case WeenieClassName.W_MATERIALRAREFOOLPROOFZIRCON_CLASS:
+                case WeenieClassName.W_MATERIALACE36634FOOLPROOFPERIDOT:
+                case WeenieClassName.W_MATERIALACE36635FOOLPROOFYELLOWTOPAZ:
+                case WeenieClassName.W_MATERIALACE36636FOOLPROOFZIRCON:
 
                     // ensure clothing/armor w/ AL and workmanship
                     if (target.WeenieType != WeenieType.Clothing || (target.ArmorLevel ?? 0) == 0 || target.Workmanship == null)
@@ -324,7 +327,93 @@ namespace ACE.Server.Managers
                 case WeenieClassName.W_LEFTHANDTETHERREMOVER_CLASS:
                 case WeenieClassName.W_COREPLATINGINTEGRATOR_CLASS:
                 case WeenieClassName.W_COREPLATINGDISINTEGRATOR_CLASS:
+                case WeenieClassName.W_MATERIALACE36619FOOLPROOFAQUAMARINE:
+                case WeenieClassName.W_MATERIALACE36620FOOLPROOFBLACKGARNET:
+                case WeenieClassName.W_MATERIALACE36621FOOLPROOFBLACKOPAL:
+                case WeenieClassName.W_MATERIALACE36622FOOLPROOFEMERALD:
+                case WeenieClassName.W_MATERIALACE36623FOOLPROOFFIREOPAL:
+                case WeenieClassName.W_MATERIALACE36624FOOLPROOFIMPERIALTOPAZ:
+                case WeenieClassName.W_MATERIALACE36625FOOLPROOFJET:
+                case WeenieClassName.W_MATERIALACE36626FOOLPROOFREDGARNET:
+                case WeenieClassName.W_MATERIALACE36627FOOLPROOFSUNSTONE:
+                case WeenieClassName.W_MATERIALACE36628FOOLPROOFWHITESAPPHIRE:
 
+
+                    recipe = DatabaseManager.World.GetRecipe(SourceToRecipe[(WeenieClassName)source.WeenieClassId]);
+                    break;
+
+                // Paragon Weapons
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE1STTIERPARAGON_CLASS:
+
+                    switch (target.WeenieType)
+                    {
+                        case WeenieType.Caster:
+                            recipe = DatabaseManager.World.GetRecipe(8700);
+                            break;
+
+                        case WeenieType.MeleeWeapon:
+                            recipe = DatabaseManager.World.GetRecipe(8701);
+                            break;
+
+                        case WeenieType.MissileLauncher:
+                            recipe = DatabaseManager.World.GetRecipe(8699);
+                            break;
+
+                        default:
+                            return null;
+                    }
+
+                    break;
+
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE2NDTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE3RDTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE4THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE5THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE6THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE7THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE8THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE9THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE10THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE11THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE12THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE13THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE14THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE15THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE16THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE17THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE18THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE19THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE20THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE21STTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE22NDTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE23RDTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE24THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE25THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE26THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE27THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE28THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE29THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE30THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE31STTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE32NDTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE33RDTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE34THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE35THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE36THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE37THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE38THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE39THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE40THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE41STTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE42NDTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE43RDTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE44THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE45THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE46THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE47THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE48THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE49THTIERPARAGON_CLASS:
+                case WeenieClassName.W_LUMINOUSAMBEROFTHE50THTIERPARAGON_CLASS:
                     recipe = DatabaseManager.World.GetRecipe(SourceToRecipe[(WeenieClassName)source.WeenieClassId]);
                     break;
             }
@@ -387,43 +476,106 @@ namespace ACE.Server.Managers
             { WeenieClassName.W_MATERIALYELLOWTOPAZ_CLASS,     4434 },
             { WeenieClassName.W_MATERIALZIRCON_CLASS,          4433 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFPERIDOT_CLASS,     4435 },
+            { WeenieClassName.W_MATERIALACE36634FOOLPROOFPERIDOT,       4435 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFYELLOWTOPAZ_CLASS, 4434 },
+            { WeenieClassName.W_MATERIALACE36635FOOLPROOFYELLOWTOPAZ,   4434 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFZIRCON_CLASS,      4433 },
+            { WeenieClassName.W_MATERIALACE36636FOOLPROOFZIRCON,        4433 },
 
             { WeenieClassName.W_MATERIALRAREFOOLPROOFAQUAMARINE_CLASS,    4436 },
+            { WeenieClassName.W_MATERIALACE36619FOOLPROOFAQUAMARINE,      4436 },
             { WeenieClassName.W_MATERIALAQUAMARINE100_CLASS,              4436 },
             { WeenieClassName.W_MATERIALAQUAMARINE_CLASS,                 4436 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFBLACKGARNET_CLASS,   4449 },
+            { WeenieClassName.W_MATERIALACE36620FOOLPROOFBLACKGARNET,     4449 },
             { WeenieClassName.W_MATERIALBLACKGARNET100_CLASS,             4449 },
             { WeenieClassName.W_MATERIALBLACKGARNET_CLASS,                4449 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFBLACKOPAL_CLASS,     3863 },
+            { WeenieClassName.W_MATERIALACE36621FOOLPROOFBLACKOPAL,       3863 },
             { WeenieClassName.W_MATERIALBLACKOPAL100_CLASS,               3863 },
             { WeenieClassName.W_MATERIALBLACKOPAL_CLASS,                  3863 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFEMERALD_CLASS,       4450 },
+            { WeenieClassName.W_MATERIALACE36622FOOLPROOFEMERALD,         4450 },
             { WeenieClassName.W_MATERIALEMERALD100_CLASS,                 4450 },
             { WeenieClassName.W_MATERIALEMERALD_CLASS,                    4450 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFFIREOPAL_CLASS,      3864 },
+            { WeenieClassName.W_MATERIALACE36623FOOLPROOFFIREOPAL,        3864 },
             { WeenieClassName.W_MATERIALFIREOPAL100_CLASS,                3864 },
             { WeenieClassName.W_MATERIALFIREOPAL_CLASS,                   3864 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFIMPERIALTOPAZ_CLASS, 4454 },
+            { WeenieClassName.W_MATERIALACE36624FOOLPROOFIMPERIALTOPAZ,   4454 },
             { WeenieClassName.W_MATERIALIMPERIALTOPAZ100_CLASS,           4454 },
             { WeenieClassName.W_MATERIALIMPERIALTOPAZ_CLASS,              4454 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFJET_CLASS,           4451 },
+            { WeenieClassName.W_MATERIALACE36625FOOLPROOFJET,             4451 },
             { WeenieClassName.W_MATERIALJET100_CLASS,                     4451 },
             { WeenieClassName.W_MATERIALJET_CLASS,                        4451 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFREDGARNET_CLASS,     4452 },
+            { WeenieClassName.W_MATERIALACE36626FOOLPROOFREDGARNET,       4452 },
             { WeenieClassName.W_MATERIALREDGARNET100_CLASS,               4452 },
             { WeenieClassName.W_MATERIALREDGARNET_CLASS,                  4452 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFSUNSTONE_CLASS,      3865 },
+            { WeenieClassName.W_MATERIALACE36627FOOLPROOFSUNSTONE,        3865 },
             { WeenieClassName.W_MATERIALSUNSTONE100_CLASS,                3865 },
             { WeenieClassName.W_MATERIALSUNSTONE_CLASS,                   3865 },
             { WeenieClassName.W_MATERIALRAREFOOLPROOFWHITESAPPHIRE_CLASS, 4453 },
+            { WeenieClassName.W_MATERIALACE36628FOOLPROOFWHITESAPPHIRE,   4453 },
             { WeenieClassName.W_MATERIALWHITESAPPHIRE100_CLASS,           4453 },
             { WeenieClassName.W_MATERIALWHITESAPPHIRE_CLASS,              4453 },
             { WeenieClassName.W_LEFTHANDTETHER_CLASS,                     6798 },
             { WeenieClassName.W_LEFTHANDTETHERREMOVER_CLASS,              6799 },
             { WeenieClassName.W_COREPLATINGINTEGRATOR_CLASS,              6800 },
             { WeenieClassName.W_COREPLATINGDISINTEGRATOR_CLASS,           6801 },
+
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE2NDTIERPARAGON_CLASS,    8702 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE3RDTIERPARAGON_CLASS,    8703 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE4THTIERPARAGON_CLASS,    8704 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE5THTIERPARAGON_CLASS,    8705 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE6THTIERPARAGON_CLASS,    8706 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE7THTIERPARAGON_CLASS,    8707 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE8THTIERPARAGON_CLASS,    8708 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE9THTIERPARAGON_CLASS,    8709 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE10THTIERPARAGON_CLASS,   8710 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE11THTIERPARAGON_CLASS,   8711 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE12THTIERPARAGON_CLASS,   8712 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE13THTIERPARAGON_CLASS,   8713 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE14THTIERPARAGON_CLASS,   8714 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE15THTIERPARAGON_CLASS,   8715 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE16THTIERPARAGON_CLASS,   8716 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE17THTIERPARAGON_CLASS,   8717 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE18THTIERPARAGON_CLASS,   8718 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE19THTIERPARAGON_CLASS,   8719 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE20THTIERPARAGON_CLASS,   8720 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE21STTIERPARAGON_CLASS,   8721 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE22NDTIERPARAGON_CLASS,   8722 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE23RDTIERPARAGON_CLASS,   8723 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE24THTIERPARAGON_CLASS,   8724 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE25THTIERPARAGON_CLASS,   8725 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE26THTIERPARAGON_CLASS,   8726 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE27THTIERPARAGON_CLASS,   8727 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE28THTIERPARAGON_CLASS,   8728 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE29THTIERPARAGON_CLASS,   8729 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE30THTIERPARAGON_CLASS,   8730 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE31STTIERPARAGON_CLASS,   8731 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE32NDTIERPARAGON_CLASS,   8732 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE33RDTIERPARAGON_CLASS,   8733 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE34THTIERPARAGON_CLASS,   8734 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE35THTIERPARAGON_CLASS,   8735 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE36THTIERPARAGON_CLASS,   8736 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE37THTIERPARAGON_CLASS,   8737 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE38THTIERPARAGON_CLASS,   8738 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE39THTIERPARAGON_CLASS,   8739 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE40THTIERPARAGON_CLASS,   8740 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE41STTIERPARAGON_CLASS,   8741 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE42NDTIERPARAGON_CLASS,   8742 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE43RDTIERPARAGON_CLASS,   8743 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE44THTIERPARAGON_CLASS,   8744 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE45THTIERPARAGON_CLASS,   8745 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE46THTIERPARAGON_CLASS,   8746 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE47THTIERPARAGON_CLASS,   8747 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE48THTIERPARAGON_CLASS,   8748 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE49THTIERPARAGON_CLASS,   8749 },
+            { WeenieClassName.W_LUMINOUSAMBEROFTHE50THTIERPARAGON_CLASS,   8750 },
         };
     }
 }

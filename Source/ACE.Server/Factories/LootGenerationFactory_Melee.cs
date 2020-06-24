@@ -368,6 +368,9 @@ namespace ACE.Server.Factories
                 wo.MaterialType = (MaterialType)materialType;
             wo.ItemWorkmanship = workmanship;
 
+            // Burden
+            MutateBurden(wo, profile.Tier, true);
+
             // Weapon Stats
             wo.Damage = damage;
             wo.DamageVariance = damageVariance;
@@ -440,7 +443,7 @@ namespace ACE.Server.Factories
         private static double GetVariance(Skill category, LootWeaponType type)
         {
             double variance = 0;
-            int chance = ThreadSafeRandom.Next(0, 100);
+            int chance = ThreadSafeRandom.Next(0, 99);
 
             switch (category)
             {

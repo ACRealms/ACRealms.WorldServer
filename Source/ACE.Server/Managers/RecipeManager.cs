@@ -70,7 +70,7 @@ namespace ACE.Server.Managers
                 return;
             }
 
-            if (source.ItemType == ItemType.TinkeringMaterial)
+            if ((source.ItemType == ItemType.TinkeringMaterial) || (source.WeenieClassId >= 36619 && source.WeenieClassId <= 36628) || (source.WeenieClassId >= 36634 && source.WeenieClassId <= 36636))
             {
                 HandleTinkering(player, source, target);
                 return;
@@ -286,7 +286,7 @@ namespace ACE.Server.Managers
                 }
 
                 // handle rare foolproof material
-                if (tool.WeenieClassId >= 30094 && tool.WeenieClassId <= 30106)
+                if ((tool.WeenieClassId >= 30094 && tool.WeenieClassId <= 30106) || (tool.WeenieClassId >= 36619 && tool.WeenieClassId <= 36628) || (tool.WeenieClassId >= 36634 && tool.WeenieClassId <= 36636))
                     successChance = 1.0f;
 
                 // check for player option: 'Use Crafting Chance of Success Dialog'
@@ -1144,10 +1144,19 @@ namespace ACE.Server.Managers
                 // apply base mod
                 switch (mod.DataId)
                 {
-                    // 	Fetish of the Dark Idols
+                    //  Fetish of the Dark Idols
                     case 0x38000046:
                         AddImbuedEffect(player, target, ImbuedEffectType.IgnoreSomeMagicProjectileDamage);
                         target.SetProperty(PropertyFloat.AbsorbMagicDamage, 0.25f);
+                        break;
+
+                    //  Paragon Weapons (data id is ACE custom/placeholder for unknown real value)
+                    case 0x39000000:
+                        var itemMaxLevel = target.GetProperty(PropertyInt.ItemMaxLevel) ?? 0;
+                        target.SetProperty(PropertyInt.ItemMaxLevel, ++itemMaxLevel);
+                        target.SetProperty(PropertyInt64.ItemBaseXp, 2000000000);
+                        var itemTotalXp = target.GetProperty(PropertyInt64.ItemTotalXp) ?? 0;
+                        target.SetProperty(PropertyInt64.ItemTotalXp, itemTotalXp);
                         break;
                 }
 

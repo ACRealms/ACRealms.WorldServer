@@ -584,6 +584,9 @@ namespace ACE.Server.WorldObjects
 
             var item_location_z = objectWereReachingToward.Location.Pos.Z;
 
+            if (!(objectWereReachingToward is Corpse))
+                item_location_z += objectWereReachingToward.Height * 0.5f;
+
             if (item_location_z >= Location.Pos.Z + (Height * 0.90))
                 pickupMotion = MotionCommand.Pickup20; // Reach up
             else if (item_location_z >= Location.Pos.Z + (Height * 0.70))
