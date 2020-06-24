@@ -1440,6 +1440,26 @@ namespace ACE.Server.Command.Handlers
             creature.TurnTo(session.Player, true);
         }
 
+        [CommandHandler("sloc", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, 0, "Reports the location that the server believes the player is at.")]
+        public static void HandleServerLoc(Session session, params string[] parameters)
+        {
+            session.Network.EnqueueSend(new GameMessageSystemChat(session.Player.Location.ToLOCString(), ChatMessageType.Broadcast));
+        }
+
+        [CommandHandler("debugloc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Toggles location debugging for a player", "PlayerName")]
+        public static void ToggleDebugLoc(Session session, params string[] parameters)
+        {
+            var playerName = string.Join(" ", parameters);
+            var player = PlayerManager.GetOnlinePlayer(playerName);
+            if (player == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Player {playerName} was not found.", ChatMessageType.Broadcast));
+                return;
+            }
+            player.DebugLoc = !player.DebugLoc;
+            session.Network.EnqueueSend(new GameMessageSystemChat($"DebugLoc is now {player.DebugLoc} for player {playerName}.", ChatMessageType.Broadcast));
+        }
+
         [CommandHandler("debugmove", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0, "Toggles movement debugging for the last appraised monster", "debugmove <on/off>")]
         public static void ToggleMovementDebug(Session session, params string[] parameters)
         {
