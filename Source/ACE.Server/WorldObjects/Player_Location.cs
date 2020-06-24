@@ -22,6 +22,7 @@ namespace ACE.Server.WorldObjects
     partial class Player
     {
         private static readonly Position MarketplaceDrop = DatabaseManager.World.GetCachedWeenie("portalmarketplace").GetPosition(PositionType.Destination);
+        public bool DebugLoc { get; set; }
 
         /// <summary>
         /// Teleports the player to position

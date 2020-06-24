@@ -934,19 +934,22 @@ namespace ACE.Server.Command.Handlers
                 {
                     if (!float.TryParse(parameters[i + 1].Trim(new Char[] { ' ', '[', ']' }), out var position))
                         return;
-
                     positionData[i] = position;
                 }
 
-                session.Player.Teleport(new Position(cell, positionData[0], positionData[1], positionData[2], positionData[4], positionData[5], positionData[6], positionData[3]));
+                byte inst = 0;
+                if (parameters.Length >= 9)
+                    inst = byte.Parse(parameters[8].Trim());
+
+                session.Player.Teleport(new Position(cell, positionData[0], positionData[1], positionData[2], positionData[4], positionData[5], positionData[6], positionData[3], inst));
             }
             catch (Exception)
             {
                 ChatPacket.SendServerMessage(session, "Invalid arguments for @teleloc", ChatMessageType.Broadcast);
-                ChatPacket.SendServerMessage(session, "Hint: @teleloc follows the same number order as displayed from @loc output", ChatMessageType.Broadcast);
-                ChatPacket.SendServerMessage(session, "Usage: @teleloc cell [x y z] (qw qx qy qz)", ChatMessageType.Broadcast);
-                ChatPacket.SendServerMessage(session, "Example: @teleloc 0x7F0401AD [12.319900 -28.482000 0.005000] -0.338946 0.000000 0.000000 -0.940806", ChatMessageType.Broadcast);
-                ChatPacket.SendServerMessage(session, "Example: @teleloc 0x7F0401AD 12.319900 -28.482000 0.005000 -0.338946 0.000000 0.000000 -0.940806", ChatMessageType.Broadcast);
+                ChatPacket.SendServerMessage(session, "Hint: @teleloc follows the same number order as displayed from @sloc output", ChatMessageType.Broadcast);
+                ChatPacket.SendServerMessage(session, "Usage: @teleloc cell [x y z] (qw qx qy qz) (instance id)", ChatMessageType.Broadcast);
+                ChatPacket.SendServerMessage(session, "Example: @teleloc 0x7F0401AD [12.319900 -28.482000 0.005000] -0.338946 0.000000 0.000000 -0.940806 0", ChatMessageType.Broadcast);
+                ChatPacket.SendServerMessage(session, "Example: @teleloc 0x7F0401AD 12.319900 -28.482000 0.005000 -0.338946 0.000000 0.000000 -0.940806 0", ChatMessageType.Broadcast);
                 ChatPacket.SendServerMessage(session, "Example: @teleloc 7F0401AD 12.319900 -28.482000 0.005000", ChatMessageType.Broadcast);
             }
         }

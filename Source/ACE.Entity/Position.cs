@@ -385,7 +385,7 @@ namespace ACE.Entity
 
         public string ToLOCString()
         {
-            return $"0x{ObjCellID:X8} [{Pos.X:F6} {Pos.Y:F6} {Pos.Z:F6}] {Rotation.W:F6} {Rotation.X:F6} {Rotation.Y:F6} {Rotation.Z:F6}";
+            return $"0x{ObjCellID:X8} [{Pos.X:F6} {Pos.Y:F6} {Pos.Z:F6}] {Rotation.W:F6} {Rotation.X:F6} {Rotation.Y:F6} {Rotation.Z:F6} {Instance}";
         }
 
         public bool Equals(Position p)

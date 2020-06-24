@@ -43,7 +43,6 @@ namespace ACE.Server.WorldObjects
         public MagicSchool LastSuccessCast_School;
 
         public bool DebugSpell { get; set; }
-
         public RecordCast RecordCast { get; set; }
 
         /// <summary>
