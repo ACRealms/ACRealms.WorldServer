@@ -134,7 +134,7 @@ namespace ACE.Server.Physics.Common
             return result;
         }
 
-        public static ObjCell get_landcell(uint blockCellID, byte? instance = null)
+        public static ObjCell get_landcell(uint blockCellID, uint? instance = null)
         {
             var iBlockCell = BlockCell.GetLongCell(blockCellID, instance);
 
