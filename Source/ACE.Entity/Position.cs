@@ -22,7 +22,7 @@ namespace ACE.Entity
 
         public bool Indoors => (ObjCellID & 0xFFFF) >= 0x100;
 
-        public byte Instance;
+        public uint Instance;
 
         public ulong LongObjCellID => (ulong)Instance << 32 | ObjCellID;
 
@@ -74,7 +74,7 @@ namespace ACE.Entity
             Instance = pos.Instance;
         }
 
-        public Position(uint blockCellID, float newPositionX, float newPositionY, float newPositionZ, float newRotationX, float newRotationY, float newRotationZ, float newRotationW, byte? instance = null)
+        public Position(uint blockCellID, float newPositionX, float newPositionY, float newPositionZ, float newRotationX, float newRotationY, float newRotationZ, float newRotationW, uint? instance = null)
         {
             ObjCellID = blockCellID;
 
@@ -87,7 +87,7 @@ namespace ACE.Entity
                 SetPosition(_pos);
         }
 
-        public Position(uint blockCellID, Vector3 position, Quaternion rotation, bool normalize = false, byte? instance = null)
+        public Position(uint blockCellID, Vector3 position, Quaternion rotation, bool normalize = false, uint? instance = null)
         {
             ObjCellID = blockCellID;
 

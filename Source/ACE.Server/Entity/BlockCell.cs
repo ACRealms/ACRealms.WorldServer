@@ -42,9 +42,9 @@ namespace ACE.Server.Entity
             return (objCellID & 0xFFFF) >= 0x100;
         }
 
-        public static ulong GetLongCell(uint objCellID, byte? instance = null)
+        public static ulong GetLongCell(uint objCellID, uint? instance = null)
         {
-            byte inst = instance ?? 0;
+            uint inst = instance ?? 0;
 
             return (ulong)inst << 32 | objCellID;
         }

@@ -12,7 +12,7 @@ namespace ACE.Entity.Models
         public float RotationX { get; set; }
         public float RotationY { get; set; }
         public float RotationZ { get; set; }
-        public byte? Instance { get; set; }
+        public uint? Instance { get; set; }
 
         public PropertiesPosition Clone()
         {

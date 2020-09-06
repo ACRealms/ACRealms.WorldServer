@@ -221,7 +221,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public static ObjCell GetVisible(uint cellID, byte? instance = null)
+        public static ObjCell GetVisible(uint cellID, uint? instance = null)
         {
             if (cellID == 0) return null;
 
