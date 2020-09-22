@@ -597,6 +597,13 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void Teleport(Position _newPosition)
         {
+            if (!ValidateRealmTeleport(_newPosition))
+            {
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to teleport to that realm.", ChatMessageType.System));
+                return;
+            }
+
+
             var newPosition = new Position(_newPosition);
             newPosition._pos.Z += 0.005f * (ObjScale ?? 1.0f);
 
@@ -645,6 +652,51 @@ namespace ACE.Server.WorldObjects
             HandlePreTeleportVisibility(newPosition);
 
             UpdatePlayerPosition(new Position(newPosition), true);
+        }
+
+        public ushort HomeRealm
+        {
+            get
+            {
+                int intid = GetProperty(PropertyInt.HomeRealm) ?? 0;
+                if ((intid < 0) || (uint)intid > 0x7FFF)
+                {
+                    log.Error("Player " + Name + " HomeRealm out of range.");
+                    return 0;
+                }
+                return (ushort)intid;
+            }
+            set
+            {
+                if (value == 0)
+                {
+                    RemoveProperty(PropertyInt.HomeRealm);
+                    return;
+                }
+                if (value > 0x7FFF)
+                {
+                    log.Error("Cannot set HomeRealm for Player " + Name + ". Must be between 0 and 32767");
+                    return;
+                }
+                SetProperty(PropertyInt.HomeRealm, value);
+            }
+        }
+
+        private bool ValidateRealmTeleport(Position newPosition)
+        {
+            Position.ParseInstanceID(newPosition.Instance, out var isTemporaryRuleset, out ushort newRealmId, out ushort shortInstanceId);
+            var homerealm = RealmManager.GetRealm(HomeRealm);
+            var destrealm = RealmManager.GetRealm(newPosition.RealmID);
+            if (homerealm == null || destrealm == null)
+            {
+                return false;
+            }
+            if (homerealm.Ruleset.GetProperty(RealmPropertyBool.CanInteractWithNeutralZone) == true &&
+                destrealm.Ruleset.GetProperty(RealmPropertyBool.IsNeutralZone) == true)
+            {
+                return true;
+            }
+            return homerealm.Realm.Id == destrealm.Realm.Id;
         }
 
         public void DoPreTeleportHide()

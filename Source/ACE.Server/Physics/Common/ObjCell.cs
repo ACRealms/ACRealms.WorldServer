@@ -326,7 +326,7 @@ namespace ACE.Server.Physics.Common
             return false;
         }
 
-        public static void find_cell_list(Position position, int numSphere, List<Sphere> sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, byte? instance = null)
+        public static void find_cell_list(Position position, int numSphere, List<Sphere> sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, uint? instance = null)
         {
             cellArray.NumCells = 0;
             cellArray.AddedOutside = false;
@@ -426,7 +426,7 @@ namespace ACE.Server.Physics.Common
             find_cell_list(position, numCylSphere, spheres, cellArray, ref empty, path);
         }
 
-        public static void find_cell_list(Position position, Sphere sphere, CellArray cellArray, SpherePath path, byte? instance = null)
+        public static void find_cell_list(Position position, Sphere sphere, CellArray cellArray, SpherePath path, uint? instance = null)
         {
             var globalSphere = new Sphere();
             globalSphere.Center = position.LocalToGlobal(sphere.Center);
@@ -441,7 +441,7 @@ namespace ACE.Server.Physics.Common
             find_cell_list(path.CheckPos, path.NumSphere, path.GlobalSphere, cellArray, ref checkCell, path);
         }
 
-        public static void find_cell_list(Position position, int numSphere, Sphere sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, byte? instance = null)
+        public static void find_cell_list(Position position, int numSphere, Sphere sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, uint? instance = null)
         {
             find_cell_list(position, numSphere, new List<Sphere>() { sphere }, cellArray, ref currCell, path, instance);
         }

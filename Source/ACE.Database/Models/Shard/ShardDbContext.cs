@@ -426,6 +426,9 @@ namespace ACE.Database.Models.Shard
 
                 entity.ToTable("biota_properties_bool");
 
+                entity.HasIndex(e => e.Type)
+                    .HasName("idx_type");
+
                 entity.Property(e => e.ObjectId)
                     .HasColumnName("object_Id")
                     .HasDefaultValueSql("'0'");
@@ -782,6 +785,9 @@ namespace ACE.Database.Models.Shard
 
                 entity.ToTable("biota_properties_float");
 
+                entity.HasIndex(e => e.Type)
+                    .HasName("idx_type");
+
                 entity.Property(e => e.ObjectId)
                     .HasColumnName("object_Id")
                     .HasDefaultValueSql("'0'");
@@ -903,6 +909,9 @@ namespace ACE.Database.Models.Shard
                     .HasName("PRIMARY");
 
                 entity.ToTable("biota_properties_int");
+
+                entity.HasIndex(e => e.Type)
+                    .HasName("idx_type");
 
                 entity.Property(e => e.ObjectId)
                     .HasColumnName("object_Id")
@@ -1088,6 +1097,9 @@ namespace ACE.Database.Models.Shard
                     .HasName("PRIMARY");
 
                 entity.ToTable("biota_properties_string");
+
+                entity.HasIndex(e => e.Type)
+                    .HasName("idx_type");
 
                 entity.Property(e => e.ObjectId)
                     .HasColumnName("object_Id")

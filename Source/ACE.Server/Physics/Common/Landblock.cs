@@ -32,7 +32,7 @@ namespace ACE.Server.Physics.Common
         public List<PhysicsObj> Scenery;
         public List<PhysicsObj> ServerObjects { get; set; }
 
-        public byte Instance;
+        public uint Instance;
 
         public static bool UseSceneFiles = true;
 
@@ -41,7 +41,7 @@ namespace ACE.Server.Physics.Common
             Init();
         }
 
-        public Landblock(CellLandblock landblock, byte instance)
+        public Landblock(CellLandblock landblock, uint instance)
             : base(landblock)
         {
             Init();

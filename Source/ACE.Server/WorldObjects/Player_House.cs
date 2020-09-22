@@ -822,7 +822,7 @@ namespace ACE.Server.WorldObjects
             if (!isLoaded)
                 return House = House.Load(houseGuid);
 
-            var loaded = LandblockManager.GetLandblock(landblock, false);
+            var loaded = LandblockManager.GetLandblockBase(landblock, false);
             return House = loaded.GetObject(new ObjectGuid(houseGuid)) as House;
         }
 
@@ -1656,7 +1656,7 @@ namespace ACE.Server.WorldObjects
 
             if (isLoaded)
             {
-                var loaded = LandblockManager.GetLandblock(landblock, false);
+                var loaded = LandblockManager.GetLandblockBase(landblock, false);
                 return loaded.GetObject(new ObjectGuid(houseGuid)) as House;
             }
 

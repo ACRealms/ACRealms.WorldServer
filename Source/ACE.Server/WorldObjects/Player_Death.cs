@@ -83,7 +83,7 @@ namespace ACE.Server.WorldObjects
 
                 // instead, we get all of the players in the lifestone landblock + adjacent landblocks,
                 // and possibly limit that to some radius around the landblock?
-                var lifestoneBlock = LandblockManager.GetLandblock(Sanctuary.ObjCellID, true);
+                var lifestoneBlock = LandblockManager.GetLandblockBase(Sanctuary.ObjCellID, true);
                 lifestoneBlock.EnqueueBroadcast(excludePlayers, true, Sanctuary, LocalBroadcastRangeSq, broadcastMsg);
             }
 

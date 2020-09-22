@@ -47,7 +47,7 @@ namespace ACE.Server.Physics.Common
 
         public static int LandblocksCount => Landblocks.Count;
 
-        public static Landblock get_landblock(uint blockCellID, byte instance)
+        public static Landblock get_landblock(uint blockCellID, uint instance)
         {
             var iBlockCell = BlockCell.GetLongCell(blockCellID, instance);
 

@@ -33,6 +33,15 @@ namespace ACE.Entity
             get => _pos;
             set => SetPosition(value);
         }
+        public ushort RealmID
+        {
+            get
+            {
+                ParseInstanceID(this.Instance, out var _a, out var realmId, out var _b);
+                return realmId;
+            }
+        }
+
 
         public Tuple<bool, bool> SetPosition(Vector3 pos)
         {
@@ -73,6 +82,7 @@ namespace ACE.Entity
 
             Instance = pos.Instance;
         }
+
 
         public Position(uint blockCellID, float newPositionX, float newPositionY, float newPositionZ, float newRotationX, float newRotationY, float newRotationZ, float newRotationW, uint? instance = null)
         {
@@ -391,6 +401,14 @@ namespace ACE.Entity
         public bool Equals(Position p)
         {
             return ObjCellID == p.ObjCellID && Pos == p.Pos && Rotation == p.Rotation;
+        }
+
+        public static void ParseInstanceID(uint instanceId, out bool isTemporaryRuleset, out ushort realmId, out ushort shortInstanceId)
+        {
+            shortInstanceId = (ushort)(instanceId & 0xFFFF);
+            ushort left = (ushort)(instanceId >> 16);
+            isTemporaryRuleset = (left & 0x8000) == 0x8000;
+            realmId = (ushort)(left & 0x7FFF);
         }
     }
 }

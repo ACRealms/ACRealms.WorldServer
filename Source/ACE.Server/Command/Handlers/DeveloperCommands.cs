@@ -488,7 +488,7 @@ namespace ACE.Server.Command.Handlers
                     for (int y = 0; y <= 0xFE; y++)
                     {
                         var blockid = (uint)(x << 24 | y << 16 | 0xFFFF);
-                        LandblockManager.GetLandblock(blockid, false, false);
+                        LandblockManager.GetLandblockBase(blockid, false, false);
                     }
                 }
 
