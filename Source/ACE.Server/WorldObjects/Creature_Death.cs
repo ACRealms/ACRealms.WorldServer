@@ -393,7 +393,7 @@ namespace ACE.Server.WorldObjects
 
             // use the physics location for accuracy,
             // especially while jumping
-            corpse.Location = PhysicsObj.Position.ACEPosition();
+            corpse.Location = PhysicsObj.Position.ACEPosition(Location);
 
             corpse.VictimId = Guid.Full;
             corpse.Name = $"{prefix} of {Name}";
@@ -433,7 +433,7 @@ namespace ACE.Server.WorldObjects
                 if (dropped.Count > 0)
                     saveCorpse = true;
 
-                if ((player.Location.Cell & 0xFFFF) < 0x100)
+                if (!player.Location.Indoors)
                 {
                     player.SetPosition(PositionType.LastOutsideDeath, new Position(corpse.Location));
                     player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePosition(player, PositionType.LastOutsideDeath, corpse.Location));
@@ -606,7 +606,7 @@ namespace ACE.Server.WorldObjects
             return string.Join(", ", spells.Select(i => i.Name));
         }
 
-        public bool IsOnNoDeathXPLandblock => Location != null ? NoDeathXP_Landblocks.Contains(Location.LandblockId.Landblock) : false;
+        public bool IsOnNoDeathXPLandblock => Location != null ? NoDeathXP_Landblocks.Contains(Location.Landblock) : false;
 
         /// <summary>
         /// A list of landblocks the player gains no xp from creature kills

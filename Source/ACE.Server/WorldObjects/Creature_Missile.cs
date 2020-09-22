@@ -96,9 +96,7 @@ namespace ACE.Server.WorldObjects
 
             proj.ProjectileLauncher = weapon;
 
-            proj.Location = new Position(Location);
-            proj.Location.Pos = origin;
-            proj.Location.Rotation = orientation;
+            proj.Location = new Position(Location.ObjCellID, origin, orientation);
 
             SetProjectilePhysicsState(proj, target, velocity);
 

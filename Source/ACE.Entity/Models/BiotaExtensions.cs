@@ -176,7 +176,7 @@ namespace ACE.Entity.Models
             try
             {
                 if (biota.PropertiesPosition.TryGetValue(property, out var value))
-                    return new Position(value.ObjCellId, value.PositionX, value.PositionY, value.PositionZ, value.RotationX, value.RotationY, value.RotationZ, value.RotationW);
+                    return new Position(value.ObjCellId, value.PositionX, value.PositionY, value.PositionZ, value.RotationX, value.RotationY, value.RotationZ, value.RotationW, value.Instance);
 
                 return null;
             }
@@ -349,7 +349,7 @@ namespace ACE.Entity.Models
                 if (biota.PropertiesPosition == null)
                     biota.PropertiesPosition = new Dictionary<PositionType, PropertiesPosition>();
 
-                var entity = new PropertiesPosition { ObjCellId = value.Cell, PositionX = value.PositionX, PositionY = value.PositionY, PositionZ = value.PositionZ, RotationW = value.RotationW, RotationX = value.RotationX, RotationY = value.RotationY, RotationZ = value.RotationZ };
+                var entity = new PropertiesPosition { ObjCellId = value.ObjCellID, PositionX = value.Pos.X, PositionY = value.Pos.Y, PositionZ = value.Pos.Z, RotationW = value.Rotation.W, RotationX = value.Rotation.X, RotationY = value.Rotation.Y, RotationZ = value.Rotation.Z, Instance = value.Instance };
 
                 biota.PropertiesPosition[property] = entity;
             }

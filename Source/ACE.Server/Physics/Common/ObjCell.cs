@@ -221,7 +221,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public static ObjCell GetVisible(uint cellID)
+        public static ObjCell GetVisible(uint cellID, byte? instance = null)
         {
             if (cellID == 0) return null;
 
@@ -230,7 +230,8 @@ namespace ACE.Server.Physics.Common
                return EnvCell.get_visible(cellID);
             else
                 return LandCell.Get(cellID);*/
-            return LScape.get_landcell(cellID);
+
+            return LScape.get_landcell(cellID, instance);
         }
 
         public void Init()
@@ -325,12 +326,12 @@ namespace ACE.Server.Physics.Common
             return false;
         }
 
-        public static void find_cell_list(Position position, int numSphere, List<Sphere> sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path)
+        public static void find_cell_list(Position position, int numSphere, List<Sphere> sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, byte? instance = null)
         {
             cellArray.NumCells = 0;
             cellArray.AddedOutside = false;
 
-            var visibleCell = GetVisible(position.ObjCellID);
+            var visibleCell = GetVisible(position.ObjCellID, instance ?? path?.CurCell.CurLandblock.Instance);
 
             if ((position.ObjCellID & 0xFFFF) >= 0x100)
             {
@@ -425,14 +426,14 @@ namespace ACE.Server.Physics.Common
             find_cell_list(position, numCylSphere, spheres, cellArray, ref empty, path);
         }
 
-        public static void find_cell_list(Position position, Sphere sphere, CellArray cellArray, SpherePath path)
+        public static void find_cell_list(Position position, Sphere sphere, CellArray cellArray, SpherePath path, byte? instance = null)
         {
             var globalSphere = new Sphere();
             globalSphere.Center = position.LocalToGlobal(sphere.Center);
             globalSphere.Radius = sphere.Radius;
 
             ObjCell empty = null;
-            find_cell_list(position, 1, globalSphere, cellArray, ref empty, path);
+            find_cell_list(position, 1, globalSphere, cellArray, ref empty, path, instance);
         }
 
         public static void find_cell_list(CellArray cellArray, ref ObjCell checkCell, SpherePath path)
@@ -440,9 +441,9 @@ namespace ACE.Server.Physics.Common
             find_cell_list(path.CheckPos, path.NumSphere, path.GlobalSphere, cellArray, ref checkCell, path);
         }
 
-        public static void find_cell_list(Position position, int numSphere, Sphere sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path)
+        public static void find_cell_list(Position position, int numSphere, Sphere sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, byte? instance = null)
         {
-            find_cell_list(position, numSphere, new List<Sphere>() { sphere }, cellArray, ref currCell, path);
+            find_cell_list(position, numSphere, new List<Sphere>() { sphere }, cellArray, ref currCell, path, instance);
         }
 
         public virtual void find_transit_cells(int numParts, List<PhysicsPart> parts, CellArray cellArray)

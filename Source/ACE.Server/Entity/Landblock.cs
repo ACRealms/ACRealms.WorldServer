@@ -40,15 +40,25 @@ namespace ACE.Server.Entity
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static float AdjacencyLoadRange { get; } = 96f;
-        public static float OutdoorChatRange { get; } = 75f;
-        public static float IndoorChatRange { get; } = 25f;
-        public static float MaxXY { get; } = 192f;
-        public static float MaxObjectRange { get; } = 192f;
-        public static float MaxObjectGhostRange { get; } = 250f;
+        public uint Id;
 
+        public ushort ShortId => (ushort)(Id >> 16);
 
-        public LandblockId Id { get; }
+        public byte X => (byte)(Id >> 24);
+
+        public byte Y => (byte)(Id >> 16);
+
+        public byte Instance;
+
+        public ulong LongId
+        {
+            get => (ulong)Instance << 32 | Id;
+            set
+            {
+                Id = (uint)value;
+                Instance = (byte)(value >> 32);
+            }
+        }
 
         /// <summary>
         /// Flag indicates if this landblock is permanently loaded (for example, towns on high-traffic servers)
@@ -159,20 +169,35 @@ namespace ACE.Server.Entity
             set => fogColor = value;
         }
 
+        // this is used for debugging the instancing branch
+        // if you are in an instanced version of a dungeon (instance > 0)
+        // the base instance should never load
 
-        public Landblock(LandblockId id)
+        public static HashSet<ulong> TestDungeons = new HashSet<ulong>()
         {
-            //log.Debug($"Landblock({(id.Raw | 0xFFFF):X8})");
+            0x01D9FFFF,
+        };
 
-            Id = id;
+        public Landblock(ulong objCellID)
+        {
+            LongId = objCellID | 0xFFFF;
 
-            CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id.Raw >> 16 | 0xFFFF);
-            LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>((uint)Id.Landblock << 16 | 0xFFFE);
+            log.Info($"Landblock({LongId:X8})");
+
+            if (TestDungeons.Contains(LongId))
+            {
+                log.Error($"Landblock({objCellID:X8}): base instance is loading!");
+                log.Error(System.Environment.StackTrace);
+            }
+
+            CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id);
+            LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>(Id & 0xFFFF0000 | 0xFFFE);
 
             lastActiveTime = DateTime.UtcNow;
 
-            var cellLandblock = DBObj.GetCellLandblock(Id.Raw | 0xFFFF);
-            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock);
+            // load physics landblock
+            var cellLandblock = DBObj.GetCellLandblock(Id);
+            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock, Instance);
         }
 
         public void Init(bool reload = false)
@@ -198,8 +223,8 @@ namespace ACE.Server.Entity
         /// </summary>
         private void CreateWorldObjects()
         {
-            var objects = DatabaseManager.World.GetCachedInstancesByLandblock(Id.Landblock);
-            var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(Id.Landblock);
+            var objects = DatabaseManager.World.GetCachedInstancesByLandblock(ShortId);
+            var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(ShortId);
             var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects);
 
             actionQueue.EnqueueAction(new ActionEventDelegate(() =>
@@ -247,7 +272,7 @@ namespace ACE.Server.Entity
         /// </summary>
         private void SpawnDynamicShardObjects()
         {
-            var dynamics = DatabaseManager.Shard.BaseDatabase.GetDynamicObjectsByLandblock(Id.Landblock);
+            var dynamics = DatabaseManager.Shard.BaseDatabase.GetDynamicObjectsByLandblock(ShortId, Instance);
             var factoryShardObjects = WorldObjectFactory.CreateWorldObjects(dynamics);
 
             actionQueue.EnqueueAction(new ActionEventDelegate(() =>
@@ -263,8 +288,10 @@ namespace ACE.Server.Entity
         /// </summary>
         private void SpawnEncounters()
         {
+            var shortId = (ushort)(Id >> 16);
+
             // get the encounter spawns for this landblock
-            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(Id.Landblock);
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(shortId);
 
             foreach (var encounter in encounters)
             {
@@ -276,7 +303,7 @@ namespace ACE.Server.Entity
                 var yPos = Math.Clamp(encounter.CellY * 24.0f, 0.5f, 191.5f);
 
                 var pos = new Physics.Common.Position();
-                pos.ObjCellID = (uint)(Id.Landblock << 16) | 1;
+                pos.ObjCellID = Id & 0xFFFF0000 | 1;
                 pos.Frame = new Physics.Animation.AFrame(new Vector3(xPos, yPos, 0), Quaternion.Identity);
                 pos.adjust_to_outside();
 
@@ -812,6 +839,8 @@ namespace ACE.Server.Entity
         {
             wo.CurrentLandblock = this;
 
+            wo.Location.Instance = Instance;
+
             if (wo.PhysicsObj == null)
                 wo.InitPhysicsObj();
             else
@@ -1040,8 +1069,6 @@ namespace ACE.Server.Entity
         /// </summary>
         public void Unload()
         {
-            var landblockID = Id.Raw | 0xFFFF;
-
             //log.Debug($"Landblock.Unload({landblockID:X8})");
 
             ProcessPendingWorldObjectAdditionsAndRemovals();
@@ -1062,7 +1089,7 @@ namespace ACE.Server.Entity
             actionQueue.Clear();
 
             // remove physics landblock
-            LScape.unload_landblock(landblockID);
+            LScape.unload_landblock(Id);
         }
 
         public void DestroyAllNonPlayerObjects()

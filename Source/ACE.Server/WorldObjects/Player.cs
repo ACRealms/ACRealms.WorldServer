@@ -578,7 +578,7 @@ namespace ACE.Server.WorldObjects
                 if (Location != null)
                 {
                     log.Debug($"0x{Guid}:{Name}.LogOut_Inner: Location is not null, Location = {Location.ToLOCString()}");
-                    var validLoadedLandblock = LandblockManager.GetLandblock(Location.LandblockId, false);
+                    var validLoadedLandblock = LandblockManager.GetLandblock(Location.LongObjCellID, false);
                     if (validLoadedLandblock.GetObject(Guid.Full) != null)
                     {
                         log.Debug($"0x{Guid}:{Name}.LogOut_Inner: Player is still on landblock, removing...");
