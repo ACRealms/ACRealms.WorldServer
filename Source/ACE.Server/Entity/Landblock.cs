@@ -309,7 +309,7 @@ namespace ACE.Server.Entity
 
                 pos.Frame.Origin.Z = PhysicsLandblock.GetZ(pos.Frame.Origin);
 
-                wo.Location = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation);
+                wo.Location = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation, false, Instance);
 
                 var sortCell = LScape.get_landcell(pos.ObjCellID) as SortCell;
                 if (sortCell != null && sortCell.has_building())

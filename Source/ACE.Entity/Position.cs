@@ -87,12 +87,13 @@ namespace ACE.Entity
                 SetPosition(_pos);
         }
 
-        public Position(uint blockCellID, Vector3 position, Quaternion rotation, bool normalize = false)
+        public Position(uint blockCellID, Vector3 position, Quaternion rotation, bool normalize = false, byte? instance = null)
         {
             ObjCellID = blockCellID;
 
             _pos = position;
             Rotation = rotation;
+            Instance = instance ?? 0;
 
             if (Cell == 0 || normalize)
                 SetPosition(_pos);
@@ -160,7 +161,7 @@ namespace ACE.Entity
             // move the Z slightly up due to variations in ac physics engine
             pos.Z += 0.05f;
 
-            return new Position(ObjCellID, pos, angle, true);
+            return new Position(ObjCellID, pos, angle, true, Instance);
         }
 
 
