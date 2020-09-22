@@ -502,5 +502,58 @@ namespace ACE.Database
                 return GetVersion(context);
             }
         }
+
+        public virtual Realm GetRealm(uint id)
+        {
+            using (var context = new WorldDbContext())
+                return GetRealm(context, id);
+        }
+
+        private Realm GetRealm(WorldDbContext context, uint id)
+        {
+            var realm = context.Realm
+                .FirstOrDefault(r => r.Id == id);
+
+            if (realm == null)
+                return null;
+
+            realm.RealmPropertiesBool = context.RealmPropertiesBool.Where(r => r.RealmId == realm.Id).ToList();
+            realm.RealmPropertiesFloat = context.RealmPropertiesFloat.Where(r => r.RealmId == realm.Id).ToList();
+            realm.RealmPropertiesInt = context.RealmPropertiesInt.Where(r => r.RealmId == realm.Id).ToList();
+            realm.RealmPropertiesInt64 = context.RealmPropertiesInt64.Where(r => r.RealmId == realm.Id).ToList();
+            realm.RealmPropertiesString = context.RealmPropertiesString.Where(r => r.RealmId == realm.Id).ToList();
+
+            return realm;
+        }
+
+
+        public List<ACE.Entity.Models.Realm> GetAllRealms()
+        {
+            var realms = new List<ACE.Entity.Models.Realm>();
+
+            using (var context = new WorldDbContext())
+            {
+                var results = context.Realm
+                    .AsNoTracking()
+                    .ToList();
+
+                foreach (var result in results)
+                {
+                    var realm = GetRealm(result.Id);
+
+                    if (realm != null)
+                    {
+                        var convertedRealm = ACE.Database.Adapter.RealmConverter.ConvertToEntityRealm(realm, true);
+
+                        realms.Add(convertedRealm);
+                    }
+                    else
+                        log.Error($"WorldDatabase.GetAllRealms() - couldn't find realm for id {result.Id}");
+                };
+            }
+
+            return realms;
+        }
+
     }
 }

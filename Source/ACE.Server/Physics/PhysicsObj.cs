@@ -2066,7 +2066,7 @@ namespace ACE.Server.Physics
             }
         }
 
-        public void calc_cross_cells(byte? instance = null)
+        public void calc_cross_cells(uint? instance = null)
         {
             CellArray.SetDynamic();
 

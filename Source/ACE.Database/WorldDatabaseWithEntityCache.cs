@@ -922,5 +922,32 @@ namespace ACE.Database
                 return results;
             }
         }
+
+        // =====================================
+        // Realm
+        // =====================================
+
+        private readonly Dictionary<uint, Realm> realmCache = new Dictionary<uint, Realm>();
+
+        public Realm GetRealm(uint realmId)
+        {
+            Realm realm;
+
+            lock (realmCache)
+            {
+                if (!realmCache.TryGetValue(realmId, out realm))
+                {
+                    realm = base.GetRealm(realmId);
+                    realmCache.Add(realmId, realm);
+                }
+            }
+
+            return realm;
+        }
+        public void ClearRealmCache()
+        {
+            lock (realmCache)
+                realmCache.Clear();
+        }
     }
 }

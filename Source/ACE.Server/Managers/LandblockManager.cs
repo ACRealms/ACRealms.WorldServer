@@ -108,7 +108,7 @@ namespace ACE.Server.Managers
 
         private static void PreloadLandblock(uint landblock, PreloadedLandblocks preloadLandblock)
         {
-            GetLandblock(landblock, preloadLandblock.IncludeAdjacents, preloadLandblock.Permaload);
+            GetLandblockBase(landblock, preloadLandblock.IncludeAdjacents, preloadLandblock.Permaload);
             log.DebugFormat("Landblock {0:X4}, ({1}) preloaded. IncludeAdjacents = {2}, Permaload = {3}", landblock >> 16, preloadLandblock.Description, preloadLandblock.IncludeAdjacents, preloadLandblock.Permaload);
         }
 
@@ -366,6 +366,11 @@ namespace ACE.Server.Managers
                 return landblocks.ContainsKey(objCellID | 0xFFFF);
         }
 
+        public static Landblock GetLandblockBase(uint objCellId, bool loadAdjacents, bool permaload = false)
+        {
+            return GetLandblock((ulong)objCellId, loadAdjacents, permaload);
+        }
+
         /// <summary>
         /// Returns a reference to a landblock, loading the landblock if not already active
         /// </summary>
@@ -406,7 +411,7 @@ namespace ACE.Server.Managers
                 {
                     var adjacents = GetAdjacentIDs(landblock);
                     foreach (var adjacent in adjacents)
-                        GetLandblock(adjacent, false, permaload);
+                        GetLandblock((ulong)adjacent, false, permaload);
 
                     setAdjacents = true;
                 }
@@ -692,6 +697,40 @@ namespace ACE.Server.Managers
                 else
                     SendGlobalEnvironSound(environChangeType);
             }
+        }
+        public static uint GetFreeInstanceID(bool isTemporaryRuleset, ushort realmId, ushort landblock)
+        {
+            uint right = ((uint)landblock << 16) | 0xFFFF;
+            ulong full;
+            uint iid;
+            do
+            {
+                iid = GetRandomInstanceID(isTemporaryRuleset, realmId);
+                full = ((ulong)iid << 32) | right;
+            }
+            while (LandblockManager.landblocks.ContainsKey(full));
+            return iid;
+        }
+
+        static Random random = new Random();
+        private static uint GetRandomInstanceID(bool isTemporaryRuleset, ushort realmId)
+        {
+            ushort left = realmId;
+            if ((realmId & 0x8000) != 0)
+                throw new InvalidOperationException("Realm IDs may not be higher than 0x7FFF");
+            if (isTemporaryRuleset)
+                left |= 0x8000;
+            var id = (ushort)random.Next(1, 0xFFFE);
+            uint result = (((uint)left) << 16) | id;
+            return result;
+        }
+
+        public static void ParseInstanceID(uint instanceId, out bool isTemporaryRuleset, out ushort realmId, out ushort shortInstanceId)
+        {
+            shortInstanceId = (ushort)(instanceId & 0xFFFF);
+            ushort left = (ushort)(instanceId >> 16);
+            isTemporaryRuleset = (left & 0x8000) == 0x8000;
+            realmId = (ushort)(left & 0x7FFF);
         }
     }
 }

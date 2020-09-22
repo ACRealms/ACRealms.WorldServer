@@ -619,6 +619,10 @@ namespace ACE.Entity.Enum.Properties
         /// </summary>
         [ServerOnly]
         InventoryOrder                          = 9015,
+
+        //Realm properties below this line
+        [ServerOnly]
+        HomeRealm                               = 42000
     }
 
     public static class PropertyIntExtensions
