@@ -4,6 +4,7 @@ namespace ACE.Entity.Enum.Properties
 {
     public enum RealmPropertyInt64 : ushort
     {
+        [RealmPropertyInt64(0,0,0)]
         Undef               = 0,
     }
 

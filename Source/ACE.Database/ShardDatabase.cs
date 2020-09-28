@@ -500,7 +500,7 @@ namespace ACE.Database
             return staticObjects;
         }
 
-        public List<Biota> GetDynamicObjectsByLandblock(ushort landblockId, byte instance)
+        public List<Biota> GetDynamicObjectsByLandblock(ushort landblockId, uint instance)
         {
             var dynamics = new List<Biota>();
 

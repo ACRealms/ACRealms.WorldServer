@@ -4,6 +4,7 @@ namespace ACE.Entity.Enum.Properties
 {
     public enum RealmPropertyFloat : ushort
     {
+        [RealmPropertyFloat(0f, 0f, 0f)]
         Undef                          = 0,
     }
 
