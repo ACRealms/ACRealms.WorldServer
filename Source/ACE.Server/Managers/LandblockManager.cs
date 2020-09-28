@@ -411,7 +411,7 @@ namespace ACE.Server.Managers
                 {
                     var adjacents = GetAdjacentIDs(landblock);
                     foreach (var adjacent in adjacents)
-                        GetLandblock((ulong)adjacent, false, permaload);
+                        GetLandblock(adjacent, false, permaload);
 
                     setAdjacents = true;
                 }
@@ -459,21 +459,21 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Returns the list of adjacent landblock IDs for a landblock
         /// </summary>
-        private static List<uint> GetAdjacentIDs(Landblock landblock)
+        private static List<ulong> GetAdjacentIDs(Landblock landblock)
         {
-            var adjacents = new List<uint>();
+            var adjacents = new List<ulong>();
 
             if (landblock.IsDungeon)
                 return adjacents;   // dungeons have no adjacents
 
-            var north = GetAdjacentID(landblock.Id, Adjacency.North);
-            var south = GetAdjacentID(landblock.Id, Adjacency.South);
-            var west = GetAdjacentID(landblock.Id, Adjacency.West);
-            var east = GetAdjacentID(landblock.Id, Adjacency.East);
-            var northwest = GetAdjacentID(landblock.Id, Adjacency.NorthWest);
-            var northeast = GetAdjacentID(landblock.Id, Adjacency.NorthEast);
-            var southwest = GetAdjacentID(landblock.Id, Adjacency.SouthWest);
-            var southeast = GetAdjacentID(landblock.Id, Adjacency.SouthEast);
+            var north = GetAdjacentID(landblock.LongId, Adjacency.North);
+            var south = GetAdjacentID(landblock.LongId, Adjacency.South);
+            var west = GetAdjacentID(landblock.LongId, Adjacency.West);
+            var east = GetAdjacentID(landblock.LongId, Adjacency.East);
+            var northwest = GetAdjacentID(landblock.LongId, Adjacency.NorthWest);
+            var northeast = GetAdjacentID(landblock.LongId, Adjacency.NorthEast);
+            var southwest = GetAdjacentID(landblock.LongId, Adjacency.SouthWest);
+            var southeast = GetAdjacentID(landblock.LongId, Adjacency.SouthEast);
 
             if (north != null)
                 adjacents.Add(north.Value);
@@ -498,8 +498,10 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Returns an adjacent landblock ID for a landblock
         /// </summary>
-        private static uint? GetAdjacentID(uint landblock, Adjacency adjacency)
+        private static ulong? GetAdjacentID(ulong longLandblockId, Adjacency adjacency)
         {
+            uint landblock = (uint)(longLandblockId & 0xFFFFFFFF);
+            uint instance = (uint)(longLandblockId >> 32);
             int lbx = (int)(landblock >> 24);
             int lby = (int)((landblock >> 16) & 0xFF);
 
@@ -538,7 +540,8 @@ namespace ACE.Server.Managers
             if (lbx < 0 || lbx > 254 || lby < 0 || lby > 254)
                 return null;
 
-            return (uint)(lbx << 24 | lby << 16 | 0xFFFF);
+            landblock = (uint)(lbx << 24 | lby << 16 | 0xFFFF);
+            return (((ulong)instance) << 32) | landblock;
         }
 
         /// <summary>

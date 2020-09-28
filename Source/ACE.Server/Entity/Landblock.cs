@@ -327,7 +327,8 @@ namespace ACE.Server.Entity
 
                 wo.Location = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation, false, Instance);
 
-                var sortCell = LScape.get_landcell(pos.ObjCellID) as SortCell;
+                var icellid = ((ulong)Instance << 32 | (ulong)pos.ObjCellID);
+                var sortCell = LScape.get_landcell(icellid) as SortCell;
                 if (sortCell != null && sortCell.has_building())
                     continue;
 

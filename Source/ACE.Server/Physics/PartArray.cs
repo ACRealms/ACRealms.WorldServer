@@ -614,7 +614,7 @@ namespace ACE.Server.Physics
         public void calc_cross_cells_static(ObjCell cell, CellArray cellArray)
         {
             if (cell != null)   // fixme
-                cell.find_transit_cells(NumParts, Parts, cellArray);
+                cell.find_transit_cells(NumParts, Parts, cellArray, cell.CurLandblock.Instance);
         }
     }
 }
