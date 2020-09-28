@@ -109,7 +109,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.RecipeId).HasColumnName("recipe_Id");
@@ -146,7 +146,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.WeenieClassId).HasColumnName("weenie_Class_Id");
@@ -169,7 +169,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.Name)
@@ -207,7 +207,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.ObjCellId).HasColumnName("obj_Cell_Id");
@@ -248,7 +248,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.ObjCellId).HasColumnName("obj_Cell_Id");
@@ -280,7 +280,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.ParentGuid).HasColumnName("parent_GUID");
@@ -304,7 +304,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.Name)
@@ -328,7 +328,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.MaxSolves).HasColumnName("max_Solves");
@@ -379,6 +379,10 @@ namespace ACE.Database.Models.World
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
 
+                entity.Property(e => e.Locked)
+                    .HasColumnName("locked")
+                    .HasColumnType("bit(1)");
+
                 entity.Property(e => e.Value)
                     .HasColumnName("value")
                     .HasColumnType("bit(1)");
@@ -406,6 +410,10 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.Type)
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
+
+                entity.Property(e => e.Locked)
+                    .HasColumnName("locked")
+                    .HasColumnType("bit(1)");
 
                 entity.Property(e => e.Value)
                     .HasColumnName("value")
@@ -435,6 +443,10 @@ namespace ACE.Database.Models.World
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
 
+                entity.Property(e => e.Locked)
+                    .HasColumnName("locked")
+                    .HasColumnType("bit(1)");
+
                 entity.Property(e => e.Value)
                     .HasColumnName("value")
                     .HasDefaultValueSql("'0'");
@@ -459,6 +471,10 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.Type)
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
+
+                entity.Property(e => e.Locked)
+                    .HasColumnName("locked")
+                    .HasColumnType("bit(1)");
 
                 entity.Property(e => e.Value)
                     .HasColumnName("value")
@@ -487,6 +503,10 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.Type)
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
+
+                entity.Property(e => e.Locked)
+                    .HasColumnName("locked")
+                    .HasColumnType("bit(1)");
 
                 entity.Property(e => e.Value)
                     .IsRequired()
@@ -536,7 +556,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.SalvageType).HasColumnName("salvage_Type");
@@ -1008,7 +1028,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.Link).HasColumnName("link");
@@ -1117,7 +1137,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.LootQualityMod).HasColumnName("loot_Quality_Mod");
@@ -1151,21 +1171,13 @@ namespace ACE.Database.Models.World
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
-                entity.Property(e => e.Chance)
-                    .HasColumnName("chance")
-                    .HasDefaultValueSql("'0'");
+                entity.Property(e => e.Chance).HasColumnName("chance");
 
-                entity.Property(e => e.Count)
-                    .HasColumnName("count")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.Count).HasColumnName("count");
 
-                entity.Property(e => e.GemCode)
-                    .HasColumnName("gem_Code")
-                    .HasDefaultValueSql("'0'");
+                entity.Property(e => e.GemCode).HasColumnName("gem_Code");
 
-                entity.Property(e => e.Tier)
-                    .HasColumnName("tier")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.Tier).HasColumnName("tier");
             });
 
             modelBuilder.Entity<TreasureMaterialBase>(entity =>
@@ -1245,7 +1257,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.PaletteId).HasColumnName("palette_Id");
@@ -1298,7 +1310,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.PatchVersion)
@@ -1327,7 +1339,7 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.LastModified)
                     .HasColumnName("last_Modified")
                     .HasColumnType("datetime")
-                    .HasDefaultValueSql("'current_timestamp()'")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'")
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.Property(e => e.Type)

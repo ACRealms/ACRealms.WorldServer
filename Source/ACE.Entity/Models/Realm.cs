@@ -14,11 +14,11 @@ namespace ACE.Entity.Models
         public ushort? ParentRealmID { get; set; }
 
 
-        public IDictionary<RealmPropertyBool, bool> PropertiesBool { get; set; }
-        public IDictionary<RealmPropertyFloat, double> PropertiesFloat { get; set; }
-        public IDictionary<RealmPropertyInt, int> PropertiesInt { get; set; }
-        public IDictionary<RealmPropertyInt64, long> PropertiesInt64 { get; set; }
-        public IDictionary<RealmPropertyString, string> PropertiesString { get; set; }
+        public IDictionary<RealmPropertyBool, (bool value, bool locked)> PropertiesBool { get; set; }
+        public IDictionary<RealmPropertyFloat, (double value, bool locked)> PropertiesFloat { get; set; }
+        public IDictionary<RealmPropertyInt, (int value, bool locked)> PropertiesInt { get; set; }
+        public IDictionary<RealmPropertyInt64, (long value, bool locked)> PropertiesInt64 { get; set; }
+        public IDictionary<RealmPropertyString, (string value, bool locked)> PropertiesString { get; set; }
         public bool NeedsRefresh { get; set; }
     }
 }

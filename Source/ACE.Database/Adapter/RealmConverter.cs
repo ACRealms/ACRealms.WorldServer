@@ -20,39 +20,39 @@ namespace ACE.Database.Adapter
 
             if (realm.RealmPropertiesBool != null && (instantiateEmptyCollections || realm.RealmPropertiesBool.Count > 0))
             {
-                result.PropertiesBool = new Dictionary<RealmPropertyBool, bool>(realm.RealmPropertiesBool.Count);
+                result.PropertiesBool = new Dictionary<RealmPropertyBool, (bool, bool)> (realm.RealmPropertiesBool.Count);
                 foreach (var value in realm.RealmPropertiesBool)
-                    result.PropertiesBool[(RealmPropertyBool)value.Type] = value.Value;
+                    result.PropertiesBool[(RealmPropertyBool)value.Type] = (value.Value, value.Locked);
             }
             if (realm.RealmPropertiesFloat != null && (instantiateEmptyCollections || realm.RealmPropertiesFloat.Count > 0))
             {
-                result.PropertiesFloat = new Dictionary<RealmPropertyFloat, double>(realm.RealmPropertiesFloat.Count);
+                result.PropertiesFloat = new Dictionary<RealmPropertyFloat, (double, bool)>(realm.RealmPropertiesFloat.Count);
                 foreach (var value in realm.RealmPropertiesFloat)
-                    result.PropertiesFloat[(RealmPropertyFloat)value.Type] = value.Value;
+                    result.PropertiesFloat[(RealmPropertyFloat)value.Type] = (value.Value, value.Locked);
             }
             if (realm.RealmPropertiesInt != null && (instantiateEmptyCollections || realm.RealmPropertiesInt.Count > 0))
             {
-                result.PropertiesInt = new Dictionary<RealmPropertyInt, int>(realm.RealmPropertiesInt.Count);
+                result.PropertiesInt = new Dictionary<RealmPropertyInt, (int, bool)>(realm.RealmPropertiesInt.Count);
                 foreach (var value in realm.RealmPropertiesInt)
-                    result.PropertiesInt[(RealmPropertyInt)value.Type] = value.Value;
+                    result.PropertiesInt[(RealmPropertyInt)value.Type] = (value.Value, value.Locked);
             }
             if (realm.RealmPropertiesInt64 != null && (instantiateEmptyCollections || realm.RealmPropertiesInt64.Count > 0))
             {
-                result.PropertiesInt64 = new Dictionary<RealmPropertyInt64, long>(realm.RealmPropertiesInt64.Count);
+                result.PropertiesInt64 = new Dictionary<RealmPropertyInt64, (long, bool)>(realm.RealmPropertiesInt64.Count);
                 foreach (var value in realm.RealmPropertiesInt64)
-                    result.PropertiesInt64[(RealmPropertyInt64)value.Type] = value.Value;
+                    result.PropertiesInt64[(RealmPropertyInt64)value.Type] = (value.Value, value.Locked);
             }
             if (realm.RealmPropertiesString != null && (instantiateEmptyCollections || realm.RealmPropertiesString.Count > 0))
             {
-                result.PropertiesString = new Dictionary<RealmPropertyString, string>(realm.RealmPropertiesString.Count);
+                result.PropertiesString = new Dictionary<RealmPropertyString, (string, bool)>(realm.RealmPropertiesString.Count);
                 foreach (var value in realm.RealmPropertiesString)
-                    result.PropertiesString[(RealmPropertyString)value.Type] = value.Value;
+                    result.PropertiesString[(RealmPropertyString)value.Type] = (value.Value, value.Locked);
             }
 
             return result;
         }
 
-        public static ACE.Database.Models.World.Realm ConvertFromEntityRealm(ACE.Entity.Models.Realm realm, bool includeDatabaseRecordIds = false)
+        /*public static ACE.Database.Models.World.Realm ConvertFromEntityRealm(ACE.Entity.Models.Realm realm, bool includeDatabaseRecordIds = false)
         {
             var result = new ACE.Database.Models.World.Realm();
 
@@ -88,6 +88,6 @@ namespace ACE.Database.Adapter
             }
 
             return result;
-        }
+        }*/
     }
 }

@@ -4,12 +4,16 @@ namespace ACE.Entity.Enum.Properties
 {
     public enum RealmPropertyBool : ushort
     {
+        [RealmPropertyBool(false)]
         Undef                            = 0,
+
+        [RealmPropertyBool(false)]
         IsNeutralZone                    = 1,
 
         /// <summary>
         /// Standard "Red server" rules. Players are always Player Killer status unless recently killed by a player killer
         /// </summary>
+        [RealmPropertyBool(false)]
         IsPKOnly                         = 2,
 
         /// <summary>
@@ -17,13 +21,17 @@ namespace ACE.Entity.Enum.Properties
         /// all landblocks will use the parent realm instead. Any players with a homeworld underneath this realm
         /// will be moved to the parent realm.
         /// </summary>
+        [RealmPropertyBool(false)]
         IsTemporaryRealm                 = 3,
+
+        [RealmPropertyBool(true)]
         CanBeHomeworld                   = 4,
 
         /// <summary>
         /// Players with a homeworld of this realm may enter the neutral zone if true
         /// </summary>
-        CanInteractWithNeutralZone       = 5
+        [RealmPropertyBool(true)]
+        CanInteractWithNeutralZone = 5
     }
 
     public static class RealmPropertyBoolExtensions
