@@ -901,7 +901,10 @@ namespace ACE.Server.Command.Handlers
                 if (teleportPOI == null)
                     return;
                 var weenie = DatabaseManager.World.GetCachedWeenie(teleportPOI.WeenieClassId);
+
+
                 var portalDest = new Position(weenie.GetPosition(PositionType.Destination));
+                portalDest.SetToDefaultRealmInstance(session.Player.Location.RealmID);
                 WorldObject.AdjustDungeon(portalDest);
                 session.Player.Teleport(portalDest);
             }
@@ -937,9 +940,9 @@ namespace ACE.Server.Command.Handlers
                     positionData[i] = position;
                 }
 
-                byte inst = 0;
+                uint inst = 0;
                 if (parameters.Length >= 9)
-                    inst = byte.Parse(parameters[8].Trim());
+                    inst = uint.Parse(parameters[8].Trim());
 
                 session.Player.Teleport(new Position(cell, positionData[0], positionData[1], positionData[2], positionData[4], positionData[5], positionData[6], positionData[3], inst));
             }

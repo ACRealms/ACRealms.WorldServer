@@ -27,6 +27,7 @@ using ACE.Server.Network.GameMessages;
 using ACE.Server.WorldObjects;
 
 using Position = ACE.Entity.Position;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Entity
 {
@@ -48,15 +49,15 @@ namespace ACE.Server.Entity
 
         public byte Y => (byte)(Id >> 16);
 
-        public byte Instance;
-
+        public uint Instance;
+        public AppliedRuleset RealmRuleset { get; private set; }
         public ulong LongId
         {
             get => (ulong)Instance << 32 | Id;
             set
             {
                 Id = (uint)value;
-                Instance = (byte)(value >> 32);
+                Instance = (uint)(value >> 32);
             }
         }
 
@@ -202,6 +203,8 @@ namespace ACE.Server.Entity
 
         public void Init(bool reload = false)
         {
+            RealmRuleset = GetOrApplyRuleset();
+
             if (!reload)
                 PhysicsLandblock.PostInit();
 
@@ -215,6 +218,19 @@ namespace ACE.Server.Entity
             });
 
             //LoadMeshes(objects);
+        }
+
+        private AppliedRuleset GetOrApplyRuleset()
+        {
+            Position.ParseInstanceID(this.Instance, out bool _istemp, out var realmid, out var _shortinstid);
+            var realm = RealmManager.GetRealm(realmid);
+            if (realm == null)
+            {
+                //Shouldn't happen
+                throw new Exception($"Error: Realm {realmid} is null when creating landblock.");
+            }
+            return realm.Ruleset;
+            //TODO: apply randomized rulesets per lb
         }
 
         /// <summary>
@@ -1228,7 +1244,6 @@ namespace ACE.Server.Entity
                 return hasDungeon.Value;
             }
         }
-
 
         public List<House> Houses = new List<House>();
 

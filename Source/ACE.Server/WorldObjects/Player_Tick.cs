@@ -64,6 +64,8 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public override void Heartbeat(double currentUnixTime)
         {
+            ValidateCurrentRealm();
+
             NotifyLandblocks();
 
             ManaConsumersTick();

@@ -7,6 +7,8 @@ using ACE.Database;
 using ACE.Entity.Models;
 using ACE.Server.Realms;
 using ACE.Database.Adapter;
+using ACE.Entity.Enum.Properties;
+using System.Linq;
 
 namespace ACE.Server.Managers
 {
@@ -19,30 +21,75 @@ namespace ACE.Server.Managers
 
         public static Realm DefaultRealm { get; private set; }
 
+        public static Dictionary<RealmPropertyBool, RealmPropertyBoolAttribute> PropertyDefinitionsBool;
+        public static Dictionary<RealmPropertyInt, RealmPropertyIntAttribute> PropertyDefinitionsInt;
+        public static Dictionary<RealmPropertyInt64, RealmPropertyInt64Attribute> PropertyDefinitionsInt64;
+        public static Dictionary<RealmPropertyFloat, RealmPropertyFloatAttribute> PropertyDefinitionsFloat;
+        public static Dictionary<RealmPropertyString, RealmPropertyStringAttribute> PropertyDefinitionsString;
+
+        private static Dictionary<E, A> MakePropDict<E, A>()
+        {
+            return typeof(E).GetEnumNames().Select(n =>
+            {
+                var value = (E)Enum.Parse(typeof(E), n);
+                var attributes = typeof(E).GetMember(n)
+                    .FirstOrDefault(m => m.DeclaringType == typeof(E))
+                    .GetCustomAttributes(typeof(A), false);
+
+                if (attributes.Length == 0)
+                    throw new Exception($"Enum {typeof(E).Name}.{n} is missing a {typeof(A)} attribute.");
+                if (attributes.Length != 1)
+                    throw new Exception($"Enum {typeof(E).Name}.{n} must have no more than 1 {typeof(A)} attributes.");
+
+                var attribute = (A)attributes[0];
+                return (value, attribute);
+            }).ToDictionary((pair) => pair.value, (pair) => pair.attribute);
+        }
         public static void Initialize()
         {
-           /* var results = DatabaseManager.World.GetAllRealms();
+            PropertyDefinitionsBool = MakePropDict<RealmPropertyBool, RealmPropertyBoolAttribute>();
+            PropertyDefinitionsInt = MakePropDict<RealmPropertyInt, RealmPropertyIntAttribute>();
+            PropertyDefinitionsInt64 = MakePropDict<RealmPropertyInt64, RealmPropertyInt64Attribute>();
+            PropertyDefinitionsString = MakePropDict<RealmPropertyString, RealmPropertyStringAttribute>();
+            PropertyDefinitionsFloat = MakePropDict<RealmPropertyFloat, RealmPropertyFloatAttribute>();
 
-            foreach(var realm in results)
-            {
-                lock (realmsLock)
-                {
-                    realms[realm.Id] = realm;
-                }
-            }*/
+            /* var results = DatabaseManager.World.GetAllRealms();
+
+             foreach(var realm in results)
+             {
+                 lock (realmsLock)
+                 {
+                     realms[realm.Id] = realm;
+                 }
+             }*/
         }
 
-        public static WorldRealm GetRealm(ushort realmId)
+        public static WorldRealm GetRealm(ushort? realm_id)
         {
+            if (!realm_id.HasValue)
+                return null;
+            var realmId = realm_id.Value;
+
             lock (realmsLock)
             {
                 if (realmId > 0x7FFF)
                     return null;
                 if (realms.TryGetValue(realmId, out var realm))
                     return realm;
-                var dbitem = DatabaseManager.World.GetRealm(realmId);
+
+                Database.Models.World.Realm dbitem;
+                if (realmId == 0)
+                {
+                    dbitem = new Database.Models.World.Realm();
+                    dbitem.Type = 1;
+                    dbitem.Name = "Undefined Realm";
+                }
+                else
+                    dbitem = DatabaseManager.World.GetRealm(realmId);
+
                 if (dbitem == null)
                     return null;
+
                 var erealm = RealmConverter.ConvertToEntityRealm(dbitem, true);
                 if (!ValidateCircularDependency(erealm))
                 {
@@ -82,17 +129,14 @@ namespace ACE.Server.Managers
         {
             lock (realmsLock)
             {
-                foreach (var realm in realms.Values)
+                foreach (var realm in realms.Values.Where(x => x != null))
+                {
                     realm.NeedsRefresh = true;
+                }
 
                 DatabaseManager.World.ClearRealmCache();
                 realms.Clear();
             }
-        }
-
-        internal static object GetRealm(object realmID)
-        {
-            throw new NotImplementedException();
         }
     }
 }

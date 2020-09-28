@@ -1271,6 +1271,7 @@ namespace ACE.Server.WorldObjects.Managers
                         if (emote.ObjCellId.HasValue && emote.OriginX.HasValue && emote.OriginY.HasValue && emote.OriginZ.HasValue && emote.AnglesX.HasValue && emote.AnglesY.HasValue && emote.AnglesZ.HasValue && emote.AnglesW.HasValue)
                         {
                             var destination = new Position(emote.ObjCellId.Value, emote.OriginX.Value, emote.OriginY.Value, emote.OriginZ.Value, emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value);
+                            destination.SetToDefaultRealmInstance(player.Location.RealmID);
 
                             WorldObject.AdjustDungeon(destination);
                             WorldManager.ThreadSafeTeleport(player, destination);

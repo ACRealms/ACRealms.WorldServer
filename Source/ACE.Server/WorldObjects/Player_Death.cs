@@ -949,7 +949,7 @@ namespace ACE.Server.WorldObjects
             if (MinimumTimeSincePk == null || (PropertyManager.GetBool("pk_server_safe_training_academy").Item && RecallsDisabled))
                 return;
 
-            if (PkLevel == PKLevel.NPK && !PropertyManager.GetBool("pk_server").Item && !PropertyManager.GetBool("pkl_server").Item)
+            if (PkLevel == PKLevel.NPK && !RealmRuleset.GetProperty(RealmPropertyBool.IsPKOnly) && !PropertyManager.GetBool("pkl_server").Item)
             {
                 MinimumTimeSincePk = null;
                 return;
@@ -965,7 +965,7 @@ namespace ACE.Server.WorldObjects
             var werror = WeenieError.None;
             var pkLevel = PkLevel;
 
-            if (PropertyManager.GetBool("pk_server").Item)
+            if (RealmRuleset.GetProperty(RealmPropertyBool.IsPKOnly))
                 pkLevel = PKLevel.PK;
             else if (PropertyManager.GetBool("pkl_server").Item)
                 pkLevel = PKLevel.PKLite;
