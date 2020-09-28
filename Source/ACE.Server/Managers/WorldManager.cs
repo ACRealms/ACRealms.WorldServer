@@ -204,11 +204,24 @@ namespace ACE.Server.Managers
 
             // If the client is missing a location, we start them off in the starter town they chose
             if (session.Player.Location == null)
-            {
+            {    
                 if (session.Player.Instantiation != null)
                     session.Player.Location = new Position(session.Player.Instantiation);
                 else
                     session.Player.Location = new Position(0xA9B40019, 84, 7.1f, 94, 0, 0, -0.0784591f, 0.996917f);  // ultimate fallback
+            }
+
+            var realm = RealmManager.GetRealm(session.Player.Location.RealmID);
+            if (realm == null)
+            {
+                var homerealm = RealmManager.GetRealm(session.Player.HomeRealm);
+                if (homerealm == null)
+                    homerealm = RealmManager.GetRealm(0);
+                var pos = new Position(session.Player.Location);
+                pos.SetToDefaultRealmInstance(homerealm.Realm.Id);
+
+                log.Error($"WorldManager.DoPlayerEnterWorld: failed to find realm {session.Player.Location.RealmID}, for player {session.Player.Name}, relocating to realm {homerealm.Realm.Id}.");
+                session.Player.Location = pos;
             }
 
             session.Player.PlayerEnterWorld();

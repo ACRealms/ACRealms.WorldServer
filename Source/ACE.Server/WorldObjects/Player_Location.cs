@@ -16,6 +16,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Managers;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -36,6 +37,7 @@ namespace ACE.Server.WorldObjects
             if (position != null)
             {
                 var teleportDest = new Position(position);
+                teleportDest.SetToDefaultRealmInstance(Location.RealmID);
                 AdjustDungeon(teleportDest);
 
                 Teleport(teleportDest);
@@ -597,13 +599,32 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void Teleport(Position _newPosition)
         {
-            if (!ValidateRealmTeleport(_newPosition))
+            if (_newPosition.Instance == 0)
+                _newPosition.Instance = Location.Instance;
+
+            if (RealmManager.GetRealm(_newPosition.RealmID) == null)
             {
-                Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to teleport to that realm.", ChatMessageType.System));
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"Error: Realm at destination location does not exist.", ChatMessageType.System));
                 return;
             }
+            if (!ValidatePlayerRealmPosition(_newPosition))
+            {
+                if (IsAdmin)
+                {
+                    Session.Network.EnqueueSend(new GameMessageSystemChat($"Admin bypassing realm restriction.", ChatMessageType.System));
+                }
+                else
+                { 
+                    Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to teleport to that realm.", ChatMessageType.System));
+                    return;
+                }
+            }
 
-
+            if (_newPosition.RealmID != Location.RealmID)
+            {
+                if (!OnTransitionToNewRealm(Location.RealmID, _newPosition.RealmID))
+                    return;
+            }
             var newPosition = new Position(_newPosition);
             newPosition._pos.Z += 0.005f * (ObjScale ?? 1.0f);
 
@@ -654,6 +675,20 @@ namespace ACE.Server.WorldObjects
             UpdatePlayerPosition(new Position(newPosition), true);
         }
 
+        private bool OnTransitionToNewRealm(ushort prevRealmId, ushort newRealmId)
+        {
+            var prevrealm = RealmManager.GetRealm(prevRealmId);
+            var newRealm = RealmManager.GetRealm(newRealmId);
+            if (newRealm.Ruleset.GetProperty(RealmPropertyBool.IsPKOnly))
+                PlayerKillerStatus = PlayerKillerStatus.PK;
+            else
+                PlayerKillerStatus = PlayerKillerStatus.NPK;
+            EnqueueBroadcast(new GameMessagePublicUpdatePropertyInt(this, PropertyInt.PlayerKillerStatus, (int)PlayerKillerStatus));
+
+            Session.Network.EnqueueSend(new GameMessageSystemChat($"Moving from realm {prevrealm.Realm.Id} ({prevrealm.Realm.Name}) to {newRealm.Realm.Id} ({newRealm.Realm.Name})", ChatMessageType.System));
+            return true;
+        }
+
         public ushort HomeRealm
         {
             get
@@ -682,14 +717,38 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        private bool ValidateRealmTeleport(Position newPosition)
+        public void ValidateCurrentRealm()
+        {
+            if (IsAdmin)
+                return;
+            if (!ValidatePlayerRealmPosition(Location))
+                TeleportToHomeRealm();
+        }
+
+        public void TeleportToHomeRealm()
+        {
+            var homerealm = RealmManager.GetRealm(HomeRealm);
+            if (homerealm == null)
+                homerealm = RealmManager.GetRealm(0);
+
+            var iid = homerealm.Ruleset.GetDefaultInstanceID();
+            var pos = new Position(Home) { Instance = iid };
+            Teleport(pos);
+        }
+
+        public bool ValidatePlayerRealmPosition(Position newPosition)
         {
             Position.ParseInstanceID(newPosition.Instance, out var isTemporaryRuleset, out ushort newRealmId, out ushort shortInstanceId);
             var homerealm = RealmManager.GetRealm(HomeRealm);
             var destrealm = RealmManager.GetRealm(newPosition.RealmID);
-            if (homerealm == null || destrealm == null)
+            if (destrealm == null)
             {
                 return false;
+            }
+            if (homerealm == null && destrealm.Realm.Id == 0)
+            {
+                //Home realm is either bugged and can't be found, or the player hasn't set one yet. Then they are allowed in realm 0.
+                return true;
             }
             if (homerealm.Ruleset.GetProperty(RealmPropertyBool.CanInteractWithNeutralZone) == true &&
                 destrealm.Ruleset.GetProperty(RealmPropertyBool.IsNeutralZone) == true)

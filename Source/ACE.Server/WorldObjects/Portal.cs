@@ -240,6 +240,8 @@ namespace ACE.Server.WorldObjects
             // player.Session.Network.EnqueueSend(new GameMessageSystemChat("Portal sending player to destination", ChatMessageType.System));
 #endif
             var portalDest = new Position(Destination);
+            portalDest.SetToDefaultRealmInstance(Location.RealmID);
+
             WorldObject.AdjustDungeon(portalDest);
 
             WorldManager.ThreadSafeTeleport(player, portalDest, new ActionEventDelegate(() =>

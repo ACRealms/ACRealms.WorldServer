@@ -25,6 +25,7 @@ namespace ACE.Entity
         public uint Instance;
 
         public ulong LongObjCellID => (ulong)Instance << 32 | ObjCellID;
+        public ulong LongLandblockID => ((ulong)Instance << 32 | ObjCellID) & 0xFFFF;
 
         public Vector3 _pos;
 
@@ -84,11 +85,11 @@ namespace ACE.Entity
         }
 
 
-        public Position(uint blockCellID, float newPositionX, float newPositionY, float newPositionZ, float newRotationX, float newRotationY, float newRotationZ, float newRotationW, uint? instance = null)
-        {
+        public Position(uint blockCellID, float newPositionX, float newPositionY, float newPositionZ, float newRotationX, float newRotationY, float newRotationZ, float newRotationW, uint instance)
+        { 
             ObjCellID = blockCellID;
 
-            Instance = instance ?? 0;
+            Instance = instance;
 
             _pos = new Vector3(newPositionX, newPositionY, newPositionZ);
             Rotation = new Quaternion(newRotationX, newRotationY, newRotationZ, newRotationW);
@@ -409,6 +410,22 @@ namespace ACE.Entity
             ushort left = (ushort)(instanceId >> 16);
             isTemporaryRuleset = (left & 0x8000) == 0x8000;
             realmId = (ushort)(left & 0x7FFF);
+        }
+
+        public static uint InstanceIDFromVars(ushort realmId, ushort shortInstanceId, bool isTemporaryRuleset)
+        {
+            if (realmId > 0x7FFF)
+                throw new ArgumentOutOfRangeException(nameof(realmId));
+            uint result = ((uint)realmId) << 16;
+            result |= (uint)shortInstanceId;
+            if (isTemporaryRuleset)
+                result |= 0x80000000;
+            return result;
+        }
+
+        public void SetToDefaultRealmInstance(ushort newRealmId)
+        {
+            Instance = InstanceIDFromVars(newRealmId, 0, false);
         }
     }
 }
