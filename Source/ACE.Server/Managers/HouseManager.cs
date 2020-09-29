@@ -291,7 +291,7 @@ namespace ACE.Server.Managers
         {
             var p = biota.BiotaPropertiesPosition.FirstOrDefault(i => i.PositionType == (ushort)PositionType.Location);
 
-            return GetCoords(new Position(p.ObjCellId, p.OriginX, p.OriginY, p.OriginZ, p.AnglesX, p.AnglesY, p.AnglesZ, p.AnglesW));
+            return GetCoords(new Position(p.ObjCellId, p.OriginX, p.OriginY, p.OriginZ, p.AnglesX, p.AnglesY, p.AnglesZ, p.AnglesW, 0));
         }
 
         /// <summary>

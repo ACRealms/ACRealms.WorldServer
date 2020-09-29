@@ -932,7 +932,7 @@ namespace ACE.Server.WorldObjects.Managers
                             newRotation *= new Quaternion(emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value);  
                         }
 
-                        var newPosition = new Position(creature.Home.ObjCellID, newPos, newRotation, true);
+                        var newPosition = new Position(creature.Home.ObjCellID, newPos, newRotation, true, creature.Location.Instance);
 
                         if (Debug)
                             Console.WriteLine(newPosition.ToLOCString());
@@ -983,7 +983,7 @@ namespace ACE.Server.WorldObjects.Managers
                         var newPos = new Position();
 
                         newPos.ObjCellID = emote.ObjCellId ?? currentPos.ObjCellID;
-
+                        newPos.Instance = creature.Location.Instance;
                         newPos.Pos = new Vector3(emote.OriginX ?? currentPos.Pos.X, emote.OriginY ?? currentPos.Pos.Y, emote.OriginZ ?? currentPos.Pos.Z);
 
                         if (emote.AnglesX == null || emote.AnglesY == null || emote.AnglesZ == null || emote.AnglesW == null)
@@ -1159,7 +1159,7 @@ namespace ACE.Server.WorldObjects.Managers
                 case EmoteType.SetSanctuaryPosition:
 
                     if (player != null)
-                        player.SetPosition(PositionType.Sanctuary, new Position(emote.ObjCellId.Value, emote.OriginX.Value, emote.OriginY.Value, emote.OriginZ.Value, emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value));
+                        player.SetPosition(PositionType.Sanctuary, new Position(emote.ObjCellId.Value, emote.OriginX.Value, emote.OriginY.Value, emote.OriginZ.Value, emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value, player.Location.Instance));
                     break;
 
                 case EmoteType.Sound:
@@ -1270,7 +1270,7 @@ namespace ACE.Server.WorldObjects.Managers
                     {
                         if (emote.ObjCellId.HasValue && emote.OriginX.HasValue && emote.OriginY.HasValue && emote.OriginZ.HasValue && emote.AnglesX.HasValue && emote.AnglesY.HasValue && emote.AnglesZ.HasValue && emote.AnglesW.HasValue)
                         {
-                            var destination = new Position(emote.ObjCellId.Value, emote.OriginX.Value, emote.OriginY.Value, emote.OriginZ.Value, emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value);
+                            var destination = new Position(emote.ObjCellId.Value, emote.OriginX.Value, emote.OriginY.Value, emote.OriginZ.Value, emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value, player.Location.Instance);
                             destination.SetToDefaultRealmInstance(player.Location.RealmID);
 
                             WorldObject.AdjustDungeon(destination);

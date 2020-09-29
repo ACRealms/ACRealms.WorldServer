@@ -30,7 +30,7 @@ namespace ACE.Entity
                     break;
             }
 
-            var startingPosition = new Position(landblockID, 12.3199f, -28.482f, 0.0049999995f, 0.0f, 0.0f, -0.9408059f, -0.3389459f);
+            var startingPosition = new Position(landblockID, 12.3199f, -28.482f, 0.0049999995f, 0.0f, 0.0f, -0.9408059f, -0.3389459f, 0);
 
             return startingPosition;
         }

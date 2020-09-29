@@ -292,7 +292,7 @@ namespace ACE.Server.WorldObjects
                 var cellBefore = PhysicsObj.CurCell != null ? PhysicsObj.CurCell.ID : 0;
 
                 //Console.WriteLine($"{Name} - ticking physics");
-                var updated = PhysicsObj.update_object();
+                var updated = PhysicsObj.update_object(Location.Instance);
 
                 // get position after
                 var newPos = PhysicsObj.Position.Frame.Origin;

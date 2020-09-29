@@ -201,7 +201,7 @@ namespace ACE.Server.WorldObjects
             if (Timers.RunningTime < NextMoveTime)
                 return false;
 
-            PhysicsObj.update_object();
+            PhysicsObj.update_object(Location.Instance);
             UpdatePosition_SyncLocation();
 
             return !PhysicsObj.IsAnimating;
@@ -218,7 +218,7 @@ namespace ACE.Server.WorldObjects
             if (Timers.RunningTime < nextAttackTime || !IsAttackRange())
                 return false;
 
-            PhysicsObj.update_object();
+            PhysicsObj.update_object(Location.Instance);
             UpdatePosition_SyncLocation();
 
             return !PhysicsObj.IsAnimating;

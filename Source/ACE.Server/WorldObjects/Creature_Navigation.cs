@@ -345,7 +345,7 @@ namespace ACE.Server.WorldObjects
             if (setLoc)
             {
                 Location = new Position(position);
-                PhysicsObj.SetPositionSimple(new Physics.Common.Position(position), true);
+                PhysicsObj.SetPositionSimple(new Physics.Common.Position(position), true, position.Instance);
             }
 
             EnqueueBroadcastMotion(motion);

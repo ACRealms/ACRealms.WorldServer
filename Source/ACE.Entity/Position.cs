@@ -98,13 +98,13 @@ namespace ACE.Entity
                 SetPosition(_pos);
         }
 
-        public Position(uint blockCellID, Vector3 position, Quaternion rotation, bool normalize = false, uint? instance = null)
+        public Position(uint blockCellID, Vector3 position, Quaternion rotation, bool normalize, uint instance)
         {
             ObjCellID = blockCellID;
 
             _pos = position;
             Rotation = rotation;
-            Instance = instance ?? 0;
+            Instance = instance;
 
             if (Cell == 0 || normalize)
                 SetPosition(_pos);

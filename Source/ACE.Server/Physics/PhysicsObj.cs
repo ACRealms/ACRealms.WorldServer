@@ -900,7 +900,7 @@ namespace ACE.Server.Physics
                 MovementManager.MotionDone(motion, success);
         }
 
-        public bool MoveOrTeleport(Position pos, int timestamp, bool contact, Vector3 velocity)
+        public bool MoveOrTeleport(Position pos, int timestamp, bool contact, Vector3 velocity, uint instance)
         {
             var updateTime = UpdateTimes[4];
             bool timeDiff;
@@ -925,7 +925,7 @@ namespace ACE.Server.Physics
                 else
                 {
                     if (PositionManager != null) PositionManager.StopInterpolating();
-                    SetPositionSimple(pos, true);
+                    SetPositionSimple(pos, true, instance);
                 }
             }
             return true;
@@ -1342,11 +1342,12 @@ namespace ACE.Server.Physics
             return result;
         }
 
-        public SetPositionError SetPositionSimple(Position pos, bool sliding)
+        public SetPositionError SetPositionSimple(Position pos, bool sliding, uint instance)
         {
             var setPos = new SetPosition();
             setPos.Pos = pos;
             setPos.Flags = SetPositionFlags.Teleport | SetPositionFlags.SendPositionEvent;
+            setPos.Instance = instance;
 
             if (sliding)
                 setPos.Flags |= SetPositionFlags.Slide;
@@ -1636,7 +1637,7 @@ namespace ACE.Server.Physics
 
         public int InitialUpdates;
 
-        public void UpdateObjectInternal(double quantum)
+        public void UpdateObjectInternal(double quantum, uint instance)
         {
             if ((TransientState & TransientStateFlags.Active) == 0 || CurCell == null)
                 return;
@@ -1714,7 +1715,7 @@ namespace ACE.Server.Physics
 
             if (PartArray != null) PartArray.HandleMovement();
 
-            if (PositionManager != null) PositionManager.UseTime();
+            if (PositionManager != null) PositionManager.UseTime(instance);
 
             if (ParticleManager != null) ParticleManager.UpdateParticles();
 
@@ -1747,7 +1748,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// This is for legacy movement system
         /// </summary>
-        public bool UpdateObjectInternalServer(double quantum)
+        public bool UpdateObjectInternalServer(double quantum, uint instance)
         {
             //var offsetFrame = new AFrame();
             //UpdatePhysicsInternal((float)quantum, ref offsetFrame);
@@ -1776,7 +1777,7 @@ namespace ACE.Server.Physics
 
             if (PartArray != null) PartArray.HandleMovement();
 
-            if (PositionManager != null) PositionManager.UseTime();
+            if (PositionManager != null) PositionManager.UseTime(instance);
 
             if (ParticleManager != null) ParticleManager.UpdateParticles();
 
@@ -4121,7 +4122,7 @@ namespace ACE.Server.Physics
 
         public static float TickRate = 1.0f / 30.0f;
 
-        public bool update_object()
+        public bool update_object(uint instance)
         {
             if (Parent != null || CurCell == null || State.HasFlag(PhysicsState.Frozen))
             {
@@ -4157,14 +4158,14 @@ namespace ACE.Server.Physics
             while (deltaTime > PhysicsGlobals.MaxQuantum)
             {
                 PhysicsTimer_CurrentTime += PhysicsGlobals.MaxQuantum;
-                UpdateObjectInternal(PhysicsGlobals.MaxQuantum);
+                UpdateObjectInternal(PhysicsGlobals.MaxQuantum, instance);
                 deltaTime -= PhysicsGlobals.MaxQuantum;
             }
 
             if (deltaTime > PhysicsGlobals.MinQuantum)
             {
                 PhysicsTimer_CurrentTime += deltaTime;
-                UpdateObjectInternal(deltaTime);
+                UpdateObjectInternal(deltaTime, instance);
             }
 
             UpdateTime = PhysicsTimer_CurrentTime;
@@ -4231,14 +4232,14 @@ namespace ACE.Server.Physics
         /// <summary>
         /// This is for legacy movement system
         /// </summary>
-        public bool update_object_server(bool forcePos = true)
+        public bool update_object_server(bool forcePos, uint instance)
         {
             var deltaTime = PhysicsTimer.CurrentTime - UpdateTime;
 
             var wo = WeenieObj.WorldObject;
             var success = true;
             if (wo != null && !wo.Teleporting)
-                success = UpdateObjectInternalServer(deltaTime);
+                success = UpdateObjectInternalServer(deltaTime, instance);
 
             if (forcePos && success)
                 set_current_pos(RequestPos, RequestInstance);
@@ -4274,7 +4275,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// This is for full / updated movement system
         /// </summary>
-        public bool update_object_server_new(bool forcePos = true)
+        public bool update_object_server_new(bool forcePos, uint instance) //forcePos = true
         {
             if (Parent != null || CurCell == null || State.HasFlag(PhysicsState.Frozen))
             {
@@ -4312,14 +4313,14 @@ namespace ACE.Server.Physics
                 while (deltaTime > PhysicsGlobals.MaxQuantum)
                 {
                     PhysicsTimer_CurrentTime += PhysicsGlobals.MaxQuantum;
-                    UpdateObjectInternal(PhysicsGlobals.MaxQuantum);
+                    UpdateObjectInternal(PhysicsGlobals.MaxQuantum, instance);
                     deltaTime -= PhysicsGlobals.MaxQuantum;
                 }
 
                 if (deltaTime > PhysicsGlobals.MinQuantum)
                 {
                     PhysicsTimer_CurrentTime += deltaTime;
-                    UpdateObjectInternal(deltaTime);
+                    UpdateObjectInternal(deltaTime, instance);
                 }
 
                 success &= requestCell >> 16 != 0x18A || CurCell?.ID >> 16 == requestCell >> 16;

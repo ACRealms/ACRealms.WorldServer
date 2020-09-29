@@ -241,7 +241,7 @@ namespace ACE.Server.Entity
         {
             var objects = DatabaseManager.World.GetCachedInstancesByLandblock(ShortId);
             var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(ShortId);
-            var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects);
+            var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects, null, Instance);
 
             actionQueue.EnqueueAction(new ActionEventDelegate(() =>
             {
@@ -414,7 +414,7 @@ namespace ACE.Server.Entity
                 var weenie = DatabaseManager.World.GetCachedWeenie(obj.WeenieClassId);
                 WeenieMeshes.Add(
                     new ModelMesh(weenie.GetProperty(PropertyDataId.Setup) ?? 0,
-                    new DatLoader.Entity.Frame(new Position(obj.ObjCellId, obj.OriginX, obj.OriginY, obj.OriginZ, obj.AnglesX, obj.AnglesY, obj.AnglesZ, obj.AnglesW))));
+                    new DatLoader.Entity.Frame(new Position(obj.ObjCellId, obj.OriginX, obj.OriginY, obj.OriginZ, obj.AnglesX, obj.AnglesY, obj.AnglesZ, obj.AnglesW, this.Instance))));
             }
         }
 
