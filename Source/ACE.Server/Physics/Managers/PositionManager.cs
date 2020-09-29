@@ -116,10 +116,10 @@ namespace ACE.Server.Physics.Animation
                 StickyManager.HandleExitWorld();
         }
 
-        public void UseTime()
+        public void UseTime(uint instance)
         {
             if (InterpolationManager != null)
-                InterpolationManager.UseTime();
+                InterpolationManager.UseTime(instance);
 
             if (StickyManager != null)
                 StickyManager.UseTime();

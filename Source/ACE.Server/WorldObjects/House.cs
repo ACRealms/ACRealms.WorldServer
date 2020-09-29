@@ -139,7 +139,7 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
-            var linkedHouses = WorldObjectFactory.CreateNewWorldObjects(instances, new List<ACE.Database.Models.Shard.Biota> { biota }, biota.WeenieClassId);
+            var linkedHouses = WorldObjectFactory.CreateNewWorldObjects(instances, new List<ACE.Database.Models.Shard.Biota> { biota }, biota.WeenieClassId, 0);
 
             foreach (var linkedHouse in linkedHouses)
                 linkedHouse.ActivateLinks(instances, new List<ACE.Database.Models.Shard.Biota> { biota }, linkedHouses[0]);

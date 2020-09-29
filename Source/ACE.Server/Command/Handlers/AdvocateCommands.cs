@@ -185,7 +185,8 @@ namespace ACE.Server.Command.Handlers
             if (!CommandParameterHelpers.ResolveACEParameters(session, parameters, aceParams)) return;
 
             // Check if water block
-            var landblock = LScape.get_landblock(aceParams[1].AsPosition.ObjCellID);
+            var longcellid = ((ulong)session.Player.Location.Instance << 32) | aceParams[1].AsPosition.ObjCellID;
+            var landblock = LScape.get_landblock(longcellid);
             if (landblock.WaterType == LandDefs.WaterType.EntirelyWater)
             {
                 ChatPacket.SendServerMessage(session, $"Landblock 0x{aceParams[1].AsPosition.Landblock:X4} is entirely filled with water, and is impassable", ChatMessageType.Broadcast);

@@ -287,7 +287,7 @@ namespace ACE.Server.WorldObjects
             //Console.WriteLine($"{PhysicsObj.Position.Frame.Origin}");
             //Console.WriteLine($"{PhysicsObj.Position.Frame.get_heading()}");
 
-            PhysicsObj.update_object();
+            PhysicsObj.update_object(Location.Instance);
 
             // handle landblock update?
 
@@ -410,9 +410,9 @@ namespace ACE.Server.WorldObjects
 
                             PhysicsObj.set_request_pos(newPosition.Pos, newPosition.Rotation, newPosition.Instance, curCell, Location.ObjCellID);
                             if (FastTick)
-                                success = PhysicsObj.update_object_server_new();
+                                success = PhysicsObj.update_object_server_new(true, newPosition.Instance);
                             else
-                                success = PhysicsObj.update_object_server();
+                                success = PhysicsObj.update_object_server(true, newPosition.Instance);
 
                             if (PhysicsObj.CurCell == null && curCell.ID >> 16 != 0x18A)
                             {

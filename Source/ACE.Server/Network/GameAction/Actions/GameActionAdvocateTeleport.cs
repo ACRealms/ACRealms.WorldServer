@@ -16,6 +16,7 @@ namespace ACE.Server.Network.GameAction.Actions
         {
             var target = message.Payload.ReadString16L();
             var position = new Position(message.Payload);
+            position.Instance = session.Player.Location.Instance;
             // this check is also done clientside, see: PlayerDesc::PlayerIsPSR
             if (!session.Player.IsAdmin && !session.Player.IsArch && !session.Player.IsPsr)
                 return;
@@ -24,7 +25,7 @@ namespace ACE.Server.Network.GameAction.Actions
             //Console.WriteLine($"Client sent position: {position}");
 
             // Check if water block
-            var landblock = LScape.get_landblock(position.ObjCellID);
+            var landblock = LScape.get_landblock(position.LongObjCellID);
             if (landblock.WaterType == LandDefs.WaterType.EntirelyWater)
             {
                 ChatPacket.SendServerMessage(session, $"Landblock 0x{position.Landblock:X4} is entirely filled with water, and is impassable", ChatMessageType.Broadcast);

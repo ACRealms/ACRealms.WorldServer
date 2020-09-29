@@ -60,6 +60,7 @@ namespace ACE.Server.Entity
             var landblock = (uint)(blockX << 24 | blockY << 16);
 
             var position = new Position();
+            position.Instance = p.Instance;
             position.ObjCellID = landblock;
             position.Pos = new Vector3(localX, localY, pos.Z);
             position.Rotation = p.Rotation;
@@ -72,7 +73,7 @@ namespace ACE.Server.Entity
         /// </summary>
         public static uint GetCell(this Position p)
         {
-            var landblock = LScape.get_landblock(p.ObjCellID);
+            var landblock = LScape.get_landblock(p.LongObjCellID);
 
             // dungeons
             // TODO: investigate dungeons that are below actual traversable overworld terrain
@@ -83,7 +84,8 @@ namespace ACE.Server.Entity
 
             // outside - could be on landscape, in building, or underground cave
             var cellID = GetOutdoorCell(p);
-            var landcell = LScape.get_landcell(cellID) as LandCell;
+            var longcellID = ((ulong)p.Instance << 32) | cellID;
+            var landcell = LScape.get_landcell(longcellID) as LandCell;
 
             if (landcell == null)
                 return cellID;
@@ -187,7 +189,7 @@ namespace ACE.Server.Entity
             pos._pos.Z = pos.GetTerrainZ();
 
             // adjust to building height, if applicable
-            var sortCell = LScape.get_landcell(pos.ObjCellID) as SortCell;
+            var sortCell = LScape.get_landcell(pos.LongObjCellID) as SortCell;
             if (sortCell != null && sortCell.has_building())
             {
                 var building = sortCell.Building;
@@ -203,7 +205,7 @@ namespace ACE.Server.Entity
 
         public static float GetTerrainZ(this Position p)
         {
-            var landblock = LScape.get_landblock(p.ObjCellID);
+            var landblock = LScape.get_landblock(p.LongObjCellID);
 
             var cellID = GetOutdoorCell(p);
             var landcell = (LandCell)LScape.get_landcell(cellID);
@@ -228,7 +230,7 @@ namespace ACE.Server.Entity
         {
             if (p.Indoors) return true;
 
-            var landcell = (LandCell)LScape.get_landcell(p.ObjCellID);
+            var landcell = (LandCell)LScape.get_landcell(p.LongObjCellID);
 
             Physics.Polygon walkable = null;
             var terrainPoly = landcell.find_terrain_poly(p.Pos, ref walkable);
@@ -249,7 +251,7 @@ namespace ACE.Server.Entity
 
         public static Position ACEPosition(this Physics.Common.Position pos, Position source)
         {
-            var newPos = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation);
+            var newPos = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation, false, source.Instance);
             newPos.Instance = source.Instance;
 
             return newPos;

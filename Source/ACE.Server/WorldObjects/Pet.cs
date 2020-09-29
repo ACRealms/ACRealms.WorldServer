@@ -114,7 +114,7 @@ namespace ACE.Server.WorldObjects
 
             if (IsMoving)
             {
-                PhysicsObj.update_object();
+                PhysicsObj.update_object(Location.Instance);
 
                 UpdatePosition_SyncLocation();
 

@@ -54,7 +54,7 @@ namespace ACE.Server.WorldObjects
                 if (i.ObjCellId == Location.ObjCellID && housePortals.Count > 1)
                     i = housePortals[1];
 
-                var destination = new Position(i.ObjCellId, new Vector3(i.OriginX, i.OriginY, i.OriginZ), new Quaternion(i.AnglesX, i.AnglesY, i.AnglesZ, i.AnglesW));
+                var destination = new Position(i.ObjCellId, new Vector3(i.OriginX, i.OriginY, i.OriginZ), new Quaternion(i.AnglesX, i.AnglesY, i.AnglesZ, i.AnglesW), false, 0);
 
                 wo.SetPosition(PositionType.Destination, destination);
 

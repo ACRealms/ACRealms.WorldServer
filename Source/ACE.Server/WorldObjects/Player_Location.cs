@@ -422,11 +422,11 @@ namespace ACE.Server.WorldObjects
 
         private static List<Position> pkArenaLocs = new List<Position>()
         {
-            new Position(0x00660117, new Vector3(30, -50, 0.005f), new Quaternion(0, 0, 0, 1)),
-            new Position(0x00660106, new Vector3(10, 0, 0.005f), new Quaternion(0, 0, -0.947071f, 0.321023f)),
-            new Position(0x00660103, new Vector3(0, -30, 0.005f), new Quaternion(0, 0, -0.699713f, 0.714424f)),
-            new Position(0x0066011E, new Vector3(50, 0, 0.005f), new Quaternion(0, 0, -0.961021f, -0.276474f)),
-            new Position(0x00660127, new Vector3(60, -30, 0.005f), new Quaternion(0, 0, 0.681639f, 0.731689f)),
+            new Position(0x00660117, new Vector3(30, -50, 0.005f), new Quaternion(0, 0, 0, 1),false,0),
+            new Position(0x00660106, new Vector3(10, 0, 0.005f), new Quaternion(0, 0, -0.947071f, 0.321023f),false,0),
+            new Position(0x00660103, new Vector3(0, -30, 0.005f), new Quaternion(0, 0, -0.699713f, 0.714424f),false,0),
+            new Position(0x0066011E, new Vector3(50, 0, 0.005f), new Quaternion(0, 0, -0.961021f, -0.276474f),false,0),
+            new Position(0x00660127, new Vector3(60, -30, 0.005f), new Quaternion(0, 0, 0.681639f, 0.731689f),false,0),
         };
 
         public void HandleActionTeleToPkArena()
@@ -500,11 +500,11 @@ namespace ACE.Server.WorldObjects
 
         private static List<Position> pklArenaLocs = new List<Position>()
         {
-            new Position(0x00670117, new Vector3(30, -50, 0.005f), new Quaternion(0, 0, 0, 1)),
-            new Position(0x00670106, new Vector3(10, 0, 0.005f), new Quaternion(0, 0, -0.947071f, 0.321023f)),
-            new Position(0x00670103, new Vector3(0, -30, 0.005f), new Quaternion(0, 0, -0.699713f, 0.714424f)),
-            new Position(0x0067011E, new Vector3(50, 0, 0.005f), new Quaternion(0, 0, -0.961021f, -0.276474f)),
-            new Position(0x00670127, new Vector3(60, -30, 0.005f), new Quaternion(0, 0, 0.681639f, 0.731689f)),
+            new Position(0x00670117, new Vector3(30, -50, 0.005f), new Quaternion(0, 0, 0, 1),false,0),
+            new Position(0x00670106, new Vector3(10, 0, 0.005f), new Quaternion(0, 0, -0.947071f, 0.321023f),false,0),
+            new Position(0x00670103, new Vector3(0, -30, 0.005f), new Quaternion(0, 0, -0.699713f, 0.714424f),false,0),
+            new Position(0x0067011E, new Vector3(50, 0, 0.005f), new Quaternion(0, 0, -0.961021f, -0.276474f),false,0),
+            new Position(0x00670127, new Vector3(60, -30, 0.005f), new Quaternion(0, 0, 0.681639f, 0.731689f),false,0),
         };
 
         public void HandleActionTeleToPklArena()

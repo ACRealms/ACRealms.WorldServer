@@ -61,7 +61,7 @@ namespace ACE.Database.Models.World
             if (result == null)
                 return null;
 
-            return new Position(result.ObjCellId, result.OriginX, result.OriginY, result.OriginZ, result.AnglesX, result.AnglesY, result.AnglesZ, result.AnglesW, result.Instance);
+            return new Position(result.ObjCellId, result.OriginX, result.OriginY, result.OriginZ, result.AnglesX, result.AnglesY, result.AnglesZ, result.AnglesW, result.Instance ?? 0);
         }
 
 

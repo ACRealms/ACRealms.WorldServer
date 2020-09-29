@@ -52,7 +52,7 @@ namespace ACE.Server.WorldObjects
             PhysicsObj.MoveToObject(target.PhysicsObj, mvp);
             //PhysicsObj.LastMoveWasAutonomous = false;
 
-            PhysicsObj.update_object();
+            PhysicsObj.update_object(Location.Instance);
         }
 
         public void CreateTurnToChain2(WorldObject target, Action<bool> callback, bool stopCompletely = false, bool alwaysTurn = false)
@@ -91,7 +91,7 @@ namespace ACE.Server.WorldObjects
             PhysicsObj.TurnToObject(rotateTarget.PhysicsObj, mvp);
             //PhysicsObj.LastMoveWasAutonomous = false;
 
-            PhysicsObj.update_object();
+            PhysicsObj.update_object(Location.Instance);
 
             PhysicsObj.MovementManager.MoveToManager.AlwaysTurn = false;
         }
