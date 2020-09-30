@@ -358,7 +358,12 @@ namespace ACE.Server.WorldObjects
             else if (target is Hotspot hotspot)
                 hotspot.OnCollideObject(this);
             else if (target is SpellProjectile spellProjectile)
-                spellProjectile.OnCollideObject(this);
+            {
+                if (this.RealmRuleset.GetProperty(RealmPropertyBool.SpellCastingPKDoubleCollisionCheck))
+                {
+                    spellProjectile.OnCollideObject(this);
+                }
+            }
         }
 
         public override void OnCollideObjectEnd(WorldObject target)

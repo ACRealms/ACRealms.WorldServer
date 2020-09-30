@@ -659,7 +659,7 @@ namespace ACE.Server.WorldObjects
             }
 
             //Console.WriteLine($"Angle: " + angle);
-            var maxAngle = PropertyManager.GetDouble("spellcast_max_angle").Item;
+            var maxAngle = RealmRuleset.GetProperty(ACE.Entity.Enum.Properties.RealmPropertyFloat.Spellcasting_Max_Angle);
 
             if (RecordCast.Enabled)
                 RecordCast.Log($"DoCastSpell(angle={angle} vs. {maxAngle})");
@@ -734,7 +734,8 @@ namespace ACE.Server.WorldObjects
 
             if (FastTick)
             {
-                if (PropertyManager.GetDouble("spellcast_max_angle").Item > 5.0f && IsWithinAngle(target))
+                
+                if (RealmRuleset.GetProperty(ACE.Entity.Enum.Properties.RealmPropertyFloat.Spellcasting_Max_Angle) > 5.0f && IsWithinAngle(target))
                 {
                     // emulate current gdle TurnTo - doesn't match retail, but some players may prefer this
                     OnMoveComplete_Magic(WeenieError.None);

@@ -31,7 +31,10 @@ namespace ACE.Entity.Enum.Properties
         /// Players with a homeworld of this realm may enter the neutral zone if true
         /// </summary>
         [RealmPropertyBool(true)]
-        CanInteractWithNeutralZone = 5
+        CanInteractWithNeutralZone = 5,
+
+        [RealmPropertyBool(true)]
+        SpellCastingPKDoubleCollisionCheck = 6
     }
 
     public static class RealmPropertyBoolExtensions

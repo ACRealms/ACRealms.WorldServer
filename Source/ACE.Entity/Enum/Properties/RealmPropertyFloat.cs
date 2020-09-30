@@ -6,6 +6,12 @@ namespace ACE.Entity.Enum.Properties
     {
         [RealmPropertyFloat(0f, 0f, 0f)]
         Undef                          = 0,
+
+        [RealmPropertyFloat(1f, 0.1f, 5f)]
+        SpellCasting_MoveToState_UpdatePosition_Threshold = 1,
+
+        [RealmPropertyFloat(5f, 1f, 360f)]
+        Spellcasting_Max_Angle = 2
     }
 
     public static class RealmPropertyFloatExtensions
