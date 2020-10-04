@@ -293,11 +293,11 @@ namespace ACE.Server.Managers
         /// Note that this work will be done on the next tick, not immediately, so be careful about your order of operations.
         /// If you must ensure order, pass your follow up work in with the argument actionToFollowUpWith. That work will be enqueued onto the Player.
         /// </summary>
-        public static void ThreadSafeTeleport(Player player, Position newPosition, IAction actionToFollowUpWith = null)
+        public static void ThreadSafeTeleport(Player player, Position newPosition, bool teleportingFromInstance, IAction actionToFollowUpWith = null)
         {
             EnqueueAction(new ActionEventDelegate(() =>
             {
-                player.Teleport(newPosition);
+                player.Teleport(newPosition, teleportingFromInstance);
 
                 if (actionToFollowUpWith != null)
                     EnqueueAction(actionToFollowUpWith);

@@ -240,11 +240,12 @@ namespace ACE.Server.WorldObjects
             // player.Session.Network.EnqueueSend(new GameMessageSystemChat("Portal sending player to destination", ChatMessageType.System));
 #endif
             var portalDest = new Position(Destination);
-            portalDest.SetToDefaultRealmInstance(Location.RealmID);
+            if (portalDest.Instance == 0)
+                portalDest.SetToDefaultRealmInstance(Location.RealmID);
 
             WorldObject.AdjustDungeon(portalDest);
 
-            WorldManager.ThreadSafeTeleport(player, portalDest, new ActionEventDelegate(() =>
+            WorldManager.ThreadSafeTeleport(player, portalDest, false, new ActionEventDelegate(() =>
             {
                 // If the portal just used is able to be recalled to,
                 // save the destination coordinates to the LastPortal character position save table

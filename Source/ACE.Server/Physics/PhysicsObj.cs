@@ -47,7 +47,19 @@ namespace ACE.Server.Physics
         public PhysicsObj Parent;
         public ChildList Children;
         public Position Position;
-        public ObjCell CurCell;
+
+        private ObjCell _curCell;
+        public ObjCell CurCell
+        {
+            get => _curCell;
+            set
+            {
+                _curCell = value;
+                if (_curCell?.CurLandblock != null)
+                    CurLandblock = _curCell.CurLandblock;
+            }
+        }
+
         public Landblock CurLandblock;
         public int NumShadowObjects;
         public Dictionary<uint, ShadowObj> ShadowObjects;

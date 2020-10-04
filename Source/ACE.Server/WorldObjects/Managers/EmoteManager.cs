@@ -1274,7 +1274,7 @@ namespace ACE.Server.WorldObjects.Managers
                             destination.SetToDefaultRealmInstance(player.Location.RealmID);
 
                             WorldObject.AdjustDungeon(destination);
-                            WorldManager.ThreadSafeTeleport(player, destination);
+                            WorldManager.ThreadSafeTeleport(player, destination, false);
                         }
                     }
                     break;

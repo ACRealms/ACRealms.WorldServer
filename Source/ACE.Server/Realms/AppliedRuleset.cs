@@ -36,6 +36,28 @@ namespace ACE.Server.Realms
             return ruleset;
         }
 
+        internal string DebugOutputString()
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine("AC Realmulator Zone Info:");
+
+            foreach (var item in PropertiesBool)
+                sb.AppendLine($"RealmPropertyBool.{Enum.GetName(typeof(RealmPropertyBool), item.Key)} ({(int)item.Key}) = {item.Value}");
+            foreach (var item in PropertiesFloat)
+                sb.AppendLine($"RealmPropertyFloat.{Enum.GetName(typeof(RealmPropertyFloat), item.Key)} ({(int)item.Key}) = {item.Value}");
+            foreach (var item in PropertiesInt)
+                sb.AppendLine($"RealmPropertyInt.{Enum.GetName(typeof(RealmPropertyInt), item.Key)} ({(int)item.Key}) = {item.Value}");
+            foreach (var item in PropertiesInt64)
+                sb.AppendLine($"RealmPropertyInt64.{Enum.GetName(typeof(RealmPropertyInt64), item.Key)} ({(int)item.Key}) = {item.Value}");
+            foreach (var item in PropertiesString)
+                sb.AppendLine($"RealmPropertyString.{Enum.GetName(typeof(RealmPropertyString), item.Key)} ({(int)item.Key}) = {item.Value}");
+
+            sb.AppendLine("\n");
+
+            return sb.ToString().Replace("\r", "");
+        }
+
         public static AppliedRuleset ApplyRuleset(AppliedRuleset baseset, Realm subset)
         {
             if (baseset.InheritedRealmIDs.Contains(subset.Id))

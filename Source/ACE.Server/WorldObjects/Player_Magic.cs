@@ -363,8 +363,8 @@ namespace ACE.Server.WorldObjects
             Success
         }
 
-        public static float Windup_MaxMove = 6.0f;
-        public static float Windup_MaxMoveSq = Windup_MaxMove * Windup_MaxMove;
+        //public static float Windup_MaxMove = 6.0f;
+        //public static float Windup_MaxMoveSq = Windup_MaxMove * Windup_MaxMove;
 
         public bool VerifyBusy()
         {
@@ -789,6 +789,7 @@ namespace ACE.Server.WorldObjects
             var dist = StartPos.Distance(endPos);
 
             // only PKs affected by these caps?
+            var Windup_MaxMove = RealmRuleset.GetProperty(ACE.Entity.Enum.Properties.RealmPropertyFloat.SpellCastingPvPWindupMaxMove);
             if (dist > Windup_MaxMove && PlayerKillerStatus != PlayerKillerStatus.NPK)
             {
                 //player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.YouHaveMovedTooFar));
