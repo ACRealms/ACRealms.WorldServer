@@ -96,6 +96,9 @@ namespace ACE.Entity.Enum.Properties
         GodState                        = 9006,
         [ServerOnly]
         TinkerLog                       = 9007,
+
+        [ServerOnly]
+        SummonTargetRuleset             = 42000,
     }
 
     public static class PropertyStringExtensions

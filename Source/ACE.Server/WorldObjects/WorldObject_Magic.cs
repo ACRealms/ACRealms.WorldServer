@@ -22,6 +22,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Physics;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.WorldObjects.Managers;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -1225,8 +1226,7 @@ namespace ACE.Server.WorldObjects
 
                         if (summonLoc != null)
                             summonLoc.ObjCellID = summonLoc.GetCell();
-
-                        if (SummonPortal(portalId, summonLoc, spell.PortalLifetime))
+                        if (SummonPortal(portalId, summonLoc, spell.PortalLifetime, player ?? targetPlayer))
                             EnqueueBroadcast(new GameMessageScript(Guid, spell.CasterEffect, spell.Formula.Scale));
                         else if (player != null)
                             player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.YouFailToSummonPortal));
@@ -1260,18 +1260,37 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Spawns a player-summoned portal from item magic or gems
         /// </summary>
-        protected bool SummonPortal(uint portalId, Position location, double portalLifetime)
+        protected bool SummonPortal(uint portalId, Position location, double portalLifetime, Player summoner)
         {
             var portal = GetPortal(portalId);
             if (portal == null || location == null)
                 return false;
+
+            Position targetPosition = new Position(portal.Destination);
+            var summonTargetRealm = GetProperty(PropertyInt.SummonTargetRealm);
+            if (summonTargetRealm.HasValue)
+            {
+                var realm = RealmManager.GetRealm((ushort)summonTargetRealm.Value);
+                if (realm == null)
+                {
+                    log.Error($"SummonTargetRealm for guid {Guid} has invalid realm ID {summonTargetRealm.Value}");
+                    return false;
+                }
+                if (realm.Realm.Type != RealmType.Ruleset)
+                {
+                    log.Error($"SummonTargetRealm for guid {Guid} has invalid realm ID {summonTargetRealm.Value}. Realm must be of type 'Ruleset'");
+                    return false;
+                }
+                var landblock = RealmManager.GetNewEphemeralLandblock((uint)(portal.Destination.LongLandblockID & 0xFFFFFFFF), summoner, realm.Realm);
+                targetPosition.Instance = landblock.Instance;
+            }
 
             var gateway = WorldObjectFactory.CreateNewWorldObject("portalgateway") as Portal;
             if (gateway == null) return false;
             gateway.Location = new Position(location);
             gateway.OriginalPortal = portalId;
 
-            gateway.UpdatePortalDestination(new Position(portal.Destination));
+            gateway.UpdatePortalDestination(targetPosition);
 
             gateway.TimeToRot = portalLifetime;
 

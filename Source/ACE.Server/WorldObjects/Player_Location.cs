@@ -597,10 +597,17 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// This is not thread-safe. Consider using WorldManager.ThreadSafeTeleport() instead if you're calling this from a multi-threaded subsection.
         /// </summary>
-        public void Teleport(Position _newPosition)
+        public void Teleport(Position _newPosition, bool teleportingFromInstance = false)
         {
             if (_newPosition.Instance == 0)
                 _newPosition.Instance = Location.Instance;
+
+            Position.ParseInstanceID(Location.Instance, out var isTemporaryRuleset, out ushort _a, out ushort _b);
+            if (isTemporaryRuleset)
+            {
+                if (!teleportingFromInstance && ExitInstance())
+                    return;
+            }
 
             if (RealmManager.GetRealm(_newPosition.RealmID) == null)
             {
@@ -620,13 +627,14 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
-            if (_newPosition.RealmID != Location.RealmID)
-            {
-                if (!OnTransitionToNewRealm(Location.RealmID, _newPosition.RealmID))
-                    return;
-            }
             var newPosition = new Position(_newPosition);
             newPosition._pos.Z += 0.005f * (ObjScale ?? 1.0f);
+
+            if (_newPosition.RealmID != Location.RealmID)
+            {
+                if (!OnTransitionToNewRealm(Location.RealmID, _newPosition.RealmID, newPosition))
+                    return;
+            }
 
             //Console.WriteLine($"{Name}.Teleport() - Sending to {newPosition.ToLOCString()}");
 
@@ -640,7 +648,7 @@ namespace ACE.Server.WorldObjects
                 var delayTelport = new ActionChain();
                 delayTelport.AddAction(this, () => ClearFogColor());
                 delayTelport.AddDelaySeconds(1);
-                delayTelport.AddAction(this, () => WorldManager.ThreadSafeTeleport(this, _newPosition));
+                delayTelport.AddAction(this, () => WorldManager.ThreadSafeTeleport(this, _newPosition, teleportingFromInstance));
 
                 delayTelport.EnqueueChain();
 
@@ -675,10 +683,22 @@ namespace ACE.Server.WorldObjects
             UpdatePlayerPosition(new Position(newPosition), true);
         }
 
-        private bool OnTransitionToNewRealm(ushort prevRealmId, ushort newRealmId)
+        private bool OnTransitionToNewRealm(ushort prevRealmId, ushort newRealmId, Position newLocation)
         {
             var prevrealm = RealmManager.GetRealm(prevRealmId);
             var newRealm = RealmManager.GetRealm(newRealmId);
+
+            if (newRealm.Realm.Type == RealmType.Ruleset)
+            {
+                SetPosition(PositionType.EphemeralRealmExitTo, new Position(Location));
+                SetPosition(PositionType.EphemeralRealmLastEnteredDrop, new Position(newLocation));
+            }
+            else if (newRealm.Realm.Type == RealmType.Realm)
+            {
+                SetPosition(PositionType.EphemeralRealmExitTo, null);
+                SetPosition(PositionType.EphemeralRealmLastEnteredDrop, null);
+            }
+
             if (newRealm.Ruleset.GetProperty(RealmPropertyBool.IsPKOnly))
                 PlayerKillerStatus = PlayerKillerStatus.PK;
             else
@@ -742,9 +762,8 @@ namespace ACE.Server.WorldObjects
             var homerealm = RealmManager.GetRealm(HomeRealm);
             var destrealm = RealmManager.GetRealm(newPosition.RealmID);
             if (destrealm == null)
-            {
                 return false;
-            }
+
             if (homerealm == null && destrealm.Realm.Id == 0)
             {
                 //Home realm is either bugged and can't be found, or the player hasn't set one yet. Then they are allowed in realm 0.
@@ -752,10 +771,48 @@ namespace ACE.Server.WorldObjects
             }
             if (homerealm.Ruleset.GetProperty(RealmPropertyBool.CanInteractWithNeutralZone) == true &&
                 destrealm.Ruleset.GetProperty(RealmPropertyBool.IsNeutralZone) == true)
-            {
                 return true;
+
+            if (isTemporaryRuleset)
+            {
+                var lb = newPosition.TryGetLandblock();
+                if (lb?.InnerRealmInfo == null)
+                    return false;
+                if (lb.InnerRealmInfo.Owner == this)
+                    return true;
+                if (lb.InnerRealmInfo.AllowedPlayers.Contains(this))
+                    return true;
+                if (lb.InnerRealmInfo.OpenToFellowship)
+                {
+                    if (lb.InnerRealmInfo.Owner.Fellowship?.GetFellowshipMembers().Values.Contains(this) == true)
+                        return true;
+                }
+                return false;
             }
+            
             return homerealm.Realm.Id == destrealm.Realm.Id;
+        }
+
+        internal bool ExitInstance()
+        {
+            Position.ParseInstanceID(Location.Instance, out var isTemporaryRuleset, out ushort newRealmId, out ushort shortInstanceId);
+            if (!isTemporaryRuleset)
+            {
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"You are not in an instance!", ChatMessageType.System));
+                return false;
+            }
+            var loc = GetPosition(PositionType.EphemeralRealmExitTo);
+            if (loc == null || !ValidatePlayerRealmPosition(loc))
+            {
+                loc = GetPosition(PositionType.Sanctuary) ?? GetPosition(PositionType.Home);
+                loc.Instance = Position.InstanceIDFromVars(HomeRealm, 0, false);
+            }
+            WorldManager.ThreadSafeTeleport(this, loc, true, new ActionEventDelegate(() =>
+            {
+                this.SetPosition(PositionType.EphemeralRealmExitTo, null);
+                this.SetPosition(PositionType.EphemeralRealmLastEnteredDrop, null);
+            }));
+            return true;
         }
 
         public void DoPreTeleportHide()

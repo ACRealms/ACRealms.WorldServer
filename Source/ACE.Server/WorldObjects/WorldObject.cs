@@ -70,7 +70,7 @@ namespace ACE.Server.WorldObjects
         /// Should only be adjusted by Landblock -- default is null
         /// </summary>
         public Landblock CurrentLandblock { get; internal set; }
-        public AppliedRuleset RealmRuleset => CurrentLandblock.RealmRuleset;
+        public AppliedRuleset RealmRuleset => CurrentLandblock?.RealmRuleset;
 
         public DateTime? ItemManaDepletionMessageTimestamp { get; set; } = null;
         public DateTime? ItemManaConsumptionTimestamp { get; set; } = null;

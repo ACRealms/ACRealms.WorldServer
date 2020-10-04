@@ -28,5 +28,35 @@ namespace ACE.Server.Command.Handlers
             var positionMessage = new GameMessageSystemChat($"Teleporting to realm {realmid}.", ChatMessageType.Broadcast);
             session.Network.EnqueueSend(positionMessage);
         }
+
+        [CommandHandler("zoneinfo", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Lists all properties for the current realm.")]
+        public static void HandleZoneInfo(Session session, params string[] parameters)
+        {
+            session.Network.EnqueueSend(new GameMessageSystemChat($"\n{session.Player.CurrentLandblock.RealmRuleset.DebugOutputString()}", ChatMessageType.System));
+        }
+
+        [CommandHandler("exitinstance", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
+        public static void HandleExitInstance(Session session, params string[] parameters)
+        {
+            session.Player.ExitInstance();
+        }
+
+        [CommandHandler("leaveinstance", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
+        public static void HandleLeaveInstance(Session session, params string[] parameters)
+        {
+            session.Player.ExitInstance();
+        }
+
+        [CommandHandler("leaveinst", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
+        public static void HandleLeaveInst(Session session, params string[] parameters)
+        {
+            session.Player.ExitInstance();
+        }
+
+        [CommandHandler("leavei", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
+        public static void HandleLeaveI(Session session, params string[] parameters)
+        {
+            session.Player.ExitInstance();
+        }
     }
 }

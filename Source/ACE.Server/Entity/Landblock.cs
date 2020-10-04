@@ -51,6 +51,9 @@ namespace ACE.Server.Entity
 
         public uint Instance;
         public AppliedRuleset RealmRuleset { get; private set; }
+
+        //Will be null if its a standard realm landblock - I.e. the default for a realm and not with an added ruleset applied
+        public EphemeralRealm InnerRealmInfo { get; set; }
         public ulong LongId
         {
             get => (ulong)Instance << 32 | Id;
@@ -201,9 +204,10 @@ namespace ACE.Server.Entity
             PhysicsLandblock = new Physics.Common.Landblock(cellLandblock, Instance);
         }
 
-        public void Init(bool reload = false)
+        public void Init(bool reload, EphemeralRealm ephemeralRealm = null)
         {
-            RealmRuleset = GetOrApplyRuleset();
+            RealmRuleset = GetOrApplyRuleset(ephemeralRealm);
+            InnerRealmInfo = ephemeralRealm;
 
             if (!reload)
                 PhysicsLandblock.PostInit();
@@ -220,8 +224,11 @@ namespace ACE.Server.Entity
             //LoadMeshes(objects);
         }
 
-        private AppliedRuleset GetOrApplyRuleset()
+        private AppliedRuleset GetOrApplyRuleset(EphemeralRealm ephemeralRealm = null)
         {
+            if (ephemeralRealm != null)
+                return ephemeralRealm.Ruleset;
+
             Position.ParseInstanceID(this.Instance, out bool _istemp, out var realmid, out var _shortinstid);
             var realm = RealmManager.GetRealm(realmid);
             if (realm == null)

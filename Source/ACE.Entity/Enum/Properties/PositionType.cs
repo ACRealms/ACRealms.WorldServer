@@ -179,6 +179,12 @@ namespace ACE.Entity.Enum.Properties
         TeleportedCharacter = 27,
 
         [ServerOnly]
-        PCAPRecordedLocation = 8040
+        PCAPRecordedLocation = 8040,
+
+        [ServerOnly]
+        EphemeralRealmLastEnteredDrop = 42000,
+
+        [ServerOnly]
+        EphemeralRealmExitTo = 42001
     }
 }

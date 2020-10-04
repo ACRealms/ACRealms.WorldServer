@@ -9,6 +9,8 @@ using ACE.Server.Realms;
 using ACE.Database.Adapter;
 using ACE.Entity.Enum.Properties;
 using System.Linq;
+using ACE.Server.WorldObjects;
+using ACE.Server.Entity;
 
 namespace ACE.Server.Managers
 {
@@ -18,6 +20,7 @@ namespace ACE.Server.Managers
 
         private static readonly ReaderWriterLockSlim realmsLock = new ReaderWriterLockSlim();
         private static readonly Dictionary<ushort, WorldRealm> realms = new Dictionary<ushort, WorldRealm>();
+        private static readonly Dictionary<string, WorldRealm> realmsByName = new Dictionary<string, WorldRealm>();
 
         public static Realm DefaultRealm { get; private set; }
 
@@ -100,8 +103,16 @@ namespace ACE.Server.Managers
                 var ruleset = BuildRuleset(erealm);
                 realm = new WorldRealm(erealm, ruleset);
                 realms[realmId] = realm;
+                realmsByName[erealm.Name] = realm;
                 return realm;
             }
+        }
+
+        public static WorldRealm GetRealm(string name)
+        {
+            if (!realmsByName.ContainsKey(name))
+                return null;
+            return GetRealm(realmsByName[name].Realm.Id);
         }
 
         private static bool ValidateCircularDependency(Realm realm)
@@ -136,7 +147,28 @@ namespace ACE.Server.Managers
 
                 DatabaseManager.World.ClearRealmCache();
                 realms.Clear();
+                realmsByName.Clear();
             }
+        }
+
+        internal static WorldRealm GetBaseRealm(Player player)
+        {
+            if (!player.Location.IsEphemeralRealm)
+                return realmsByName[player.RealmRuleset.Realm.Name];
+
+            var realmId = player.GetPosition(PositionType.EphemeralRealmExitTo)?.RealmID ?? player.HomeRealm;
+            return realms[realmId];
+        }
+
+        internal static Landblock GetNewEphemeralLandblock(uint landcell, Player owner, Realm realmTemplate)
+        {
+            EphemeralRealm ephemeralRealm = EphemeralRealm.Initialize(owner, realmTemplate);
+            var iid = LandblockManager.GetFreeInstanceID(true, ephemeralRealm.Ruleset.Realm.Id, (ushort)(landcell >> 16));
+            var longcell = ((ulong)iid << 32) | landcell;
+            var landblock = LandblockManager.GetLandblock(longcell, false, false, ephemeralRealm);
+
+            log.Info($"GetNewEphemeralLandblock created for player {owner.Name}, realm ruleset {ephemeralRealm.Ruleset.Realm.Id}, longcell {longcell}.");
+            return landblock;
         }
     }
 }

@@ -11,6 +11,7 @@ using ACE.Server.Physics.Util;
 using ACE.Server.WorldObjects;
 
 using Position = ACE.Entity.Position;
+using ACE.Server.Managers;
 
 namespace ACE.Server.Entity
 {
@@ -66,6 +67,11 @@ namespace ACE.Server.Entity
             position.Rotation = p.Rotation;
             position.ObjCellID = GetCell(position);
             return position;
+        }
+
+        public static Landblock TryGetLandblock(this Position p)
+        {
+            return LandblockManager.TryGetLandblock(p.LongLandblockID);
         }
 
         /// <summary>

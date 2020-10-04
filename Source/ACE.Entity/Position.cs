@@ -25,7 +25,7 @@ namespace ACE.Entity
         public uint Instance;
 
         public ulong LongObjCellID => (ulong)Instance << 32 | ObjCellID;
-        public ulong LongLandblockID => ((ulong)Instance << 32 | ObjCellID) & 0xFFFF;
+        public ulong LongLandblockID => ((ulong)Instance << 32 | ObjCellID) | 0xFFFF;
 
         public Vector3 _pos;
 
@@ -40,6 +40,15 @@ namespace ACE.Entity
             {
                 ParseInstanceID(this.Instance, out var _a, out var realmId, out var _b);
                 return realmId;
+            }
+        }
+
+        public bool IsEphemeralRealm
+        {
+            get
+            {
+                ParseInstanceID(this.Instance, out var result, out var _a, out var _b);
+                return result;
             }
         }
 

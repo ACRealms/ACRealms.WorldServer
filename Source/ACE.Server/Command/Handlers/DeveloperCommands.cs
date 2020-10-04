@@ -510,7 +510,6 @@ namespace ACE.Server.Command.Handlers
                 session.Network.EnqueueSend(new GameMessageSystemChat($"\n{target.DebugOutputString(target)}", ChatMessageType.System));
         }
 
-
         // ==================================
         // Player Properties
         // ==================================

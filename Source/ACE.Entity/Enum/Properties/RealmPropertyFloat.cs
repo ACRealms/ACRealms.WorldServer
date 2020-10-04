@@ -11,7 +11,10 @@ namespace ACE.Entity.Enum.Properties
         SpellCasting_MoveToState_UpdatePosition_Threshold = 1,
 
         [RealmPropertyFloat(5f, 1f, 360f)]
-        Spellcasting_Max_Angle = 2
+        Spellcasting_Max_Angle = 2,
+
+        [RealmPropertyFloat(6f, 1f, 1000f)]
+        SpellCastingPvPWindupMaxMove = 3
     }
 
     public static class RealmPropertyFloatExtensions

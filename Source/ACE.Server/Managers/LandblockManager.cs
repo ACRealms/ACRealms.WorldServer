@@ -12,6 +12,7 @@ using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
 using ACE.Server.WorldObjects;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Managers
 {
@@ -371,10 +372,20 @@ namespace ACE.Server.Managers
             return GetLandblock((ulong)objCellId, loadAdjacents, permaload);
         }
 
+        internal static Landblock TryGetLandblock(ulong longLandblockID)
+        {
+            lock(landblockMutex)
+            {
+                Landblock landblock;
+                landblocks.TryGetValue(longLandblockID | 0xFFFF, out landblock);
+                return landblock;
+            }
+        }
+
         /// <summary>
         /// Returns a reference to a landblock, loading the landblock if not already active
         /// </summary>
-        public static Landblock GetLandblock(ulong objCellID, bool loadAdjacents, bool permaload = false)
+        public static Landblock GetLandblock(ulong objCellID, bool loadAdjacents, bool permaload = false, EphemeralRealm ephemeralRealm = null)
         {
             Landblock landblock;
 
@@ -398,7 +409,7 @@ namespace ACE.Server.Managers
 
                     landblockGroupPendingAdditions.Add(landblock);
 
-                    landblock.Init();
+                    landblock.Init(false, ephemeralRealm);
 
                     setAdjacents = true;
                 }
@@ -411,7 +422,7 @@ namespace ACE.Server.Managers
                 {
                     var adjacents = GetAdjacentIDs(landblock);
                     foreach (var adjacent in adjacents)
-                        GetLandblock(adjacent, false, permaload);
+                        GetLandblock(adjacent, false, permaload, ephemeralRealm);
 
                     setAdjacents = true;
                 }
