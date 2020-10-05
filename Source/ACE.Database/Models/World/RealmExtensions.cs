@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 using ACE.Entity;
@@ -6,6 +7,27 @@ using ACE.Entity.Enum.Properties;
 
 namespace ACE.Database.Models.World
 {
+    public partial class Realm
+    {
+        [NotMapped]
+        public string ParentRealmName { get; set; }
+
+        public void SetId(ushort value)
+        {
+            this.Id = value;
+            foreach (var item in RealmPropertiesBool)
+                item.RealmId = value;
+            foreach (var item in RealmPropertiesInt)
+                item.RealmId = value;
+            foreach (var item in RealmPropertiesInt64)
+                item.RealmId = value;
+            foreach (var item in RealmPropertiesString)
+                item.RealmId = value;
+            foreach (var item in RealmPropertiesFloat)
+                item.RealmId = value;
+        }
+    }
+
     public static class RealmExtensions
     {
         // =====================================
@@ -43,6 +65,23 @@ namespace ACE.Database.Models.World
         // Set
         // Bool, DID, Float, Int, Int64, String
         // =====================================
+
+        //Slower than SetProperty as it has to use reflection
+        public static void SetPropertyByName(this Realm realm, string propertyName, dynamic value)
+        {
+            if (Enum.TryParse<RealmPropertyBool>(propertyName, out var boolprop))
+                SetProperty(realm, boolprop, (bool)value);
+            else if (Enum.TryParse<RealmPropertyInt>(propertyName, out var intprop))
+                SetProperty(realm, intprop, (int)value);
+            else if (Enum.TryParse<RealmPropertyString>(propertyName, out var stringprop))
+                SetProperty(realm, stringprop, (string)value);
+            else if (Enum.TryParse<RealmPropertyFloat>(propertyName, out var floatprop))
+                SetProperty(realm, floatprop, (double)value);
+            else if (Enum.TryParse<RealmPropertyInt64>(propertyName, out var longprop))
+                SetProperty(realm, longprop, (long)value);
+            else
+                throw new Exception("Realm property not found: " + propertyName);
+        }
 
         public static void SetProperty(this Realm realm, RealmPropertyBool property, bool value)
         {

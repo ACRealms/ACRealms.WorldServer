@@ -526,6 +526,29 @@ namespace ACE.Database
             return realm;
         }
 
+        internal void ReplaceAllRealms(Dictionary<ushort, Realm> realmsById)
+        {
+            var propsbool = realmsById.Values.SelectMany(x => x.RealmPropertiesBool);
+            var propsint = realmsById.Values.SelectMany(x => x.RealmPropertiesInt);
+            var propsint64 = realmsById.Values.SelectMany(x => x.RealmPropertiesInt64);
+            var propsfloat = realmsById.Values.SelectMany(x => x.RealmPropertiesFloat);
+            var propsstring = realmsById.Values.SelectMany(x => x.RealmPropertiesString);
+
+            using (var context = new WorldDbContext())
+            {
+                using (var transaction = context.Database.BeginTransaction())
+                {
+                    context.Database.ExecuteSqlCommand("DELETE FROM realm;");
+                    context.BulkInsert(realmsById.Values);
+                    context.BulkInsert(propsbool);
+                    context.BulkInsert(propsint);
+                    context.BulkInsert(propsint64);
+                    context.BulkInsert(propsfloat);
+                    context.BulkInsert(propsstring);
+                    transaction.Commit();
+                }
+            }
+        }
 
         public List<ACE.Entity.Models.Realm> GetAllRealms()
         {
@@ -554,6 +577,5 @@ namespace ACE.Database
 
             return realms;
         }
-
     }
 }

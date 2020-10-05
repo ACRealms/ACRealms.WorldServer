@@ -102,8 +102,149 @@ namespace ACE.Server.Command.Handlers.Processors
                     break;
 
                 case FileType.Realm:
-                    CommandHandlerHelper.WriteOutputInfo(session, $"Realm content type not supported for JSON");
+                    //ImportJsonRealm(session, param);
                     return;
+            }
+        }
+
+        [CommandHandler("import-realms", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Imports all json realms from the Content folder")]
+        public static void HandleImportRealms(Session session, params string[] parameters)
+        {
+            DirectoryInfo di = VerifyContentFolder(session);
+            if (!di.Exists) return;
+
+            var sep = Path.DirectorySeparatorChar;
+
+            var realms_index = $"{di.FullName}{sep}json{sep}realms.json";
+            var json_folder = $"{di.FullName}{sep}json{sep}realms{sep}";
+
+            var realms = ImportJsonRealmsFolder(session, json_folder);
+            if (realms != null)
+                ImportJsonRealmsIndex(session, realms_index, realms);
+        }
+
+        private static List<ACE.Database.Models.World.Realm> ImportJsonRealmsFromSubFolder(Session session, string json_folder)
+        {
+            var di = new DirectoryInfo(json_folder);
+
+            var files = di.Exists ? di.GetFiles($"*.json") : null;
+
+            if (files == null)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find {json_folder}*.json");
+                return null;
+            }
+
+            List<ACE.Database.Models.World.Realm> list = new List<Realm>();
+            foreach(var file in files)
+            {
+                var jsondata = File.ReadAllText(file.FullName);
+                var realm = DeserializeRealmJson(session, file.FullName, jsondata);
+                if (realm == null)
+                    return null;
+                list.Add(realm);
+            }
+            return list;
+        }
+
+        private static ACE.Database.Models.World.Realm DeserializeRealmJson(Session session, string filename, string fileContent)
+        {
+            try
+            {
+                var dobj = JsonConvert.DeserializeObject<dynamic>(fileContent);
+                Realm realm = new Realm();
+                realm.Name = dobj.name.Value;
+                realm.Type = (ushort)Enum.Parse(typeof(RealmType), dobj.type.Value);
+                if (dobj.parent != null)
+                    realm.ParentRealmName = dobj.parent.Value;
+
+                foreach(var prop in ((Newtonsoft.Json.Linq.JObject)dobj.properties).Properties())
+                    realm.SetPropertyByName(prop.Name, prop.Value);
+
+                return realm;
+            }
+            catch (Exception ex)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Error importing json file {filename}. Exception: {ex.Message}.");
+                return null;
+            }
+        }
+
+        private static List<ACE.Database.Models.World.Realm> ImportJsonRealmsFolder(Session session, string json_folder)
+        {
+            var sep = Path.DirectorySeparatorChar;
+            var json_folder_realm = $"{json_folder}{sep}realm{sep}";
+            var json_folder_ruleset = $"{json_folder}{sep}ruleset{sep}";
+
+            var list = ImportJsonRealmsFromSubFolder(session, json_folder_realm).ToList();
+            if (list == null)
+                return null;
+
+            var list2 = ImportJsonRealmsFromSubFolder(session, json_folder_ruleset);
+            if (list2 != null)
+            {
+                list.AddRange(list2);
+                return list;
+            }
+            return null;
+        }
+
+        private static void ImportJsonRealmsIndex(Session session, string realmsIndexJsonFile, List<Realm> realms)
+        {
+            Dictionary<string, Realm> realmsDict = null;
+            Dictionary<ushort, Realm> realmsById = new Dictionary<ushort, Realm>();
+            try
+            {
+                realmsDict = realms.ToDictionary(x => x.Name);
+            }
+            catch
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't create realms dictionary. Is there a problem with a realm name?");
+                return;
+            }
+
+            Dictionary<string, ushort> result = null;
+            try
+            {
+                var fileText = File.ReadAllText(realmsIndexJsonFile);
+                result = JsonConvert.DeserializeObject<Dictionary<string, ushort>>(fileText);
+
+                //Map ids
+                foreach (var item in result)
+                {
+                    var realm = realmsDict[item.Key];
+                    realm.SetId(item.Value);
+                    realmsById.Add(item.Value, realm);
+                }
+
+                //Map parents
+                foreach(var item in result)
+                {
+                    var realm = realmsDict[item.Key];
+                    if (realm.ParentRealmName != null)
+                    {
+                        if (!realmsDict.TryGetValue(realm.ParentRealmName, out var parentRealm))
+                            throw new Exception($"Couldn't find parent realm with name {parentRealm}");
+                        realm.ParentRealmId = parentRealm.Id;
+                    }
+                }
+            }
+            catch
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't import {realmsIndexJsonFile}");
+                return;
+            }
+
+
+
+            try
+            {
+                RealmManager.FullUpdateRealmsRepository(realmsDict, realmsById);
+            }
+            catch
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Failed to update realms repository.");
+                return;
             }
         }
 

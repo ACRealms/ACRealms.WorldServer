@@ -949,5 +949,14 @@ namespace ACE.Database
             lock (realmCache)
                 realmCache.Clear();
         }
+
+        public void ReplaceAllRealms(Dictionary<ushort, Realm> realmsById)
+        {
+            lock (realmCache)
+            {
+                base.ReplaceAllRealms(realmsById);
+                ClearRealmCache();
+            }
+        }
     }
 }
