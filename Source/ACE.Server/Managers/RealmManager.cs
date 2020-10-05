@@ -18,6 +18,7 @@ namespace ACE.Server.Managers
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private const string NULL_REALM_NAME = "null-realm";
         private static readonly ReaderWriterLockSlim realmsLock = new ReaderWriterLockSlim();
         private static readonly Dictionary<ushort, WorldRealm> Realms = new Dictionary<ushort, WorldRealm>();
         private static readonly Dictionary<string, WorldRealm> RealmsByName = new Dictionary<string, WorldRealm>();
@@ -85,7 +86,7 @@ namespace ACE.Server.Managers
                 {
                     dbitem = new Database.Models.World.Realm();
                     dbitem.Type = 1;
-                    dbitem.Name = "Undefined Realm";
+                    dbitem.Name = NULL_REALM_NAME;
                 }
                 else
                     dbitem = DatabaseManager.World.GetRealm(realmId);
@@ -195,9 +196,24 @@ namespace ACE.Server.Managers
         private static bool ValidateRealmUpdates(Dictionary<string, Database.Models.World.Realm> newRealmsByName,
             Dictionary<ushort, Database.Models.World.Realm> newRealmsById)
         {
-            //Make sure that existing realms aren't being renamed
+            //Ensure realm 0 (null-realm) is not included in the new realms file
+            if (newRealmsById.ContainsKey(0))
+            {
+                log.Error("realms.json may not contain id 0, which is a reserved id.");
+                return false;
+            }
+            if (newRealmsByName.ContainsKey(NULL_REALM_NAME))
+            {
+                log.Error($"May not import a realm named {NULL_REALM_NAME}, which is a reserved name.");
+                return false;
+            }
+
+            //Check for renames
             foreach (var realm in RealmsByName.Values)
             {
+                if (realm.Realm.Id == 0)
+                    continue;
+
                 if (newRealmsByName.TryGetValue(realm.Realm.Name, out var newRealm) && newRealm.Id != realm.Realm.Id)
                 {
                     log.Error($"Realm {realm.Realm.Name} attempted to have its numeric ID changed to a different value during realm import, which is not supported.");
@@ -210,23 +226,59 @@ namespace ACE.Server.Managers
                 }
             }
 
+            //Check for deletions
             foreach(var realmId in Realms.Keys)
             {
-               if (!newRealmsById.ContainsKey(realmId))
+                if (realmId == 0)
+                    continue;
+
+                if (!newRealmsById.ContainsKey(realmId))
                 {
                     log.Error($"Realm {realmId} is missing in realms.json. Realms may not be removed once added. Unable to continue sync.");
                     return false;
                 }
             }
-
             foreach (var realmName in RealmsByName.Keys)
             {
+                if (realmName == NULL_REALM_NAME)
+                    continue;
+
                 if (!newRealmsByName.ContainsKey(realmName))
                 {
                     log.Error($"Realm {realmName} is missing in realms.json. Realms may not be removed once added. Unable to continue sync.");
                     return false;
                 }
             }
+
+            //Check for circular dependencies - from top to bottom of tree
+            Queue<Database.Models.World.Realm> realmsToCheck = new Queue<Database.Models.World.Realm>();
+            foreach(var realm in newRealmsByName.Values)
+            {
+                if (realm.ParentRealmId == null)
+                    realmsToCheck.Enqueue(realm);
+            }
+
+            HashSet<ushort> realmsChecked = new HashSet<ushort>();
+            while(realmsToCheck.TryDequeue(out var realmToCheck))
+            {
+                if (realmsChecked.Contains(realmToCheck.Id))
+                {
+                    log.Error($"A circular dependency was detected when attempting to import realm {realmToCheck.Id}.");
+                    return false;
+                }
+
+                realmsChecked.Add(realmToCheck.Id);
+                foreach (var realm in realmToCheck.Descendents.Values)
+                    realmsToCheck.Enqueue(realm);
+            }
+
+            if (realmsChecked.Count != newRealmsById.Count)
+            {
+                var badRealm = newRealmsById.First(x => !realmsChecked.Contains(x.Key)).Value;
+                log.Error($"A circular dependency was detected when attempting to import realm {badRealm.Name}.");
+                return false;
+            }
+
             return true;
         }
     }
