@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-
+using System.Collections.Generic;
 using ACE.Entity;
 using ACE.Entity.Enum.Properties;
 
@@ -11,6 +11,9 @@ namespace ACE.Database.Models.World
     {
         [NotMapped]
         public string ParentRealmName { get; set; }
+
+        [NotMapped]
+        public Dictionary<ushort, Realm> Descendents = new Dictionary<ushort, Realm>();
 
         public void SetId(ushort value)
         {

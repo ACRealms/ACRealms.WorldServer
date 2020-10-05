@@ -228,6 +228,17 @@ namespace ACE.Server.Command.Handlers.Processors
                         realm.ParentRealmId = parentRealm.Id;
                     }
                 }
+
+                //Map descendents
+                foreach (var item in result)
+                {
+                    var realm = realmsDict[item.Key];
+                    if (realm.ParentRealmId == null)
+                        continue;
+
+                    var parentRealm = realmsById[realm.ParentRealmId.Value];
+                    parentRealm.Descendents.Add(realm.Id, realm);
+                }
             }
             catch
             {
