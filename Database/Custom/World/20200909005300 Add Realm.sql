@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS `realm_properties_int64`;
 DROP TABLE IF EXISTS `realm`;
 
 CREATE TABLE `realm` (
-  `id` smallint unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Realm Id within the Shard',
+  `id` smallint unsigned NOT NULL COMMENT 'Unique Realm Id within the Shard',
   `type` smallint unsigned NOT NULL,
   `name` text NOT NULL COMMENT 'Name of this realm',
   `parent_realm_id` smallint unsigned NULL,

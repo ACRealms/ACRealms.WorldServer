@@ -19,10 +19,10 @@ namespace ACE.Server.Managers
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly ReaderWriterLockSlim realmsLock = new ReaderWriterLockSlim();
-        private static readonly Dictionary<ushort, WorldRealm> realms = new Dictionary<ushort, WorldRealm>();
-        private static readonly Dictionary<string, WorldRealm> realmsByName = new Dictionary<string, WorldRealm>();
+        private static readonly Dictionary<ushort, WorldRealm> Realms = new Dictionary<ushort, WorldRealm>();
+        private static readonly Dictionary<string, WorldRealm> RealmsByName = new Dictionary<string, WorldRealm>();
 
-        public static Realm DefaultRealm { get; private set; }
+        public static ACE.Entity.Models.Realm DefaultRealm { get; private set; }
 
         public static Dictionary<RealmPropertyBool, RealmPropertyBoolAttribute> PropertyDefinitionsBool;
         public static Dictionary<RealmPropertyInt, RealmPropertyIntAttribute> PropertyDefinitionsInt;
@@ -77,7 +77,7 @@ namespace ACE.Server.Managers
             {
                 if (realmId > 0x7FFF)
                     return null;
-                if (realms.TryGetValue(realmId, out var realm))
+                if (Realms.TryGetValue(realmId, out var realm))
                     return realm;
 
                 Database.Models.World.Realm dbitem;
@@ -97,25 +97,25 @@ namespace ACE.Server.Managers
                 if (!ValidateCircularDependency(erealm))
                 {
                     log.Error("Circular inheritance chain detected for realm " + erealm.Id.ToString());
-                    realms[realmId] = null;
+                    Realms[realmId] = null;
                     return null;
                 }
                 var ruleset = BuildRuleset(erealm);
                 realm = new WorldRealm(erealm, ruleset);
-                realms[realmId] = realm;
-                realmsByName[erealm.Name] = realm;
+                Realms[realmId] = realm;
+                RealmsByName[erealm.Name] = realm;
                 return realm;
             }
         }
 
         public static WorldRealm GetRealm(string name)
         {
-            if (!realmsByName.ContainsKey(name))
+            if (!RealmsByName.ContainsKey(name))
                 return null;
-            return GetRealm(realmsByName[name].Realm.Id);
+            return GetRealm(RealmsByName[name].Realm.Id);
         }
 
-        private static bool ValidateCircularDependency(Realm realm)
+        private static bool ValidateCircularDependency(ACE.Entity.Models.Realm realm)
         {
             var parentids = new HashSet<ushort>();
             parentids.Add(realm.Id);
@@ -128,7 +128,7 @@ namespace ACE.Server.Managers
             return true;
         }
 
-        private static AppliedRuleset BuildRuleset(Realm realm)
+        private static AppliedRuleset BuildRuleset(ACE.Entity.Models.Realm realm)
         {
             if (realm.ParentRealmID == null)
                 return AppliedRuleset.MakeTopLevelRuleset(realm);
@@ -140,27 +140,27 @@ namespace ACE.Server.Managers
         {
             lock (realmsLock)
             {
-                foreach (var realm in realms.Values.Where(x => x != null))
+                foreach (var realm in Realms.Values.Where(x => x != null))
                 {
                     realm.NeedsRefresh = true;
                 }
 
                 DatabaseManager.World.ClearRealmCache();
-                realms.Clear();
-                realmsByName.Clear();
+                Realms.Clear();
+                RealmsByName.Clear();
             }
         }
 
         internal static WorldRealm GetBaseRealm(Player player)
         {
             if (!player.Location.IsEphemeralRealm)
-                return realmsByName[player.RealmRuleset.Realm.Name];
+                return RealmsByName[player.RealmRuleset.Realm.Name];
 
             var realmId = player.GetPosition(PositionType.EphemeralRealmExitTo)?.RealmID ?? player.HomeRealm;
-            return realms[realmId];
+            return Realms[realmId];
         }
 
-        internal static Landblock GetNewEphemeralLandblock(uint landcell, Player owner, Realm realmTemplate)
+        internal static Landblock GetNewEphemeralLandblock(uint landcell, Player owner, ACE.Entity.Models.Realm realmTemplate)
         {
             EphemeralRealm ephemeralRealm = EphemeralRealm.Initialize(owner, realmTemplate);
             var iid = LandblockManager.GetFreeInstanceID(true, ephemeralRealm.Ruleset.Realm.Id, (ushort)(landcell >> 16));
@@ -169,6 +169,65 @@ namespace ACE.Server.Managers
 
             log.Info($"GetNewEphemeralLandblock created for player {owner.Name}, realm ruleset {ephemeralRealm.Ruleset.Realm.Id}, longcell {longcell}.");
             return landblock;
+        }
+
+        internal static void FullUpdateRealmsRepository(Dictionary<string, Database.Models.World.Realm> realmsDict,
+            Dictionary<ushort, Database.Models.World.Realm> realmsById)
+        {
+            lock(realmsLock)
+            {
+                if (!ValidateRealmUpdates(realmsDict, realmsById))
+                    return;
+
+                try
+                {
+                    DatabaseManager.World.ReplaceAllRealms(realmsById);
+                    ClearCache();
+                }
+                catch(Exception ex)
+                {
+                    log.Error(ex.Message, ex);
+                    throw;
+                }
+            }
+        }
+
+        private static bool ValidateRealmUpdates(Dictionary<string, Database.Models.World.Realm> newRealmsByName,
+            Dictionary<ushort, Database.Models.World.Realm> newRealmsById)
+        {
+            //Make sure that existing realms aren't being renamed
+            foreach (var realm in RealmsByName.Values)
+            {
+                if (newRealmsByName.TryGetValue(realm.Realm.Name, out var newRealm) && newRealm.Id != realm.Realm.Id)
+                {
+                    log.Error($"Realm {realm.Realm.Name} attempted to have its numeric ID changed to a different value during realm import, which is not supported.");
+                    return false;
+                }
+                if (newRealmsById.TryGetValue(realm.Realm.Id, out var newRealm2) && newRealm2.Name != realm.Realm.Name)
+                {
+                    log.Error($"Realm {realm.Realm.Id} ({realm.Realm.Name}) attempted to have its unique name changed to a different value during realm import, which is not supported.");
+                    return false;
+                }
+            }
+
+            foreach(var realmId in Realms.Keys)
+            {
+               if (!newRealmsById.ContainsKey(realmId))
+                {
+                    log.Error($"Realm {realmId} is missing in realms.json. Realms may not be removed once added. Unable to continue sync.");
+                    return false;
+                }
+            }
+
+            foreach (var realmName in RealmsByName.Keys)
+            {
+                if (!newRealmsByName.ContainsKey(realmName))
+                {
+                    log.Error($"Realm {realmName} is missing in realms.json. Realms may not be removed once added. Unable to continue sync.");
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
