@@ -1,6 +1,7 @@
 using ACE.Database.Models.World;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Entity.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,36 +21,80 @@ namespace ACE.Database.Adapter
 
             if (realm.RealmPropertiesBool != null && (instantiateEmptyCollections || realm.RealmPropertiesBool.Count > 0))
             {
-                result.PropertiesBool = new Dictionary<RealmPropertyBool, (bool, bool)> (realm.RealmPropertiesBool.Count);
+                result.PropertiesBool = new Dictionary<RealmPropertyBool, AppliedRealmProperty<bool>> (realm.RealmPropertiesBool.Count);
                 foreach (var value in realm.RealmPropertiesBool)
-                    result.PropertiesBool[(RealmPropertyBool)value.Type] = (value.Value, value.Locked);
+                    result.PropertiesBool[(RealmPropertyBool)value.Type] = ConvertRealmProperty(value);
             }
             if (realm.RealmPropertiesFloat != null && (instantiateEmptyCollections || realm.RealmPropertiesFloat.Count > 0))
             {
-                result.PropertiesFloat = new Dictionary<RealmPropertyFloat, (double, bool)>(realm.RealmPropertiesFloat.Count);
+                result.PropertiesFloat = new Dictionary<RealmPropertyFloat, AppliedRealmProperty<double>>(realm.RealmPropertiesFloat.Count);
                 foreach (var value in realm.RealmPropertiesFloat)
-                    result.PropertiesFloat[(RealmPropertyFloat)value.Type] = (value.Value, value.Locked);
+                    result.PropertiesFloat[(RealmPropertyFloat)value.Type] = ConvertRealmProperty(value);
             }
             if (realm.RealmPropertiesInt != null && (instantiateEmptyCollections || realm.RealmPropertiesInt.Count > 0))
             {
-                result.PropertiesInt = new Dictionary<RealmPropertyInt, (int, bool)>(realm.RealmPropertiesInt.Count);
+                result.PropertiesInt = new Dictionary<RealmPropertyInt, AppliedRealmProperty<int>>(realm.RealmPropertiesInt.Count);
                 foreach (var value in realm.RealmPropertiesInt)
-                    result.PropertiesInt[(RealmPropertyInt)value.Type] = (value.Value, value.Locked);
+                    result.PropertiesInt[(RealmPropertyInt)value.Type] = ConvertRealmProperty(value);
             }
             if (realm.RealmPropertiesInt64 != null && (instantiateEmptyCollections || realm.RealmPropertiesInt64.Count > 0))
             {
-                result.PropertiesInt64 = new Dictionary<RealmPropertyInt64, (long, bool)>(realm.RealmPropertiesInt64.Count);
+                result.PropertiesInt64 = new Dictionary<RealmPropertyInt64, AppliedRealmProperty<long>>(realm.RealmPropertiesInt64.Count);
                 foreach (var value in realm.RealmPropertiesInt64)
-                    result.PropertiesInt64[(RealmPropertyInt64)value.Type] = (value.Value, value.Locked);
+                    result.PropertiesInt64[(RealmPropertyInt64)value.Type] = ConvertRealmProperty(value);
             }
             if (realm.RealmPropertiesString != null && (instantiateEmptyCollections || realm.RealmPropertiesString.Count > 0))
             {
-                result.PropertiesString = new Dictionary<RealmPropertyString, (string, bool)>(realm.RealmPropertiesString.Count);
+                result.PropertiesString = new Dictionary<RealmPropertyString, AppliedRealmProperty<string>>(realm.RealmPropertiesString.Count);
                 foreach (var value in realm.RealmPropertiesString)
-                    result.PropertiesString[(RealmPropertyString)value.Type] = (value.Value, value.Locked);
+                    result.PropertiesString[(RealmPropertyString)value.Type] = ConvertRealmProperty(value);
             }
 
             return result;
+        }
+
+        private static AppliedRealmProperty<bool> ConvertRealmProperty(RealmPropertiesBool dbobj)
+        {
+            var prop = new RealmPropertyOptions<bool>();
+            prop.SeedPropertiesStatic(dbobj.Value, dbobj.Locked, dbobj.Probability);
+            return new AppliedRealmProperty<bool>(prop);
+        }
+
+        private static AppliedRealmProperty<string> ConvertRealmProperty(RealmPropertiesString dbobj)
+        {
+            var prop = new RealmPropertyOptions<string>();
+            prop.SeedPropertiesStatic(dbobj.Value, dbobj.Locked, dbobj.Probability);
+            return new AppliedRealmProperty<string>(prop);
+        }
+
+        private static AppliedRealmProperty<int> ConvertRealmProperty(RealmPropertiesInt dbobj)
+        {
+            var prop = new RealmPropertyOptions<int>();
+            if (dbobj.Value.HasValue)
+                prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
+            else
+                prop.SeedPropertiesRandomized(dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
+            return new AppliedRealmProperty<int>(prop);
+        }
+
+        private static AppliedRealmProperty<long> ConvertRealmProperty(RealmPropertiesInt64 dbobj)
+        {
+            var prop = new RealmPropertyOptions<long>();
+            if (dbobj.Value.HasValue)
+                prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
+            else
+                prop.SeedPropertiesRandomized(dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
+            return new AppliedRealmProperty<long>(prop);
+        }
+
+        private static AppliedRealmProperty<double> ConvertRealmProperty(RealmPropertiesFloat dbobj)
+        {
+            var prop = new RealmPropertyOptions<double>();
+            if (dbobj.Value.HasValue)
+                prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
+            else
+                prop.SeedPropertiesRandomized(dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
+            return new AppliedRealmProperty<double>(prop);
         }
 
         /*public static ACE.Database.Models.World.Realm ConvertFromEntityRealm(ACE.Entity.Models.Realm realm, bool includeDatabaseRecordIds = false)

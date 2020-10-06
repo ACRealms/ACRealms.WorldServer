@@ -9,6 +9,7 @@ namespace ACE.Database.Models.World
         public ushort Type { get; set; }
         public bool Value { get; set; }
         public bool Locked { get; set; }
+        public double? Probability { get; set; }
 
         public virtual Realm Realm { get; set; }
     }

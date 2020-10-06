@@ -26,11 +26,13 @@ using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.WorldObjects;
 using ACE.Database.Models.Shard;
+using log4net;
 
 namespace ACE.Server.Command.Handlers.Processors
 {
     public class DeveloperContentCommands
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public enum FileType
         {
             Undefined,
@@ -158,8 +160,18 @@ namespace ACE.Server.Command.Handlers.Processors
                 if (dobj.parent != null)
                     realm.ParentRealmName = dobj.parent.Value;
 
-                foreach(var prop in ((Newtonsoft.Json.Linq.JObject)dobj.properties).Properties())
-                    realm.SetPropertyByName(prop.Name, prop.Value);
+                foreach (var prop in ((Newtonsoft.Json.Linq.JObject)dobj.properties).Properties())
+                {
+                    if (prop.Value.Type == Newtonsoft.Json.Linq.JTokenType.Object)
+                    {
+                        var pobj = prop.Value.ToObject<RealmPropertyJsonModel>();
+                        realm.SetPropertyByName_Complex(prop.Name, pobj);
+                    }
+                    else
+                    {
+                        realm.SetPropertyByName(prop.Name, prop.Value);
+                    }
+                }
 
                 return realm;
             }
@@ -224,7 +236,7 @@ namespace ACE.Server.Command.Handlers.Processors
                     if (realm.ParentRealmName != null)
                     {
                         if (!realmsDict.TryGetValue(realm.ParentRealmName, out var parentRealm))
-                            throw new Exception($"Couldn't find parent realm with name {parentRealm}");
+                            throw new Exception($"Couldn't find parent realm with name {realm.ParentRealmName}");
                         realm.ParentRealmId = parentRealm.Id;
                     }
                 }
@@ -240,13 +252,12 @@ namespace ACE.Server.Command.Handlers.Processors
                     parentRealm.Descendents.Add(realm.Id, realm);
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                log.Error($"Couldn't import {realmsIndexJsonFile}", ex);
                 CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't import {realmsIndexJsonFile}");
                 return;
             }
-
-
 
             try
             {
