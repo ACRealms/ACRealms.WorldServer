@@ -250,7 +250,7 @@ namespace ACE.Server.Entity
             }
             else
             {
-                var wo = WorldObjectFactory.CreateNewWorldObject(Biota.WeenieClassId);
+                var wo = WorldObjectFactory.CreateNewWorldObject(Biota.WeenieClassId, Generator.RealmRuleset);
                 if (wo == null)
                 {
                     log.Debug($"{Generator.Name}.Spawn(): failed to create wcid {Biota.WeenieClassId}");

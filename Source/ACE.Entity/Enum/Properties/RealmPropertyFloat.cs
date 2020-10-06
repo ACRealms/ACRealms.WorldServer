@@ -14,7 +14,13 @@ namespace ACE.Entity.Enum.Properties
         Spellcasting_Max_Angle = 2,
 
         [RealmPropertyFloat(6f, 1f, 1000f)]
-        SpellCastingPvPWindupMaxMove = 3
+        SpellCastingPvPWindupMaxMove = 3,
+
+        [RealmPropertyFloat(1f, 0.001f, 100f)]
+        CreatureSpawnHPMultiplier = 4,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureSpawnRateMultiplier = 5
     }
 
     public static class RealmPropertyFloatExtensions

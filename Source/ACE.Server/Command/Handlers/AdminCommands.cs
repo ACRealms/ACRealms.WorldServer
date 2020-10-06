@@ -2182,7 +2182,7 @@ namespace ACE.Server.Command.Handlers
 
             var guid = GuidManager.NewPlayerGuid();
 
-            var player = new Player(weenie, guid, session.AccountId);
+            var player = new Player(weenie, guid, session.AccountId, RealmManager.DefaultRuleset);
 
             player.Biota.WeenieType = session.Player.WeenieType;
 

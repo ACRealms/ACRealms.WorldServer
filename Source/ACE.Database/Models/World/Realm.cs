@@ -18,6 +18,7 @@ namespace ACE.Database.Models.World
         public ushort Type { get; set; }
         public string Name { get; set; }
         public ushort? ParentRealmId { get; set; }
+        public ushort? PropertyCountRandomized { get; set; }
 
         public virtual ICollection<RealmPropertiesBool> RealmPropertiesBool { get; set; }
         public virtual ICollection<RealmPropertiesFloat> RealmPropertiesFloat { get; set; }

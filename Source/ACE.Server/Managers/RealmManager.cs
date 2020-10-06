@@ -23,7 +23,8 @@ namespace ACE.Server.Managers
         private static readonly Dictionary<ushort, WorldRealm> Realms = new Dictionary<ushort, WorldRealm>();
         private static readonly Dictionary<string, WorldRealm> RealmsByName = new Dictionary<string, WorldRealm>();
 
-        public static ACE.Entity.Models.Realm DefaultRealm { get; private set; }
+        public static WorldRealm DefaultRealm { get; private set; }
+        public static AppliedRuleset DefaultRuleset => DefaultRealm.Ruleset;
 
         public static Dictionary<RealmPropertyBool, RealmPropertyBoolAttribute> PropertyDefinitionsBool;
         public static Dictionary<RealmPropertyInt, RealmPropertyIntAttribute> PropertyDefinitionsInt;
@@ -57,6 +58,14 @@ namespace ACE.Server.Managers
             PropertyDefinitionsString = MakePropDict<RealmPropertyString, RealmPropertyStringAttribute>();
             PropertyDefinitionsFloat = MakePropDict<RealmPropertyFloat, RealmPropertyFloatAttribute>();
 
+            var erealm = RealmConverter.ConvertToEntityRealm(new Database.Models.World.Realm()
+            {
+                Id = 0,
+                Name = NULL_REALM_NAME,
+                Type = 1
+            }, true);
+
+            DefaultRealm = new WorldRealm(erealm, AppliedRuleset.MakeTopLevelRuleset(erealm));
             /* var results = DatabaseManager.World.GetAllRealms();
 
              foreach(var realm in results)
@@ -73,24 +82,17 @@ namespace ACE.Server.Managers
             if (!realm_id.HasValue)
                 return null;
             var realmId = realm_id.Value;
-
+            if (realmId == 0)
+                return DefaultRealm;
+            if (realmId > 0x7FFF)
+                return null;
+            
             lock (realmsLock)
             {
-                if (realmId > 0x7FFF)
-                    return null;
                 if (Realms.TryGetValue(realmId, out var realm))
                     return realm;
 
-                Database.Models.World.Realm dbitem;
-                if (realmId == 0)
-                {
-                    dbitem = new Database.Models.World.Realm();
-                    dbitem.Type = 1;
-                    dbitem.Name = NULL_REALM_NAME;
-                }
-                else
-                    dbitem = DatabaseManager.World.GetRealm(realmId);
-
+                var dbitem = DatabaseManager.World.GetRealm(realmId);
                 if (dbitem == null)
                     return null;
 

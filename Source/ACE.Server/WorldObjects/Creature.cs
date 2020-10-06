@@ -15,6 +15,7 @@ using ACE.Server.Managers;
 using ACE.Server.WorldObjects.Entity;
 
 using Position = ACE.Entity.Position;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -59,10 +60,22 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// A new biota be created taking all of its values from weenie.
         /// </summary>
-        public Creature(Weenie weenie, ObjectGuid guid) : base(weenie, guid)
+        public Creature(Weenie weenie, ObjectGuid guid, AppliedRuleset ruleset) : base(weenie, guid)
         {
             InitializePropertyDictionaries();
+            RealmMutate(ruleset);
             SetEphemeralValues();
+        }
+
+        private void RealmMutate(AppliedRuleset ruleset)
+        {
+            if (WeenieType == WeenieType.Creature)
+            {
+                Biota.PropertiesAttribute2nd[PropertyAttribute2nd.MaxHealth].InitLevel =
+
+                    (uint)((double)Biota.PropertiesAttribute2nd[PropertyAttribute2nd.MaxHealth].InitLevel *
+                    ruleset.GetProperty(RealmPropertyFloat.CreatureSpawnHPMultiplier));
+            }
         }
 
         /// <summary>

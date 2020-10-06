@@ -15,11 +15,11 @@ namespace ACE.Server.Realms
         public Realm Realm { get; private set; }
         public HashSet<ushort> InheritedRealmIDs { get; } = new HashSet<ushort>();
 
-        private IDictionary<RealmPropertyBool, (bool value, bool locked)> PropertiesBool { get; set; }
-        private IDictionary<RealmPropertyFloat, (double value, bool locked)> PropertiesFloat { get; set; }
-        private IDictionary<RealmPropertyInt, (int value, bool locked)> PropertiesInt { get; set; }
-        private IDictionary<RealmPropertyInt64, (long value, bool locked)> PropertiesInt64 { get; set; }
-        private IDictionary<RealmPropertyString, (string value, bool locked)> PropertiesString { get; set; }
+        private IDictionary<RealmPropertyBool, AppliedRealmProperty<bool>> PropertiesBool { get; set; }
+        private IDictionary<RealmPropertyFloat, AppliedRealmProperty<double>> PropertiesFloat { get; set; }
+        private IDictionary<RealmPropertyInt, AppliedRealmProperty<int>> PropertiesInt { get; set; }
+        private IDictionary<RealmPropertyInt64, AppliedRealmProperty<long>> PropertiesInt64 { get; set; }
+        private IDictionary<RealmPropertyString, AppliedRealmProperty<string>> PropertiesString { get; set; }
 
         public static AppliedRuleset MakeTopLevelRuleset(Realm entity)
         {
@@ -27,11 +27,11 @@ namespace ACE.Server.Realms
             ruleset.Realm = entity;
             ruleset.InheritedRealmIDs.Add(entity.Id);
 
-            ruleset.PropertiesBool = new Dictionary<RealmPropertyBool, (bool, bool)>(entity.PropertiesBool);
-            ruleset.PropertiesFloat = new Dictionary<RealmPropertyFloat, (double, bool)>(entity.PropertiesFloat);
-            ruleset.PropertiesInt = new Dictionary<RealmPropertyInt, (int, bool)>(entity.PropertiesInt);
-            ruleset.PropertiesInt64 = new Dictionary<RealmPropertyInt64, (long, bool)>(entity.PropertiesInt64);
-            ruleset.PropertiesString = new Dictionary<RealmPropertyString, (string, bool)>(entity.PropertiesString);
+            ruleset.PropertiesBool = new Dictionary<RealmPropertyBool, AppliedRealmProperty<bool>>(entity.PropertiesBool);
+            ruleset.PropertiesFloat = new Dictionary<RealmPropertyFloat, AppliedRealmProperty<double>>(entity.PropertiesFloat);
+            ruleset.PropertiesInt = new Dictionary<RealmPropertyInt, AppliedRealmProperty<int>>(entity.PropertiesInt);
+            ruleset.PropertiesInt64 = new Dictionary<RealmPropertyInt64, AppliedRealmProperty<long>>(entity.PropertiesInt64);
+            ruleset.PropertiesString = new Dictionary<RealmPropertyString, AppliedRealmProperty<string>>(entity.PropertiesString);
 
             return ruleset;
         }
@@ -68,11 +68,11 @@ namespace ACE.Server.Realms
             ruleset.Realm = subset;
             ruleset.InheritedRealmIDs.Add(subset.Id);
 
-            ruleset.PropertiesBool = new Dictionary<RealmPropertyBool, (bool, bool)>(baseset.PropertiesBool);
-            ruleset.PropertiesFloat = new Dictionary<RealmPropertyFloat, (double, bool)>(baseset.PropertiesFloat);
-            ruleset.PropertiesInt = new Dictionary<RealmPropertyInt, (int, bool)>(baseset.PropertiesInt);
-            ruleset.PropertiesInt64 = new Dictionary<RealmPropertyInt64, (long, bool)>(baseset.PropertiesInt64);
-            ruleset.PropertiesString = new Dictionary<RealmPropertyString, (string, bool)>(baseset.PropertiesString);
+            ruleset.PropertiesBool = new Dictionary<RealmPropertyBool, AppliedRealmProperty<bool>>(baseset.PropertiesBool);
+            ruleset.PropertiesFloat = new Dictionary<RealmPropertyFloat, AppliedRealmProperty<double>>(baseset.PropertiesFloat);
+            ruleset.PropertiesInt = new Dictionary<RealmPropertyInt, AppliedRealmProperty<int>>(baseset.PropertiesInt);
+            ruleset.PropertiesInt64 = new Dictionary<RealmPropertyInt64, AppliedRealmProperty<long>>(baseset.PropertiesInt64);
+            ruleset.PropertiesString = new Dictionary<RealmPropertyString, AppliedRealmProperty<string>>(baseset.PropertiesString);
 
             ApplyRulesetDict(ruleset.PropertiesBool, subset.PropertiesBool);
             ApplyRulesetDict(ruleset.PropertiesFloat, subset.PropertiesFloat);
@@ -83,16 +83,18 @@ namespace ACE.Server.Realms
             return ruleset;
         }
 
-        private static void ApplyRulesetDict<K, V>(IDictionary<K, (V value, bool locked)> dest, IDictionary<K, (V value, bool locked)> sub)
+        private static void ApplyRulesetDict<K, V>(IDictionary<K, AppliedRealmProperty<V>> dest, IDictionary<K, AppliedRealmProperty<V>> sub)
         {
             foreach(var prop in sub)
             {
                 if (dest.ContainsKey(prop.Key))
                 {
-                    if (dest[prop.Key].locked)
+                    if (dest[prop.Key].Options.Locked)
                         continue;
                 }
-                dest[prop.Key] = prop.Value;
+                dest[prop.Key] = new AppliedRealmProperty<V>(prop.Value);
+                if (prop.Value.Options.RandomType == RealmPropertyRerollType.landblock)
+                    prop.Value.RollValue();
             }
         }
 
@@ -100,17 +102,17 @@ namespace ACE.Server.Realms
 
         private void InitializePropertyDictionaries()
         {
-            PropertiesBool = new Dictionary<RealmPropertyBool, (bool, bool)>();
-            PropertiesFloat = new Dictionary<RealmPropertyFloat, (double, bool)>();
-            PropertiesInt = new Dictionary<RealmPropertyInt, (int, bool)>();
-            PropertiesInt64 = new Dictionary<RealmPropertyInt64, (long, bool)>();
-            PropertiesString = new Dictionary<RealmPropertyString, (string, bool)>();
+            PropertiesBool = new Dictionary<RealmPropertyBool, AppliedRealmProperty<bool>>();
+            PropertiesFloat = new Dictionary<RealmPropertyFloat, AppliedRealmProperty<double>>();
+            PropertiesInt = new Dictionary<RealmPropertyInt, AppliedRealmProperty<int>>();
+            PropertiesInt64 = new Dictionary<RealmPropertyInt64, AppliedRealmProperty<long>>();
+            PropertiesString = new Dictionary<RealmPropertyString, AppliedRealmProperty<string>>();
         }
 
         public bool GetProperty(RealmPropertyBool property)
         {
             if (PropertiesBool.TryGetValue(property, out var value))
-                return value.value;
+                return value.Value;
             return RealmManager.PropertyDefinitionsBool[property].DefaultValue;
         }
         public double GetProperty(RealmPropertyFloat property)
@@ -118,7 +120,7 @@ namespace ACE.Server.Realms
             var att = RealmManager.PropertyDefinitionsFloat[property];
             if (PropertiesFloat.TryGetValue(property, out var result))
             {
-                var val = result.value;
+                var val = result.Value;
                 val = Math.Max(val, att.MinValue);
                 val = Math.Min(val, att.MaxValue);
                 return val;
@@ -131,7 +133,7 @@ namespace ACE.Server.Realms
             var att = RealmManager.PropertyDefinitionsInt[property];
             if (PropertiesInt.TryGetValue(property, out var result))
             {
-                var val = result.value;
+                var val = result.Value;
                 val = Math.Max(val, att.MinValue);
                 val = Math.Min(val, att.MaxValue);
                 return val;
@@ -144,7 +146,7 @@ namespace ACE.Server.Realms
             var att = RealmManager.PropertyDefinitionsInt64[property];
             if (PropertiesInt64.TryGetValue(property, out var result))
             {
-                var val = result.value;
+                var val = result.Value;
                 val = Math.Max(val, att.MinValue);
                 val = Math.Min(val, att.MaxValue);
                 return val;
@@ -155,7 +157,7 @@ namespace ACE.Server.Realms
         public string GetProperty(RealmPropertyString property)
         {
             if (PropertiesString.TryGetValue(property, out var result))
-                return result.value;
+                return result.Value;
             return RealmManager.PropertyDefinitionsString[property].DefaultValue;
         }
 

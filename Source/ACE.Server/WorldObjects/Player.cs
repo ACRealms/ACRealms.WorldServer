@@ -28,6 +28,7 @@ using ACE.Server.WorldObjects.Managers;
 
 using Character = ACE.Database.Models.Shard.Character;
 using MotionTable = ACE.DatLoader.FileTypes.MotionTable;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -79,7 +80,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// A new biota be created taking all of its values from weenie.
         /// </summary>
-        public Player(Weenie weenie, ObjectGuid guid, uint accountId) : base(weenie, guid)
+        public Player(Weenie weenie, ObjectGuid guid, uint accountId, AppliedRuleset ruleset) : base(weenie, guid, ruleset)
         {
             Character = new Character();
             Character.Id = guid.Full;
