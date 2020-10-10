@@ -223,6 +223,26 @@ namespace ACE.Server.Managers
                 log.Error($"WorldManager.DoPlayerEnterWorld: failed to find realm {session.Player.Location.RealmID}, for player {session.Player.Name}, relocating to realm {homerealm.Realm.Id}.");
                 session.Player.Location = pos;
             }
+            if (!session.Player.ValidatePlayerRealmPosition(session.Player.Location))
+            {
+                var homerealm = RealmManager.GetRealm(session.Player.HomeRealm);
+                if (homerealm == null)
+                    homerealm = RealmManager.GetRealm(0);
+                var exitloc = session.Player.GetPosition(ACE.Entity.Enum.Properties.PositionType.EphemeralRealmExitTo);
+                if (exitloc != null)
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"The instance you were in has expired and you have been transported outside!", ChatMessageType.System));
+                    session.Player.ExitInstance();
+                }
+                else
+                {
+                    var pos = new Position(session.Player.Location);
+                    pos.SetToDefaultRealmInstance(homerealm.Realm.Id);
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"You have been transported back to your home realm.", ChatMessageType.System));
+                    log.Info($"WorldManager.DoPlayerEnterWorld: player {session.Player.Name} doesn't have permission to be in realm {session.Player.Location.RealmID}, relocating to realm {homerealm.Realm.Id}.");
+                    session.Player.Location = pos;
+                }
+            }
 
             session.Player.PlayerEnterWorld();
 
