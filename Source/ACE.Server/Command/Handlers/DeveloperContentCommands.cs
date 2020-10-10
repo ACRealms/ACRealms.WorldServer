@@ -262,6 +262,7 @@ namespace ACE.Server.Command.Handlers.Processors
             try
             {
                 RealmManager.FullUpdateRealmsRepository(realmsDict, realmsById);
+                Console.WriteLine($"Imported {realmsById.Count} realms.");
             }
             catch
             {

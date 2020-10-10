@@ -11,6 +11,7 @@ using ACE.Entity.Enum.Properties;
 using System.Linq;
 using ACE.Server.WorldObjects;
 using ACE.Server.Entity;
+using ACE.Server.Command.Handlers.Processors;
 
 namespace ACE.Server.Managers
 {
@@ -75,6 +76,9 @@ namespace ACE.Server.Managers
                      realms[realm.Id] = realm;
                  }
              }*/
+
+            //Import-realms
+            DeveloperContentCommands.HandleImportRealms(null, null);
         }
 
         public static WorldRealm GetRealm(ushort? realm_id)
