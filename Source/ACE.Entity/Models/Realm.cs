@@ -43,8 +43,8 @@ namespace ACE.Entity.Models
         //Clone
         public AppliedRealmProperty(AppliedRealmProperty<T> prop)
         {
-            this.Value = prop.Value;
             this.Options = prop.Options;
+            RollValue();
         }
 
         public AppliedRealmProperty(RealmPropertyOptions<T> options)
