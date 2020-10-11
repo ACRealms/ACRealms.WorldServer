@@ -18,6 +18,7 @@ namespace ACE.Database.Adapter
             result.Name = realm.Name;
             result.Type = (RealmType)realm.Type;
             result.ParentRealmID = realm.ParentRealmId;
+            result.PropertyCountRandomized = realm.PropertyCountRandomized;
 
             if (realm.RealmPropertiesBool != null && (instantiateEmptyCollections || realm.RealmPropertiesBool.Count > 0))
             {
@@ -57,14 +58,14 @@ namespace ACE.Database.Adapter
         {
             var prop = new RealmPropertyOptions<bool>();
             prop.SeedPropertiesStatic(dbobj.Value, dbobj.Locked, dbobj.Probability);
-            return new AppliedRealmProperty<bool>(prop);
+            return new AppliedRealmProperty<bool>(dbobj.Type, prop);
         }
 
         private static AppliedRealmProperty<string> ConvertRealmProperty(RealmPropertiesString dbobj)
         {
             var prop = new RealmPropertyOptions<string>();
             prop.SeedPropertiesStatic(dbobj.Value, dbobj.Locked, dbobj.Probability);
-            return new AppliedRealmProperty<string>(prop);
+            return new AppliedRealmProperty<string>(dbobj.Type, prop);
         }
 
         private static AppliedRealmProperty<int> ConvertRealmProperty(RealmPropertiesInt dbobj)
@@ -74,7 +75,7 @@ namespace ACE.Database.Adapter
                 prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
             else
                 prop.SeedPropertiesRandomized(dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
-            return new AppliedRealmProperty<int>(prop);
+            return new AppliedRealmProperty<int>(dbobj.Type, prop);
         }
 
         private static AppliedRealmProperty<long> ConvertRealmProperty(RealmPropertiesInt64 dbobj)
@@ -84,7 +85,7 @@ namespace ACE.Database.Adapter
                 prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
             else
                 prop.SeedPropertiesRandomized(dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
-            return new AppliedRealmProperty<long>(prop);
+            return new AppliedRealmProperty<long>(dbobj.Type, prop);
         }
 
         private static AppliedRealmProperty<double> ConvertRealmProperty(RealmPropertiesFloat dbobj)
@@ -94,7 +95,7 @@ namespace ACE.Database.Adapter
                 prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
             else
                 prop.SeedPropertiesRandomized(dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
-            return new AppliedRealmProperty<double>(prop);
+            return new AppliedRealmProperty<double>(dbobj.Type, prop);
         }
 
         /*public static ACE.Database.Models.World.Realm ConvertFromEntityRealm(ACE.Entity.Models.Realm realm, bool includeDatabaseRecordIds = false)

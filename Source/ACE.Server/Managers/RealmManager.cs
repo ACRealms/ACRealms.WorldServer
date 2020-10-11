@@ -23,10 +23,20 @@ namespace ACE.Server.Managers
         private static readonly ReaderWriterLockSlim realmsLock = new ReaderWriterLockSlim();
         private static readonly Dictionary<ushort, WorldRealm> Realms = new Dictionary<ushort, WorldRealm>();
         private static readonly Dictionary<string, WorldRealm> RealmsByName = new Dictionary<string, WorldRealm>();
-        private static readonly Dictionary<(WorldRealm, Realm), AppliedRuleset> EphemeralRealmCache = new Dictionary<(WorldRealm, Realm), AppliedRuleset>();
+        private static readonly Dictionary<(WorldRealm, Realm), RulesetTemplate> EphemeralRealmCache = new Dictionary<(WorldRealm, Realm), RulesetTemplate>();
 
-        public static WorldRealm DefaultRealm { get; private set; }
-        public static AppliedRuleset DefaultRuleset => DefaultRealm.Ruleset;
+
+        private static WorldRealm _defaultRealm;
+        public static WorldRealm DefaultRealm
+        {
+            get { return _defaultRealm; }
+            private set
+            {
+                _defaultRealm = value;
+                DefaultRuleset = AppliedRuleset.MakeRerolledRuleset(value.RulesetTemplate);
+            }
+        }
+        public static AppliedRuleset DefaultRuleset { get; private set; }
 
         public static Dictionary<RealmPropertyBool, RealmPropertyBoolAttribute> PropertyDefinitionsBool;
         public static Dictionary<RealmPropertyInt, RealmPropertyIntAttribute> PropertyDefinitionsInt;
@@ -67,7 +77,7 @@ namespace ACE.Server.Managers
                 Type = 1
             }, true);
 
-            DefaultRealm = new WorldRealm(erealm, AppliedRuleset.MakeTopLevelRuleset(erealm));
+            DefaultRealm = new WorldRealm(erealm, RulesetTemplate.MakeTopLevelRuleset(erealm));
             /* var results = DatabaseManager.World.GetAllRealms();
 
              foreach(var realm in results)
@@ -136,12 +146,12 @@ namespace ACE.Server.Managers
             return true;
         }
 
-        private static AppliedRuleset BuildRuleset(ACE.Entity.Models.Realm realm)
+        private static RulesetTemplate BuildRuleset(ACE.Entity.Models.Realm realm)
         {
             if (realm.ParentRealmID == null)
-                return AppliedRuleset.MakeTopLevelRuleset(realm);
+                return RulesetTemplate.MakeTopLevelRuleset(realm);
             var parent = GetRealm(realm.ParentRealmID.Value);
-            return AppliedRuleset.ApplyRuleset(parent.Ruleset, realm);
+            return RulesetTemplate.MakeRuleset(parent.RulesetTemplate, realm);
         }
 
         internal static void ClearCache()
@@ -163,7 +173,7 @@ namespace ACE.Server.Managers
         internal static WorldRealm GetBaseRealm(Player player)
         {
             if (!player.Location.IsEphemeralRealm)
-                return RealmsByName[player.RealmRuleset.Realm.Name];
+                return RealmsByName[player.RealmRuleset.Template.Realm.Name];
 
             var realmId = player.GetPosition(PositionType.EphemeralRealmExitTo)?.RealmID ?? player.HomeRealm;
             return Realms[realmId];
@@ -172,11 +182,11 @@ namespace ACE.Server.Managers
         internal static Landblock GetNewEphemeralLandblock(uint landcell, Player owner, ACE.Entity.Models.Realm realmTemplate)
         {
             EphemeralRealm ephemeralRealm = EphemeralRealm.Initialize(owner, realmTemplate);
-            var iid = LandblockManager.GetFreeInstanceID(true, ephemeralRealm.Ruleset.Realm.Id, (ushort)(landcell >> 16));
+            var iid = LandblockManager.GetFreeInstanceID(true, ephemeralRealm.RulesetTemplate.Realm.Id, (ushort)(landcell >> 16));
             var longcell = ((ulong)iid << 32) | landcell;
             var landblock = LandblockManager.GetLandblock(longcell, false, false, ephemeralRealm);
 
-            log.Info($"GetNewEphemeralLandblock created for player {owner.Name}, realm ruleset {ephemeralRealm.Ruleset.Realm.Id}, longcell {longcell}.");
+            log.Info($"GetNewEphemeralLandblock created for player {owner.Name}, realm ruleset {ephemeralRealm.RulesetTemplate.Realm.Id}, longcell {longcell}.");
             return landblock;
         }
 
@@ -290,7 +300,7 @@ namespace ACE.Server.Managers
             return true;
         }
 
-        internal static AppliedRuleset GetEphemeralRealmRuleset(WorldRealm baseRealm, Realm appliedRealm)
+        internal static RulesetTemplate GetEphemeralRealmRulesetTemplate(WorldRealm baseRealm, Realm appliedRealm)
         {
             lock(realmsLock)
             {
@@ -300,7 +310,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        internal static AppliedRuleset SyncRulesetForEphemeralRealm(WorldRealm baseRealm, Realm appliedRealm, AppliedRuleset generatedRuleset)
+        internal static RulesetTemplate SyncRulesetForEphemeralRealm(WorldRealm baseRealm, Realm appliedRealm, RulesetTemplate template)
         {
             var key = (baseRealm, appliedRealm);
             lock (realmsLock)
@@ -311,8 +321,8 @@ namespace ACE.Server.Managers
                 }
                 else
                 { 
-                    EphemeralRealmCache[key] = generatedRuleset;
-                    return generatedRuleset;
+                    EphemeralRealmCache[key] = template;
+                    return template;
                 }
             }
         }

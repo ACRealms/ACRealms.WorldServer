@@ -227,7 +227,7 @@ namespace ACE.Server.Entity
         private AppliedRuleset GetOrApplyRuleset(EphemeralRealm ephemeralRealm = null)
         {
             if (ephemeralRealm != null)
-                return AppliedRuleset.MakeRerolledRuleset(ephemeralRealm.Ruleset);
+                return AppliedRuleset.MakeRerolledRuleset(ephemeralRealm.RulesetTemplate);
 
             Position.ParseInstanceID(this.Instance, out bool _istemp, out var realmid, out var _shortinstid);
             var realm = RealmManager.GetRealm(realmid);
@@ -236,7 +236,7 @@ namespace ACE.Server.Entity
                 //Shouldn't happen
                 throw new Exception($"Error: Realm {realmid} is null when creating landblock.");
             }
-            return AppliedRuleset.MakeRerolledRuleset(realm.Ruleset);
+            return AppliedRuleset.MakeRerolledRuleset(realm.RulesetTemplate);
         }
 
         /// <summary>

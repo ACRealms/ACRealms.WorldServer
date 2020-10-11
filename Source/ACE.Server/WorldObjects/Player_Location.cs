@@ -699,7 +699,7 @@ namespace ACE.Server.WorldObjects
                 SetPosition(PositionType.EphemeralRealmLastEnteredDrop, null);
             }
 
-            if (newRealm.Ruleset.GetProperty(RealmPropertyBool.IsPKOnly))
+            if (newRealm.StandardRules.GetProperty(RealmPropertyBool.IsPKOnly))
                 PlayerKillerStatus = PlayerKillerStatus.PK;
             else
                 PlayerKillerStatus = PlayerKillerStatus.NPK;
@@ -751,7 +751,7 @@ namespace ACE.Server.WorldObjects
             if (homerealm == null)
                 homerealm = RealmManager.GetRealm(0);
 
-            var iid = homerealm.Ruleset.GetDefaultInstanceID();
+            var iid = homerealm.StandardRules.GetDefaultInstanceID();
             var pos = new Position(Home) { Instance = iid };
             Teleport(pos);
         }
@@ -769,8 +769,8 @@ namespace ACE.Server.WorldObjects
                 //Home realm is either bugged and can't be found, or the player hasn't set one yet. Then they are allowed in realm 0.
                 return true;
             }
-            if (homerealm.Ruleset.GetProperty(RealmPropertyBool.CanInteractWithNeutralZone) == true &&
-                destrealm.Ruleset.GetProperty(RealmPropertyBool.IsNeutralZone) == true)
+            if (homerealm.StandardRules.GetProperty(RealmPropertyBool.CanInteractWithNeutralZone) == true &&
+                destrealm.StandardRules.GetProperty(RealmPropertyBool.IsNeutralZone) == true)
                 return true;
 
             if (isTemporaryRuleset)
