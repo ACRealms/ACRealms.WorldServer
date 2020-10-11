@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using ACE.Server.Entity;
+using ACE.Database.Adapter;
 
 namespace ACE.Server.Realms
 {
@@ -326,11 +327,11 @@ namespace ACE.Server.Realms
         {
             if (PropertiesBool.TryGetValue(property, out var value))
                 return value.Value;
-            return RealmManager.PropertyDefinitionsBool[property].DefaultValue;
+            return RealmConverter.PropertyDefinitionsBool[property].DefaultValue;
         }
         public double GetProperty(RealmPropertyFloat property)
         {
-            var att = RealmManager.PropertyDefinitionsFloat[property];
+            var att = RealmConverter.PropertyDefinitionsFloat[property];
             if (PropertiesFloat.TryGetValue(property, out var result))
             {
                 var val = result.Value;
@@ -343,7 +344,7 @@ namespace ACE.Server.Realms
 
         public int GetProperty(RealmPropertyInt property)
         {
-            var att = RealmManager.PropertyDefinitionsInt[property];
+            var att = RealmConverter.PropertyDefinitionsInt[property];
             if (PropertiesInt.TryGetValue(property, out var result))
             {
                 var val = result.Value;
@@ -356,7 +357,7 @@ namespace ACE.Server.Realms
 
         public long GetProperty(RealmPropertyInt64 property)
         {
-            var att = RealmManager.PropertyDefinitionsInt64[property];
+            var att = RealmConverter.PropertyDefinitionsInt64[property];
             if (PropertiesInt64.TryGetValue(property, out var result))
             {
                 var val = result.Value;
@@ -371,7 +372,7 @@ namespace ACE.Server.Realms
         {
             if (PropertiesString.TryGetValue(property, out var result))
                 return result.Value;
-            return RealmManager.PropertyDefinitionsString[property].DefaultValue;
+            return RealmConverter.PropertyDefinitionsString[property].DefaultValue;
         }
 
         public uint GetDefaultInstanceID()

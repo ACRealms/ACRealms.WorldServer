@@ -38,37 +38,10 @@ namespace ACE.Server.Managers
         }
         public static AppliedRuleset DefaultRuleset { get; private set; }
 
-        public static Dictionary<RealmPropertyBool, RealmPropertyBoolAttribute> PropertyDefinitionsBool;
-        public static Dictionary<RealmPropertyInt, RealmPropertyIntAttribute> PropertyDefinitionsInt;
-        public static Dictionary<RealmPropertyInt64, RealmPropertyInt64Attribute> PropertyDefinitionsInt64;
-        public static Dictionary<RealmPropertyFloat, RealmPropertyFloatAttribute> PropertyDefinitionsFloat;
-        public static Dictionary<RealmPropertyString, RealmPropertyStringAttribute> PropertyDefinitionsString;
 
-        private static Dictionary<E, A> MakePropDict<E, A>()
-        {
-            return typeof(E).GetEnumNames().Select(n =>
-            {
-                var value = (E)Enum.Parse(typeof(E), n);
-                var attributes = typeof(E).GetMember(n)
-                    .FirstOrDefault(m => m.DeclaringType == typeof(E))
-                    .GetCustomAttributes(typeof(A), false);
-
-                if (attributes.Length == 0)
-                    throw new Exception($"Enum {typeof(E).Name}.{n} is missing a {typeof(A)} attribute.");
-                if (attributes.Length != 1)
-                    throw new Exception($"Enum {typeof(E).Name}.{n} must have no more than 1 {typeof(A)} attributes.");
-
-                var attribute = (A)attributes[0];
-                return (value, attribute);
-            }).ToDictionary((pair) => pair.value, (pair) => pair.attribute);
-        }
         public static void Initialize()
         {
-            PropertyDefinitionsBool = MakePropDict<RealmPropertyBool, RealmPropertyBoolAttribute>();
-            PropertyDefinitionsInt = MakePropDict<RealmPropertyInt, RealmPropertyIntAttribute>();
-            PropertyDefinitionsInt64 = MakePropDict<RealmPropertyInt64, RealmPropertyInt64Attribute>();
-            PropertyDefinitionsString = MakePropDict<RealmPropertyString, RealmPropertyStringAttribute>();
-            PropertyDefinitionsFloat = MakePropDict<RealmPropertyFloat, RealmPropertyFloatAttribute>();
+            RealmConverter.Initialize();
 
             var erealm = RealmConverter.ConvertToEntityRealm(new Database.Models.World.Realm()
             {

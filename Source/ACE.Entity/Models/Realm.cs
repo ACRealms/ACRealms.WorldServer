@@ -67,11 +67,9 @@ namespace ACE.Entity.Models
 
         public void RollValue()
         {
-            var rolledValue = Options.RollValue();
-            if (Parent == null)
-                Value = rolledValue;
-            else
-                Value = Options.Compose(Parent.Value, rolledValue);
+            if (Parent != null)
+                Parent.RollValue();
+            Value = Options.Compose(Parent != null ? Parent.Value : Options.HardDefaultValue, Options.RollValue());
         }
 
         public override string ToString()
@@ -95,6 +93,7 @@ namespace ACE.Entity.Models
     {
         static Random Randomizer = new Random();
 
+        public T HardDefaultValue { get; private set; }
         public T DefaultValue { get; private set; }
         public RealmPropertyRerollType RandomType { get; private set; }
         public RealmPropertyCompositionType CompositionType { get; set; }
@@ -105,16 +104,18 @@ namespace ACE.Entity.Models
 
         public RealmPropertyOptions() { }
 
-        public void SeedPropertiesStatic(T defaultValue, bool locked, double? probability)
+        public void SeedPropertiesStatic(T defaultValue, T hardDefaultValue, bool locked, double? probability)
         {
             RandomType = RealmPropertyRerollType.never;
             Locked = locked;
             Probability = probability ?? 1.0;
             DefaultValue = defaultValue;
+            HardDefaultValue = hardDefaultValue;
         }
 
-        public void SeedPropertiesRandomized(byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
+        public void SeedPropertiesRandomized(T hardDefaultValue, byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
         {
+            HardDefaultValue = hardDefaultValue;
             Locked = locked;
             Probability = probability ?? 1.0;
             RandomType = (RealmPropertyRerollType)randomType;
@@ -170,16 +171,16 @@ namespace ACE.Entity.Models
             return (long)(ulongRand % uRange) + min;
         }
 
-        internal T Compose<T>(T value, T rolledValue)
+        internal T Compose<T>(T parentValue, T rolledValue)
         {
             switch (CompositionType)
             {
                 case RealmPropertyCompositionType.replace:
                     return rolledValue;
                 case RealmPropertyCompositionType.add:
-                    return Add(value, rolledValue);
+                    return Add(parentValue, rolledValue);
                 case RealmPropertyCompositionType.multiply:
-                    return Multiply(value, rolledValue);
+                    return Multiply(parentValue, rolledValue);
                 default:
                     return rolledValue;
             }
