@@ -5,11 +5,46 @@ using ACE.Entity.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace ACE.Database.Adapter
 {
     public static class RealmConverter
     {
+        public static Dictionary<RealmPropertyBool, RealmPropertyBoolAttribute> PropertyDefinitionsBool;
+        public static Dictionary<RealmPropertyInt, RealmPropertyIntAttribute> PropertyDefinitionsInt;
+        public static Dictionary<RealmPropertyInt64, RealmPropertyInt64Attribute> PropertyDefinitionsInt64;
+        public static Dictionary<RealmPropertyFloat, RealmPropertyFloatAttribute> PropertyDefinitionsFloat;
+        public static Dictionary<RealmPropertyString, RealmPropertyStringAttribute> PropertyDefinitionsString;
+
+        public static void Initialize()
+        {
+            PropertyDefinitionsBool = MakePropDict<RealmPropertyBool, RealmPropertyBoolAttribute>();
+            PropertyDefinitionsInt = MakePropDict<RealmPropertyInt, RealmPropertyIntAttribute>();
+            PropertyDefinitionsInt64 = MakePropDict<RealmPropertyInt64, RealmPropertyInt64Attribute>();
+            PropertyDefinitionsString = MakePropDict<RealmPropertyString, RealmPropertyStringAttribute>();
+            PropertyDefinitionsFloat = MakePropDict<RealmPropertyFloat, RealmPropertyFloatAttribute>();
+        }
+
+        private static Dictionary<E, A> MakePropDict<E, A>()
+        {
+            return typeof(E).GetEnumNames().Select(n =>
+            {
+                var value = (E)Enum.Parse(typeof(E), n);
+                var attributes = typeof(E).GetMember(n)
+                    .FirstOrDefault(m => m.DeclaringType == typeof(E))
+                    .GetCustomAttributes(typeof(A), false);
+
+                if (attributes.Length == 0)
+                    throw new Exception($"Enum {typeof(E).Name}.{n} is missing a {typeof(A)} attribute.");
+                if (attributes.Length != 1)
+                    throw new Exception($"Enum {typeof(E).Name}.{n} must have no more than 1 {typeof(A)} attributes.");
+
+                var attribute = (A)attributes[0];
+                return (value, attribute);
+            }).ToDictionary((pair) => pair.value, (pair) => pair.attribute);
+        }
+
         public static ACE.Entity.Models.Realm ConvertToEntityRealm(ACE.Database.Models.World.Realm realm, bool instantiateEmptyCollections = false)
         {
             var result = new ACE.Entity.Models.Realm();
@@ -57,44 +92,50 @@ namespace ACE.Database.Adapter
         private static AppliedRealmProperty<bool> ConvertRealmProperty(RealmPropertiesBool dbobj)
         {
             var prop = new RealmPropertyOptions<bool>();
-            prop.SeedPropertiesStatic(dbobj.Value, dbobj.Locked, dbobj.Probability);
+
+            var att = PropertyDefinitionsBool[(RealmPropertyBool)dbobj.Type];
+            prop.SeedPropertiesStatic(dbobj.Value, att.DefaultValue, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<bool>(dbobj.Type, prop);
         }
 
         private static AppliedRealmProperty<string> ConvertRealmProperty(RealmPropertiesString dbobj)
         {
             var prop = new RealmPropertyOptions<string>();
-            prop.SeedPropertiesStatic(dbobj.Value, dbobj.Locked, dbobj.Probability);
+            var att = PropertyDefinitionsString[(RealmPropertyString)dbobj.Type];
+            prop.SeedPropertiesStatic(dbobj.Value, att.DefaultValue, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<string>(dbobj.Type, prop);
         }
 
         private static AppliedRealmProperty<int> ConvertRealmProperty(RealmPropertiesInt dbobj)
         {
+            var att = PropertyDefinitionsInt[(RealmPropertyInt)dbobj.Type];
             var prop = new RealmPropertyOptions<int>();
             if (dbobj.Value.HasValue)
-                prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesStatic(dbobj.Value.Value, att.DefaultValue, dbobj.Locked, dbobj.Probability);
             else
-                prop.SeedPropertiesRandomized(dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesRandomized(att.DefaultValue, dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<int>(dbobj.Type, prop);
         }
 
         private static AppliedRealmProperty<long> ConvertRealmProperty(RealmPropertiesInt64 dbobj)
         {
+            var att = PropertyDefinitionsInt64[(RealmPropertyInt64)dbobj.Type];
             var prop = new RealmPropertyOptions<long>();
             if (dbobj.Value.HasValue)
-                prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesStatic(dbobj.Value.Value, att.DefaultValue, dbobj.Locked, dbobj.Probability);
             else
-                prop.SeedPropertiesRandomized(dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesRandomized(att.DefaultValue, dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<long>(dbobj.Type, prop);
         }
 
         private static AppliedRealmProperty<double> ConvertRealmProperty(RealmPropertiesFloat dbobj)
         {
+            var att = PropertyDefinitionsFloat[(RealmPropertyFloat)dbobj.Type];
             var prop = new RealmPropertyOptions<double>();
             if (dbobj.Value.HasValue)
-                prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesStatic(dbobj.Value.Value, att.DefaultValue, dbobj.Locked, dbobj.Probability);
             else
-                prop.SeedPropertiesRandomized(dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesRandomized(att.DefaultValue, dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<double>(dbobj.Type, prop);
         }
 
