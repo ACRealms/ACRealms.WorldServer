@@ -23,6 +23,7 @@ namespace ACE.Server.Managers
         private static readonly ReaderWriterLockSlim realmsLock = new ReaderWriterLockSlim();
         private static readonly Dictionary<ushort, WorldRealm> Realms = new Dictionary<ushort, WorldRealm>();
         private static readonly Dictionary<string, WorldRealm> RealmsByName = new Dictionary<string, WorldRealm>();
+        private static readonly Dictionary<(WorldRealm, Realm), AppliedRuleset> EphemeralRealmCache = new Dictionary<(WorldRealm, Realm), AppliedRuleset>();
 
         public static WorldRealm DefaultRealm { get; private set; }
         public static AppliedRuleset DefaultRuleset => DefaultRealm.Ruleset;
@@ -155,6 +156,7 @@ namespace ACE.Server.Managers
                 DatabaseManager.World.ClearRealmCache();
                 Realms.Clear();
                 RealmsByName.Clear();
+                EphemeralRealmCache.Clear();
             }
         }
 
@@ -286,6 +288,33 @@ namespace ACE.Server.Managers
             }
 
             return true;
+        }
+
+        internal static AppliedRuleset GetEphemeralRealmRuleset(WorldRealm baseRealm, Realm appliedRealm)
+        {
+            lock(realmsLock)
+            {
+                if (EphemeralRealmCache.TryGetValue((baseRealm, appliedRealm), out var storedruleset))
+                    return storedruleset;
+                return null;
+            }
+        }
+
+        internal static AppliedRuleset SyncRulesetForEphemeralRealm(WorldRealm baseRealm, Realm appliedRealm, AppliedRuleset generatedRuleset)
+        {
+            var key = (baseRealm, appliedRealm);
+            lock (realmsLock)
+            {
+                if (EphemeralRealmCache.TryGetValue(key, out var storedruleset))
+                {
+                    return storedruleset;
+                }
+                else
+                { 
+                    EphemeralRealmCache[key] = generatedRuleset;
+                    return generatedRuleset;
+                }
+            }
         }
     }
 }
