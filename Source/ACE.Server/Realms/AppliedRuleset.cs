@@ -50,24 +50,28 @@ namespace ACE.Server.Realms
         protected static void ApplyRulesetDict<K, V>(IDictionary<K, AppliedRealmProperty<V>> parent, IDictionary<K, AppliedRealmProperty<V>> sub)
         {
             //Add all parent items to sub. But if it is already in sub, then calculate using the special composition rules
-            foreach(var prop in parent)
+            foreach (var pair in parent)
             {
-                if (prop.Value.Options.Locked)
+                var parentprop = pair.Value;
+                if (parentprop.Options.Locked)
                 {
                     //Use parent's property as it is locked
-                    sub[prop.Key] = prop.Value;
+                    sub[pair.Key] = parentprop;
                     continue;
                 }
-                if (!sub.ContainsKey(prop.Key))
+                if (!sub.ContainsKey(pair.Key))
                 {
                     //Just add the parent's reference, as we already previously imprinted the parent from its template for this purpose
-                    sub[prop.Key] = parent[prop.Key];
+                    sub[pair.Key] = parentprop;
                     continue;
                 }
-
+                if (sub[pair.Key].Options.CompositionType == RealmPropertyCompositionType.replace)
+                {
+                    //No need to do anything here since we are replacing the parent
+                    continue;
+                }
                 //Apply composition rules
-                //if (prop.Value.Options.CompositionType)
-                //return new AppliedRealmProperty<V>(sub[prop.Key], prop.Value);
+                sub[pair.Key] = new AppliedRealmProperty<V>(sub[pair.Key], parentprop);
             }
         }
         private static AppliedRealmProperty GetRandomProperty(RulesetTemplate template)

@@ -50,25 +50,28 @@ namespace ACE.Entity.Models
         {
             PropertyKey = prop.PropertyKey;
             Options = prop.Options;
-            if (parent != null)
-                Parent = new AppliedRealmProperty<T>(parent);
-            else if (prop.Parent != null)
-                Parent = new AppliedRealmProperty<T>(prop.Parent);
+            if (Options.CompositionType != RealmPropertyCompositionType.replace)
+            {
+                if (parent != null)
+                    Parent = new AppliedRealmProperty<T>(parent);
+                else if (prop.Parent != null)
+                    Parent = new AppliedRealmProperty<T>(prop.Parent);
+            }
         }
 
         public AppliedRealmProperty(ushort propertyKey, RealmPropertyOptions<T> options)
         {
-            this.PropertyKey = propertyKey;
-            this.Options = options;
+            PropertyKey = propertyKey;
+            Options = options;
         }
 
         public void RollValue()
         {
-            if (Parent != null)
-                Parent.RollValue();
             var rolledValue = Options.RollValue();
-            //TODO: Compose
-        //    Value = Options.Compose(Parent.Value, rolledValue);
+            if (Parent == null)
+                Value = rolledValue;
+            else
+                Value = Options.Compose(Parent.Value, rolledValue);
         }
 
         public override string ToString()
@@ -110,11 +113,12 @@ namespace ACE.Entity.Models
             DefaultValue = defaultValue;
         }
 
-        public void SeedPropertiesRandomized(byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
+        public void SeedPropertiesRandomized(byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
         {
             Locked = locked;
             Probability = probability ?? 1.0;
             RandomType = (RealmPropertyRerollType)randomType;
+            CompositionType = (RealmPropertyCompositionType)compositionType;
             MinValue = randomLowRange;
             MaxValue = randomHighRange;
             ClampMinMax();
@@ -164,6 +168,45 @@ namespace ACE.Entity.Models
             } while (ulongRand > ulong.MaxValue - ((ulong.MaxValue % uRange) + 1) % uRange);
 
             return (long)(ulongRand % uRange) + min;
+        }
+
+        internal T Compose<T>(T value, T rolledValue)
+        {
+            switch (CompositionType)
+            {
+                case RealmPropertyCompositionType.replace:
+                    return rolledValue;
+                case RealmPropertyCompositionType.add:
+                    return Add(value, rolledValue);
+                case RealmPropertyCompositionType.multiply:
+                    return Multiply(value, rolledValue);
+                default:
+                    return rolledValue;
+            }
+        }
+
+        T Add<T>(T oldvalue, T newvalue)
+        {
+            if (typeof(T) == typeof(double))
+                return (T)(object)((double)(object)oldvalue + (double)(object)newvalue);
+            else if (typeof(T) == typeof(int))
+                return (T)(object)((int)(object)oldvalue + (int)(object)newvalue);
+            else if (typeof(T) == typeof(long))
+                return (T)(object)((long)(object)oldvalue + (long)(object)newvalue);
+            else
+                return newvalue;
+        }
+
+        T Multiply<T>(T oldvalue, T newvalue)
+        {
+            if (typeof(T) == typeof(double))
+                return (T)(object)((double)(object)oldvalue * (double)(object)newvalue);
+            else if (typeof(T) == typeof(int))
+                return (T)(object)((int)(object)oldvalue * (int)(object)newvalue);
+            else if (typeof(T) == typeof(long))
+                return (T)(object)((long)(object)oldvalue * (long)(object)newvalue);
+            else
+                return newvalue;
         }
     }
 }

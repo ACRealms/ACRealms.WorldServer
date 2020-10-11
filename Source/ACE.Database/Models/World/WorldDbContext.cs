@@ -416,6 +416,8 @@ namespace ACE.Database.Models.World
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
 
+                entity.Property(e => e.CompositionType).HasColumnName("composition_type");
+
                 entity.Property(e => e.Locked)
                     .HasColumnName("locked")
                     .HasColumnType("bit(1)");
@@ -454,6 +456,8 @@ namespace ACE.Database.Models.World
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
 
+                entity.Property(e => e.CompositionType).HasColumnName("composition_type");
+
                 entity.Property(e => e.Locked)
                     .HasColumnName("locked")
                     .HasColumnType("bit(1)");
@@ -488,6 +492,8 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.Type)
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
+
+                entity.Property(e => e.CompositionType).HasColumnName("composition_type");
 
                 entity.Property(e => e.Locked)
                     .HasColumnName("locked")
