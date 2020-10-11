@@ -190,7 +190,7 @@ namespace ACE.Server.Managers
             //Ensure realm 0 (null-realm) is not included in the new realms file
             if (newRealmsById.ContainsKey(0))
             {
-                log.Error("realms.json may not contain id 0, which is a reserved id.");
+                log.Error("realms.jsonc may not contain id 0, which is a reserved id.");
                 return false;
             }
             if (newRealmsByName.ContainsKey(NULL_REALM_NAME))
@@ -225,7 +225,7 @@ namespace ACE.Server.Managers
 
                 if (!newRealmsById.ContainsKey(realmId))
                 {
-                    log.Error($"Realm {realmId} is missing in realms.json. Realms may not be removed once added. Unable to continue sync.");
+                    log.Error($"Realm {realmId} is missing in realms.jsonc. Realms may not be removed once added. Unable to continue sync.");
                     return false;
                 }
             }
@@ -236,7 +236,7 @@ namespace ACE.Server.Managers
 
                 if (!newRealmsByName.ContainsKey(realmName))
                 {
-                    log.Error($"Realm {realmName} is missing in realms.json. Realms may not be removed once added. Unable to continue sync.");
+                    log.Error($"Realm {realmName} is missing in realms.jsonc. Realms may not be removed once added. Unable to continue sync.");
                     return false;
                 }
             }
