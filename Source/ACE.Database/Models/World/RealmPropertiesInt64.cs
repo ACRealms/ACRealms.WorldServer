@@ -13,6 +13,7 @@ namespace ACE.Database.Models.World
         public long? RandomLowRange { get; set; }
         public long? RandomHighRange { get; set; }
         public byte RandomType { get; set; }
+        public byte CompositionType { get; set; }
 
         public virtual Realm Realm { get; set; }
     }

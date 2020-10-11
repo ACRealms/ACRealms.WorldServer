@@ -47,6 +47,7 @@ CREATE TABLE `realm_properties_int64` (
   `random_low_range` bigint NULL,
   `random_high_range` bigint NULL,
   `random_type` tinyint unsigned NOT NULL,
+  `composition_type` tinyint unsigned NOT NULL,
   PRIMARY KEY (`realm_Id`,`type`),
   CONSTRAINT `realm_int64` FOREIGN KEY (`realm_Id`) REFERENCES `realm` (`id`) ON DELETE CASCADE
   
@@ -62,6 +63,7 @@ CREATE TABLE `realm_properties_int` (
   `random_high_range` int NULL,
   `probability` double NULL,
   `random_type` tinyint unsigned NOT NULL,
+  `composition_type` tinyint unsigned NOT NULL,
   PRIMARY KEY (`realm_Id`,`type`),
   KEY `idx_type` (`type`),
   CONSTRAINT `realm_int` FOREIGN KEY (`realm_Id`) REFERENCES `realm` (`id`) ON DELETE CASCADE
@@ -77,6 +79,7 @@ CREATE TABLE `realm_properties_float` (
   `random_high_range` double NULL,
   `probability` double NULL,
   `random_type` tinyint unsigned NOT NULL,
+  `composition_type` tinyint unsigned NOT NULL,
   PRIMARY KEY (`realm_Id`,`type`),
   KEY `idx_type` (`type`),
   CONSTRAINT `realm_float` FOREIGN KEY (`realm_Id`) REFERENCES `realm` (`id`) ON DELETE CASCADE

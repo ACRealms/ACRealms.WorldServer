@@ -14,7 +14,8 @@ namespace ACE.Database.Models.World
         public string high { get; set; }
         public bool? locked { get; set; }
         public double? probability { get; set; }
-        public RealmPropertyRerollType reroll { get; set; }
+        public RealmPropertyRerollType? reroll { get; set; }
+        public RealmPropertyCompositionType compose { get; set; }
 
         public void ValidateAll()
         {
@@ -56,10 +57,13 @@ namespace ACE.Database.Models.World
                 this.RandomHighRange = double.Parse(model.high);
                 if (RandomLowRange > RandomHighRange)
                     throw new Exception("high must be > low");
+                if (!model.reroll.HasValue)
+                    model.reroll = RealmPropertyRerollType.landblock;
             }
             this.Locked = model.locked ?? false;
             this.Probability = model.probability;
             this.RandomType = (byte)model.reroll;
+            this.CompositionType = (byte)model.compose;
         }
     }
 
@@ -75,10 +79,13 @@ namespace ACE.Database.Models.World
                 this.RandomHighRange = int.Parse(model.high);
                 if (RandomLowRange > RandomHighRange)
                     throw new Exception("high must be > low");
+                if (!model.reroll.HasValue)
+                    model.reroll = RealmPropertyRerollType.landblock;
             }
             this.Locked = model.locked ?? false;
             this.Probability = model.probability;
             this.RandomType = (byte)model.reroll;
+            this.CompositionType = (byte)model.compose;
         }
     }
 
@@ -94,10 +101,13 @@ namespace ACE.Database.Models.World
                 this.RandomHighRange = long.Parse(model.high);
                 if (RandomLowRange > RandomHighRange)
                     throw new Exception("high must be > low");
+                if (!model.reroll.HasValue)
+                    model.reroll = RealmPropertyRerollType.landblock;
             }
             this.Locked = model.locked ?? false;
             this.Probability = model.probability;
             this.RandomType = (byte)model.reroll;
+            this.CompositionType = (byte)model.compose;
         }
     }
 

@@ -74,7 +74,7 @@ namespace ACE.Database.Adapter
             if (dbobj.Value.HasValue)
                 prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
             else
-                prop.SeedPropertiesRandomized(dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesRandomized(dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<int>(dbobj.Type, prop);
         }
 
@@ -84,7 +84,7 @@ namespace ACE.Database.Adapter
             if (dbobj.Value.HasValue)
                 prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
             else
-                prop.SeedPropertiesRandomized(dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesRandomized(dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<long>(dbobj.Type, prop);
         }
 
@@ -94,7 +94,7 @@ namespace ACE.Database.Adapter
             if (dbobj.Value.HasValue)
                 prop.SeedPropertiesStatic(dbobj.Value.Value, dbobj.Locked, dbobj.Probability);
             else
-                prop.SeedPropertiesRandomized(dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesRandomized(dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<double>(dbobj.Type, prop);
         }
 
