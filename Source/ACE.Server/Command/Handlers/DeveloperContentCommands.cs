@@ -112,6 +112,7 @@ namespace ACE.Server.Command.Handlers.Processors
         [CommandHandler("import-realms", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Imports all json realms from the Content folder")]
         public static void HandleImportRealms(Session session, params string[] parameters)
         {
+            DateTime now = DateTime.Now;
             DirectoryInfo di = VerifyContentFolder(session);
             if (!di.Exists) return;
 
@@ -123,6 +124,8 @@ namespace ACE.Server.Command.Handlers.Processors
             var realms = ImportJsonRealmsFolder(session, json_folder);
             if (realms != null)
                 ImportJsonRealmsIndex(session, realms_index, realms);
+
+            session?.Network.EnqueueSend(new GameMessageSystemChat($"Synced {realms.Count} realms in {(DateTime.Now - now)}.", ChatMessageType.Broadcast));
         }
 
         private static List<ACE.Database.Models.World.Realm> ImportJsonRealmsFromSubFolder(Session session, string json_folder)
