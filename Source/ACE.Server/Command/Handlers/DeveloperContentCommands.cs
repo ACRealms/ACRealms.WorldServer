@@ -160,6 +160,8 @@ namespace ACE.Server.Command.Handlers.Processors
                 Realm realm = new Realm();
                 realm.Name = dobj.name.Value;
                 realm.Type = (ushort)Enum.Parse(typeof(RealmType), dobj.type.Value);
+                realm.PropertyCountRandomized = (ushort?)dobj.properties_random_count?.Value;
+
                 if (dobj.parent != null)
                     realm.ParentRealmName = dobj.parent.Value;
 

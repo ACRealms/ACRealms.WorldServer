@@ -16,30 +16,31 @@ namespace ACE.Server.Realms
         public List<Player> AllowedPlayers { get; } = new List<Player>();
         public bool OpenToFellowship { get; set; } = true;
         public DateTime ExpiresAt = DateTime.UtcNow.AddDays(1);
-        public AppliedRuleset Ruleset { get; set; }
+
+        public RulesetTemplate RulesetTemplate { get; set; }
 
         private EphemeralRealm() { }
-        private EphemeralRealm(Player owner, AppliedRuleset ruleset)
+        private EphemeralRealm(Player owner, RulesetTemplate template)
         {
             this.Owner = owner;
-            this.Ruleset = ruleset;
+            this.RulesetTemplate = template;
         }
 
-        public static EphemeralRealm Initialize(Player owner, Realm rulesetTemplate)
+        public static EphemeralRealm Initialize(Player owner, Realm realm)
         {
             var baseRealm = RealmManager.GetBaseRealm(owner);
-            return Initialize(owner, baseRealm, rulesetTemplate);
+            return Initialize(owner, baseRealm, realm);
         }
 
-        private static EphemeralRealm Initialize(Player owner, WorldRealm baseRealm, Realm rulesetTemplate)
+        private static EphemeralRealm Initialize(Player owner, WorldRealm baseRealm, Realm appliedRealm)
         {
-            var ruleset = RealmManager.GetEphemeralRealmRuleset(baseRealm, rulesetTemplate);
-            if (ruleset != null)
-                return new EphemeralRealm(owner, ruleset);
+            var template = RealmManager.GetEphemeralRealmRulesetTemplate(baseRealm, appliedRealm);
+            if (template != null) //cached
+                return new EphemeralRealm(owner, template);
 
-            ruleset = AppliedRuleset.ApplyRuleset(baseRealm.Ruleset, rulesetTemplate);
-            ruleset = RealmManager.SyncRulesetForEphemeralRealm(baseRealm, rulesetTemplate, ruleset);
-            return new EphemeralRealm(owner, ruleset);
+            template = RulesetTemplate.MakeRuleset(baseRealm.RulesetTemplate, appliedRealm);
+            template = RealmManager.SyncRulesetForEphemeralRealm(baseRealm, appliedRealm, template);
+            return new EphemeralRealm(owner, template);
         }
     }
 }

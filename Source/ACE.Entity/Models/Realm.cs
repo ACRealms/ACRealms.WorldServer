@@ -12,7 +12,7 @@ namespace ACE.Entity.Models
         public string Name { get; set; }
         public RealmType Type { get; set; }
         public ushort? ParentRealmID { get; set; }
-
+        public ushort? PropertyCountRandomized { get; set; }
 
         public IDictionary<RealmPropertyBool, AppliedRealmProperty<bool>> PropertiesBool { get; set; }
         public IDictionary<RealmPropertyFloat, AppliedRealmProperty<double>> PropertiesFloat { get; set; }
@@ -22,9 +22,14 @@ namespace ACE.Entity.Models
         public bool NeedsRefresh { get; set; }
     }
 
-    public class AppliedRealmProperty<T>
+    public abstract class AppliedRealmProperty
+    {
+        public ushort PropertyKey { get; protected set; }
+    }
+    public class AppliedRealmProperty<T> : AppliedRealmProperty
     {
         public RealmPropertyOptions<T> Options { get; }
+        public AppliedRealmProperty<T> Parent { get; }
 
         private T _value;
         public T Value
@@ -41,19 +46,30 @@ namespace ACE.Entity.Models
         private AppliedRealmProperty() { }
 
         //Clone
-        public AppliedRealmProperty(AppliedRealmProperty<T> prop)
+        public AppliedRealmProperty(AppliedRealmProperty<T> prop, AppliedRealmProperty<T> parent = null)
         {
-            this.Options = prop.Options;
-            RollValue();
+            PropertyKey = prop.PropertyKey;
+            Options = prop.Options;
+            if (parent != null)
+                Parent = new AppliedRealmProperty<T>(parent);
+            else if (prop.Parent != null)
+                Parent = new AppliedRealmProperty<T>(prop.Parent);
         }
 
-        public AppliedRealmProperty(RealmPropertyOptions<T> options)
+        public AppliedRealmProperty(ushort propertyKey, RealmPropertyOptions<T> options)
         {
+            this.PropertyKey = propertyKey;
             this.Options = options;
-            RollValue();
         }
 
-        public void RollValue() => Value = Options.RollValue();
+        public void RollValue()
+        {
+            if (Parent != null)
+                Parent.RollValue();
+            var rolledValue = Options.RollValue();
+            //TODO: Compose
+        //    Value = Options.Compose(Parent.Value, rolledValue);
+        }
 
         public override string ToString()
         {
@@ -78,6 +94,7 @@ namespace ACE.Entity.Models
 
         public T DefaultValue { get; private set; }
         public RealmPropertyRerollType RandomType { get; private set; }
+        public RealmPropertyCompositionType CompositionType { get; set; }
         public T MinValue { get; private set; }
         public T MaxValue { get; private set; }
         public bool Locked { get; private set; }
