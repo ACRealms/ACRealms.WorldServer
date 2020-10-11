@@ -118,7 +118,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var sep = Path.DirectorySeparatorChar;
 
-            var realms_index = $"{di.FullName}{sep}json{sep}realms.json";
+            var realms_index = $"{di.FullName}{sep}json{sep}realms.jsonc";
             var json_folder = $"{di.FullName}{sep}json{sep}realms{sep}";
 
             var realms = ImportJsonRealmsFolder(session, json_folder);
@@ -132,11 +132,11 @@ namespace ACE.Server.Command.Handlers.Processors
         {
             var di = new DirectoryInfo(json_folder);
 
-            var files = di.Exists ? di.GetFiles($"*.json") : null;
+            var files = di.Exists ? di.GetFiles($"*.jsonc") : null;
 
             if (files == null)
             {
-                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find {json_folder}*.json");
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find {json_folder}*.jsonc");
                 return null;
             }
 
