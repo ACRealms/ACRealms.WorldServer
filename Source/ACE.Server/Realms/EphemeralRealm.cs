@@ -33,7 +33,12 @@ namespace ACE.Server.Realms
 
         private static EphemeralRealm Initialize(Player owner, WorldRealm baseRealm, Realm rulesetTemplate)
         {
-            var ruleset = AppliedRuleset.ApplyRuleset(baseRealm.Ruleset, rulesetTemplate);
+            var ruleset = RealmManager.GetEphemeralRealmRuleset(baseRealm, rulesetTemplate);
+            if (ruleset != null)
+                return new EphemeralRealm(owner, ruleset);
+
+            ruleset = AppliedRuleset.ApplyRuleset(baseRealm.Ruleset, rulesetTemplate);
+            ruleset = RealmManager.SyncRulesetForEphemeralRealm(baseRealm, rulesetTemplate, ruleset);
             return new EphemeralRealm(owner, ruleset);
         }
     }
