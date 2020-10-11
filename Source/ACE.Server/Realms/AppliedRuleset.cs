@@ -5,6 +5,7 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace ACE.Server.Realms
 {
@@ -13,7 +14,7 @@ namespace ACE.Server.Realms
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public Realm Realm { get; private set; }
-        public HashSet<ushort> InheritedRealmIDs { get; } = new HashSet<ushort>();
+        public HashSet<ushort> InheritedRealmIDs { get; private set; } = new HashSet<ushort>();
 
         private IDictionary<RealmPropertyBool, AppliedRealmProperty<bool>> PropertiesBool { get; set; }
         private IDictionary<RealmPropertyFloat, AppliedRealmProperty<double>> PropertiesFloat { get; set; }
@@ -83,6 +84,29 @@ namespace ACE.Server.Realms
             return ruleset;
         }
 
+        internal static AppliedRuleset MakeRerolledRuleset(AppliedRuleset baseset)
+        {
+            var ruleset = new AppliedRuleset(baseset);
+            ruleset.RerollAllRules();
+            return ruleset;
+        }
+
+        private void RerollAllRules()
+        {
+            foreach (var v in PropertiesFloat.Values.Where(x =>
+                x.Options.RandomType == RealmPropertyRerollType.landblock ||
+                x.Options.RandomType == RealmPropertyRerollType.manual))
+                    v.RollValue();
+            foreach (var v in PropertiesInt.Values.Where(x =>
+                x.Options.RandomType == RealmPropertyRerollType.landblock ||
+                x.Options.RandomType == RealmPropertyRerollType.manual))
+                    v.RollValue();
+            foreach (var v in PropertiesInt64.Values.Where(x =>
+                x.Options.RandomType == RealmPropertyRerollType.landblock ||
+                x.Options.RandomType == RealmPropertyRerollType.manual))
+                    v.RollValue();
+        }
+
         private static void ApplyRulesetDict<K, V>(IDictionary<K, AppliedRealmProperty<V>> dest, IDictionary<K, AppliedRealmProperty<V>> sub)
         {
             foreach(var prop in sub)
@@ -99,6 +123,26 @@ namespace ACE.Server.Realms
         }
 
         private AppliedRuleset() { }
+
+        //Deep copy
+        private AppliedRuleset(AppliedRuleset baseset)
+        {
+            Realm = baseset.Realm;
+            InheritedRealmIDs = baseset.InheritedRealmIDs;
+
+            InitializePropertyDictionaries();
+
+            foreach(var item in baseset.PropertiesBool)
+                PropertiesBool.Add(item.Key, new AppliedRealmProperty<bool>(item.Value));
+            foreach(var item in baseset.PropertiesFloat)
+                PropertiesFloat.Add(item.Key, new AppliedRealmProperty<double>(item.Value));
+            foreach (var item in baseset.PropertiesInt)
+                PropertiesInt.Add(item.Key, new AppliedRealmProperty<int>(item.Value));
+            foreach (var item in baseset.PropertiesInt64)
+                PropertiesInt64.Add(item.Key, new AppliedRealmProperty<long>(item.Value));
+            foreach (var item in baseset.PropertiesString)
+                PropertiesString.Add(item.Key, new AppliedRealmProperty<string>(item.Value));
+        }
 
         private void InitializePropertyDictionaries()
         {
