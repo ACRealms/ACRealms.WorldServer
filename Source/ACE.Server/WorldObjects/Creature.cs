@@ -72,10 +72,61 @@ namespace ACE.Server.WorldObjects
             if (WeenieType == WeenieType.Creature)
             {
                 Biota.PropertiesAttribute2nd[PropertyAttribute2nd.MaxHealth].InitLevel =
-
                     (uint)((double)Biota.PropertiesAttribute2nd[PropertyAttribute2nd.MaxHealth].InitLevel *
                     ruleset.GetProperty(RealmPropertyFloat.CreatureSpawnHPMultiplier));
+
+                Biota.PropertiesAttribute[PropertyAttribute.Strength].InitLevel =
+                    ClampStat(
+                        (int)Biota.PropertiesAttribute[PropertyAttribute.Strength].InitLevel,
+                        ruleset.GetProperty(RealmPropertyInt.CreatureStrengthAdded),
+                        ruleset.GetProperty(RealmPropertyFloat.CreatureStrengthMultiplier)
+                    );
+
+                Biota.PropertiesAttribute[PropertyAttribute.Endurance].InitLevel =
+                    ClampStat(
+                        (int)Biota.PropertiesAttribute[PropertyAttribute.Endurance].InitLevel,
+                        ruleset.GetProperty(RealmPropertyInt.CreatureEnduranceAdded),
+                        ruleset.GetProperty(RealmPropertyFloat.CreatureEnduranceMultiplier)
+                    );
+
+                Biota.PropertiesAttribute[PropertyAttribute.Coordination].InitLevel =
+                    ClampStat(
+                        (int)Biota.PropertiesAttribute[PropertyAttribute.Coordination].InitLevel,
+                        ruleset.GetProperty(RealmPropertyInt.CreatureCoordinationAdded),
+                        ruleset.GetProperty(RealmPropertyFloat.CreatureCoordinationMultiplier)
+                    );
+
+                Biota.PropertiesAttribute[PropertyAttribute.Quickness].InitLevel =
+                    ClampStat(
+                        (int)Biota.PropertiesAttribute[PropertyAttribute.Quickness].InitLevel,
+                        ruleset.GetProperty(RealmPropertyInt.CreatureQuicknessAdded),
+                        ruleset.GetProperty(RealmPropertyFloat.CreatureQuicknessMultiplier)
+                    );
+
+                Biota.PropertiesAttribute[PropertyAttribute.Focus].InitLevel =
+                    ClampStat(
+                        (int)Biota.PropertiesAttribute[PropertyAttribute.Focus].InitLevel,
+                        ruleset.GetProperty(RealmPropertyInt.CreatureFocusAdded),
+                        ruleset.GetProperty(RealmPropertyFloat.CreatureFocusMultiplier)
+                    );
+
+                Biota.PropertiesAttribute[PropertyAttribute.Self].InitLevel =
+                    ClampStat(
+                        (int)Biota.PropertiesAttribute[PropertyAttribute.Self].InitLevel,
+                        ruleset.GetProperty(RealmPropertyInt.CreatureSelfAdded),
+                        ruleset.GetProperty(RealmPropertyFloat.CreatureSelfMultiplier)
+                    );
             }
+        }
+
+        private uint ClampStat(int initialValue, int amountToAdd, double multiplier, int maxValue = 10000000)
+        {
+            var value = (int)(initialValue * multiplier + amountToAdd);
+            if (value < 1)
+                value = 1;
+            if (value > maxValue)
+                value = maxValue;
+            return  (uint)value;
         }
 
         /// <summary>

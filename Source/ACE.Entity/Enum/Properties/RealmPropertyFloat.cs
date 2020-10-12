@@ -8,19 +8,40 @@ namespace ACE.Entity.Enum.Properties
         Undef                          = 0,
 
         [RealmPropertyFloat(1f, 0.1f, 5f)]
-        SpellCasting_MoveToState_UpdatePosition_Threshold = 1,
+        SpellCasting_MoveToState_UpdatePosition_Threshold,
 
         [RealmPropertyFloat(5f, 1f, 360f)]
-        Spellcasting_Max_Angle = 2,
+        Spellcasting_Max_Angle,
 
         [RealmPropertyFloat(6f, 1f, 1000f)]
-        SpellCastingPvPWindupMaxMove = 3,
+        SpellCastingPvPWindupMaxMove,
 
         [RealmPropertyFloat(1f, 0.001f, 100f)]
-        CreatureSpawnHPMultiplier = 4,
+        CreatureSpawnHPMultiplier,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureSpawnRateMultiplier = 5
+        CreatureSpawnRateMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureDamageMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureStrengthMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureEnduranceMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureCoordinationMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureQuicknessMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureFocusMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureSelfMultiplier,
     }
 
     public static class RealmPropertyFloatExtensions
