@@ -27,6 +27,7 @@ using ACE.Server.Physics.Extensions;
 using ACE.Server.WorldObjects;
 using ACE.Database.Models.Shard;
 using log4net;
+using ACE.Database.Adapter;
 
 namespace ACE.Server.Command.Handlers.Processors
 {
@@ -128,7 +129,7 @@ namespace ACE.Server.Command.Handlers.Processors
             session?.Network.EnqueueSend(new GameMessageSystemChat($"Synced {realms.Count} realms in {(DateTime.Now - now)}.", ChatMessageType.Broadcast));
         }
 
-        private static List<ACE.Database.Models.World.Realm> ImportJsonRealmsFromSubFolder(Session session, string json_folder)
+        private static List<RealmToImport> ImportJsonRealmsFromSubFolder(Session session, string json_folder)
         {
             var di = new DirectoryInfo(json_folder);
 
@@ -140,19 +141,19 @@ namespace ACE.Server.Command.Handlers.Processors
                 return null;
             }
 
-            List<ACE.Database.Models.World.Realm> list = new List<Realm>();
+            List<RealmToImport> list = new List<RealmToImport>();
             foreach(var file in files)
             {
                 var jsondata = File.ReadAllText(file.FullName);
-                var realm = DeserializeRealmJson(session, file.FullName, jsondata);
-                if (realm == null)
+                var realmToImport = DeserializeRealmJson(session, file.FullName, jsondata);
+                if (realmToImport == null)
                     return null;
-                list.Add(realm);
+                list.Add(realmToImport);
             }
             return list;
         }
 
-        private static ACE.Database.Models.World.Realm DeserializeRealmJson(Session session, string filename, string fileContent)
+        private static RealmToImport DeserializeRealmJson(Session session, string filename, string fileContent)
         {
             try
             {
@@ -178,7 +179,75 @@ namespace ACE.Server.Command.Handlers.Processors
                     }
                 }
 
-                return realm;
+                var links = new List<RealmRulesetLinks>();
+                ushort order = 0;
+                if (dobj.apply_rulesets is Newtonsoft.Json.Linq.JArray apply_rulesets)
+                {
+                    foreach(var apply_ruleset in apply_rulesets)
+                    {
+                        var name = (string)apply_ruleset;
+                        var link = new RealmRulesetLinks();
+                        link.Import_RulesetToApply = name;
+                        link.Realm = realm;
+                        link.Order = ++order;
+                        link.LinkType = (ushort)RealmRulesetLinkType.apply_after_inherit;
+                        links.Add(link);
+                    }
+                }
+
+                if (dobj.apply_rulesets_random is Newtonsoft.Json.Linq.JArray apply_rulesets_random)
+                {
+                    byte probabilitygroup = 0;
+                    foreach (var apply_ruleset in apply_rulesets_random)
+                    {
+                        probabilitygroup++;
+                        var dict = apply_ruleset.ToObject<Dictionary<string, double?>>();
+                        var list = dict.ToList().Select(x => (x.Key, x.Value)).ToList();
+
+                        //Ensure that all probabilities go up in order
+                        double current = 0;
+                        for (int i = 0; i < list.Count; i++)
+                        {
+                            if (list[i].Value.HasValue && list[i].Value <= current)
+                                throw new Exception($"apply_rulesets_random in {filename} for item {list[i].Key} must have a value greater than the previous item (or greater than 0 if the first item).");
+                            current = list[i].Value ?? current;
+                        }
+                        //Fill in missing values by applying a gradual increase to the next non null value
+                        for(int i = 0; i < list.Count; i++)
+                        {
+                            var p = list[i].Value;
+                            if (p == null)
+                            {
+                                double min = i == 0 ? 0 : list[i-1].Value.Value;
+                                int numToFill = 0;
+                                double? max = null;
+                                for (int j = i + 1; j < list.Count && max == null; j++, numToFill++)
+                                    max = list[j].Value;
+                                if (max == null)
+                                    max = 1.0;
+                                double delta = (max.Value - min) / (numToFill + 1);
+                                for(int n = 0; n < numToFill; n++,i++)
+                                    list[i] = i == 0 ? (list[i].Key, delta) : (list[i].Key, list[i - 1].Value + delta);
+                            }
+                        }
+                        foreach(var item in list)
+                        {
+                            var link = new RealmRulesetLinks();
+                            link.Realm = realm;
+                            link.Order = ++order;
+                            link.ProbabilityGroup = probabilitygroup;
+                            link.Probability = item.Value.Value;
+                            link.LinkType = (ushort)RealmRulesetLinkType.apply_after_inherit;
+                            link.Import_RulesetToApply = item.Key;
+                            links.Add(link);
+                        }
+                    }
+                }
+                return new RealmToImport()
+                {
+                    Realm = realm,
+                    Links = links
+                };
             }
             catch (Exception ex)
             {
@@ -187,7 +256,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
         }
 
-        private static List<ACE.Database.Models.World.Realm> ImportJsonRealmsFolder(Session session, string json_folder)
+        private static List<RealmToImport> ImportJsonRealmsFolder(Session session, string json_folder)
         {
             var sep = Path.DirectorySeparatorChar;
             var json_folder_realm = $"{json_folder}{sep}realm{sep}";
@@ -206,13 +275,13 @@ namespace ACE.Server.Command.Handlers.Processors
             return null;
         }
 
-        private static void ImportJsonRealmsIndex(Session session, string realmsIndexJsonFile, List<Realm> realms)
+        private static void ImportJsonRealmsIndex(Session session, string realmsIndexJsonFile, List<RealmToImport> realms)
         {
-            Dictionary<string, Realm> realmsDict = null;
-            Dictionary<ushort, Realm> realmsById = new Dictionary<ushort, Realm>();
+            Dictionary<string, RealmToImport> realmsDict = null;
+            Dictionary<ushort, RealmToImport> realmsById = new Dictionary<ushort, RealmToImport>();
             try
             {
-                realmsDict = realms.ToDictionary(x => x.Name);
+                realmsDict = realms.ToDictionary(x => x.Realm.Name);
             }
             catch
             {
@@ -229,32 +298,32 @@ namespace ACE.Server.Command.Handlers.Processors
                 //Map ids
                 foreach (var item in result)
                 {
-                    var realm = realmsDict[item.Key];
-                    realm.SetId(item.Value);
-                    realmsById.Add(item.Value, realm);
+                    var importItem = realmsDict[item.Key];
+                    importItem.Realm.SetId(item.Value);
+                    realmsById.Add(item.Value, importItem);
                 }
 
                 //Map parents
                 foreach(var item in result)
                 {
-                    var realm = realmsDict[item.Key];
-                    if (realm.ParentRealmName != null)
+                    var importItem = realmsDict[item.Key];
+                    if (importItem.Realm.ParentRealmName != null)
                     {
-                        if (!realmsDict.TryGetValue(realm.ParentRealmName, out var parentRealm))
-                            throw new Exception($"Couldn't find parent realm with name {realm.ParentRealmName}");
-                        realm.ParentRealmId = parentRealm.Id;
+                        if (!realmsDict.TryGetValue(importItem.Realm.ParentRealmName, out var parentImportItem))
+                            throw new Exception($"Couldn't find parent realm with name {importItem.Realm.ParentRealmName}");
+                        importItem.Realm.ParentRealmId = parentImportItem.Realm.Id;
                     }
                 }
 
                 //Map descendents
                 foreach (var item in result)
                 {
-                    var realm = realmsDict[item.Key];
-                    if (realm.ParentRealmId == null)
+                    var importItem = realmsDict[item.Key];
+                    if (importItem.Realm.ParentRealmId == null)
                         continue;
 
-                    var parentRealm = realmsById[realm.ParentRealmId.Value];
-                    parentRealm.Descendents.Add(realm.Id, realm);
+                    var parentImportItem = realmsById[importItem.Realm.ParentRealmId.Value];
+                    parentImportItem.Realm.Descendents.Add(importItem.Realm.Id, importItem.Realm);
                 }
             }
             catch (Exception ex)
@@ -272,6 +341,7 @@ namespace ACE.Server.Command.Handlers.Processors
             catch
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Failed to update realms repository.");
+                log.Error($"Failed to update realms repository.");
                 return;
             }
         }

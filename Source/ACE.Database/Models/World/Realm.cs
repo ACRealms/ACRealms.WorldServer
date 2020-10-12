@@ -12,6 +12,8 @@ namespace ACE.Database.Models.World
             RealmPropertiesInt = new HashSet<RealmPropertiesInt>();
             RealmPropertiesInt64 = new HashSet<RealmPropertiesInt64>();
             RealmPropertiesString = new HashSet<RealmPropertiesString>();
+            RealmRulesetLinksLinkedRealm = new HashSet<RealmRulesetLinks>();
+            RealmRulesetLinksRealm = new HashSet<RealmRulesetLinks>();
         }
 
         public ushort Id { get; set; }
@@ -25,5 +27,7 @@ namespace ACE.Database.Models.World
         public virtual ICollection<RealmPropertiesInt> RealmPropertiesInt { get; set; }
         public virtual ICollection<RealmPropertiesInt64> RealmPropertiesInt64 { get; set; }
         public virtual ICollection<RealmPropertiesString> RealmPropertiesString { get; set; }
+        public virtual ICollection<RealmRulesetLinks> RealmRulesetLinksLinkedRealm { get; set; }
+        public virtual ICollection<RealmRulesetLinks> RealmRulesetLinksRealm { get; set; }
     }
 }

@@ -950,7 +950,7 @@ namespace ACE.Database
                 realmCache.Clear();
         }
 
-        public void ReplaceAllRealms(Dictionary<ushort, Realm> realmsById)
+        public void ReplaceAllRealms(Dictionary<ushort, RealmToImport> realmsById)
         {
             lock (realmCache)
             {

@@ -24,7 +24,7 @@ namespace ACE.Server.Managers
         private static readonly Dictionary<ushort, WorldRealm> Realms = new Dictionary<ushort, WorldRealm>();
         private static readonly Dictionary<string, WorldRealm> RealmsByName = new Dictionary<string, WorldRealm>();
         private static readonly Dictionary<(WorldRealm, Realm), RulesetTemplate> EphemeralRealmCache = new Dictionary<(WorldRealm, Realm), RulesetTemplate>();
-
+        private static bool ImportComplete;
 
         private static WorldRealm _defaultRealm;
         public static WorldRealm DefaultRealm
@@ -63,6 +63,8 @@ namespace ACE.Server.Managers
 
             //Import-realms
             DeveloperContentCommands.HandleImportRealms(null, null);
+            if (!ImportComplete)
+                throw new Exception("Import of realms.jsonc did not complete successfully.");
         }
 
         public static WorldRealm GetRealm(ushort? realm_id)
@@ -74,7 +76,7 @@ namespace ACE.Server.Managers
                 return DefaultRealm;
             if (realmId > 0x7FFF)
                 return null;
-            
+
             lock (realmsLock)
             {
                 if (Realms.TryGetValue(realmId, out var realm))
@@ -110,7 +112,7 @@ namespace ACE.Server.Managers
         {
             var parentids = new HashSet<ushort>();
             parentids.Add(realm.Id);
-            while(realm.ParentRealmID != null)
+            while (realm.ParentRealmID != null)
             {
                 if (parentids.Contains(realm.ParentRealmID.Value))
                     return false;
@@ -163,10 +165,10 @@ namespace ACE.Server.Managers
             return landblock;
         }
 
-        internal static void FullUpdateRealmsRepository(Dictionary<string, Database.Models.World.Realm> realmsDict,
-            Dictionary<ushort, Database.Models.World.Realm> realmsById)
+        internal static void FullUpdateRealmsRepository(Dictionary<string, RealmToImport> realmsDict,
+            Dictionary<ushort, RealmToImport> realmsById)
         {
-            lock(realmsLock)
+            lock (realmsLock)
             {
                 if (!ValidateRealmUpdates(realmsDict, realmsById))
                     return;
@@ -176,16 +178,17 @@ namespace ACE.Server.Managers
                     DatabaseManager.World.ReplaceAllRealms(realmsById);
                     ClearCache();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     log.Error(ex.Message, ex);
                     throw;
                 }
             }
+            ImportComplete = true;
         }
 
-        private static bool ValidateRealmUpdates(Dictionary<string, Database.Models.World.Realm> newRealmsByName,
-            Dictionary<ushort, Database.Models.World.Realm> newRealmsById)
+        private static bool ValidateRealmUpdates(Dictionary<string, RealmToImport> newRealmsByName,
+            Dictionary<ushort, RealmToImport> newRealmsById)
         {
             //Ensure realm 0 (null-realm) is not included in the new realms file
             if (newRealmsById.ContainsKey(0))
@@ -205,12 +208,12 @@ namespace ACE.Server.Managers
                 if (realm.Realm.Id == 0)
                     continue;
 
-                if (newRealmsByName.TryGetValue(realm.Realm.Name, out var newRealm) && newRealm.Id != realm.Realm.Id)
+                if (newRealmsByName.TryGetValue(realm.Realm.Name, out var newRealmToImport) && newRealmToImport.Realm.Id != realm.Realm.Id)
                 {
                     log.Error($"Realm {realm.Realm.Name} attempted to have its numeric ID changed to a different value during realm import, which is not supported.");
                     return false;
                 }
-                if (newRealmsById.TryGetValue(realm.Realm.Id, out var newRealm2) && newRealm2.Name != realm.Realm.Name)
+                if (newRealmsById.TryGetValue(realm.Realm.Id, out var newRealmToImport2) && newRealmToImport2.Realm.Name != realm.Realm.Name)
                 {
                     log.Error($"Realm {realm.Realm.Id} ({realm.Realm.Name}) attempted to have its unique name changed to a different value during realm import, which is not supported.");
                     return false;
@@ -218,7 +221,7 @@ namespace ACE.Server.Managers
             }
 
             //Check for deletions
-            foreach(var realmId in Realms.Keys)
+            foreach (var realmId in Realms.Keys)
             {
                 if (realmId == 0)
                     continue;
@@ -241,16 +244,33 @@ namespace ACE.Server.Managers
                 }
             }
 
+            //Ensure realm in each link exists
+            foreach (var realm in newRealmsByName.Values)
+            {
+                foreach (var link in realm.Links)
+                {
+                    if (!newRealmsByName.ContainsKey(link.Import_RulesetToApply))
+                    {
+                        log.Error($"New realm {realm.Realm.Name} has a linked realm {link.Import_RulesetToApply} which was not found in the import set. Unable to continue sync.");
+                        return false;
+                    }
+                    link.RealmId = realm.Realm.Id;
+                    link.LinkedRealmId = newRealmsByName[link.Import_RulesetToApply].Realm.Id;
+                }
+            }
+
             //Check for circular dependencies - from top to bottom of tree
             Queue<Database.Models.World.Realm> realmsToCheck = new Queue<Database.Models.World.Realm>();
-            foreach(var realm in newRealmsByName.Values)
+            foreach (var importItem in newRealmsByName.Values)
             {
-                if (realm.ParentRealmId == null)
-                    realmsToCheck.Enqueue(realm);
+                if (importItem.Realm.ParentRealmId == null)
+                {
+                    realmsToCheck.Enqueue(importItem.Realm);
+                }
             }
 
             HashSet<ushort> realmsChecked = new HashSet<ushort>();
-            while(realmsToCheck.TryDequeue(out var realmToCheck))
+            while (realmsToCheck.TryDequeue(out var realmToCheck))
             {
                 if (realmsChecked.Contains(realmToCheck.Id))
                 {
@@ -266,11 +286,69 @@ namespace ACE.Server.Managers
             if (realmsChecked.Count != newRealmsById.Count)
             {
                 var badRealm = newRealmsById.First(x => !realmsChecked.Contains(x.Key)).Value;
-                log.Error($"A circular dependency was detected when attempting to import realm {badRealm.Name}.");
+                log.Error($"A circular dependency was detected when attempting to import realm {badRealm.Realm.Name}.");
                 return false;
             }
 
+            // Check for circular dependencies in realm links. Not sure of a good algorithm for this as it gets complex.
+            // So for now, restrict realm links to only rulesets that do not have a parent.
+            var itemsToCheck = newRealmsByName.Values.Select(i => new RealmToImportMarked() { ImportItem = i }).ToDictionary(x => x.ImportItem.Realm.Id);
+            var unmarkedNodes = itemsToCheck.Values.ToHashSet();
+
+            //Check for duplicate names (may be unnecessary due to the RecursiveCheckCircularDependency section below)
+            foreach (var item in itemsToCheck.Values)
+            {
+                foreach (var link in item.ImportItem.Links)
+                {
+                    var thisRealm = newRealmsById[link.RealmId].Realm;
+                    if (thisRealm.Name == link.Import_RulesetToApply || thisRealm.Id == link.LinkedRealmId || link.RealmId == link.LinkedRealmId)
+                    {
+                        log.Error($"Error importing realm {thisRealm.Name}: A realm cannot have a linked ruleset with the same name as that realm.");
+                        return false;
+                    }
+                }
+            }
+
+            //DepthFirstSearch traversal to find circular references on entire graph
+            while (unmarkedNodes.Count > 0)
+            {
+                var item = unmarkedNodes.First();
+                try
+                {
+                    RecursiveCheckCircularDependency(unmarkedNodes.First(), itemsToCheck, unmarkedNodes);
+                }
+                catch (InvalidOperationException)
+                {
+                    log.Error($"Error importing realm {item.ImportItem.Realm.Name}: A circular dependency was detected.");
+                    return false;
+                }
+            }
+
             return true;
+        }
+
+        private class RealmToImportMarked
+        {
+            public RealmToImport ImportItem { get; set; }
+            public bool TemporaryMark { get; set; }
+            public bool PermanentMark { get; set; }
+        }
+
+        //https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search
+        private static void RecursiveCheckCircularDependency(RealmToImportMarked item, Dictionary<ushort, RealmToImportMarked> dict, HashSet<RealmToImportMarked> unmarkedNodes)
+        {
+            if (item.PermanentMark)
+                return;
+            if (item.TemporaryMark)
+                throw new InvalidOperationException();
+            item.TemporaryMark = true;
+            if (item.ImportItem.Realm.ParentRealmId.HasValue)
+                RecursiveCheckCircularDependency(dict[item.ImportItem.Realm.ParentRealmId.Value], dict, unmarkedNodes);
+            foreach (var link in item.ImportItem.Links)
+                RecursiveCheckCircularDependency(dict[link.LinkedRealmId], dict, unmarkedNodes);
+            item.TemporaryMark = false;
+            item.PermanentMark = true;
+            unmarkedNodes.Remove(item);
         }
 
         internal static RulesetTemplate GetEphemeralRealmRulesetTemplate(WorldRealm baseRealm, Realm appliedRealm)

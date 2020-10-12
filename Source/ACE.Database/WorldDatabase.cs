@@ -13,6 +13,7 @@ using ACE.Database.Entity;
 using ACE.Database.Models.World;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Database.Adapter;
 
 namespace ACE.Database
 {
@@ -526,25 +527,28 @@ namespace ACE.Database
             return realm;
         }
 
-        internal void ReplaceAllRealms(Dictionary<ushort, Realm> realmsById)
+        internal void ReplaceAllRealms(Dictionary<ushort, RealmToImport> realmsById)
         {
-            var propsbool = realmsById.Values.SelectMany(x => x.RealmPropertiesBool);
-            var propsint = realmsById.Values.SelectMany(x => x.RealmPropertiesInt);
-            var propsint64 = realmsById.Values.SelectMany(x => x.RealmPropertiesInt64);
-            var propsfloat = realmsById.Values.SelectMany(x => x.RealmPropertiesFloat);
-            var propsstring = realmsById.Values.SelectMany(x => x.RealmPropertiesString);
+            var realms = realmsById.Values.Select(x => x.Realm);
+            var propsbool = realms.SelectMany(x => x.RealmPropertiesBool);
+            var propsint = realms.SelectMany(x => x.RealmPropertiesInt);
+            var propsint64 = realms.SelectMany(x => x.RealmPropertiesInt64);
+            var propsfloat = realms.SelectMany(x => x.RealmPropertiesFloat);
+            var propsstring = realms.SelectMany(x => x.RealmPropertiesString);
+            var links = realmsById.Values.SelectMany(x => x.Links);
 
             using (var context = new WorldDbContext())
             {
                 using (var transaction = context.Database.BeginTransaction())
                 {
                     context.Database.ExecuteSqlCommand("DELETE FROM realm;");
-                    context.BulkInsert(realmsById.Values);
+                    context.BulkInsert(realms);
                     context.BulkInsert(propsbool);
                     context.BulkInsert(propsint);
                     context.BulkInsert(propsint64);
                     context.BulkInsert(propsfloat);
                     context.BulkInsert(propsstring);
+                    context.BulkInsert(links);
                     transaction.Commit();
                 }
             }

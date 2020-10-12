@@ -122,6 +122,12 @@ namespace ACE.Database.Models.World
         }
     }
 
+    public partial class RealmRulesetLinks
+    {
+        [NotMapped]
+        public string Import_RulesetToApply { get; set; }
+    }
+
     public partial class Realm
     {
         [NotMapped]
