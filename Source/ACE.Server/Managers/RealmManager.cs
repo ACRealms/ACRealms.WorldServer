@@ -146,7 +146,7 @@ namespace ACE.Server.Managers
         internal static WorldRealm GetBaseRealm(Player player)
         {
             if (!player.Location.IsEphemeralRealm)
-                return RealmsByName[player.RealmRuleset.Template.Realm.Name];
+                return GetRealm(player.RealmRuleset.Template.Realm.Name);
 
             var realmId = player.GetPosition(PositionType.EphemeralRealmExitTo)?.RealmID ?? player.HomeRealm;
             return Realms[realmId];
