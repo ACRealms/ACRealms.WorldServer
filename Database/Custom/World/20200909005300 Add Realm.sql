@@ -18,13 +18,15 @@ CREATE TABLE `realm` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Dynamic Realm of a Shard/World';
 
 CREATE TABLE `realm_ruleset_links` (
-  `realm_id` smallint NOT NULL,
-  `linked_realm_id` text NOT NULL,
-  `link_type` int NOT NULL,
-  `order` int NOT NULL,
+  `realm_id` smallint unsigned NOT NULL,
+  `order` smallint unsigned NOT NULL,
+  `link_type` smallint unsigned NOT NULL,
+  `linked_realm_id` smallint unsigned NOT NULL,
+  `probability_group` tinyint unsigned NULL,
   `probability` double NULL COMMENT 'A random number between 0 and 1 will be generated. The first link with a probability value greater than the number value in the probability_group will be applied, and the rest in the group ignored (per landblock).',
-  `probability_group` int NULL,
-  PRIMARY KEY (`realm_id`)
+  PRIMARY KEY (`realm_id`, `order`),
+  CONSTRAINT `realm_link_parent` FOREIGN KEY (`realm_Id`) REFERENCES `realm` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `realm_link_child` FOREIGN KEY (`linked_realm_id`) REFERENCES `realm` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `realm_properties_string` (

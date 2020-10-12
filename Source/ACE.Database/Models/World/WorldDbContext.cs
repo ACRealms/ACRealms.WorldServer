@@ -552,25 +552,35 @@ namespace ACE.Database.Models.World
 
             modelBuilder.Entity<RealmRulesetLinks>(entity =>
             {
-                entity.HasKey(e => e.RealmId)
+                entity.HasKey(e => new { e.RealmId, e.Order })
                     .HasName("PRIMARY");
 
                 entity.ToTable("realm_ruleset_links");
 
+                entity.HasIndex(e => e.LinkedRealmId)
+                    .HasName("realm_link_child");
+
                 entity.Property(e => e.RealmId).HasColumnName("realm_id");
+
+                entity.Property(e => e.Order).HasColumnName("order");
 
                 entity.Property(e => e.LinkType).HasColumnName("link_type");
 
-                entity.Property(e => e.LinkedRealmId)
-                    .IsRequired()
-                    .HasColumnName("linked_realm_id")
-                    .HasColumnType("text");
-
-                entity.Property(e => e.Order).HasColumnName("order");
+                entity.Property(e => e.LinkedRealmId).HasColumnName("linked_realm_id");
 
                 entity.Property(e => e.Probability).HasColumnName("probability");
 
                 entity.Property(e => e.ProbabilityGroup).HasColumnName("probability_group");
+
+                entity.HasOne(d => d.LinkedRealm)
+                    .WithMany(p => p.RealmRulesetLinksLinkedRealm)
+                    .HasForeignKey(d => d.LinkedRealmId)
+                    .HasConstraintName("realm_link_child");
+
+                entity.HasOne(d => d.Realm)
+                    .WithMany(p => p.RealmRulesetLinksRealm)
+                    .HasForeignKey(d => d.RealmId)
+                    .HasConstraintName("realm_link_parent");
             });
 
             modelBuilder.Entity<Recipe>(entity =>
