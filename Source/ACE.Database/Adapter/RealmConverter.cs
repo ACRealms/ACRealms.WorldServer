@@ -47,7 +47,30 @@ namespace ACE.Database.Adapter
 
         public static ACE.Entity.Models.Realm ConvertToEntityRealm(ACE.Database.Models.World.Realm realm, bool instantiateEmptyCollections = false)
         {
-            var result = new ACE.Entity.Models.Realm();
+            var jobs = new List<RealmLinkJob>();
+            foreach(var jobtype_group in realm.RealmRulesetLinksRealm.GroupBy(x => x.LinkType))
+            {
+                foreach (var group in jobtype_group.GroupBy(x => x.ProbabilityGroup))
+                {
+                    if (group.Key == null)
+                    {
+                        foreach (var unconditionallink in group)
+                        {
+                            jobs.Add(new RealmLinkJob((RealmRulesetLinkType)unconditionallink.LinkType, new List<AppliedRealmLink>() {
+                            new AppliedRealmLink(unconditionallink.LinkedRealmId, 1.0)}.AsReadOnly()));
+                        }
+                    }
+                    else
+                    {
+                        var linksToAdd = new List<AppliedRealmLink>();
+                        foreach (var link in group)
+                            linksToAdd.Add(new AppliedRealmLink(link.LinkedRealmId, link.Probability.Value));
+                        jobs.Add(new RealmLinkJob((RealmRulesetLinkType)jobtype_group.Key, linksToAdd.AsReadOnly()));
+                    }
+                }
+            }
+
+            var result = new ACE.Entity.Models.Realm(jobs);
 
             result.Id = realm.Id;
             result.Name = realm.Name;

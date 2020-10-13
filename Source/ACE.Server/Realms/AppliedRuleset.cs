@@ -48,31 +48,48 @@ namespace ACE.Server.Realms
         protected IDictionary<RealmPropertyInt64, AppliedRealmProperty<long>> PropertiesInt64 { get; set; }
         protected IDictionary<RealmPropertyString, AppliedRealmProperty<string>> PropertiesString { get; set; }
 
-        protected static void ApplyRulesetDict<K, V>(IDictionary<K, AppliedRealmProperty<V>> parent, IDictionary<K, AppliedRealmProperty<V>> sub)
+        protected static void ApplyRulesetDict<K, V>(IDictionary<K, AppliedRealmProperty<V>> parent, IDictionary<K, AppliedRealmProperty<V>> sub, bool invertRelationships = false)
         {
+            //If invertRelationships is true, we are prioritizing the sub dictionary for the purposes of lock, and prioritizing the parent for the purposes of replace.
+            //Add and multiply operations can be applied independent of the ordering so they are not affected. 
+
             //Add all parent items to sub. But if it is already in sub, then calculate using the special composition rules
             foreach (var pair in parent)
             {
                 var parentprop = pair.Value;
-                if (parentprop.Options.Locked)
-                {
-                    //Use parent's property as it is locked
-                    sub[pair.Key] = parentprop;
-                    continue;
-                }
                 if (!sub.ContainsKey(pair.Key))
                 {
                     //Just add the parent's reference, as we already previously imprinted the parent from its template for this purpose
                     sub[pair.Key] = parentprop;
                     continue;
                 }
-                if (sub[pair.Key].Options.CompositionType == RealmPropertyCompositionType.replace)
+
+                if (!invertRelationships && parentprop.Options.Locked)
+                {
+                    //Use parent's property as it is locked
+                    sub[pair.Key] = parentprop;
+                    continue;
+                }
+                else if (invertRelationships && sub[pair.Key].Options.Locked)
+                    continue;
+
+                //Replace
+                if (!invertRelationships && sub[pair.Key].Options.CompositionType == RealmPropertyCompositionType.replace)
                 {
                     //No need to do anything here since we are replacing the parent
                     continue;
                 }
+                else if (invertRelationships && parentprop.Options.CompositionType == RealmPropertyCompositionType.replace)
+                {
+                    sub[pair.Key] = parentprop;
+                    continue;
+                }
+
                 //Apply composition rules
-                sub[pair.Key] = new AppliedRealmProperty<V>(sub[pair.Key], parentprop);
+                if (!invertRelationships)
+                    sub[pair.Key] = new AppliedRealmProperty<V>(sub[pair.Key], parentprop);
+                else
+                    sub[pair.Key] = new AppliedRealmProperty<V>(parentprop, sub[pair.Key]); //ensure parent chain is kept
             }
         }
         private static AppliedRealmProperty GetRandomProperty(RulesetTemplate template)
@@ -175,7 +192,7 @@ namespace ACE.Server.Realms
         }
 
         internal IReadOnlyList<AppliedRealmProperty> PropertiesForRandomization { get; set; }
-
+        internal IReadOnlyList<RealmLinkJob> Jobs { get; private set; }
         public static RulesetTemplate MakeTopLevelRuleset(Realm entity)
         {
             var ruleset = new RulesetTemplate();
@@ -187,6 +204,7 @@ namespace ACE.Server.Realms
             ruleset.PropertiesInt = new Dictionary<RealmPropertyInt, AppliedRealmProperty<int>>(entity.PropertiesInt);
             ruleset.PropertiesInt64 = new Dictionary<RealmPropertyInt64, AppliedRealmProperty<long>>(entity.PropertiesInt64);
             ruleset.PropertiesString = new Dictionary<RealmPropertyString, AppliedRealmProperty<string>>(entity.PropertiesString);
+            ruleset.Jobs = entity.Jobs;
 
             ruleset.MakeRandomizationList();
             return ruleset;
@@ -208,6 +226,7 @@ namespace ACE.Server.Realms
             ruleset.PropertiesInt = new Dictionary<RealmPropertyInt, AppliedRealmProperty<int>>(subset.PropertiesInt);
             ruleset.PropertiesInt64 = new Dictionary<RealmPropertyInt64, AppliedRealmProperty<long>>(subset.PropertiesInt64);
             ruleset.PropertiesString = new Dictionary<RealmPropertyString, AppliedRealmProperty<string>>(subset.PropertiesString);
+            ruleset.Jobs = subset.Jobs;
 
             ruleset.MakeRandomizationList();
             return ruleset;
@@ -283,26 +302,40 @@ namespace ACE.Server.Realms
             result.CopyDicts(template);
             if (template.ParentRuleset != null)
                 result.ComposeFrom(template.ParentRuleset);
+            foreach (var job in template.Jobs.Where(x => x.Type == RealmRulesetLinkType.apply_after_inherit))
+                result.ApplyJob(job);
+
             // Composition needs to happen first before rerolling,
             // so that random properties that depend on other random
             // properties with a composition rule can be applied in sequence
-
             result.RerollAllRules();
             return result;
         }
 
-        private void ComposeFrom(RulesetTemplate parentTemplate)
+        private void ApplyJob(RealmLinkJob job)
+        {
+            foreach(var link in job.Links)
+            {
+                if (random.NextDouble() < link.Probability)
+                {
+                    var template = RealmManager.GetRealm(link.RulesetIDToApply).RulesetTemplate;
+                    ComposeFrom(template, true);
+                    return;
+                }
+            }
+        }
+
+        private void ComposeFrom(RulesetTemplate parentTemplate, bool invertRules = false)
         {
             if (parentTemplate == null)
                 return;
             var parent = MakeRerolledRuleset(parentTemplate);
-            ParentRuleset = parent;
 
-            ApplyRulesetDict(parent.PropertiesBool, PropertiesBool);
-            ApplyRulesetDict(parent.PropertiesFloat, PropertiesFloat);
-            ApplyRulesetDict(parent.PropertiesInt, PropertiesInt);
-            ApplyRulesetDict(parent.PropertiesInt64, PropertiesInt64);
-            ApplyRulesetDict(parent.PropertiesString, PropertiesString);
+            ApplyRulesetDict(parent.PropertiesBool, PropertiesBool, invertRules);
+            ApplyRulesetDict(parent.PropertiesFloat, PropertiesFloat, invertRules);
+            ApplyRulesetDict(parent.PropertiesInt, PropertiesInt, invertRules);
+            ApplyRulesetDict(parent.PropertiesInt64, PropertiesInt64, invertRules);
+            ApplyRulesetDict(parent.PropertiesString, PropertiesString, invertRules);
         }
 
         private void RerollAllRules()

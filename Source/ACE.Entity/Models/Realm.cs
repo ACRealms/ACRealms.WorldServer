@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-
+using System.Collections.ObjectModel;
+using System.Linq;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 
@@ -20,6 +21,36 @@ namespace ACE.Entity.Models
         public IDictionary<RealmPropertyInt64, AppliedRealmProperty<long>> PropertiesInt64 { get; set; }
         public IDictionary<RealmPropertyString, AppliedRealmProperty<string>> PropertiesString { get; set; }
         public bool NeedsRefresh { get; set; }
+
+        public IReadOnlyList<RealmLinkJob> Jobs { get; }
+
+        public Realm(List<RealmLinkJob> jobs)
+        {
+            Jobs = jobs.AsReadOnly();
+        }
+    }
+
+    public class RealmLinkJob
+    {
+        public RealmRulesetLinkType Type { get; }
+        public IReadOnlyList<AppliedRealmLink> Links { get; }
+        public RealmLinkJob(RealmRulesetLinkType type, ReadOnlyCollection<AppliedRealmLink> links)
+        {
+            this.Type = type;
+            this.Links = links;
+        }
+    }
+
+    public class AppliedRealmLink
+    {
+        public double Probability { get; }
+        public ushort RulesetIDToApply { get; }
+
+        public AppliedRealmLink(ushort rulesetIDToApply, double probability)
+        {
+            Probability = probability;
+            RulesetIDToApply = rulesetIDToApply;
+        }
     }
 
     public abstract class AppliedRealmProperty

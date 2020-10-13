@@ -87,38 +87,12 @@ namespace ACE.Server.Managers
                     return null;
 
                 var erealm = RealmConverter.ConvertToEntityRealm(dbitem, true);
-                if (!ValidateCircularDependency(erealm))
-                {
-                    log.Error("Circular inheritance chain detected for realm " + erealm.Id.ToString());
-                    Realms[realmId] = null;
-                    return null;
-                }
                 var ruleset = BuildRuleset(erealm);
                 realm = new WorldRealm(erealm, ruleset);
                 Realms[realmId] = realm;
                 RealmsByName[erealm.Name] = realm;
                 return realm;
             }
-        }
-
-        public static WorldRealm GetRealm(string name)
-        {
-            if (!RealmsByName.ContainsKey(name))
-                return null;
-            return GetRealm(RealmsByName[name].Realm.Id);
-        }
-
-        private static bool ValidateCircularDependency(ACE.Entity.Models.Realm realm)
-        {
-            var parentids = new HashSet<ushort>();
-            parentids.Add(realm.Id);
-            while (realm.ParentRealmID != null)
-            {
-                if (parentids.Contains(realm.ParentRealmID.Value))
-                    return false;
-                realm = GetRealm(realm.ParentRealmID.Value).Realm;
-            }
-            return true;
         }
 
         private static RulesetTemplate BuildRuleset(ACE.Entity.Models.Realm realm)
@@ -148,10 +122,10 @@ namespace ACE.Server.Managers
         internal static WorldRealm GetBaseRealm(Player player)
         {
             if (!player.Location.IsEphemeralRealm)
-                return GetRealm(player.RealmRuleset.Template.Realm.Name);
+                return GetRealm(player.RealmRuleset.Template.Realm.Id);
 
             var realmId = player.GetPosition(PositionType.EphemeralRealmExitTo)?.RealmID ?? player.HomeRealm;
-            return Realms[realmId];
+            return GetRealm(realmId);
         }
 
         internal static Landblock GetNewEphemeralLandblock(uint landcell, Player owner, ACE.Entity.Models.Realm realmTemplate)
