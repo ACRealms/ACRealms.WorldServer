@@ -524,6 +524,8 @@ namespace ACE.Database
             realm.RealmPropertiesInt64 = context.RealmPropertiesInt64.Where(r => r.RealmId == realm.Id).ToList();
             realm.RealmPropertiesString = context.RealmPropertiesString.Where(r => r.RealmId == realm.Id).ToList();
 
+            realm.RealmRulesetLinksRealm = context.RealmRulesetLinks.Where(r => r.RealmId == realm.Id).ToList();
+            realm.RealmRulesetLinksLinkedRealm = context.RealmRulesetLinks.Where(r => r.LinkedRealmId == realm.Id).ToList();
             return realm;
         }
 
