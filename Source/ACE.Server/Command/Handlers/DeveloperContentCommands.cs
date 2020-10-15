@@ -201,8 +201,33 @@ namespace ACE.Server.Command.Handlers.Processors
                     foreach (var apply_ruleset in apply_rulesets_random)
                     {
                         probabilitygroup++;
-                        var dict = apply_ruleset.ToObject<Dictionary<string, double?>>();
-                        var list = dict.ToList().Select(x => (x.Key, x.Value)).ToList();
+                        List<(string Key, double? Value)> list = new List<(string Key, double? Value)>();
+                        if (apply_ruleset is Newtonsoft.Json.Linq.JArray)
+                        {
+                            foreach(var apply_ruleset_item in apply_ruleset)
+                            {
+                                var x = (Newtonsoft.Json.Linq.JProperty)apply_ruleset_item.ToList()[0];
+                                if (x.Value.Type == Newtonsoft.Json.Linq.JTokenType.Float)
+                                    list.Add((x.Name, (double)x.Value));
+                                else if (x.Value.Type == Newtonsoft.Json.Linq.JTokenType.String && ((string)x.Value).ToLower() == "auto")
+                                    list.Add((x.Name, null));
+                                else
+                                    throw new Exception($"apply_rulesets_random in {filename} for item {x.Name} has an invalid value. Must be a number between 0 and 1, or \"auto\"");
+                            }
+                        }
+                        else
+                        {
+                            var apply_ruleset_item = apply_ruleset;
+                            var x = (Newtonsoft.Json.Linq.JProperty)apply_ruleset_item.ToList()[0];
+                            if (x.Value.Type == Newtonsoft.Json.Linq.JTokenType.Float)
+                                list.Add((x.Name, (double)x.Value));
+                            else if (x.Value.Type == Newtonsoft.Json.Linq.JTokenType.String && ((string)x.Value).ToLower() == "auto")
+                                list.Add((x.Name, null));
+                            else
+                                throw new Exception($"apply_rulesets_random in {filename} for item {x.Name} has an invalid value. Must be a number between 0 and 1, or \"auto\"");
+                        }
+                        //var dict = apply_ruleset.ToObject<Dictionary<string, double?>>();
+                       // var list = dict.ToList().Select(x => (x.Key, x.Value)).ToList();
 
                         //Ensure that all probabilities go up in order
                         double current = 0;
@@ -226,8 +251,10 @@ namespace ACE.Server.Command.Handlers.Processors
                                 if (max == null)
                                     max = 1.0;
                                 double delta = (max.Value - min) / (numToFill + 1);
-                                for(int n = 0; n < numToFill; n++,i++)
+                                for (int n = 0; n < numToFill; n++, i++)
                                     list[i] = i == 0 ? (list[i].Key, delta) : (list[i].Key, list[i - 1].Value + delta);
+                                if (numToFill == 0)
+                                    list[i] = (list[i].Key, max);
                             }
                         }
                         foreach(var item in list)
