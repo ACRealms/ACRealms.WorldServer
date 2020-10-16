@@ -529,7 +529,37 @@ namespace ACE.Database
             return realm;
         }
 
-        internal void ReplaceAllRealms(Dictionary<ushort, RealmToImport> realmsById)
+        public virtual List<Realm> GetAllRealms()
+        {
+            using (var context = new WorldDbContext())
+            {
+                var results = context.Realm.ToList();
+
+                var pbool = context.RealmPropertiesBool.ToLookup(x => x.RealmId);
+                var pfloat = context.RealmPropertiesFloat.ToLookup(x => x.RealmId);
+                var pint = context.RealmPropertiesInt.ToLookup(x => x.RealmId);
+                var plong = context.RealmPropertiesInt64.ToLookup(x => x.RealmId);
+                var pstring = context.RealmPropertiesString.ToLookup(x => x.RealmId);
+                var links = context.RealmRulesetLinks.ToList();
+                var linksrealm = links.ToLookup(x => x.RealmId);
+                var linkslinkedrealm = links.ToLookup(x => x.LinkedRealmId);
+
+                System.Threading.Tasks.Parallel.ForEach(results, realm =>
+                {
+                    realm.RealmPropertiesBool = pbool[realm.Id].ToList();
+                    realm.RealmPropertiesFloat = pfloat[realm.Id].ToList();
+                    realm.RealmPropertiesInt = pint[realm.Id].ToList();
+                    realm.RealmPropertiesInt64 = plong[realm.Id].ToList();
+                    realm.RealmPropertiesString = pstring[realm.Id].ToList();
+
+                    realm.RealmRulesetLinksRealm = linksrealm[realm.Id].ToList();
+                    realm.RealmRulesetLinksLinkedRealm = linkslinkedrealm[realm.Id].ToList();
+                });
+                return results;
+            }
+        }
+
+        public virtual void ReplaceAllRealms(Dictionary<ushort, RealmToImport> realmsById)
         {
             var realms = realmsById.Values.Select(x => x.Realm);
             var propsbool = realms.SelectMany(x => x.RealmPropertiesBool);
@@ -554,34 +584,6 @@ namespace ACE.Database
                     transaction.Commit();
                 }
             }
-        }
-
-        public List<ACE.Entity.Models.Realm> GetAllRealms()
-        {
-            var realms = new List<ACE.Entity.Models.Realm>();
-
-            using (var context = new WorldDbContext())
-            {
-                var results = context.Realm
-                    .AsNoTracking()
-                    .ToList();
-
-                foreach (var result in results)
-                {
-                    var realm = GetRealm(result.Id);
-
-                    if (realm != null)
-                    {
-                        var convertedRealm = ACE.Database.Adapter.RealmConverter.ConvertToEntityRealm(realm, true);
-
-                        realms.Add(convertedRealm);
-                    }
-                    else
-                        log.Error($"WorldDatabase.GetAllRealms() - couldn't find realm for id {result.Id}");
-                };
-            }
-
-            return realms;
         }
     }
 }
