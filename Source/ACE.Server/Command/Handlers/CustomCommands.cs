@@ -41,6 +41,19 @@ namespace ACE.Server.Command.Handlers
             session.Player.ExitInstance();
         }
 
+        [CommandHandler("exitinst", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
+        public static void HandleExitInst(Session session, params string[] parameters)
+        {
+            session.Player.ExitInstance();
+        }
+
+
+        [CommandHandler("exiti", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
+        public static void HandleExitI(Session session, params string[] parameters)
+        {
+            session.Player.ExitInstance();
+        }
+
         [CommandHandler("leaveinstance", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
         public static void HandleLeaveInstance(Session session, params string[] parameters)
         {
@@ -57,6 +70,17 @@ namespace ACE.Server.Command.Handlers
         public static void HandleLeaveI(Session session, params string[] parameters)
         {
             session.Player.ExitInstance();
+        }
+
+        [CommandHandler("hideout", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Recalls to your hideout.")]
+        public static void HandleHideout(Session session, params string[] parameters)
+        {
+            if (session?.Player?.HomeRealm == null)
+                return;
+            if (!Managers.RealmManager.GetRealm(session.Player.HomeRealm).StandardRules.GetProperty(RealmPropertyBool.HideoutEnabled))
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Your home realm has not enabled hideouts.", ChatMessageType.Broadcast));
+            
+            session.Player.HandleActionTeleToHideout();
         }
     }
 }
