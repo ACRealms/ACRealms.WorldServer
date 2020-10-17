@@ -99,18 +99,6 @@ namespace ACE.Server.Managers
                 if (Realms.TryGetValue(realmId, out var realm))
                     return realm;
                 return null;
-                /*
-                var dbitem = DatabaseManager.World.GetRealm(realmId);
-                if (dbitem == null)
-                    return null;
-
-                
-                var erealm = RealmConverter.ConvertToEntityRealm(dbitem, true);
-                var ruleset = BuildRuleset(erealm);
-                realm = new WorldRealm(erealm, ruleset);
-                Realms[realmId] = realm;
-                RealmsByName[erealm.Name] = realm;
-                return realm;*/
             }
         }
 
@@ -520,6 +508,17 @@ namespace ACE.Server.Managers
                 Command.Handlers.CommandHandlerHelper.WriteOutputInfo(session, $"Error importing json file {filename}. Exception: {ex.Message}.");
                 return null;
             }
+        }
+
+        public static bool TryParseReservedRealm(ushort realmId, out ReservedRealm reservedRealm)
+        {
+            if (Enum.IsDefined(typeof(ReservedRealm), realmId))
+            {
+                reservedRealm = (ReservedRealm)realmId;
+                return true;
+            }
+            reservedRealm = ReservedRealm.@default;
+            return false;
         }
     }
 }

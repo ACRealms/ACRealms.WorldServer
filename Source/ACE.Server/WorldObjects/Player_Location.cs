@@ -23,6 +23,22 @@ namespace ACE.Server.WorldObjects
     partial class Player
     {
         private static readonly Position MarketplaceDrop = DatabaseManager.World.GetCachedWeenie("portalmarketplace").GetPosition(PositionType.Destination);
+
+        private uint HideoutInstanceId
+        {
+            get
+            {
+                //TODO: Support account IDs > 65535
+                var realm = RealmManager.GetReservedRealm(ReservedRealm.hideout);
+                return Position.InstanceIDFromVars(realm.Realm.Id, (ushort)Account.AccountId, false);
+            }
+        }
+
+        private Position UlgrimsHideout
+        {
+            get { return new Position(0x7308001Fu, 80f, 163.4f, 12.004999f, 0f, 0f, 0.4475889f, 0.8942394f, HideoutInstanceId); }
+        }
+
         public bool DebugLoc { get; set; }
 
         /// <summary>
@@ -118,6 +134,62 @@ namespace ACE.Server.WorldObjects
                     return;
                 }
                 Teleport(house.SlumLord.Location);
+            });
+
+            actionChain.EnqueueChain();
+        }
+
+        public void HandleActionTeleToHideout()
+        {
+            if (PKTimerActive)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveBeenInPKBattleTooRecently));
+                return;
+            }
+
+            if (RecallsDisabled)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.ExitTrainingAcademyToUseCommand));
+                return;
+            }
+
+            if (TooBusyToRecall)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YoureTooBusy));
+                return;
+            }
+
+            if (CombatMode != CombatMode.NonCombat)
+            {
+                // this should be handled by a different thing, probably a function that forces player into peacemode
+                var updateCombatMode = new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.CombatMode, (int)CombatMode.NonCombat);
+                SetCombatMode(CombatMode.NonCombat);
+                Session.Network.EnqueueSend(updateCombatMode);
+            }
+
+            EnqueueBroadcast(new GameMessageSystemChat($"{Name} is recalling to the hideout.", ChatMessageType.Recall), LocalBroadcastRange, ChatMessageType.Recall);
+
+            SendMotionAsCommands(MotionCommand.HouseRecall, MotionStance.NonCombat);
+
+            var startPos = new Position(Location);
+
+            // Wait for animation
+            var actionChain = new ActionChain();
+
+            // Then do teleport
+            var animLength = DatManager.PortalDat.ReadFromDat<MotionTable>(MotionTableId).GetAnimationLength(MotionCommand.HouseRecall);
+            actionChain.AddDelaySeconds(animLength);
+            IsBusy = true;
+            actionChain.AddAction(this, () =>
+            {
+                IsBusy = false;
+                var endPos = new Position(Location);
+                if (startPos.SquaredDistanceTo(endPos) > RecallMoveThresholdSq)
+                {
+                    Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveMovedTooFar));
+                    return;
+                }
+                TeleportToHideout();
             });
 
             actionChain.EnqueueChain();
@@ -756,6 +828,18 @@ namespace ACE.Server.WorldObjects
             Teleport(pos);
         }
 
+        private void TeleportToHideout()
+        {
+            if (Account.AccountId > 0xFFFFu)
+            {
+                //TODO: Support account IDs > 65535
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to teleport to hideout.", ChatMessageType.System));
+                return;
+            }
+
+            Teleport(UlgrimsHideout);
+        }
+
         public bool ValidatePlayerRealmPosition(Position newPosition)
         {
             Position.ParseInstanceID(newPosition.Instance, out var isTemporaryRuleset, out ushort newRealmId, out ushort shortInstanceId);
@@ -763,11 +847,21 @@ namespace ACE.Server.WorldObjects
             var destrealm = RealmManager.GetRealm(newPosition.RealmID);
             if (destrealm == null)
                 return false;
-
-            if (homerealm == null && destrealm.Realm.Id == 0)
+            if (RealmManager.TryParseReservedRealm(destrealm.Realm.Id, out var reservedRealm))
             {
-                //Home realm is either bugged and can't be found, or the player hasn't set one yet. Then they are allowed in realm 0.
-                return true;
+                switch (reservedRealm)
+                {
+                    case ReservedRealm.@default:
+                        return homerealm == null;
+                    case ReservedRealm.hideout:
+                        if (shortInstanceId != Account.AccountId)
+                            return false;
+                        if (!homerealm.StandardRules.GetProperty(RealmPropertyBool.HideoutEnabled))
+                            return false;
+                        return new ushort[] { 0x7308, 0x7309 }.Contains(newPosition.Landblock); //Ulgrims only, todo: add other landblocks
+                    default:
+                        return false;
+                }
             }
             if (homerealm.StandardRules.GetProperty(RealmPropertyBool.CanInteractWithNeutralZone) == true &&
                 destrealm.StandardRules.GetProperty(RealmPropertyBool.IsNeutralZone) == true)
