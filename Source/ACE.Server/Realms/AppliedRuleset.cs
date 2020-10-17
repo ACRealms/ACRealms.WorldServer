@@ -340,21 +340,17 @@ namespace ACE.Server.Realms
 
         private void RerollAllRules()
         {
-            foreach (var v in PropertiesFloat.Values.Where(x =>
-                x.Options.RandomType == RealmPropertyRerollType.landblock ||
-                x.Options.RandomType == RealmPropertyRerollType.manual))
-                    v.RollValue();
-            foreach (var v in PropertiesInt.Values.Where(x =>
-                x.Options.RandomType == RealmPropertyRerollType.landblock ||
-                x.Options.RandomType == RealmPropertyRerollType.manual))
-                    v.RollValue();
-            foreach (var v in PropertiesInt64.Values.Where(x =>
-                x.Options.RandomType == RealmPropertyRerollType.landblock ||
-                x.Options.RandomType == RealmPropertyRerollType.manual))
-                    v.RollValue();
+            foreach (var v in PropertiesFloat.Values)
+                v.RollValue();
+            foreach (var v in PropertiesInt.Values)
+                v.RollValue();
+            foreach (var v in PropertiesInt64.Values)
+                v.RollValue();
+            foreach (var v in PropertiesBool.Values)
+                v.RollValue();
+            foreach (var v in PropertiesString.Values)
+                v.RollValue();
         }
-
-
 
         public bool GetProperty(RealmPropertyBool property)
         {
