@@ -34,11 +34,12 @@ namespace ACE.Server.WorldObjects
             }
         }
 
+        public Position HideoutLocation => UlgrimsHideout;
         private Position UlgrimsHideout
         {
             get { return new Position(0x7308001Fu, 80f, 163.4f, 12.004999f, 0f, 0f, 0.4475889f, 0.8942394f, HideoutInstanceId); }
         }
-
+        
         public bool DebugLoc { get; set; }
 
         /// <summary>
@@ -837,7 +838,7 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            Teleport(UlgrimsHideout);
+            Teleport(HideoutLocation);
         }
 
         public bool ValidatePlayerRealmPosition(Position newPosition)

@@ -20,7 +20,6 @@ namespace ACE.Server.WorldObjects
     partial class Creature
     {
         public TreasureDeath DeathTreasure { get => DeathTreasureType.HasValue ? DatabaseManager.World.GetCachedDeathTreasure(DeathTreasureType.Value) : null; }
-
         private bool onDeathEntered = false;
 
         /// <summary>
@@ -390,13 +389,34 @@ namespace ACE.Server.WorldObjects
 
                 corpse.Biota.PropertiesTextureMap = objDesc.TextureChanges.Clone(corpse.BiotaDatabaseLock);
             }
+            var player = this as Player;
 
-            // use the physics location for accuracy,
-            // especially while jumping
-            corpse.Location = PhysicsObj.Position.ACEPosition(Location);
 
+            bool atHideout = false;
+            if (player?.HomeRealm != null &&
+                player.Location.RealmID != player.HomeRealm &&
+                RealmManager.GetRealm(player.HomeRealm).StandardRules.GetProperty(RealmPropertyBool.HideoutEnabled))
+            {
+                atHideout = true;
+                var loc = player.HideoutLocation;
+                //Randomize the location of the corpse within a small square
+                loc = new Position(loc.ObjCellID,
+                    loc.Pos.X + (float)Common.ThreadSafeRandom.Next(-2f, 2f),
+                    loc.Pos.Y + (float)Common.ThreadSafeRandom.Next(-2f, 2f),
+                    loc.Pos.Z, loc.Rotation.X, loc.Rotation.Y, loc.Rotation.Z, loc.Rotation.W, loc.Instance);
+                var rads = (float)Common.ThreadSafeRandom.Next(0.0f, (float)Math.PI * 2.0f);
+                loc.Rotation = System.Numerics.Quaternion.CreateFromAxisAngle(System.Numerics.Vector3.UnitZ, rads);
+                
+                corpse.Location = loc;
+            }
+            else
+            {
+                // use the physics location for accuracy,
+                // especially while jumping
+                corpse.Location = PhysicsObj.Position.ACEPosition(Location);
+            }
             corpse.VictimId = Guid.Full;
-            corpse.Name = $"{prefix} of {Name}";
+            corpse.Name = $"{prefix} of {Name}ra";
 
             // set 'killed by' for looting rights
             var killerName = "misadventure";
@@ -422,7 +442,7 @@ namespace ACE.Server.WorldObjects
 
             bool saveCorpse = false;
 
-            var player = this as Player;
+
 
             if (player != null)
             {
@@ -433,7 +453,12 @@ namespace ACE.Server.WorldObjects
                 if (dropped.Count > 0)
                     saveCorpse = true;
 
-                if (!player.Location.Indoors)
+                if (atHideout)
+                {
+                    if (dropped.Count > 0)
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your corpse is located at your hideout (/hideout).", ChatMessageType.Broadcast));
+                }
+                else if (!player.Location.Indoors)
                 {
                     player.SetPosition(PositionType.LastOutsideDeath, new Position(corpse.Location));
                     player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePosition(player, PositionType.LastOutsideDeath, corpse.Location));
