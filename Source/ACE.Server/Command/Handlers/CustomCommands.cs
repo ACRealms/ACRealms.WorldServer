@@ -78,7 +78,10 @@ namespace ACE.Server.Command.Handlers
             if (session?.Player?.HomeRealm == null)
                 return;
             if (!Managers.RealmManager.GetRealm(session.Player.HomeRealm).StandardRules.GetProperty(RealmPropertyBool.HideoutEnabled))
+            {
                 session.Network.EnqueueSend(new GameMessageSystemChat($"Your home realm has not enabled hideouts.", ChatMessageType.Broadcast));
+                return;
+            }
             
             session.Player.HandleActionTeleToHideout();
         }
