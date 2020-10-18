@@ -150,6 +150,11 @@ namespace ACE.Database.Models.World
             foreach (var item in RealmPropertiesFloat)
                 item.RealmId = value;
         }
+
+        public override string ToString()
+        {
+            return $"{Name} ({Id})";
+        }
     }
 
     public static class RealmExtensions
