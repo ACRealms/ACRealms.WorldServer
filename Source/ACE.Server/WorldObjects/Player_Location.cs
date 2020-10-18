@@ -824,7 +824,7 @@ namespace ACE.Server.WorldObjects
             if (homerealm == null)
                 homerealm = RealmManager.GetRealm(0);
 
-            var iid = homerealm.StandardRules.GetDefaultInstanceID();
+            var iid = homerealm.GetDefaultInstanceID(this);
             var pos = new Position(Home) { Instance = iid };
             Teleport(pos);
         }
@@ -853,7 +853,9 @@ namespace ACE.Server.WorldObjects
                 switch (reservedRealm)
                 {
                     case ReservedRealm.@default:
-                        return homerealm == null;
+                        if (homerealm.Realm.Id != (ushort)ReservedRealm.@default)
+                            return false;
+                        return shortInstanceId == Account.AccountId;
                     case ReservedRealm.hideout:
                         if (shortInstanceId != Account.AccountId)
                             return false;

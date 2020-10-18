@@ -542,8 +542,13 @@ namespace ACE.Server.Managers
                 log.Error($"SetHomeRealm from object references a missing realm with id {realmId}!" + Environment.NewLine + Environment.StackTrace);
                 return;
             }
-            player.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
             log.Info($"Setting HomeRealm for character {player.Name} to {realm.Realm.Id}.");
+            player.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
+            player.SetProperty(PropertyBool.RecallsDisabled, false);
+            var loc = realm.DefaultStartingLocation(player);
+            player.SetPosition(PositionType.Sanctuary, new ACE.Entity.Position(loc));
+            player.Teleport(loc);
+            player.GrantXP((long)player.GetXPToNextLevel(10), XpType.Emote, ShareType.None);
         }
     }
 }
