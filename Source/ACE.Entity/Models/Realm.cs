@@ -28,6 +28,11 @@ namespace ACE.Entity.Models
         {
             Jobs = jobs.AsReadOnly();
         }
+
+        public override string ToString()
+        {
+            return $"{Type} {Name} ({Id})";
+        }
     }
 
     public class RealmLinkJob
@@ -38,6 +43,11 @@ namespace ACE.Entity.Models
         {
             this.Type = type;
             this.Links = links;
+        }
+
+        public override string ToString()
+        {
+            return $"{Links.Count} Links";
         }
     }
 
@@ -50,6 +60,11 @@ namespace ACE.Entity.Models
         {
             Probability = probability;
             RulesetIDToApply = rulesetIDToApply;
+        }
+
+        public override string ToString()
+        {
+            return $"{Probability} - Realm {RulesetIDToApply}";
         }
     }
 
@@ -239,6 +254,11 @@ namespace ACE.Entity.Models
                 return (T)(object)((long)(object)oldvalue * (long)(object)newvalue);
             else
                 return newvalue;
+        }
+
+        public override string ToString()
+        {
+            return $"Default: {DefaultValue}, Min: {MinValue}, Max: {MaxValue}, Locked: {Locked}, Probability: {Probability}";
         }
     }
 }

@@ -245,6 +245,11 @@ namespace ACE.Server.Realms
                 PropertiesForRandomization = list.AsReadOnly();
             }
         }
+
+        public override string ToString()
+        {
+            return $"Template {Realm.Name}";
+        }
     }
 
     //Properties may be changed freely
@@ -407,6 +412,11 @@ namespace ACE.Server.Realms
         public uint GetDefaultInstanceID()
         {
             return ACE.Entity.Position.InstanceIDFromVars(this.Template.Realm.Id, 0, this.Template.Realm.Type == ACE.Entity.Enum.RealmType.Ruleset);
+        }
+
+        public override string ToString()
+        {
+            return $"Applied Rulest {Realm.Name}";
         }
     }
 }
