@@ -183,7 +183,6 @@ namespace ACE.Server.Realms
     //Properties should not be changed after initial composition
     public class RulesetTemplate : Ruleset
     {
-        public HashSet<ushort> InheritedRealmIDs { get; protected set; } = new HashSet<ushort>();
         public Realm Realm { get; protected set; }
         public new RulesetTemplate ParentRuleset
         {
@@ -197,7 +196,6 @@ namespace ACE.Server.Realms
         {
             var ruleset = new RulesetTemplate();
             ruleset.Realm = entity;
-            ruleset.InheritedRealmIDs.Add(entity.Id);
 
             ruleset.PropertiesBool = new Dictionary<RealmPropertyBool, AppliedRealmProperty<bool>>(entity.PropertiesBool);
             ruleset.PropertiesFloat = new Dictionary<RealmPropertyFloat, AppliedRealmProperty<double>>(entity.PropertiesFloat);
@@ -212,14 +210,11 @@ namespace ACE.Server.Realms
 
         public static RulesetTemplate MakeRuleset(RulesetTemplate baseset, Realm subset)
         {
-            if (baseset.InheritedRealmIDs.Contains(subset.Id))
-                throw new Exception("Circular inheritance chain detected for realm id " + subset.Id.ToString());
             if (baseset.Realm.Type == ACE.Entity.Enum.RealmType.Ruleset && subset.Type == ACE.Entity.Enum.RealmType.Realm)
                 throw new Exception("Realms may not inherit from rulesets at this time.");
             var ruleset = new RulesetTemplate();
             ruleset.ParentRuleset = baseset;
             ruleset.Realm = subset;
-            ruleset.InheritedRealmIDs.Add(subset.Id);
 
             ruleset.PropertiesBool = new Dictionary<RealmPropertyBool, AppliedRealmProperty<bool>>(subset.PropertiesBool);
             ruleset.PropertiesFloat = new Dictionary<RealmPropertyFloat, AppliedRealmProperty<double>>(subset.PropertiesFloat);

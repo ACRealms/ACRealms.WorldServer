@@ -29,7 +29,7 @@ namespace ACE.Server.Managers
         private static readonly Dictionary<string, WorldRealm> RealmsByName = new Dictionary<string, WorldRealm>();
         private static readonly Dictionary<ReservedRealm, RealmToImport> ReservedRealmsToImport = new Dictionary<ReservedRealm, RealmToImport>();
         private static readonly Dictionary<ReservedRealm, WorldRealm> ReservedRealms = new Dictionary<ReservedRealm, WorldRealm>();
-        private static readonly Dictionary<(WorldRealm, ACE.Entity.Models.Realm), RulesetTemplate> EphemeralRealmCache = new Dictionary<(WorldRealm, ACE.Entity.Models.Realm), RulesetTemplate>();
+        private static readonly Dictionary<string, RulesetTemplate> EphemeralRealmCache = new Dictionary<string, RulesetTemplate>();
         private static List<ushort> RealmIDsByTopologicalSort;
 
         private static bool ImportComplete;
@@ -144,9 +144,11 @@ namespace ACE.Server.Managers
             return GetRealm(player.GetPosition(PositionType.EphemeralRealmExitTo)?.RealmID ?? player.HomeRealm);
         }
 
-        internal static Landblock GetNewEphemeralLandblock(uint landcell, Player owner, ACE.Entity.Models.Realm realmTemplate)
+        internal static Landblock GetNewEphemeralLandblock(uint landcell, Player owner, List<ACE.Entity.Models.Realm> realmTemplates)
         {
-            EphemeralRealm ephemeralRealm = EphemeralRealm.Initialize(owner, realmTemplate);
+            EphemeralRealm ephemeralRealm;
+            lock (realmsLock)
+                ephemeralRealm = EphemeralRealm.Initialize(owner, realmTemplates);
             var iid = LandblockManager.GetFreeInstanceID(true, ephemeralRealm.RulesetTemplate.Realm.Id, (ushort)(landcell >> 16));
             var longcell = ((ulong)iid << 32) | landcell;
             var landblock = LandblockManager.GetLandblock(longcell, false, false, ephemeralRealm);
@@ -362,31 +364,19 @@ namespace ACE.Server.Managers
             RealmIDsByTopologicalSort.Add(item.ImportItem.Realm.Id);
         }
 
-        internal static RulesetTemplate GetEphemeralRealmRulesetTemplate(WorldRealm baseRealm, ACE.Entity.Models.Realm appliedRealm)
+        internal static RulesetTemplate GetEphemeralRealmRulesetTemplate(string key)
         {
             lock(realmsLock)
             {
-                if (EphemeralRealmCache.TryGetValue((baseRealm, appliedRealm), out var storedruleset))
+                if (EphemeralRealmCache.TryGetValue(key, out var storedruleset))
                     return storedruleset;
                 return null;
             }
         }
 
-        internal static RulesetTemplate SyncRulesetForEphemeralRealm(WorldRealm baseRealm, ACE.Entity.Models.Realm appliedRealm, RulesetTemplate template)
+        internal static void CacheEphemeralRealmTemplate(string key, RulesetTemplate template)
         {
-            var key = (baseRealm, appliedRealm);
-            lock (realmsLock)
-            {
-                if (EphemeralRealmCache.TryGetValue(key, out var storedruleset))
-                {
-                    return storedruleset;
-                }
-                else
-                { 
-                    EphemeralRealmCache[key] = template;
-                    return template;
-                }
-            }
+            EphemeralRealmCache[key] = template;
         }
 
         internal static RealmToImport DeserializeRealmJson(Network.Session session, string filename, string fileContent)
