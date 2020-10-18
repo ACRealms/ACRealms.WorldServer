@@ -26,20 +26,30 @@ namespace ACE.Server.Realms
             this.RulesetTemplate = template;
         }
 
-        public static EphemeralRealm Initialize(Player owner, Realm realm)
+        public static EphemeralRealm Initialize(Player owner, List<Realm> realms)
         {
             var baseRealm = RealmManager.GetBaseRealm(owner);
-            return Initialize(owner, baseRealm, realm);
+            return Initialize(owner, baseRealm, realms);
         }
 
-        private static EphemeralRealm Initialize(Player owner, WorldRealm baseRealm, Realm appliedRealm)
+        private static EphemeralRealm Initialize(Player owner, WorldRealm baseRealm, List<Realm> appliedRealms)
         {
-            var template = RealmManager.GetEphemeralRealmRulesetTemplate(baseRealm, appliedRealm);
-            if (template != null) //cached
-                return new EphemeralRealm(owner, template);
+            string key = baseRealm.Realm.Id.ToString();
+            RulesetTemplate template = null;
+            RulesetTemplate prevTemplate = baseRealm.RulesetTemplate;
+            for(int i = 0; i < appliedRealms.Count; i++)
+            {
+                var appliedRealm = appliedRealms[i];
+                key += $".{appliedRealm.Id}";
+                template = RealmManager.GetEphemeralRealmRulesetTemplate(key);
+                if (template == null)
+                {
+                    template = RulesetTemplate.MakeRuleset(prevTemplate, appliedRealm);
+                    RealmManager.CacheEphemeralRealmTemplate(key, template);
+                }
+                prevTemplate = template;
+            }
 
-            template = RulesetTemplate.MakeRuleset(baseRealm.RulesetTemplate, appliedRealm);
-            template = RealmManager.SyncRulesetForEphemeralRealm(baseRealm, appliedRealm, template);
             return new EphemeralRealm(owner, template);
         }
     }
