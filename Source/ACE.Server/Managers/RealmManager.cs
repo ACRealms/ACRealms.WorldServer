@@ -126,13 +126,22 @@ namespace ACE.Server.Managers
             }
         }
 
+        /// <summary>
+        /// Gets the base realm for which a new ephemeral realm will be created from
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
         internal static WorldRealm GetBaseRealm(Player player)
         {
+            //Hideouts will use the player's home realm
+            if (player.Location.RealmID == (ushort)ReservedRealm.hideout)
+                return GetRealm(player.HomeRealm);
+
+            //Otherwise use the current location, or the exit location (or alternatively the home realm) if already in an ephemeral realm
             if (!player.Location.IsEphemeralRealm)
                 return GetRealm(player.RealmRuleset.Template.Realm.Id);
 
-            var realmId = player.GetPosition(PositionType.EphemeralRealmExitTo)?.RealmID ?? player.HomeRealm;
-            return GetRealm(realmId);
+            return GetRealm(player.GetPosition(PositionType.EphemeralRealmExitTo)?.RealmID ?? player.HomeRealm);
         }
 
         internal static Landblock GetNewEphemeralLandblock(uint landcell, Player owner, ACE.Entity.Models.Realm realmTemplate)
