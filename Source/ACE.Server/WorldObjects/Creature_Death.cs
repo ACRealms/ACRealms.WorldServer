@@ -347,7 +347,7 @@ namespace ACE.Server.WorldObjects
 
             var cachedWeenie = DatabaseManager.World.GetCachedWeenie("corpse");
 
-            var corpse = WorldObjectFactory.CreateNewWorldObject(cachedWeenie) as Corpse;
+            var corpse = WorldObjectFactory.CreateNewWorldObject(cachedWeenie, RealmRuleset) as Corpse;
 
             var prefix = "Corpse";
 

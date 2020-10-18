@@ -100,26 +100,26 @@ namespace ACE.Server.Factories
 
             if (characterCreateInfo.Apperance.HeadgearStyle < 0xFFFFFFFF) // No headgear is max UINT
             {
-                var hat = GetClothingObject(sex.GetHeadgearWeenie(characterCreateInfo.Apperance.HeadgearStyle), characterCreateInfo.Apperance.HeadgearColor, characterCreateInfo.Apperance.HeadgearHue);
+                var hat = GetClothingObject(sex.GetHeadgearWeenie(characterCreateInfo.Apperance.HeadgearStyle), characterCreateInfo.Apperance.HeadgearColor, characterCreateInfo.Apperance.HeadgearHue, RealmManager.DefaultRuleset);
                 if (hat != null)
                     player.TryEquipObject(hat, hat.ValidLocations ?? 0);
                 else
                     player.TryAddToInventory(CreateIOU(sex.GetHeadgearWeenie(characterCreateInfo.Apperance.HeadgearStyle)));
             }
 
-            var shirt = GetClothingObject(sex.GetShirtWeenie(characterCreateInfo.Apperance.ShirtStyle), characterCreateInfo.Apperance.ShirtColor, characterCreateInfo.Apperance.ShirtHue);
+            var shirt = GetClothingObject(sex.GetShirtWeenie(characterCreateInfo.Apperance.ShirtStyle), characterCreateInfo.Apperance.ShirtColor, characterCreateInfo.Apperance.ShirtHue, RealmManager.DefaultRuleset);
             if (shirt != null)
                 player.TryEquipObject(shirt, shirt.ValidLocations ?? 0);
             else
                 player.TryAddToInventory(CreateIOU(sex.GetShirtWeenie(characterCreateInfo.Apperance.ShirtStyle)));
 
-            var pants = GetClothingObject(sex.GetPantsWeenie(characterCreateInfo.Apperance.PantsStyle), characterCreateInfo.Apperance.PantsColor, characterCreateInfo.Apperance.PantsHue);
+            var pants = GetClothingObject(sex.GetPantsWeenie(characterCreateInfo.Apperance.PantsStyle), characterCreateInfo.Apperance.PantsColor, characterCreateInfo.Apperance.PantsHue, RealmManager.DefaultRuleset);
             if (pants != null)
                 player.TryEquipObject(pants, pants.ValidLocations ?? 0);
             else
                 player.TryAddToInventory(CreateIOU(sex.GetPantsWeenie(characterCreateInfo.Apperance.PantsStyle)));
 
-            var shoes = GetClothingObject(sex.GetFootwearWeenie(characterCreateInfo.Apperance.FootwearStyle), characterCreateInfo.Apperance.FootwearColor, characterCreateInfo.Apperance.FootwearHue);
+            var shoes = GetClothingObject(sex.GetFootwearWeenie(characterCreateInfo.Apperance.FootwearStyle), characterCreateInfo.Apperance.FootwearColor, characterCreateInfo.Apperance.FootwearHue, RealmManager.DefaultRuleset);
             if (shoes != null)
                 player.TryEquipObject(shoes, shoes.ValidLocations ?? 0);
             else
@@ -406,14 +406,14 @@ namespace ACE.Server.Factories
             return CreateResult.Success;
         }
 
-        private static WorldObject GetClothingObject(uint weenieClassId, uint palette, double shade)
+        private static WorldObject GetClothingObject(uint weenieClassId, uint palette, double shade, Realms.AppliedRuleset ruleset)
         {
             var weenie = DatabaseManager.World.GetCachedWeenie(weenieClassId);
 
             if (weenie == null)
                 return null;
 
-            var worldObject = (Clothing)WorldObjectFactory.CreateNewWorldObject(weenie);
+            var worldObject = (Clothing)WorldObjectFactory.CreateNewWorldObject(weenie, ruleset);
 
             worldObject.SetProperties((int)palette, shade);
 

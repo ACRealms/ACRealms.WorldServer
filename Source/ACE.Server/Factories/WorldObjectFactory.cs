@@ -349,7 +349,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// This will create a new WorldObject with a new GUID.
         /// </summary>
-        public static WorldObject CreateNewWorldObject(Weenie weenie, AppliedRuleset ruleset = null)
+        public static WorldObject CreateNewWorldObject(Weenie weenie, AppliedRuleset ruleset)
         {
             var worldObject = CreateWorldObject(weenie, GuidManager.NewDynamicGuid(), ruleset);
 

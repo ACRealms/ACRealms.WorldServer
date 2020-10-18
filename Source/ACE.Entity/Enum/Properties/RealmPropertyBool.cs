@@ -24,7 +24,7 @@ namespace ACE.Entity.Enum.Properties
         [RealmPropertyBool(false)]
         IsTemporaryRealm,
 
-        [RealmPropertyBool(true)]
+        [RealmPropertyBool(false)]
         CanBeHomeworld,
 
         [RealmPropertyBool(false)]
@@ -32,7 +32,7 @@ namespace ACE.Entity.Enum.Properties
         /// <summary>
         /// Players with a homeworld of this realm may enter the neutral zone if true
         /// </summary>
-        [RealmPropertyBool(true)]
+        [RealmPropertyBool(false)]
         CanInteractWithNeutralZone,
 
         [RealmPropertyBool(true)]
