@@ -273,8 +273,6 @@ namespace ACE.Server.Realms
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine("AC Realmulator Zone Info:");
-
             foreach (var item in PropertiesBool)
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyBool), item.Key)}: {item.Value}");
             foreach (var item in PropertiesFloat)
@@ -283,7 +281,7 @@ namespace ACE.Server.Realms
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyInt), item.Key)}: {item.Value}");
             foreach (var item in PropertiesInt64)
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyInt64), item.Key)}: {item.Value}");
-            foreach (var item in PropertiesString)
+            foreach (var item in PropertiesString.Where(x => x.Key != RealmPropertyString.Description))
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyString), item.Key)}: {item.Value}");
 
             sb.AppendLine("\n");

@@ -1218,7 +1218,7 @@ namespace ACE.Server.Command.Handlers
                 return null;
             }
 
-            var obj = WorldObjectFactory.CreateNewWorldObject(weenie);
+            var obj = WorldObjectFactory.CreateNewWorldObject(weenie, session.Player.RealmRuleset);
 
             //if (!obj.TimeToRot.HasValue)
             //    obj.TimeToRot = Double.MaxValue;
@@ -2219,7 +2219,7 @@ namespace ACE.Server.Command.Handlers
                         if (weenieOfWearable == null)
                             continue;
 
-                        var worldObject = WorldObjectFactory.CreateNewWorldObject(weenieOfWearable);
+                        var worldObject = WorldObjectFactory.CreateNewWorldObject(weenieOfWearable, session.Player.RealmRuleset);
 
                         if (worldObject == null)
                             continue;
@@ -2243,7 +2243,7 @@ namespace ACE.Server.Command.Handlers
                         if (weenieOfWearable == null)
                             continue;
 
-                        var worldObject = WorldObjectFactory.CreateNewWorldObject(weenieOfWearable);
+                        var worldObject = WorldObjectFactory.CreateNewWorldObject(weenieOfWearable, session.Player.RealmRuleset);
 
                         if (worldObject == null)
                             continue;

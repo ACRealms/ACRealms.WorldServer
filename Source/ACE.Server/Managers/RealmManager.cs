@@ -23,13 +23,16 @@ namespace ACE.Server.Managers
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private const string NULL_REALM_NAME = "null-realm";
+        public static IReadOnlyCollection<WorldRealm> Realms { get; private set; }
+        public static IReadOnlyCollection<WorldRealm> Rulesets { get; private set; }
+        public static IReadOnlyCollection<WorldRealm> RealmsAndRulesets { get; private set; }
         private static readonly ReaderWriterLockSlim realmsLock = new ReaderWriterLockSlim();
-        private static readonly Dictionary<ushort, WorldRealm> Realms = new Dictionary<ushort, WorldRealm>();
+        private static readonly Dictionary<ushort, WorldRealm> RealmsByID = new Dictionary<ushort, WorldRealm>();
         private static readonly Dictionary<string, WorldRealm> RealmsByName = new Dictionary<string, WorldRealm>();
         private static readonly Dictionary<ReservedRealm, RealmToImport> ReservedRealmsToImport = new Dictionary<ReservedRealm, RealmToImport>();
         private static readonly Dictionary<ReservedRealm, WorldRealm> ReservedRealms = new Dictionary<ReservedRealm, WorldRealm>();
         private static readonly Dictionary<string, RulesetTemplate> EphemeralRealmCache = new Dictionary<string, RulesetTemplate>();
+        
         private static List<ushort> RealmIDsByTopologicalSort;
 
         private static bool ImportComplete;
@@ -96,7 +99,7 @@ namespace ACE.Server.Managers
 
             lock (realmsLock)
             {
-                if (Realms.TryGetValue(realmId, out var realm))
+                if (RealmsByID.TryGetValue(realmId, out var realm))
                     return realm;
                 return null;
             }
@@ -114,13 +117,13 @@ namespace ACE.Server.Managers
         {
             lock (realmsLock)
             {
-                foreach (var realm in Realms.Values.Where(x => x != null))
+                foreach (var realm in RealmsByID.Values.Where(x => x != null))
                 {
                     realm.NeedsRefresh = true;
                 }
 
                 DatabaseManager.World.ClearRealmCache();
-                Realms.Clear();
+                RealmsByID.Clear();
                 RealmsByName.Clear();
                 EphemeralRealmCache.Clear();
             }
@@ -189,13 +192,19 @@ namespace ACE.Server.Managers
                 var erealm = RealmConverter.ConvertToEntityRealm(realms[realmid], true);
                 var ruleset = BuildRuleset(erealm);
                 var wrealm = new WorldRealm(erealm, ruleset);
-                Realms[erealm.Id] = wrealm;
+                RealmsByID[erealm.Id] = wrealm;
                 RealmsByName[erealm.Name] = wrealm;
                 if (Enum.IsDefined(typeof(ReservedRealm), erealm.Id))
                 {
                     ReservedRealms[(ReservedRealm)erealm.Id] = wrealm;
+                    if (erealm.Id == (ushort)ReservedRealm.@default)
+                        DefaultRealm = wrealm;
                 }
             };
+
+            Realms = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Realm).ToList().AsReadOnly();
+            Rulesets = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Ruleset).ToList().AsReadOnly();
+            RealmsAndRulesets = RealmsByID.Values.ToList().AsReadOnly();
         }
 
         private static bool PrepareRealmUpdates(Dictionary<string, RealmToImport> newRealmsByName,
@@ -213,7 +222,7 @@ namespace ACE.Server.Managers
                 }
                 if (newRealmsByName.ContainsKey(enumid.ToString()))
                 {
-                    log.Error($"May not import a realm named {NULL_REALM_NAME}, which is a reserved name.");
+                    log.Error($"May not import a realm named {enumid}, which is a reserved name.");
                     return false;
                 }
                 newRealmsByName[enumid.ToString()] = reservedrealm;
@@ -239,7 +248,7 @@ namespace ACE.Server.Managers
             }
 
             //Check for deletions
-            foreach (var realmId in Realms.Keys)
+            foreach (var realmId in RealmsByID.Keys)
             {
                 if (!newRealmsById.ContainsKey(realmId))
                 {
@@ -518,6 +527,23 @@ namespace ACE.Server.Managers
             }
             reservedRealm = ReservedRealm.@default;
             return false;
+        }
+
+        public static void SetHomeRealm(Player player, int realmId)
+        {
+            if (realmId < 1 || realmId > 0x7FFF)
+            {
+                log.Error($"SetHomeRealm must have a value between 1 and {0x7FFF}!" + Environment.NewLine + Environment.StackTrace);
+                return;
+            }
+            var realm = RealmManager.GetRealm((ushort)realmId);
+            if (realm == null)
+            {
+                log.Error($"SetHomeRealm from object references a missing realm with id {realmId}!" + Environment.NewLine + Environment.StackTrace);
+                return;
+            }
+            player.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
+            log.Info($"Setting HomeRealm for character {player.Name} to {realm.Realm.Id}.");
         }
     }
 }
