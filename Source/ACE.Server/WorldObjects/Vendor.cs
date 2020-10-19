@@ -242,6 +242,32 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
+            if (GetProperty(PropertyInt.RulesetStampVendorType).HasValue)
+            {
+                var rulesetVendorType = GetProperty(PropertyInt.RulesetStampVendorType).Value;
+                if (rulesetVendorType > 0)
+                {
+                    var weenie = DatabaseManager.World.GetCachedWeenie("realm-ruleset-stamp");
+                    if (weenie == null)
+                        log.Error("Weenie not found: realm-ruleset-stamp" + Environment.NewLine + Environment.StackTrace);
+                    else
+                    {
+                        var rulesets = RealmManager.Rulesets.Where(x => x.StandardRules.GetProperty(RealmPropertyInt.RulesetStampVendorCategory) == rulesetVendorType);
+                        foreach (var ruleset in rulesets)
+                        {
+                            WorldObject wo = WorldObjectFactory.CreateNewWorldObject(weenie.WeenieClassId);
+                            wo.Name = ruleset.Realm.Name;
+                            wo.Use = ruleset.StandardRules.GetProperty(RealmPropertyString.Description);
+                            wo.LongDesc = ruleset.StandardRules.DebugOutputString();
+                            wo.SetProperty(PropertyInt.HomeRealm, ruleset.Realm.Id);
+                            wo.ContainerId = Guid.Full;
+                            wo.CalculateObjDesc();
+                            DefaultItemsForSale.Add(wo.Guid, wo);
+                        }
+                    }
+                }
+            }
+
             inventoryloaded = true;
         }
 
@@ -316,13 +342,14 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Used to convert Weenie based objects / not used for unique items
         /// </summary>
-        private List<WorldObject> ItemProfileToWorldObjects(ItemProfile itemprofile)
+        private List<WorldObject> ItemProfileToWorldObjects(ItemProfile itemprofile, WorldObject worldObject)
         {
             List<WorldObject> worldobjects = new List<WorldObject>();
 
             while (itemprofile.Amount > 0)
             {
-                WorldObject wo = WorldObjectFactory.CreateNewWorldObject(itemprofile.WeenieClassId);
+                WorldObject wo = WorldObjectFactory.CreateNewWorldObject(itemprofile.WeenieClassId, RealmRuleset);
+                wo.ClonePropertiesFrom(worldObject);
 
                 if (itemprofile.Palette.HasValue)
                     wo.PaletteTemplate = itemprofile.Palette;
@@ -462,7 +489,7 @@ namespace ACE.Server.WorldObjects
                 if (item.ItemType == ItemType.Service)
                     genlist.Add(item);
                 else
-                    genlist.AddRange(ItemProfileToWorldObjects(fitem));
+                    genlist.AddRange(ItemProfileToWorldObjects(fitem, item));
             }
 
             // calculate price. (both unique and item profile)

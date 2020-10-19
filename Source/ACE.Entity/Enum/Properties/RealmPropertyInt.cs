@@ -9,23 +9,26 @@ namespace ACE.Entity.Enum.Properties
         [RealmPropertyInt(0,0,0)]
         Undef                                    = 0,
 
-        [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureStrengthAdded = 1,
+        [RealmPropertyInt(0, 0, 0xFFFF)]
+        RulesetStampVendorCategory,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureEnduranceAdded = 2,
+        CreatureStrengthAdded,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureCoordinationAdded = 3,
+        CreatureEnduranceAdded,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureQuicknessAdded = 4,
+        CreatureCoordinationAdded,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureFocusAdded = 5,
+        CreatureQuicknessAdded,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureSelfAdded = 6,
+        CreatureFocusAdded,
+
+        [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
+        CreatureSelfAdded,
     }
 
     public static class RealmPropertyIntExtensions
