@@ -622,6 +622,7 @@ namespace ACE.Entity.Enum.Properties
 
         //Realm properties below this line
         [ServerOnly]
+        [Clone]
         HomeRealm                               = 42000,
 
         [ServerOnly]
@@ -631,7 +632,10 @@ namespace ACE.Entity.Enum.Properties
         SummonTargetRealm2                      = 42002,
 
         [ServerOnly]
-        SummonTargetRealm3                      = 42003
+        SummonTargetRealm3                      = 42003,
+
+        [ServerOnly]
+        RulesetStampVendorType                  = 42004
     }
 
     public static class PropertyIntExtensions

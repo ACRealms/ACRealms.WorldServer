@@ -8,6 +8,7 @@ using System.Timers;
 using log4net;
 
 using ACE.Database;
+using ACE.Entity.Enum.Properties;
 
 namespace ACE.Server.Managers
 {
@@ -30,6 +31,8 @@ namespace ACE.Server.Managers
         /// <param name="loadDefaultValues">Should we use the DefaultPropertyManager to load the default properties for keys?</param>
         public static void Initialize(bool loadDefaultValues = true)
         {
+            PropertyAttributes.Initialize();
+
             if (loadDefaultValues)
                 DefaultPropertyManager.LoadDefaultProperties();
 
