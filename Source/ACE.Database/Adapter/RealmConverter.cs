@@ -117,7 +117,7 @@ namespace ACE.Database.Adapter
             var prop = new RealmPropertyOptions<bool>();
 
             var att = PropertyDefinitionsBool[(RealmPropertyBool)dbobj.Type];
-            prop.SeedPropertiesStatic(dbobj.Value, att.DefaultValue, dbobj.Locked, dbobj.Probability);
+            prop.SeedPropertiesStatic(dbobj.Value, att.DefaultValue, (byte)RealmPropertyCompositionType.replace, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<bool>(dbobj.Type, prop);
         }
 
@@ -125,7 +125,7 @@ namespace ACE.Database.Adapter
         {
             var prop = new RealmPropertyOptions<string>();
             var att = PropertyDefinitionsString[(RealmPropertyString)dbobj.Type];
-            prop.SeedPropertiesStatic(dbobj.Value, att.DefaultValue, dbobj.Locked, dbobj.Probability);
+            prop.SeedPropertiesStatic(dbobj.Value, att.DefaultValue, (byte)RealmPropertyCompositionType.replace, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<string>(dbobj.Type, prop);
         }
 
@@ -134,7 +134,7 @@ namespace ACE.Database.Adapter
             var att = PropertyDefinitionsInt[(RealmPropertyInt)dbobj.Type];
             var prop = new RealmPropertyOptions<int>();
             if (dbobj.Value.HasValue)
-                prop.SeedPropertiesStatic(dbobj.Value.Value, att.DefaultValue, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesStatic(dbobj.Value.Value, att.DefaultValue, dbobj.CompositionType, dbobj.Locked, dbobj.Probability);
             else
                 prop.SeedPropertiesRandomized(att.DefaultValue, dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<int>(dbobj.Type, prop);
@@ -145,7 +145,7 @@ namespace ACE.Database.Adapter
             var att = PropertyDefinitionsInt64[(RealmPropertyInt64)dbobj.Type];
             var prop = new RealmPropertyOptions<long>();
             if (dbobj.Value.HasValue)
-                prop.SeedPropertiesStatic(dbobj.Value.Value, att.DefaultValue, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesStatic(dbobj.Value.Value, att.DefaultValue, dbobj.CompositionType, dbobj.Locked, dbobj.Probability);
             else
                 prop.SeedPropertiesRandomized(att.DefaultValue, dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<long>(dbobj.Type, prop);
@@ -156,7 +156,7 @@ namespace ACE.Database.Adapter
             var att = PropertyDefinitionsFloat[(RealmPropertyFloat)dbobj.Type];
             var prop = new RealmPropertyOptions<double>();
             if (dbobj.Value.HasValue)
-                prop.SeedPropertiesStatic(dbobj.Value.Value, att.DefaultValue, dbobj.Locked, dbobj.Probability);
+                prop.SeedPropertiesStatic(dbobj.Value.Value, att.DefaultValue, dbobj.CompositionType, dbobj.Locked, dbobj.Probability);
             else
                 prop.SeedPropertiesRandomized(att.DefaultValue, dbobj.CompositionType, dbobj.RandomType, dbobj.RandomLowRange.Value, dbobj.RandomHighRange.Value, dbobj.Locked, dbobj.Probability);
             return new AppliedRealmProperty<double>(dbobj.Type, prop);
