@@ -150,9 +150,10 @@ namespace ACE.Entity.Models
 
         public RealmPropertyOptions() { }
 
-        public void SeedPropertiesStatic(T defaultValue, T hardDefaultValue, bool locked, double? probability)
+        public void SeedPropertiesStatic(T defaultValue, T hardDefaultValue, byte compositionType, bool locked, double? probability)
         {
             RandomType = RealmPropertyRerollType.never;
+            CompositionType = (RealmPropertyCompositionType)compositionType;
             Locked = locked;
             Probability = probability ?? 1.0;
             DefaultValue = defaultValue;
