@@ -25,6 +25,9 @@ namespace ACE.Entity.Enum.Properties
         IsTemporaryRealm,
 
         [RealmPropertyBool(false)]
+        IsDuelingRealm,
+
+        [RealmPropertyBool(false)]
         CanBeHomeworld,
 
         [RealmPropertyBool(false)]

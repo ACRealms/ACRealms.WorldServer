@@ -29,6 +29,22 @@ namespace ACE.Entity.Enum.Properties
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
         CreatureSelfAdded,
+
+        /*Below not implemented*/
+        [RealmPropertyInt(0, -100000, 100000)]
+        PlayerDamageMeleeAdded,
+
+        [RealmPropertyInt(0, -100000, 100000)]
+        PlayerDamageMagicAdded,
+
+        [RealmPropertyInt(0, -100000, 100000)]
+        PlayerDamageMissileAdded,
+
+        [RealmPropertyInt(0, -100000, 100000)]
+        HealingKitHealAdded,
+
+        [RealmPropertyInt(0, -100000, 100000)]
+        FoodRestoreAmountAdded,
     }
 
     public static class RealmPropertyIntExtensions
