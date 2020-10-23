@@ -191,10 +191,12 @@ namespace ACE.Server.WorldObjects
 
             // update vitae
             // players who died in a PKLite fight do not accrue vitae
-            if (!IsPKLiteDeath(topDamager))
+            var duelRealm = RealmManager.GetRealm(HomeRealm)?.StandardRules?.GetProperty(RealmPropertyBool.IsDuelingRealm) == true ||
+                RealmRuleset?.GetProperty(RealmPropertyBool.IsDuelingRealm) == true;
+            if (!duelRealm && !IsPKLiteDeath(topDamager))
                 InflictVitaePenalty();
 
-            if (IsPKDeath(topDamager) || AugmentationSpellsRemainPastDeath == 0)
+            if (!duelRealm && IsPKDeath(topDamager) || AugmentationSpellsRemainPastDeath == 0)
             {
                 var msgPurgeEnchantments = new GameEventMagicPurgeEnchantments(Session);
                 EnchantmentManager.RemoveAllEnchantments();
@@ -210,7 +212,8 @@ namespace ACE.Server.WorldObjects
 
             dieChain.AddAction(this, () =>
             {
-                CreateCorpse(topDamager);
+                if (!duelRealm)
+                    CreateCorpse(topDamager);
 
                 ThreadSafeTeleportOnDeath(); // enter portal space
 

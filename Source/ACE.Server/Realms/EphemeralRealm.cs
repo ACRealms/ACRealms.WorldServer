@@ -3,7 +3,6 @@ using ACE.Server.Managers;
 using ACE.Server.WorldObjects;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ACE.Server.Realms
 {
