@@ -391,9 +391,9 @@ namespace ACE.Server.Command.Handlers.Processors
                     ImportSQLWeenie(session, param);
                     break;
 
-                case FileType.Realm:
+                /*case FileType.Realm:
                     ImportSQLRealm(session, param);
-                    break;
+                    break;*/
             }
         }
 
