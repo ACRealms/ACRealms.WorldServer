@@ -42,6 +42,67 @@ namespace ACE.Entity.Enum.Properties
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
         CreatureSelfMultiplier,
+
+        /*Below is not implemented*/
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        PlayerDamageGlobalMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        PlayerDamageMeleeMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        PlayerDamageMissileMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        PlayerDamageMagicMultiplier,
+
+        [RealmPropertyFloat(1f, 0f, 1f)]
+        PlayerChanceToEvadeMeleeCap,
+
+        [RealmPropertyFloat(1f, 0f, 1f)]
+        PlayerChanceToDodgeMissileCap,
+
+        [RealmPropertyFloat(1f, 0f, 1f)]
+        PlayerChanceToResistMagicCap,
+
+        [RealmPropertyFloat(1f, 0f, 1f)]
+        CreatureChanceToEvadeMeleeCap,
+
+        [RealmPropertyFloat(1f, 0f, 1f)]
+        CreatureChanceToDodgeMissileCap,
+
+        [RealmPropertyFloat(1f, 0f, 1f)]
+        CreatureChanceToResistMagicCap,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureDamageGlobalMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureDamageMeleeMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        CreatureDamageMagicMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        PlayerCriticalDamageMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        HealingKitHealMultiplier,
+
+        [RealmPropertyFloat(1f, 0.01f, 100f)]
+        FoodRestoreAmountMultiplier,
+
+        [RealmPropertyFloat(1f, 0.001f, 1000f)]
+        ExperienceMultiplierAll,
+
+        [RealmPropertyFloat(1f, 0.001f, 1000f)]
+        ExperienceMultiplierQuest,
+
+        [RealmPropertyFloat(1f, 0.001f, 1000f)]
+        ExperienceMultiplierKills,
+
+        [RealmPropertyFloat(33f, -10f, 100f)]
+        TinkeringBaseImbueChanceCap,
     }
 
     public static class RealmPropertyFloatExtensions
