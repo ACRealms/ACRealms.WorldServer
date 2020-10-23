@@ -866,6 +866,8 @@ namespace ACE.Server.WorldObjects
                         return false;
                 }
             }
+            if (!destrealm.IsWhitelistedLandblock(newPosition.Landblock))
+                return false;
             if (homerealm.StandardRules.GetProperty(RealmPropertyBool.CanInteractWithNeutralZone) == true &&
                 destrealm.StandardRules.GetProperty(RealmPropertyBool.IsNeutralZone) == true)
                 return true;

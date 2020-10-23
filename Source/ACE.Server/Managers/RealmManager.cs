@@ -32,6 +32,9 @@ namespace ACE.Server.Managers
         private static readonly Dictionary<ReservedRealm, RealmToImport> ReservedRealmsToImport = new Dictionary<ReservedRealm, RealmToImport>();
         private static readonly Dictionary<ReservedRealm, WorldRealm> ReservedRealms = new Dictionary<ReservedRealm, WorldRealm>();
         private static readonly Dictionary<string, RulesetTemplate> EphemeralRealmCache = new Dictionary<string, RulesetTemplate>();
+
+        //Todo: refactor
+        public static WorldRealm DuelRealm;
         
         private static List<ushort> RealmIDsByTopologicalSort;
 
@@ -200,6 +203,10 @@ namespace ACE.Server.Managers
                     if (erealm.Id == (ushort)ReservedRealm.@default)
                         DefaultRealm = wrealm;
                 }
+
+                //Stupid hack, leaks complexity
+                if (wrealm.Realm.Type == RealmType.Realm && wrealm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                    DuelRealm = wrealm;
             };
 
             Realms = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Realm).ToList().AsReadOnly();
@@ -547,7 +554,13 @@ namespace ACE.Server.Managers
             player.SetProperty(PropertyBool.RecallsDisabled, false);
             var loc = realm.DefaultStartingLocation(player);
             player.SetPosition(PositionType.Sanctuary, new ACE.Entity.Position(loc));
-            player.Teleport(loc);
+            WorldManager.ThreadSafeTeleport(player, loc, false, new Entity.Actions.ActionEventDelegate(() =>
+            {
+                //if (realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                //{
+                    DuelRealmHelpers.SetupNewCharacter(player);
+                //}
+            }));
             player.GrantXP((long)player.GetXPToNextLevel(10), XpType.Emote, ShareType.None);
         }
     }

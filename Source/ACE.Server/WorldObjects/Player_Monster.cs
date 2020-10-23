@@ -3,6 +3,8 @@ using System.Linq;
 using ACE.Server.Entity;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Entity.Actions;
 
 namespace ACE.Server.WorldObjects
 {

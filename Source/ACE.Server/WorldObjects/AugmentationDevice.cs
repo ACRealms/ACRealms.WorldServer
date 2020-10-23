@@ -67,12 +67,8 @@ namespace ACE.Server.WorldObjects
             DoAugmentation(player);
         }
 
-        public void DoAugmentation(Player player)
+        public static void DoAugmentation(Player player, AugmentationType type, AugmentationDevice deviceWorldObject, bool broadcast = true, bool saveToDbImmediately = true)
         {
-            //Console.WriteLine($"{Name}.DoAugmentation({player.Name})");
-
-            // set augmentation props for player
-            var type = (AugmentationType)(AugmentationStat ?? 0);
             var augProp = AugProps[type];
             var curVal = player.GetProperty(augProp) ?? 0;
             var newVal = curVal + 1;
@@ -95,6 +91,7 @@ namespace ACE.Server.WorldObjects
                 var playerSkill = player.GetCreatureSkill(AugTypeHelper.GetSkill(type));
                 playerSkill.AdvancementClass = SkillAdvancementClass.Specialized;
                 playerSkill.InitLevel = 10;
+
                 // adjust rank?
                 // handle overages?
                 // if trained skill is maxed, there will be a ~103m xp overage...
@@ -117,24 +114,33 @@ namespace ACE.Server.WorldObjects
             }
 
             // consume xp
-            player.AvailableExperience -= AugmentationCost;
+            if (deviceWorldObject != null)
+            {
+                player.AvailableExperience -= deviceWorldObject.AugmentationCost;
+                player.TryConsumeFromInventoryWithNetworking(deviceWorldObject, 1);
+                var updateXP = new GameMessagePrivateUpdatePropertyInt64(player, PropertyInt64.AvailableExperience, player.AvailableExperience ?? 0);
+                var updateProp = new GameMessagePrivateUpdatePropertyInt(player, augProp, newVal);
+                player.Session.Network.EnqueueSend(updateProp, updateXP);
+                player.SendWeenieErrorWithString(WeenieErrorWithString.YouSuccededAcquiringAugmentation, deviceWorldObject.Name);
 
-            // consume augmentation gem
-            player.TryConsumeFromInventoryWithNetworking(this, 1);
+                if (broadcast)
+                {
+                    player.EnqueueBroadcast(new GameMessageSystemChat($"{player.Name} has acquired the {deviceWorldObject.Name} augmentation!", ChatMessageType.Broadcast));
+                    player.EnqueueBroadcast(new GameMessageScript(player.Guid, AugTypeHelper.GetEffect(type)));
+                }
+            }
 
-            // send network messages
-            var updateProp = new GameMessagePrivateUpdatePropertyInt(player, augProp, newVal);
-            var updateXP = new GameMessagePrivateUpdatePropertyInt64(player, PropertyInt64.AvailableExperience, player.AvailableExperience ?? 0);
-
-            player.Session.Network.EnqueueSend(updateProp, updateXP);
-            player.SendWeenieErrorWithString(WeenieErrorWithString.YouSuccededAcquiringAugmentation, Name);
-
-            // also broadcast to nearby players
-            player.EnqueueBroadcast(new GameMessageScript(player.Guid, AugTypeHelper.GetEffect(type)));
-            player.EnqueueBroadcast(new GameMessageSystemChat($"{player.Name} has acquired the {Name} augmentation!", ChatMessageType.Broadcast));
-
-            player.SaveBiotaToDatabase();
+            if (saveToDbImmediately)
+                player.SaveBiotaToDatabase();
         }
+
+        public void DoAugmentation(Player player)
+        {
+            // set augmentation props for player
+            var type = (AugmentationType)(AugmentationStat ?? 0);
+            DoAugmentation(player, type, this, true, true);
+        }
+
 
         public bool VerifyRequirements(Player player)
         {

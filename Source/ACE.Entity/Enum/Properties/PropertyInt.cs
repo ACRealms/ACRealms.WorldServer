@@ -635,7 +635,10 @@ namespace ACE.Entity.Enum.Properties
         SummonTargetRealm3                      = 42003,
 
         [ServerOnly]
-        RulesetStampVendorType                  = 42004
+        RulesetStampVendorType                  = 42004,
+
+        [ServerOnly]
+        LastRebuffTimestamp                     = 42005
     }
 
     public static class PropertyIntExtensions

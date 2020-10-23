@@ -98,6 +98,10 @@
       <None Include="..\..\Database\Custom\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Custom\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Realms\Constants\" />
+  </ItemGroup>
+
   <Target Name="ChangeAliasesOfStrongNameAssemblies" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
     <ItemGroup>
       <ReferencePath Condition="'%(FileName)' == 'MySqlConnector'">

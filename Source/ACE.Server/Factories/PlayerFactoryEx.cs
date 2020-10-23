@@ -569,7 +569,7 @@ namespace ACE.Server.Factories
             return player;
         }
 
-        private static void SpendAllXp(Player player)
+        public static void SpendAllXp(Player player)
         {
             player.SpendAllXp(false);
 

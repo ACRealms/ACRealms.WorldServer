@@ -1,8 +1,13 @@
+using ACE.Common;
 using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Server.Entity.Actions;
+using ACE.Server.Managers;
 using ACE.Server.Network;
+using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
 using System;
 using System.Collections.Generic;
@@ -84,6 +89,95 @@ namespace ACE.Server.Command.Handlers
             }
             
             session.Player.HandleActionTeleToHideout();
+        }
+
+        [CommandHandler("rebuff", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, 0,
+            "Buffs you with all beneficial spells. Only usable in certain realms.")]
+        public static void HandleRebuff(Session session, params string[] parameters)
+        {
+            var player = session.Player;
+            var realm = RealmManager.GetRealm(player.HomeRealm);
+            if (realm == null) return;
+            if (!realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm)) return;
+            var ts = player.GetProperty(PropertyInt.LastRebuffTimestamp);
+            if (ts != null)
+            {
+                var timesince = (int)Time.GetUnixTime() - ts.Value;
+                if (timesince < 180)
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"You may use this command again in {timesince}s.", ChatMessageType.Broadcast));
+                    return;
+                }
+            }
+            player.SetProperty(PropertyInt.LastRebuffTimestamp, (int)Time.GetUnixTime());
+            player.CreateSentinelBuffPlayers(new Player[] { player }, true);
+        }
+
+        [CommandHandler("duels", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, 0,
+         "Recalls you to the duel staging area.")]
+        public static void HandleRecallDuels(Session session, params string[] parameters)
+        {
+            if (RealmManager.DuelRealm == null)
+                return;
+            var player = session.Player;
+            if (!player.ValidatePlayerRealmPosition(DuelRealmHelpers.GetDuelingAreaDrop()))
+                return;
+
+            if (player.PKTimerActive)
+            {
+                session.Network.EnqueueSend(new GameEventWeenieError(session, WeenieError.YouHaveBeenInPKBattleTooRecently));
+                return;
+            }
+
+            if (player.RecallsDisabled)
+            {
+                session.Network.EnqueueSend(new GameEventWeenieError(session, WeenieError.ExitTrainingAcademyToUseCommand));
+                return;
+            }
+
+            if (player.TooBusyToRecall)
+            {
+                session.Network.EnqueueSend(new GameEventWeenieError(session, WeenieError.YoureTooBusy));
+                return;
+            }
+
+            if (player.CombatMode != CombatMode.NonCombat)
+            {
+                // this should be handled by a different thing, probably a function that forces player into peacemode
+                var updateCombatMode = new GameMessagePrivateUpdatePropertyInt(player, PropertyInt.CombatMode, (int)CombatMode.NonCombat);
+                player.SetCombatMode(CombatMode.NonCombat);
+                session.Network.EnqueueSend(updateCombatMode);
+            }
+
+            player.EnqueueBroadcast(new GameMessageSystemChat($"{player.Name} is recalling to the duel staging area.", ChatMessageType.Recall), Player.LocalBroadcastRange, ChatMessageType.Recall);
+
+            player.SendMotionAsCommands(MotionCommand.MarketplaceRecall, MotionStance.NonCombat);
+
+            var startPos = new Position(player.Location);
+
+            // TODO: (OptimShi): Actual animation length is longer than in retail. 18.4s
+            // float mpAnimationLength = MotionTable.GetAnimationLength((uint)MotionTableId, MotionCommand.MarketplaceRecall);
+            // mpChain.AddDelaySeconds(mpAnimationLength);
+            ActionChain mpChain = new ActionChain();
+            mpChain.AddDelaySeconds(5);
+
+            // Then do teleport
+            player.IsBusy = true;
+            mpChain.AddAction(player, () =>
+            {
+                player.IsBusy = false;
+                var endPos = new Position(player.Location);
+                if (startPos.SquaredDistanceTo(endPos) > Player.RecallMoveThresholdSq)
+                {
+                    session.Network.EnqueueSend(new GameEventWeenieError(session, WeenieError.YouHaveMovedTooFar));
+                    return;
+                }
+
+                player.Teleport(DuelRealmHelpers.GetDuelingAreaDrop());
+            });
+
+            // Set the chain to run
+            mpChain.EnqueueChain();
         }
     }
 }
