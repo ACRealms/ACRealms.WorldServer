@@ -171,6 +171,7 @@ namespace ACE.Server.Managers
             var weenie = DatabaseManager.World.GetCachedWeenie("realm-portal-gem-stamped");
             item = CreateItem(player, weenie.WeenieClassId, 1);
             item.SetProperty(PropertyInt.SummonTargetRealm, realm.Realm.Id);
+            item.SetProperty(PropertyDataId.LinkedPortalOne, originalItem.GetProperty(PropertyDataId.LinkedPortalOne).Value);
             item.SetProperty(PropertyString.Name, $"Imbued {originalItem.Name}");
             item.SetProperty(PropertyInt.MaxStackSize, 1);
             item.SetProperty(PropertyString.LongDesc,
