@@ -23,6 +23,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Realms\reserved_realms\default.jsonc" />
+    <None Remove="Realms\reserved_realms\hideout.jsonc" />
     <None Remove="starterGear.json" />
     <None Include="..\..\LICENSE">
       <Pack>True</Pack>
@@ -32,6 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Realms\reserved_realms\hideout.jsonc" />
+    <EmbeddedResource Include="Realms\reserved_realms\default.jsonc" />
     <EmbeddedResource Include="starterGear.json" />
   </ItemGroup>
 
@@ -92,6 +96,10 @@
     <None Include="..\..\Database\Updates\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Updates\" />
     <None Include="..\..\Database\Optional\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Optional\" />
       <None Include="..\..\Database\Custom\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Custom\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Realms\Constants\" />
   </ItemGroup>
 
   <Target Name="ChangeAliasesOfStrongNameAssemblies" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">

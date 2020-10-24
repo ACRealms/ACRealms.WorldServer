@@ -7,6 +7,127 @@ using ACE.Entity.Enum.Properties;
 
 namespace ACE.Database.Models.World
 {
+    public class RealmPropertyJsonModel
+    {
+        public string value { get; set; }
+        public string low { get; set; }
+        public string high { get; set; }
+        public bool? locked { get; set; }
+        public double? probability { get; set; }
+        public RealmPropertyRerollType? reroll { get; set; }
+        public RealmPropertyCompositionType compose { get; set; }
+
+        public void ValidateAll()
+        {
+            if ((low == null && high != null) || (low != null && high == null))
+                throw new Exception("Both low and high values must be present if one is present.");
+            if (value == null && low == null)
+                throw new Exception("Either value or low/high range must be provided.");
+            if (value != null && low != null)
+                throw new Exception("If providing a value, may not provide a low/high range.");
+        }
+
+        public void ValidateValuePresent()
+        {
+            if (value == null)
+                throw new Exception("value must be present");
+        }
+    }
+
+    public partial class RealmPropertiesBool
+    {
+        public void SetProperties(RealmPropertyJsonModel model)
+        {
+            model.ValidateValuePresent();
+            this.Value = bool.Parse(model.value);
+            this.Locked = model.locked ?? false;
+            this.Probability = model.probability;
+        }
+    }
+
+    public partial class RealmPropertiesFloat
+    {
+        public void SetProperties(RealmPropertyJsonModel model)
+        {
+            if (model.value != null)
+                this.Value = double.Parse(model.value);
+            if (model.low != null)
+            {
+                this.RandomLowRange = double.Parse(model.low);
+                this.RandomHighRange = double.Parse(model.high);
+                if (RandomLowRange > RandomHighRange)
+                    throw new Exception("high must be > low");
+                if (!model.reroll.HasValue)
+                    model.reroll = RealmPropertyRerollType.landblock;
+            }
+            this.Locked = model.locked ?? false;
+            this.Probability = model.probability;
+            this.RandomType = (byte)(model.reroll ?? RealmPropertyRerollType.never);
+            this.CompositionType = (byte)model.compose;
+        }
+    }
+
+    public partial class RealmPropertiesInt
+    {
+        public void SetProperties(RealmPropertyJsonModel model)
+        {
+            if (model.value != null)
+                this.Value = int.Parse(model.value);
+            if (model.low != null)
+            {
+                this.RandomLowRange = int.Parse(model.low);
+                this.RandomHighRange = int.Parse(model.high);
+                if (RandomLowRange > RandomHighRange)
+                    throw new Exception("high must be > low");
+                if (!model.reroll.HasValue)
+                    model.reroll = RealmPropertyRerollType.landblock;
+            }
+            this.Locked = model.locked ?? false;
+            this.Probability = model.probability;
+            this.RandomType = (byte)model.reroll;
+            this.CompositionType = (byte)model.compose;
+        }
+    }
+
+    public partial class RealmPropertiesInt64
+    {
+        public void SetProperties(RealmPropertyJsonModel model)
+        {
+            if (model.value != null)
+                this.Value = long.Parse(model.value);
+            if (model.low != null)
+            {
+                this.RandomLowRange = long.Parse(model.low);
+                this.RandomHighRange = long.Parse(model.high);
+                if (RandomLowRange > RandomHighRange)
+                    throw new Exception("high must be > low");
+                if (!model.reroll.HasValue)
+                    model.reroll = RealmPropertyRerollType.landblock;
+            }
+            this.Locked = model.locked ?? false;
+            this.Probability = model.probability;
+            this.RandomType = (byte)model.reroll;
+            this.CompositionType = (byte)model.compose;
+        }
+    }
+
+    public partial class RealmPropertiesString
+    {
+        public void SetProperties(RealmPropertyJsonModel model)
+        {
+            model.ValidateValuePresent();
+            this.Value = model.value;
+            this.Locked = model.locked ?? false;
+            this.Probability = model.probability;
+        }
+    }
+
+    public partial class RealmRulesetLinks
+    {
+        [NotMapped]
+        public string Import_RulesetToApply { get; set; }
+    }
+
     public partial class Realm
     {
         [NotMapped]
@@ -28,6 +149,11 @@ namespace ACE.Database.Models.World
                 item.RealmId = value;
             foreach (var item in RealmPropertiesFloat)
                 item.RealmId = value;
+        }
+
+        public override string ToString()
+        {
+            return $"{Name} ({Id})";
         }
     }
 
@@ -153,6 +279,96 @@ namespace ACE.Database.Models.World
                 var entity = new RealmPropertiesString { RealmId = realm.Id, Type = (ushort)property, Value = value, Realm = realm };
 
                 realm.RealmPropertiesString.Add(entity);
+            }
+        }
+
+        
+        public static void SetPropertyByName_Complex(this Realm realm, string propertyName, RealmPropertyJsonModel pobj)
+        {
+            pobj.ValidateAll();
+
+            if (Enum.TryParse<RealmPropertyBool>(propertyName, out var boolprop))
+                SetProperty_Complex(realm, boolprop, pobj);
+            else if (Enum.TryParse<RealmPropertyInt>(propertyName, out var intprop))
+                SetProperty_Complex(realm, intprop, pobj);
+            else if (Enum.TryParse<RealmPropertyString>(propertyName, out var stringprop))
+                SetProperty_Complex(realm, stringprop, pobj);
+            else if (Enum.TryParse<RealmPropertyFloat>(propertyName, out var floatprop))
+                SetProperty_Complex(realm, floatprop, pobj);
+            else if (Enum.TryParse<RealmPropertyInt64>(propertyName, out var longprop))
+                SetProperty_Complex(realm, longprop, pobj);
+            else
+                throw new Exception("Realm property not found: " + propertyName);
+        }
+        
+        
+        private static void SetProperty_Complex(Realm realm, RealmPropertyInt64 property, RealmPropertyJsonModel pobj)
+        {
+            var result = realm.RealmPropertiesInt64.FirstOrDefault(x => x.Type == (ushort)property);
+
+            if (result != null)
+                result.SetProperties(pobj);
+            else
+            {
+                var entity = new RealmPropertiesInt64 { RealmId = realm.Id, Type = (ushort)property };
+                entity.SetProperties(pobj);
+                realm.RealmPropertiesInt64.Add(entity);
+            }
+        }
+
+        private static void SetProperty_Complex(Realm realm, RealmPropertyBool property, RealmPropertyJsonModel pobj)
+        {
+            var result = realm.RealmPropertiesBool.FirstOrDefault(x => x.Type == (ushort)property);
+
+            if (result != null)
+                result.SetProperties(pobj);
+            else
+            {
+                var entity = new RealmPropertiesBool { RealmId = realm.Id, Type = (ushort)property };
+                entity.SetProperties(pobj);
+                realm.RealmPropertiesBool.Add(entity);
+            }
+        }
+
+        private static void SetProperty_Complex(Realm realm, RealmPropertyInt property, RealmPropertyJsonModel pobj)
+        {
+            var result = realm.RealmPropertiesInt.FirstOrDefault(x => x.Type == (ushort)property);
+
+            if (result != null)
+                result.SetProperties(pobj);
+            else
+            {
+                var entity = new RealmPropertiesInt { RealmId = realm.Id, Type = (ushort)property };
+                entity.SetProperties(pobj);
+                realm.RealmPropertiesInt.Add(entity);
+            }
+        }
+
+        private static void SetProperty_Complex(Realm realm, RealmPropertyString property, RealmPropertyJsonModel pobj)
+        {
+            var result = realm.RealmPropertiesString.FirstOrDefault(x => x.Type == (ushort)property);
+
+            if (result != null)
+                result.SetProperties(pobj);
+            else
+            {
+                var entity = new RealmPropertiesString { RealmId = realm.Id, Type = (ushort)property };
+                entity.SetProperties(pobj);
+                realm.RealmPropertiesString.Add(entity);
+            }
+        }
+
+        private static void SetProperty_Complex(Realm realm, RealmPropertyFloat property, RealmPropertyJsonModel pobj)
+        {
+            var result = realm.RealmPropertiesFloat.FirstOrDefault(x => x.Type == (ushort)property);
+
+            if (result != null)
+                result.SetProperties(pobj);
+            else
+            {
+                var entity = new RealmPropertiesFloat { RealmId = realm.Id, Type = (ushort)property };
+                entity.SetProperties(pobj);
+                realm.RealmPropertiesFloat.Add(entity);
             }
         }
 

@@ -20,6 +20,7 @@ using ACE.Server.Factories;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Managers
 {
@@ -58,6 +59,8 @@ namespace ACE.Server.Managers
 
             if (recipe == null)
             {
+                if (TryHandleHardcodedRecipe(player, source, target))
+                    return;
                 player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The {source.NameWithMaterial} cannot be used on the {target.NameWithMaterial}.", ChatMessageType.Craft));
                 player.SendUseDoneEvent();
                 return;
@@ -123,6 +126,72 @@ namespace ACE.Server.Managers
             craftChain.EnqueueChain();
 
             player.NextUseTime = DateTime.UtcNow.AddSeconds(animTime);
+        }
+
+        private static bool TryHandleHardcodedRecipe(Player player, WorldObject source, WorldObject target)
+        {
+            if (target.GetProperty(PropertyBool.AllowRulesetStamp) == true && source.WeenieClassName == "realm-ruleset-stamp")
+                return ApplyRulesetStamp(player, source, target);
+            return false;
+        }
+
+        private static bool ApplyRulesetStamp(Player player, WorldObject source, WorldObject target)
+        {
+            var _realmId = source.GetProperty(PropertyInt.HomeRealm);
+            if (!_realmId.HasValue)
+                return false;
+            var realmId = _realmId.Value;
+            if (realmId < 0 || realmId > 0xFFFF)
+                return false;
+            var realm = RealmManager.GetRealm((ushort)realmId);
+            if (realm == null)
+            {
+                log.Error($"Player ${player.Name} attempted to apply stamp for missing realm {realmId} to a portal gem.");
+                return false;
+            }
+
+            if (!target.GetProperty(PropertyInt.SummonTargetRealm).HasValue)
+                target = DoApplyRulesetStamp1(player, target, realm);
+            else if (!target.GetProperty(PropertyInt.SummonTargetRealm2).HasValue)
+                DoApplyRulesetStamp2(target, realm);
+            else if (!target.GetProperty(PropertyInt.SummonTargetRealm3).HasValue)
+                DoApplyRulesetStamp3(target, realm);
+            else
+                return false;
+
+            player.Session.Network.EnqueueSend(new GameMessageSystemChat("You apply the stamp to the portal gem.", ChatMessageType.Craft));
+            player.Session.Network.EnqueueSend(new GameMessageUpdateObject(target));
+            return true;
+        }
+
+        private static WorldObject DoApplyRulesetStamp1(Player player, WorldObject item, WorldRealm realm)
+        {
+            var originalItem = item;
+            DestroyItem(player, null, item, 1, null);
+            var weenie = DatabaseManager.World.GetCachedWeenie("realm-portal-gem-stamped");
+            item = CreateItem(player, weenie.WeenieClassId, 1);
+            item.SetProperty(PropertyInt.SummonTargetRealm, realm.Realm.Id);
+            item.SetProperty(PropertyString.Name, $"Imbued {originalItem.Name}");
+            item.SetProperty(PropertyInt.MaxStackSize, 1);
+            item.SetProperty(PropertyString.LongDesc,
+            $"Rulesets Applied:\n{realm.Realm.Name} - {realm.StandardRules.GetProperty(RealmPropertyString.Description)}");
+            return item;
+        }
+
+        private static void DoApplyRulesetStamp2(WorldObject item, WorldRealm realm)
+        {
+            item.SetProperty(PropertyInt.SummonTargetRealm2, realm.Realm.Id);
+            item.SetProperty(PropertyDataId.IconOverlay, 0x06006C21);
+            item.SetProperty(PropertyString.LongDesc,
+            $"{item.GetProperty(PropertyString.LongDesc) ?? ""}\n\n{realm.Realm.Name} - {realm.StandardRules.GetProperty(RealmPropertyString.Description)}");
+        }
+
+        private static void DoApplyRulesetStamp3(WorldObject item, WorldRealm realm)
+        {
+            item.SetProperty(PropertyInt.SummonTargetRealm3, realm.Realm.Id);
+            item.SetProperty(PropertyDataId.IconOverlay, 0x06006C22);
+            item.SetProperty(PropertyString.LongDesc,
+            $"{item.GetProperty(PropertyString.LongDesc) ?? ""}\n\n{realm.Realm.Name} - {realm.StandardRules.GetProperty(RealmPropertyString.Description)}");
         }
 
         public static bool HasDifficulty(Recipe recipe)

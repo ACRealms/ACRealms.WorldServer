@@ -51,6 +51,7 @@ namespace ACE.Server.Entity
 
         public uint Instance;
         public AppliedRuleset RealmRuleset { get; private set; }
+        public RealmShortcuts RealmHelpers { get; }
 
         //Will be null if its a standard realm landblock - I.e. the default for a realm and not with an added ruleset applied
         public EphemeralRealm InnerRealmInfo { get; set; }
@@ -184,6 +185,7 @@ namespace ACE.Server.Entity
 
         public Landblock(ulong objCellID)
         {
+            RealmHelpers = new RealmShortcuts(this);
             LongId = objCellID | 0xFFFF;
 
             log.Info($"Landblock({LongId:X8})");
@@ -227,7 +229,7 @@ namespace ACE.Server.Entity
         private AppliedRuleset GetOrApplyRuleset(EphemeralRealm ephemeralRealm = null)
         {
             if (ephemeralRealm != null)
-                return ephemeralRealm.Ruleset;
+                return AppliedRuleset.MakeRerolledRuleset(ephemeralRealm.RulesetTemplate);
 
             Position.ParseInstanceID(this.Instance, out bool _istemp, out var realmid, out var _shortinstid);
             var realm = RealmManager.GetRealm(realmid);
@@ -236,8 +238,7 @@ namespace ACE.Server.Entity
                 //Shouldn't happen
                 throw new Exception($"Error: Realm {realmid} is null when creating landblock.");
             }
-            return realm.Ruleset;
-            //TODO: apply randomized rulesets per lb
+            return AppliedRuleset.MakeRerolledRuleset(realm.RulesetTemplate);
         }
 
         /// <summary>
@@ -248,7 +249,7 @@ namespace ACE.Server.Entity
         {
             var objects = DatabaseManager.World.GetCachedInstancesByLandblock(ShortId);
             var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(ShortId);
-            var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects, null, Instance);
+            var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects, null, Instance, RealmRuleset);
 
             actionQueue.EnqueueAction(new ActionEventDelegate(() =>
             {
@@ -1311,6 +1312,23 @@ namespace ACE.Server.Entity
                 SetFogColor(environChangeType);
             else
                 SendEnvironSound(environChangeType);
+        }
+
+        public class RealmShortcuts
+        {
+            Landblock Landblock { get; }
+            public RealmShortcuts(Landblock lb) { this.Landblock = lb; }
+
+            /// <summary>
+            /// True if the landblock is intended for a duel (does not include the duel staging area).
+            /// </summary>
+            public bool IsDuel
+            {
+                get
+                {
+                    return Landblock.InnerRealmInfo != null && Landblock.RealmRuleset.GetProperty(RealmPropertyBool.IsDuelingRealm);
+                }
+            }
         }
     }
 }

@@ -115,6 +115,8 @@ namespace ACE.Server.WorldObjects
                 amountRemaining = (uint)AvailableExperience;
 
             SpendAttributeXp(creatureAttribute, amountRemaining, sendNetworkUpdate);
+            if (sendNetworkUpdate)
+                Session.Network.EnqueueSend(new GameMessagePrivateUpdateAttribute(this, creatureAttribute));
         }
 
         /// <summary>

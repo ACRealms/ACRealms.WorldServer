@@ -48,5 +48,15 @@ namespace ACE.Entity.Models
         // Properties for books
         public PropertiesBook PropertiesBook { get; set; }
         public IList<PropertiesBookPageData> PropertiesBookPageData { get; set; }
+
+        public bool CanReferenceCommonProperties
+        {
+            get
+            {
+                if (this.GetProperty(PropertyBool.RealmSelectorVendor) == true)
+                    return false;
+                return true;
+            }
+        }
     }
 }

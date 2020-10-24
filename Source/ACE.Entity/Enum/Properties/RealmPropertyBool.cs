@@ -8,13 +8,13 @@ namespace ACE.Entity.Enum.Properties
         Undef                            = 0,
 
         [RealmPropertyBool(false)]
-        IsNeutralZone                    = 1,
+        IsNeutralZone,
 
         /// <summary>
         /// Standard "Red server" rules. Players are always Player Killer status unless recently killed by a player killer
         /// </summary>
         [RealmPropertyBool(false)]
-        IsPKOnly                         = 2,
+        IsPKOnly,
 
         /// <summary>
         /// If true, this realm may have an expiration timestamp. When this timestamp is reached,
@@ -22,19 +22,24 @@ namespace ACE.Entity.Enum.Properties
         /// will be moved to the parent realm.
         /// </summary>
         [RealmPropertyBool(false)]
-        IsTemporaryRealm                 = 3,
+        IsTemporaryRealm,
 
-        [RealmPropertyBool(true)]
-        CanBeHomeworld                   = 4,
+        [RealmPropertyBool(false)]
+        IsDuelingRealm,
 
+        [RealmPropertyBool(false)]
+        CanBeHomeworld,
+
+        [RealmPropertyBool(false)]
+        HideoutEnabled,
         /// <summary>
         /// Players with a homeworld of this realm may enter the neutral zone if true
         /// </summary>
-        [RealmPropertyBool(true)]
-        CanInteractWithNeutralZone = 5,
+        [RealmPropertyBool(false)]
+        CanInteractWithNeutralZone,
 
         [RealmPropertyBool(true)]
-        SpellCastingPKDoubleCollisionCheck = 6
+        SpellCastingPKDoubleCollisionCheck 
     }
 
     public static class RealmPropertyBoolExtensions

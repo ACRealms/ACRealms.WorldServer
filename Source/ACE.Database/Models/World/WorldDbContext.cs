@@ -29,6 +29,7 @@ namespace ACE.Database.Models.World
         public virtual DbSet<RealmPropertiesInt> RealmPropertiesInt { get; set; }
         public virtual DbSet<RealmPropertiesInt64> RealmPropertiesInt64 { get; set; }
         public virtual DbSet<RealmPropertiesString> RealmPropertiesString { get; set; }
+        public virtual DbSet<RealmRulesetLinks> RealmRulesetLinks { get; set; }
         public virtual DbSet<Recipe> Recipe { get; set; }
         public virtual DbSet<RecipeMod> RecipeMod { get; set; }
         public virtual DbSet<RecipeModsBool> RecipeModsBool { get; set; }
@@ -358,6 +359,8 @@ namespace ACE.Database.Models.World
 
                 entity.Property(e => e.ParentRealmId).HasColumnName("parent_realm_id");
 
+                entity.Property(e => e.PropertyCountRandomized).HasColumnName("property_count_randomized");
+
                 entity.Property(e => e.Type).HasColumnName("type");
             });
 
@@ -382,6 +385,8 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.Locked)
                     .HasColumnName("locked")
                     .HasColumnType("bit(1)");
+
+                entity.Property(e => e.Probability).HasColumnName("probability");
 
                 entity.Property(e => e.Value)
                     .HasColumnName("value")
@@ -411,13 +416,21 @@ namespace ACE.Database.Models.World
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
 
+                entity.Property(e => e.CompositionType).HasColumnName("composition_type");
+
                 entity.Property(e => e.Locked)
                     .HasColumnName("locked")
                     .HasColumnType("bit(1)");
 
-                entity.Property(e => e.Value)
-                    .HasColumnName("value")
-                    .HasDefaultValueSql("'0'");
+                entity.Property(e => e.Probability).HasColumnName("probability");
+
+                entity.Property(e => e.RandomHighRange).HasColumnName("random_high_range");
+
+                entity.Property(e => e.RandomLowRange).HasColumnName("random_low_range");
+
+                entity.Property(e => e.RandomType).HasColumnName("random_type");
+
+                entity.Property(e => e.Value).HasColumnName("value");
 
                 entity.HasOne(d => d.Realm)
                     .WithMany(p => p.RealmPropertiesFloat)
@@ -443,13 +456,21 @@ namespace ACE.Database.Models.World
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
 
+                entity.Property(e => e.CompositionType).HasColumnName("composition_type");
+
                 entity.Property(e => e.Locked)
                     .HasColumnName("locked")
                     .HasColumnType("bit(1)");
 
-                entity.Property(e => e.Value)
-                    .HasColumnName("value")
-                    .HasDefaultValueSql("'0'");
+                entity.Property(e => e.Probability).HasColumnName("probability");
+
+                entity.Property(e => e.RandomHighRange).HasColumnName("random_high_range");
+
+                entity.Property(e => e.RandomLowRange).HasColumnName("random_low_range");
+
+                entity.Property(e => e.RandomType).HasColumnName("random_type");
+
+                entity.Property(e => e.Value).HasColumnName("value");
 
                 entity.HasOne(d => d.Realm)
                     .WithMany(p => p.RealmPropertiesInt)
@@ -472,13 +493,21 @@ namespace ACE.Database.Models.World
                     .HasColumnName("type")
                     .HasDefaultValueSql("'0'");
 
+                entity.Property(e => e.CompositionType).HasColumnName("composition_type");
+
                 entity.Property(e => e.Locked)
                     .HasColumnName("locked")
                     .HasColumnType("bit(1)");
 
-                entity.Property(e => e.Value)
-                    .HasColumnName("value")
-                    .HasDefaultValueSql("'0'");
+                entity.Property(e => e.Probability).HasColumnName("probability");
+
+                entity.Property(e => e.RandomHighRange).HasColumnName("random_high_range");
+
+                entity.Property(e => e.RandomLowRange).HasColumnName("random_low_range");
+
+                entity.Property(e => e.RandomType).HasColumnName("random_type");
+
+                entity.Property(e => e.Value).HasColumnName("value");
 
                 entity.HasOne(d => d.Realm)
                     .WithMany(p => p.RealmPropertiesInt64)
@@ -508,6 +537,8 @@ namespace ACE.Database.Models.World
                     .HasColumnName("locked")
                     .HasColumnType("bit(1)");
 
+                entity.Property(e => e.Probability).HasColumnName("probability");
+
                 entity.Property(e => e.Value)
                     .IsRequired()
                     .HasColumnName("value")
@@ -517,6 +548,39 @@ namespace ACE.Database.Models.World
                     .WithMany(p => p.RealmPropertiesString)
                     .HasForeignKey(d => d.RealmId)
                     .HasConstraintName("realm_string");
+            });
+
+            modelBuilder.Entity<RealmRulesetLinks>(entity =>
+            {
+                entity.HasKey(e => new { e.RealmId, e.Order })
+                    .HasName("PRIMARY");
+
+                entity.ToTable("realm_ruleset_links");
+
+                entity.HasIndex(e => e.LinkedRealmId)
+                    .HasName("realm_link_child");
+
+                entity.Property(e => e.RealmId).HasColumnName("realm_id");
+
+                entity.Property(e => e.Order).HasColumnName("order");
+
+                entity.Property(e => e.LinkType).HasColumnName("link_type");
+
+                entity.Property(e => e.LinkedRealmId).HasColumnName("linked_realm_id");
+
+                entity.Property(e => e.Probability).HasColumnName("probability");
+
+                entity.Property(e => e.ProbabilityGroup).HasColumnName("probability_group");
+
+                entity.HasOne(d => d.LinkedRealm)
+                    .WithMany(p => p.RealmRulesetLinksLinkedRealm)
+                    .HasForeignKey(d => d.LinkedRealmId)
+                    .HasConstraintName("realm_link_child");
+
+                entity.HasOne(d => d.Realm)
+                    .WithMany(p => p.RealmRulesetLinksRealm)
+                    .HasForeignKey(d => d.RealmId)
+                    .HasConstraintName("realm_link_parent");
             });
 
             modelBuilder.Entity<Recipe>(entity =>

@@ -14,6 +14,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Factories;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Managers;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -68,7 +69,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// A new biota be created taking all of its values from weenie.
         /// </summary>
-        public Vendor(Weenie weenie, ObjectGuid guid) : base(weenie, guid)
+        public Vendor(Weenie weenie, ObjectGuid guid, AppliedRuleset ruleset) : base(weenie, guid, ruleset)
         {
             SetEphemeralValues();
         }
@@ -200,19 +201,70 @@ namespace ACE.Server.WorldObjects
             if (inventoryloaded)
                 return;
 
-            foreach (var item in Biota.PropertiesCreateList.Where(x => x.DestinationType == DestinationType.Shop))
+            if (Biota.PropertiesCreateList != null)
             {
-                WorldObject wo = WorldObjectFactory.CreateNewWorldObject(item.WeenieClassId);
-
-                if (wo != null)
+                foreach (var item in Biota.PropertiesCreateList.Where(x => x.DestinationType == DestinationType.Shop))
                 {
-                    if (item.Palette > 0)
-                        wo.PaletteTemplate = item.Palette;
-                    if (item.Shade > 0)
-                        wo.Shade = item.Shade;
-                    wo.ContainerId = Guid.Full;
-                    wo.CalculateObjDesc(); // i don't like firing this but this triggers proper icons, the way vendors load inventory feels off to me in this method.
-                    DefaultItemsForSale.Add(wo.Guid, wo);
+                    WorldObject wo = WorldObjectFactory.CreateNewWorldObject(item.WeenieClassId);
+
+                    if (wo != null)
+                    {
+                        if (item.Palette > 0)
+                            wo.PaletteTemplate = item.Palette;
+                        if (item.Shade > 0)
+                            wo.Shade = item.Shade;
+                        wo.ContainerId = Guid.Full;
+                        wo.CalculateObjDesc(); // i don't like firing this but this triggers proper icons, the way vendors load inventory feels off to me in this method.
+                        DefaultItemsForSale.Add(wo.Guid, wo);
+                    }
+                }
+            }
+
+            if (GetProperty(PropertyBool.RealmSelectorVendor) == true)
+            {
+                var weenie = DatabaseManager.World.GetCachedWeenie("realm-selector-token");
+                if (weenie == null)
+                    log.Error("Weenie not found: realm-selector-token" + Environment.NewLine + Environment.StackTrace);
+                else
+                {
+                    foreach (var realm in RealmManager.Realms.Where(x => x.StandardRules.GetProperty(RealmPropertyBool.CanBeHomeworld)))
+                    {
+                        WorldObject wo = WorldObjectFactory.CreateNewWorldObject(weenie.WeenieClassId);
+                        wo.Name = realm.Realm.Name;
+                        wo.Use = realm.StandardRules.GetProperty(RealmPropertyString.Description);
+                        wo.LongDesc = realm.StandardRules.DebugOutputString();
+                        wo.ItemType = ItemType.Service;
+                        wo.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
+                        wo.ContainerId = Guid.Full;
+                        wo.CalculateObjDesc();
+                        DefaultItemsForSale.Add(wo.Guid, wo);
+                    }
+                }
+            }
+
+            if (GetProperty(PropertyInt.RulesetStampVendorType).HasValue)
+            {
+                var rulesetVendorType = GetProperty(PropertyInt.RulesetStampVendorType).Value;
+                if (rulesetVendorType > 0)
+                {
+                    var weenie = DatabaseManager.World.GetCachedWeenie("realm-ruleset-stamp");
+                    if (weenie == null)
+                        log.Error("Weenie not found: realm-ruleset-stamp" + Environment.NewLine + Environment.StackTrace);
+                    else
+                    {
+                        var rulesets = RealmManager.Rulesets.Where(x => x.StandardRules.GetProperty(RealmPropertyInt.RulesetStampVendorCategory) == rulesetVendorType);
+                        foreach (var ruleset in rulesets)
+                        {
+                            WorldObject wo = WorldObjectFactory.CreateNewWorldObject(weenie.WeenieClassId);
+                            wo.Name = ruleset.Realm.Name;
+                            wo.Use = ruleset.StandardRules.GetProperty(RealmPropertyString.Description);
+                            wo.LongDesc = ruleset.StandardRules.DebugOutputString();
+                            wo.SetProperty(PropertyInt.HomeRealm, ruleset.Realm.Id);
+                            wo.ContainerId = Guid.Full;
+                            wo.CalculateObjDesc();
+                            DefaultItemsForSale.Add(wo.Guid, wo);
+                        }
+                    }
                 }
             }
 
@@ -290,13 +342,14 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Used to convert Weenie based objects / not used for unique items
         /// </summary>
-        private List<WorldObject> ItemProfileToWorldObjects(ItemProfile itemprofile)
+        private List<WorldObject> ItemProfileToWorldObjects(ItemProfile itemprofile, WorldObject worldObject)
         {
             List<WorldObject> worldobjects = new List<WorldObject>();
 
             while (itemprofile.Amount > 0)
             {
-                WorldObject wo = WorldObjectFactory.CreateNewWorldObject(itemprofile.WeenieClassId);
+                WorldObject wo = WorldObjectFactory.CreateNewWorldObject(itemprofile.WeenieClassId, RealmRuleset);
+                wo.ClonePropertiesFrom(worldObject);
 
                 if (itemprofile.Palette.HasValue)
                     wo.PaletteTemplate = itemprofile.Palette;
@@ -429,10 +482,14 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            // convert profile to world objects / stack logic does not include unique items.
+            // convert profile to world objects / stack logic does not include unique items or services.
             foreach (ItemProfile fitem in filteredlist)
             {
-                genlist.AddRange(ItemProfileToWorldObjects(fitem));
+                var item = DefaultItemsForSale[(new ObjectGuid(fitem.ObjectGuid))];
+                if (item.ItemType == ItemType.Service)
+                    genlist.Add(item);
+                else
+                    genlist.AddRange(ItemProfileToWorldObjects(fitem, item));
             }
 
             // calculate price. (both unique and item profile)
