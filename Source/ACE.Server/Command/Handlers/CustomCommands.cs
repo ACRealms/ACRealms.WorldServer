@@ -105,7 +105,7 @@ namespace ACE.Server.Command.Handlers
                 var timesince = (int)Time.GetUnixTime() - ts.Value;
                 if (timesince < 180)
                 {
-                    session.Network.EnqueueSend(new GameMessageSystemChat($"You may use this command again in {timesince}s.", ChatMessageType.Broadcast));
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"You may use this command again in {180 - timesince}s.", ChatMessageType.Broadcast));
                     return;
                 }
             }

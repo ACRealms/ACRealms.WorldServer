@@ -1281,7 +1281,14 @@ namespace ACE.Server.WorldObjects
 
             Position targetPosition = new Position(portal.Destination);
             var summonTargetRealms = GetRealmsToApply();
+
+            bool doEphemeralInstance = false;
             if (summonTargetRealms.Count > 0)
+                doEphemeralInstance = true;
+            if (summoner.RealmRuleset.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                doEphemeralInstance = true;
+
+            if (doEphemeralInstance)
             {
                 if (summonTargetRealms.Any(x => x == null))
                 { 

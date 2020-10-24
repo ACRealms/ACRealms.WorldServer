@@ -17,6 +17,7 @@ namespace ACE.Server.Realms
         public DateTime ExpiresAt = DateTime.UtcNow.AddDays(1);
 
         public RulesetTemplate RulesetTemplate { get; set; }
+        //public bool IsDuelInstance => RulesetTemplate.
 
         private EphemeralRealm() { }
         private EphemeralRealm(Player owner, RulesetTemplate template)
@@ -49,6 +50,8 @@ namespace ACE.Server.Realms
                 prevTemplate = template;
             }
 
+            if (template == null)
+                template = prevTemplate;
             return new EphemeralRealm(owner, template);
         }
     }
