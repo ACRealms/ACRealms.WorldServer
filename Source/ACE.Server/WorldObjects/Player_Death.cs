@@ -104,10 +104,15 @@ namespace ACE.Server.WorldObjects
                 pkPlayer.PkTimestamp = Time.GetUnixTime();
                 pkPlayer.PlayerKillsPk++;
 
-                var globalPKDe = $"{lastDamager.Name} has defeated {Name}!";
-
-                if (!Location.Indoors)
-                    globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
+                string globalPKDe;
+                if (pkPlayer.CurrentLandblock.RealmHelpers.IsDuel)
+                    globalPKDe = $"{lastDamager.Name} has defeated {Name} in a duel!";
+                else
+                {
+                    globalPKDe = $"{lastDamager.Name} has defeated {Name}!";
+                    if (!Location.Indoors)
+                        globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
+                }
 
                 globalPKDe += "\n[PKDe]";
 

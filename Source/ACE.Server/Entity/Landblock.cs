@@ -51,6 +51,7 @@ namespace ACE.Server.Entity
 
         public uint Instance;
         public AppliedRuleset RealmRuleset { get; private set; }
+        public RealmShortcuts RealmHelpers { get; }
 
         //Will be null if its a standard realm landblock - I.e. the default for a realm and not with an added ruleset applied
         public EphemeralRealm InnerRealmInfo { get; set; }
@@ -184,6 +185,7 @@ namespace ACE.Server.Entity
 
         public Landblock(ulong objCellID)
         {
+            RealmHelpers = new RealmShortcuts(this);
             LongId = objCellID | 0xFFFF;
 
             log.Info($"Landblock({LongId:X8})");
@@ -1310,6 +1312,23 @@ namespace ACE.Server.Entity
                 SetFogColor(environChangeType);
             else
                 SendEnvironSound(environChangeType);
+        }
+
+        public class RealmShortcuts
+        {
+            Landblock Landblock { get; }
+            public RealmShortcuts(Landblock lb) { this.Landblock = lb; }
+
+            /// <summary>
+            /// True if the landblock is intended for a duel (does not include the duel staging area).
+            /// </summary>
+            public bool IsDuel
+            {
+                get
+                {
+                    return Landblock.InnerRealmInfo != null && Landblock.RealmRuleset.GetProperty(RealmPropertyBool.IsDuelingRealm);
+                }
+            }
         }
     }
 }
