@@ -7,9 +7,9 @@ namespace ACE.Common
     {
         public string WorldName { get; set; }
 
-        public NetworkSettings Network { get; set; }
+        public NetworkSettings Network { get; set; } = new NetworkSettings();
 
-        public AccountDefaults Accounts { get; set; }
+        public AccountDefaults Accounts { get; set; } = new AccountDefaults();
 
         public string DatFilesDirectory { get; set; }
 
@@ -34,6 +34,6 @@ namespace ACE.Common
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public bool LandblockPreloading { get; set; }
 
-        public List<PreloadedLandblocks> PreloadedLandblocks { get; set; }
+        public List<PreloadedLandblocks> PreloadedLandblocks { get; set; } = new List<PreloadedLandblocks>();
     }
 }

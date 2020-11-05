@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ACE.Database.Models.Auth
 {
@@ -13,14 +14,16 @@ namespace ACE.Database.Models.Auth
         public string EmailAddress { get; set; }
         public DateTime CreateTime { get; set; }
         public byte[] CreateIP { get; set; }
+        public string CreateIPNtoa { get; set; }
         public DateTime? LastLoginTime { get; set; }
         public byte[] LastLoginIP { get; set; }
+        public string LastLoginIPNtoa { get; set; }
         public uint TotalTimesLoggedIn { get; set; }
         public DateTime? BannedTime { get; set; }
         public uint? BannedByAccountId { get; set; }
         public DateTime? BanExpireTime { get; set; }
         public string BanReason { get; set; }
 
-        public Accesslevel AccessLevelNavigation { get; set; }
+        public virtual Accesslevel AccessLevelNavigation { get; set; }
     }
 }

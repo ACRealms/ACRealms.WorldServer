@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -36,7 +36,8 @@ namespace ACE.Database.Models.Auth
         {
             modelBuilder.Entity<Accesslevel>(entity =>
             {
-                entity.HasKey(e => e.Level);
+                entity.HasKey(e => e.Level)
+                    .HasName("PRIMARY");
 
                 entity.ToTable("accesslevel");
 
@@ -70,7 +71,11 @@ namespace ACE.Database.Models.Auth
                     .HasName("accountName_uidx")
                     .IsUnique();
 
-                entity.Property(e => e.AccountId).HasColumnName("accountId");
+                entity.Property(e => e.AccountId)
+                    .HasColumnName("accountId")
+                    .ValueGeneratedOnAddOrUpdate()
+                    .UseMySqlIdentityColumn();
+                    
 
                 entity.Property(e => e.AccessLevel)
                     .HasColumnName("accessLevel")
@@ -99,6 +104,10 @@ namespace ACE.Database.Models.Auth
                     .HasColumnName("create_I_P")
                     .HasMaxLength(16);
 
+                entity.Property(e => e.CreateIPNtoa)
+                    .HasColumnName("create_I_P_ntoa")
+                    .HasColumnType("varchar(45)");
+
                 entity.Property(e => e.CreateTime)
                     .HasColumnName("create_Time")
                     .HasColumnType("datetime")
@@ -111,6 +120,10 @@ namespace ACE.Database.Models.Auth
                 entity.Property(e => e.LastLoginIP)
                     .HasColumnName("last_Login_I_P")
                     .HasMaxLength(16);
+
+                entity.Property(e => e.LastLoginIPNtoa)
+                    .HasColumnName("last_Login_I_P_ntoa")
+                    .HasColumnType("varchar(45)");
 
                 entity.Property(e => e.LastLoginTime)
                     .HasColumnName("last_Login_Time")

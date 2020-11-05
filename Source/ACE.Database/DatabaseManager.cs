@@ -8,7 +8,7 @@ namespace ACE.Database
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static AuthenticationDatabase Authentication { get; } = new AuthenticationDatabase();
+        public static IAuthenticationDatabase Authentication { get; } = new AuthenticationDatabase();
 
         public static WorldDatabaseWithEntityCache World { get; } = new WorldDatabaseWithEntityCache();
 

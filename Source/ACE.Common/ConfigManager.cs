@@ -18,6 +18,16 @@ namespace ACE.Common
             Config = configuration;
         }
 
+        public static void InitializeForTesting()
+        {
+            Config = new MasterConfiguration()
+            {
+                MySql = null, //should use mock object
+                Offline = new OfflineConfiguration(),
+                Server = new GameConfiguration()
+            };
+        }
+
         /// <summary>
         /// initializes from a Config.js file specified by the path
         /// </summary>

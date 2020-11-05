@@ -15,9 +15,36 @@ using System.Net;
 
 namespace ACE.Database
 {
-    public class AuthenticationDatabase
+
+    public interface IAuthenticationDatabase
+    {
+        bool Exists(bool retryUntilFound);
+        Account CreateAccount(string name, string password, AccessLevel accessLevel, IPAddress address);
+        Account GetAccountById(uint accountId);
+        int GetAccountCount();
+        Account GetAccountByName(string accountName);
+        List<string> GetListofAccountsByAccessLevel(AccessLevel accessLevel);
+        void UpdateAccount(Account account);
+        uint GetAccountIdByName(string accountName);
+        List<string> GetListofBannedAccounts();
+        bool UpdateAccountAccessLevel(uint accountId, AccessLevel accessLevel);
+    }
+
+    public class AuthenticationDatabase : IAuthenticationDatabase
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private Func<AuthDbContext> contextFactory;
+
+        public AuthenticationDatabase()
+        {
+            contextFactory = () => new AuthDbContext();
+        }
+
+        public AuthenticationDatabase(Func<AuthDbContext> contextFactory)
+        {
+            this.contextFactory = contextFactory;
+        }
 
         public bool Exists(bool retryUntilFound)
         {
@@ -25,7 +52,7 @@ namespace ACE.Database
 
             for (; ; )
             {
-                using (var context = new AuthDbContext())
+                using (var context = contextFactory())
                 {
                     if (((RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>()).Exists())
                     {
@@ -46,7 +73,7 @@ namespace ACE.Database
 
         public int GetAccountCount()
         {
-            using (var context = new AuthDbContext())
+            using (var context = contextFactory())
                 return context.Account.Count();
         }
 
@@ -63,7 +90,7 @@ namespace ACE.Database
             account.CreateTime = DateTime.UtcNow;
             account.CreateIP = address.GetAddressBytes();
 
-            using (var context = new AuthDbContext())
+            using (var context = contextFactory())
             {
                 context.Account.Add(account);
 
@@ -78,7 +105,7 @@ namespace ACE.Database
         /// </summary>
         public Account GetAccountById(uint accountId)
         {
-            using (var context = new AuthDbContext())
+            using (var context = contextFactory())
             {
                 return context.Account
                     .AsNoTracking()
@@ -91,7 +118,7 @@ namespace ACE.Database
         /// </summary>
         public Account GetAccountByName(string accountName)
         {
-            using (var context = new AuthDbContext())
+            using (var context = contextFactory())
             {
                 return context.Account
                     .AsNoTracking()
@@ -104,7 +131,7 @@ namespace ACE.Database
         /// </summary>
         public uint GetAccountIdByName(string accountName)
         {
-            using (var context = new AuthDbContext())
+            using (var context = contextFactory())
             {
                 var result = context.Account
                     .AsNoTracking()
@@ -116,7 +143,7 @@ namespace ACE.Database
 
         public void UpdateAccount(Account account)
         {
-            using (var context = new AuthDbContext())
+            using (var context = contextFactory())
             {
                 context.Entry(account).State = EntityState.Modified;
 
@@ -126,7 +153,7 @@ namespace ACE.Database
 
         public bool UpdateAccountAccessLevel(uint accountId, AccessLevel accessLevel)
         {
-            using (var context = new AuthDbContext())
+            using (var context = contextFactory())
             {
                 var account = context.Account
                     .First(r => r.AccountId == accountId);
@@ -144,7 +171,7 @@ namespace ACE.Database
 
         public List<string> GetListofAccountsByAccessLevel(AccessLevel accessLevel)
         {
-            using (var context = new AuthDbContext())
+            using (var context = contextFactory())
             {
                 var results = context.Account
                     .AsNoTracking()
@@ -160,7 +187,7 @@ namespace ACE.Database
 
         public List<string> GetListofBannedAccounts()
         {
-            using (var context = new AuthDbContext())
+            using (var context = contextFactory())
             {
                 var results = context.Account
                     .AsNoTracking()
