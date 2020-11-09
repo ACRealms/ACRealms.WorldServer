@@ -29,7 +29,7 @@
     <PackageReference Include="System.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
     <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
-    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="2.7.96" />
+    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="2.7.106" />
   </ItemGroup>
 
   <ItemGroup>
