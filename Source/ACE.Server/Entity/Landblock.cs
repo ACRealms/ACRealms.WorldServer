@@ -27,6 +27,7 @@ using ACE.Server.Network.GameMessages;
 using ACE.Server.WorldObjects;
 
 using Position = ACE.Entity.Position;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Entity
 {
@@ -49,6 +50,11 @@ namespace ACE.Server.Entity
         public byte Y => (byte)(Id >> 16);
 
         public uint Instance;
+        public AppliedRuleset RealmRuleset { get; private set; }
+        public RealmShortcuts RealmHelpers { get; }
+
+        //Will be null if its a standard realm landblock - I.e. the default for a realm and not with an added ruleset applied
+        public EphemeralRealm InnerRealmInfo { get; set; }
         public ulong LongId
         {
             get => (ulong)Instance << 32 | Id;
@@ -168,24 +174,43 @@ namespace ACE.Server.Entity
             set => fogColor = value;
         }
 
+        // this is used for debugging the instancing branch
+        // if you are in an instanced version of a dungeon (instance > 0)
+        // the base instance should never load
 
-        public Landblock(LandblockId id)
+        public static HashSet<ulong> TestDungeons = new HashSet<ulong>()
         {
-            //log.Debug($"Landblock({(id.Raw | 0xFFFF):X8})");
+            0x01D9FFFF,
+        };
 
-            Id = id;
+        public Landblock(ulong objCellID)
+        {
+            RealmHelpers = new RealmShortcuts(this);
+            LongId = objCellID | 0xFFFF;
 
-            CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id.Raw >> 16 | 0xFFFF);
-            LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>((uint)Id.Landblock << 16 | 0xFFFE);
+            log.Info($"Landblock({LongId:X8})");
+
+            if (TestDungeons.Contains(LongId))
+            {
+                log.Error($"Landblock({objCellID:X8}): base instance is loading!");
+                log.Error(System.Environment.StackTrace);
+            }
+
+            CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id);
+            LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>(Id & 0xFFFF0000 | 0xFFFE);
 
             lastActiveTime = DateTime.UtcNow;
 
-            var cellLandblock = DBObj.GetCellLandblock(Id.Raw | 0xFFFF);
-            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock);
+            // load physics landblock
+            var cellLandblock = DBObj.GetCellLandblock(Id);
+            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock, Instance);
         }
 
-        public void Init(bool reload = false)
+        public void Init(bool reload, EphemeralRealm ephemeralRealm = null)
         {
+            RealmRuleset = GetOrApplyRuleset(ephemeralRealm);
+            InnerRealmInfo = ephemeralRealm;
+
             if (!reload)
                 PhysicsLandblock.PostInit();
 
@@ -201,15 +226,30 @@ namespace ACE.Server.Entity
             //LoadMeshes(objects);
         }
 
+        private AppliedRuleset GetOrApplyRuleset(EphemeralRealm ephemeralRealm = null)
+        {
+            if (ephemeralRealm != null)
+                return AppliedRuleset.MakeRerolledRuleset(ephemeralRealm.RulesetTemplate);
+
+            Position.ParseInstanceID(this.Instance, out bool _istemp, out var realmid, out var _shortinstid);
+            var realm = RealmManager.GetRealm(realmid);
+            if (realm == null)
+            {
+                //Shouldn't happen
+                throw new Exception($"Error: Realm {realmid} is null when creating landblock.");
+            }
+            return AppliedRuleset.MakeRerolledRuleset(realm.RulesetTemplate);
+        }
+
         /// <summary>
         /// Monster Locations, Generators<para />
         /// This will be called from a separate task from our constructor. Use thread safety when interacting with this landblock.
         /// </summary>
         private void CreateWorldObjects()
         {
-            var objects = DatabaseManager.World.GetCachedInstancesByLandblock(Id.Landblock);
-            var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(Id.Landblock);
-            var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects);
+            var objects = DatabaseManager.World.GetCachedInstancesByLandblock(ShortId);
+            var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(ShortId);
+            var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects, null, Instance, RealmRuleset);
 
             actionQueue.EnqueueAction(new ActionEventDelegate(() =>
             {
@@ -1272,6 +1312,23 @@ namespace ACE.Server.Entity
                 SetFogColor(environChangeType);
             else
                 SendEnvironSound(environChangeType);
+        }
+
+        public class RealmShortcuts
+        {
+            Landblock Landblock { get; }
+            public RealmShortcuts(Landblock lb) { this.Landblock = lb; }
+
+            /// <summary>
+            /// True if the landblock is intended for a duel (does not include the duel staging area).
+            /// </summary>
+            public bool IsDuel
+            {
+                get
+                {
+                    return Landblock.InnerRealmInfo != null && Landblock.RealmRuleset.GetProperty(RealmPropertyBool.IsDuelingRealm);
+                }
+            }
         }
     }
 }

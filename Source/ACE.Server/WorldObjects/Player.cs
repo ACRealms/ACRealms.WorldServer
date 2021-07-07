@@ -28,6 +28,7 @@ using ACE.Server.WorldObjects.Managers;
 
 using Character = ACE.Database.Models.Shard.Character;
 using MotionTable = ACE.DatLoader.FileTypes.MotionTable;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -79,7 +80,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// A new biota be created taking all of its values from weenie.
         /// </summary>
-        public Player(Weenie weenie, ObjectGuid guid, uint accountId) : base(weenie, guid)
+        public Player(Weenie weenie, ObjectGuid guid, uint accountId, AppliedRuleset ruleset) : base(weenie, guid, ruleset)
         {
             Character = new Character();
             Character.Id = guid.Full;
@@ -358,7 +359,12 @@ namespace ACE.Server.WorldObjects
             else if (target is Hotspot hotspot)
                 hotspot.OnCollideObject(this);
             else if (target is SpellProjectile spellProjectile)
-                spellProjectile.OnCollideObject(this);
+            {
+                if (this.RealmRuleset.GetProperty(RealmPropertyBool.SpellCastingPKDoubleCollisionCheck))
+                {
+                    spellProjectile.OnCollideObject(this);
+                }
+            }
         }
 
         public override void OnCollideObjectEnd(WorldObject target)
@@ -578,7 +584,7 @@ namespace ACE.Server.WorldObjects
                 if (Location != null)
                 {
                     log.Debug($"0x{Guid}:{Name}.LogOut_Inner: Location is not null, Location = {Location.ToLOCString()}");
-                    var validLoadedLandblock = LandblockManager.GetLandblock(Location.LandblockId, false);
+                    var validLoadedLandblock = LandblockManager.GetLandblock(Location.LongObjCellID, false);
                     if (validLoadedLandblock.GetObject(Guid.Full) != null)
                     {
                         log.Debug($"0x{Guid}:{Name}.LogOut_Inner: Player is still on landblock, removing...");
@@ -1114,7 +1120,7 @@ namespace ACE.Server.WorldObjects
                     if (colliding)
                     {
                         // try initial placement
-                        var result = PhysicsObj.SetPositionSimple(PhysicsObj.Position, true);
+                        var result = PhysicsObj.SetPositionSimple(PhysicsObj.Position, true, Location.Instance);
 
                         if (result == SetPositionError.OK)
                         {

@@ -22,6 +22,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Physics;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.WorldObjects.Managers;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -1256,14 +1257,54 @@ namespace ACE.Server.WorldObjects
             return WorldObjectFactory.CreateWorldObject(weenie, new ObjectGuid(wcid)) as Portal;
         }
 
+        private List<WorldRealm> GetRealmsToApply()
+        {
+            return new List<PropertyInt>()
+            {
+                PropertyInt.SummonTargetRealm,
+                PropertyInt.SummonTargetRealm2,
+                PropertyInt.SummonTargetRealm3
+            }
+            .Select(GetProperty)
+            .Where(x => x.HasValue)
+            .Select(x => RealmManager.GetRealm((ushort)x))
+            .ToList();
+        }
         /// <summary>
         /// Spawns a player-summoned portal from item magic or gems
         /// </summary>
-        protected bool SummonPortal(uint portalId, Position location, double portalLifetime)
+        protected bool SummonPortal(uint portalId, Position location, double portalLifetime, Player summoner)
         {
             var portal = GetPortal(portalId);
             if (portal == null || location == null)
                 return false;
+
+            Position targetPosition = new Position(portal.Destination);
+            var summonTargetRealms = GetRealmsToApply();
+
+            bool doEphemeralInstance = false;
+            if (summonTargetRealms.Count > 0)
+                doEphemeralInstance = true;
+            if (summoner.RealmRuleset.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                doEphemeralInstance = true;
+
+            if (doEphemeralInstance)
+            {
+                if (summonTargetRealms.Any(x => x == null))
+                { 
+                    log.Error($"SummonTargetRealm for guid {Guid} has an invalid realm ID.");
+                    summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to summon: Realm not found.", ChatMessageType.Magic));
+                    return false;
+                }
+                if (summonTargetRealms.Any(x => x.Realm.Type != RealmType.Ruleset))
+                {
+                    log.Error($"SummonTargetRealm for guid {Guid} has invalid realm ID {summonTargetRealms.First(x => x.Realm.Type != RealmType.Ruleset).Realm.Id}. Realm must be of type 'Ruleset'");
+                    summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to summon: Invalid realm type.", ChatMessageType.Magic));
+                    return false;
+                }
+                var landblock = RealmManager.GetNewEphemeralLandblock((uint)(portal.Destination.LongLandblockID & 0xFFFFFFFF), summoner, summonTargetRealms.Select(x => x.Realm).ToList());
+                targetPosition.Instance = landblock.Instance;
+            }
 
             var gateway = WorldObjectFactory.CreateNewWorldObject("portalgateway") as Portal;
             if (gateway == null) return false;

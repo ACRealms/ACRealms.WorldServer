@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Numerics;
-using ACE.Entity.Enum;
 
 namespace ACE.Entity
 {
@@ -35,6 +34,24 @@ namespace ACE.Entity
             get => _pos;
             set => SetPosition(value);
         }
+        public ushort RealmID
+        {
+            get
+            {
+                ParseInstanceID(this.Instance, out var _a, out var realmId, out var _b);
+                return realmId;
+            }
+        }
+
+        public bool IsEphemeralRealm
+        {
+            get
+            {
+                ParseInstanceID(this.Instance, out var result, out var _a, out var _b);
+                return result;
+            }
+        }
+
 
         public Tuple<bool, bool> SetPosition(Vector3 pos)
         {
@@ -396,18 +413,28 @@ namespace ACE.Entity
             return ObjCellID == p.ObjCellID && Pos == p.Pos && Rotation == p.Rotation;
         }
 
-        public string ToLOCString()
+        public static void ParseInstanceID(uint instanceId, out bool isTemporaryRuleset, out ushort realmId, out ushort shortInstanceId)
         {
-            return $"0x{LandblockId.Raw:X8} [{PositionX:F6} {PositionY:F6} {PositionZ:F6}] {RotationW:F6} {RotationX:F6} {RotationY:F6} {RotationZ:F6}";
+            shortInstanceId = (ushort)(instanceId & 0xFFFF);
+            ushort left = (ushort)(instanceId >> 16);
+            isTemporaryRuleset = (left & 0x8000) == 0x8000;
+            realmId = (ushort)(left & 0x7FFF);
         }
 
-        public static readonly int BlockLength = 192;
-        public static readonly int CellSide = 8;
-        public static readonly int CellLength = 24;
-
-        public bool Equals(Position p)
+        public static uint InstanceIDFromVars(ushort realmId, ushort shortInstanceId, bool isTemporaryRuleset)
         {
-            return Cell == p.Cell && Pos.Equals(p.Pos) && Rotation.Equals(p.Rotation);
+            if (realmId > 0x7FFF)
+                throw new ArgumentOutOfRangeException(nameof(realmId));
+            uint result = ((uint)realmId) << 16;
+            result |= (uint)shortInstanceId;
+            if (isTemporaryRuleset)
+                result |= 0x80000000;
+            return result;
+        }
+
+        public void SetToDefaultRealmInstance(ushort newRealmId)
+        {
+            Instance = InstanceIDFromVars(newRealmId, 0, false);
         }
     }
 }

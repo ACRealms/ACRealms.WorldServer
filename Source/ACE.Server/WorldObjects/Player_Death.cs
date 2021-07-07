@@ -104,10 +104,15 @@ namespace ACE.Server.WorldObjects
                 pkPlayer.PkTimestamp = Time.GetUnixTime();
                 pkPlayer.PlayerKillsPk++;
 
-                var globalPKDe = $"{lastDamager.Name} has defeated {Name}!";
-
-                if ((Location.Cell & 0xFFFF) < 0x100)
-                    globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
+                string globalPKDe;
+                if (pkPlayer.CurrentLandblock.RealmHelpers.IsDuel)
+                    globalPKDe = $"{lastDamager.Name} has defeated {Name} in a duel!";
+                else
+                {
+                    globalPKDe = $"{lastDamager.Name} has defeated {Name}!";
+                    if (!Location.Indoors)
+                        globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
+                }
 
                 globalPKDe += "\n[PKDe]";
 
@@ -191,10 +196,12 @@ namespace ACE.Server.WorldObjects
 
             // update vitae
             // players who died in a PKLite fight do not accrue vitae
-            if (!IsPKLiteDeath(topDamager))
+            var duelRealm = RealmManager.GetRealm(HomeRealm)?.StandardRules?.GetProperty(RealmPropertyBool.IsDuelingRealm) == true ||
+                RealmRuleset?.GetProperty(RealmPropertyBool.IsDuelingRealm) == true;
+            if (!duelRealm && !IsPKLiteDeath(topDamager))
                 InflictVitaePenalty();
 
-            if (IsPKDeath(topDamager) || AugmentationSpellsRemainPastDeath == 0)
+            if (!duelRealm && IsPKDeath(topDamager) || AugmentationSpellsRemainPastDeath == 0)
             {
                 var msgPurgeEnchantments = new GameEventMagicPurgeEnchantments(Session);
                 EnchantmentManager.RemoveAllEnchantments();
@@ -210,7 +217,8 @@ namespace ACE.Server.WorldObjects
 
             dieChain.AddAction(this, () =>
             {
-                CreateCorpse(topDamager);
+                if (!duelRealm)
+                    CreateCorpse(topDamager);
 
                 ThreadSafeTeleportOnDeath(); // enter portal space
 
@@ -949,7 +957,7 @@ namespace ACE.Server.WorldObjects
             if (MinimumTimeSincePk == null || (PropertyManager.GetBool("pk_server_safe_training_academy").Item && RecallsDisabled))
                 return;
 
-            if (PkLevel == PKLevel.NPK && !PropertyManager.GetBool("pk_server").Item && !PropertyManager.GetBool("pkl_server").Item)
+            if (PkLevel == PKLevel.NPK && !RealmRuleset.GetProperty(RealmPropertyBool.IsPKOnly) && !PropertyManager.GetBool("pkl_server").Item)
             {
                 MinimumTimeSincePk = null;
                 return;
@@ -965,7 +973,7 @@ namespace ACE.Server.WorldObjects
             var werror = WeenieError.None;
             var pkLevel = PkLevel;
 
-            if (PropertyManager.GetBool("pk_server").Item)
+            if (RealmRuleset.GetProperty(RealmPropertyBool.IsPKOnly))
                 pkLevel = PKLevel.PK;
             else if (PropertyManager.GetBool("pkl_server").Item)
                 pkLevel = PKLevel.PKLite;
