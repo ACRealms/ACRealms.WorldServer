@@ -74,7 +74,7 @@ namespace ACE.Server.WorldObjects
                 Location = player.Location.InFrontOf(5.0f);
             }
 
-            Location.LandblockId = new LandblockId(Location.GetCell());
+            Location.ObjCellID = Location.GetCell();
 
             Name = player.Name + "'s " + Name;
 
@@ -167,7 +167,7 @@ namespace ACE.Server.WorldObjects
 
             if (IsMoving)
             {
-                PhysicsObj.update_object();
+                PhysicsObj.update_object(Location.Instance);
 
                 UpdatePosition_SyncLocation();
 

@@ -40,15 +40,24 @@ namespace ACE.Server.Entity
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static float AdjacencyLoadRange { get; } = 96f;
-        public static float OutdoorChatRange { get; } = 75f;
-        public static float IndoorChatRange { get; } = 25f;
-        public static float MaxXY { get; } = 192f;
-        public static float MaxObjectRange { get; } = 192f;
-        public static float MaxObjectGhostRange { get; } = 250f;
+        public uint Id; //AKA "LandblockId.Raw" from old code
 
+        public ushort ShortId => (ushort)(Id >> 16);
 
-        public LandblockId Id { get; }
+        public byte X => (byte)(Id >> 24);
+
+        public byte Y => (byte)(Id >> 16);
+
+        public uint Instance;
+        public ulong LongId
+        {
+            get => (ulong)Instance << 32 | Id;
+            set
+            {
+                Id = (uint)value;
+                Instance = (uint)(value >> 32);
+            }
+        }
 
         /// <summary>
         /// Flag indicates if this landblock is permanently loaded (for example, towns on high-traffic servers)
@@ -165,19 +174,20 @@ namespace ACE.Server.Entity
         }
 
 
-        public Landblock(LandblockId id)
+        public Landblock(ulong objCellID)
         {
             //log.Debug($"Landblock({(id.Raw | 0xFFFF):X8})");
 
-            Id = id;
+            LongId = objCellID | 0xFFFF;
 
-            CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id.Raw | 0xFFFF);
-            LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>((uint)Id.Landblock << 16 | 0xFFFE);
+            CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id);
+            LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>(Id & 0xFFFF0000 | 0xFFFE);
 
             lastActiveTime = DateTime.UtcNow;
 
-            var cellLandblock = DBObj.GetCellLandblock(Id.Raw | 0xFFFF);
-            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock);
+            // load physics landblock
+            var cellLandblock = DBObj.GetCellLandblock(Id);
+            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock, Instance);
         }
 
         public void Init(bool reload = false)
@@ -203,9 +213,9 @@ namespace ACE.Server.Entity
         /// </summary>
         private void CreateWorldObjects()
         {
-            var objects = DatabaseManager.World.GetCachedInstancesByLandblock(Id.Landblock);
-            var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(Id.Landblock);
-            var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects);
+            var objects = DatabaseManager.World.GetCachedInstancesByLandblock(ShortId);
+            var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(ShortId);
+            var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects, null);
 
             actionQueue.EnqueueAction(new ActionEventDelegate(() =>
             {
@@ -252,7 +262,7 @@ namespace ACE.Server.Entity
         /// </summary>
         private void SpawnDynamicShardObjects()
         {
-            var dynamics = DatabaseManager.Shard.BaseDatabase.GetDynamicObjectsByLandblock(Id.Landblock);
+            var dynamics = DatabaseManager.Shard.BaseDatabase.GetDynamicObjectsByLandblock(ShortId, Instance);
             var factoryShardObjects = WorldObjectFactory.CreateWorldObjects(dynamics);
 
             actionQueue.EnqueueAction(new ActionEventDelegate(() =>
@@ -268,8 +278,10 @@ namespace ACE.Server.Entity
         /// </summary>
         private void SpawnEncounters()
         {
+            var shortId = (ushort)(Id >> 16);
+
             // get the encounter spawns for this landblock
-            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(Id.Landblock);
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(shortId);
 
             foreach (var encounter in encounters)
             {
@@ -283,15 +295,16 @@ namespace ACE.Server.Entity
                     var yPos = Math.Clamp(encounter.CellY * 24.0f, 0.5f, 191.5f);
 
                     var pos = new Physics.Common.Position();
-                    pos.ObjCellID = (uint)(Id.Landblock << 16) | 1;
+                    pos.ObjCellID = (uint) (shortId << 16) | 1;
                     pos.Frame = new Physics.Animation.AFrame(new Vector3(xPos, yPos, 0), Quaternion.Identity);
                     pos.adjust_to_outside();
 
                     pos.Frame.Origin.Z = PhysicsLandblock.GetZ(pos.Frame.Origin);
 
-                    wo.Location = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation);
+                    wo.Location = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation, false, Instance);
 
-                    var sortCell = LScape.get_landcell(pos.ObjCellID) as SortCell;
+                    var icellid = ((ulong) Instance << 32 | (ulong) pos.ObjCellID);
+                    var sortCell = LScape.get_landcell(icellid) as SortCell;
                     if (sortCell != null && sortCell.has_building())
                         return;
 
@@ -309,18 +322,19 @@ namespace ACE.Server.Entity
                             // then we'll end up updating the global weenie (from the cache), instead of just this specific biota.
                             if (wo.Biota.PropertiesGenerator == wo.Weenie.PropertiesGenerator)
                             {
-                                wo.Biota.PropertiesGenerator = new List<PropertiesGenerator>(wo.Weenie.PropertiesGenerator.Count);
+                                wo.Biota.PropertiesGenerator =
+                                    new List<PropertiesGenerator>(wo.Weenie.PropertiesGenerator.Count);
 
                                 foreach (var record in wo.Weenie.PropertiesGenerator)
                                     wo.Biota.PropertiesGenerator.Add(record.Clone());
                             }
 
                             foreach (var profile in wo.Biota.PropertiesGenerator)
-                                profile.Delay = (float)PropertyManager.GetDouble("encounter_delay").Item;
+                                profile.Delay = (float) PropertyManager.GetDouble("encounter_delay").Item;
                         }
                     }
 
-                    AddWorldObject(wo);
+                    actionQueue.EnqueueAction(new ActionEventDelegate(() => { AddWorldObject(wo); }));
                 }));
             }
         }
@@ -375,7 +389,7 @@ namespace ACE.Server.Entity
                 var weenie = DatabaseManager.World.GetCachedWeenie(obj.WeenieClassId);
                 WeenieMeshes.Add(
                     new ModelMesh(weenie.GetProperty(PropertyDataId.Setup) ?? 0,
-                    new DatLoader.Entity.Frame(new Position(obj.ObjCellId, obj.OriginX, obj.OriginY, obj.OriginZ, obj.AnglesX, obj.AnglesY, obj.AnglesZ, obj.AnglesW))));
+                    new DatLoader.Entity.Frame(new Position(obj.ObjCellId, obj.OriginX, obj.OriginY, obj.OriginZ, obj.AnglesX, obj.AnglesY, obj.AnglesZ, obj.AnglesW, this.Instance))));
             }
         }
 
@@ -848,6 +862,8 @@ namespace ACE.Server.Entity
 
             wo.CurrentLandblock = this;
 
+            wo.Location.Instance = Instance;
+
             if (wo.PhysicsObj == null)
                 wo.InitPhysicsObj();
             else
@@ -896,7 +912,7 @@ namespace ACE.Server.Entity
 
                     if (corpse != null)
                     {
-                        log.Warn($"[CORPSE] Landblock.AddWorldObjectInternal(): {wo.Name} (0x{wo.Guid}) exceeds the per player limit of {corpseLimit} corpses for 0x{Id.Landblock:X4}. Adjusting TimeToRot for oldest {corpse.Name} (0x{corpse.Guid}), CreationTimestamp: {corpse.CreationTimestamp} ({Common.Time.GetDateTimeFromTimestamp(corpse.CreationTimestamp ?? 0).ToLocalTime():yyyy-MM-dd HH:mm:ss}), to Corpse.EmptyDecayTime({Corpse.EmptyDecayTime}).");
+                        log.Warn($"[CORPSE] Landblock.AddWorldObjectInternal(): {wo.Name} (0x{wo.Guid}) exceeds the per player limit of {corpseLimit} corpses for 0x{Id:X4}. Adjusting TimeToRot for oldest {corpse.Name} (0x{corpse.Guid}), CreationTimestamp: {corpse.CreationTimestamp} ({Common.Time.GetDateTimeFromTimestamp(corpse.CreationTimestamp ?? 0).ToLocalTime():yyyy-MM-dd HH:mm:ss}), to Corpse.EmptyDecayTime({Corpse.EmptyDecayTime}).");
                         corpse.TimeToRot = Corpse.EmptyDecayTime;
                     }
                 }
@@ -1112,8 +1128,6 @@ namespace ACE.Server.Entity
         /// </summary>
         public void Unload()
         {
-            var landblockID = Id.Raw | 0xFFFF;
-
             //log.Debug($"Landblock.Unload({landblockID:X8})");
 
             ProcessPendingWorldObjectAdditionsAndRemovals();
@@ -1134,7 +1148,7 @@ namespace ACE.Server.Entity
             actionQueue.Clear();
 
             // remove physics landblock
-            LScape.unload_landblock(landblockID);
+            LScape.unload_landblock(Id);
         }
 
         public void DestroyAllNonPlayerObjects()
@@ -1221,6 +1235,9 @@ namespace ACE.Server.Entity
 
         private bool? isDungeon;
 
+        public byte LandblockX => (byte)((Id >> 24) & 0xFF);
+        public byte LandblockY => (byte)((Id >> 16) & 0xFF);
+
         /// <summary>
         /// Returns TRUE if this landblock is a dungeon,
         /// with no traversable overworld
@@ -1236,7 +1253,7 @@ namespace ACE.Server.Entity
                 // hack for NW island
                 // did a worldwide analysis for adding watercells into the formula,
                 // but they are inconsistently defined for some of the edges of map unfortunately
-                if (Id.LandblockX < 0x08 && Id.LandblockY > 0xF8)
+                if (LandblockX < 0x08 && LandblockY > 0xF8)
                 {
                     isDungeon = false;
                     return isDungeon.Value;
@@ -1282,7 +1299,6 @@ namespace ACE.Server.Entity
                 return hasDungeon.Value;
             }
         }
-
 
         public List<House> Houses = new List<House>();
 

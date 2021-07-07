@@ -285,6 +285,7 @@ namespace ACE.Server.WorldObjects
         public void SetRequestedLocation(Position pos, bool broadcast = true)
         {
             RequestedLocation = pos;
+            RequestedLocation.Instance = Location.Instance;
             RequestedLocationBroadcast = broadcast;
         }
 

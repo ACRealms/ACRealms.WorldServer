@@ -237,7 +237,7 @@ namespace ACE.Server.WorldObjects
             set { if (!value) RemoveProperty(PropertyBool.CorpseGeneratedRare); else SetProperty(PropertyBool.CorpseGeneratedRare, value); }
         }
 
-        public bool IsOnNoDropLandblock => Location != null ? NoDrop_Landblocks.Contains(Location.LandblockId.Landblock) : false;
+        public bool IsOnNoDropLandblock => Location != null ? NoDrop_Landblocks.Contains(Location.Landblock) : false;
 
         public override bool EnterWorld()
         {

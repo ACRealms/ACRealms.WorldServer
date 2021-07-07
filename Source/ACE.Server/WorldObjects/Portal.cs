@@ -54,12 +54,9 @@ namespace ACE.Server.WorldObjects
 
             if (RelativeDestination != null && Location != null && Destination == null)
             {
-                var relativeDestination = new Position(Location);
-                relativeDestination.Pos += new Vector3(RelativeDestination.PositionX, RelativeDestination.PositionY, RelativeDestination.PositionZ);
-                relativeDestination.Rotation = new Quaternion(RelativeDestination.RotationX, relativeDestination.RotationY, relativeDestination.RotationZ, relativeDestination.RotationW);
-                relativeDestination.LandblockId = new LandblockId(relativeDestination.GetCell());
+                var destination = new Position(Location.ObjCellID, Location.Pos + RelativeDestination.Pos, RelativeDestination.Rotation, true, Location.Instance);
 
-                UpdatePortalDestination(relativeDestination);
+                UpdatePortalDestination(destination);
             }
 
             return true;
@@ -275,7 +272,7 @@ namespace ACE.Server.WorldObjects
             var portalDest = new Position(Destination);
             AdjustDungeon(portalDest);
 
-            WorldManager.ThreadSafeTeleport(player, portalDest, new ActionEventDelegate(() =>
+            WorldManager.ThreadSafeTeleport(player, portalDest, false, new ActionEventDelegate(() =>
             {
                 // If the portal just used is able to be recalled to,
                 // save the destination coordinates to the LastPortal character position save table

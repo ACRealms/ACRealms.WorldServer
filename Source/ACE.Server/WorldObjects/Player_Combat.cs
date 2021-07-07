@@ -996,12 +996,12 @@ namespace ACE.Server.WorldObjects
 
         public bool CheckHouseRestrictions(Player player)
         {
-            if (Location.Cell == player.Location.Cell)
+            if (Location.ObjCellID == player.Location.ObjCellID)
                 return true;
 
             // dealing with outdoor cell equivalents at this point, if applicable
-            var cell = (CurrentLandblock?.IsDungeon ?? false) ? Location.Cell : Location.GetOutdoorCell();
-            var playerCell = (player.CurrentLandblock?.IsDungeon ?? false) ? player.Location.Cell : player.Location.GetOutdoorCell();
+            var cell = (CurrentLandblock?.IsDungeon ?? false) ? Location.ObjCellID : Location.GetOutdoorCell();
+            var playerCell = (player.CurrentLandblock?.IsDungeon ?? false) ? player.Location.ObjCellID : player.Location.GetOutdoorCell();
 
             if (cell == playerCell)
                 return true;
@@ -1042,7 +1042,7 @@ namespace ACE.Server.WorldObjects
                 houses.Add(rootHouse);
             }
             else
-                log.Error($"{Name}.CheckHouseRestrictions_GetHouse({houseGuid:X8}): couldn't find house from {CurrentLandblock.Id.Raw:X8}");
+                log.Error($"{Name}.CheckHouseRestrictions_GetHouse({houseGuid:X8}): couldn't find house from {CurrentLandblock.Id:X8}");
         }
 
         /// <summary>

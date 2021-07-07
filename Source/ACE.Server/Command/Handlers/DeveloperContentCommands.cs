@@ -1046,7 +1046,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             uint? parentGuid = null;
 
-            var landblock = session.Player.CurrentLandblock.Id.Landblock;
+            var landblock = session.Player.CurrentLandblock.ShortId;
 
             var firstStaticGuid = 0x70000000 | (uint)landblock << 12;
 

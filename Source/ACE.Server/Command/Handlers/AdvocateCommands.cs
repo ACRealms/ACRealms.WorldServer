@@ -185,14 +185,14 @@ namespace ACE.Server.Command.Handlers
             if (!CommandParameterHelpers.ResolveACEParameters(session, parameters, aceParams)) return;
 
             // Check if water block
-            var landblock = LScape.get_landblock(aceParams[1].AsPosition.LandblockId.Raw);
+            var landblock = LScape.get_landblock(aceParams[1].AsPosition.ObjCellID);
             if (landblock.WaterType == LandDefs.WaterType.EntirelyWater)
             {
-                ChatPacket.SendServerMessage(session, $"Landblock 0x{aceParams[1].AsPosition.LandblockId.Landblock:X4} is entirely filled with water, and is impassable", ChatMessageType.Broadcast);
+                ChatPacket.SendServerMessage(session, $"Landblock 0x{aceParams[1].AsPosition.Landblock:X4} is entirely filled with water, and is impassable", ChatMessageType.Broadcast);
                 return;
             }
 
-            ChatPacket.SendServerMessage(session, $"Position: [Cell: 0x{aceParams[1].AsPosition.LandblockId.Landblock:X4} | Offset: {aceParams[1].AsPosition.PositionX}, "+
+            ChatPacket.SendServerMessage(session, $"Position: [Cell: 0x{aceParams[1].AsPosition.Landblock:X4} | Offset: {aceParams[1].AsPosition.PositionX}, "+
                 $"{aceParams[1].AsPosition.PositionY}, {aceParams[1].AsPosition.PositionZ} | Facing: {aceParams[1].AsPosition.RotationX}, {aceParams[1].AsPosition.RotationY}, " +
                 $"{ aceParams[1].AsPosition.RotationZ}, {aceParams[1].AsPosition.RotationW}]", ChatMessageType.Broadcast);
 

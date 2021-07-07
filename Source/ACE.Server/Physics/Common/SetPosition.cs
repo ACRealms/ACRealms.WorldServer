@@ -30,6 +30,7 @@ namespace ACE.Server.Physics.Common
     public class SetPosition
     {
         public Position Pos;
+        public uint Instance;
         public SetPositionFlags Flags;
         public Vector3 Line;
         public float RadX;

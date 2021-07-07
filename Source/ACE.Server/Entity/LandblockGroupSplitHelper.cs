@@ -25,10 +25,10 @@ namespace ACE.Server.Entity
         {
             if (landblocks.Add(landblock))
             {
-                if (landblock.Id.LandblockX < xMin) xMin = landblock.Id.LandblockX;
-                if (landblock.Id.LandblockX > xMax) xMax = landblock.Id.LandblockX;
-                if (landblock.Id.LandblockY < yMin) yMin = landblock.Id.LandblockY;
-                if (landblock.Id.LandblockY > yMax) yMax = landblock.Id.LandblockY;
+                if (landblock.LandblockX < xMin) xMin = landblock.LandblockX;
+                if (landblock.LandblockX > xMax) xMax = landblock.LandblockX;
+                if (landblock.LandblockY < yMin) yMin = landblock.LandblockY;
+                if (landblock.LandblockY > yMax) yMax = landblock.LandblockY;
 
                 xCenter = xMin + ((xMax - xMin) / 2.0);
                 yCenter = yMin + ((yMax - yMin) / 2.0);

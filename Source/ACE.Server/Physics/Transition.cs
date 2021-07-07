@@ -25,6 +25,7 @@ namespace ACE.Server.Physics.Animation
         public CollisionInfo CollisionInfo;
         public CellArray CellArray;
         public ObjCell NewCellPtr;
+        public uint Instance;
 
         public Transition()
         {
@@ -91,7 +92,7 @@ namespace ACE.Server.Physics.Animation
             SpherePath.CellArrayValid = true;
             SpherePath.HitsInteriorCell = false;
 
-            ObjCell.find_cell_list(CellArray, ref newCell, SpherePath);
+            ObjCell.find_cell_list(CellArray, ref newCell, SpherePath, Instance);
         }
 
         public void CalcNumSteps(ref Vector3 offset, ref Vector3 offsetPerStep, ref int numSteps)
@@ -156,7 +157,7 @@ namespace ACE.Server.Physics.Animation
 
             //ObjCell newCell = null;
             var newCell = new ObjCell();    // null check?
-            ObjCell.find_cell_list(CellArray, ref newCell, SpherePath);
+            ObjCell.find_cell_list(CellArray, ref newCell, SpherePath, Instance);
 
             for (var i = 0; i < CellArray.Cells.Count; i++)
             {
@@ -491,7 +492,7 @@ namespace ACE.Server.Physics.Animation
             return result == TransitionState.OK;
         }
 
-        public bool FindTransitionalPosition()
+        public bool FindTransitionalPosition(uint instance)
         {
             if (SpherePath.BeginCell == null) return false;
 
@@ -525,7 +526,7 @@ namespace ACE.Server.Physics.Animation
                 SpherePath.HitsInteriorCell = false;
 
                 ObjCell empty = null;
-                ObjCell.find_cell_list(CellArray, ref empty, SpherePath);
+                ObjCell.find_cell_list(CellArray, ref empty, SpherePath, instance);
                 return true;
             }
 
@@ -593,10 +594,10 @@ namespace ACE.Server.Physics.Animation
             return transitionState == TransitionState.OK;
         }
 
-        public bool FindValidPosition()
+        public bool FindValidPosition(uint instance)
         {
             if (SpherePath.InsertType == InsertType.Transition)
-                return FindTransitionalPosition();
+                return FindTransitionalPosition(instance);
             else
                 return FindPlacementPosition();
         }
@@ -687,9 +688,9 @@ namespace ACE.Server.Physics.Animation
         /// Initializes a new default transition
         /// </summary>
         /// <returns></returns>
-        public static Transition MakeTransition()
+        public static Transition MakeTransition(uint instance)
         {
-            var transition = new Transition();
+            var transition = new Transition() { Instance = instance };
             transition.Init();
             return transition;
         }

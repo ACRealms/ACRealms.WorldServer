@@ -185,7 +185,7 @@ namespace ACE.Server.WorldObjects
         {
             //Console.WriteLine($"{Name}.MoveTo_Tick()");
 
-            PhysicsObj.update_object();
+            PhysicsObj.update_object(Location.Instance);
 
             if (IsMoving)
                 Enqueue_NextMoveTick();
