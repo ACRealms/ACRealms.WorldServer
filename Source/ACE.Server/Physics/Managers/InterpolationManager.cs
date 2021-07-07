@@ -139,7 +139,7 @@ namespace ACE.Server.Physics.Animation
             NodeFailCounter = 0;
         }
 
-        public void UseTime()
+        public void UseTime(uint instance)
         {
             if (PhysicsObj == null)
                 return;
@@ -151,7 +151,7 @@ namespace ACE.Server.Physics.Animation
                 var last = PositionQueue.Last.Value;
                 if (last.Type != InterpolationNodeType.JumpType && last.Type != InterpolationNodeType.VelocityType)
                 {
-                    if (PhysicsObj.SetPositionSimple(last.Position, true) != SetPositionError.OK)
+                    if (PhysicsObj.SetPositionSimple(last.Position, true, instance) != SetPositionError.OK)
                         return;
 
                     StopInterpolating();
@@ -165,7 +165,7 @@ namespace ACE.Server.Physics.Animation
                         var node = PositionQueue.ElementAt(i);
                         if (node.Type == InterpolationNodeType.PositionType)
                         {
-                            if (PhysicsObj.SetPositionSimple(node.Position, true) != SetPositionError.OK)
+                            if (PhysicsObj.SetPositionSimple(node.Position, true, instance) != SetPositionError.OK)
                                 return;
 
                             PhysicsObj.set_velocity(last.Velocity, true);
@@ -175,7 +175,7 @@ namespace ACE.Server.Physics.Animation
                     }
                 }
 
-                if (PhysicsObj.SetPositionSimple(BlipToPosition, true) != SetPositionError.OK)
+                if (PhysicsObj.SetPositionSimple(BlipToPosition, true, instance) != SetPositionError.OK)
                     return;
 
                 StopInterpolating();

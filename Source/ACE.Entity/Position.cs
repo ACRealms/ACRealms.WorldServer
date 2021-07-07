@@ -7,38 +7,38 @@ namespace ACE.Entity
 {
     public class Position
     {
-        private LandblockId landblockId;
+        public uint ObjCellID { get; set; }
 
-        public LandblockId LandblockId
-        {
-            get => landblockId.Raw != 0 ? landblockId : new LandblockId(Cell);
-            set => landblockId = value;
-        }
+        public ushort Landblock => (ushort)(ObjCellID >> 16);
 
-        public uint Landblock { get => landblockId.Raw >> 16; }
+        public ushort Cell => (ushort)ObjCellID;
 
-        // FIXME: this is returning landblock + cell
-        public uint Cell { get => landblockId.Raw; }
+        public byte LandblockX => (byte)(ObjCellID >> 24);
 
-        public uint CellX { get => landblockId.Raw >> 8 & 0xFF; }
-        public uint CellY { get => landblockId.Raw & 0xFF; }
+        public byte LandblockY => (byte)(ObjCellID >> 16);
 
-        public uint LandblockX { get => landblockId.Raw >> 24 & 0xFF; }
-        public uint LandblockY { get => landblockId.Raw >> 16 & 0xFF; }
-        public uint GlobalCellX { get => LandblockX * 8 + CellX; }
-        public uint GlobalCellY { get => LandblockY * 8 + CellY; }
+        public byte CellX => (byte)(ObjCellID >> 8);
+
+        public byte CellY => (byte)ObjCellID;
+
+        public bool Indoors => (ObjCellID & 0xFFFF) >= 0x100;
+
+        public uint Instance;
+
+        public ulong LongObjCellID => (ulong)Instance << 32 | ObjCellID;
+        public ulong LongLandblockID => ((ulong)Instance << 32 | ObjCellID) | 0xFFFF;
+
+        public Vector3 _pos;
 
         public Vector3 Pos
         {
-            get => new Vector3(PositionX, PositionY, PositionZ);
+            get => _pos;
             set => SetPosition(value);
         }
 
         public Tuple<bool, bool> SetPosition(Vector3 pos)
         {
-            PositionX = pos.X;
-            PositionY = pos.Y;
-            PositionZ = pos.Z;
+            _pos = pos;
 
             var blockUpdate = SetLandblock();
             var cellUpdate = SetLandCell();
@@ -46,33 +46,12 @@ namespace ACE.Entity
             return new Tuple<bool, bool>(blockUpdate, cellUpdate);
         }
 
-        public Quaternion Rotation
-        {
-            get => new Quaternion(RotationX, RotationY, RotationZ, RotationW);
-            set
-            {
-                RotationW = value.W;
-                RotationX = value.X;
-                RotationY = value.Y;
-                RotationZ = value.Z;
-            }
-        }
+        public Quaternion Rotation;
 
         public void Rotate(Vector3 dir)
         {
             Rotation = Quaternion.CreateFromYawPitchRoll(0, 0, (float)Math.Atan2(-dir.X, dir.Y));
         }
-
-        // TODO: delete this, use proper Vector3 and Quaternion
-        public float PositionX { get; set; }
-        public float PositionY { get; set; }
-        public float PositionZ { get; set; }
-        public float RotationW { get; set; }
-        public float RotationX { get; set; }
-        public float RotationY { get; set; }
-        public float RotationZ { get; set; }
-
-        public bool Indoors => landblockId.Indoors;
 
         /// <summary>
         /// Returns the normalized 2D heading direction
@@ -80,128 +59,6 @@ namespace ACE.Entity
         public Vector3 GetCurrentDir()
         {
             return Vector3.Normalize(Vector3.Transform(Vector3.UnitY, Rotation));
-        }
-
-        /// <summary>
-        /// Returns this vector as a unit vector
-        /// with a length of 1
-        /// </summary>
-        public Vector3 Normalize(Vector3 v)
-        {
-            var invLen = 1.0f / v.Length();
-            return v * invLen;
-        }
-
-        public Position InFrontOf(double distanceInFront, bool rotate180 = false)
-        {
-            float qw = RotationW; // north
-            float qz = RotationZ; // south
-
-            double x = 2 * qw * qz;
-            double y = 1 - 2 * qz * qz;
-
-            var heading = Math.Atan2(x, y);
-            var dx = -1 * Convert.ToSingle(Math.Sin(heading) * distanceInFront);
-            var dy = Convert.ToSingle(Math.Cos(heading) * distanceInFront);
-
-            // move the Z slightly up and let gravity pull it down.  just makes things easier.
-            var bumpHeight = 0.05f;
-            if (rotate180)
-            {
-                var rotate = new Quaternion(0, 0, qz, qw) * Quaternion.CreateFromYawPitchRoll(0, 0, (float)Math.PI);
-                return new Position(LandblockId.Raw, PositionX + dx, PositionY + dy, PositionZ + bumpHeight, 0f, 0f, rotate.Z, rotate.W);
-            }
-            else
-                return new Position(LandblockId.Raw, PositionX + dx, PositionY + dy, PositionZ + bumpHeight, 0f, 0f, qz, qw);
-        }
-
-        /// <summary>
-        /// Handles the Position crossing over landblock boundaries
-        /// </summary>
-        public bool SetLandblock()
-        {
-            if (Indoors) return false;
-
-            var changedBlock = false;
-
-            if (PositionX < 0)
-            {
-                var blockOffset = (int)PositionX / BlockLength - 1;
-                var landblock = LandblockId.TransitionX(blockOffset);
-                if (landblock != null)
-                {
-                    LandblockId = landblock.Value;
-                    PositionX -= BlockLength * blockOffset;
-                    changedBlock = true;
-                }
-                else
-                    PositionX = 0;
-            }
-
-            if (PositionX >= BlockLength)
-            {
-                var blockOffset = (int)PositionX / BlockLength;
-                var landblock = LandblockId.TransitionX(blockOffset);
-                if (landblock != null)
-                {
-                    LandblockId = landblock.Value;
-                    PositionX -= BlockLength * blockOffset;
-                    changedBlock = true;
-                }
-                else
-                    PositionX = BlockLength;
-            }
-
-            if (PositionY < 0)
-            {
-                var blockOffset = (int)PositionY / BlockLength - 1;
-                var landblock = LandblockId.TransitionY(blockOffset);
-                if (landblock != null)
-                {
-                    LandblockId = landblock.Value;
-                    PositionY -= BlockLength * blockOffset;
-                    changedBlock = true;
-                }
-                else
-                    PositionY = 0;
-            }
-
-            if (PositionY >= BlockLength)
-            {
-                var blockOffset = (int)PositionY / BlockLength;
-                var landblock = LandblockId.TransitionY(blockOffset);
-                if (landblock != null)
-                {
-                    LandblockId = landblock.Value;
-                    PositionY -= BlockLength * blockOffset;
-                    changedBlock = true;
-                }
-                else
-                    PositionY = BlockLength;
-            }
-
-            return changedBlock;
-        }
-
-        /// <summary>
-        /// Determines the outdoor landcell for current position
-        /// </summary>
-        public bool SetLandCell()
-        {
-            if (Indoors) return false;
-
-            var cellX = (uint)PositionX / CellLength;
-            var cellY = (uint)PositionY / CellLength;
-
-            var cellID = cellX * CellSide + cellY + 1;
-
-            var curCellID = LandblockId.Raw & 0xFFFF;
-
-            if (cellID == curCellID)
-                return false;
-
-            LandblockId = new LandblockId((uint)((LandblockId.Raw & 0xFFFF0000) | cellID));
-            return true;
         }
 
         public Position()
@@ -212,46 +69,49 @@ namespace ACE.Entity
 
         public Position(Position pos)
         {
-            LandblockId = new LandblockId(pos.LandblockId.Raw);
+            ObjCellID = pos.ObjCellID;
             Pos = pos.Pos;
             Rotation = pos.Rotation;
+
+            Instance = pos.Instance;
         }
 
-        public Position(uint blockCellID, float newPositionX, float newPositionY, float newPositionZ, float newRotationX, float newRotationY, float newRotationZ, float newRotationW)
-        {
-            LandblockId = new LandblockId(blockCellID);
 
-            Pos = new Vector3(newPositionX, newPositionY, newPositionZ);
+        public Position(uint blockCellID, float newPositionX, float newPositionY, float newPositionZ, float newRotationX, float newRotationY, float newRotationZ, float newRotationW, uint instance)
+        { 
+            ObjCellID = blockCellID;
+
+            Instance = instance;
+
+            _pos = new Vector3(newPositionX, newPositionY, newPositionZ);
             Rotation = new Quaternion(newRotationX, newRotationY, newRotationZ, newRotationW);
 
-            if ((blockCellID & 0xFFFF) == 0)
-                SetPosition(Pos);
+            if (Cell == 0)
+                SetPosition(_pos);
         }
 
-        public Position(uint blockCellID, Vector3 position, Quaternion rotation)
+        public Position(uint blockCellID, Vector3 position, Quaternion rotation, bool normalize, uint instance)
         {
-            LandblockId = new LandblockId(blockCellID);
+            ObjCellID = blockCellID;
 
-            Pos = position;
+            _pos = position;
             Rotation = rotation;
+            Instance = instance;
 
-            if ((blockCellID & 0xFFFF) == 0)
-                SetPosition(Pos);
+            if (Cell == 0 || normalize)
+                SetPosition(_pos);
         }
 
         public Position(BinaryReader payload)
         {
-            LandblockId = new LandblockId(payload.ReadUInt32());
+            ObjCellID = payload.ReadUInt32();
 
-            PositionX = payload.ReadSingle();
-            PositionY = payload.ReadSingle();
-            PositionZ = payload.ReadSingle();
+            Pos = new Vector3(payload.ReadSingle(), payload.ReadSingle(), payload.ReadSingle());
 
             // packet stream isn't the same order as the quaternion constructor
-            RotationW = payload.ReadSingle();
-            RotationX = payload.ReadSingle();
-            RotationY = payload.ReadSingle();
-            RotationZ = payload.ReadSingle();
+            var w = payload.ReadSingle();
+
+            Rotation = new Quaternion(payload.ReadSingle(), payload.ReadSingle(), payload.ReadSingle(), w);
         }
 
         public Position(float northSouth, float eastWest)
@@ -263,72 +123,19 @@ namespace ACE.Entity
             var baseY = (uint)(northSouth + 0x400);
 
             if (baseX >= 0x7F8 || baseY >= 0x7F8)
-                throw new Exception("Bad coordinates");  // TODO: Instead of throwing exception should we set to a default location?
+            {
+                Console.WriteLine($"Position({northSouth}, {eastWest}) - bad coordinates");
+                return;
+            }
 
             float xOffset = ((baseX & 7) * 24.0f) + 12;
             float yOffset = ((baseY & 7) * 24.0f) + 12;
-            // float zOffset = GetZFromCellXY(LandblockId.Raw, xOffset, yOffset);
-            const float zOffset = 0.0f;
 
-            LandblockId = new LandblockId(GetCellFromBase(baseX, baseY));
-            PositionX = xOffset;
-            PositionY = yOffset;
-            PositionZ = zOffset;
+            ObjCellID = GetCellFromBase(baseX, baseY);
+
+            Pos = new Vector3(xOffset, yOffset, 0);
+
             Rotation = Quaternion.Identity;
-        }
-
-        public void Serialize(BinaryWriter payload, PositionFlags positionFlags, int animationFrame, bool writeLandblock = true)
-        {
-            payload.Write((uint)positionFlags);
-
-            if (writeLandblock)
-                payload.Write(LandblockId.Raw);
-
-            payload.Write(PositionX);
-            payload.Write(PositionY);
-            payload.Write(PositionZ);
-
-            if ((positionFlags & PositionFlags.OrientationHasNoW) == 0)
-                payload.Write(RotationW);
-
-            if ((positionFlags & PositionFlags.OrientationHasNoX) == 0)
-                payload.Write(RotationX);
-
-            if ((positionFlags & PositionFlags.OrientationHasNoY) == 0)
-                payload.Write(RotationY);
-
-            if ((positionFlags & PositionFlags.OrientationHasNoZ) == 0)
-                payload.Write(RotationZ);
-
-            if ((positionFlags & PositionFlags.HasPlacementID) != 0)
-                // TODO: this is current animationframe_id when we are animating (?) - when we are not, how are we setting on the ground Position_id.
-                payload.Write(animationFrame);
-
-            if ((positionFlags & PositionFlags.HasVelocity) != 0)
-            {
-                // velocity would go here
-                payload.Write(0f);
-                payload.Write(0f);
-                payload.Write(0f);
-            }
-        }
-
-        public void Serialize(BinaryWriter payload, bool writeQuaternion = true, bool writeLandblock = true)
-        {
-            if (writeLandblock)
-                payload.Write(LandblockId.Raw);
-
-            payload.Write(PositionX);
-            payload.Write(PositionY);
-            payload.Write(PositionZ);
-
-            if (writeQuaternion)
-            {
-                payload.Write(RotationW);
-                payload.Write(RotationX);
-                payload.Write(RotationY);
-                payload.Write(RotationZ);
-            }
         }
 
         private uint GetCellFromBase(uint baseX, uint baseY)
@@ -344,25 +151,190 @@ namespace ACE.Entity
             return (block << 16) | (cell + 1);
         }
 
+        public static readonly Quaternion OneEighty = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.PI);
+
+        public Position InFrontOf(float distance, bool rotate180 = false)
+        {
+            var pos = Pos + Vector3.Transform(Vector3.UnitY * distance, Rotation);
+
+            var angle = Rotation;
+            if (rotate180)
+                angle *= OneEighty;
+
+            // move the Z slightly up due to variations in ac physics engine
+            pos.Z += 0.05f;
+
+            return new Position(ObjCellID, pos, angle, true, Instance);
+        }
+
+
+        public static readonly int BlockLength = 192;
+
+        /// <summary>
+        /// Handles the Position crossing over landblock boundaries
+        /// </summary>
+        public bool SetLandblock()
+        {
+            if (Indoors) return false;
+
+            var changedBlock = false;
+
+            if (Pos.X < 0)
+            {
+                var blockOffset = (int)Pos.X / BlockLength - 1;
+                var landblock = TransitionX(blockOffset);
+                if (landblock != null)
+                {
+                    ObjCellID = landblock.Value;
+                    _pos.X -= BlockLength * blockOffset;
+                    changedBlock = true;
+                }
+                else
+                    _pos.X = 0;
+            }
+
+            else if (Pos.X >= BlockLength)
+            {
+                var blockOffset = (int)Pos.X / BlockLength;
+                var landblock = TransitionX(blockOffset);
+                if (landblock != null)
+                {
+                    ObjCellID = landblock.Value;
+                    _pos.X -= BlockLength * blockOffset;
+                    changedBlock = true;
+                }
+                else
+                    _pos.X = BlockLength;
+            }
+
+            if (Pos.Y < 0)
+            {
+                var blockOffset = (int)Pos.Y / BlockLength - 1;
+                var landblock = TransitionY(blockOffset);
+                if (landblock != null)
+                {
+                    ObjCellID = landblock.Value;
+                    _pos.Y -= BlockLength * blockOffset;
+                    changedBlock = true;
+                }
+                else
+                    _pos.Y = 0;
+            }
+
+            else if (Pos.Y >= BlockLength)
+            {
+                var blockOffset = (int)Pos.Y / BlockLength;
+                var landblock = TransitionY(blockOffset);
+                if (landblock != null)
+                {
+                    ObjCellID = landblock.Value;
+                    _pos.Y -= BlockLength * blockOffset;
+                    changedBlock = true;
+                }
+                else
+                    _pos.Y = BlockLength;
+            }
+
+            return changedBlock;
+        }
+
+        public uint? TransitionX(int blockOffset)
+        {
+            var newX = LandblockX + blockOffset;
+            if (newX < 0 || newX > 254)
+                return null;
+            else
+                return (uint)(newX << 24 | LandblockY << 16 | Cell);
+        }
+
+        public uint? TransitionY(int blockOffset)
+        {
+            var newY = LandblockY + blockOffset;
+            if (newY < 0 || newY > 254)
+                return null;
+            else
+                return (uint)(LandblockX << 24 | newY << 16 | Cell);
+        }
+
+        public static readonly int CellSide = 8;
+        public static readonly int CellLength = 24;
+
+        /// <summary>
+        /// Determines the outdoor landcell for current position
+        /// </summary>
+        public bool SetLandCell()
+        {
+            if (Indoors) return false;
+
+            var cellX = (uint)Pos.X / CellLength;
+            var cellY = (uint)Pos.Y / CellLength;
+
+            var cellID = cellX * CellSide + cellY + 1;
+
+            var curCellID = ObjCellID & 0xFFFF;
+
+            if (cellID == curCellID)
+                return false;
+
+            ObjCellID = (uint)((ObjCellID & 0xFFFF0000) | cellID);
+
+            return true;
+        }
+
+        public void Serialize(BinaryWriter payload, bool writeQuaternion = true, bool writeLandblock = true)
+        {
+            if (writeLandblock)
+                payload.Write(ObjCellID);
+
+            payload.Write(Pos.X);
+            payload.Write(Pos.Y);
+            payload.Write(Pos.Z);
+
+            if (writeQuaternion)
+            {
+                payload.Write(Rotation.W);
+                payload.Write(Rotation.X);
+                payload.Write(Rotation.Y);
+                payload.Write(Rotation.Z);
+            }
+        }
+
+        /// <summary>
+        /// Returns the 3D distance between 2 objects
+        /// </summary>
+        public float DistanceTo(Position p)
+        {
+            if (Landblock == p.Landblock)
+            {
+                return Vector3.Distance(Pos, p.Pos);
+            }
+            else
+            {
+                var dx = (LandblockX - p.LandblockX) * 192 + Pos.X - p.Pos.X;
+                var dy = (LandblockY - p.LandblockY) * 192 + Pos.Y - p.Pos.Y;
+
+                var dz = Pos.Z - p.Pos.Z;
+
+                return (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
+            }
+        }
+
         /// <summary>
         /// Returns the 3D squared distance between 2 objects
         /// </summary>
         public float SquaredDistanceTo(Position p)
         {
-            if (p.LandblockId == this.LandblockId)
+            if (Landblock == p.Landblock)
             {
-                var dx = this.PositionX - p.PositionX;
-                var dy = this.PositionY - p.PositionY;
-                var dz = this.PositionZ - p.PositionZ;
-                return dx * dx + dy * dy + dz * dz;
+                return Vector3.DistanceSquared(Pos, p.Pos);
             }
-            //if (p.LandblockId.MapScope == MapScope.Outdoors && this.LandblockId.MapScope == MapScope.Outdoors)
             else
             {
-                // verify this is working correctly if one of these is indoors
-                var dx = (this.LandblockId.LandblockX - p.LandblockId.LandblockX) * 192 + this.PositionX - p.PositionX;
-                var dy = (this.LandblockId.LandblockY - p.LandblockId.LandblockY) * 192 + this.PositionY - p.PositionY;
-                var dz = this.PositionZ - p.PositionZ;
+                var dx = (LandblockX - p.LandblockX) * 192 + Pos.X - p.Pos.X;
+                var dy = (LandblockY - p.LandblockY) * 192 + Pos.Y - p.Pos.Y;
+
+                var dz = Pos.Z - p.Pos.Z;
+
                 return dx * dx + dy * dy + dz * dz;
             }
         }
@@ -372,19 +344,18 @@ namespace ACE.Entity
         /// </summary>
         public float Distance2D(Position p)
         {
-            // originally this returned the offset instead of distance...
-            if (p.LandblockId == this.LandblockId)
+            if (Landblock == p.Landblock)
             {
-                var dx = this.PositionX - p.PositionX;
-                var dy = this.PositionY - p.PositionY;
+                var dx = Pos.X - p.Pos.X;
+                var dy = Pos.Y - p.Pos.Y;
+
                 return (float)Math.Sqrt(dx * dx + dy * dy);
             }
-            //if (p.LandblockId.MapScope == MapScope.Outdoors && this.LandblockId.MapScope == MapScope.Outdoors)
             else
             {
-                // verify this is working correctly if one of these is indoors
-                var dx = (this.LandblockId.LandblockX - p.LandblockId.LandblockX) * 192 + this.PositionX - p.PositionX;
-                var dy = (this.LandblockId.LandblockY - p.LandblockId.LandblockY) * 192 + this.PositionY - p.PositionY;
+                var dx = (LandblockX - p.LandblockX) * 192 + Pos.X - p.Pos.X;
+                var dy = (LandblockY - p.LandblockY) * 192 + Pos.Y - p.Pos.Y;
+
                 return (float)Math.Sqrt(dx * dx + dy * dy);
             }
         }
@@ -394,63 +365,35 @@ namespace ACE.Entity
         /// </summary>
         public float Distance2DSquared(Position p)
         {
-            // originally this returned the offset instead of distance...
-            if (p.LandblockId == this.LandblockId)
+            if (Landblock == p.Landblock)
             {
-                var dx = this.PositionX - p.PositionX;
-                var dy = this.PositionY - p.PositionY;
+                var dx = Pos.X - p.Pos.X;
+                var dy = Pos.Y - p.Pos.Y;
+
                 return dx * dx + dy * dy;
             }
-            //if (p.LandblockId.MapScope == MapScope.Outdoors && this.LandblockId.MapScope == MapScope.Outdoors)
             else
             {
-                // verify this is working correctly if one of these is indoors
-                var dx = (this.LandblockId.LandblockX - p.LandblockId.LandblockX) * 192 + this.PositionX - p.PositionX;
-                var dy = (this.LandblockId.LandblockY - p.LandblockId.LandblockY) * 192 + this.PositionY - p.PositionY;
+                var dx = (LandblockX - p.LandblockX) * 192 + Pos.X - p.Pos.X;
+                var dy = (LandblockY - p.LandblockY) * 192 + Pos.Y - p.Pos.Y;
+
                 return dx * dx + dy * dy;
             }
-        }
-
-        /// <summary>
-        /// Returns the 3D distance between 2 objects
-        /// </summary>
-        public float DistanceTo(Position p)
-        {
-            // originally this returned the offset instead of distance...
-            if (p.LandblockId == this.LandblockId)
-            {
-                var dx = this.PositionX - p.PositionX;
-                var dy = this.PositionY - p.PositionY;
-                var dz = this.PositionZ - p.PositionZ;
-                return (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
-            }
-            //if (p.LandblockId.MapScope == MapScope.Outdoors && this.LandblockId.MapScope == MapScope.Outdoors)
-            else
-            {
-                // verify this is working correctly if one of these is indoors
-                var dx = (this.LandblockId.LandblockX - p.LandblockId.LandblockX) * 192 + this.PositionX - p.PositionX;
-                var dy = (this.LandblockId.LandblockY - p.LandblockId.LandblockY) * 192 + this.PositionY - p.PositionY;
-                var dz = this.PositionZ - p.PositionZ;
-
-                return (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
-            }
-        }
-
-        /// <summary>
-        /// Returns the offset from current position to input position
-        /// </summary>
-        public Vector3 GetOffset(Position p)
-        {
-            var dx = (p.LandblockId.LandblockX - LandblockId.LandblockX) * 192 + p.PositionX - PositionX;
-            var dy = (p.LandblockId.LandblockY - LandblockId.LandblockY) * 192 + p.PositionY - PositionY;
-            var dz = p.PositionZ - PositionZ;
-
-            return new Vector3(dx, dy, dz);
         }
 
         public override string ToString()
         {
-            return $"{LandblockId.Raw:X8} [{PositionX} {PositionY} {PositionZ}]";
+            return $"{ObjCellID:X8} [{Pos.X} {Pos.Y} {Pos.Z}]";
+        }
+
+        public string ToLOCString()
+        {
+            return $"0x{ObjCellID:X8} [{Pos.X} {Pos.Y} {Pos.Z}] {Rotation.W} {Rotation.X} {Rotation.Y} {Rotation.Z} {Instance}";
+        }
+
+        public bool Equals(Position p)
+        {
+            return ObjCellID == p.ObjCellID && Pos == p.Pos && Rotation == p.Rotation;
         }
 
         public string ToLOCString()

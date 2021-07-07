@@ -83,7 +83,7 @@ namespace ACE.Server.WorldObjects
 
                 // instead, we get all of the players in the lifestone landblock + adjacent landblocks,
                 // and possibly limit that to some radius around the landblock?
-                var lifestoneBlock = LandblockManager.GetLandblock(new LandblockId(Sanctuary.Landblock << 16 | 0xFFFF), true);
+                var lifestoneBlock = LandblockManager.GetLandblockBase(Sanctuary.ObjCellID, true);
                 lifestoneBlock.EnqueueBroadcast(excludePlayers, true, Sanctuary, LocalBroadcastRangeSq, broadcastMsg);
             }
 
@@ -231,7 +231,7 @@ namespace ACE.Server.WorldObjects
             // teleport to sanctuary or best location
             var newPosition = Sanctuary ?? Instantiation ?? Location;
 
-            WorldManager.ThreadSafeTeleport(this, newPosition, new ActionEventDelegate(() =>
+            WorldManager.ThreadSafeTeleport(this, newPosition, true, new ActionEventDelegate(() =>
             {
                 // Stand back up
                 SetCombatMode(CombatMode.NonCombat);

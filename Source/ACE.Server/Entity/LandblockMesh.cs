@@ -12,7 +12,7 @@ namespace ACE.Server.Entity
     /// </summary>
     public class LandblockMesh: Mesh
     {
-        public LandblockId LandblockId;
+        public uint LandblockId;
 
         /// <summary>
         /// The heights of the landblock cell vertices
@@ -56,7 +56,7 @@ namespace ACE.Server.Entity
         /// <summary>
         /// Constructs a new mesh for a landblock
         /// </summary>
-        public LandblockMesh(LandblockId id)
+        public LandblockMesh(uint id)
         {
             LandblockId = id;
 
@@ -82,7 +82,7 @@ namespace ACE.Server.Entity
             // The vertex heights in the cell database are stored in bytes,
             // which map to offsets in the land height table from the region file in the portal database.
 
-            var cellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(LandblockId.Raw | 0xFFFF);
+            var cellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(LandblockId);
 
             var heights = new float[VertexDim, VertexDim];
 
@@ -157,11 +157,14 @@ namespace ACE.Server.Entity
         /// <param name="cellX">The horizontal cell position within the landblock</param>
         /// <param name="cellY">The vertical cell position within the landblock</param>
         /// <returns>TRUE if NW-SE split, FALSE if NE-SW split</returns>
-        public bool GetSplitDir(LandblockId id, int cellX, int cellY)
+        public bool GetSplitDir(uint landblockID, int cellX, int cellY)
         {
+            var lbx = (byte)(landblockID >> 24);
+            var lby = (byte)(landblockID >> 16);
+
             // get the global tile offsets
-            var x = (id.LandblockX * 8) + cellX;
-            var y = (id.LandblockY * 8) + cellY;
+            var x = lbx * 8 + cellX;
+            var y = lby * 8 + cellY;
 
             // Thanks to https://github.com/deregtd/AC2D for this bit
             var dw = x * y * 0x0CCAC033 - x * 0x421BE3BD + y * 0x6C1AC587 - 0x519B8F25;

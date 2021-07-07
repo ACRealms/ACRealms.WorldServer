@@ -1224,9 +1224,8 @@ namespace ACE.Server.WorldObjects
                         }
 
                         if (summonLoc != null)
-                            summonLoc.LandblockId = new LandblockId(summonLoc.GetCell());
-
-                        if (SummonPortal(portalId, summonLoc, spell.PortalLifetime))
+                            summonLoc.ObjCellID = summonLoc.GetCell();
+                        if (SummonPortal(portalId, summonLoc, spell.PortalLifetime, player ?? targetPlayer))
                             EnqueueBroadcast(new GameMessageScript(Guid, spell.CasterEffect, spell.Formula.Scale));
                         else if (player != null)
                             player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.YouFailToSummonPortal));
@@ -1271,7 +1270,7 @@ namespace ACE.Server.WorldObjects
             gateway.Location = new Position(location);
             gateway.OriginalPortal = portalId;
 
-            gateway.UpdatePortalDestination(new Position(portal.Destination));
+            gateway.UpdatePortalDestination(targetPosition);
 
             gateway.TimeToRot = portalLifetime;
 
@@ -1482,7 +1481,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public Vector3 CalculateProjectileVelocity(Spell spell, WorldObject target, ProjectileSpellType spellType, Vector3 origin)
         {
-            var casterLoc = PhysicsObj.Position.ACEPosition();
+            var casterLoc = PhysicsObj.Position.ACEPosition(Location);
 
             var speed = GetProjectileSpeed(spell);
 
@@ -1495,7 +1494,7 @@ namespace ACE.Server.WorldObjects
                 return Vector3.Transform(Vector3.UnitY, casterLoc.Rotation) * speed;
             }
 
-            var targetLoc = target.PhysicsObj.Position.ACEPosition();
+            var targetLoc = target.PhysicsObj.Position.ACEPosition(target.Location);
 
             var strikeSpell = spellType == ProjectileSpellType.Strike;
 
@@ -1537,8 +1536,8 @@ namespace ACE.Server.WorldObjects
 
             var spellProjectiles = new List<SpellProjectile>();
 
-            var casterLoc = PhysicsObj.Position.ACEPosition();
-            var targetLoc = target?.PhysicsObj.Position.ACEPosition();
+            var casterLoc = PhysicsObj.Position.ACEPosition(Location);
+            var targetLoc = target?.PhysicsObj.Position.ACEPosition(target.Location);
 
             for (var i = 0; i < origins.Count; i++)
             {

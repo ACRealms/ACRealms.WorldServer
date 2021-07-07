@@ -256,7 +256,7 @@ namespace ACE.Server.WorldObjects
         public void UpdatePosition()
         {
             stopwatch.Restart();
-            PhysicsObj.update_object();
+            PhysicsObj.update_object(Location.Instance);
             ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.Monster_Navigation_UpdatePosition_PUO, stopwatch.Elapsed.TotalSeconds);
             UpdatePosition_SyncLocation();
 
@@ -283,17 +283,17 @@ namespace ACE.Server.WorldObjects
             // was the position successfully moved to?
             // use the physics position as the source-of-truth?
             var newPos = PhysicsObj.Position;
-            if (Location.LandblockId.Raw != newPos.ObjCellID)
+            if (Location.ObjCellID != newPos.ObjCellID)
             {
-                var prevBlockCell = Location.LandblockId.Raw;
-                var prevBlock = Location.LandblockId.Raw >> 16;
-                var prevCell = Location.LandblockId.Raw & 0xFFFF;
+                var prevBlockCell = Location.ObjCellID;
+                var prevBlock = Location.Landblock;
+                var prevCell = Location.Cell;
 
                 var newBlockCell = newPos.ObjCellID;
                 var newBlock = newPos.ObjCellID >> 16;
                 var newCell = newPos.ObjCellID & 0xFFFF;
 
-                Location.LandblockId = new LandblockId(newPos.ObjCellID);
+                Location.ObjCellID = newPos.ObjCellID;
 
                 if (prevBlock != newBlock)
                 {

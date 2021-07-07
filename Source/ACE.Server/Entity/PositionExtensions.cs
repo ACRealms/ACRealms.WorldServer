@@ -11,6 +11,7 @@ using ACE.Server.Physics.Util;
 using ACE.Server.WorldObjects;
 
 using Position = ACE.Entity.Position;
+using ACE.Server.Managers;
 
 namespace ACE.Server.Entity
 {
@@ -29,9 +30,9 @@ namespace ACE.Server.Entity
             if (p.Indoors && skipIndoors)
                 return p.Pos;
 
-            var x = p.LandblockId.LandblockX * Position.BlockLength + p.PositionX;
-            var y = p.LandblockId.LandblockY * Position.BlockLength + p.PositionY;
-            var z = p.PositionZ;
+            var x = p.LandblockX * Position.BlockLength + p.Pos.X;
+            var y = p.LandblockY * Position.BlockLength + p.Pos.Y;
+            var z = p.Pos.Z;
 
             return new Vector3(x, y, z);
         }
@@ -46,11 +47,8 @@ namespace ACE.Server.Entity
             //if (landblock.IsDungeon)
             if (p.Indoors)
             {
-                var iPos = new Position();
-                iPos.LandblockId = p.LandblockId;
-                iPos.Pos = new Vector3(pos.X, pos.Y, pos.Z);
-                iPos.Rotation = p.Rotation;
-                iPos.LandblockId = new LandblockId(GetCell(iPos));
+                var iPos = new Position(p.ObjCellID, pos, p.Rotation, false, p.Instance);
+                iPos.ObjCellID = GetCell(iPos);
                 return iPos;
             }
 
@@ -60,16 +58,20 @@ namespace ACE.Server.Entity
             var localX = pos.X % Position.BlockLength;
             var localY = pos.Y % Position.BlockLength;
 
-            var landblockID = blockX << 24 | blockY << 16 | 0xFFFF;
+            var landblock = (uint)(blockX << 24 | blockY << 16);
 
             var position = new Position();
-            position.LandblockId = new LandblockId((byte)blockX, (byte)blockY);
-            position.PositionX = localX;
-            position.PositionY = localY;
-            position.PositionZ = pos.Z;
+            position.Instance = p.Instance;
+            position.ObjCellID = landblock;
+            position.Pos = new Vector3(localX, localY, pos.Z);
             position.Rotation = p.Rotation;
-            position.LandblockId = new LandblockId(GetCell(position));
+            position.ObjCellID = GetCell(position);
             return position;
+        }
+
+        public static Landblock TryGetLandblock(this Position p)
+        {
+            return LandblockManager.TryGetLandblock(p.LongLandblockID);
         }
 
         /// <summary>
@@ -77,7 +79,7 @@ namespace ACE.Server.Entity
         /// </summary>
         public static uint GetCell(this Position p)
         {
-            var landblock = LScape.get_landblock(p.LandblockId.Raw);
+            var landblock = LScape.get_landblock(p.LongObjCellID);
 
             // dungeons
             // TODO: investigate dungeons that are below actual traversable overworld terrain
@@ -88,7 +90,8 @@ namespace ACE.Server.Entity
 
             // outside - could be on landscape, in building, or underground cave
             var cellID = GetOutdoorCell(p);
-            var landcell = LScape.get_landcell(cellID) as LandCell;
+            var longcellID = ((ulong)p.Instance << 32) | cellID;
+            var landcell = LScape.get_landcell(longcellID) as LandCell;
 
             if (landcell == null)
                 return cellID;
@@ -128,12 +131,12 @@ namespace ACE.Server.Entity
         /// </summary>
         public static uint GetOutdoorCell(this Position p)
         {
-            var cellX = (uint)p.PositionX / Position.CellLength;
-            var cellY = (uint)p.PositionY / Position.CellLength;
+            var cellX = (uint)p.Pos.X / Position.CellLength;
+            var cellY = (uint)p.Pos.Y / Position.CellLength;
 
             var cellID = cellX * Position.CellSide + cellY + 1;
 
-            var blockCellID = (uint)((p.LandblockId.Raw & 0xFFFF0000) | cellID);
+            var blockCellID = (uint)((p.ObjCellID & 0xFFFF0000) | cellID);
             return blockCellID;
         }
 
@@ -147,53 +150,14 @@ namespace ACE.Server.Entity
             if (envCell != null)
                 return envCell.Value;
             else
-                return p.Cell;
+                return p.ObjCellID;
         }
 
-        /// <summary>
-        /// Returns the greatest single-dimension square distance between 2 positions
-        /// </summary>
-        public static uint CellDist(this Position p1, Position p2)
-        {
-            if (!p1.Indoors && !p2.Indoors)
-            {
-                return Math.Max(p1.GlobalCellX, p1.GlobalCellY);
-            }
-
-            // handle dungeons
-            /*var block1 = LScape.get_landblock(p1.LandblockId.Raw);
-            var block2 = LScape.get_landblock(p2.LandblockId.Raw);
-            if (block1.IsDungeon || block2.IsDungeon)
-            {
-                // 2 separate dungeons = infinite distance
-                if (block1.ID != block2.ID)
-                    return uint.MaxValue;
-
-                return GetDungeonCellDist(p1, p2);
-            }*/
-
-            var _p1 = new Position(p1);
-            var _p2 = new Position(p2);
-
-            if (_p1.Indoors)
-                _p1.LandblockId = new LandblockId(_p1.GetOutdoorCell());
-            if (_p2.Indoors)
-                _p2.LandblockId = new LandblockId(_p2.GetIndoorCell());
-
-            return Math.Max(_p1.GlobalCellX, _p2.GlobalCellY);
-        }
-
-        public static uint GetDungeonCellDist(Position p1, Position p2)
-        {
-            // not implemented yet
-            return uint.MaxValue;
-        }
 
         public static Vector2? GetMapCoords(this Position pos)
         {
             // no map coords available for dungeons / indoors?
-            if ((pos.Cell & 0xFFFF) >= 0x100)
-                return null;
+            if (pos.Indoors) return null;
 
             var globalPos = pos.ToGlobal();
 
@@ -228,10 +192,10 @@ namespace ACE.Server.Entity
         public static void AdjustMapCoords(this Position pos)
         {
             // adjust Z to terrain height
-            pos.PositionZ = pos.GetTerrainZ();
+            pos._pos.Z = pos.GetTerrainZ();
 
             // adjust to building height, if applicable
-            var sortCell = LScape.get_landcell(pos.Cell) as SortCell;
+            var sortCell = LScape.get_landcell(pos.LongObjCellID) as SortCell;
             if (sortCell != null && sortCell.has_building())
             {
                 var building = sortCell.Building;
@@ -239,15 +203,15 @@ namespace ACE.Server.Entity
                 var minZ = building.GetMinZ();
 
                 if (minZ > 0 && minZ < float.MaxValue)
-                    pos.PositionZ += minZ;
+                    pos._pos.Z += minZ;
 
-                pos.LandblockId = new LandblockId(pos.GetCell());
+                pos.ObjCellID = pos.GetCell();
             }
         }
 
         public static float GetTerrainZ(this Position p)
         {
-            var landblock = LScape.get_landblock(p.LandblockId.Raw);
+            var landblock = LScape.get_landblock(p.LongObjCellID);
 
             var cellID = GetOutdoorCell(p);
             var landcell = (LandCell)LScape.get_landcell(cellID);
@@ -272,7 +236,7 @@ namespace ACE.Server.Entity
         {
             if (p.Indoors) return true;
 
-            var landcell = (LandCell)LScape.get_landcell(p.Cell);
+            var landcell = (LandCell)LScape.get_landcell(p.LongObjCellID);
 
             Physics.Polygon walkable = null;
             var terrainPoly = landcell.find_terrain_poly(p.Pos, ref walkable);
@@ -286,19 +250,22 @@ namespace ACE.Server.Entity
         /// </summary>
         public static bool IsRestrictable(this Position p, Landblock landblock)
         {
-            var cell = landblock.IsDungeon ? p.Cell : p.GetOutdoorCell();
+            var cell = landblock.IsDungeon ? p.ObjCellID : p.GetOutdoorCell();
 
             return HouseCell.HouseCells.ContainsKey(cell);
         }
 
-        public static Position ACEPosition(this Physics.Common.Position pos)
+        public static Position ACEPosition(this Physics.Common.Position pos, Position source)
         {
-            return new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation);
+            var newPos = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation, false, source.Instance);
+            newPos.Instance = source.Instance;
+
+            return newPos;
         }
 
         public static Physics.Common.Position PhysPosition(this Position pos)
         {
-            return new Physics.Common.Position(pos.Cell, new Physics.Animation.AFrame(pos.Pos, pos.Rotation));
+            return new Physics.Common.Position(pos.ObjCellID, new Physics.Animation.AFrame(pos.Pos, pos.Rotation));
         }
 
 
