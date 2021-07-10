@@ -892,7 +892,10 @@ namespace ACE.Server.Command.Handlers
                 if (teleportPOI == null)
                     return;
                 var weenie = DatabaseManager.World.GetCachedWeenie(teleportPOI.WeenieClassId);
+
+
                 var portalDest = new Position(weenie.GetPosition(PositionType.Destination));
+                portalDest.SetToDefaultRealmInstance(session.Player.Location.RealmID);
                 WorldObject.AdjustDungeon(portalDest);
                 session.Player.Teleport(portalDest);
             }
@@ -934,19 +937,22 @@ namespace ACE.Server.Command.Handlers
 
                     if (!float.TryParse(parameters[i + 1].Trim(new Char[] { ' ', '[', ']' }), out var position))
                         return;
-
                     positionData[i] = position;
                 }
 
-                session.Player.Teleport(new Position(cell, positionData[0], positionData[1], positionData[2], positionData[4], positionData[5], positionData[6], positionData[3]));
+                uint inst = 0;
+                if (parameters.Length >= 9)
+                    inst = uint.Parse(parameters[8].Trim());
+
+                session.Player.Teleport(new Position(cell, positionData[0], positionData[1], positionData[2], positionData[4], positionData[5], positionData[6], positionData[3], inst));
             }
             catch (Exception)
             {
                 ChatPacket.SendServerMessage(session, "Invalid arguments for @teleloc", ChatMessageType.Broadcast);
-                ChatPacket.SendServerMessage(session, "Hint: @teleloc follows the same number order as displayed from @loc output", ChatMessageType.Broadcast);
-                ChatPacket.SendServerMessage(session, "Usage: @teleloc cell [x y z] (qw qx qy qz)", ChatMessageType.Broadcast);
-                ChatPacket.SendServerMessage(session, "Example: @teleloc 0x7F0401AD [12.319900 -28.482000 0.005000] -0.338946 0.000000 0.000000 -0.940806", ChatMessageType.Broadcast);
-                ChatPacket.SendServerMessage(session, "Example: @teleloc 0x7F0401AD 12.319900 -28.482000 0.005000 -0.338946 0.000000 0.000000 -0.940806", ChatMessageType.Broadcast);
+                ChatPacket.SendServerMessage(session, "Hint: @teleloc follows the same number order as displayed from @sloc output", ChatMessageType.Broadcast);
+                ChatPacket.SendServerMessage(session, "Usage: @teleloc cell [x y z] (qw qx qy qz) (instance id)", ChatMessageType.Broadcast);
+                ChatPacket.SendServerMessage(session, "Example: @teleloc 0x7F0401AD [12.319900 -28.482000 0.005000] -0.338946 0.000000 0.000000 -0.940806 0", ChatMessageType.Broadcast);
+                ChatPacket.SendServerMessage(session, "Example: @teleloc 0x7F0401AD 12.319900 -28.482000 0.005000 -0.338946 0.000000 0.000000 -0.940806 0", ChatMessageType.Broadcast);
                 ChatPacket.SendServerMessage(session, "Example: @teleloc 7F0401AD 12.319900 -28.482000 0.005000", ChatMessageType.Broadcast);
             }
         }
@@ -1693,7 +1699,6 @@ namespace ACE.Server.Command.Handlers
                     msg += $"Location: {chest.Location.ToLOCString()}\n";
                 }
             }
-
             if (house.Hooks.Count > 0)
             {
                 msg += $"===Hooks for House 0x{house.Guid}==================\n";
@@ -2010,7 +2015,7 @@ namespace ACE.Server.Command.Handlers
         /// </summary>
         private static WorldObject CreateObjectForCommand(Session session, Weenie weenie)
         {
-            var obj = WorldObjectFactory.CreateNewWorldObject(weenie);
+            var obj = WorldObjectFactory.CreateNewWorldObject(weenie, session.Player.RealmRuleset);
 
             //if (obj.TimeToRot == null)
                 //obj.TimeToRot = double.MaxValue;
@@ -2023,8 +2028,6 @@ namespace ACE.Server.Command.Handlers
 
                 obj.Location = session.Player.Location.InFrontOf(dist);
             }
-
-            obj.Location.LandblockId = new LandblockId(obj.Location.GetCell());
 
             LastSpawnPos = obj.Location;
 
@@ -2878,7 +2881,7 @@ namespace ACE.Server.Command.Handlers
 
             var guid = GuidManager.NewPlayerGuid();
 
-            var player = new Player(weenie, guid, session.AccountId);
+            var player = new Player(weenie, guid, session.AccountId, RealmManager.DefaultRuleset);
 
             player.Biota.WeenieType = session.Player.WeenieType;
 
@@ -2915,7 +2918,7 @@ namespace ACE.Server.Command.Handlers
                         if (weenieOfWearable == null)
                             continue;
 
-                        var worldObject = WorldObjectFactory.CreateNewWorldObject(weenieOfWearable);
+                        var worldObject = WorldObjectFactory.CreateNewWorldObject(weenieOfWearable, session.Player.RealmRuleset);
 
                         if (worldObject == null)
                             continue;
@@ -2939,7 +2942,7 @@ namespace ACE.Server.Command.Handlers
                         if (weenieOfWearable == null)
                             continue;
 
-                        var worldObject = WorldObjectFactory.CreateNewWorldObject(weenieOfWearable);
+                        var worldObject = WorldObjectFactory.CreateNewWorldObject(weenieOfWearable, session.Player.RealmRuleset);
 
                         if (worldObject == null)
                             continue;
@@ -3774,13 +3777,13 @@ namespace ACE.Server.Command.Handlers
 
             if (environChange.IsFog())
             {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Setting Landblock (0x{session.Player.CurrentLandblock.Id.Landblock:X4}), including direct adjacent landblocks, to EnvironChangeType.{environChange.ToString()}.", ChatMessageType.Broadcast));
-                PlayerManager.BroadcastToAuditChannel(session.Player, $"{session.Player.Name} set Landblock (0x{session.Player.CurrentLandblock.Id.Landblock:X4}), including direct adjacent landblocks, to EnvironChangeType.{environChange.ToString()}.");
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Setting Landblock (0x{session.Player.CurrentLandblock.ShortId:X4}), including direct adjacent landblocks, to EnvironChangeType.{environChange.ToString()}.", ChatMessageType.Broadcast));
+                PlayerManager.BroadcastToAuditChannel(session.Player, $"{session.Player.Name} set Landblock (0x{session.Player.CurrentLandblock.ShortId:X4}), including direct adjacent landblocks, to EnvironChangeType.{environChange.ToString()}.");
             }
             else
             {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Sending EnvironChangeType.{environChange.ToString()} to all players on Landblock (0x{session.Player.CurrentLandblock.Id.Landblock:X4}), including direct adjacent landblocks.", ChatMessageType.Broadcast));
-                PlayerManager.BroadcastToAuditChannel(session.Player, $"{session.Player.Name} sent EnvironChangeType.{environChange.ToString()} to all players on Landblock (0x{session.Player.CurrentLandblock.Id.Landblock:X4}), including direct adjacent landblocks.");
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Sending EnvironChangeType.{environChange.ToString()} to all players on Landblock (0x{session.Player.CurrentLandblock.ShortId:X4}), including direct adjacent landblocks.", ChatMessageType.Broadcast));
+                PlayerManager.BroadcastToAuditChannel(session.Player, $"{session.Player.Name} sent EnvironChangeType.{environChange.ToString()} to all players on Landblock (0x{session.Player.CurrentLandblock.ShortId:X4}), including direct adjacent landblocks.");
             }
 
             session.Player.CurrentLandblock?.DoEnvironChange(environChange);
@@ -3869,7 +3872,7 @@ namespace ACE.Server.Command.Handlers
             }
             session.Network.EnqueueSend(new GameMessageSystemChat($"Moving {obj.Name} ({obj.Guid}) to current location", ChatMessageType.Broadcast));
 
-            obj.Location = obj.PhysicsObj.Position.ACEPosition();
+            obj.Location = obj.PhysicsObj.Position.ACEPosition(newLoc);
 
             if (prevLoc.Landblock != obj.Location.Landblock)
             {

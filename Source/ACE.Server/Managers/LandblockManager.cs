@@ -13,6 +13,7 @@ using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
 using ACE.Server.WorldObjects;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Managers
 {
@@ -411,7 +412,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Returns a reference to a landblock, loading the landblock if not already active
         /// </summary>
-        public static Landblock GetLandblock(ulong objCellID, bool loadAdjacents, bool permaload = false)
+        public static Landblock GetLandblock(ulong objCellID, bool loadAdjacents, bool permaload = false, EphemeralRealm ephemeralRealm = null)
         {
             Landblock landblock;
 
@@ -435,7 +436,7 @@ namespace ACE.Server.Managers
 
                     landblockGroupPendingAdditions.Add(landblock);
 
-                    landblock.Init();
+                    landblock.Init(false, ephemeralRealm);
 
                     setAdjacents = true;
                 }
@@ -448,7 +449,7 @@ namespace ACE.Server.Managers
                 {
                     var adjacents = GetAdjacentIDs(landblock);
                     foreach (var adjacent in adjacents)
-                        GetLandblock(adjacent, false, permaload);
+                        GetLandblock(adjacent, false, permaload, ephemeralRealm);
 
                     setAdjacents = true;
                 }
@@ -737,6 +738,40 @@ namespace ACE.Server.Managers
                 else
                     SendGlobalEnvironSound(environChangeType);
             }
+        }
+        public static uint GetFreeInstanceID(bool isTemporaryRuleset, ushort realmId, ushort landblock)
+        {
+            uint right = ((uint)landblock << 16) | 0xFFFF;
+            ulong full;
+            uint iid;
+            do
+            {
+                iid = GetRandomInstanceID(isTemporaryRuleset, realmId);
+                full = ((ulong)iid << 32) | right;
+            }
+            while (LandblockManager.landblocks.ContainsKey(full));
+            return iid;
+        }
+
+        static Random random = new Random();
+        private static uint GetRandomInstanceID(bool isTemporaryRuleset, ushort realmId)
+        {
+            ushort left = realmId;
+            if ((realmId & 0x8000) != 0)
+                throw new InvalidOperationException("Realm IDs may not be higher than 0x7FFF");
+            if (isTemporaryRuleset)
+                left |= 0x8000;
+            var id = (ushort)random.Next(1, 0xFFFE);
+            uint result = (((uint)left) << 16) | id;
+            return result;
+        }
+
+        public static void ParseInstanceID(uint instanceId, out bool isTemporaryRuleset, out ushort realmId, out ushort shortInstanceId)
+        {
+            shortInstanceId = (ushort)(instanceId & 0xFFFF);
+            ushort left = (ushort)(instanceId >> 16);
+            isTemporaryRuleset = (left & 0x8000) == 0x8000;
+            realmId = (ushort)(left & 0x7FFF);
         }
     }
 }

@@ -146,7 +146,9 @@ namespace ACE.Server.WorldObjects
 
                 // TODO: figure this out better
                 if (spell.MetaSpellType == SpellType.PortalSummon)
-                    TryCastSpell(spell, player, this, tryResist: false);
+                {
+                    HandlePortalGemSummon(spell, player);
+                }
                 else
                     player.TryCastSpell(spell, player, this, tryResist: false);
             }
@@ -171,6 +173,11 @@ namespace ACE.Server.WorldObjects
 
             if ((GetProperty(PropertyBool.UnlimitedUse) ?? false) == false)
                 player.TryConsumeFromInventoryWithNetworking(this, 1);
+        }
+
+        private void HandlePortalGemSummon(Spell spell, Player player)
+        {
+            TryCastSpell(spell, player, this);
         }
 
         public bool HandleUseCreateItem(Player player)

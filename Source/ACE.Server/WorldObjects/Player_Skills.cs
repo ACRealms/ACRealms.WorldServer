@@ -354,6 +354,8 @@ namespace ACE.Server.WorldObjects
                 amountRemaining = (uint)AvailableExperience;
 
             SpendSkillXp(creatureSkill, amountRemaining, sendNetworkUpdate);
+            if (sendNetworkUpdate)
+                Session.Network.EnqueueSend(new GameMessagePrivateUpdateSkill(this, creatureSkill));
         }
 
         /// <summary>

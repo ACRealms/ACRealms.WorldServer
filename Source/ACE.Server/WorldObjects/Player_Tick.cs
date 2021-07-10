@@ -83,6 +83,8 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public override void Heartbeat(double currentUnixTime)
         {
+            ValidateCurrentRealm();
+
             NotifyLandblocks();
 
             ManaConsumersTick();
@@ -374,7 +376,14 @@ namespace ACE.Server.WorldObjects
         /// 
         /// If you wish for players to glitch around less during powerslides, lower this value
         /// </summary>
-        public static TimeSpan MoveToState_UpdatePosition_Threshold = TimeSpan.FromSeconds(1);
+        public TimeSpan MoveToState_UpdatePosition_Threshold
+        {
+            get
+            {
+                return TimeSpan.FromSeconds(RealmRuleset.GetProperty(RealmPropertyFloat.SpellCasting_MoveToState_UpdatePosition_Threshold));
+            }
+        }
+
 
         /// <summary>
         /// Used by physics engine to actually update a player position

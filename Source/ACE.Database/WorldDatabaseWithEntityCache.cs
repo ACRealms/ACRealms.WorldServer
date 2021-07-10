@@ -1070,5 +1070,53 @@ namespace ACE.Database
         {
             cachedWieldedTreasure.Clear();
         }
+
+        // =====================================
+        // Realm
+        // =====================================
+
+        private readonly Dictionary<uint, Realm> realmCache = new Dictionary<uint, Realm>();
+
+        public override Realm GetRealm(uint realmId)
+        {
+            Realm realm;
+
+            lock (realmCache)
+            {
+                if (!realmCache.TryGetValue(realmId, out realm))
+                {
+                    realm = base.GetRealm(realmId);
+                    realmCache.Add(realmId, realm);
+                }
+            }
+
+            return realm;
+        }
+
+        public override List<Realm> GetAllRealms()
+        {
+            lock (realmCache)
+            {
+                ClearRealmCache();
+                var realms = base.GetAllRealms();
+                foreach(var realm in realms)
+                    realmCache[realm.Id] = realm;
+                return realms;
+            }
+        }
+        public void ClearRealmCache()
+        {
+            lock (realmCache)
+                realmCache.Clear();
+        }
+
+        public override void ReplaceAllRealms(Dictionary<ushort, RealmToImport> realmsById)
+        {
+            lock (realmCache)
+            {
+                base.ReplaceAllRealms(realmsById);
+                ClearRealmCache();
+            }
+        }
     }
 }

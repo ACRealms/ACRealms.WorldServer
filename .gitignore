@@ -302,3 +302,4 @@ Source/ACE.Server/log4net.config
 docker.env
 docker-compose.yml
 Source/ACE.GenerateSQLEnums/solutionpath.txt
+*.orig

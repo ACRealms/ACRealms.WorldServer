@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.22, for Linux (x86_64)
 --
--- Host: localhost    Database: ace_auth
+-- Host: localhost    Database: realms_auth
 -- ------------------------------------------------------
 -- Server version	8.0.22
 
@@ -16,14 +16,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `ace_auth`
+-- Current Database: `realms_auth`
 --
 
-/*!40000 DROP DATABASE IF EXISTS `ace_auth`*/;
+/*!40000 DROP DATABASE IF EXISTS `realms_auth`*/;
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `ace_auth` /*!40100 DEFAULT CHARACTER SET utf8mb4 */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `realms_auth` /*!40100 DEFAULT CHARACTER SET utf8mb4 */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
-USE `ace_auth`;
+USE `realms_auth`;
 
 --
 -- Table structure for table `accesslevel`
@@ -85,7 +85,7 @@ CREATE TABLE `account` (
 -- Dump completed on 2020-12-29 19:00:01
 
 /*
--- Query: SELECT * FROM ace_auth.accesslevel
+-- Query: SELECT * FROM realms_auth.accesslevel
 -- Date: 2018-02-14 13:19
 */
 INSERT INTO `accesslevel` (`level`,`name`,`prefix`) VALUES (0,'Player','');

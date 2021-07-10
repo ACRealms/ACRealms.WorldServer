@@ -971,22 +971,26 @@ namespace ACE.Server.WorldObjects.Managers
                         if (!WorldObject.PlayersInRange(ClientMaxAnimRange))
                             break;
 
+                        var newPos = new Position(creature.Home);
+                        newPos.Instance = creature.Location.Instance;
+                        newPos.Pos += new Vector3(emote.OriginX ?? 0, emote.OriginY ?? 0, emote.OriginZ ?? 0);      // uses relative position
 
                         // ensure valid quaternion - all 0s for example can lock up physics engine
                         if (emote.AnglesX != null && emote.AnglesY != null && emote.AnglesZ != null && emote.AnglesW != null &&
                            (emote.AnglesX != 0    || emote.AnglesY != 0    || emote.AnglesZ != 0    || emote.AnglesW != 0) )
                         {
                             // also relative, or absolute?
-                            newRotation *= new Quaternion(emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value);  
+                            newPos.Rotation *= new Quaternion(emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value);
                         }
 
-                        var newPosition = new Position(creature.Home.ObjCellID, newPos, newRotation, true, creature.Location.Instance);
-
                         if (Debug)
-                            Console.WriteLine(newPosition.ToLOCString());
+                            Console.WriteLine(newPos.ToLOCString());
+
+                        // get new cell
+                        //newPos.Landblock = new LandblockId(PositionExtensions.GetCell(newPos));
 
                         // TODO: handle delay for this?
-                        creature.MoveTo(newPosition, creature.GetRunRate(), true, null, emote.Extent);
+                        creature.MoveTo(newPos, creature.GetRunRate(), true, null, emote.Extent);
                     }
                     break;
 

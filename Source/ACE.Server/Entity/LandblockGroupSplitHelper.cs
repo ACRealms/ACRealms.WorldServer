@@ -59,8 +59,8 @@ namespace ACE.Server.Entity
         public int BoundaryDistance(Landblock landblock)
         {
             return (int)Math.Max(
-                Math.Abs(xCenter - landblock.Id.LandblockX) - (width + 1) / 2.0,
-                Math.Abs(yCenter - landblock.Id.LandblockY) - (height + 1) / 2.0);
+                Math.Abs(xCenter - landblock.LandblockX) - (width + 1) / 2.0,
+                Math.Abs(yCenter - landblock.LandblockY) - (height + 1) / 2.0);
         }
     }
 }

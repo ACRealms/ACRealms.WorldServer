@@ -629,6 +629,26 @@ namespace ACE.Entity.Enum.Properties
         /// </summary>
         [ServerOnly]
         InventoryOrder                          = 9015,
+
+        //Realm properties below this line
+        [ServerOnly]
+        [Clone]
+        HomeRealm                               = 42000,
+
+        [ServerOnly]
+        SummonTargetRealm                       = 42001,
+
+        [ServerOnly]
+        SummonTargetRealm2                      = 42002,
+
+        [ServerOnly]
+        SummonTargetRealm3                      = 42003,
+
+        [ServerOnly]
+        RulesetStampVendorType                  = 42004,
+
+        [ServerOnly]
+        LastRebuffTimestamp                     = 42005
     }
 
     public static class PropertyIntExtensions

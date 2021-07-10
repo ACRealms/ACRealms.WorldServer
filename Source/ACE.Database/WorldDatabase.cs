@@ -13,6 +13,7 @@ using ACE.Database.Entity;
 using ACE.Database.Models.World;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Database.Adapter;
 
 namespace ACE.Database
 {
@@ -602,6 +603,90 @@ namespace ACE.Database
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
                 return IsWorldDatabaseGuidRangeValid(context);
+            }
+        }
+                
+
+        public virtual Realm GetRealm(uint id)
+        {
+            using (var context = new WorldDbContext())
+                return GetRealm(context, id);
+        }
+
+        private Realm GetRealm(WorldDbContext context, uint id)
+        {
+            var realm = context.Realm
+                .FirstOrDefault(r => r.Id == id);
+
+            if (realm == null)
+                return null;
+
+            realm.RealmPropertiesBool = context.RealmPropertiesBool.Where(r => r.RealmId == realm.Id).ToList();
+            realm.RealmPropertiesFloat = context.RealmPropertiesFloat.Where(r => r.RealmId == realm.Id).ToList();
+                             
+            realm.RealmPropertiesInt = context.RealmPropertiesInt.Where(r => r.RealmId == realm.Id).ToList();
+            realm.RealmPropertiesInt64 = context.RealmPropertiesInt64.Where(r => r.RealmId == realm.Id).ToList();
+            realm.RealmPropertiesString = context.RealmPropertiesString.Where(r => r.RealmId == realm.Id).ToList();
+
+            realm.RealmRulesetLinksRealm = context.RealmRulesetLinks.Where(r => r.RealmId == realm.Id).ToList();
+            realm.RealmRulesetLinksLinkedRealm = context.RealmRulesetLinks.Where(r => r.LinkedRealmId == realm.Id).ToList();
+            return realm;
+        }
+
+        public virtual List<Realm> GetAllRealms()
+        {
+            using (var context = new WorldDbContext())
+            {
+                var results = context.Realm.ToList();
+
+                var pbool = context.RealmPropertiesBool.ToLookup(x => x.RealmId);
+                var pfloat = context.RealmPropertiesFloat.ToLookup(x => x.RealmId);
+                var pint = context.RealmPropertiesInt.ToLookup(x => x.RealmId);
+                var plong = context.RealmPropertiesInt64.ToLookup(x => x.RealmId);
+                var pstring = context.RealmPropertiesString.ToLookup(x => x.RealmId);
+                var links = context.RealmRulesetLinks.ToList();
+                var linksrealm = links.ToLookup(x => x.RealmId);
+                var linkslinkedrealm = links.ToLookup(x => x.LinkedRealmId);
+
+                System.Threading.Tasks.Parallel.ForEach(results, realm =>
+                {
+                    realm.RealmPropertiesBool = pbool[realm.Id].ToList();
+                    realm.RealmPropertiesFloat = pfloat[realm.Id].ToList();
+                    realm.RealmPropertiesInt = pint[realm.Id].ToList();
+                    realm.RealmPropertiesInt64 = plong[realm.Id].ToList();
+                    realm.RealmPropertiesString = pstring[realm.Id].ToList();
+
+                    realm.RealmRulesetLinksRealm = linksrealm[realm.Id].ToList();
+                    realm.RealmRulesetLinksLinkedRealm = linkslinkedrealm[realm.Id].ToList();
+                });
+                return results;
+            }
+        }
+
+        public virtual void ReplaceAllRealms(Dictionary<ushort, RealmToImport> realmsById)
+        {
+            var realms = realmsById.Values.Select(x => x.Realm);
+            var propsbool = realms.SelectMany(x => x.RealmPropertiesBool);
+            var propsint = realms.SelectMany(x => x.RealmPropertiesInt);
+            var propsint64 = realms.SelectMany(x => x.RealmPropertiesInt64);
+            var propsfloat = realms.SelectMany(x => x.RealmPropertiesFloat);
+            var propsstring = realms.SelectMany(x => x.RealmPropertiesString);
+            var links = realmsById.Values.SelectMany(x => x.Links);
+
+            using (var context = new WorldDbContext())
+            {
+                using (var transaction = context.Database.BeginTransaction())
+                {
+                    context.Database.ExecuteSqlCommand("DELETE FROM realm;");
+                    context.Realm.AddRange(realms);
+                    context.RealmPropertiesBool.AddRange(propsbool);
+                    context.RealmPropertiesInt.AddRange(propsint);
+                    context.RealmPropertiesInt64.AddRange(propsint64);
+                    context.RealmPropertiesFloat.AddRange(propsfloat);
+                    context.RealmPropertiesString.AddRange(propsstring);
+                    context.RealmRulesetLinks.AddRange(links);
+                    transaction.Commit();
+                }
             }
         }
     }

@@ -362,7 +362,7 @@ namespace ACE.Server.WorldObjects
             {
                 if (!IsDead && PhysicsObj?.MovementManager?.MoveToManager != null && PhysicsObj.IsMovingTo())
                 {
-                    PhysicsObj.update_object();
+                    PhysicsObj.update_object(this.Location.Instance);
                     UpdatePosition_SyncLocation();
                     SendUpdatePosition();
 

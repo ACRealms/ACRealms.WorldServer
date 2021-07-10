@@ -195,8 +195,6 @@ namespace ACE.Server.WorldObjects
 
         public void CreateSentinelBuffPlayers(IEnumerable<Player> players, bool self = false, ulong maxLevel = 8)
         {
-            if (!(Session.AccessLevel >= AccessLevel.Sentinel)) return;
-
             var SelfOrOther = self ? "Self" : "Other";
 
             // ensure level 8s are installed

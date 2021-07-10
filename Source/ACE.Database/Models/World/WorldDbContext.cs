@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -23,6 +23,13 @@ namespace ACE.Database.Models.World
         public virtual DbSet<LandblockInstanceLink> LandblockInstanceLink { get; set; }
         public virtual DbSet<PointsOfInterest> PointsOfInterest { get; set; }
         public virtual DbSet<Quest> Quest { get; set; }
+        public virtual DbSet<Realm> Realm { get; set; }
+        public virtual DbSet<RealmPropertiesBool> RealmPropertiesBool { get; set; }
+        public virtual DbSet<RealmPropertiesFloat> RealmPropertiesFloat { get; set; }
+        public virtual DbSet<RealmPropertiesInt> RealmPropertiesInt { get; set; }
+        public virtual DbSet<RealmPropertiesInt64> RealmPropertiesInt64 { get; set; }
+        public virtual DbSet<RealmPropertiesString> RealmPropertiesString { get; set; }
+        public virtual DbSet<RealmRulesetLinks> RealmRulesetLinks { get; set; }
         public virtual DbSet<Recipe> Recipe { get; set; }
         public virtual DbSet<RecipeMod> RecipeMod { get; set; }
         public virtual DbSet<RecipeModsBool> RecipeModsBool { get; set; }
@@ -74,15 +81,9 @@ namespace ACE.Database.Models.World
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var config = Common.ConfigManager.Config.MySql.World;
-
-                optionsBuilder.UseMySql($"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};TreatTinyAsBoolean=False", builder =>
-                {
-                    builder.EnableRetryOnFailure(10);
-                });
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseMySql("server=localhost;port=3306;user=root;password=asdf12345;database=realms_world;treattinyasboolean=False", x => x.ServerVersion("8.0.24-mysql"));
             }
-
-            optionsBuilder.EnableSensitiveDataLogging(true);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -417,6 +418,280 @@ namespace ACE.Database.Models.World
                     .HasComment("Unique Name of Quest")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_general_ci");
+            });
+
+            modelBuilder.Entity<Realm>(entity =>
+            {
+                entity.ToTable("realm");
+
+                entity.HasComment("Dynamic Realm of a Shard/World");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasComment("Unique Realm Id within the Shard")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasColumnName("name")
+                    .HasColumnType("text")
+                    .HasComment("Name of this realm")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_general_ci");
+
+                entity.Property(e => e.ParentRealmId).HasColumnName("parent_realm_id");
+
+                entity.Property(e => e.PropertyCountRandomized)
+                    .HasColumnName("property_count_randomized")
+                    .HasComment("Maximum number of properties that will be picked from the ruleset at random.");
+
+                entity.Property(e => e.Type).HasColumnName("type");
+            });
+
+            modelBuilder.Entity<RealmPropertiesBool>(entity =>
+            {
+                entity.HasKey(e => new { e.RealmId, e.Type })
+                    .HasName("PRIMARY")
+                    .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+                entity.ToTable("realm_properties_bool");
+
+                entity.HasComment("Bool Properties of Realms");
+
+                entity.HasIndex(e => e.Type)
+                    .HasName("idx_type");
+
+                entity.Property(e => e.RealmId)
+                    .HasColumnName("realm_Id")
+                    .HasComment("Id of the object this property belongs to");
+
+                entity.Property(e => e.Type)
+                    .HasColumnName("type")
+                    .HasComment("Type of Property the value applies to (RealmPropertyBool.????)");
+
+                entity.Property(e => e.Locked)
+                    .HasColumnName("locked")
+                    .HasComment("If true, this property cannot be overriden by inherited realms or rulesets.");
+
+                entity.Property(e => e.Probability).HasColumnName("probability");
+
+                entity.Property(e => e.Value)
+                    .HasColumnName("value")
+                    .HasComment("Value of this Property");
+
+                entity.HasOne(d => d.Realm)
+                    .WithMany(p => p.RealmPropertiesBool)
+                    .HasForeignKey(d => d.RealmId)
+                    .HasConstraintName("realm_bool");
+            });
+
+            modelBuilder.Entity<RealmPropertiesFloat>(entity =>
+            {
+                entity.HasKey(e => new { e.RealmId, e.Type })
+                    .HasName("PRIMARY")
+                    .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+                entity.ToTable("realm_properties_float");
+
+                entity.HasComment("Float Properties of Realms");
+
+                entity.HasIndex(e => e.Type)
+                    .HasName("idx_type");
+
+                entity.Property(e => e.RealmId)
+                    .HasColumnName("realm_Id")
+                    .HasComment("Id of the object this property belongs to");
+
+                entity.Property(e => e.Type)
+                    .HasColumnName("type")
+                    .HasComment("Type of Property the value applies to (RealmPropertyFloat.????)");
+
+                entity.Property(e => e.CompositionType).HasColumnName("composition_type");
+
+                entity.Property(e => e.Locked)
+                    .HasColumnName("locked")
+                    .HasComment("If true, this property cannot be overriden by inherited realms or rulesets.");
+
+                entity.Property(e => e.Probability).HasColumnName("probability");
+
+                entity.Property(e => e.RandomHighRange).HasColumnName("random_high_range");
+
+                entity.Property(e => e.RandomLowRange).HasColumnName("random_low_range");
+
+                entity.Property(e => e.RandomType).HasColumnName("random_type");
+
+                entity.Property(e => e.Value)
+                    .HasColumnName("value")
+                    .HasComment("Value of this Property");
+
+                entity.HasOne(d => d.Realm)
+                    .WithMany(p => p.RealmPropertiesFloat)
+                    .HasForeignKey(d => d.RealmId)
+                    .HasConstraintName("realm_float");
+            });
+
+            modelBuilder.Entity<RealmPropertiesInt>(entity =>
+            {
+                entity.HasKey(e => new { e.RealmId, e.Type })
+                    .HasName("PRIMARY")
+                    .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+                entity.ToTable("realm_properties_int");
+
+                entity.HasComment("Int Properties of Realms");
+
+                entity.HasIndex(e => e.Type)
+                    .HasName("idx_type");
+
+                entity.Property(e => e.RealmId)
+                    .HasColumnName("realm_Id")
+                    .HasComment("Id of the object this property belongs to");
+
+                entity.Property(e => e.Type)
+                    .HasColumnName("type")
+                    .HasComment("Type of Property the value applies to (RealmPropertyInt.????)");
+
+                entity.Property(e => e.CompositionType).HasColumnName("composition_type");
+
+                entity.Property(e => e.Locked)
+                    .HasColumnName("locked")
+                    .HasComment("If true, this property cannot be overriden by inherited realms or rulesets.");
+
+                entity.Property(e => e.Probability).HasColumnName("probability");
+
+                entity.Property(e => e.RandomHighRange).HasColumnName("random_high_range");
+
+                entity.Property(e => e.RandomLowRange).HasColumnName("random_low_range");
+
+                entity.Property(e => e.RandomType).HasColumnName("random_type");
+
+                entity.Property(e => e.Value)
+                    .HasColumnName("value")
+                    .HasComment("Value of this Property");
+
+                entity.HasOne(d => d.Realm)
+                    .WithMany(p => p.RealmPropertiesInt)
+                    .HasForeignKey(d => d.RealmId)
+                    .HasConstraintName("realm_int");
+            });
+
+            modelBuilder.Entity<RealmPropertiesInt64>(entity =>
+            {
+                entity.HasKey(e => new { e.RealmId, e.Type })
+                    .HasName("PRIMARY")
+                    .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+                entity.ToTable("realm_properties_int64");
+
+                entity.HasComment("Int64 Properties of Realms");
+
+                entity.Property(e => e.RealmId)
+                    .HasColumnName("realm_Id")
+                    .HasComment("Id of the object this property belongs to");
+
+                entity.Property(e => e.Type)
+                    .HasColumnName("type")
+                    .HasComment("Type of Property the value applies to (RealmPropertyInt64.????)");
+
+                entity.Property(e => e.CompositionType).HasColumnName("composition_type");
+
+                entity.Property(e => e.Locked)
+                    .HasColumnName("locked")
+                    .HasComment("If true, this property cannot be overriden by inherited realms or rulesets.");
+
+                entity.Property(e => e.Probability).HasColumnName("probability");
+
+                entity.Property(e => e.RandomHighRange).HasColumnName("random_high_range");
+
+                entity.Property(e => e.RandomLowRange).HasColumnName("random_low_range");
+
+                entity.Property(e => e.RandomType).HasColumnName("random_type");
+
+                entity.Property(e => e.Value)
+                    .HasColumnName("value")
+                    .HasComment("Value of this Property");
+
+                entity.HasOne(d => d.Realm)
+                    .WithMany(p => p.RealmPropertiesInt64)
+                    .HasForeignKey(d => d.RealmId)
+                    .HasConstraintName("realm_int64");
+            });
+
+            modelBuilder.Entity<RealmPropertiesString>(entity =>
+            {
+                entity.HasKey(e => new { e.RealmId, e.Type })
+                    .HasName("PRIMARY")
+                    .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+                entity.ToTable("realm_properties_string");
+
+                entity.HasComment("String Properties of Realms");
+
+                entity.HasIndex(e => e.Type)
+                    .HasName("idx_type");
+
+                entity.Property(e => e.RealmId)
+                    .HasColumnName("realm_Id")
+                    .HasComment("Id of the object this property belongs to");
+
+                entity.Property(e => e.Type)
+                    .HasColumnName("type")
+                    .HasComment("Type of Property the value applies to (RealmPropertyString.????)");
+
+                entity.Property(e => e.Locked)
+                    .HasColumnName("locked")
+                    .HasComment("If true, this property cannot be overriden by inherited realms or rulesets.");
+
+                entity.Property(e => e.Probability).HasColumnName("probability");
+
+                entity.Property(e => e.Value)
+                    .IsRequired()
+                    .HasColumnName("value")
+                    .HasColumnType("text")
+                    .HasComment("Value of this Property")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_general_ci");
+
+                entity.HasOne(d => d.Realm)
+                    .WithMany(p => p.RealmPropertiesString)
+                    .HasForeignKey(d => d.RealmId)
+                    .HasConstraintName("realm_string");
+            });
+
+            modelBuilder.Entity<RealmRulesetLinks>(entity =>
+            {
+                entity.HasKey(e => new { e.RealmId, e.Order })
+                    .HasName("PRIMARY")
+                    .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+                entity.ToTable("realm_ruleset_links");
+
+                entity.HasIndex(e => e.LinkedRealmId)
+                    .HasName("realm_link_child");
+
+                entity.Property(e => e.RealmId).HasColumnName("realm_id");
+
+                entity.Property(e => e.Order).HasColumnName("order");
+
+                entity.Property(e => e.LinkType).HasColumnName("link_type");
+
+                entity.Property(e => e.LinkedRealmId).HasColumnName("linked_realm_id");
+
+                entity.Property(e => e.Probability)
+                    .HasColumnName("probability")
+                    .HasComment("A random number between 0 and 1 will be generated. The first link with a probability value greater than the number value in the probability_group will be applied, and the rest in the group ignored (per landblock).");
+
+                entity.Property(e => e.ProbabilityGroup).HasColumnName("probability_group");
+
+                entity.HasOne(d => d.LinkedRealm)
+                    .WithMany(p => p.RealmRulesetLinksLinkedRealm)
+                    .HasForeignKey(d => d.LinkedRealmId)
+                    .HasConstraintName("realm_link_child");
+
+                entity.HasOne(d => d.Realm)
+                    .WithMany(p => p.RealmRulesetLinksRealm)
+                    .HasForeignKey(d => d.RealmId)
+                    .HasConstraintName("realm_link_parent");
             });
 
             modelBuilder.Entity<Recipe>(entity =>
@@ -2287,6 +2562,8 @@ namespace ACE.Database.Models.World
                 entity.Property(e => e.AnglesY).HasColumnName("angles_Y");
 
                 entity.Property(e => e.AnglesZ).HasColumnName("angles_Z");
+
+                entity.Property(e => e.Instance).HasColumnName("instance");
 
                 entity.Property(e => e.ObjCellId).HasColumnName("obj_Cell_Id");
 

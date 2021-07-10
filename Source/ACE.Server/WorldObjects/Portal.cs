@@ -271,6 +271,9 @@ namespace ACE.Server.WorldObjects
 #endif
             var portalDest = new Position(Destination);
             AdjustDungeon(portalDest);
+            if (portalDest.Instance == 0)
+                portalDest.SetToDefaultRealmInstance(Location.RealmID);
+
 
             WorldManager.ThreadSafeTeleport(player, portalDest, false, new ActionEventDelegate(() =>
             {

@@ -244,8 +244,8 @@ namespace ACE.Server.WorldObjects
 
         public Vector3 CalculateProjectileVelocity(Vector3 localOrigin, WorldObject target, float projectileSpeed, out Vector3 origin, out Quaternion rotation)
         {
-            var sourceLoc = PhysicsObj.Position.ACEPosition();
-            var targetLoc = target.PhysicsObj.Position.ACEPosition();
+            var sourceLoc = PhysicsObj.Position.ACEPosition(target.Location);
+            var targetLoc = target.PhysicsObj.Position.ACEPosition(target.Location);
 
             var crossLandblock = sourceLoc.Landblock != targetLoc.Landblock;
 

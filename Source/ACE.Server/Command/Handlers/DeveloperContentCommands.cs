@@ -25,11 +25,15 @@ using ACE.Server.Network;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.WorldObjects;
+using ACE.Database.Models.Shard;
+using log4net;
+using ACE.Database.Adapter;
 
 namespace ACE.Server.Command.Handlers.Processors
 {
-    public class DeveloperContentCommands
+    public partial class DeveloperContentCommands
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public enum FileType
         {
             Undefined,
@@ -39,6 +43,7 @@ namespace ACE.Server.Command.Handlers.Processors
             Recipe,
             Spell,
             Weenie,
+            Realm
         }
 
         public static FileType GetContentType(string[] parameters, ref string param)
@@ -59,6 +64,8 @@ namespace ACE.Server.Command.Handlers.Processors
                     return FileType.Recipe;
                 else if (fileType.StartsWith("weenie"))
                     return FileType.Weenie;
+                else if (fileType.StartsWith("realm"))
+                    return FileType.Realm;
             }
             return FileType.Undefined;
         }
@@ -96,6 +103,145 @@ namespace ACE.Server.Command.Handlers.Processors
                 case FileType.Weenie:
                     ImportJsonWeenie(session, param);
                     break;
+
+                case FileType.Realm:
+                    //ImportJsonRealm(session, param);
+                    return;
+            }
+        }
+
+        [CommandHandler("import-realms", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Imports all json realms from the Content folder")]
+        public static void HandleImportRealms(Session session, params string[] parameters)
+        {
+            DateTime now = DateTime.Now;
+            DirectoryInfo di = VerifyContentFolder(session);
+            if (!di.Exists) return;
+
+            var sep = Path.DirectorySeparatorChar;
+
+            var realms_index = $"{di.FullName}{sep}json{sep}realms.jsonc";
+            var json_folder = $"{di.FullName}{sep}json{sep}realms{sep}";
+
+            var realms = ImportJsonRealmsFolder(session, json_folder);
+            if (realms != null)
+                ImportJsonRealmsIndex(session, realms_index, realms);
+
+            session?.Network.EnqueueSend(new GameMessageSystemChat($"Synced {realms.Count} realms in {(DateTime.Now - now)}.", ChatMessageType.Broadcast));
+        }
+
+        private static List<RealmToImport> ImportJsonRealmsFromSubFolder(Session session, string json_folder)
+        {
+            var di = new DirectoryInfo(json_folder);
+
+            var files = di.Exists ? di.GetFiles($"*.jsonc") : null;
+
+            if (files == null)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find {json_folder}*.jsonc");
+                return null;
+            }
+
+            List<RealmToImport> list = new List<RealmToImport>();
+            foreach(var file in files)
+            {
+                var jsondata = File.ReadAllText(file.FullName);
+                var realmToImport = RealmManager.DeserializeRealmJson(session, file.FullName, jsondata);
+                if (realmToImport == null)
+                    return null;
+                list.Add(realmToImport);
+            }
+            return list;
+        }
+
+        
+
+        private static List<RealmToImport> ImportJsonRealmsFolder(Session session, string json_folder)
+        {
+            var sep = Path.DirectorySeparatorChar;
+            var json_folder_realm = $"{json_folder}{sep}realm{sep}";
+            var json_folder_ruleset = $"{json_folder}{sep}ruleset{sep}";
+
+            var list = ImportJsonRealmsFromSubFolder(session, json_folder_realm).ToList();
+            if (list == null)
+                return null;
+
+            var list2 = ImportJsonRealmsFromSubFolder(session, json_folder_ruleset);
+            if (list2 != null)
+            {
+                list.AddRange(list2);
+                return list;
+            }
+            return null;
+        }
+
+        private static void ImportJsonRealmsIndex(Session session, string realmsIndexJsonFile, List<RealmToImport> realms)
+        {
+            Dictionary<string, RealmToImport> realmsDict = null;
+            Dictionary<ushort, RealmToImport> realmsById = new Dictionary<ushort, RealmToImport>();
+            try
+            {
+                realmsDict = realms.ToDictionary(x => x.Realm.Name);
+            }
+            catch
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't create realms dictionary. Is there a problem with a realm name?");
+                return;
+            }
+
+            Dictionary<string, ushort> result = null;
+            try
+            {
+                var fileText = File.ReadAllText(realmsIndexJsonFile);
+                result = JsonConvert.DeserializeObject<Dictionary<string, ushort>>(fileText);
+
+                //Map ids
+                foreach (var item in result)
+                {
+                    var importItem = realmsDict[item.Key];
+                    importItem.Realm.SetId(item.Value);
+                    realmsById.Add(item.Value, importItem);
+                }
+
+                //Map parents
+                foreach(var item in result)
+                {
+                    var importItem = realmsDict[item.Key];
+                    if (importItem.Realm.ParentRealmName != null)
+                    {
+                        if (!realmsDict.TryGetValue(importItem.Realm.ParentRealmName, out var parentImportItem))
+                            throw new Exception($"Couldn't find parent realm with name {importItem.Realm.ParentRealmName}");
+                        importItem.Realm.ParentRealmId = parentImportItem.Realm.Id;
+                    }
+                }
+
+                //Map descendents
+                foreach (var item in result)
+                {
+                    var importItem = realmsDict[item.Key];
+                    if (importItem.Realm.ParentRealmId == null)
+                        continue;
+
+                    var parentImportItem = realmsById[importItem.Realm.ParentRealmId.Value];
+                    parentImportItem.Realm.Descendents.Add(importItem.Realm.Id, importItem.Realm);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Couldn't import {realmsIndexJsonFile}", ex);
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't import {realmsIndexJsonFile}");
+                return;
+            }
+
+            try
+            {
+                RealmManager.FullUpdateRealmsRepository(realmsDict, realmsById);
+                Console.WriteLine($"Imported {realmsById.Count} realms.");
+            }
+            catch
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Failed to update realms repository.");
+                log.Error($"Failed to update realms repository.");
+                return;
             }
         }
 
@@ -242,8 +388,12 @@ namespace ACE.Server.Command.Handlers.Processors
                     break;
 
                 case FileType.Weenie:
-                    ImportSQLWeenie(session, param);
+                    ImportSQLWeenieWrapped(session, param, parameters.Length >= 3 ? parameters[2] : "");
                     break;
+
+                /*case FileType.Realm:
+                    ImportSQLRealm(session, param);
+                    break;*/
             }
         }
 
@@ -301,6 +451,34 @@ namespace ACE.Server.Command.Handlers.Processors
 
             foreach (var file in files)
                 ImportSQLRecipe(session, sql_folder, file.Name);
+        }
+
+        public static void ImportSQLRealm(Session session, string realmId)
+        {
+            DirectoryInfo di = VerifyContentFolder(session);
+            if (!di.Exists) return;
+
+            var sep = Path.DirectorySeparatorChar;
+
+            var sql_folder = $"{di.FullName}{sep}sql{sep}realms{sep}";
+
+            var prefix = realmId + " ";
+
+            if (realmId.Equals("all", StringComparison.OrdinalIgnoreCase))
+                prefix = "";
+
+            di = new DirectoryInfo(sql_folder);
+
+            var files = di.Exists ? di.GetFiles($"{prefix}*.sql") : null;
+
+            if (files == null || files.Length == 0)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find {sql_folder}{prefix}*.sql");
+                return;
+            }
+
+            foreach (var file in files)
+                ImportSQLRealm(session, sql_folder, file.Name);
         }
 
         public static void ImportSQLLandblock(Session session, string landblockId)
@@ -550,6 +728,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
         public static CookBookSQLWriter CookBookSQLWriter;
         public static RecipeSQLWriter RecipeSQLWriter;
+        public static RealmSQLWriter RealmSQLWriter;
 
         public static string json2sql_recipe(Session session, string folder, string json_filename)
         {
@@ -848,6 +1027,28 @@ namespace ACE.Server.Command.Handlers.Processors
             sql2json_recipe(session, cookbooks, sql_folder, sql_file);
         }
 
+        private static void ImportSQLRealm(Session session, string sql_folder, string sql_file)
+        {
+            if (!uint.TryParse(Regex.Match(sql_file, @"\d+").Value, out var realmId))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find realm id from {sql_file}");
+                return;
+            }
+
+            ImportSQL(sql_folder + sql_file);
+            CommandHandlerHelper.WriteOutputInfo(session, $"Imported {sql_file}");
+
+            RealmManager.ClearCache();
+
+            var realm = DatabaseManager.World.GetRealm(realmId);
+
+            if (realm == null)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't load realm {realmId} from db");
+                return;
+            }
+        }
+
         private static void ImportSQLLandblock(Session session, string sql_folder, string sql_file)
         {
             if (!ushort.TryParse(Regex.Match(sql_file, @"[0-9A-F]{4}", RegexOptions.IgnoreCase).Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var landblockId))
@@ -1033,6 +1234,17 @@ namespace ACE.Server.Command.Handlers.Processors
                 ctx.Database.ExecuteSqlRaw(sqlCommands);
         }
 
+        /// <summary>
+        /// Imports an SQL file into the database
+        /// </summary>
+        public static void ImportSQLShard(string sqlFile)
+        {
+            var sqlCommands = File.ReadAllText(sqlFile);
+
+            using (var ctx = new ShardDbContext())
+                ctx.Database.ExecuteSqlCommand(sqlCommands);
+        }
+
         public static LandblockInstanceWriter LandblockInstanceWriter;
 
         [CommandHandler("createinst", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Spawns a new wcid or classname as a landblock instance", "<wcid or classname>")]
@@ -1190,7 +1402,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             // even on flat ground, objects can sometimes fail to spawn at the player's current Z
             // Position.Z has some weird thresholds when moving around, but i guess the same logic doesn't apply when trying to spawn in...
-            wo.Location.PositionZ += 0.05f;
+            wo.Location._pos.Z += 0.05f;
 
             session.Network.EnqueueSend(new GameMessageSystemChat($"Creating new landblock instance {(isLinkChild ? "child object " : "")}@ {loc.ToLOCString()}\n{wo.WeenieClassId} - {wo.Name} ({nextStaticGuid:X8})", ChatMessageType.Broadcast));
 
@@ -1287,16 +1499,16 @@ namespace ACE.Server.Command.Handlers.Processors
 
             instance.WeenieClassId = wo.WeenieClassId;
 
-            instance.ObjCellId = wo.Location.Cell;
+            instance.ObjCellId = wo.Location.ObjCellID;
 
-            instance.OriginX = wo.Location.PositionX;
-            instance.OriginY = wo.Location.PositionY;
-            instance.OriginZ = wo.Location.PositionZ;
+            instance.OriginX = wo.Location.Pos.X;
+            instance.OriginY = wo.Location.Pos.Y;
+            instance.OriginZ = wo.Location.Pos.Z;
 
-            instance.AnglesW = wo.Location.RotationW;
-            instance.AnglesX = wo.Location.RotationX;
-            instance.AnglesY = wo.Location.RotationY;
-            instance.AnglesZ = wo.Location.RotationZ;
+            instance.AnglesW = wo.Location.Rotation.W;
+            instance.AnglesX = wo.Location.Rotation.X;
+            instance.AnglesY = wo.Location.Rotation.Y;
+            instance.AnglesZ = wo.Location.Rotation.Z;
 
             instance.IsLinkChild = isLinkChild;
 
@@ -1487,14 +1699,14 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var pos = session.Player.Location;
 
-            if ((pos.Cell & 0xFFFF) >= 0x100)
+            if ((pos.ObjCellID & 0xFFFF) >= 0x100)
             {
                 session.Network.EnqueueSend(new GameMessageSystemChat("You must be outdoors to create an encounter!", ChatMessageType.Broadcast));
                 return;
             }
 
-            var cellX = (int)pos.PositionX / 24;
-            var cellY = (int)pos.PositionY / 24;
+            var cellX = (int)pos.Pos.X / 24;
+            var cellY = (int)pos.Pos.Y / 24;
 
             var landblock = (ushort)pos.Landblock;
 
@@ -1552,13 +1764,13 @@ namespace ACE.Server.Command.Handlers.Processors
             var yPos = Math.Clamp(cellY * 24.0f, 0.5f, 191.5f);
 
             var newPos = new Physics.Common.Position();
-            newPos.ObjCellID = pos.Cell;
+            newPos.ObjCellID = pos.ObjCellID;
             newPos.Frame = new Physics.Animation.AFrame(new Vector3(xPos, yPos, 0), Quaternion.Identity);
             newPos.adjust_to_outside();
 
             newPos.Frame.Origin.Z = session.Player.CurrentLandblock.PhysicsLandblock.GetZ(newPos.Frame.Origin);
 
-            wo.Location = new Position(newPos.ObjCellID, newPos.Frame.Origin, newPos.Frame.Orientation);
+            wo.Location = new Position(newPos.ObjCellID, newPos.Frame.Origin, newPos.Frame.Orientation, false, pos.Instance);
 
             var sortCell = Physics.Common.LScape.get_landcell(newPos.ObjCellID) as Physics.Common.SortCell;
             if (sortCell != null && sortCell.has_building())
@@ -1959,6 +2171,10 @@ namespace ACE.Server.Command.Handlers.Processors
                 case FileType.Weenie:
                     ExportSQLWeenie(session, param);
                     break;
+
+                case FileType.Realm:
+                    ExportSQLRealm(session, param);
+                    break;
             }
         }
 
@@ -2075,6 +2291,61 @@ namespace ACE.Server.Command.Handlers.Processors
                 sqlFile.WriteLine();
 
                 CookBookSQLWriter.CreateSQLINSERTStatement(cookbooks, sqlFile);
+
+                sqlFile.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                CommandHandlerHelper.WriteOutputInfo(session, $"Failed to export {sql_folder}{sql_filename}");
+                return;
+            }
+
+            CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
+        }
+
+        public static void ExportSQLRealm(Session session, string param)
+        {
+            DirectoryInfo di = VerifyContentFolder(session, false);
+
+            var sep = Path.DirectorySeparatorChar;
+
+            if (!uint.TryParse(param, out var realmId))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"{param} not a valid realm id");
+                return;
+            }
+
+            var realm = DatabaseManager.World.GetRealm(realmId);
+            if (realm == null)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find realm id {realmId}");
+                return;
+            }
+
+            var sql_folder = $"{di.FullName}{sep}sql{sep}realms{sep}";
+
+            di = new DirectoryInfo(sql_folder);
+
+            if (!di.Exists)
+                di.Create();
+
+            if (RealmSQLWriter == null)
+            {
+                RealmSQLWriter = new RealmSQLWriter();
+            }
+
+            var sql_filename = RealmSQLWriter.GetDefaultFileName(realm);
+
+            try
+            {
+                var sqlFile = new StreamWriter(sql_folder + sql_filename);
+
+                RealmSQLWriter.CreateSQLDELETEStatement(realm, sqlFile);
+                sqlFile.WriteLine();
+
+                RealmSQLWriter.CreateSQLINSERTStatement(realm, sqlFile);
+                sqlFile.WriteLine();
 
                 sqlFile.Close();
             }
@@ -2206,6 +2477,8 @@ namespace ACE.Server.Command.Handlers.Processors
                     mode = CacheType.Weenie;
                 if (parameters[0].Contains("wield", StringComparison.OrdinalIgnoreCase))
                     mode = CacheType.WieldedTreasure;
+                if (parameters[0].Contains("realm", StringComparison.OrdinalIgnoreCase))
+                    mode = CacheType.Realm;
             }
 
             if (mode.HasFlag(CacheType.Landblock))
@@ -2238,6 +2511,12 @@ namespace ACE.Server.Command.Handlers.Processors
                 CommandHandlerHelper.WriteOutputInfo(session, "Clearing wielded treasure cache");
                 DatabaseManager.World.ClearWieldedTreasureCache();
             }
+            
+            if (mode.HasFlag(CacheType.Realm))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "Clearing realm cache");
+                DatabaseManager.World.ClearRealmCache();
+            }
         }
 
         [Flags]
@@ -2249,6 +2528,7 @@ namespace ACE.Server.Command.Handlers.Processors
             Spell           = 0x4,
             Weenie          = 0x8,
             WieldedTreasure = 0x10,
+            Realm           = 0x16,
             All             = 0xFFFF
         };
 
@@ -2307,6 +2587,8 @@ namespace ACE.Server.Command.Handlers.Processors
                         return FileType.Spell;
                     else if (line.Contains("`weenie`"))
                         return FileType.Weenie;
+                    else if (line.Contains("`realm`"))
+                        return FileType.Realm;
                     else
                         break;
                 }
@@ -2427,20 +2709,20 @@ namespace ACE.Server.Command.Handlers.Processors
                     return;
                 }
 
-                instance.AnglesX = obj.Location.RotationX;
-                instance.AnglesY = obj.Location.RotationY;
-                instance.AnglesZ = obj.Location.RotationZ;
-                instance.AnglesW = obj.Location.RotationW;
+                instance.AnglesX = obj.Location.Rotation.X;
+                instance.AnglesY = obj.Location.Rotation.Y;
+                instance.AnglesZ = obj.Location.Rotation.Z;
+                instance.AnglesW = obj.Location.Rotation.W;
             }
             else
             {
                 // compare current position with home position
                 // the nudge should be performed as an offset from home position
-                if (instance.OriginX != obj.Location.PositionX || instance.OriginY != obj.Location.PositionY || instance.OriginZ != obj.Location.PositionZ)
+                if (instance.OriginX != obj.Location.Pos.X || instance.OriginY != obj.Location.Pos.Y || instance.OriginZ != obj.Location.Pos.Z)
                 {
                     //session.Network.EnqueueSend(new GameMessageSystemChat($"Moving {obj.Name} ({obj.Guid}) to home position: {obj.Location} to {instance.ObjCellId:X8} [{instance.OriginX} {instance.OriginY} {instance.OriginZ}]", ChatMessageType.Broadcast));
 
-                    var homePos = new Position(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW);
+                    var homePos = new Position(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW, session.Player.Location.Instance);
 
                     // slide?
                     var setPos = new Physics.Common.SetPosition(homePos.PhysPosition(), Physics.Common.SetPositionFlags.Teleport /* | Physics.Common.SetPositionFlags.Slide*/);
@@ -2459,7 +2741,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
                 var transit = obj.PhysicsObj.transition(obj.PhysicsObj.Position, newPos, true);
 
-                var errorMsg = $"{obj.Name} ({obj.Guid}) failed to move from {obj.PhysicsObj.Position.ACEPosition()} to {newPos.ACEPosition()}";
+                var errorMsg = $"{obj.Name} ({obj.Guid}) failed to move from {obj.PhysicsObj.Position.ACEPosition(obj.Location)} to {newPos.ACEPosition(obj.Location)}";
 
                 if (transit == null)
                 {
@@ -2479,7 +2761,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             // update ace location
             var prevLoc = new Position(obj.Location);
-            obj.Location = obj.PhysicsObj.Position.ACEPosition();
+            obj.Location = obj.PhysicsObj.Position.ACEPosition(obj.Location);
 
             if (prevLoc.Landblock != obj.Location.Landblock)
                 LandblockManager.RelocateObjectForPhysics(obj, true);
@@ -2491,9 +2773,9 @@ namespace ACE.Server.Command.Handlers.Processors
 
             // update sql
             instance.ObjCellId = obj.Location.Cell;
-            instance.OriginX = obj.Location.PositionX;
-            instance.OriginY = obj.Location.PositionY;
-            instance.OriginZ = obj.Location.PositionZ;
+            instance.OriginX = obj.Location.Pos.X;
+            instance.OriginY = obj.Location.Pos.Y;
+            instance.OriginZ = obj.Location.Pos.Z;
 
             SyncInstances(session, landblock_id, instances);
         }

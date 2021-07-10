@@ -30,6 +30,7 @@ using ACE.Server.WorldObjects.Managers;
 
 using Landblock = ACE.Server.Entity.Landblock;
 using Position = ACE.Entity.Position;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -69,6 +70,7 @@ namespace ACE.Server.WorldObjects
         /// Should only be adjusted by Landblock -- default is null
         /// </summary>
         public Landblock CurrentLandblock { get; internal set; }
+        public AppliedRuleset RealmRuleset => CurrentLandblock?.RealmRuleset;
 
         public bool IsBusy { get; set; }
         public bool IsShield { get => CombatUse != null && CombatUse == ACE.Entity.Enum.CombatUse.Shield; }

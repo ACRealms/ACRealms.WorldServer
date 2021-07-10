@@ -60,15 +60,9 @@ namespace ACE.Database.Models.Shard
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var config = Common.ConfigManager.Config.MySql.Shard;
-
-                optionsBuilder.UseMySql($"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};TreatTinyAsBoolean=False", builder =>
-                {
-                    builder.EnableRetryOnFailure(10);
-                });
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseMySql("server=localhost;port=3306;user=root;password=asdf12345;database=realms_shard;treattinyasboolean=False", x => x.ServerVersion("8.0.24-mysql"));
             }
-
-            optionsBuilder.EnableSensitiveDataLogging(true);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -363,8 +357,8 @@ namespace ACE.Database.Models.Shard
                     .HasColumnType("varchar(255)")
                     .HasDefaultValueSql("'prewritten'")
                     .HasComment("Account Name of the Author of this page")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.AuthorId)
                     .HasColumnName("author_Id")
@@ -376,8 +370,8 @@ namespace ACE.Database.Models.Shard
                     .HasColumnType("varchar(255)")
                     .HasDefaultValueSql("''")
                     .HasComment("Character Name of the Author of this page")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.IgnoreAuthor)
                     .HasColumnName("ignore_Author")
@@ -396,8 +390,8 @@ namespace ACE.Database.Models.Shard
                     .HasColumnName("page_Text")
                     .HasColumnType("text")
                     .HasComment("Text of the Page")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.HasOne(d => d.Object)
                     .WithMany(p => p.BiotaPropertiesBookPageData)
@@ -540,8 +534,8 @@ namespace ACE.Database.Models.Shard
                 entity.Property(e => e.Quest)
                     .HasColumnName("quest")
                     .HasColumnType("text")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Style).HasColumnName("style");
 
@@ -612,8 +606,8 @@ namespace ACE.Database.Models.Shard
                 entity.Property(e => e.Message)
                     .HasColumnName("message")
                     .HasColumnType("text")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Min).HasColumnName("min");
 
@@ -660,8 +654,8 @@ namespace ACE.Database.Models.Shard
                 entity.Property(e => e.TestString)
                     .HasColumnName("test_String")
                     .HasColumnType("text")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.TreasureClass).HasColumnName("treasure_Class");
 
@@ -1167,8 +1161,8 @@ namespace ACE.Database.Models.Shard
                     .HasColumnName("value")
                     .HasColumnType("text")
                     .HasComment("Value of this Property")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.HasOne(d => d.Object)
                     .WithMany(p => p.BiotaPropertiesString)
@@ -1259,8 +1253,8 @@ namespace ACE.Database.Models.Shard
                     .HasColumnName("name")
                     .HasColumnType("varchar(255)")
                     .HasComment("Name of Character")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.SpellbookFilters)
                     .HasColumnName("spellbook_Filters")
@@ -1363,8 +1357,8 @@ namespace ACE.Database.Models.Shard
                     .HasColumnName("quest_Name")
                     .HasColumnType("varchar(255)")
                     .HasComment("Unique Name of Quest")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.LastTimeCompleted)
                     .HasColumnName("last_Time_Completed")
@@ -1502,14 +1496,14 @@ namespace ACE.Database.Models.Shard
                 entity.Property(e => e.Key)
                     .HasColumnName("key")
                     .HasColumnType("varchar(255)")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Description)
                     .HasColumnName("description")
                     .HasColumnType("text")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Value).HasColumnName("value");
             });
@@ -1524,14 +1518,14 @@ namespace ACE.Database.Models.Shard
                 entity.Property(e => e.Key)
                     .HasColumnName("key")
                     .HasColumnType("varchar(255)")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Description)
                     .HasColumnName("description")
                     .HasColumnType("text")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Value).HasColumnName("value");
             });
@@ -1546,14 +1540,14 @@ namespace ACE.Database.Models.Shard
                 entity.Property(e => e.Key)
                     .HasColumnName("key")
                     .HasColumnType("varchar(255)")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Description)
                     .HasColumnName("description")
                     .HasColumnType("text")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Value).HasColumnName("value");
             });
@@ -1568,21 +1562,21 @@ namespace ACE.Database.Models.Shard
                 entity.Property(e => e.Key)
                     .HasColumnName("key")
                     .HasColumnType("varchar(255)")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Description)
                     .HasColumnName("description")
                     .HasColumnType("text")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Value)
                     .IsRequired()
                     .HasColumnName("value")
                     .HasColumnType("text")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_general_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
             });
 
             modelBuilder.Entity<HousePermission>(entity =>

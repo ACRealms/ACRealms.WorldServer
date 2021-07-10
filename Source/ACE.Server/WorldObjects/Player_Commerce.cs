@@ -287,6 +287,11 @@ namespace ACE.Server.WorldObjects
 
                             castChain.EnqueueChain();
                         }
+                        else if (gen.GetProperty(PropertyInt.HomeRealm).HasValue)
+                        {
+                            var realmId = gen.GetProperty(PropertyInt.HomeRealm).Value;
+                            RealmManager.SetHomeRealm(this, realmId); 
+                        }
                     }
                 }
 
