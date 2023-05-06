@@ -1,34 +1,56 @@
 version: '3'
 services:
-
   ace-db:
-    image: mysql:latest
+    image: 'mysql:8.0.12'
     container_name: ace-db
     env_file:
       - docker.env
     volumes:
-      - ./db-data:/var/lib/mysql
+      - './db-data:/var/lib/mysql'
+      - ./Database:/ace/Database
+      - ./Scripts/initdb.sh:/docker-entrypoint-initdb.d/1.sh
+      - ../../packages/shared-db/ACE-World-Database-v0.9.269.sql.gz:/docker-entrypoint-initdb.d/2.sql.gz
     ports:
-      - "3306:3306/tcp"
+      - '3306:3306/tcp'
     restart: unless-stopped
     healthcheck:
-        test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-
+      test:
+        - CMD
+        - mysqladmin
+        - ping
+        - '-h'
+        - localhost
+  ace-workbench:
+    image: 'lscr.io/linuxserver/mysql-workbench:latest'
+    depends_on:
+      - ace-db
+    container_name: mysql-workbench
+    env_file:
+      - docker.env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    ports:
+      - '3000:3000'
+      - '3001:3001'
+    cap_add:
+      - IPC_LOCK
+    restart: unless-stopped
   ace-server:
     build: .
-    image: acemulator/ace:latest
+    image: 'acemulator/ace:latest'
     depends_on:
       - ace-db
     container_name: ace-server
     env_file:
       - docker.env
     volumes:
-      - ./Config:/ace/Config
-      - ./Content:/ace/Content
-      - ./Dats:/ace/Dats
-      - ./Logs:/ace/Logs
+      - './Config:/ace/Config'
+      - '../../packages/content/ac-realms-content:/ace/Content'
+      - './Dats:/ace/Dats'
+      - './Logs:/ace/Logs'
     ports:
-      - "9000-9001:9000-9001/udp"
-    #restart: unless-stopped
+      - '9000-9001:9000-9001/udp'
     restart: on-failure
 

@@ -562,11 +562,6 @@ namespace ACE.Database
         public virtual void ReplaceAllRealms(Dictionary<ushort, RealmToImport> realmsById)
         {
             var realms = realmsById.Values.Select(x => x.Realm);
-            var propsbool = realms.SelectMany(x => x.RealmPropertiesBool);
-            var propsint = realms.SelectMany(x => x.RealmPropertiesInt);
-            var propsint64 = realms.SelectMany(x => x.RealmPropertiesInt64);
-            var propsfloat = realms.SelectMany(x => x.RealmPropertiesFloat);
-            var propsstring = realms.SelectMany(x => x.RealmPropertiesString);
             var links = realmsById.Values.SelectMany(x => x.Links);
 
             using (var context = new WorldDbContext())
@@ -574,13 +569,8 @@ namespace ACE.Database
                 using (var transaction = context.Database.BeginTransaction())
                 {
                     context.Database.ExecuteSqlCommand("DELETE FROM realm;");
-                    context.BulkInsert(realms);
-                    context.BulkInsert(propsbool);
-                    context.BulkInsert(propsint);
-                    context.BulkInsert(propsint64);
-                    context.BulkInsert(propsfloat);
-                    context.BulkInsert(propsstring);
-                    context.BulkInsert(links);
+                    context.Realm.AddRange(realms);
+                    context.SaveChanges();
                     transaction.Commit();
                 }
             }
