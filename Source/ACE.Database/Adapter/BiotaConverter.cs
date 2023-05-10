@@ -81,6 +81,7 @@ namespace ACE.Database.Adapter
                         RotationY = record.AnglesY,
                         RotationZ = record.AnglesZ,
                         Instance = record.Instance,
+
                     };
 
                     result.PropertiesPosition[(PositionType)record.PositionType] = newEntity;
@@ -519,7 +520,8 @@ namespace ACE.Database.Adapter
                 foreach (var kvp in biota.PropertiesString)
                     result.SetProperty(kvp.Key, kvp.Value);
             }
- 
+
+
 
             if (biota.PropertiesPosition != null)
             {
@@ -644,7 +646,7 @@ namespace ACE.Database.Adapter
                             Type = value2.Type,
                             Delay = value2.Delay,
                             Extent = value2.Extent,
-                            Motion = (int?)value2.Motion,
+                            Motion = (uint?)value2.Motion,
                             Message = value2.Message,
                             TestString = value2.TestString,
                             Min = value2.Min,

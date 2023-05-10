@@ -107,7 +107,12 @@ namespace ACE.Server.WorldObjects.Entity
             {
                 var attr = AttributeFormula.GetFormula(creature, Vital, false);
 
-                return StartingValue + Ranks + attr;
+                var total = StartingValue + Ranks + attr;
+
+                if (creature is Player player && Vital == PropertyAttribute2nd.MaxHealth)
+                    total += (uint)(player.Enlightenment * 2 + player.GetGearMaxHealth());
+
+                return total;
             }
         }
 
@@ -117,39 +122,55 @@ namespace ACE.Server.WorldObjects.Entity
             set => propertiesAttribute2nd.CurrentLevel = value;
         }
 
-        public uint MaxValue
+        public uint MaxValue => GetMaxValue(true);
+
+        public uint GetMaxValue(bool enchanted)
         {
-            get
+            var attr = AttributeFormula.GetFormula(creature, Vital, true);
+
+            uint total = StartingValue + Ranks + attr;
+
+            var player = creature as Player;
+
+            if (player != null)
             {
-                var attr = AttributeFormula.GetFormula(creature, Vital, true);
+                // Enlightenment and GearMaxHealth didn't work like other additives
+                // most additives (ie. from enchantments) were added in *after* multipliers,
+                // but Enlightenment and GearMaxHealth were an exception, and added in beforehand
 
-                uint total = StartingValue + Ranks + attr;
+                // this means Enlightenment and GearMaxHealth would get scaled by multipliers,
+                // including Asheron's Benediction, and oddly enough, vitae as well
 
-                // apply multiplicative enchantments first
-                var multiplier = creature.EnchantmentManager.GetVitalMod_Multiplier(this);
-
-                var fTotal = total * multiplier;
-
-                var additives = 0.0f;
-
-                if (creature is Player player)
-                {
-                    var vitae = player.Vitae;
-
-                    if (vitae != 1.0f)
-                        fTotal *= vitae;
-
-                    // everything beyond this point does not get scaled by vitae
-                    if (Vital == PropertyAttribute2nd.MaxHealth)
-                        additives += player.Enlightenment * 2;
-                }
-
-                additives += creature.EnchantmentManager.GetVitalMod_Additives(this);
-
-                total = (uint)(fTotal + additives).Round();
-
-                return total;
+                // it's also possible these were considered "base"
+                if (Vital == PropertyAttribute2nd.MaxHealth)
+                    total += (uint)(player.Enlightenment * 2 + player.GetGearMaxHealth());
             }
+
+            // apply multiplicative enchantments first
+            var multiplier = enchanted ? creature.EnchantmentManager.GetVitalMod_Multiplier(this) : 1.0f;
+
+            var fTotal = total * multiplier;
+
+            if (player != null)
+            {
+                var vitae = player.Vitae;
+
+                if (vitae != 1.0f)
+                    fTotal *= vitae;
+            }
+
+            // everything beyond this point does not get scaled by vitae
+            var additives = enchanted ? creature.EnchantmentManager.GetVitalMod_Additives(this) : 0;
+
+            var iTotal = (fTotal + additives).Round();
+
+            // a creature cannot fall below 5 MaxVital from enchantments / vitae normally,
+            // or 1 MaxVital for creatures with very low starting vitals
+            var minVital = total >= 5 ? 5 : 1; 
+
+            iTotal = Math.Max(minVital, iTotal);
+
+            return (uint)iTotal;
         }
 
         public uint Missing => MaxValue - Current;
@@ -160,10 +181,12 @@ namespace ACE.Server.WorldObjects.Entity
         {
             get
             {
-                if (Vital == PropertyAttribute2nd.MaxHealth || Vital == PropertyAttribute2nd.MaxStamina)
-                    return creature.Endurance.ModifierType;
-                else if (Vital == PropertyAttribute2nd.MaxMana)
-                    return creature.Self.ModifierType;
+                var diff = (int)GetMaxValue(true) - (int)GetMaxValue(false);
+
+                if (diff > 0)
+                    return ModifierType.Buffed;
+                else if (diff < 0)
+                    return ModifierType.Debuffed;
                 else
                     return ModifierType.None;
             }

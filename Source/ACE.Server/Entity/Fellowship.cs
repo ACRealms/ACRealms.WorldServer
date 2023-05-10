@@ -107,9 +107,7 @@ namespace ACE.Server.Entity
 
             if (newMember.Fellowship != null || FellowshipMembers.ContainsKey(newMember.Guid.Full))
             {
-                // todo: can't seem to find pcap of this scenario... seems odd..
-                inviter.Session.Network.EnqueueSend(new GameMessageSystemChat($"{newMember.Name} is already in a fellowship", ChatMessageType.Fellowship));
-                //inviter.Session.Network.EnqueueSend(new GameEventWeenieError(inviter.Session, WeenieError.FellowshipMember)); 
+                inviter.Session.Network.EnqueueSend(new GameMessageSystemChat($"{newMember.Name} is already a member of a Fellowship.", ChatMessageType.Broadcast));
             }
             else
             {
@@ -124,7 +122,12 @@ namespace ACE.Server.Entity
                     AddConfirmedMember(inviter, newMember, true);
                 }
                 else
-                    newMember.ConfirmationManager.EnqueueSend(new Confirmation_Fellowship(inviter.Guid, newMember.Guid), inviter.Name);
+                {
+                    if (!newMember.ConfirmationManager.EnqueueSend(new Confirmation_Fellowship(inviter.Guid, newMember.Guid), inviter.Name))
+                    {
+                        inviter.Session.Network.EnqueueSend(new GameMessageSystemChat($"{newMember.Name} is busy.", ChatMessageType.Broadcast));
+                    }
+                }
             }
         }
 
@@ -174,13 +177,36 @@ namespace ACE.Server.Entity
             }
 
             UpdateAllMembers();
+
+            if (inviter.CurrentMotionState.Stance == MotionStance.NonCombat) // only do this motion if inviter is at peace, other times motion is skipped. 
+                inviter.SendMotionAsCommands(MotionCommand.BowDeep, MotionStance.NonCombat);
         }
 
-        public void RemoveFellowshipMember(Player player)
+        public void RemoveFellowshipMember(Player player, Player leader)
         {
             if (player == null) return;
 
             var fellowshipMembers = GetFellowshipMembers();
+
+            if (!fellowshipMembers.ContainsKey(player.Guid.Full))
+            {
+                log.Warn($"{leader.Name} tried to dismiss {player.Name} from the fellowship, but {player.Name} was not found in the fellowship");
+
+                var done = true;
+
+                if (player.Fellowship != null)
+                {
+                    if (player.Fellowship == this)
+                    {
+                        log.Warn($"{player.Name} still has a reference to this fellowship somehow. This shouldn't happen");
+                        done = false;
+                    }
+                    else
+                        log.Warn($"{player.Name} has a reference to a different fellowship. {leader.Name} is possibly sending crafted data!");
+                }
+
+                if (done) return;
+            }
 
             foreach (var member in fellowshipMembers.Values)
             {
@@ -284,8 +310,6 @@ namespace ACE.Server.Entity
                 }
                 else
                 {
-                    // most likely is not hit due to client proactively sending AssignNewLeader msg
-
                     FellowshipMembers.Remove(player.Guid.Full);
 
                     if (IsLocked)
@@ -296,9 +320,12 @@ namespace ACE.Server.Entity
                     }
 
                     player.Fellowship = null;
+
                     player.Session.Network.EnqueueSend(new GameEventFellowshipQuit(player.Session, player.Guid.Full));
                     player.Session.Network.EnqueueSend(new GameMessageSystemChat("You no longer have permission to loot anyone else's kills.", ChatMessageType.Broadcast));
+
                     var fellowshipMembers = GetFellowshipMembers();
+
                     foreach (var member in fellowshipMembers.Values)
                     {
                         member.Session.Network.EnqueueSend(new GameEventFellowshipQuit(member.Session, player.Guid.Full));
@@ -310,6 +337,7 @@ namespace ACE.Server.Entity
                         }
                     }
                     AssignNewLeader(null, null);
+
                     CalculateXPSharing();
                 }
             }
@@ -320,12 +348,15 @@ namespace ACE.Server.Entity
                 if (IsLocked)
                 {
                     var timestamp = (int)Time.GetUnixTime();
+
                     if (!DepartedMembers.TryAdd(player.Guid.Full, timestamp))
                         DepartedMembers[player.Guid.Full] = timestamp;
                 }
 
                 player.Session.Network.EnqueueSend(new GameEventFellowshipQuit(player.Session, player.Guid.Full));
+
                 var fellowshipMembers = GetFellowshipMembers();
+
                 foreach (var member in fellowshipMembers.Values)
                 {
                     member.Session.Network.EnqueueSend(new GameEventFellowshipQuit(member.Session, player.Guid.Full));
@@ -336,36 +367,43 @@ namespace ACE.Server.Entity
                         player.Session.Network.EnqueueSend(new GameMessageSystemChat($"{member.Name} does not have permission to loot your kills.", ChatMessageType.Broadcast));
                     }
                 }
+
                 player.Fellowship = null;
+
                 CalculateXPSharing();
             }
         }
 
         public void AssignNewLeader(Player oldLeader, Player newLeader)
         {
-            string newLeaderName = string.Empty;
             if (newLeader != null)
             {
                 FellowshipLeaderGuid = newLeader.Guid.Full;
-                newLeaderName = newLeader.Name;
+
                 if (oldLeader != null)
-                    oldLeader.Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(oldLeader.Session, WeenieErrorWithString.YouHavePassedFellowshipLeadershipTo_, newLeaderName));
-                SendWeenieErrorWithStringAndUpdate(WeenieErrorWithString._IsNowLeaderOfFellowship, newLeaderName);
+                    oldLeader.Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(oldLeader.Session, WeenieErrorWithString.YouHavePassedFellowshipLeadershipTo_, newLeader.Name));
+
+                SendWeenieErrorWithStringAndUpdate(WeenieErrorWithString._IsNowLeaderOfFellowship, newLeader.Name);
             }
             else
             {
+                // leader has dropped, assign new random leader
                 var fellowshipMembers = GetFellowshipMembers();
 
-                if (fellowshipMembers.Count > 0)
-                {
-                    int newLeaderIndex = ThreadSafeRandom.Next(0, fellowshipMembers.Count - 1);
-                    var fellowGuids = fellowshipMembers.Keys.ToList();
-                    FellowshipLeaderGuid = fellowGuids[newLeaderIndex];
-                    newLeaderName = fellowshipMembers[FellowshipLeaderGuid].Name;
-                    if (oldLeader != null)
-                        oldLeader.Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(oldLeader.Session, WeenieErrorWithString.YouHavePassedFellowshipLeadershipTo_, newLeaderName));
-                    SendWeenieErrorWithStringAndUpdate(WeenieErrorWithString._IsNowLeaderOfFellowship, newLeaderName);
-                }
+                if (fellowshipMembers.Count == 0) return;
+
+                var rng = ThreadSafeRandom.Next(0, fellowshipMembers.Count - 1);
+
+                var fellowGuids = fellowshipMembers.Keys.ToList();
+
+                FellowshipLeaderGuid = fellowGuids[rng];
+
+                var newLeaderName = fellowshipMembers[FellowshipLeaderGuid].Name;
+
+                if (oldLeader != null)
+                    oldLeader.Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(oldLeader.Session, WeenieErrorWithString.YouHavePassedFellowshipLeadershipTo_, newLeaderName));
+
+                SendWeenieErrorWithStringAndUpdate(WeenieErrorWithString._IsNowLeaderOfFellowship, newLeaderName);
             }
         }
 
@@ -422,9 +460,10 @@ namespace ACE.Server.Entity
 
             var fellows = GetFellowshipMembers();
 
-            var allOver50 = !fellows.Values.Any(f => (f.Level ?? 1) < 50);
+            var allEvenShareLevel = PropertyManager.GetLong("fellowship_even_share_level").Item;
+            var allOverEvenShareLevel = !fellows.Values.Any(f => (f.Level ?? 1) < allEvenShareLevel);
 
-            if (allOver50)
+            if (allOverEvenShareLevel)
             {
                 ShareXP = DesiredShareXP;
                 EvenShare = true;
@@ -736,20 +775,18 @@ namespace ACE.Server.Entity
 
     public static class FellowshipExtensions
     {
-        public static ushort NumBuckets = 32;
+        private static readonly HashComparer hashComparer = new HashComparer(32);
 
-        public static HashComparer HashComparer = new HashComparer(NumBuckets);
-
-        public static void Write(this BinaryWriter writer, Dictionary<uint, int> departedMembersHash)
+        public static void Write(this BinaryWriter writer, Dictionary<uint, int> departedFellows)
         {
-            writer.Write((ushort)departedMembersHash.Count);
-            writer.Write(NumBuckets);
+            PackableHashTable.WriteHeader(writer, departedFellows.Count, hashComparer.NumBuckets);
 
-            var departedMembers = new SortedDictionary<uint, int>(departedMembersHash, HashComparer);
-            foreach (var member in departedMembers)
+            var sorted = new SortedDictionary<uint, int>(departedFellows, hashComparer);
+
+            foreach (var departed in sorted)
             {
-                writer.Write(member.Key);
-                writer.Write(member.Value);
+                writer.Write(departed.Key);
+                writer.Write(departed.Value);
             }
         }
     }

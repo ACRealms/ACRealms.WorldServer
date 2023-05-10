@@ -47,19 +47,7 @@ namespace ACE.Server.Physics
         public PhysicsObj Parent;
         public ChildList Children;
         public Position Position;
-
-        private ObjCell _curCell;
-        public ObjCell CurCell
-        {
-            get => _curCell;
-            set
-            {
-                _curCell = value;
-                if (_curCell?.CurLandblock != null)
-                    CurLandblock = _curCell.CurLandblock;
-            }
-        }
-
+        public ObjCell CurCell;
         public Landblock CurLandblock;
         public int NumShadowObjects;
         public Dictionary<uint, ShadowObj> ShadowObjects;
@@ -109,7 +97,7 @@ namespace ACE.Server.Physics
             MovementManager.MotionInterpreter.InterpretedState.HasCommands() || MovementManager.MoveToManager.Initialized;
 
         // server
-        public Position RequestPos { get; set; }
+        public Position RequestPos;
         public uint RequestInstance { get; set; }
 
         public string Name
@@ -158,6 +146,9 @@ namespace ACE.Server.Physics
             UpdateTime = PhysicsTimer.CurrentTime;
             UpdateTimes = new int[UpdateTimeLength];
             PhysicsTimer_CurrentTime = PhysicsTimer.CurrentTime;
+
+            // todo: only allocate these for server objects
+            // get rid of 'DatObject', use the existing WeenieObj == null
             WeenieObj = new WeenieObject();
             ObjMaint = new ObjectMaint(this);
 
@@ -1321,6 +1312,21 @@ namespace ACE.Server.Physics
                 WeenieObj.WorldObject.SetProperty(PropertyBool.Ethereal, true);
             }
 
+            if (entering_world && transition.SpherePath.CurPos.Landblock != pos.Landblock)
+            {
+                // AdjustToOutside and find_cell_list can inconsistently result in 2 different cells for edges
+                // if something directly on a landblock edge has resulted in a different landblock from find_cell_list, discard completely
+
+                // this can also (more legitimately) happen even if the object isn't directly on landblock edge, but is near it
+                // an object trying to spawn on a hillside near a landblock edge might get pushed slightly during spawning,
+                // resulting in a successful spawn in a neighboring landblock. we don't handle adjustments to the actual landblock reference in here
+
+                // ideally CellArray.LoadCells = false would be passed to find_cell_list to prevent it from even attempting to load an unloaded neighboring landblock
+
+                log.Debug($"{Name} ({ID:X8}) AddPhysicsObj() - {pos.ShortLoc()} resulted in {transition.SpherePath.CurPos.ShortLoc()}, discarding");
+                return SetPositionError.NoValidPosition;
+            }
+
             if (!SetPositionInternal(transition))
                 return SetPositionError.GeneralFailure;
 
@@ -1439,7 +1445,7 @@ namespace ACE.Server.Physics
 
                     }
                     //else
-                        //indoors = true;
+                    //indoors = true;
 
                     /*if (sortCell != null && sortCell.has_building())
                     {
@@ -1475,7 +1481,7 @@ namespace ACE.Server.Physics
             }
 
             //if (result != SetPositionError.OK)
-                //Console.WriteLine($"Couldn't spawn {Name} after {setPos.NumTries} retries @ {setPos.Pos}");
+            //Console.WriteLine($"Couldn't spawn {Name} after {setPos.NumTries} retries @ {setPos.Pos}");
 
             return result;
         }
@@ -1678,34 +1684,34 @@ namespace ACE.Server.Physics
                     }
                     else if ((State & PhysicsState.Sledding) != 0 && Velocity != Vector3.Zero)
                         newPos.Frame.set_vector_heading(Vector3.Normalize(Velocity));
-                }
 
-                if (GetBlockDist(Position, newPos) > 1)
-                {
-                    log.Warn($"WARNING: failed transition for {Name} from {Position} to {newPos}");
-                    return;
-                }
+                    if (GetBlockDist(Position, newPos) > 1)
+                    {
+                        log.Warn($"WARNING: failed transition for {Name} from {Position} to {newPos}");
+                        return;
+                    }
 
-                var transit = transition(Position, newPos, false);
+                    var transit = transition(Position, newPos, false);
 
 
-                // temporarily modified while debug path is examined
-                if (transit != null && transit.SpherePath.CurCell != null)
-                {
-                    CachedVelocity = Position.GetOffset(transit.SpherePath.CurPos) / (float)quantum;
+                    // temporarily modified while debug path is examined
+                    if (transit != null && transit.SpherePath.CurCell != null)
+                    {
+                        CachedVelocity = Position.GetOffset(transit.SpherePath.CurPos) / (float)quantum;
 
-                    SetPositionInternal(transit);
-                }
-                else
-                {
-                    if (IsPlayer)
-                        log.Debug($"{Name} ({ID:X8}).UpdateObjectInternal({quantum}) - failed transition from {Position} to {newPos}");
-                    else if (transit != null && transit.SpherePath.CurCell == null)
-                        log.Warn($"{Name} ({ID:X8}).UpdateObjectInternal({quantum}) - avoided CurCell=null from {Position} to {newPos}");
+                        SetPositionInternal(transit);
+                    }
+                    else
+                    {
+                        if (IsPlayer)
+                            log.Debug($"{Name} ({ID:X8}).UpdateObjectInternal({quantum}) - failed transition from {Position} to {newPos}");
+                        else if (transit != null && transit.SpherePath.CurCell == null)
+                            log.Warn($"{Name} ({ID:X8}).UpdateObjectInternal({quantum}) - avoided CurCell=null from {Position} to {newPos}");
 
-                    newPos.Frame.Origin = Position.Frame.Origin;
-                    set_initial_frame(newPos.Frame);
-                    CachedVelocity = Vector3.Zero;
+                        newPos.Frame.Origin = Position.Frame.Origin;
+                        set_initial_frame(newPos.Frame);
+                        CachedVelocity = Vector3.Zero;
+                    }
                 }
             }
             else
@@ -2670,9 +2676,8 @@ namespace ACE.Server.Physics
             }
             else if (collisions.CollidedWithEnvironment || !prev_on_walkable && TransientState.HasFlag(TransientStateFlags.OnWalkable))
             {
-                //retval = report_environment_collision(prev_has_contact);
-                report_environment_collision(prev_has_contact);
-                retval = true;
+                if (report_environment_collision(prev_has_contact))
+                    retval = true;
             }
 
             if (collisions.FramesStationaryFall <= 1)
@@ -2699,7 +2704,7 @@ namespace ACE.Server.Physics
             }
             else
             {
-                //Velocity = Vector3.Zero;  // gets objects stuck in falling state?
+                Velocity = Vector3.Zero;
                 if (collisions.FramesStationaryFall == 3)
                 {
                     TransientState &= ~TransientStateFlags.StationaryComplete;
@@ -3876,10 +3881,13 @@ namespace ACE.Server.Physics
             return true;
         }
 
+        private Vector3 requestCachedVelocity;
+
         /// <summary>
         /// Sets the requested position to the AutonomousPosition
         /// received from the client
         /// </summary>
+
         public void set_request_pos(Vector3 pos, Quaternion rotation, uint instance, ObjCell cell, uint blockCellID)
         {
             RequestPos.Frame.Origin = pos;

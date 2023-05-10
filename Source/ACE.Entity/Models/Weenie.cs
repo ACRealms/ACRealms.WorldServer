@@ -48,7 +48,6 @@ namespace ACE.Entity.Models
         // Properties for books
         public PropertiesBook PropertiesBook { get; set; }
         public IList<PropertiesBookPageData> PropertiesBookPageData { get; set; }
-
         public bool CanReferenceCommonProperties
         {
             get

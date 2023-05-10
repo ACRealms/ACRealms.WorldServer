@@ -28,6 +28,7 @@ using ACE.Server.WorldObjects;
 
 using Position = ACE.Entity.Position;
 using ACE.Server.Realms;
+using Org.BouncyCastle.Utilities;
 
 namespace ACE.Server.Entity
 {
@@ -49,12 +50,22 @@ namespace ACE.Server.Entity
 
         public byte Y => (byte)(Id >> 16);
 
+
+        public static float AdjacencyLoadRange { get; } = 96f;
+        public static float OutdoorChatRange { get; } = 75f;
+        public static float IndoorChatRange { get; } = 25f;
+        public static float MaxXY { get; } = 192f;
+        public static float MaxObjectRange { get; } = 192f;
+        public static float MaxObjectGhostRange { get; } = 250f;
+
+
         public uint Instance;
         public AppliedRuleset RealmRuleset { get; private set; }
         public RealmShortcuts RealmHelpers { get; }
 
         //Will be null if its a standard realm landblock - I.e. the default for a realm and not with an added ruleset applied
         public EphemeralRealm InnerRealmInfo { get; set; }
+
         public ulong LongId
         {
             get => (ulong)Instance << 32 | Id;
@@ -65,6 +76,7 @@ namespace ACE.Server.Entity
             }
         }
 
+   
         /// <summary>
         /// Flag indicates if this landblock is permanently loaded (for example, towns on high-traffic servers)
         /// </summary>
@@ -98,6 +110,11 @@ namespace ACE.Server.Entity
         private readonly LinkedList<WorldObject> sortedWorldObjectsByNextHeartbeat = new LinkedList<WorldObject>();
         private readonly LinkedList<WorldObject> sortedGeneratorsByNextGeneratorUpdate = new LinkedList<WorldObject>();
         private readonly LinkedList<WorldObject> sortedGeneratorsByNextRegeneration = new LinkedList<WorldObject>();
+
+        /// <summary>
+        /// This is used to detect and manage cross-landblock group (which is potentially cross-thread) operations.
+        /// </summary>
+        public LandblockGroup CurrentLandblockGroup { get; internal set; }
 
         public List<Landblock> Adjacents = new List<Landblock>();
 
@@ -173,16 +190,6 @@ namespace ACE.Server.Entity
             }
             set => fogColor = value;
         }
-
-        // this is used for debugging the instancing branch
-        // if you are in an instanced version of a dungeon (instance > 0)
-        // the base instance should never load
-
-        public static HashSet<ulong> TestDungeons = new HashSet<ulong>()
-        {
-            0x01D9FFFF,
-        };
-
         public Landblock(ulong objCellID)
         {
             RealmHelpers = new RealmShortcuts(this);
@@ -190,11 +197,11 @@ namespace ACE.Server.Entity
 
             log.Info($"Landblock({LongId:X8})");
 
-            if (TestDungeons.Contains(LongId))
+            /*if (TestDungeons.Contains(LongId))
             {
                 log.Error($"Landblock({objCellID:X8}): base instance is loading!");
                 log.Error(System.Environment.StackTrace);
-            }
+            }*/
 
             CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id);
             LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>(Id & 0xFFFF0000 | 0xFFFE);
@@ -206,7 +213,8 @@ namespace ACE.Server.Entity
             PhysicsLandblock = new Physics.Common.Landblock(cellLandblock, Instance);
         }
 
-        public void Init(bool reload, EphemeralRealm ephemeralRealm = null)
+        public void Init(bool reload = false, EphemeralRealm ephemeralRealm = null)
+
         {
             RealmRuleset = GetOrApplyRuleset(ephemeralRealm);
             InnerRealmInfo = ephemeralRealm;
@@ -240,6 +248,7 @@ namespace ACE.Server.Entity
             }
             return AppliedRuleset.MakeRerolledRuleset(realm.RulesetTemplate);
         }
+
 
         /// <summary>
         /// Monster Locations, Generators<para />
@@ -361,7 +370,7 @@ namespace ACE.Server.Entity
                         }
 
                         foreach (var profile in wo.Biota.PropertiesGenerator)
-                            profile.Delay = (float) PropertyManager.GetDouble("encounter_delay").Item;
+                            profile.Delay = (float)PropertyManager.GetDouble("encounter_delay").Item;
                     }
                 }
 
@@ -513,6 +522,47 @@ namespace ACE.Server.Entity
                 ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.Landblock_Tick_Monster_Tick, stopwatch.Elapsed.TotalSeconds);
             }
 
+            stopwatch.Restart();
+            while (sortedGeneratorsByNextGeneratorUpdate.Count > 0)
+            {
+                var first = sortedGeneratorsByNextGeneratorUpdate.First.Value;
+
+                // If they wanted to run before or at now
+                if (first.NextGeneratorUpdateTime <= currentUnixTime)
+                {
+                    sortedGeneratorsByNextGeneratorUpdate.RemoveFirst();
+                    first.GeneratorUpdate(currentUnixTime);
+                    //InsertWorldObjectIntoSortedGeneratorUpdateList(first);
+                    sortedGeneratorsByNextGeneratorUpdate.AddLast(first);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.Landblock_Tick_GeneratorUpdate, stopwatch.Elapsed.TotalSeconds);
+
+            stopwatch.Restart();
+            while (sortedGeneratorsByNextRegeneration.Count > 0) // GeneratorRegeneration()
+            {
+                var first = sortedGeneratorsByNextRegeneration.First.Value;
+
+                //Console.WriteLine($"{first.Name}.Landblock_Tick_GeneratorRegeneration({currentUnixTime})");
+
+                // If they wanted to run before or at now
+                if (first.NextGeneratorRegenerationTime <= currentUnixTime)
+                {
+                    sortedGeneratorsByNextRegeneration.RemoveFirst();
+                    first.GeneratorRegeneration(currentUnixTime);
+                    InsertWorldObjectIntoSortedGeneratorRegenerationList(first); // Generators can have regnerations at different intervals
+                }
+                else
+                {
+                    break;
+                }
+            }
+            ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.Landblock_Tick_GeneratorRegeneration, stopwatch.Elapsed.TotalSeconds);
+
             // Heartbeat
             stopwatch.Restart();
             if (lastHeartBeat + heartbeatInterval <= DateTime.UtcNow)
@@ -613,47 +663,6 @@ namespace ACE.Server.Entity
                 }
             }
             ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.Landblock_Tick_WorldObject_Heartbeat, stopwatch.Elapsed.TotalSeconds);
-
-            stopwatch.Restart();
-            while (sortedGeneratorsByNextGeneratorUpdate.Count > 0)
-            {
-                var first = sortedGeneratorsByNextGeneratorUpdate.First.Value;
-
-                // If they wanted to run before or at now
-                if (first.NextGeneratorUpdateTime <= currentUnixTime)
-                {
-                    sortedGeneratorsByNextGeneratorUpdate.RemoveFirst();
-                    first.GeneratorUpdate(currentUnixTime);
-                    //InsertWorldObjectIntoSortedGeneratorUpdateList(first);
-                    sortedGeneratorsByNextGeneratorUpdate.AddLast(first);
-                }
-                else
-                {
-                    break;
-                }
-            }
-            ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.Landblock_Tick_GeneratorUpdate, stopwatch.Elapsed.TotalSeconds);
-
-            stopwatch.Restart();
-            while (sortedGeneratorsByNextRegeneration.Count > 0) // GeneratorRegeneration()
-            {
-                var first = sortedGeneratorsByNextRegeneration.First.Value;
-
-                //Console.WriteLine($"{first.Name}.Landblock_Tick_GeneratorRegeneration({currentUnixTime})");
-
-                // If they wanted to run before or at now
-                if (first.NextGeneratorRegenerationTime <= currentUnixTime)
-                {
-                    sortedGeneratorsByNextRegeneration.RemoveFirst();
-                    first.GeneratorRegeneration(currentUnixTime);
-                    InsertWorldObjectIntoSortedGeneratorRegenerationList(first); // Generators can have regnerations at different intervals
-                }
-                else
-                {
-                    break;
-                }
-            }
-            ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.Landblock_Tick_GeneratorRegeneration, stopwatch.Elapsed.TotalSeconds);
 
             Monitor5m.RegisterEventEnd();
             Monitor1h.RegisterEventEnd();
@@ -905,6 +914,7 @@ namespace ACE.Server.Entity
             return true;
         }
 
+
         public void RemoveWorldObject(ObjectGuid objectId, bool adjacencyMove = false, bool fromPickup = false, bool showError = true)
         {
             RemoveWorldObjectInternal(objectId, adjacencyMove, fromPickup, showError);
@@ -922,6 +932,24 @@ namespace ACE.Server.Entity
 
         private void RemoveWorldObjectInternal(ObjectGuid objectId, bool adjacencyMove = false, bool fromPickup = false, bool showError = true)
         {
+            if (LandblockManager.CurrentlyTickingLandblockGroupsMultiThreaded)
+            {
+                if (CurrentLandblockGroup != null && CurrentLandblockGroup != LandblockManager.CurrentMultiThreadedTickingLandblockGroup.Value)
+                {
+                    log.Error($"Landblock 0x{Id} entered RemoveWorldObjectInternal in a cross-thread operation.");
+                    log.Error($"Landblock 0x{Id} CurrentLandblockGroup: {CurrentLandblockGroup}");
+                    log.Error($"LandblockManager.CurrentMultiThreadedTickingLandblockGroup.Value: {LandblockManager.CurrentMultiThreadedTickingLandblockGroup.Value}");
+
+                    log.Error($"objectId: 0x{objectId}");
+
+                    log.Error(System.Environment.StackTrace);
+
+                    log.Error("PLEASE REPORT THIS TO THE ACE DEV TEAM !!!");
+
+                    // This may still crash...
+                }
+            }
+
             if (worldObjects.TryGetValue(objectId, out var wo))
                 pendingRemovals.Add(objectId);
             else if (!pendingAdditions.Remove(objectId, out wo))
@@ -1092,6 +1120,7 @@ namespace ACE.Server.Entity
         /// Handles the cleanup process for a landblock
         /// This method is called by LandblockManager
         /// </summary>
+
         public void Unload()
         {
             //log.Debug($"Landblock.Unload({landblockID:X8})");
@@ -1115,6 +1144,7 @@ namespace ACE.Server.Entity
 
             // remove physics landblock
             LScape.unload_landblock(Id);
+            PhysicsLandblock.release_shadow_objs();
         }
 
         public void DestroyAllNonPlayerObjects()
@@ -1253,6 +1283,7 @@ namespace ACE.Server.Entity
                 return hasDungeon.Value;
             }
         }
+
 
         public List<House> Houses = new List<House>();
 

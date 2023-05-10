@@ -29,6 +29,7 @@ namespace ACE.Server.WorldObjects
             GameMessageSystemChat sysMessage = new GameMessageSystemChat(message, messageType);
 
             PlayerManager.BroadcastToAll(sysMessage);
+            PlayerManager.LogBroadcastChat(Channel.AllBroadcast, this, message);
         }
 
         public override ACE.Entity.ObjDesc CalculateObjDesc()
@@ -107,8 +108,8 @@ namespace ACE.Server.WorldObjects
                     break;
             }
 
-            // get all the Armor Items so we can calculate their priority
-            var armorItems = EquippedObjects.Values.Where(x => (x.ItemType == ItemType.Armor)).ToList();
+            // get all the Armor Items, and any Clothing items that might be equipped (robes, slippers, gloves, kasa, etc) so we can calculate their priority
+            var armorItems = EquippedObjects.Values.Where(x => (x.ItemType == ItemType.Armor || (x.CurrentWieldedLocation & (EquipMask.Armor | EquipMask.Extremity)) != 0)).ToList();
             foreach (var w in armorItems)
                 w.setVisualClothingPriority();
 

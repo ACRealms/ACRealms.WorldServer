@@ -29,7 +29,7 @@ namespace ACE.Server.Factories
             if (ruleset == null)
                 ruleset = RealmManager.DefaultRuleset;
 
-            if (weenie == null || guid == null)
+            if (weenie == null)
                 return null;
 
             var objWeenieType = weenie.WeenieType;
@@ -37,6 +37,7 @@ namespace ACE.Server.Factories
             switch (objWeenieType)
             {
                 case WeenieType.Undef:
+                    log.Warn($"CreateWorldObject: {weenie.GetName()} (0x{guid}:{weenie.WeenieClassId}) - WeenieType is Undef, Object cannot be created.");
                     return null;
                 case WeenieType.LifeStone:
                     return new Lifestone(weenie, guid);
@@ -284,7 +285,10 @@ namespace ACE.Server.Factories
                 var weenie = DatabaseManager.World.GetCachedWeenie(instance.WeenieClassId);
 
                 if (weenie == null)
+                {
+                    log.Warn($"CreateNewWorldObjects: Database does not contain weenie {instance.WeenieClassId} for instance 0x{instance.Guid:X8} at {new Position(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW, iid).ToLOCString()}");
                     continue;
+                }
 
                 if (restrict_wcid != null && restrict_wcid.Value != instance.WeenieClassId)
                     continue;
@@ -296,7 +300,7 @@ namespace ACE.Server.Factories
                 var biota = biotas.FirstOrDefault(b => b.Id == instance.Guid);
                 if (biota == null)
                 {
-                    worldObject = CreateWorldObject(weenie, guid, ruleset);
+                    worldObject = CreateWorldObject(weenie, guid);
 
                     worldObject.Location = new Position(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW, iid);
                 }
@@ -351,7 +355,12 @@ namespace ACE.Server.Factories
         /// </summary>
         public static WorldObject CreateNewWorldObject(Weenie weenie, AppliedRuleset ruleset)
         {
-            var worldObject = CreateWorldObject(weenie, GuidManager.NewDynamicGuid(), ruleset);
+            var guid = GuidManager.NewDynamicGuid();
+
+            var worldObject = CreateWorldObject(weenie, guid, ruleset);
+
+            if (worldObject == null)
+                GuidManager.RecycleDynamicGuid(guid);
 
             return worldObject;
         }

@@ -37,8 +37,8 @@ namespace ACE.Server.WorldObjects
                 var animSpeed = GetAnimSpeed();
                 //Console.WriteLine($"AnimSpeed: {animSpeed}");
 
-                animLength = EnqueueMotion(actionChain, MotionCommand.Reload, animSpeed);   // start pulling out next arrow
-                EnqueueMotion(actionChain, MotionCommand.Ready);    // finish reloading
+                animLength = EnqueueMotionPersist(actionChain, MotionCommand.Reload, animSpeed);   // start pulling out next arrow
+                EnqueueMotionPersist(actionChain, MotionCommand.Ready);    // finish reloading
             }
 
             // ensure ammo visibility for players
@@ -188,7 +188,11 @@ namespace ACE.Server.WorldObjects
             if (!weenie.PropertiesFloat.TryGetValue(PropertyFloat.DefaultScale, out var scale))
                 scale = 1.0f;
 
-            return ProjectileRadiusCache[projectileWcid] = (float)(setup.Spheres[0].Radius * scale);
+            var result = (float)(setup.Spheres[0].Radius * scale);
+
+            ProjectileRadiusCache.TryAdd(projectileWcid, result);
+
+            return result;
         }
 
         // lowest value found in data / for starter bows
@@ -240,10 +244,13 @@ namespace ACE.Server.WorldObjects
 
         public Vector3 CalculateProjectileVelocity(Vector3 localOrigin, WorldObject target, float projectileSpeed, out Vector3 origin, out Quaternion rotation)
         {
-            var crossLandblock = Location.Landblock != target.Location.Landblock;
+            var sourceLoc = PhysicsObj.Position.ACEPosition(Location);
+            var targetLoc = target.PhysicsObj.Position.ACEPosition(target.Location);
 
-            var startPos = crossLandblock ? Location.ToGlobal(false) : Location.Pos;
-            var endPos = crossLandblock ? target.Location.ToGlobal(false) : target.Location.Pos;
+            var crossLandblock = sourceLoc.Landblock != targetLoc.Landblock;
+
+            var startPos = crossLandblock ? sourceLoc.ToGlobal(false) : sourceLoc.Pos;
+            var endPos = crossLandblock ? targetLoc.ToGlobal(false) : targetLoc.Pos;
 
             var dir = Vector3.Normalize(endPos - startPos);
 
@@ -251,7 +258,7 @@ namespace ACE.Server.WorldObjects
 
             rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)angle);
 
-            origin = Location.Pos + Vector3.Transform(localOrigin, rotation);
+            origin = sourceLoc.Pos + Vector3.Transform(localOrigin, rotation);
 
             startPos += Vector3.Transform(localOrigin, rotation);
             endPos.Z += target.Height / GetAimHeight(target);
@@ -306,18 +313,28 @@ namespace ACE.Server.WorldObjects
                 else
                 {
                     // use movement quartic solver
-                    var numSolutions = Trajectory.solve_ballistic_arc(origin, speed, dest, targetVelocity, gravity, out s0, out _, out time);
+                    if (!PropertyManager.GetBool("trajectory_alt_solver").Item)
+                    {
+                        var numSolutions = Trajectory.solve_ballistic_arc(origin, speed, dest, targetVelocity, gravity, out s0, out _, out time);
 
-                    if (numSolutions > 0)
-                        return s0;
+                        if (numSolutions > 0)
+                            return s0;
+                    }
+                    else
+                        return Trajectory2.CalculateTrajectory(origin, dest, targetVelocity, speed, useGravity);
                 }
             }
 
             // use stationary solver
-            Trajectory.solve_ballistic_arc(origin, speed, dest, gravity, out s0, out _, out t0, out _);
+            if (!PropertyManager.GetBool("trajectory_alt_solver").Item)
+            {
+                Trajectory.solve_ballistic_arc(origin, speed, dest, gravity, out s0, out _, out t0, out _);
 
-            time = t0;
-            return s0;
+                time = t0;
+                return s0;
+            }
+            else
+                return Trajectory2.CalculateTrajectory(origin, dest, Vector3.Zero, speed, useGravity);
         }
 
         /// <summary>
@@ -338,11 +355,24 @@ namespace ACE.Server.WorldObjects
             var rotation = obj.Location.Rotation;
             obj.PhysicsObj.Position.Frame.Origin = pos;
             obj.PhysicsObj.Position.Frame.Orientation = rotation;
-            obj.Placement = ACE.Entity.Enum.Placement.MissileFlight;
+
+            if (obj.HasMissileFlightPlacement)
+                obj.Placement = ACE.Entity.Enum.Placement.MissileFlight;
+            else
+                obj.Placement = null;
+
             obj.CurrentMotionState = null;
 
             obj.PhysicsObj.Velocity = velocity;
             obj.PhysicsObj.ProjectileTarget = target.PhysicsObj;
+
+            // Projectiles with RotationSpeed get omega values and "align path" turned off which
+            // creates the nice swirling animation
+            if ((obj.RotationSpeed ?? 0) != 0)
+            {
+                obj.AlignPath = false;
+                obj.PhysicsObj.Omega = new Vector3((float)(Math.PI * 2 * obj.RotationSpeed), 0, 0);
+            }
 
             obj.PhysicsObj.set_active(true);
         }

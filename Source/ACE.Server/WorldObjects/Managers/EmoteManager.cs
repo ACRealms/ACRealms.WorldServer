@@ -66,7 +66,7 @@ namespace ACE.Server.WorldObjects.Managers
             var emoteType = (EmoteType)emote.Type;
 
             //if (Debug)
-                //Console.WriteLine($"{WorldObject.Name}.ExecuteEmote({emoteType})");
+            //Console.WriteLine($"{WorldObject.Name}.ExecuteEmote({emoteType})");
 
             var text = emote.Message;
 
@@ -125,18 +125,17 @@ namespace ACE.Server.WorldObjects.Managers
 
                 case EmoteType.AwardLevelProportionalXP:
 
-                    bool shareXP = emote.Display ?? false;
                     min = emote.Min64 ?? emote.Min ?? 0;
                     max = emote.Max64 ?? emote.Max ?? 0;
 
                     if (player != null)
-                        player.GrantLevelProportionalXp(emote.Percent ?? 0, min, max, shareXP);
+                        player.GrantLevelProportionalXp(emote.Percent ?? 0, min, max);
                     break;
 
                 case EmoteType.AwardLuminance:
 
                     if (player != null)
-                        player.EarnLuminance(emote.HeroXP64 ?? 0, XpType.Quest, ShareType.None);
+                        player.EarnLuminance(emote.Amount64 ?? emote.HeroXP64 ?? 0, XpType.Quest, ShareType.None);
 
                     break;
 
@@ -156,13 +155,16 @@ namespace ACE.Server.WorldObjects.Managers
                 case EmoteType.AwardSkillXP:
 
                     if (player != null)
+                    {
+                        if (delay < 1) delay += 1; // because of how AwardSkillXP grants and then raises the skill, ensure delay is at least 1 to allow for processing correctly
                         player.AwardSkillXP((Skill)emote.Stat, (uint)emote.Amount, true);
+                    }
                     break;
 
                 case EmoteType.AwardTrainingCredits:
 
                     if (player != null)
-                        player.AddSkillCredits(emote.Amount ?? 0, false);
+                        player.AddSkillCredits(emote.Amount ?? 0);
                     break;
 
                 case EmoteType.AwardXP:
@@ -199,15 +201,19 @@ namespace ACE.Server.WorldObjects.Managers
                             break;
                         }
 
-                        var preCastTime = creature.PreCastMotion(targetObject);
+                        creature.CheckForHumanPreCast(spell);
 
-                        delay = preCastTime + creature.GetPostCastTime();
+                        var spellTarget = GetSpellTarget(spell, targetObject);
+
+                        var preCastTime = creature.PreCastMotion(spellTarget);
+
+                        delay = preCastTime + creature.GetPostCastTime(spell);
 
                         var castChain = new ActionChain();
                         castChain.AddDelaySeconds(preCastTime);
                         castChain.AddAction(creature, () =>
                         {
-                            creature.TryCastSpell(spell, targetObject, creature);
+                            creature.TryCastSpell_WithRedirects(spell, spellTarget, creature);
                             creature.PostCastMotion();
                         });
                         castChain.EnqueueChain();
@@ -219,8 +225,13 @@ namespace ACE.Server.WorldObjects.Managers
                     if (WorldObject != null)
                     {
                         var spell = new Spell((uint)emote.SpellId);
+
                         if (!spell.NotFound)
-                            WorldObject.TryCastSpell(spell, targetObject, WorldObject);
+                        {
+                            var spellTarget = GetSpellTarget(spell, targetObject);
+
+                            WorldObject.TryCastSpell_WithRedirects(spell, spellTarget, WorldObject);
+                        }
                     }
                     break;
 
@@ -236,21 +247,39 @@ namespace ACE.Server.WorldObjects.Managers
 
                 case EmoteType.CreateTreasure:
 
-                    if (emote.WealthRating.HasValue)
+                    if (player != null)
                     {
-                        // Create a dummy treasure profile for passing in tier value
+                        var treasureTier = emote.WealthRating ?? 1;
+
+                        var treasureType = (TreasureItemCategory?)emote.TreasureType ?? TreasureItemCategory.Undef;
+
+                        var treasureClass = (TreasureItemType_Orig?)emote.TreasureClass ?? TreasureItemType_Orig.Undef;
+
+                        // Create a dummy treasure profile for passing emote values
                         var profile = new Database.Models.World.TreasureDeath
                         {
-                            Tier = emote.WealthRating ?? 1,
-                            LootQualityMod = 0
+                            Tier = treasureTier,
+                            //TreasureType = (uint)treasureType,
+                            LootQualityMod = 0,
+                            ItemChance = 100,
+                            ItemMinAmount = 1,
+                            ItemMaxAmount = 1,
+                            //ItemTreasureTypeSelectionChances = (int)treasureClass,
+                            MagicItemChance = 100,
+                            MagicItemMinAmount = 1,
+                            MagicItemMaxAmount = 1,
+                            //MagicItemTreasureTypeSelectionChances = (int)treasureClass,
+                            MundaneItemChance = 100,
+                            MundaneItemMinAmount = 1,
+                            MundaneItemMaxAmount = 1,
+                            //MundaneItemTypeSelectionChances = (int)treasureClass,
+                            UnknownChances = 21
                         };
 
-                        // todo: make use of emote.TreasureClass and emote.TreasureType fields.
-                        // this emote is primarily seen on fishing holes so defaulting with jewelery as the only pcap showed 2:1 amulet to crown pull (not much to go on) for now
-                        var treasure = LootGenerationFactory.CreateRandomLootObjects(profile, false, LootBias.Jewelry /* probably treasure type here */);
+                        var treasure = LootGenerationFactory.CreateRandomLootObjects_New(profile, treasureType, treasureClass);
                         if (treasure != null)
                         {
-                            player.TryCreateInInventoryWithNetworking(treasure);
+                            player.TryCreateForGive(WorldObject, treasure);
                         }
                     }
                     break;
@@ -340,7 +369,7 @@ namespace ACE.Server.WorldObjects.Managers
                 case EmoteType.Generate:
 
                     if (WorldObject.IsGenerator)
-                        WorldObject.Generator_Regeneration();
+                        WorldObject.Generator_Generate();
                     break;
 
                 case EmoteType.Give:
@@ -350,7 +379,17 @@ namespace ACE.Server.WorldObjects.Managers
                     var stackSize = emote.StackSize ?? 1;
 
                     if (player != null && emote.WeenieClassId != null)
-                        player.GiveFromEmote(WorldObject, emote.WeenieClassId ?? 0, stackSize > 0 ? stackSize : 1);
+                    {
+                        var motionChain = new ActionChain();
+
+                        if (!WorldObject.DontTurnOrMoveWhenGiving && creature != null && targetCreature != null)
+                        {
+                            delay = creature.Rotate(targetCreature);
+                            motionChain.AddDelaySeconds(delay);
+                        }
+                        motionChain.AddAction(WorldObject, () => player.GiveFromEmote(WorldObject, emote.WeenieClassId ?? 0, stackSize > 0 ? stackSize : 1, emote.Palette ?? 0, emote.Shade ?? 0));
+                        motionChain.EnqueueChain();
+                    }
 
                     break;
 
@@ -437,14 +476,25 @@ namespace ACE.Server.WorldObjects.Managers
 
                 case EmoteType.InqEvent:
 
-                    var started = EventManager.IsEventStarted(emote.Message);
+                    var started = EventManager.IsEventStarted(emote.Message, WorldObject, targetObject);
                     ExecuteEmoteSet(started ? EmoteCategory.EventSuccess : EmoteCategory.EventFailure, emote.Message, targetObject, true);
                     break;
 
                 case EmoteType.InqFellowNum:
 
                     // unused in PY16 - ensure # of fellows between min-max?
-                    ExecuteEmoteSet(player != null && player.Fellowship != null ? EmoteCategory.TestSuccess : EmoteCategory.TestNoFellow, emote.Message, targetObject, true);
+                    var result = EmoteCategory.TestNoFellow;
+
+                    if (player?.Fellowship != null)
+                    {
+                        var fellows = player.Fellowship.GetFellowshipMembers();
+
+                        if (fellows.Count < (emote.Min ?? int.MinValue) || fellows.Count > (emote.Max ?? int.MaxValue))
+                            result = EmoteCategory.NumFellowsFailure;
+                        else
+                            result = EmoteCategory.NumFellowsSuccess;
+                    }
+                    ExecuteEmoteSet(result, emote.Message, targetObject, true);
                     break;
 
                 case EmoteType.InqFellowQuest:
@@ -530,6 +580,7 @@ namespace ACE.Server.WorldObjects.Managers
                         var numRequired = emote.StackSize ?? 1;
 
                         var items = player.GetInventoryItemsOfWCID(emote.WeenieClassId ?? 0);
+                        items.AddRange(player.GetEquippedObjectsOfWCID(emote.WeenieClassId ?? 0));
                         var numItems = items.Sum(i => i.StackSize ?? 1);
 
                         success = numItems >= numRequired;
@@ -756,22 +807,16 @@ namespace ACE.Server.WorldObjects.Managers
 
                 case EmoteType.InqStringStat:
 
-                    if (targetCreature != null)
+                    if (targetObject != null)
                     {
-                        if (Enum.TryParse(emote.TestString, true, out PropertyString propStr))
+                        var stringStat = targetObject.GetProperty((PropertyString)emote.Stat);
+
+                        if (stringStat == null && HasValidTestNoQuality(emote.Message))
+                            ExecuteEmoteSet(EmoteCategory.TestNoQuality, emote.Message, targetObject, true);
+                        else
                         {
-                            var stat = targetCreature.GetProperty(propStr);
-
-                            if (stat == null && HasValidTestNoQuality(emote.Message))
-                            {
-                                ExecuteEmoteSet(EmoteCategory.TestNoQuality, emote.Message, targetObject, true);
-                            }
-                            else
-                            {
-                                success = stat != null && stat.Equals(emote.Message);
-
-                                ExecuteEmoteSet(success ? EmoteCategory.TestSuccess : EmoteCategory.TestFailure, emote.Message, targetObject, true);
-                            }
+                            success = stringStat != null && stringStat.Equals(emote.TestString);
+                            ExecuteEmoteSet(success ? EmoteCategory.TestSuccess : EmoteCategory.TestFailure, emote.Message, targetObject, true);
                         }
                     }
                     break;
@@ -780,7 +825,10 @@ namespace ACE.Server.WorldObjects.Managers
 
                     if (player != null)
                     {
-                        player.ConfirmationManager.EnqueueSend(new Confirmation_YesNo(WorldObject.Guid, player.Guid, emote.Message), emote.TestString);
+                        if (!player.ConfirmationManager.EnqueueSend(new Confirmation_YesNo(WorldObject.Guid, player.Guid, emote.Message), Replace(emote.TestString, WorldObject, targetObject, emoteSet.Quest)))
+                        {
+                            ExecuteEmoteSet(EmoteCategory.TestFailure, emote.Message, player);
+                        }
                     }
                     break;
 
@@ -831,8 +879,15 @@ namespace ACE.Server.WorldObjects.Managers
                     if (Debug)
                         Console.Write($".{(MotionCommand)emote.Motion}");
 
+                    // If the landblock is dormant, there are no players in range
+                    if (WorldObject.CurrentLandblock?.IsDormant ?? false)
+                        break;
+
                     // are there players within emote range?
                     if (!WorldObject.PlayersInRange(ClientMaxAnimRange))
+                        break;
+
+                    if (WorldObject.PhysicsObj != null && WorldObject.PhysicsObj.IsMovingTo())
                         break;
 
                     if (WorldObject == null || WorldObject.CurrentMotionState == null) break;
@@ -926,10 +981,10 @@ namespace ACE.Server.WorldObjects.Managers
 
                         // ensure valid quaternion - all 0s for example can lock up physics engine
                         if (emote.AnglesX != null && emote.AnglesY != null && emote.AnglesZ != null && emote.AnglesW != null &&
-                           (emote.AnglesX != 0    || emote.AnglesY != 0    || emote.AnglesZ != 0    || emote.AnglesW != 0) )
+                           (emote.AnglesX != 0 || emote.AnglesY != 0 || emote.AnglesZ != 0 || emote.AnglesW != 0))
                         {
                             // also relative, or absolute?
-                            newRotation *= new Quaternion(emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value);  
+                            newRotation *= new Quaternion(emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value);
                         }
 
                         var newPosition = new Position(creature.Home.ObjCellID, newPos, newRotation, true, creature.Location.Instance);
@@ -1050,7 +1105,13 @@ namespace ACE.Server.WorldObjects.Managers
                         Console.Write($" - {emote.Message}");
 
                     message = Replace(emote.Message, WorldObject, targetObject, emoteSet.Quest);
-                    WorldObject.EnqueueBroadcast(new GameMessageCreatureMessage(message, WorldObject.Name, WorldObject.Guid.Full, ChatMessageType.Emote), WorldObject.LocalBroadcastRange);
+
+                    var name = WorldObject.CreatureType == CreatureType.Olthoi ? WorldObject.Name + "&" : WorldObject.Name;
+
+                    if (emote.Extent > 0)
+                        WorldObject.EnqueueBroadcast(new GameMessageHearRangedSpeech(message, name, WorldObject.Guid.Full, emote.Extent, ChatMessageType.Emote), WorldObject.LocalBroadcastRange);
+                    else
+                        WorldObject.EnqueueBroadcast(new GameMessageHearSpeech(message, name, WorldObject.Guid.Full, ChatMessageType.Emote), WorldObject.LocalBroadcastRange);
                     break;
 
                 case EmoteType.SetAltRacialSkills:
@@ -1170,7 +1231,7 @@ namespace ACE.Server.WorldObjects.Managers
                 case EmoteType.SpendLuminance:
 
                     if (player != null)
-                        player.SpendLuminance(emote.HeroXP64 ?? 0);
+                        player.SpendLuminance(emote.Amount64 ?? emote.HeroXP64 ?? 0);
                     break;
 
                 case EmoteType.StampFellowQuest:
@@ -1210,12 +1271,12 @@ namespace ACE.Server.WorldObjects.Managers
 
                 case EmoteType.StartEvent:
 
-                    EventManager.StartEvent(emote.Message);
+                    EventManager.StartEvent(emote.Message, WorldObject, targetObject);
                     break;
 
                 case EmoteType.StopEvent:
 
-                    EventManager.StopEvent(emote.Message);
+                    EventManager.StopEvent(emote.Message, WorldObject, targetObject);
                     break;
 
                 case EmoteType.TakeItems:
@@ -1237,7 +1298,8 @@ namespace ACE.Server.WorldObjects.Managers
                             break;
                         }
 
-                        if (player.GetNumInventoryItemsOfWCID(weenieItemToTake) > 0 && player.TryConsumeFromInventoryWithNetworking(weenieItemToTake, amountToTake == -1 ? int.MaxValue : amountToTake))
+                        if ((player.GetNumInventoryItemsOfWCID(weenieItemToTake) > 0 && player.TryConsumeFromInventoryWithNetworking(weenieItemToTake, amountToTake == -1 ? int.MaxValue : amountToTake))
+                            || (player.GetNumEquippedObjectsOfWCID(weenieItemToTake) > 0 && player.TryConsumeFromEquippedObjectsWithNetworking(weenieItemToTake, amountToTake == -1 ? int.MaxValue : amountToTake)))
                         {
                             var itemTaken = DatabaseManager.World.GetCachedWeenie(weenieItemToTake);
                             if (itemTaken != null)
@@ -1255,7 +1317,7 @@ namespace ACE.Server.WorldObjects.Managers
                 case EmoteType.TeachSpell:
 
                     if (player != null)
-                        player.LearnSpellWithNetworking((uint)emote.SpellId);
+                        player.LearnSpellWithNetworking((uint)emote.SpellId, false);
                     break;
 
                 case EmoteType.TeleportSelf:
@@ -1263,6 +1325,7 @@ namespace ACE.Server.WorldObjects.Managers
                     //if (WorldObject is Player)
                     //(WorldObject as Player).Teleport(emote.Position);
                     break;
+
 
                 case EmoteType.TeleportTarget:
 
@@ -1284,7 +1347,7 @@ namespace ACE.Server.WorldObjects.Managers
                     if (player != null)
                     {
                         message = Replace(emote.Message, WorldObject, player, emoteSet.Quest);
-                        player.Session.Network.EnqueueSend(new GameMessageHearDirectSpeech(WorldObject, message, player, ChatMessageType.Tell));
+                        player.Session.Network.EnqueueSend(new GameEventTell(WorldObject, message, player, ChatMessageType.Tell));
                     }
                     break;
 
@@ -1405,7 +1468,10 @@ namespace ACE.Server.WorldObjects.Managers
 
                     PlayerManager.BroadcastToAll(new GameMessageSystemChat(message, ChatMessageType.WorldBroadcast));
 
+                    PlayerManager.LogBroadcastChat(Channel.AllBroadcast, WorldObject, message);
+
                     break;
+
                 default:
                     log.Debug($"EmoteManager.Execute - Encountered Unhandled EmoteType {(EmoteType)emote.Type} for {WorldObject.Name} ({WorldObject.WeenieClassId})");
                     break;
@@ -1428,7 +1494,7 @@ namespace ACE.Server.WorldObjects.Managers
             var emoteSet = _worldObject.Biota.PropertiesEmote.Where(e => e.Category == category);
 
             // optional criteria
-            if (category == EmoteCategory.HearChat && questName != null)
+            if ((category == EmoteCategory.HearChat || category == EmoteCategory.ReceiveTalkDirect) && questName != null)
                 emoteSet = emoteSet.Where(e => e.Quest != null && e.Quest.Equals(questName, StringComparison.OrdinalIgnoreCase) || e.Quest == null);
             else if (questName != null)
                 emoteSet = emoteSet.Where(e => e.Quest != null && e.Quest.Equals(questName, StringComparison.OrdinalIgnoreCase));
@@ -1470,6 +1536,8 @@ namespace ACE.Server.WorldObjects.Managers
 
             var emoteSet = GetEmoteSet(category, quest);
 
+            if (emoteSet == null) return;
+
             // TODO: revisit if nested chains need to propagate timers
             ExecuteEmoteSet(emoteSet, targetObject, nested);
         }
@@ -1510,6 +1578,22 @@ namespace ACE.Server.WorldObjects.Managers
 
             var emote = emoteSet.PropertiesEmoteAction.ElementAt(emoteIdx);
 
+            if (Nested > 75 && !string.IsNullOrEmpty(emoteSet.Quest) && emoteSet.Quest == emote.Message && EmoteIsBranchingType(emote))
+            {
+                var emoteStack = $"{emoteSet.Category}: {emoteSet.Quest}\n";
+                foreach (var e in emoteSet.PropertiesEmoteAction)
+                    emoteStack += $"       - {(EmoteType)emote.Type}{(string.IsNullOrEmpty(emote.Message) ? "" : $": {emote.Message}")}\n";
+
+                log.Error($"[EMOTE] {WorldObject.Name}.EmoteManager.Enqueue(): Nested > 75, possible Infinite loop detected and aborted on 0x{WorldObject.Guid}:{WorldObject.WeenieClassId}\n-> {emoteStack}");
+
+                Nested--;
+
+                if (Nested == 0)
+                    IsBusy = false;
+
+                return;
+            }
+
             if (delay + emote.Delay > 0)
             {
                 var actionChain = new ActionChain();
@@ -1537,6 +1621,18 @@ namespace ACE.Server.WorldObjects.Managers
         {
             if (Debug)
                 Console.Write($"{(EmoteType)emote.Type}");
+
+            //if (!string.IsNullOrEmpty(emoteSet.Quest) && emoteSet.Quest == emote.Message && EmoteIsBranchingType(emote))
+            //{
+            //    log.Error($"[EMOTE] {WorldObject.Name}.EmoteManager.DoEnqueue(): Infinite loop detected on 0x{WorldObject.Guid}:{WorldObject.WeenieClassId}\n-> {emoteSet.Category}: {emoteSet.Quest} to {(EmoteType)emote.Type}: {emote.Message}");
+
+            //    Nested--;
+
+            //    if (Nested == 0)
+            //        IsBusy = false;
+
+            //    return;
+            //}
 
             var nextDelay = ExecuteEmote(emoteSet, emote, targetObject);
 
@@ -1567,6 +1663,54 @@ namespace ACE.Server.WorldObjects.Managers
                     if (Nested == 0)
                         IsBusy = false;
                 }
+            }
+        }
+
+        private bool EmoteIsBranchingType(PropertiesEmoteAction emote)
+        {
+            if (emote == null)
+                return false;
+
+            var emoteType = (EmoteType)emote.Type;
+
+            switch (emoteType)
+            {
+                case EmoteType.UpdateQuest:
+                case EmoteType.InqQuest:
+                case EmoteType.InqQuestSolves:
+                case EmoteType.InqBoolStat:
+                case EmoteType.InqIntStat:
+                case EmoteType.InqFloatStat:
+                case EmoteType.InqStringStat:
+                case EmoteType.InqAttributeStat:
+                case EmoteType.InqRawAttributeStat:
+                case EmoteType.InqSecondaryAttributeStat:
+                case EmoteType.InqRawSecondaryAttributeStat:
+                case EmoteType.InqSkillStat:
+                case EmoteType.InqRawSkillStat:
+                case EmoteType.InqSkillTrained:
+                case EmoteType.InqSkillSpecialized:
+                case EmoteType.InqEvent:
+                case EmoteType.InqFellowQuest:
+                case EmoteType.InqFellowNum:
+                case EmoteType.UpdateFellowQuest:
+                case EmoteType.Goto:
+                case EmoteType.InqNumCharacterTitles:
+                case EmoteType.InqYesNo:
+                case EmoteType.InqOwnsItems:
+                case EmoteType.UpdateMyQuest:
+                case EmoteType.InqMyQuest:
+                case EmoteType.InqMyQuestSolves:
+                case EmoteType.InqPackSpace:
+                case EmoteType.InqQuestBitsOn:
+                case EmoteType.InqQuestBitsOff:
+                case EmoteType.InqMyQuestBitsOn:
+                case EmoteType.InqMyQuestBitsOff:
+                case EmoteType.InqInt64Stat:
+                case EmoteType.InqContractsFull:
+                    return true;
+                default:
+                    return false;
             }
         }
 
@@ -1605,6 +1749,12 @@ namespace ACE.Server.WorldObjects.Managers
         public string Replace(string message, WorldObject source, WorldObject target, string quest)
         {
             var result = message;
+
+            if (result == null)
+            {
+                log.Warn($"[EMOTE] {WorldObject.Name}.EmoteManager.Replace(message, {source.Name}:0x{source.Guid}:{source.WeenieClassId}, {target.Name}:0x{target.Guid}:{target.WeenieClassId}, {quest}): message was null!");
+                return "";
+            }
 
             var sourceName = source != null ? source.Name : "";
             var targetName = target != null ? target.Name : "";
@@ -1706,6 +1856,20 @@ namespace ACE.Server.WorldObjects.Managers
 
                     return target ?? self;
             }
+        }
+
+        private WorldObject GetSpellTarget(Spell spell, WorldObject target)
+        {
+            var targetSelf = spell.Flags.HasFlag(SpellFlags.SelfTargeted);
+            var untargeted = spell.NonComponentTargetType == ItemType.None;
+
+            var spellTarget = target;
+            if (untargeted)
+                spellTarget = null;
+            else if (targetSelf)
+                spellTarget = WorldObject;
+
+            return spellTarget;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

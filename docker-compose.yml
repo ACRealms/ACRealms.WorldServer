@@ -1,17 +1,14 @@
 version: '3'
 services:
   ace-db:
-    image: 'mysql:8.0.12'
-    container_name: ace-db
+    image: 'mysql:latest'
+    container_name: ace-db-latest
     env_file:
       - docker.env
     volumes:
-      - './db-data:/var/lib/mysql'
-      - ./Database:/ace/Database
-      - ./Scripts/initdb.sh:/docker-entrypoint-initdb.d/1.sh
-      - ../../packages/shared-db/ACE-World-Database-v0.9.269.sql.gz:/docker-entrypoint-initdb.d/2.sql.gz
+      - './db-data-latest:/var/lib/mysql'
     ports:
-      - '3306:3306/tcp'
+      - '3307:3306/tcp'
     restart: unless-stopped
     healthcheck:
       test:

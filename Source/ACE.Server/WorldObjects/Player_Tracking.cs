@@ -50,7 +50,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void TrackObject(WorldObject worldObject, bool delay = false)
         {
-            //Console.WriteLine($"{Name}.TrackObject({worldObject.Name} {worldObject.Guid})");
+            //Console.WriteLine($"TrackObject({worldObject.Name}, {delay})");
 
             if (worldObject == null || worldObject.Guid == Guid)
                 return;
@@ -103,10 +103,7 @@ namespace ACE.Server.WorldObjects
                     Session.Network.EnqueueSend(new GameMessageParentEvent(wo.Wielder, wo));
             }
             else
-            {
-                //Console.WriteLine($"{Name}.DeleteObject({wo.Name} ({wo.Guid})");
                 Session.Network.EnqueueSend(new GameMessageDeleteObject(wo));
-            }
 
             if (wo is Creature creature)
             {
@@ -182,6 +179,7 @@ namespace ACE.Server.WorldObjects
                 Cloaked = false;
                 Ethereal = false;
                 NoDraw = false;
+                ReportCollisions = true;
                 EnqueueBroadcastPhysicsState();
             });
 
@@ -200,6 +198,7 @@ namespace ACE.Server.WorldObjects
                 Cloaked = true;
                 Ethereal = true;
                 NoDraw = true;
+                ReportCollisions = false;
                 EnqueueBroadcastPhysicsState();
             });
             actionChain.AddAction(this, () =>

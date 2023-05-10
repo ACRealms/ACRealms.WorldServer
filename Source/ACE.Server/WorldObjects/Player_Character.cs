@@ -22,10 +22,12 @@ namespace ACE.Server.WorldObjects
 
         public bool GetCharacterOption(CharacterOption option)
         {
-            if (option.GetCharacterOptions1Attribute() != null)
-                return GetCharacterOptions1((CharacterOptions1)Enum.Parse(typeof(CharacterOptions1), option.ToString()));
+            var option1 = option.GetCharacterOptions1Attribute();
 
-            return GetCharacterOptions2((CharacterOptions2)Enum.Parse(typeof(CharacterOptions2), option.ToString()));
+            if (option1 != null)
+                return GetCharacterOptions1(option1.Option);
+
+            return GetCharacterOptions2(option.GetCharacterOptions2Attribute().Option);
         }
 
         private bool GetCharacterOptions1(CharacterOptions1 option)
@@ -40,10 +42,12 @@ namespace ACE.Server.WorldObjects
 
         public void SetCharacterOption(CharacterOption option, bool value)
         {
-            if (option.GetCharacterOptions1Attribute() != null)
-                SetCharacterOptions1((CharacterOptions1)Enum.Parse(typeof(CharacterOptions1), option.ToString()), value);
+            var option1 = option.GetCharacterOptions1Attribute();
+
+            if (option1 != null)
+                SetCharacterOptions1(option1.Option, value);
             else
-                SetCharacterOptions2((CharacterOptions2)Enum.Parse(typeof(CharacterOptions2), option.ToString()), value);
+                SetCharacterOptions2(option.GetCharacterOptions2Attribute().Option, value);
         }
 
         private void SetCharacterOptions1(CharacterOptions1 option, bool value)
@@ -160,6 +164,8 @@ namespace ACE.Server.WorldObjects
 
             // send network message
             Session.Network.EnqueueSend(new GameEventFriendsListUpdate(Session, GameEventFriendsListUpdate.FriendsUpdateTypeFlag.FriendAdded, newFriend));
+
+            ChatPacket.SendServerMessage(Session, $"{friend.Name} has been added to your friends list.", ChatMessageType.Broadcast);
         }
 
         /// <summary>
@@ -178,6 +184,14 @@ namespace ACE.Server.WorldObjects
 
             // send network message
             Session.Network.EnqueueSend(new GameEventFriendsListUpdate(Session, GameEventFriendsListUpdate.FriendsUpdateTypeFlag.FriendRemoved, friendToRemove));
+
+            // get friend player info
+            var friend = PlayerManager.FindByGuid(friendToRemove.FriendId);
+
+            if (friend == null) // shouldn't happen
+                ChatPacket.SendServerMessage(Session, "Friend has been removed from your friends list.", ChatMessageType.Broadcast);
+            else
+                ChatPacket.SendServerMessage(Session, $"{friend.Name} has been removed from your friends list.", ChatMessageType.Broadcast);
         }
 
         /// <summary>
@@ -186,7 +200,11 @@ namespace ACE.Server.WorldObjects
         public void HandleActionRemoveAllFriends()
         {
             // Remove all from DB
-            log.Warn("HandleActionRemoveAllFriends is not implemented.");
+            if (Character.ClearAllFriends(CharacterDatabaseLock))
+            {
+                //ChatPacket.SendServerMessage(Session, "Your friends list has been cleared.", ChatMessageType.Broadcast);
+                CharacterChangesDetected = true;
+            }
         }
 
         public bool GetAppearOffline()

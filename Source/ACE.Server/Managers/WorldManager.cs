@@ -1,26 +1,24 @@
-using System;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using System.Threading;
-
-using log4net;
-
 using ACE.Common;
 using ACE.Common.Performance;
 using ACE.Database;
 using ACE.Database.Entity;
 using ACE.Entity.Enum;
+using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
 using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
-using ACE.Server.WorldObjects;
 using ACE.Server.Network;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Network.Managers;
 using ACE.Server.Physics;
 using ACE.Server.Physics.Common;
-
+using ACE.Server.WorldObjects;
+using log4net;
+using System;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using System.Threading;
 using Character = ACE.Database.Models.Shard.Character;
 using Position = ACE.Entity.Position;
 
@@ -43,7 +41,7 @@ namespace ACE.Server.Managers
 
         public static WorldStatusState WorldStatus { get; private set; } = WorldStatusState.Closed;
 
-        private static readonly ActionQueue actionQueue = new ActionQueue();
+        public static readonly ActionQueue ActionQueue = new ActionQueue();
         public static readonly DelayManager DelayManager = new DelayManager();
 
         static WorldManager()
@@ -104,7 +102,7 @@ namespace ACE.Server.Managers
             {
                 log.Debug($"GetPossessedBiotasInParallel for {character.Name} took {(DateTime.UtcNow - start).TotalMilliseconds:N0} ms");
 
-                actionQueue.EnqueueAction(new ActionEventDelegate(() => DoPlayerEnterWorld(session, character, offlinePlayer.Biota, biotas)));
+                ActionQueue.EnqueueAction(new ActionEventDelegate(() => DoPlayerEnterWorld(session, character, offlinePlayer.Biota, biotas)));
             });
         }
 
@@ -112,7 +110,7 @@ namespace ACE.Server.Managers
         {
             Player player;
 
-            Player.HandleNoLogLandblock(playerBiota);
+            Player.HandleNoLogLandblock(playerBiota, out var playerLoggedInOnNoLogLandblock);
 
             var stripAdminProperties = false;
             var addAdminProperties = false;
@@ -161,7 +159,7 @@ namespace ACE.Server.Managers
             {
                 player.CloakStatus = CloakStatus.Undef;
                 player.Attackable = true;
-                player.SetProperty(ACE.Entity.Enum.Properties.PropertyBool.DamagedByCollisions, true);
+                player.SetProperty(PropertyBool.DamagedByCollisions, true);
                 player.AdvocateLevel = null;
                 player.ChannelsActive = null;
                 player.ChannelsAllowed = null;
@@ -170,6 +168,7 @@ namespace ACE.Server.Managers
                 player.IgnoreHouseBarriers = false;
                 player.IgnorePortalRestrictions = false;
                 player.SafeSpellComponents = false;
+                player.ReportCollisions = true;
 
 
                 player.ChangesDetected = true;
@@ -189,10 +188,10 @@ namespace ACE.Server.Managers
                 {
                     player.CloakStatus = CloakStatus.Off;
                     player.Attackable = weenie.Attackable;
-                    player.SetProperty(ACE.Entity.Enum.Properties.PropertyBool.DamagedByCollisions, false);
-                    player.AdvocateLevel = weenie.GetProperty(ACE.Entity.Enum.Properties.PropertyInt.AdvocateLevel);
-                    player.ChannelsActive = (Channel?)weenie.GetProperty(ACE.Entity.Enum.Properties.PropertyInt.ChannelsActive);
-                    player.ChannelsAllowed = (Channel?)weenie.GetProperty(ACE.Entity.Enum.Properties.PropertyInt.ChannelsAllowed);
+                    player.SetProperty(PropertyBool.DamagedByCollisions, false);
+                    player.AdvocateLevel = weenie.GetProperty(PropertyInt.AdvocateLevel);
+                    player.ChannelsActive = (Channel?)weenie.GetProperty(PropertyInt.ChannelsActive);
+                    player.ChannelsAllowed = (Channel?)weenie.GetProperty(PropertyInt.ChannelsAllowed);
                     player.Invincible = false;
                     player.Cloaked = false;
 
@@ -204,7 +203,7 @@ namespace ACE.Server.Managers
 
             // If the client is missing a location, we start them off in the starter town they chose
             if (session.Player.Location == null)
-            {    
+            {
                 if (session.Player.Instantiation != null)
                     session.Player.Location = new Position(session.Player.Instantiation);
                 else
@@ -244,6 +243,11 @@ namespace ACE.Server.Managers
                 }
             }
 
+
+            var olthoiPlayerReturnedToLifestone = session.Player.IsOlthoiPlayer && character.TotalLogins >= 1 && session.Player.LoginAtLifestone;
+            if (olthoiPlayerReturnedToLifestone)
+                session.Player.Location = new Position(session.Player.Sanctuary);
+
             session.Player.PlayerEnterWorld();
 
             var success = LandblockManager.AddObject(session.Player, true);
@@ -277,11 +281,14 @@ namespace ACE.Server.Managers
 
             var popup_header = PropertyManager.GetString("popup_header").Item;
             var popup_motd = PropertyManager.GetString("popup_motd").Item;
-            var popup_welcome = PropertyManager.GetString("popup_welcome").Item;
+            var popup_welcome = player.IsOlthoiPlayer ? PropertyManager.GetString("popup_welcome_olthoi").Item : PropertyManager.GetString("popup_welcome").Item;
 
             if (character.TotalLogins <= 1)
             {
-                session.Network.EnqueueSend(new GameEventPopupString(session, AppendLines(popup_header, popup_motd, popup_welcome)));
+                if (player.IsOlthoiPlayer)
+                    session.Network.EnqueueSend(new GameEventPopupString(session, AppendLines(popup_welcome, popup_motd)));
+                else
+                    session.Network.EnqueueSend(new GameEventPopupString(session, AppendLines(popup_header, popup_motd, popup_welcome)));
             }
             else if (!string.IsNullOrEmpty(popup_motd))
             {
@@ -294,6 +301,11 @@ namespace ACE.Server.Managers
             var server_motd = PropertyManager.GetString("server_motd").Item;
             if (!string.IsNullOrEmpty(server_motd))
                 session.Network.EnqueueSend(new GameMessageSystemChat($"{server_motd}\n", ChatMessageType.Broadcast));
+
+            if (olthoiPlayerReturnedToLifestone)
+                session.Network.EnqueueSend(new GameMessageSystemChat("You have returned to the Olthoi Queen to serve the hive.", ChatMessageType.Broadcast));
+            else if (playerLoggedInOnNoLogLandblock) // see http://acpedia.org/wiki/Mount_Elyrii_Hive
+                session.Network.EnqueueSend(new GameMessageSystemChat("The currents of portal space cannot return you from whence you came. Your previous location forbids login.", ChatMessageType.Broadcast));            
         }
 
         private static string AppendLines(params string[] lines)
@@ -313,11 +325,11 @@ namespace ACE.Server.Managers
         /// Note that this work will be done on the next tick, not immediately, so be careful about your order of operations.
         /// If you must ensure order, pass your follow up work in with the argument actionToFollowUpWith. That work will be enqueued onto the Player.
         /// </summary>
-        public static void ThreadSafeTeleport(Player player, Position newPosition, bool teleportingFromInstance, IAction actionToFollowUpWith = null)
+        public static void ThreadSafeTeleport(Player player, Position newPosition, bool teleportingFromInstance, IAction actionToFollowUpWith = null, bool fromPortal = false)
         {
             EnqueueAction(new ActionEventDelegate(() =>
             {
-                player.Teleport(newPosition, teleportingFromInstance);
+                player.Teleport(newPosition, fromPortal);
 
                 if (actionToFollowUpWith != null)
                     EnqueueAction(actionToFollowUpWith);
@@ -326,7 +338,7 @@ namespace ACE.Server.Managers
 
         public static void EnqueueAction(IAction action)
         {
-            actionQueue.EnqueueAction(action);
+            ActionQueue.EnqueueAction(action);
         }
 
         private static readonly RateLimiter updateGameWorldRateLimiter = new RateLimiter(60, TimeSpan.FromSeconds(1));
@@ -384,7 +396,7 @@ namespace ACE.Server.Managers
 
                 // This will consist of PlayerEnterWorld actions, as well as other game world actions that require thread safety
                 ServerPerformanceMonitor.RestartEvent(ServerPerformanceMonitor.MonitorType.actionQueue_RunActions);
-                actionQueue.RunActions();
+                ActionQueue.RunActions();
                 ServerPerformanceMonitor.RegisterEventEnd(ServerPerformanceMonitor.MonitorType.actionQueue_RunActions);
 
                 ServerPerformanceMonitor.RestartEvent(ServerPerformanceMonitor.MonitorType.DelayManager_RunActions);

@@ -64,10 +64,9 @@ namespace ACE.Server.Physics.Common
 
         public void find_building_transit_cells(int numParts, List<PhysicsPart> parts, CellArray cellArray, uint instance)
         {
-            ulong longcellid = ((ulong)instance << 32) | CurCell.ID;
             foreach (var portal in Portals)
             {
-                var otherCell = portal.GetOtherCell(longcellid);
+                var otherCell = portal.GetOtherCell(CurCell.ID);
                 if (otherCell != null)
                     otherCell.check_building_transit(portal.OtherPortalId, numParts, parts, cellArray, instance);
             }
@@ -137,6 +136,8 @@ namespace ACE.Server.Physics.Common
 
             foreach (var buildingCell in BuildingCells.Where(i => i.Environment != null))
             {
+                if (buildingCell.Environment == null) continue;
+
                 foreach (var cellStruct in buildingCell.Environment.Cells.Values)
                 {
                     foreach (var vertex in cellStruct.VertexArray.Vertices.Values)

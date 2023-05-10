@@ -134,19 +134,42 @@ namespace ACE.Entity.Models
             return pluralName;
         }
 
+        public static ItemType GetItemType(this Weenie weenie)
+        {
+            var itemType = weenie.GetProperty(PropertyInt.ItemType) ?? 0;
+
+            return (ItemType)itemType;
+        }
+
+        public static int? GetValue(this Weenie weenie)
+        {
+            var value = weenie.GetProperty(PropertyInt.Value);
+
+            return value;
+        }
+
         public static bool IsStackable(this Weenie weenie)
         {
-            var weenieType = (WeenieType)weenie.WeenieType;
+            switch (weenie.WeenieType)
+            {
+                case WeenieType.Stackable:
 
-            return weenieType == WeenieType.Stackable || weenieType == WeenieType.Food || weenieType == WeenieType.Coin || weenieType == WeenieType.CraftTool
-                   || weenieType == WeenieType.SpellComponent || weenieType == WeenieType.Gem || weenieType == WeenieType.Ammunition || weenieType == WeenieType.Missile;
+                case WeenieType.Ammunition:
+                case WeenieType.Coin:
+                case WeenieType.CraftTool:
+                case WeenieType.Food:
+                case WeenieType.Gem:
+                case WeenieType.Missile:
+                case WeenieType.SpellComponent:
+
+                    return true;
+            }
+            return false;
         }
 
         public static bool IsStuck(this Weenie weenie)
         {
-            var stuck = weenie.GetProperty(PropertyBool.Stuck) ?? false;
-
-            return stuck;
+            return weenie.GetProperty(PropertyBool.Stuck) ?? false;
         }
 
         public static bool RequiresBackpackSlotOrIsContainer(this Weenie weenie)
@@ -158,9 +181,38 @@ namespace ACE.Entity.Models
 
         public static bool IsVendorService(this Weenie weenie)
         {
-            var vendorService = weenie.GetProperty(PropertyBool.VendorService) ?? false;
+            return weenie.GetProperty(PropertyBool.VendorService) ?? false;
+        }
 
-            return vendorService;
+        public static int GetStackUnitEncumbrance(this Weenie weenie)
+        {
+            if (weenie.IsStackable())
+            {
+                var stackUnitEncumbrance = weenie.GetProperty(PropertyInt.StackUnitEncumbrance);
+
+                if (stackUnitEncumbrance != null)
+                    return stackUnitEncumbrance.Value;
+            }
+            return weenie.GetProperty(PropertyInt.EncumbranceVal) ?? 0;
+        }
+
+        public static int GetMaxStackSize(this Weenie weenie)
+        {
+            if (weenie.IsStackable())
+            {
+                var maxStackSize = weenie.GetProperty(PropertyInt.MaxStackSize);
+
+                if (maxStackSize != null)
+                    return maxStackSize.Value;
+            }
+            return 1;
+        }
+
+        public static int? GetMaxStructure(this Weenie weenie)
+        {
+            var value = weenie.GetProperty(PropertyInt.MaxStructure);
+
+            return value;
         }
     }
 }

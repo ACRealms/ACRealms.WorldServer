@@ -22,8 +22,8 @@ namespace ACE.Server.WorldObjects
 {
     partial class Player
     {
-        private static readonly Position MarketplaceDrop = DatabaseManager.World.GetCachedWeenie("portalmarketplace").GetPosition(PositionType.Destination);
-
+        // this may break, Position now requires instance to be provided in constructor
+        private static readonly Position MarketplaceDrop = DatabaseManager.World.GetCachedWeenie("portalmarketplace")?.GetPosition(PositionType.Destination) ?? new Position(0x016C01BC, 49.206f, -31.935f, 0.005f, 0, 0, -0.707107f, 0.707107f, 0);
         private uint HideoutInstanceId
         {
             get
@@ -39,8 +39,7 @@ namespace ACE.Server.WorldObjects
         {
             get { return new Position(0x7308001Fu, 80f, 163.4f, 12.004999f, 0f, 0f, 0.4475889f, 0.8942394f, HideoutInstanceId); }
         }
-        
-        public bool DebugLoc { get; set; }
+
 
         /// <summary>
         /// Teleports the player to position
@@ -54,7 +53,6 @@ namespace ACE.Server.WorldObjects
             if (position != null)
             {
                 var teleportDest = new Position(position);
-                teleportDest.SetToDefaultRealmInstance(Location.RealmID);
                 AdjustDungeon(teleportDest);
 
                 Teleport(teleportDest);
@@ -73,11 +71,17 @@ namespace ACE.Server.WorldObjects
 
         public bool TooBusyToRecall
         {
-            get => IsBusy || Teleporting || suicideInProgress;
+            get => IsBusy || suicideInProgress;     // recalls could be started from portal space?
         }
 
         public void HandleActionTeleToHouse()
         {
+            if (IsOlthoiPlayer)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
+                return;
+            }
+
             if (PKTimerActive)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveBeenInPKBattleTooRecently));
@@ -196,6 +200,7 @@ namespace ACE.Server.WorldObjects
             actionChain.EnqueueChain();
         }
 
+
         /// <summary>
         /// Handles teleporting a player to the lifestone (/ls or /lifestone command)
         /// </summary>
@@ -268,6 +273,12 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToMarketPlace()
         {
+            if (IsOlthoiPlayer)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
+                return;
+            }
+
             if (PKTimerActive)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveBeenInPKBattleTooRecently));
@@ -331,6 +342,12 @@ namespace ACE.Server.WorldObjects
         {
             //Console.WriteLine($"{Name}.HandleActionRecallAllegianceHometown()");
 
+            if (IsOlthoiPlayer)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
+                return;
+            }
+
             if (PKTimerActive)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveBeenInPKBattleTooRecently));
@@ -350,17 +367,8 @@ namespace ACE.Server.WorldObjects
             }
 
             // check if player is in an allegiance
-            if (Allegiance == null)
-            {
-                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouAreNotInAllegiance));
+            if (!VerifyRecallAllegianceHometown())
                 return;
-            }
-
-            if (Allegiance.Sanctuary == null)
-            {
-                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YourAllegianceDoesNotHaveHometown));
-                return;
-            }
 
             if (CombatMode != CombatMode.NonCombat)
             {
@@ -393,11 +401,31 @@ namespace ACE.Server.WorldObjects
                     return;
                 }
 
-                if (Allegiance != null)
-                    Teleport(Allegiance.Sanctuary);
+                // re-verify
+                if (!VerifyRecallAllegianceHometown())
+                    return;
+
+                Teleport(Allegiance.Sanctuary);
             });
 
             actionChain.EnqueueChain();
+        }
+
+        private bool VerifyRecallAllegianceHometown()
+        {
+            if (Allegiance == null)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouAreNotInAllegiance));
+                return false;
+            }
+
+            if (Allegiance.Sanctuary == null)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YourAllegianceDoesNotHaveHometown));
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -406,6 +434,12 @@ namespace ACE.Server.WorldObjects
         public void HandleActionTeleToMansion()
         {
             //Console.WriteLine($"{Name}.HandleActionTeleToMansion()");
+
+            if (IsOlthoiPlayer)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
+                return;
+            }
 
             if (PKTimerActive)
             {
@@ -425,33 +459,10 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            // check if player is in an allegiance
-            if (Allegiance == null)
-            {
-                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouAreNotInAllegiance));
-                return;
-            }
-
-            var allegianceHouse = Allegiance.GetHouse();
+            var allegianceHouse = VerifyTeleToMansion();
 
             if (allegianceHouse == null)
-            {
-                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YourMonarchDoesNotOwnAMansionOrVilla));
                 return;
-            }
-
-            if (allegianceHouse.HouseType < HouseType.Villa)
-            {
-                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YourMonarchsHouseIsNotAMansionOrVilla));
-                return;
-            }
-
-            // ensure allegiance housing has allegiance permissions enabled
-            if (allegianceHouse.MonarchId == null)
-            {
-                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YourMonarchHasClosedTheMansion));
-                return;
-            }
 
             if (CombatMode != CombatMode.NonCombat)
             {
@@ -485,21 +496,60 @@ namespace ACE.Server.WorldObjects
                     return;
                 }
 
+                // re-verify
+                allegianceHouse = VerifyTeleToMansion();
+
+                if (allegianceHouse == null)
+                    return;
+
                 Teleport(allegianceHouse.SlumLord.Location);
             }); 
 
             actionChain.EnqueueChain();
         }
 
+        private House VerifyTeleToMansion()
+        {
+            // check if player is in an allegiance
+            if (Allegiance == null)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouAreNotInAllegiance));
+                return null;
+            }
+
+            var allegianceHouse = Allegiance.GetHouse();
+
+            if (allegianceHouse == null)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YourMonarchDoesNotOwnAMansionOrVilla));
+                return null;
+            }
+
+            if (allegianceHouse.HouseType < HouseType.Villa)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YourMonarchsHouseIsNotAMansionOrVilla));
+                return null;
+            }
+
+            // ensure allegiance housing has allegiance permissions enabled
+            if (allegianceHouse.MonarchId == null)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YourMonarchHasClosedTheMansion));
+                return null;
+            }
+
+            return allegianceHouse;
+        }
+
         private static readonly Motion motionPkArenaRecall = new Motion(MotionStance.NonCombat, MotionCommand.PKArenaRecall);
 
         private static List<Position> pkArenaLocs = new List<Position>()
         {
-            new Position(0x00660117, new Vector3(30, -50, 0.005f), new Quaternion(0, 0, 0, 1),false,0),
-            new Position(0x00660106, new Vector3(10, 0, 0.005f), new Quaternion(0, 0, -0.947071f, 0.321023f),false,0),
-            new Position(0x00660103, new Vector3(0, -30, 0.005f), new Quaternion(0, 0, -0.699713f, 0.714424f),false,0),
-            new Position(0x0066011E, new Vector3(50, 0, 0.005f), new Quaternion(0, 0, -0.961021f, -0.276474f),false,0),
-            new Position(0x00660127, new Vector3(60, -30, 0.005f), new Quaternion(0, 0, 0.681639f, 0.731689f),false,0),
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew1")?.GetPosition(PositionType.Destination) ?? new Position(0x00660117, 30, -50, 0.005f, 0, 0,  0.000000f,  1.000000f, 0)),
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew2")?.GetPosition(PositionType.Destination) ?? new Position(0x00660106, 10,   0, 0.005f, 0, 0, -0.947071f,  0.321023f, 0)),
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew3")?.GetPosition(PositionType.Destination) ?? new Position(0x00660103, 30, -30, 0.005f, 0, 0, -0.699713f,  0.714424f, 0)),
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew4")?.GetPosition(PositionType.Destination) ?? new Position(0x0066011E, 50,   0, 0.005f, 0, 0, -0.961021f, -0.276474f, 0)),
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew5")?.GetPosition(PositionType.Destination) ?? new Position(0x00660127, 60, -30, 0.005f, 0, 0,  0.681639f,  0.731689f, 0)),
         };
 
         public void HandleActionTeleToPkArena()
@@ -573,16 +623,22 @@ namespace ACE.Server.WorldObjects
 
         private static List<Position> pklArenaLocs = new List<Position>()
         {
-            new Position(0x00670117, new Vector3(30, -50, 0.005f), new Quaternion(0, 0, 0, 1),false,0),
-            new Position(0x00670106, new Vector3(10, 0, 0.005f), new Quaternion(0, 0, -0.947071f, 0.321023f),false,0),
-            new Position(0x00670103, new Vector3(0, -30, 0.005f), new Quaternion(0, 0, -0.699713f, 0.714424f),false,0),
-            new Position(0x0067011E, new Vector3(50, 0, 0.005f), new Quaternion(0, 0, -0.961021f, -0.276474f),false,0),
-            new Position(0x00670127, new Vector3(60, -30, 0.005f), new Quaternion(0, 0, 0.681639f, 0.731689f),false,0),
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpklarenanew1")?.GetPosition(PositionType.Destination) ?? new Position(0x00670117, 30, -50, 0.005f, 0, 0,  0.000000f,  1.000000f, 0)),
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpklarenanew2")?.GetPosition(PositionType.Destination) ?? new Position(0x00670106, 10,   0, 0.005f, 0, 0, -0.947071f,  0.321023f, 0)),
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpklarenanew3")?.GetPosition(PositionType.Destination) ?? new Position(0x00670103, 30, -30, 0.005f, 0, 0, -0.699713f,  0.714424f, 0)),
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpklarenanew4")?.GetPosition(PositionType.Destination) ?? new Position(0x0067011E, 50,   0, 0.005f, 0, 0, -0.961021f, -0.276474f, 0)),
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpklarenanew5")?.GetPosition(PositionType.Destination) ?? new Position(0x00670127, 60, -30, 0.005f, 0, 0,  0.681639f,  0.731689f, 0)),
         };
 
         public void HandleActionTeleToPklArena()
         {
             //Console.WriteLine($"{Name}.HandleActionTeleToPkLiteArena()");
+
+            if (IsOlthoiPlayer)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
+                return;
+            }
 
             if (PlayerKillerStatus != PlayerKillerStatus.PKLite)
             {
@@ -670,7 +726,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// This is not thread-safe. Consider using WorldManager.ThreadSafeTeleport() instead if you're calling this from a multi-threaded subsection.
         /// </summary>
-        public void Teleport(Position _newPosition, bool teleportingFromInstance = false)
+        public void Teleport(Position _newPosition, bool fromPortal = false, bool teleportingFromInstance = false)
         {
             if (_newPosition.Instance == 0)
                 _newPosition.Instance = Location.Instance;
@@ -694,14 +750,17 @@ namespace ACE.Server.WorldObjects
                     Session.Network.EnqueueSend(new GameMessageSystemChat($"Admin bypassing realm restriction.", ChatMessageType.System));
                 }
                 else
-                { 
+                {
                     Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to teleport to that realm.", ChatMessageType.System));
                     return;
                 }
             }
 
+            // this may break
             var newPosition = new Position(_newPosition);
-            newPosition._pos.Z += 0.005f * (ObjScale ?? 1.0f);
+            var _poz = newPosition.Pos;
+            _poz.Z += 0.005f * (ObjScale ?? 1.0f);
+            newPosition.Pos = _poz;
 
             if (_newPosition.Instance != Location.Instance)
             {
@@ -732,6 +791,9 @@ namespace ACE.Server.WorldObjects
             LastTeleportTime = DateTime.UtcNow;
             LastTeleportStartTimestamp = Time.GetUnixTime();
 
+            if (fromPortal)
+                LastPortalTeleportTimestamp = LastTeleportStartTimestamp;
+
             Session.Network.EnqueueSend(new GameMessagePlayerTeleport(this));
 
             // load quickly, but player can load into landblock before server is finished loading
@@ -754,6 +816,186 @@ namespace ACE.Server.WorldObjects
             HandlePreTeleportVisibility(newPosition);
 
             UpdatePlayerPosition(new Position(newPosition), true);
+        }
+
+        public void DoPreTeleportHide()
+        {
+            if (Teleporting) return;
+            PlayParticleEffect(PlayScript.Hide, Guid);
+        }
+
+        public void DoTeleportPhysicsStateChanges()
+        {
+            var broadcastUpdate = false;
+
+            var oldHidden = Hidden.Value;
+            var oldIgnore = IgnoreCollisions.Value;
+            var oldReport = ReportCollisions.Value;
+
+            Hidden = true;
+            IgnoreCollisions = true;
+            ReportCollisions = false;
+
+            if (Hidden != oldHidden || IgnoreCollisions != oldIgnore || ReportCollisions != oldReport)
+                broadcastUpdate = true;
+
+            if (broadcastUpdate)
+                EnqueueBroadcastPhysicsState();
+        }
+
+        /// <summary>
+        /// Prevent message spam
+        /// </summary>
+        public double? LastPortalTeleportTimestampError;
+
+        public void OnTeleportComplete()
+        {
+            if (CurrentLandblock != null && !CurrentLandblock.CreateWorldObjectsCompleted)
+            {
+                // If the critical landblock resources haven't been loaded yet, we keep the player in the pink bubble state
+                // We'll check periodically to see when it's safe to let them materialize in
+                var actionChain = new ActionChain();
+                actionChain.AddDelaySeconds(0.1);
+                actionChain.AddAction(this, OnTeleportComplete);
+                actionChain.EnqueueChain();
+                return;
+            }
+
+            // set materialize physics state
+            // this takes the player from pink bubbles -> fully materialized
+            if (CloakStatus != CloakStatus.On)
+                ReportCollisions = true;
+
+            IgnoreCollisions = false;
+            Hidden = false;
+            Teleporting = false;
+            
+            CheckMonsters();
+            CheckHouse();
+
+            EnqueueBroadcastPhysicsState();
+
+            // hijacking this for both start/end on portal teleport
+            if (LastTeleportStartTimestamp == LastPortalTeleportTimestamp)
+                LastPortalTeleportTimestamp = Time.GetUnixTime();
+        }
+
+        public void SendTeleportedViaMagicMessage(WorldObject itemCaster, Spell spell)
+        {
+            if (itemCaster == null || itemCaster is Gem)
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"You have been teleported.", ChatMessageType.Magic));
+            else if (this != itemCaster && !(itemCaster is Gem) && !(itemCaster is Switch) && !(itemCaster.GetProperty(PropertyBool.NpcInteractsSilently) ?? false))
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"{itemCaster.Name} teleports you with {spell.Name}.", ChatMessageType.Magic));
+            //else if (itemCaster is Gem)
+            //    Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.ITeleported));
+        }
+
+        public void NotifyLandblocks()
+        {
+            // the original implementations of this were done on landblock heartbeat,
+            // with checks for players in the current landblock, as well as adjacent outdoor landblocks
+
+            // for performance reasons, this is being reimplemented in the reverse manner,
+            // with players notifying landblocks of their activity
+
+            // notify current landblock of player activity
+            if (CurrentLandblock != null)
+                CurrentLandblock?.SetActive();
+        }
+
+        public static readonly float RunFactor = 1.5f;
+
+        /// <summary>
+        /// Returns the amount of time for player to rotate by the # of degrees
+        /// from the input angle, using the omega speed from its MotionTable
+        /// </summary>
+        public override float GetRotateDelay(float angle)
+        {
+            return base.GetRotateDelay(angle) / RunFactor;
+        }
+
+        /// <summary>
+        /// A list of landblocks the player cannot relog directly into
+        /// 
+        /// If a regular player logs out in one of these landblocks,
+        /// they will be transported back to the lifestone when they log back in.
+        /// </summary>
+        public static HashSet<ushort> NoLog_Landblocks = new HashSet<ushort>()
+        {
+            // https://asheron.fandom.com/wiki/Special:Search?query=Lifestone+on+Relog%3A+Yes+
+            // https://docs.google.com/spreadsheets/d/122xOw3IKCezaTDjC_hggWSVzYJ_9M_zUUtGEXkwNXfs/edit#gid=846612575
+
+            0x0002,     // Viamontian Garrison
+            0x0007,     // Town Network
+            0x0056,     // Augmentation Realm Main Level
+            0x005F,     // Tanada House of Pancakes (Seasonal)
+            0x0067,     // PKL Arena
+            0x006D,     // Augmentation Realm Upper Level
+            0x007D,     // Augmentation Realm Lower Level
+            0x00AB,     // Derethian Combat Arena
+            0x00AC,     // Derethian Combat Arena
+            0x00C3,     // Blighted Putrid Moarsman Tunnels
+            0x00D7,     // Jester's Prison
+            0x00EA,     // Mhoire Armory
+            0x015D,     // Mountain Cavern
+            0x027F,     // East Fork Dam Hive
+            0x03A7,     // Mount Elyrii Hive
+            0x5764,     // Oubliette of Mhoire Castle
+            0x634C,     // Tainted Grotto
+            0x6544,     // Greater Battle Dungeon
+            0x6651,     // Hoshino Tower
+            0x7E04,     // Thug Hideout
+            0x8A04,     // Night Club (Seasonal Anniversary)
+            0x8B04,     // Frozen Wight Lair
+            0x9EE5,     // Northwatch Castle Black Market
+            0xB5F0,     // Aerfalle's Sanctum
+            0xF92F,     // Freebooter Keep Black Market
+            0x00B0,     // Colosseum Arena One
+            0x00B1,     // Colosseum Arena Two
+            0x00B2,     // Colosseum Arena Three
+            0x00B3,     // Colosseum Arena Four
+            0x00B4,     // Colosseum Arena Five
+            0x00B6,     // Colosseum Arena Mini-Bosses
+            0x5960,     // Gauntlet Arena One (Celestial Hand)
+            0x5961,     // Gauntlet Arena Two (Celestial Hand)
+            0x5962,     // Gauntlet Arena One (Eldritch Web)
+            0x5963,     // Gauntlet Arena Two (Eldritch Web)
+            0x5964,     // Gauntlet Arena One (Radiant Blood)
+            0x5965,     // Gauntlet Arena Two (Radiant Blood)
+        };
+
+        /// <summary>
+        /// Called when a player first logs in
+        /// </summary>
+        public static void HandleNoLogLandblock(Biota biota, out bool playerWasMovedFromNoLogLandblock)
+        {
+            playerWasMovedFromNoLogLandblock = false;
+
+            if (biota.WeenieType == WeenieType.Sentinel || biota.WeenieType == WeenieType.Admin) return;
+
+            if (!biota.PropertiesPosition.TryGetValue(PositionType.Location, out var location))
+                return;
+
+            var landblock = (ushort)(location.ObjCellId >> 16);
+
+            if (!NoLog_Landblocks.Contains(landblock))
+                return;
+
+            if (!biota.PropertiesPosition.TryGetValue(PositionType.Sanctuary, out var lifestone))
+                return;
+
+            location.ObjCellId = lifestone.ObjCellId;
+            location.PositionX = lifestone.PositionX;
+            location.PositionY = lifestone.PositionY;
+            location.PositionZ = lifestone.PositionZ;
+            location.RotationX = lifestone.RotationX;
+            location.RotationY = lifestone.RotationY;
+            location.RotationZ = lifestone.RotationZ;
+            location.RotationW = lifestone.RotationW;
+
+            playerWasMovedFromNoLogLandblock = true;
+
+            return;
         }
 
         private bool OnTransitionToNewRealm(ushort prevRealmId, ushort newRealmId, Position newLocation)
@@ -911,7 +1153,7 @@ namespace ACE.Server.WorldObjects
                     destrealm.StandardRules.GetProperty(RealmPropertyBool.IsNeutralZone) == true)
                     return true;
             }
-            
+
             return homerealm.Realm.Id == destrealm.Realm.Id;
         }
 
@@ -935,168 +1177,6 @@ namespace ACE.Server.WorldObjects
                 this.SetPosition(PositionType.EphemeralRealmLastEnteredDrop, null);
             }));
             return true;
-        }
-
-        public void DoPreTeleportHide()
-        {
-            if (Teleporting) return;
-            PlayParticleEffect(PlayScript.Hide, Guid);
-        }
-
-        public void DoTeleportPhysicsStateChanges()
-        {
-            var broadcastUpdate = false;
-
-            var oldHidden = Hidden.Value;
-            var oldIgnore = IgnoreCollisions.Value;
-            var oldReport = ReportCollisions.Value;
-
-            Hidden = true;
-            IgnoreCollisions = true;
-            ReportCollisions = false;
-
-            if (Hidden != oldHidden || IgnoreCollisions != oldIgnore || ReportCollisions != oldReport)
-                broadcastUpdate = true;
-
-            if (broadcastUpdate)
-                EnqueueBroadcastPhysicsState();
-        }
-
-        public void OnTeleportComplete()
-        {
-            if (CurrentLandblock != null && !CurrentLandblock.CreateWorldObjectsCompleted)
-            {
-                // If the critical landblock resources haven't been loaded yet, we keep the player in the pink bubble state
-                // We'll check periodically to see when it's safe to let them materialize in
-                var actionChain = new ActionChain();
-                actionChain.AddDelaySeconds(0.1);
-                actionChain.AddAction(this, OnTeleportComplete);
-                actionChain.EnqueueChain();
-                return;
-            }
-
-            // set materialize physics state
-            // this takes the player from pink bubbles -> fully materialized
-            ReportCollisions = true;
-            IgnoreCollisions = false;
-            Hidden = false;
-            Teleporting = false;
-            
-            CheckMonsters();
-            CheckHouse();
-
-            EnqueueBroadcastPhysicsState();
-        }
-
-        public void SendTeleportedViaMagicMessage(WorldObject itemCaster, Spell spell)
-        {
-            if (itemCaster == null || itemCaster is Gem)
-                Session.Network.EnqueueSend(new GameMessageSystemChat($"You have been teleported.", ChatMessageType.Magic));
-            else if (this != itemCaster && !(itemCaster is Gem) && !(itemCaster is Switch) && !(itemCaster.GetProperty(PropertyBool.NpcInteractsSilently) ?? false))
-                Session.Network.EnqueueSend(new GameMessageSystemChat($"{itemCaster.Name} teleports you with {spell.Name}.", ChatMessageType.Magic));
-            //else if (itemCaster is Gem)
-            //    Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.ITeleported));
-        }
-
-        public void NotifyLandblocks()
-        {
-            // the original implementations of this were done on landblock heartbeat,
-            // with checks for players in the current landblock, as well as adjacent outdoor landblocks
-
-            // for performance reasons, this is being reimplemented in the reverse manner,
-            // with players notifying landblocks of their activity
-
-            // notify current landblock of player activity
-            if (CurrentLandblock != null)
-                CurrentLandblock?.SetActive();
-        }
-
-        public static readonly float RunFactor = 1.5f;
-
-        /// <summary>
-        /// Returns the amount of time for player to rotate by the # of degrees
-        /// from the input angle, using the omega speed from its MotionTable
-        /// </summary>
-        public override float GetRotateDelay(float angle)
-        {
-            return base.GetRotateDelay(angle) / RunFactor;
-        }
-
-        /// <summary>
-        /// A list of landblocks the player cannot relog directly into
-        /// 
-        /// If a regular player logs out in one of these landblocks,
-        /// they will be transported back to the lifestone when they log back in.
-        /// </summary>
-        public static HashSet<ushort> NoLog_Landblocks = new HashSet<ushort>()
-        {
-            // https://asheron.fandom.com/wiki/Special:Search?query=Lifestone+on+Relog%3A+Yes+
-            // https://docs.google.com/spreadsheets/d/122xOw3IKCezaTDjC_hggWSVzYJ_9M_zUUtGEXkwNXfs/edit#gid=846612575
-
-            0x0002,     // Viamontian Garrison
-            0x0007,     // Town Network
-            0x0056,     // Augmentation Realm Main Level
-            0x005F,     // Tanada House of Pancakes (Seasonal)
-            0x006D,     // Augmentation Realm Upper Level
-            0x007D,     // Augmentation Realm Lower Level
-            0x00AB,     // Derethian Combat Arena
-            0x00AC,     // Derethian Combat Arena
-            0x00C3,     // Blighted Putrid Moarsman Tunnels
-            0x00D7,     // Jester's Prison
-            0x00EA,     // Mhoire Armory
-            0x015D,     // Mountain Cavern
-            0x027F,     // East Fork Dam Hive
-            0x03A7,     // Mount Elyrii Hive
-            0x5764,     // Oubliette of Mhoire Castle
-            0x634C,     // Tainted Grotto
-            0x6544,     // Greater Battle Dungeon
-            0x6651,     // Hoshino Tower
-            0x7E04,     // Thug Hideout
-            0x8A04,     // Night Club (Seasonal Anniversary)
-            0x8B04,     // Frozen Wight Lair
-            0x9EE5,     // Northwatch Castle Black Market
-            0xB5F0,     // Aerfalle's Sanctum
-            0xF92F,     // Freebooter Keep Black Market
-            0x00B0,     // Colosseum Arena One
-            0x00B1,     // Colosseum Arena Two
-            0x00B2,     // Colosseum Arena Three
-            0x00B3,     // Colosseum Arena Four
-            0x00B4,     // Colosseum Arena Five
-            0x00B6,     // Colosseum Arena Mini-Bosses
-            0x5960,     // Gauntlet Arena One (Celestial Hand)
-            0x5961,     // Gauntlet Arena Two (Celestial Hand)
-            0x5962,     // Gauntlet Arena One (Eldritch Web)
-            0x5963,     // Gauntlet Arena Two (Eldritch Web)
-            0x5964,     // Gauntlet Arena One (Radiant Blood)
-            0x5965,     // Gauntlet Arena Two (Radiant Blood)
-        };
-
-        /// <summary>
-        /// Called when a player first logs in
-        /// </summary>
-        public static void HandleNoLogLandblock(Biota biota)
-        {
-            if (biota.WeenieType == WeenieType.Sentinel || biota.WeenieType == WeenieType.Admin) return;
-
-            if (!biota.PropertiesPosition.TryGetValue(PositionType.Location, out var location))
-                return;
-
-            var landblock = (ushort)(location.ObjCellId >> 16);
-
-            if (!NoLog_Landblocks.Contains(landblock))
-                return;
-
-            if (!biota.PropertiesPosition.TryGetValue(PositionType.Sanctuary, out var lifestone))
-                return;
-
-            location.ObjCellId = lifestone.ObjCellId;
-            location.PositionX = lifestone.PositionX;
-            location.PositionY = lifestone.PositionY;
-            location.PositionZ = lifestone.PositionZ;
-            location.RotationX = lifestone.RotationX;
-            location.RotationY = lifestone.RotationY;
-            location.RotationZ = lifestone.RotationZ;
-            location.RotationW = lifestone.RotationW;
         }
     }
 }

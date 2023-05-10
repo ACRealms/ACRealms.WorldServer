@@ -3,6 +3,7 @@ using System.Numerics;
 
 using log4net;
 
+using ACE.DatLoader;
 using ACE.Entity;
 using ACE.Entity.Enum.Properties;
 using ACE.Server.Physics.Common;
@@ -124,11 +125,9 @@ namespace ACE.Server.Entity
             }
 
             return cellID;
-        }
-
-        /// <summary>
-        /// Gets an outdoor cell ID for a position within a landblock
-        /// </summary>
+        }        /// <summary>
+                 /// Gets an outdoor cell ID for a position within a landblock
+                 /// </summary>
         public static uint GetOutdoorCell(this Position p)
         {
             var cellX = (uint)p.Pos.X / Position.CellLength;
@@ -152,7 +151,6 @@ namespace ACE.Server.Entity
             else
                 return p.ObjCellID;
         }
-
 
         public static Vector2? GetMapCoords(this Position pos)
         {
@@ -188,7 +186,6 @@ namespace ACE.Server.Entity
             return string.Format("{0:0.0}", Math.Abs(mapCoords.Value.Y) - 0.05f) + northSouth + ", "
                  + string.Format("{0:0.0}", Math.Abs(mapCoords.Value.X) - 0.05f) + eastWest;
         }
-
         public static void AdjustMapCoords(this Position pos)
         {
             // adjust Z to terrain height
@@ -208,6 +205,29 @@ namespace ACE.Server.Entity
                 pos.ObjCellID = pos.GetCell();
             }
         }
+
+        /*public static void Translate(this Position pos, uint blockCell)
+        {
+            var newBlockX = blockCell >> 24;
+            var newBlockY = (blockCell >> 16) & 0xFF;
+
+            var xDiff = (int)newBlockX - pos.LandblockX;
+            var yDiff = (int)newBlockY - pos.LandblockY;
+
+            //pos.Origin.X -= xDiff * 192;
+            pos.PositionX -= xDiff * 192;
+            //pos.Origin.Y -= yDiff * 192;
+            pos.PositionY -= yDiff * 192;
+
+            //pos.ObjCellID = blockCell;
+            pos.LandblockId = new LandblockId(blockCell);
+        }*/
+
+        /*public static void FindZ(this Position pos)
+        {
+            var envCell = DatManager.CellDat.ReadFromDat<DatLoader.FileTypes.EnvCell>(pos.Cell);
+            pos.PositionZ = envCell.Position.Origin.Z;
+        }*/
 
         public static float GetTerrainZ(this Position p)
         {
@@ -244,7 +264,6 @@ namespace ACE.Server.Entity
 
             return Physics.PhysicsObj.is_valid_walkable(walkable.Plane.Normal);
         }
-
         /// <summary>
         /// Returns TRUE if current cell is a House cell
         /// </summary>

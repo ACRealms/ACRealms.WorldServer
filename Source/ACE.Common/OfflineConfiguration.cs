@@ -36,11 +36,39 @@ namespace ACE.Common
         public bool PurgeOrphanedBiotas { get; set; }
 
         /// <summary>
+        /// Prune deleted characters from all friend lists
+        /// </summary>
+        [System.ComponentModel.DefaultValue(true)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public bool PruneDeletedCharactersFromFriendLists { get; set; }
+
+        /// <summary>
+        /// Prune deleted objects from all shortcut bars
+        /// </summary>
+        [System.ComponentModel.DefaultValue(false)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public bool PruneDeletedObjectsFromShortcutBars { get; set; }
+
+        /// <summary>
+        /// Prune deleted characters from all squelch lists, excluding those used to squelch entire accounts
+        /// </summary>
+        [System.ComponentModel.DefaultValue(false)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public bool PruneDeletedCharactersFromSquelchLists { get; set; }
+
+        /// <summary>
         /// Automatically check for and update to latest available world database
         /// </summary>
         [System.ComponentModel.DefaultValue(false)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public bool AutoUpdateWorldDatabase { get; set; }
+
+        /// <summary>
+        /// Automatically check for updated server binaries
+        /// </summary>
+        [System.ComponentModel.DefaultValue(true)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public bool AutoServerUpdateCheck { get; set; }
 
         /// <summary>
         /// After updating to latest world database, automatically import further customizations

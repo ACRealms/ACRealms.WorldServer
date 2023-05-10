@@ -25,15 +25,16 @@ using ACE.Server.Network;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.WorldObjects;
-using ACE.Database.Models.Shard;
-using log4net;
 using ACE.Database.Adapter;
+using log4net;
 
 namespace ACE.Server.Command.Handlers.Processors
 {
-    public partial class DeveloperContentCommands
+    public class DeveloperContentCommands
     {
+
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public enum FileType
         {
             Undefined,
@@ -64,8 +65,8 @@ namespace ACE.Server.Command.Handlers.Processors
                     return FileType.Recipe;
                 else if (fileType.StartsWith("weenie"))
                     return FileType.Weenie;
-                else if (fileType.StartsWith("realm"))
-                    return FileType.Realm;
+                else if (fileType.StartsWith("spell"))
+                    return FileType.Spell;
             }
             return FileType.Undefined;
         }
@@ -142,7 +143,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             List<RealmToImport> list = new List<RealmToImport>();
-            foreach(var file in files)
+            foreach (var file in files)
             {
                 var jsondata = File.ReadAllText(file.FullName);
                 var realmToImport = RealmManager.DeserializeRealmJson(session, file.FullName, jsondata);
@@ -153,7 +154,7 @@ namespace ACE.Server.Command.Handlers.Processors
             return list;
         }
 
-        
+
 
         private static List<RealmToImport> ImportJsonRealmsFolder(Session session, string json_folder)
         {
@@ -203,7 +204,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 }
 
                 //Map parents
-                foreach(var item in result)
+                foreach (var item in result)
                 {
                     var importItem = realmsDict[item.Key];
                     if (importItem.Realm.ParentRealmName != null)
@@ -245,6 +246,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
         }
 
+
         public static void ImportJsonWeenie(Session session, string wcid)
         {
             DirectoryInfo di = VerifyContentFolder(session);
@@ -282,7 +284,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var json_folder = $"{di.FullName}{sep}json{sep}recipes{sep}";
 
-            var prefix = recipeId + " - ";
+            var prefix = recipeId.PadLeft(5, '0') + " - ";
 
             if (recipeId.Equals("all", StringComparison.OrdinalIgnoreCase))
                 prefix = "";
@@ -357,6 +359,13 @@ namespace ACE.Server.Command.Handlers.Processors
                 ImportJsonQuest(session, json_folder, file.Name);
         }
 
+        [CommandHandler("import-sql-folders", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports all weenie sql data from the Content folder and all sub-folders", "<wcid>")]
+        public static void HandleImportSQLFolders(Session session, params string[] parameters)
+        {
+            var param = parameters[0];
+            ImportSQLWeenie(session, param, true);
+        }
+
         [CommandHandler("import-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports sql data from the Content folder", "<wcid>")]
         public static void HandleImportSQL(Session session, params string[] parameters)
         {
@@ -373,31 +382,38 @@ namespace ACE.Server.Command.Handlers.Processors
                     return;
                 }
             }
-            switch (contentType)
+            try
             {
-                case FileType.LandblockInstance:
-                    ImportSQLLandblock(session, param);
-                    break;
+                switch (contentType)
+                {
+                    case FileType.LandblockInstance:
+                        ImportSQLLandblock(session, param);
+                        break;
 
-                case FileType.Quest:
-                    ImportSQLQuest(session, param);
-                    break;
+                    case FileType.Quest:
+                        ImportSQLQuest(session, param);
+                        break;
 
-                case FileType.Recipe:
-                    ImportSQLRecipe(session, param);
-                    break;
+                    case FileType.Recipe:
+                        ImportSQLRecipe(session, param);
+                        break;
 
-                case FileType.Weenie:
-                    ImportSQLWeenieWrapped(session, param, parameters.Length >= 3 ? parameters[2] : "");
-                    break;
+                    case FileType.Spell:
+                        ImportSQLSpell(session, param);
+                        break;
 
-                /*case FileType.Realm:
-                    ImportSQLRealm(session, param);
-                    break;*/
+                    case FileType.Weenie:
+                        ImportSQLWeenie(session, param);
+                        break;
+                }
+            }
+            catch(Exception e)
+            {
+                CommandHandlerHelper.WriteOutputError(session, $"There was an error importing the SQL:\n\n{e.Message}");
             }
         }
 
-        public static void ImportSQLWeenie(Session session, string wcid)
+        public static void ImportSQLWeenie(Session session, string wcid, bool withFolders = false)
         {
             DirectoryInfo di = VerifyContentFolder(session);
             if (!di.Exists) return;
@@ -406,14 +422,16 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}";
 
-            var prefix = wcid + " ";
+            var prefix = wcid.PadLeft(5, '0') + " ";
 
             if (wcid.Equals("all", StringComparison.OrdinalIgnoreCase))
                 prefix = "";
 
             di = new DirectoryInfo(sql_folder);
 
-            var files = di.Exists ? di.GetFiles($"{prefix}*.sql") : null;
+            EnumerationOptions options = new EnumerationOptions();
+            options.RecurseSubdirectories = withFolders;
+            var files = di.Exists ? di.GetFiles($"{prefix}*.sql", options) : null;
 
             if (files == null || files.Length == 0)
             {
@@ -422,7 +440,8 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             foreach (var file in files)
-                ImportSQLWeenie(session, sql_folder, file.Name);
+                ImportSQLWeenie(session, file.DirectoryName + sep, file.Name);
+                
         }
 
         public static void ImportSQLRecipe(Session session, string recipeId)
@@ -434,7 +453,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var sql_folder = $"{di.FullName}{sep}sql{sep}recipes{sep}";
 
-            var prefix = recipeId + " ";
+            var prefix = recipeId.PadLeft(5, '0') + " ";
 
             if (recipeId.Equals("all", StringComparison.OrdinalIgnoreCase))
                 prefix = "";
@@ -451,34 +470,6 @@ namespace ACE.Server.Command.Handlers.Processors
 
             foreach (var file in files)
                 ImportSQLRecipe(session, sql_folder, file.Name);
-        }
-
-        public static void ImportSQLRealm(Session session, string realmId)
-        {
-            DirectoryInfo di = VerifyContentFolder(session);
-            if (!di.Exists) return;
-
-            var sep = Path.DirectorySeparatorChar;
-
-            var sql_folder = $"{di.FullName}{sep}sql{sep}realms{sep}";
-
-            var prefix = realmId + " ";
-
-            if (realmId.Equals("all", StringComparison.OrdinalIgnoreCase))
-                prefix = "";
-
-            di = new DirectoryInfo(sql_folder);
-
-            var files = di.Exists ? di.GetFiles($"{prefix}*.sql") : null;
-
-            if (files == null || files.Length == 0)
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find {sql_folder}{prefix}*.sql");
-                return;
-            }
-
-            foreach (var file in files)
-                ImportSQLRealm(session, sql_folder, file.Name);
         }
 
         public static void ImportSQLLandblock(Session session, string landblockId)
@@ -535,6 +526,34 @@ namespace ACE.Server.Command.Handlers.Processors
 
             foreach (var file in files)
                 ImportSQLQuest(session, sql_folder, file.Name);
+        }
+
+        public static void ImportSQLSpell(Session session, string spellId)
+        {
+            DirectoryInfo di = VerifyContentFolder(session);
+            if (!di.Exists) return;
+
+            var sep = Path.DirectorySeparatorChar;
+
+            var sql_folder = $"{di.FullName}{sep}sql{sep}spells{sep}";
+
+            var prefix = spellId.PadLeft(5, '0') + " ";
+
+            if (spellId.Equals("all", StringComparison.OrdinalIgnoreCase))
+                prefix = "";
+
+            di = new DirectoryInfo(sql_folder);
+
+            var files = di.Exists ? di.GetFiles($"{prefix}*.sql") : null;
+
+            if (files == null || files.Length == 0)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find {sql_folder}{prefix}*.sql");
+                return;
+            }
+
+            foreach (var file in files)
+                ImportSQLSpell(session, sql_folder, file.Name);
         }
 
         /// <summary>
@@ -728,7 +747,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
         public static CookBookSQLWriter CookBookSQLWriter;
         public static RecipeSQLWriter RecipeSQLWriter;
-        public static RealmSQLWriter RealmSQLWriter;
+        public static SpellSQLWriter SpellSQLWriter;
 
         public static string json2sql_recipe(Session session, string folder, string json_filename)
         {
@@ -1027,28 +1046,6 @@ namespace ACE.Server.Command.Handlers.Processors
             sql2json_recipe(session, cookbooks, sql_folder, sql_file);
         }
 
-        private static void ImportSQLRealm(Session session, string sql_folder, string sql_file)
-        {
-            if (!uint.TryParse(Regex.Match(sql_file, @"\d+").Value, out var realmId))
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find realm id from {sql_file}");
-                return;
-            }
-
-            ImportSQL(sql_folder + sql_file);
-            CommandHandlerHelper.WriteOutputInfo(session, $"Imported {sql_file}");
-
-            RealmManager.ClearCache();
-
-            var realm = DatabaseManager.World.GetRealm(realmId);
-
-            if (realm == null)
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't load realm {realmId} from db");
-                return;
-            }
-        }
-
         private static void ImportSQLLandblock(Session session, string sql_folder, string sql_file)
         {
             if (!ushort.TryParse(Regex.Match(sql_file, @"[0-9A-F]{4}", RegexOptions.IgnoreCase).Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var landblockId))
@@ -1086,6 +1083,26 @@ namespace ACE.Server.Command.Handlers.Processors
 
             // convert to json file
             sql2json_quest(session, quest, sql_folder, sql_file);
+        }
+
+        private static void ImportSQLSpell(Session session, string sql_folder, string sql_file)
+        {
+            if (!uint.TryParse(Regex.Match(sql_file, @"\d+").Value, out var spellId))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find spell id from {sql_file}");
+                return;
+            }
+
+            // import sql to db
+            ImportSQL(sql_folder + sql_file);
+            CommandHandlerHelper.WriteOutputInfo(session, $"Imported {sql_file}");
+
+            // clear this spell out of the cache (and everything else)
+            DatabaseManager.World.ClearSpellCache();
+            WorldObject.ClearSpellCache();
+
+            // load spell from db
+            var spell = DatabaseManager.World.GetCachedSpell(spellId);
         }
 
         /// <summary>
@@ -1223,24 +1240,15 @@ namespace ACE.Server.Command.Handlers.Processors
         {
             var sqlCommands = File.ReadAllText(sqlFile);
 
+            sqlCommands = sqlCommands.Replace("\r\n", "\n");
+
             // not sure why ExecuteSqlCommand doesn't parse this correctly..
             var idx = sqlCommands.IndexOf($"/* Lifestoned Changelog:");
             if (idx != -1)
                 sqlCommands = sqlCommands.Substring(0, idx);
 
             using (var ctx = new WorldDbContext())
-                ctx.Database.ExecuteSqlCommand(sqlCommands);
-        }
-
-        /// <summary>
-        /// Imports an SQL file into the database
-        /// </summary>
-        public static void ImportSQLShard(string sqlFile)
-        {
-            var sqlCommands = File.ReadAllText(sqlFile);
-
-            using (var ctx = new ShardDbContext())
-                ctx.Database.ExecuteSqlCommand(sqlCommands);
+                ctx.Database.ExecuteSqlRaw(sqlCommands);
         }
 
         public static LandblockInstanceWriter LandblockInstanceWriter;
@@ -1453,24 +1461,35 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var sqlFilename = $"{folder.FullName}{sep}{landblock:X4}.sql";
 
-            var fileWriter = new StreamWriter(sqlFilename);
-
-            if (LandblockInstanceWriter == null)
+            if (instances.Count > 0)
             {
-                LandblockInstanceWriter = new LandblockInstanceWriter();
-                LandblockInstanceWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                var fileWriter = new StreamWriter(sqlFilename);
+
+                if (LandblockInstanceWriter == null)
+                {
+                    LandblockInstanceWriter = new LandblockInstanceWriter();
+                    LandblockInstanceWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                }
+
+                LandblockInstanceWriter.CreateSQLDELETEStatement(instances, fileWriter);
+
+                fileWriter.WriteLine();
+
+                LandblockInstanceWriter.CreateSQLINSERTStatement(instances, fileWriter);
+
+                fileWriter.Close();
+
+                // import into db
+                ImportSQL(sqlFilename);
             }
+            else
+            {
+                // handle special case: deleting the last instance from landblock
+                File.Delete(sqlFilename);
 
-            LandblockInstanceWriter.CreateSQLDELETEStatement(instances, fileWriter);
-
-            fileWriter.WriteLine();
-
-            LandblockInstanceWriter.CreateSQLINSERTStatement(instances, fileWriter);
-
-            fileWriter.Close();
-
-            // import into db
-            ImportSQL(sqlFilename);
+                using (var ctx = new WorldDbContext())
+                    ctx.Database.ExecuteSqlRaw($"DELETE FROM landblock_instance WHERE landblock={landblock};");
+            }
 
             // clear landblock instances for this landblock (again)
             DatabaseManager.World.ClearCachedInstancesByLandblock(landblock);
@@ -1503,6 +1522,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             return instance;
         }
+
 
         public static uint GetNextStaticGuid(ushort landblock, List<LandblockInstance> instances)
         {
@@ -1582,7 +1602,8 @@ namespace ACE.Server.Command.Handlers.Processors
 
                 // require confirmation for parent objects
                 var msg = $"Are you sure you want to delete this parent object, and {numChilds} child object{(numChilds != 1 ? "s" : "")}?";
-                session.Player.ConfirmationManager.EnqueueSend(new Confirmation_Custom(session.Player.Guid, () => RemoveInstance(session, true)), msg);
+                if (!session.Player.ConfirmationManager.EnqueueSend(new Confirmation_Custom(session.Player.Guid, () => RemoveInstance(session, true)), msg))
+                    session.Player.SendWeenieError(WeenieError.ConfirmationInProgress);
                 return;
             }
 
@@ -1664,6 +1685,8 @@ namespace ACE.Server.Command.Handlers.Processors
                 RemoveChild(session, subLink, instances);
         }
 
+        public static EncounterSQLWriter LandblockEncounterWriter;
+
         [CommandHandler("addenc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Spawns a new wcid or classname in the current outdoor cell as an encounter", "<wcid or classname>")]
         public static void HandleAddEncounter(Session session, params string[] parameters)
         {
@@ -1693,6 +1716,21 @@ namespace ACE.Server.Command.Handlers.Processors
             var cellX = (int)pos.Pos.X / 24;
             var cellY = (int)pos.Pos.Y / 24;
 
+            var landblock = (ushort)pos.Landblock;
+
+            // clear any cached encounters for this landblock
+            DatabaseManager.World.ClearCachedEncountersByLandblock(landblock);
+
+            // get existing encounters for this landblock
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock);
+
+            // check for existing encounter
+            if (encounters.Any(i => i.CellX == cellX && i.CellY == cellY))
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat("This cell already contains an encounter!", ChatMessageType.Broadcast));
+                return;
+            }
+
             // spawn encounter
             var wo = SpawnEncounter(weenie, cellX, cellY, pos, session);
 
@@ -1700,30 +1738,18 @@ namespace ACE.Server.Command.Handlers.Processors
 
             session.Network.EnqueueSend(new GameMessageSystemChat($"Creating new encounter @ landblock {pos.Landblock:X4}, cellX={cellX}, cellY={cellY}\n{wo.WeenieClassId} - {wo.Name}", ChatMessageType.Broadcast));
 
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            // add a new encounter (verifications?)
+            var encounter = new Encounter();
+            encounter.Landblock = (int)pos.Landblock;
+            encounter.CellX = cellX;
+            encounter.CellY = cellY;
+            encounter.WeenieClassId = weenie.ClassId;
+            encounter.LastModified = DateTime.Now;
 
-            var sql = $"INSERT INTO encounter set landblock=0x{pos.Landblock:X4}, weenie_Class_Id={weenie.ClassId} /* {wo.Name} */, cell_X={cellX}, cell_Y={cellY}, last_Modified='{timestamp}';";
+            encounters.Add(encounter);
 
-            Console.WriteLine(sql);
-
-            // serialize to .sql file
-            var contentFolder = VerifyContentFolder(session, false);
-
-            var sep = Path.DirectorySeparatorChar;
-            var folder = new DirectoryInfo($"{contentFolder.FullName}{sep}sql{sep}encounters{sep}");
-
-            if (!folder.Exists)
-                folder.Create();
-
-            var sql_filename = $"{pos.Landblock:X4}.sql";
-
-            using (var file = File.Open($"{folder.FullName}{sep}{sql_filename}", FileMode.OpenOrCreate))
-            {
-                file.Seek(0, SeekOrigin.End);
-
-                using (var stream = new StreamWriter(file))
-                    stream.WriteLine(sql);
-            }
+            // write encounters to sql file / load into db
+            SyncEncounters(session, landblock, encounters);
         }
 
         public static WorldObject SpawnEncounter(Weenie weenie, int cellX, int cellY, Position pos, Session session)
@@ -1732,7 +1758,13 @@ namespace ACE.Server.Command.Handlers.Processors
 
             if (wo == null)
             {
-                Console.WriteLine($"Failed to create encounter weenie");
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Failed to create encounter weenie", ChatMessageType.Broadcast));
+                return null;
+            }
+
+            if (!wo.IsGenerator)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Encounter must be a Generator", ChatMessageType.Broadcast));
                 return null;
             }
 
@@ -1751,7 +1783,7 @@ namespace ACE.Server.Command.Handlers.Processors
             var sortCell = Physics.Common.LScape.get_landcell(newPos.ObjCellID) as Physics.Common.SortCell;
             if (sortCell != null && sortCell.has_building())
             {
-                Console.WriteLine($"Failed to create encounter near building cell");
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Failed to create encounter near building cell", ChatMessageType.Broadcast));
                 return null;
             }
 
@@ -1777,9 +1809,136 @@ namespace ACE.Server.Command.Handlers.Processors
                 }
             }
 
-            wo.EnterWorld();
+            var success = wo.EnterWorld();
 
+            if (!success)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Failed to spawn encounter", ChatMessageType.Broadcast));
+                return null;
+            }
             return wo;
+        }
+
+        /// <summary>
+        /// Serializes encounters to XXYY.sql file,
+        /// import into database, and clears the cached encounters
+        /// </summary>
+        public static void SyncEncounters(Session session, ushort landblock, List<Encounter> encounters)
+        {
+            // serialize to .sql file
+            var contentFolder = VerifyContentFolder(session, false);
+
+            var sep = Path.DirectorySeparatorChar;
+            var folder = new DirectoryInfo($"{contentFolder.FullName}{sep}sql{sep}encounters{sep}");
+
+            if (!folder.Exists)
+                folder.Create();
+
+            var sqlFilename = $"{folder.FullName}{sep}{landblock:X4}.sql";
+
+            if (encounters.Count > 0)
+            {
+                var fileWriter = new StreamWriter(sqlFilename);
+
+                if (LandblockEncounterWriter == null)
+                {
+                    LandblockEncounterWriter = new EncounterSQLWriter();
+                    LandblockEncounterWriter.WeenieNames = DatabaseManager.World.GetAllWeenieNames();
+                }
+
+                LandblockEncounterWriter.CreateSQLDELETEStatement(encounters, fileWriter);
+
+                fileWriter.WriteLine();
+
+                LandblockEncounterWriter.CreateSQLINSERTStatement(encounters, fileWriter);
+
+                fileWriter.Close();
+
+                // import into db
+                ImportSQL(sqlFilename);
+            }
+            else
+            {
+                // handle special case: deleting the last encounter from landblock
+                File.Delete(sqlFilename);
+
+                using (var ctx = new WorldDbContext())
+                    ctx.Database.ExecuteSqlRaw($"DELETE FROM encounter WHERE landblock={landblock};");
+            }
+
+            // clear the encounters for this landblock (again)
+            DatabaseManager.World.ClearCachedEncountersByLandblock(landblock);
+        }
+
+        [CommandHandler("removeenc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, "Removes the last appraised object from the encounters table")]
+        public static void HandleRemoveEnc(Session session, params string[] parameters)
+        {
+            var obj = CommandHandlerHelper.GetLastAppraisedObject(session);
+
+            if (obj == null)
+                return;
+
+            // find root generator
+            while (obj.Generator != null)
+                obj = obj.Generator;
+
+            var cellX = (int)obj.Location.Pos.X / 24;
+            var cellY = (int)obj.Location.Pos.Y / 24;
+
+            var landblock = (ushort)obj.Location.Landblock;
+
+            // clear any cached encounters for this landblock
+            DatabaseManager.World.ClearCachedEncountersByLandblock(landblock);
+
+            // get existing encounters for this landblock
+            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock);
+
+            // check for existing encounter
+            var encounter = encounters.FirstOrDefault(i => i.CellX == cellX && i.CellY == cellY && i.WeenieClassId == obj.WeenieClassId);
+
+            if (encounter == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find encounter for {obj.WeenieClassId} - {obj.Name}", ChatMessageType.Broadcast));
+                return;
+            }
+
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Removing encounter @ landblock {obj.Location.Landblock:X4}, cellX={cellX}, cellY={cellY}\n{obj.WeenieClassId} - {obj.Name}", ChatMessageType.Broadcast));
+
+            encounters.Remove(encounter);
+
+            SyncEncounters(session, landblock, encounters);
+
+            // this is needed for any generators that don't have GeneratorDestructionType
+            DestroyAll(obj);
+        }
+
+        /// <summary>
+        /// Destroys a parent generator, and all of its child objects
+        /// </summary>
+        private static void DestroyAll(WorldObject wo)
+        {
+            wo.Destroy();
+
+            if (wo.GeneratorProfiles == null)
+                return;
+
+            foreach (var profile in wo.GeneratorProfiles)
+            {
+                foreach (var kvp in profile.Spawned)
+                {
+                    var child = kvp.Value.TryGetWorldObject();
+
+                    if (child != null)
+                        DestroyAll(child);
+                }
+            }
+        }
+
+        [CommandHandler("export-json-folders", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to JSON file in a WeenieType/ItemType folder structure", "<wcid>")]
+        public static void HandleExportJsonFolder(Session session, params string[] parameters)
+        {
+            var param = parameters[0];
+            ExportJsonWeenie(session, param, true);
         }
 
         [CommandHandler("export-json", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to JSON file", "<wcid>")]
@@ -1818,7 +1977,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
         }
 
-        public static void ExportJsonWeenie(Session session, string param)
+        public static void ExportJsonWeenie(Session session, string param, bool withFolders = false)
         {
             DirectoryInfo di = VerifyContentFolder(session, false);
 
@@ -1843,8 +2002,39 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            var json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}";
-
+            string json_folder = null;
+            if (withFolders)
+            {
+                var weenieType = (WeenieType)weenie.Type;
+                switch (weenieType)
+                {
+                    case WeenieType.Creature: // Export to the "CreatureType" folder
+                        WeeniePropertiesInt cType = (from x in weenie.WeeniePropertiesInt where x.Type == 2 select x).FirstOrDefault();
+                        if (cType == null)
+                            json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}{weenieType}{sep}";
+                        else
+                        {
+                            CreatureType creatureType = (CreatureType)cType.Value;
+                            json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}{weenieType}{sep}{creatureType}{sep}";
+                        }
+                        break;
+                    default: // Otherwise goes to "ItemType" folder
+                        WeeniePropertiesInt iType = (from x in weenie.WeeniePropertiesInt where x.Type == 1 select x).FirstOrDefault();
+                        if (iType == null)
+                            json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}{weenieType}{sep}";
+                        else
+                        {
+                            ItemType itemType = (ItemType)iType.Value;
+                            json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}{weenieType}{sep}{itemType}{sep}";
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}";
+            }
+            
             di = new DirectoryInfo(json_folder);
 
             if (!di.Exists)
@@ -1875,7 +2065,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             var cookbooks = DatabaseManager.World.GetCookbooksByRecipeId(recipeId);
-            if (cookbooks == null)
+            if (cookbooks == null || cookbooks.Count == 0)
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find recipe id {recipeId}");
                 return;
@@ -1994,7 +2184,14 @@ namespace ACE.Server.Command.Handlers.Processors
             CommandHandlerHelper.WriteOutputInfo(session, $"Exported {json_folder}{json_filename}");
         }
 
-        [CommandHandler("export-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to SQL file", "<wcid>")]
+        [CommandHandler("export-sql-folders", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports weenie content from database to an SQL file in a WeenieType/ItemType folder structure", "<wcid>")]
+        public static void HandleExportSqlFolder(Session session, params string[] parameters)
+        {
+            var param = parameters[0];
+            ExportSQLWeenie(session, param, true);
+        }
+
+        [CommandHandler("export-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to SQL file", "<wcid> [content-type]")]
         public static void HandleExportSql(Session session, params string[] parameters)
         {
             var param = parameters[0];
@@ -2024,17 +2221,17 @@ namespace ACE.Server.Command.Handlers.Processors
                     ExportSQLRecipe(session, param);
                     break;
 
-                case FileType.Weenie:
-                    ExportSQLWeenie(session, param);
+                case FileType.Spell:
+                    ExportSQLSpell(session, param);
                     break;
 
-                case FileType.Realm:
-                    ExportSQLRealm(session, param);
+                case FileType.Weenie:
+                    ExportSQLWeenie(session, param);
                     break;
             }
         }
 
-        public static void ExportSQLWeenie(Session session, string param)
+        public static void ExportSQLWeenie(Session session, string param, bool withFolders = false)
         {
             DirectoryInfo di = VerifyContentFolder(session, false);
 
@@ -2053,7 +2250,38 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            var sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}";
+            string sql_folder = null;
+            if (withFolders)
+            {
+                var weenieType = (WeenieType)weenie.Type;
+                switch (weenieType)
+                {
+                    case WeenieType.Creature: // Export to the "CreatureType" folder
+                        WeeniePropertiesInt cType = (from x in weenie.WeeniePropertiesInt where x.Type == 2 select x).FirstOrDefault();
+                        if (cType == null)
+                            sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}{weenieType}{sep}";
+                        else
+                        {
+                            CreatureType creatureType = (CreatureType)cType.Value;
+                            sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}{weenieType}{sep}{creatureType}{sep}";
+                        }
+                        break;
+                    default: // Otherwise goes to "ItemType" folder
+                        WeeniePropertiesInt iType = (from x in weenie.WeeniePropertiesInt where x.Type == 1 select x).FirstOrDefault();
+                        if (iType == null)
+                            sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}{weenieType}{sep}";
+                        else
+                        {
+                            ItemType itemType = (ItemType)iType.Value;
+                            sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}{weenieType}{sep}{itemType}{sep}";
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}";
+            }
 
             di = new DirectoryInfo(sql_folder);
 
@@ -2067,6 +2295,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 WeenieSQLWriter.SpellNames = DatabaseManager.World.GetAllSpellNames();
                 WeenieSQLWriter.TreasureDeath = DatabaseManager.World.GetAllTreasureDeath();
                 WeenieSQLWriter.TreasureWielded = DatabaseManager.World.GetAllTreasureWielded();
+                WeenieSQLWriter.PacketOpCodes = PacketOpCodeNames.Values;
             }
 
             var sql_filename = WeenieSQLWriter.GetDefaultFileName(weenie);
@@ -2103,7 +2332,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             var cookbooks = DatabaseManager.World.GetCookbooksByRecipeId(recipeId);
-            if (cookbooks == null)
+            if (cookbooks == null || cookbooks.Count == 0)
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find recipe id {recipeId}");
                 return;
@@ -2147,61 +2376,6 @@ namespace ACE.Server.Command.Handlers.Processors
                 sqlFile.WriteLine();
 
                 CookBookSQLWriter.CreateSQLINSERTStatement(cookbooks, sqlFile);
-
-                sqlFile.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                CommandHandlerHelper.WriteOutputInfo(session, $"Failed to export {sql_folder}{sql_filename}");
-                return;
-            }
-
-            CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
-        }
-
-        public static void ExportSQLRealm(Session session, string param)
-        {
-            DirectoryInfo di = VerifyContentFolder(session, false);
-
-            var sep = Path.DirectorySeparatorChar;
-
-            if (!uint.TryParse(param, out var realmId))
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"{param} not a valid realm id");
-                return;
-            }
-
-            var realm = DatabaseManager.World.GetRealm(realmId);
-            if (realm == null)
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find realm id {realmId}");
-                return;
-            }
-
-            var sql_folder = $"{di.FullName}{sep}sql{sep}realms{sep}";
-
-            di = new DirectoryInfo(sql_folder);
-
-            if (!di.Exists)
-                di.Create();
-
-            if (RealmSQLWriter == null)
-            {
-                RealmSQLWriter = new RealmSQLWriter();
-            }
-
-            var sql_filename = RealmSQLWriter.GetDefaultFileName(realm);
-
-            try
-            {
-                var sqlFile = new StreamWriter(sql_folder + sql_filename);
-
-                RealmSQLWriter.CreateSQLDELETEStatement(realm, sqlFile);
-                sqlFile.WriteLine();
-
-                RealmSQLWriter.CreateSQLINSERTStatement(realm, sqlFile);
-                sqlFile.WriteLine();
 
                 sqlFile.Close();
             }
@@ -2317,6 +2491,60 @@ namespace ACE.Server.Command.Handlers.Processors
             CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
         }
 
+
+        public static void ExportSQLSpell(Session session, string param)
+        {
+            DirectoryInfo di = VerifyContentFolder(session, false);
+
+            var sep = Path.DirectorySeparatorChar;
+
+            if (!uint.TryParse(param, out var spellId))
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"{param} not a valid spell id");
+                return;
+            }
+
+            var spell = DatabaseManager.World.GetCachedSpell(spellId);
+
+            if (spell == null)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find spell id {spellId}");
+                return;
+            }
+
+            var sql_folder = $"{di.FullName}{sep}sql{sep}spells{sep}";
+
+            di = new DirectoryInfo(sql_folder);
+
+            if (!di.Exists)
+                di.Create();
+
+            if (SpellSQLWriter == null)
+                SpellSQLWriter = new SpellSQLWriter();
+
+            var sql_filename = SpellSQLWriter.GetDefaultFileName(spell);
+
+            try
+            {
+                var sqlFile = new StreamWriter(sql_folder + sql_filename);
+
+                SpellSQLWriter.CreateSQLDELETEStatement(spell, sqlFile);
+                sqlFile.WriteLine();
+
+                SpellSQLWriter.CreateSQLINSERTStatement(spell, sqlFile);
+
+                sqlFile.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                CommandHandlerHelper.WriteOutputInfo(session, $"Failed to export {sql_folder}{sql_filename}");
+                return;
+            }
+
+            CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
+        }
+
         [CommandHandler("clearcache", AccessLevel.Developer, CommandHandlerFlag.None, "Clears the various database caches. This enables live editing of the database information")]
         public static void HandleClearCache(Session session, params string[] parameters)
         {
@@ -2331,8 +2559,8 @@ namespace ACE.Server.Command.Handlers.Processors
                     mode = CacheType.Spell;
                 if (parameters[0].Contains("weenie", StringComparison.OrdinalIgnoreCase))
                     mode = CacheType.Weenie;
-                if (parameters[0].Contains("realm", StringComparison.OrdinalIgnoreCase))
-                    mode = CacheType.Realm;
+                if (parameters[0].Contains("wield", StringComparison.OrdinalIgnoreCase))
+                    mode = CacheType.WieldedTreasure;
             }
 
             if (mode.HasFlag(CacheType.Landblock))
@@ -2360,23 +2588,23 @@ namespace ACE.Server.Command.Handlers.Processors
                 DatabaseManager.World.ClearWeenieCache();
             }
 
-            if (mode.HasFlag(CacheType.Realm))
+            if (mode.HasFlag(CacheType.WieldedTreasure))
             {
-                CommandHandlerHelper.WriteOutputInfo(session, "Clearing realm cache");
-                DatabaseManager.World.ClearRealmCache();
+                CommandHandlerHelper.WriteOutputInfo(session, "Clearing wielded treasure cache");
+                DatabaseManager.World.ClearWieldedTreasureCache();
             }
         }
 
         [Flags]
         public enum CacheType
         {
-            None      = 0x0,
-            Landblock = 0x1,
-            Recipe    = 0x2,
-            Spell     = 0x4,
-            Weenie    = 0x8,
-            Realm     = 0x16,
-            All       = 0xFFFF
+            None            = 0x0,
+            Landblock       = 0x1,
+            Recipe          = 0x2,
+            Spell           = 0x4,
+            Weenie          = 0x8,
+            WieldedTreasure = 0x10,
+            All             = 0xFFFF
         };
 
         public static FileType GetFileType(string filename)
@@ -2434,8 +2662,6 @@ namespace ACE.Server.Command.Handlers.Processors
                         return FileType.Spell;
                     else if (line.Contains("`weenie`"))
                         return FileType.Weenie;
-                    else if (line.Contains("`realm`"))
-                        return FileType.Realm;
                     else
                         break;
                 }
@@ -2733,6 +2959,113 @@ namespace ACE.Server.Command.Handlers.Processors
                 newRotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)angle);
             }
 
+            newRotation = Quaternion.Normalize(newRotation);
+
+            // get landblock for static guid
+            var landblock_id = (ushort)(obj.Guid.Full >> 12);
+
+            // get instances for landblock
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock_id);
+
+            // find instance
+            var instance = instances.FirstOrDefault(i => i.Guid == obj.Guid.Full);
+
+            if (instance == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find instance for {obj.Name} ({obj.Guid})", ChatMessageType.Broadcast));
+                return;
+            }
+
+            session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) new rotation: {newRotation}", ChatMessageType.Broadcast));
+
+            // update physics / ace rotation
+            obj.PhysicsObj.Position.Frame.Orientation = newRotation;
+            obj.Location.Rotation = newRotation;
+
+            // update instance
+            instance.AnglesW = newRotation.W;
+            instance.AnglesX = newRotation.X;
+            instance.AnglesY = newRotation.Y;
+            instance.AnglesZ = newRotation.Z;
+
+            SyncInstances(session, landblock_id, instances);
+
+            // broadcast new rotation
+            obj.SendUpdatePosition(true);
+        }
+
+        [CommandHandler("rotate-x", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Adjusts the rotation of a landblock instance along the x-axis", "<degrees>")]
+        public static void HandleRotateX(Session session, params string[] parameters)
+        {
+            HandleRotateAxis(session, Vector3.UnitX, parameters);
+        }
+
+        [CommandHandler("rotate-y", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Adjusts the rotation of a landblock instance along the y-axis", "<degrees>")]
+        public static void HandleRotateY(Session session, params string[] parameters)
+        {
+            HandleRotateAxis(session, Vector3.UnitY, parameters);
+        }
+
+        [CommandHandler("rotate-z", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Adjusts the rotation of a landblock instance along the z-axis", "<degrees>")]
+        public static void HandleRotateZ(Session session, params string[] parameters)
+        {
+            HandleRotateAxis(session, Vector3.UnitZ, parameters);
+        }
+
+        public static void HandleRotateAxis(Session session, Vector3 axis, params string[] parameters)
+        {
+            WorldObject obj = null;
+
+            var curParam = 0;
+
+            if (parameters.Length == 2)
+            {
+                if (!uint.TryParse(parameters[curParam++].TrimStart("0x"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var guid))
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"Invalid guid: {parameters[0]}", ChatMessageType.Broadcast));
+                    return;
+                }
+
+                obj = session.Player.FindObject(guid, Player.SearchLocations.Landblock);
+
+                if (obj == null)
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find {parameters[0]}", ChatMessageType.Broadcast));
+                    return;
+                }
+            }
+            else
+                obj = CommandHandlerHelper.GetLastAppraisedObject(session);
+
+            if (obj == null) return;
+
+            // ensure landblock instance
+            if (!obj.Guid.IsStatic())
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) is not landblock instance", ChatMessageType.Broadcast));
+                return;
+            }
+
+            if (obj.PhysicsObj == null)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) is not a physics object", ChatMessageType.Broadcast));
+                return;
+            }
+
+            var degrees_str = parameters[curParam];
+
+            if (!float.TryParse(degrees_str, out var degrees))
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Invalid angle: {degrees_str}", ChatMessageType.Broadcast));
+                return;
+            }
+
+            var rads = degrees.ToRadians();
+            var q = Quaternion.CreateFromAxisAngle(axis, rads);
+
+            // get quaternion
+            var newRotation = Quaternion.Normalize(obj.PhysicsObj.Position.Frame.Orientation * q);
+
             // get landblock for static guid
             var landblock_id = (ushort)(obj.Guid.Full >> 12);
 
@@ -2773,9 +3106,11 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var replaceChars = new Dictionary<string, string>()
             {
+                { " ", "_" },
                 { "-", "_" },
                 { "!", "" },
                 { "#", "" },
+                { "?", "" },
             };
 
             using (var ctx = new WorldDbContext())
@@ -2814,5 +3149,114 @@ namespace ACE.Server.Command.Handlers.Processors
 
             CommandHandlerHelper.WriteOutputInfo(session, $"Wrote {path}");
         }
+
+        /*[CommandHandler("vloc2loc", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Output a set of LOCs for a given landblock found in the VLOCS dataset", "<LandblockID>\nExample: @vloc2loc 0x0007\n         @vloc2loc 0xCE95")]
+        public static void HandleVLOCtoLOC(Session session, params string[] parameters)
+        {
+            var hex = parameters[0];
+
+            if (hex.StartsWith("0x", StringComparison.CurrentCultureIgnoreCase)
+             || hex.StartsWith("&H", StringComparison.CurrentCultureIgnoreCase))
+            {
+                hex = hex[2..];
+            }
+
+            if (uint.TryParse(hex, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var lbid))
+            {
+                DirectoryInfo di = VerifyContentFolder(session);
+                if (!di.Exists) return;
+
+                var sep = Path.DirectorySeparatorChar;
+
+                var vloc_folder = $"{di.FullName}{sep}vlocs{sep}";
+
+                di = new DirectoryInfo(vloc_folder);
+
+                var vlocDB = vloc_folder + "vlocDB.txt";
+
+                var vlocs = di.Exists ? new FileInfo(vlocDB).Exists ? File.ReadLines(vlocDB).ToArray() : null : null;
+
+                if (vlocs == null)
+                {
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Unable to read VLOC database file located here: {vlocDB}");
+                    return;
+                }
+
+                // Name,ObjectClass,LandCell,X,Y
+                // Master MacTavish,37,-114359889,97.14075000286103,-63.93749958674113
+
+                if (vlocs.Length == 0 || !vlocs[0].Equals("Name,ObjectClass,LandCell,X,Y"))
+                {
+                    CommandHandlerHelper.WriteOutputInfo(session, $"{vlocDB} does not appear to be a valid VLOC database file.");
+                    return;
+                }
+
+                var vlocFile = vloc_folder + $"{lbid:X4}.txt";
+
+                var vi = new FileInfo(vlocFile);
+                if (vi.Exists)
+                    vi.Delete();
+
+                for (var i = 1; i < vlocs.Length; i++)
+                {
+                    var split = vlocs[i].Split(",");
+
+                    var name = split[0].Trim();
+                    var objectClass = split[1].Trim();
+                    var strLandCell = split[2].Trim();
+                    var strX = split[3].Trim();
+                    var strY = split[4].Trim();
+
+                    if (!int.TryParse(strLandCell, out var landCell))
+                    {
+                        CommandHandlerHelper.WriteOutputInfo(session, $"Unable to parse LandCell ({strLandCell}) value from line {i} in vlocDB: {vlocs[i]}");
+                        continue;
+                    }
+                    var objCellId = (uint)landCell;
+                    if (!float.TryParse(strX, out var x))
+                    {
+                        CommandHandlerHelper.WriteOutputInfo(session, $"Unable to parse X ({strX}) value from line {i} in vlocDB: {vlocs[i]}");
+                        continue;
+                    }    
+                    if (!float.TryParse(strY, out var y))
+                    {
+                        CommandHandlerHelper.WriteOutputInfo(session, $"Unable to parse Y ({strY}) value from line {i} in vlocDB: {vlocs[i]}");
+                        continue;
+                    }    
+
+                    if ((objCellId >> 16) != lbid) continue;
+
+                    try
+                    {
+                        var pos = new Position(new Vector2(x, y));
+                        pos.AdjustMapCoords();
+                        pos.Translate(objCellId);
+                        pos.FindZ();
+
+                        using (StreamWriter sw = File.AppendText(vlocFile))
+                        {
+                            sw.WriteLine($"{name} - @teleloc {pos.ToLOCString()}");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        using (StreamWriter sw = File.AppendText(vlocFile))
+                        {
+                            sw.WriteLine($"Unable to parse {name} - 0x{objCellId:X8} {strX}, {strY}");
+                        }
+                    }
+                }
+
+                vi = new FileInfo(vlocFile);
+                if (vi.Exists)
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Successfully wrote VLOCs for 0x{lbid:X4} to {vlocFile}");
+                else
+                    CommandHandlerHelper.WriteOutputInfo(session, $"No VLOCs able to be written for 0x{lbid:X4}");
+            }
+            else
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Invalid Landblock ID: {parameters[0]}\nLandblock ID should be in the hex format such as this: @vloc2loc 0xAB94");
+            }
+        }*/
     }
 }

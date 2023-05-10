@@ -10,7 +10,6 @@ namespace ACE.Entity.Enum.Properties
         // description attributes are used by the weenie editor for a cleaner display name
         Undef                           = 0,
         [SendOnLogin]
-        [Clone]
         Name                            = 1,
         /// <summary>
         /// default "Adventurer"
@@ -30,10 +29,8 @@ namespace ACE.Entity.Enum.Properties
         LockCode                        = 12,
         [ServerOnly]
         KeyCode                         = 13,
-        [Clone]
         Use                             = 14,
         ShortDesc                       = 15,
-        [Clone]
         LongDesc                        = 16,
         ActivationTalk                  = 17,
         [ServerOnly]
@@ -99,9 +96,6 @@ namespace ACE.Entity.Enum.Properties
         GodState                        = 9006,
         [ServerOnly]
         TinkerLog                       = 9007,
-
-        [ServerOnly]
-        SummonTargetRuleset             = 42000,
     }
 
     public static class PropertyStringExtensions

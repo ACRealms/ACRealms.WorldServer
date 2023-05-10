@@ -65,7 +65,7 @@ namespace ACE.Server.Physics.Common
             return objInfo.ValidateWalkable(checkPos, walkable.Plane, WaterType != LandDefs.WaterType.NotWater, waterDepth, transition, ID);
         }
 
-        public new static LandCell Get(ulong cellID)
+        public static LandCell Get(ulong cellID)
         {
             return (LandCell)LScape.get_landcell(cellID);
         }
@@ -213,6 +213,7 @@ namespace ACE.Server.Physics.Common
             var x = (uint)_x;
             var y = (uint)_y;
             ulong iid = ((ulong)instance) << 32;
+
             if (x >= 0 && y >= 0 && x < 2040 && y < 2040)
             {
                 var cellID = (((y >> 3) | 32 * (x & 0xFFFFFFF8)) << 16) | ((y & 7) + 8 * (x & 7) + 1);

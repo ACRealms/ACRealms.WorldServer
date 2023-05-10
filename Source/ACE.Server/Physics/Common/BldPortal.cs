@@ -31,6 +31,13 @@ namespace ACE.Server.Physics.Common
             return (EnvCell)LScape.get_landcell(blockCellID);
         }
 
+        public EnvCell GetOtherCell(uint landblockID)
+        {
+            var blockCellID = landblockID & 0xFFFF0000 | OtherCellId;
+
+            return (EnvCell)LScape.get_landcell(blockCellID);
+        }
+
         public void add_to_stablist(ref List<ushort> stabList, ref uint maxSize, ref uint stabNum)
         {
             // is maxSize needed with list?

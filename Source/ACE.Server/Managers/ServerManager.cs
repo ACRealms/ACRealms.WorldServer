@@ -6,6 +6,7 @@ using log4net;
 using ACE.Common;
 using ACE.Database;
 using ACE.Entity.Enum;
+using ACE.Server.Entity.Actions;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Network.Managers;
 
@@ -106,12 +107,12 @@ namespace ACE.Server.Managers
                 if (!ShutdownInitiated)
                 {
                     // reset shutdown details
-                    string shutdownText = $"The server has canceled the shutdown procedure @ {DateTime.UtcNow} UTC";
+                    string shutdownText = $"The server shut down has been cancelled @ {DateTime.Now} ({DateTime.UtcNow} UTC)";
                     log.Info(shutdownText);
 
                     // special text
                     foreach (var player in PlayerManager.GetAllOnline())
-                        player.Session.WorldBroadcast(shutdownText);
+                        player.Session.WorldBroadcast($"Broadcast from System> ATTENTION - This Asheron's Call Server shut down has been cancelled.");
 
                     // break function
                     return;
@@ -127,32 +128,50 @@ namespace ACE.Server.Managers
             PropertyManager.ResyncVariables();
             PropertyManager.StopUpdating();
 
-            log.Debug("Logging off all players...");
+            WorldManager.EnqueueAction(new ActionEventDelegate(() =>
+            {
+                log.Debug("Logging off all players...");
 
-            // logout each player
-            foreach (var player in PlayerManager.GetAllOnline())
-                player.Session.LogOffPlayer(true);
+                // logout each player
+                foreach (var player in PlayerManager.GetAllOnline())
+                    player.Session.LogOffPlayer(true);
+            }));
 
             // Wait for all players to log out
             var logUpdateTS = DateTime.MinValue;
             int playerCount;
+            var playerLogoffStart = DateTime.UtcNow;
             while ((playerCount = PlayerManager.GetOnlineCount()) > 0)
             {
                 logUpdateTS = LogStatusUpdate(logUpdateTS, $"Waiting for {playerCount} player{(playerCount > 1 ? "s" : "")} to log off...");
                 Thread.Sleep(10);
+                if (playerCount > 0 && DateTime.UtcNow - playerLogoffStart > TimeSpan.FromMinutes(5))
+                {
+                    playerLogoffStart = DateTime.UtcNow;
+                    log.Warn($"5 minute log off failsafe reached and there are {playerCount} player{(playerCount > 1 ? "s" : "")} still online.");
+                    foreach (var player in PlayerManager.GetAllOnline())
+                    {
+                        log.Warn($"Player {player.Name} (0x{player.Guid}) appears to be stuck in world and unable to log off normally. Requesting Forced Logoff...");
+                        player.ForcedLogOffRequested = true;
+                        player.ForceLogoff();
+                    }    
+                }
             }
 
-            log.Debug("Disconnecting all sessions...");
+            WorldManager.EnqueueAction(new ActionEventDelegate(() =>
+            {
+                log.Debug("Disconnecting all sessions...");
 
-            // disconnect each session
-            NetworkManager.DisconnectAllSessionsForShutdown();
+                // disconnect each session
+                NetworkManager.DisconnectAllSessionsForShutdown();
+            }));
 
             // Wait for all sessions to drop out
             logUpdateTS = DateTime.MinValue;
             int sessionCount;
-            while ((sessionCount = NetworkManager.GetSessionCount()) > 0)
+            while ((sessionCount = NetworkManager.GetAuthenticatedSessionCount()) > 0)
             {
-                logUpdateTS = LogStatusUpdate(logUpdateTS, $"Waiting for {sessionCount} session{(sessionCount > 1 ? "s" : "")} to disconnect...");
+                logUpdateTS = LogStatusUpdate(logUpdateTS, $"Waiting for {sessionCount} authenticated session{(sessionCount > 1 ? "s" : "")} to disconnect...");
                 Thread.Sleep(10);
             }
 
@@ -258,6 +277,11 @@ namespace ACE.Server.Managers
             }
             else
                 return lastNoticeTime;
+        }
+
+        public static void StartupAbort()
+        {
+            ShutdownInitiated = true;
         }
 
         public static string ShutdownNoticeText()

@@ -52,7 +52,13 @@ namespace ACE.Server.WorldObjects
             if (!(activator is Player player))
                 return new ActivationResult(false);
 
-            if (player.PkLevel > PKLevel.PK || player.RealmRuleset.GetProperty(RealmPropertyBool.IsPKOnly) || PropertyManager.GetBool("pkl_server").Item)
+            if (player.IsOlthoiPlayer)
+            {
+                player.SendWeenieError(WeenieError.OlthoiCannotInteractWithThat);
+                return new ActivationResult(false);
+            }
+
+            if (player.PkLevel > PKLevel.PK || PropertyManager.GetBool("pk_server").Item || PropertyManager.GetBool("pkl_server").Item)
             {
                 if (!string.IsNullOrWhiteSpace(GetProperty(PropertyString.UsePkServerError)))
                     player.Session.Network.EnqueueSend(new GameMessageSystemChat(GetProperty(PropertyString.UsePkServerError), ChatMessageType.Broadcast));

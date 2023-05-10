@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable disable
+
 namespace ACE.Database.Models.World
 {
     public partial class WeeniePropertiesEmoteAction
@@ -11,7 +13,7 @@ namespace ACE.Database.Models.World
         public uint Type { get; set; }
         public float Delay { get; set; }
         public float Extent { get; set; }
-        public int? Motion { get; set; }
+        public uint? Motion { get; set; }
         public string Message { get; set; }
         public string TestString { get; set; }
         public int? Min { get; set; }

@@ -77,7 +77,8 @@ namespace ACE.Server.WorldObjects
             {
                 var msg = $"Are you sure you want to use {Name}?";
                 var confirm = new Confirmation_Custom(player.Guid, () => ActOnUse(activator, true));
-                player.ConfirmationManager.EnqueueSend(confirm, msg);
+                if (!player.ConfirmationManager.EnqueueSend(confirm, msg))
+                    player.SendWeenieError(WeenieError.ConfirmationInProgress);
                 return;
             }
 
@@ -116,6 +117,24 @@ namespace ACE.Server.WorldObjects
         {
             if (player.IsDead) return;
 
+            // verify item is still valid
+            if (player.FindObject(Guid.Full, Player.SearchLocations.MyInventory) == null)
+            {
+                //player.SendWeenieError(WeenieError.ObjectGone);   // results in 'Unable to move object!' transient error
+                player.SendTransientError($"Cannot find the {Name}");   // custom message
+                return;
+            }
+
+            // trying to use a dispel potion while pk timer is active
+            // send error message and cancel - do not consume item
+            if (SpellDID != null)
+            {
+                var spell = new Spell(SpellDID.Value);
+
+                if (spell.MetaSpellType == SpellType.Dispel && !VerifyDispelPKStatus(this, player))
+                    return;
+            }
+
             if (RareUsesTimer)
             {
                 var currentTime = Time.GetUnixTime();
@@ -136,11 +155,11 @@ namespace ACE.Server.WorldObjects
 
                 // TODO: figure this out better
                 if (spell.MetaSpellType == SpellType.PortalSummon)
-                {
-                    HandlePortalGemSummon(spell, player);
-                }
+                    TryCastSpell(spell, player, this, tryResist: false);
+                else if (spell.IsImpenBaneType || spell.IsItemRedirectableType)
+                    player.TryCastItemEnchantment_WithRedirects(spell, player, this);
                 else
-                    player.TryCastSpell(spell, player, this, false);
+                    player.TryCastSpell(spell, player, this, tryResist: false);
             }
 
             if (UseCreateContractId > 0)
@@ -165,83 +184,50 @@ namespace ACE.Server.WorldObjects
                 player.TryConsumeFromInventoryWithNetworking(this, 1);
         }
 
-        private void HandlePortalGemSummon(Spell spell, Player player)
-        {
-            TryCastSpell(spell, player, this, false);
-        }
-
         public bool HandleUseCreateItem(Player player)
         {
-            var playerFreeInventorySlots = player.GetFreeInventorySlots();
-            var playerFreeContainerSlots = player.GetFreeContainerSlots();
-            var playerAvailableBurden = player.GetAvailableBurden();
-
-            var playerOutOfInventorySlots = false;
-            var playerOutOfContainerSlots = false;
-            var playerExceedsAvailableBurden = false;
-
             var amount = UseCreateQuantity ?? 1;
 
-            var itemStacks = player.PreCheckItem(UseCreateItem.Value, amount, playerFreeContainerSlots, playerFreeInventorySlots, playerAvailableBurden, out var itemEncumberance, out bool itemRequiresBackpackSlot);
+            var itemsToReceive = new ItemsToReceive(player);
 
-            if (itemRequiresBackpackSlot)
+            itemsToReceive.Add(UseCreateItem.Value, amount);
+
+            if (itemsToReceive.PlayerExceedsLimits)
             {
-                playerFreeContainerSlots -= itemStacks;
-                playerAvailableBurden -= itemEncumberance;
-
-                playerOutOfContainerSlots = playerFreeContainerSlots < 0;
-            }
-            else
-            {
-                playerFreeInventorySlots -= itemStacks;
-                playerAvailableBurden -= itemEncumberance;
-
-                playerOutOfInventorySlots = playerFreeInventorySlots < 0;
-            }
-
-            playerExceedsAvailableBurden = playerAvailableBurden < 0;
-
-            if (playerOutOfInventorySlots || playerOutOfContainerSlots || playerExceedsAvailableBurden)
-            {
-                if (playerExceedsAvailableBurden)
+                if (itemsToReceive.PlayerExceedsAvailableBurden)
                     player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, "You are too encumbered to use that!"));
-                else if (playerOutOfInventorySlots)
+                else if (itemsToReceive.PlayerOutOfInventorySlots)
                     player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, "You do not have enough pack space to use that!"));
-                else //if (playerOutOfContainerSlots)
+                else if (itemsToReceive.PlayerOutOfContainerSlots)
                     player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, "You do not have enough container slots to use that!"));
 
                 return false;
             }
 
-            if (itemStacks > 0)
+            if (itemsToReceive.RequiredSlots > 0)
             {
-                while (amount > 0)
+                var remaining = amount;
+
+                while (remaining > 0)
                 {
                     var item = WorldObjectFactory.CreateNewWorldObject(UseCreateItem.Value);
 
                     if (item is Stackable)
                     {
-                        // amount contains a max stack
-                        if (item.MaxStackSize <= amount)
-                        {
-                            item.SetStackSize(item.MaxStackSize);
-                            amount -= item.MaxStackSize.Value;
-                        }
-                        else // not a full stack
-                        {
-                            item.SetStackSize(amount);
-                            amount -= amount;
-                        }
+                        var stackSize = Math.Min(remaining, item.MaxStackSize ?? 1);
+
+                        item.SetStackSize(stackSize);
+                        remaining -= stackSize;
                     }
                     else
-                        amount -= 1;
+                        remaining--;
 
                     player.TryCreateInInventoryWithNetworking(item);
                 }
             }
             else
             {
-                player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, $"Unable to use {Name} at this time!"));
+                player.SendTransientError($"Unable to use {Name} at this time!");
                 return false;
             }
             return true;
@@ -283,6 +269,34 @@ namespace ACE.Server.WorldObjects
         {
             get => GetProperty(PropertyString.UseSendsSignal);
             set { if (value == null) RemoveProperty(PropertyString.UseSendsSignal); else SetProperty(PropertyString.UseSendsSignal, value); }
+        }
+
+        public override void OnActivate(WorldObject activator)
+        {
+            if (ItemUseable == Usable.Contained && activator is Player player)
+            {               
+                var containedItem = player.FindObject(Guid.Full, Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems);
+                if (containedItem != null) // item is contained by player
+                {
+                    if (player.IsBusy || player.Teleporting || player.suicideInProgress)
+                    {
+                        player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.YoureTooBusy));
+                        player.EnchantmentManager.StartCooldown(this);
+                        return;
+                    }
+
+                    if (player.IsDead)
+                    {
+                        player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.Dead));
+                        player.EnchantmentManager.StartCooldown(this);
+                        return;
+                    }
+                }
+                else
+                    return;
+            }
+
+            base.OnActivate(activator);
         }
     }
 }

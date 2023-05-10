@@ -199,43 +199,5 @@ namespace ACE.Server.WorldObjects
 
             return false;
         }
-
-        /// <summary>
-        /// Clones properties marked with the Clone property
-        /// </summary>
-        /// <param name="worldObject"></param>
-        internal void ClonePropertiesFrom(WorldObject worldObject)
-        {
-            foreach(var e in PropertyAttributes.GetProperties<PropertyInt, CloneAttribute>())
-            {
-                var p = worldObject.GetProperty(e);
-                if (p != null)
-                    SetProperty(e, p.Value);
-            }
-            foreach (var e in PropertyAttributes.GetProperties<PropertyInt64, CloneAttribute>())
-            {
-                var p = worldObject.GetProperty(e);
-                if (p != null)
-                    SetProperty(e, p.Value);
-            }
-            foreach (var e in PropertyAttributes.GetProperties<PropertyFloat, CloneAttribute>())
-            {
-                var p = worldObject.GetProperty(e);
-                if (p != null)
-                    SetProperty(e, p.Value);
-            }
-            foreach (var e in PropertyAttributes.GetProperties<PropertyString, CloneAttribute>())
-            {
-                var p = worldObject.GetProperty(e);
-                if (p != null)
-                    SetProperty(e, p);
-            }
-            foreach (var e in PropertyAttributes.GetProperties<PropertyBool, CloneAttribute>())
-            {
-                var p = worldObject.GetProperty(e);
-                if (p != null)
-                    SetProperty(e, p.Value);
-            }
-        }
     }
 }

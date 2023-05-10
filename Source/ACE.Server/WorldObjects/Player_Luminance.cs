@@ -14,9 +14,14 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void EarnLuminance(long amount, XpType xpType, ShareType shareType = ShareType.All)
         {
-            // following the same model as Player_Xp
+            if (IsOlthoiPlayer)
+                return;
 
+            // following the same model as Player_Xp
+            var questModifier = PropertyManager.GetDouble("quest_lum_modifier").Item;
             var modifier = PropertyManager.GetDouble("luminance_modifier").Item;
+            if (xpType == XpType.Quest)
+                modifier *= questModifier;
 
             // should this be passed upstream to fellowship?
             var enchantment = GetXPAndLuminanceModifier(xpType);
@@ -31,6 +36,9 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void GrantLuminance(long amount, XpType xpType, ShareType shareType = ShareType.All)
         {
+            if (IsOlthoiPlayer)
+                return;
+
             if (Fellowship != null && Fellowship.ShareXP && shareType.HasFlag(ShareType.Fellowship))
             {
                 // this will divy up the luminance, and re-call this function

@@ -21,7 +21,7 @@ namespace ACE.Server.Realms
         {
             foreach(var augtype in RealmConstants.DuelAugmentations)
             {
-                AugmentationDevice.DoAugmentation(player, augtype, null, false, false);
+                //AugmentationDevice.DoAugmentation(player);
                 player.SaveBiotaToDatabase();
             }
         }
@@ -57,7 +57,7 @@ namespace ACE.Server.Realms
         public static void SetupNewCharacter(Player player)
         {
             player.GrantXP((long)player.GetXPBetweenLevels(1, 275), XpType.Admin, ShareType.None);
-            TeachAugmentations(player);
+            //TeachAugmentations(player);
             SpendAllXp(player);
             GiveGear(player);
             LearnAllNonAdminSpells(player);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Numerics;
 using ACE.DatLoader;
 using ACE.DatLoader.FileTypes;
@@ -7,8 +8,9 @@ namespace ACE.Server.Physics.Util
 {
     public class AdjustCell
     {
-        public List<Common.EnvCell> EnvCells { get; set; }
-        public static Dictionary<ulong, AdjustCell> AdjustCells { get; set; } = new Dictionary<ulong, AdjustCell>();
+        public List<Common.EnvCell> EnvCells;
+        public static ConcurrentDictionary<ulong, AdjustCell> AdjustCells = new ConcurrentDictionary<ulong, AdjustCell>();
+
 
         public AdjustCell(ulong iDungeonID)
         {
@@ -52,7 +54,7 @@ namespace ACE.Server.Physics.Util
             if (adjustCell == null)
             {
                 adjustCell = new AdjustCell(iDungeonID);
-                AdjustCells.Add(iDungeonID, adjustCell);
+                AdjustCells.TryAdd(iDungeonID, adjustCell);
             }
             return adjustCell;
         }

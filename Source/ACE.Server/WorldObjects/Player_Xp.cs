@@ -23,8 +23,11 @@ namespace ACE.Server.WorldObjects
         {
             //Console.WriteLine($"{Name}.EarnXP({amount}, {sharable}, {fixedAmount})");
 
-            // apply xp modifier
+            // apply xp modifiers.  Quest XP is multiplicative with general XP modification
+            var questModifier = PropertyManager.GetDouble("quest_xp_modifier").Item;
             var modifier = PropertyManager.GetDouble("xp_modifier").Item;
+            if (xpType == XpType.Quest)
+                modifier *= questModifier;
 
             // should this be passed upstream to fellowship / allegiance?
             var enchantment = GetXPAndLuminanceModifier(xpType);
@@ -49,6 +52,14 @@ namespace ACE.Server.WorldObjects
         /// <param name="shareable">If TRUE, this XP can be shared with fellowship members</param>
         public void GrantXP(long amount, XpType xpType, ShareType shareType = ShareType.All)
         {
+            if (IsOlthoiPlayer)
+            {
+                if (HasVitae)
+                    UpdateXpVitae(amount);
+
+                return;
+            }
+
             if (Fellowship != null && Fellowship.ShareXP && shareType.HasFlag(ShareType.Fellowship))
             {
                 // this will divy up the XP, and re-call this function
@@ -57,7 +68,8 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            UpdateXpAndLevel(amount, xpType);
+            // Make sure UpdateXpAndLevel is done on this players thread
+            EnqueueAction(new ActionEventDelegate(() => UpdateXpAndLevel(amount, xpType)));
 
             // for passing XP up the allegiance chain,
             // this function is only called at the very beginning, to start the process.
@@ -121,7 +133,16 @@ namespace ACE.Server.WorldObjects
         /// <param name="amount">The amount of XP to apply to the vitae penalty</param>
         private void UpdateXpVitae(long amount)
         {
-            var vitaePenalty = EnchantmentManager.GetVitae().StatModValue;
+            var vitae = EnchantmentManager.GetVitae();
+
+            if (vitae == null)
+            {
+                log.Error($"{Name}.UpdateXpVitae({amount}) vitae null, likely due to cross-thread operation or corrupt EnchantmentManager cache. Please report this.");
+                log.Error(Environment.StackTrace);
+                return;
+            }
+
+            var vitaePenalty = vitae.StatModValue;
             var startPenalty = vitaePenalty;
 
             var maxPool = (int)VitaeCPPoolThreshold(vitaePenalty, DeathLevel.Value);
@@ -417,7 +438,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Raise the available XP by a percentage of the current level XP or a maximum
         /// </summary>
-        public void GrantLevelProportionalXp(double percent, long min, long max, bool shareable = false)
+        public void GrantLevelProportionalXp(double percent, long min, long max)
         {
             var nextLevelXP = GetXPBetweenLevels(Level.Value, Level.Value + 1);
 
@@ -429,9 +450,8 @@ namespace ACE.Server.WorldObjects
             if (min > 0)
                 scaledXP = Math.Max(scaledXP, min);
 
-            var shareType = shareable ? ShareType.All : ShareType.None;
-
-            GrantXP(scaledXP, XpType.Quest, shareType);
+            // apply xp modifiers?
+            EarnXP(scaledXP, XpType.Quest, ShareType.Allegiance);
         }
 
         /// <summary>

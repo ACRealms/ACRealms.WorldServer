@@ -96,7 +96,6 @@ namespace ACE.Server.WorldObjects
 
             return new ActivationResult(true);
         }
-
         /// <summary>
         /// House Portals are on Use activated, rather than collision based activation
         /// The actual portal process is wrapped to the base portal class ActOnUse, after ACL check are performed

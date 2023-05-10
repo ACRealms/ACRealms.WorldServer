@@ -6,12 +6,19 @@ using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
 using ACE.Server.Entity;
+using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;
 
 namespace ACE.Server.WorldObjects
 {
     public class AugmentationDevice: WorldObject
     {
+        /// <summary>
+        /// Indicates that the server should enforce logic to prevent players
+        /// from augmenting a given attribute's innate value over 100
+        /// </summary>
+        public static bool AttributeAugmentationSafetyCapEnabled => PropertyManager.GetBool("attribute_augmentation_safety_cap").Item;
+
         public long? AugmentationCost
         {
             get => GetProperty(PropertyInt64.AugmentationCost);
@@ -59,16 +66,21 @@ namespace ACE.Server.WorldObjects
 
             if (!confirmed)
             {
-                player.ConfirmationManager.EnqueueSend(new Confirmation_Augmentation(player.Guid, Guid),
-                    $"This action will augment your character with {Name} and will cost {AugmentationCost:N0} available experience.");
+                if (!player.ConfirmationManager.EnqueueSend(new Confirmation_Augmentation(player.Guid, Guid),
+                    $"This action will augment your character with {Name} and will cost {AugmentationCost:N0} available experience."))
+                    player.SendWeenieError(WeenieError.ConfirmationInProgress);
 
                 return;
             }
             DoAugmentation(player);
         }
 
-        public static void DoAugmentation(Player player, AugmentationType type, AugmentationDevice deviceWorldObject, bool broadcast = true, bool saveToDbImmediately = true)
+        public void DoAugmentation(Player player)
         {
+            //Console.WriteLine($"{Name}.DoAugmentation({player.Name})");
+
+            // set augmentation props for player
+            var type = (AugmentationType)(AugmentationStat ?? 0);
             var augProp = AugProps[type];
             var curVal = player.GetProperty(augProp) ?? 0;
             var newVal = curVal + 1;
@@ -80,18 +92,18 @@ namespace ACE.Server.WorldObjects
 
                 var attr = AugTypeHelper.GetAttribute(type);
                 var playerAttr = player.Attributes[attr];
-                playerAttr.StartingValue += 5;
+                playerAttr.StartingValue += AttributeAugmentationSafetyCapEnabled ? Math.Min(5, 100 - playerAttr.StartingValue) : 5;
                 player.Session.Network.EnqueueSend(new GameMessagePrivateUpdateAttribute(player, playerAttr));
             }
             else if (AugTypeHelper.IsResist(type))
+            {
                 player.AugmentationResistanceFamily++;
-
+            }
             else if (AugTypeHelper.IsSkill(type))
             {
                 var playerSkill = player.GetCreatureSkill(AugTypeHelper.GetSkill(type));
                 playerSkill.AdvancementClass = SkillAdvancementClass.Specialized;
                 playerSkill.InitLevel = 10;
-
                 // adjust rank?
                 // handle overages?
                 // if trained skill is maxed, there will be a ~103m xp overage...
@@ -99,14 +111,12 @@ namespace ACE.Server.WorldObjects
                 playerSkill.Ranks = (ushort)specRank;
                 player.Session.Network.EnqueueSend(new GameMessagePrivateUpdateSkill(player, playerSkill));
             }
-
             else if (type == AugmentationType.PackSlot)
             {
                 // still seems to require the client to relog
                 player.ContainerCapacity++;
                 player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(player, PropertyInt.ContainersCapacity, (int)player.ContainerCapacity));
             }
-
             else if (type == AugmentationType.BurdenLimit)
             {
                 var capacity = player.GetEncumbranceCapacity();
@@ -114,33 +124,24 @@ namespace ACE.Server.WorldObjects
             }
 
             // consume xp
-            if (deviceWorldObject != null)
-            {
-                player.AvailableExperience -= deviceWorldObject.AugmentationCost;
-                player.TryConsumeFromInventoryWithNetworking(deviceWorldObject, 1);
-                var updateXP = new GameMessagePrivateUpdatePropertyInt64(player, PropertyInt64.AvailableExperience, player.AvailableExperience ?? 0);
-                var updateProp = new GameMessagePrivateUpdatePropertyInt(player, augProp, newVal);
-                player.Session.Network.EnqueueSend(updateProp, updateXP);
-                player.SendWeenieErrorWithString(WeenieErrorWithString.YouSuccededAcquiringAugmentation, deviceWorldObject.Name);
+            player.AvailableExperience -= AugmentationCost;
 
-                if (broadcast)
-                {
-                    player.EnqueueBroadcast(new GameMessageSystemChat($"{player.Name} has acquired the {deviceWorldObject.Name} augmentation!", ChatMessageType.Broadcast));
-                    player.EnqueueBroadcast(new GameMessageScript(player.Guid, AugTypeHelper.GetEffect(type)));
-                }
-            }
+            // consume augmentation gem
+            player.TryConsumeFromInventoryWithNetworking(this, 1);
 
-            if (saveToDbImmediately)
-                player.SaveBiotaToDatabase();
+            // send network messages
+            var updateProp = new GameMessagePrivateUpdatePropertyInt(player, augProp, newVal);
+            var updateXP = new GameMessagePrivateUpdatePropertyInt64(player, PropertyInt64.AvailableExperience, player.AvailableExperience ?? 0);
+
+            player.Session.Network.EnqueueSend(updateProp, updateXP);
+            player.SendWeenieErrorWithString(WeenieErrorWithString.YouSuccededAcquiringAugmentation, Name);
+
+            // also broadcast to nearby players
+            player.EnqueueBroadcast(new GameMessageScript(player.Guid, AugTypeHelper.GetEffect(type)));
+            player.EnqueueBroadcast(new GameMessageSystemChat($"{player.Name} has acquired the {Name} augmentation!", ChatMessageType.Broadcast));
+
+            player.SaveBiotaToDatabase();
         }
-
-        public void DoAugmentation(Player player)
-        {
-            // set augmentation props for player
-            var type = (AugmentationType)(AugmentationStat ?? 0);
-            DoAugmentation(player, type, this, true, true);
-        }
-
 
         public bool VerifyRequirements(Player player)
         {
@@ -174,7 +175,8 @@ namespace ACE.Server.WorldObjects
                 var playerAttribute = player.Attributes[AugTypeHelper.GetAttribute(type)];
 
                 // check InitLevel
-                if (playerAttribute.StartingValue >= 100)
+                var maxInnateValue = AttributeAugmentationSafetyCapEnabled ? 96 : 100;
+                if (playerAttribute.StartingValue >= maxInnateValue)
                 {
                     player.SendWeenieErrorWithString(WeenieErrorWithString.AugmentationSkillNotTrained, $"You are not able to purchase this augmentation because your {playerAttribute.Attribute.ToString()} is already at the maximum innate level!");
                     return false;

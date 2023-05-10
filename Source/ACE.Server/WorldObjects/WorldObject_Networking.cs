@@ -74,7 +74,7 @@ namespace ACE.Server.WorldObjects
                 objDescriptionFlags &= ~ObjectDescriptionFlag.UiHidden;
 
             writer.Write((uint)weenieFlags);
-            writer.WriteString16L(Name ?? String.Empty);
+            writer.WriteString16L(Name ?? string.Empty);
             writer.WritePackedDword(WeenieClassId);
             writer.WritePackedDwordOfKnownType(IconId, 0x6000000);
             writer.Write((uint)ItemType);
@@ -182,9 +182,9 @@ namespace ACE.Server.WorldObjects
                 }
                 else
                 {
-                    // if mansion, send permissions from master copy
-                    if (house.HouseType == HouseType.Mansion)
-                        house = house.LinkedHouses[0];
+                    // if mansion or villa, send permissions from master copy
+                    if (house.HouseType == HouseType.Villa || house.HouseType == HouseType.Mansion)
+                        house = house.RootHouse;
                 }
 
                 writer.Write(new RestrictionDB(house));
@@ -763,7 +763,7 @@ namespace ACE.Server.WorldObjects
             if ((Workmanship != null) && (uint?)Workmanship != 0u)
                 weenieHeaderFlag |= WeenieHeaderFlag.Workmanship;
 
-            if (EncumbranceVal != 0 && !(this is Creature) && !(this is SpellProjectile))
+            if ((EncumbranceVal != null) && (EncumbranceVal != 0) && !(this is Creature) && !(this is SpellProjectile))
                 weenieHeaderFlag |= WeenieHeaderFlag.Burden;
 
             if ((SpellDID != null) && (SpellDID != 0))
@@ -825,7 +825,12 @@ namespace ACE.Server.WorldObjects
             if (WeenieType == WeenieType.Container || WeenieType == WeenieType.Corpse || WeenieType == WeenieType.Chest
                 || WeenieType == WeenieType.Hook || WeenieType == WeenieType.Storage)
             {
-                UpdateObjectDescriptionFlag(ObjectDescriptionFlag.Openable, !IsLocked);
+                var openable = !IsLocked;
+
+                if (WeenieType == WeenieType.Chest && !openable && PropertyManager.GetBool("fix_chest_missing_inventory_window").Item)
+                    openable = true;
+
+                UpdateObjectDescriptionFlag(ObjectDescriptionFlag.Openable, openable);
             }
 
             UpdateObjectDescriptionFlag(ObjectDescriptionFlag.Inscribable, Inscribable);
@@ -894,7 +899,7 @@ namespace ACE.Server.WorldObjects
             }
 
             if (item.ClothingBaseEffects.ContainsKey(SetupTableId))
-            // Check if the player model has data. Gear Knights, this is usually you.
+            // Check if the ClothingBase is applicable for this Setup. (Gear Knights, this is usually you.)
             {
                 // Add the model and texture(s)
                 ClothingBaseEffect clothingBaseEffect = item.ClothingBaseEffects[SetupTableId];
@@ -902,39 +907,34 @@ namespace ACE.Server.WorldObjects
                 {
                     byte partNum = (byte)t.Index;
                     objDesc.AnimPartChanges.Add(new PropertiesAnimPart { Index = (byte)t.Index, AnimationId = t.ModelId });
-                    //AddModel((byte)t.Index, (ushort)t.ModelId);
                     foreach (CloTextureEffect t1 in t.CloTextureEffects)
                         objDesc.TextureChanges.Add(new PropertiesTextureMap { PartIndex = (byte)t.Index, OldTexture = t1.OldTexture, NewTexture = t1.NewTexture });
-                    //AddTexture((byte)t.Index, (ushort)t1.OldTexture, (ushort)t1.NewTexture);
                 }
 
                 //if (item.ClothingSubPalEffects.Count == 1 && (PaletteTemplate.HasValue | Shade.HasValue))
                 //    Console.WriteLine($"Found an item with 1 ClothingSubPalEffects and a PaletteTemplate = {PaletteTemplate} and/or Shade = {Shade} ");
 
-                if (item.ClothingSubPalEffects.Count > 0)
-                {
-                    //int size = item.ClothingSubPalEffects.Count;
-                    //int palCount = size;
-
+                // If there are no ClothingSubPalEffects, or this item has no Shade and no PaletteTemplate set, we will not apply any Palette changes
+                if (item.ClothingSubPalEffects.Count > 0 && (Shade.HasValue || PaletteTemplate.HasValue))
+                { 
                     CloSubPalEffect itemSubPal;
                     int palOption = 0;
                     if (PaletteTemplate.HasValue)
                         palOption = (int)PaletteTemplate;
-                    if (item.ClothingSubPalEffects.ContainsKey((uint)palOption))
-                    {
-                        itemSubPal = item.ClothingSubPalEffects[(uint)palOption];
-                    }
-                    else
-                    {
-                        itemSubPal = item.ClothingSubPalEffects[item.ClothingSubPalEffects.Keys.ElementAt(0)];
-                    }
 
-                    if (itemSubPal.Icon > 0 && !(IgnoreCloIcons ?? false) && (Shade.HasValue || PaletteTemplate.HasValue))
+                    // Load the correct ClothingSubPalEffects for the assigned PaletteTemplate, or the first in the Dictionary if none set or it is set to an invalid value
+                    if (item.ClothingSubPalEffects.ContainsKey((uint)palOption))
+                        itemSubPal = item.ClothingSubPalEffects[(uint)palOption];
+                    else
+                        itemSubPal = item.ClothingSubPalEffects[item.ClothingSubPalEffects.Keys.ElementAt(0)];
+
+                    if (itemSubPal.Icon > 0 && !(IgnoreCloIcons ?? false))
                         IconId = itemSubPal.Icon;
 
-                    float shade = 0;
+                    float shade = 0; // Default if no shade is set.
                     if (Shade.HasValue)
                         shade = (float)Shade;
+
                     for (int i = 0; i < itemSubPal.CloSubPalettes.Count; i++)
                     {
                         var itemPalSet = DatManager.PortalDat.ReadFromDat<PaletteSet>(itemSubPal.CloSubPalettes[i].PaletteSet);
@@ -944,9 +944,7 @@ namespace ACE.Server.WorldObjects
                         {
                             ushort palOffset = (ushort)(itemSubPal.CloSubPalettes[i].Ranges[j].Offset / 8);
                             ushort numColors = (ushort)(itemSubPal.CloSubPalettes[i].Ranges[j].NumColors / 8);
-                            if (PaletteTemplate.HasValue || Shade.HasValue)
-                                objDesc.SubPalettes.Add(new PropertiesPalette { SubPaletteId = itemPal, Offset = palOffset, Length = numColors });
-                            //AddPalette(itemPal, (ushort)palOffset, (ushort)numColors);
+                            objDesc.SubPalettes.Add(new PropertiesPalette { SubPaletteId = itemPal, Offset = palOffset, Length = numColors });
                         }
                     }
                 }
@@ -1107,7 +1105,108 @@ namespace ACE.Server.WorldObjects
             return animLength;
         }
 
-        public float EnqueueMotionAction(ActionChain actionChain, List<MotionCommand> motionCommands, float speed = 1.0f, MotionStance? useStance = null, bool usePrevCommand = false)
+        public float EnqueueMotion(ActionChain actionChain, MotionStance stance, MotionCommand motionCommand, float speed = 1.0f)
+        {
+            // specialized function to mitigate odd client behavior w/ swapping bows during repeat attacks
+            // TODO: fix the CurrentMotionState mess
+            var motion = new Motion(stance, motionCommand, speed);
+            motion.MotionState.TurnSpeed = 2.25f;  // ??
+
+            var animLength = Physics.Animation.MotionTable.GetAnimationLength(MotionTableId, stance, motionCommand, speed);
+
+            actionChain.AddAction(this, () =>
+            {
+                // if no longer in missile combat, don't bother
+                if (this is Player player && player.CombatMode != CombatMode.Missile) return;
+
+                // retain original profile of function, but if something else has changed the stance (such as weapon swapping),
+                // do not thrash CurrentMotionState.Stance
+                if (CurrentMotionState.Stance == stance)
+                    CurrentMotionState = motion;
+
+                EnqueueBroadcastMotion(motion);
+            });
+            actionChain.AddDelaySeconds(animLength);
+
+            return animLength;
+        }
+
+        public float EnqueueMotionPersist(ActionChain actionChain, MotionStance stance, MotionCommand motionCommand, float speed = 1.0f)
+        {
+            if (!PropertyManager.GetBool("persist_movement").Item)
+            {
+                return EnqueueMotion(actionChain, stance, motionCommand, speed);
+            }
+
+            // specialized function to mitigate odd client behavior w/ swapping bows during repeat attacks
+            // TODO: fix the CurrentMotionState mess
+            var motion = new Motion(stance, motionCommand, speed);
+            motion.MotionState.TurnSpeed = 2.25f;  // ??
+
+            var animLength = Physics.Animation.MotionTable.GetAnimationLength(MotionTableId, stance, motionCommand, speed);
+
+            actionChain.AddAction(this, () =>
+            {
+                // if no longer in missile combat, don't bother
+                if (this is Player player && player.CombatMode != CombatMode.Missile) return;
+
+                // retain original profile of function, but if something else has changed the stance (such as weapon swapping),
+                // do not thrash CurrentMotionState.Stance
+                if (CurrentMotionState.Stance == stance)
+                    CurrentMotionState = motion;
+
+                motion.Persist(CurrentMotionState);
+
+                EnqueueBroadcastMotion(motion);
+            });
+            actionChain.AddDelaySeconds(animLength);
+
+            return animLength;
+        }
+
+        public float EnqueueMotionPersist(ActionChain actionChain, MotionCommand motionCommand, float speed = 1.0f, bool useStance = true, MotionCommand? prevCommand = null, bool castGesture = false, bool half = false)
+        {
+            if (!PropertyManager.GetBool("persist_movement").Item)
+            {
+                return EnqueueMotion(actionChain, motionCommand, speed, useStance, prevCommand, castGesture, half);
+            }
+
+            var stance = CurrentMotionState != null && useStance ? CurrentMotionState.Stance : MotionStance.NonCombat;
+
+            if (castGesture)
+                stance = MotionStance.Magic;
+
+            var animLength = 0.0f;
+            if (prevCommand != null)
+            {
+                animLength = Physics.Animation.MotionTable.GetAnimationLength(MotionTableId, stance, prevCommand.Value, motionCommand, speed);
+            }
+            else
+                animLength = Physics.Animation.MotionTable.GetAnimationLength(MotionTableId, stance, motionCommand, speed);
+
+            actionChain.AddAction(this, () =>
+            {
+                if (castGesture && this is Player player && !player.MagicState.IsCasting)
+                    return;
+
+                var motion = new Motion(stance, motionCommand, speed);
+                motion.Persist(CurrentMotionState);
+
+                motion.MotionState.TurnSpeed = 2.25f;  // ??
+
+                CurrentMotionState = motion;
+                EnqueueBroadcastMotion(motion);
+            });
+
+            if (half)
+                animLength *= 0.5f;
+
+            actionChain.AddDelaySeconds(animLength);
+
+            return animLength;
+        }
+
+        public float EnqueueMotionAction(ActionChain actionChain, List<MotionCommand> motionCommands, float speed = 1.0f, MotionStance? useStance = null, bool usePrevCommand = false, bool checkCasting = false)
         {
             var stance = useStance ?? CurrentMotionState.Stance;
 
@@ -1134,6 +1233,9 @@ namespace ACE.Server.WorldObjects
 
             actionChain.AddAction(this, () =>
             {
+                if (checkCasting && this is Player player && player.MagicState != null && !player.MagicState.IsCasting)
+                    return;
+
                 CurrentMotionState = motion;
                 EnqueueBroadcastMotion(motion, null, false);
 

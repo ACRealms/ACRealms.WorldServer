@@ -157,7 +157,7 @@ namespace ACE.Server.Command.Handlers
             "Teleports you(or a player) to some location.",
             "[name] <longitude> <latitude>\nExample: /tele 0n0w\nExample: /tele plats4days 37s,67w\n"
             + "This command teleports yourself (or the specified character) to the given longitude and latitude.")]
-        public static void HandleTele(Session session, params string[] parameters)
+       public static void HandleTele(Session session, params string[] parameters)
         {
             // Used PhatAC source to implement most of this.  Thanks Pea!
 
@@ -193,9 +193,9 @@ namespace ACE.Server.Command.Handlers
                 return;
             }
 
-            ChatPacket.SendServerMessage(session, $"Position: [Cell: 0x{aceParams[1].AsPosition.Landblock:X4} | Offset: {aceParams[1].AsPosition.Pos.X}, "+
+            ChatPacket.SendServerMessage(session, $"Position: [Cell: 0x{aceParams[1].AsPosition.Landblock:X4} | Offset: {aceParams[1].AsPosition.Pos.X}, " +
                 $"{aceParams[1].AsPosition.Pos.Y}, {aceParams[1].AsPosition.Pos.Z} | Facing: {aceParams[1].AsPosition.Rotation.X}, {aceParams[1].AsPosition.Rotation.Y}, " +
-                $"{ aceParams[1].AsPosition.Rotation.Z}, {aceParams[1].AsPosition.Rotation.W}]", ChatMessageType.Broadcast);
+                $"{aceParams[1].AsPosition.Rotation.Z}, {aceParams[1].AsPosition.Rotation.W}]", ChatMessageType.Broadcast);
 
             aceParams[0].AsPlayer.Teleport(aceParams[1].AsPosition);
         }

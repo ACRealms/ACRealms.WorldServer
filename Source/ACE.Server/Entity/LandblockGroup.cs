@@ -171,11 +171,11 @@ namespace ACE.Server.Entity
 
         private LandblockGroup DoTrySplit()
         {
-            var newLandblockGroup = new LandblockGroup();
+            var landblockGroupSplitHelper = new LandblockGroupSplitHelper();
 
             var remainingLandblocks = new List<Landblock>(landblocks);
 
-            newLandblockGroup.Add(remainingLandblocks[remainingLandblocks.Count - 1]);
+            landblockGroupSplitHelper.Add(remainingLandblocks[remainingLandblocks.Count - 1]);
             remainingLandblocks.RemoveAt(remainingLandblocks.Count - 1);
 
             doAnotherPass:
@@ -183,9 +183,9 @@ namespace ACE.Server.Entity
 
             for (int i = remainingLandblocks.Count - 1; i >= 0; i--)
             {
-                if (newLandblockGroup.BoundaryDistance(remainingLandblocks[i]) < LandblockGroupMinSpacing)
+                if (landblockGroupSplitHelper.BoundaryDistance(remainingLandblocks[i]) < LandblockGroupMinSpacing)
                 {
-                    newLandblockGroup.Add(remainingLandblocks[i]);
+                    landblockGroupSplitHelper.Add(remainingLandblocks[i]);
                     remainingLandblocks.RemoveAt(i);
                     needsAnotherPass = true;
                 }
@@ -195,12 +195,20 @@ namespace ACE.Server.Entity
                 goto doAnotherPass;
 
             // If they're the same size, there's no split possible
-            if (Count == newLandblockGroup.Count)
+            if (Count == landblockGroupSplitHelper.Count)
                 return null;
 
-            // Remove the split landblocks. Do this manually, not through the public Remove() function
-            foreach (var landblock in newLandblockGroup)
+            // Split was a success
+            var newLandblockGroup = new LandblockGroup();
+
+            foreach (var landblock in landblockGroupSplitHelper)
+            {
+                // Remove the split landblocks. Do this manually, not through the public Remove() function
                 landblocks.Remove(landblock);
+
+                // Add them through the proper .Add() method to the new LandblockGroup
+                newLandblockGroup.Add(landblock);
+            }
 
             RecalculateBoundaries();
 
@@ -258,7 +266,7 @@ namespace ACE.Server.Entity
 
 
         /// <summary>
-        /// This will calculate the distance from the landblock group border.<para />
+        /// This will calculate the distance from the landblock group boarder.<para />
         /// -X = Inside the bounds, where -1 is the outer perimeter<para />
         ///  0 = Outside of the bounds but adjacent (touching)<para />
         /// +X = Has X landblocks between this and the bounds of the group<para />
@@ -272,7 +280,7 @@ namespace ACE.Server.Entity
         }
 
         /// <summary>
-        /// This will calculate the distance between the landblock group borders.<para />
+        /// This will calculate the distance between the landblock group boarders.<para />
         /// -X = Inside the bounds, where -1 is an overlapping outer perimeter<para />
         ///  0 = Outside of the bounds but adjacent (touching)<para />
         /// +X = Has X landblocks between this and the bounds of the group<para />

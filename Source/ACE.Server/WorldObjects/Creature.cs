@@ -55,7 +55,7 @@ namespace ACE.Server.WorldObjects
         /// - if a player attacks a same-factioned mob in a group of same-factioned mobs, the other nearby faction mobs should be alerted, and should maintain aggro, even without a DamageHistory entry
         /// - if a summoner attacks a same-factioned mob, should the summoned CombatPet possibly defend the player in that situation?
         /// </summary>
-        public HashSet<uint> RetaliateTargets { get; set; }
+        //public HashSet<uint> RetaliateTargets { get; set; }
 
         /// <summary>
         /// A new biota be created taking all of its values from weenie.
@@ -147,7 +147,7 @@ namespace ACE.Server.WorldObjects
                 value = 1;
             if (value > maxValue)
                 value = maxValue;
-            return  (uint)value;
+            return (uint)value;
         }
 
         /// <summary>
@@ -212,6 +212,8 @@ namespace ACE.Server.WorldObjects
 
                 EquipInventoryItems();
 
+                GenerateInventoryTreasure();
+
                 // TODO: fix tod data
                 Health.Current = Health.MaxValue;
                 Stamina.Current = Stamina.MaxValue;
@@ -223,9 +225,6 @@ namespace ACE.Server.WorldObjects
             CurrentMotionState = new Motion(MotionStance.NonCombat, MotionCommand.Ready);
 
             selectedTargets = new Dictionary<uint, WorldObjectInfo>();
-
-            if (!(this is Player) && Faction1Bits != null)
-                RetaliateTargets = new HashSet<uint>();
         }
 
         // verify logic

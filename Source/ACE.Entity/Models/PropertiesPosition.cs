@@ -26,7 +26,6 @@ namespace ACE.Entity.Models
                 RotationX = RotationX,
                 RotationY = RotationY,
                 RotationZ = RotationZ,
-                Instance = Instance,
             };
 
             return result;

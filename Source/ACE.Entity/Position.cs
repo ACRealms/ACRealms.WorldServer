@@ -1,6 +1,8 @@
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Numerics;
+using ACE.Entity.Enum;
 
 namespace ACE.Entity
 {
@@ -34,6 +36,7 @@ namespace ACE.Entity
             get => _pos;
             set => SetPosition(value);
         }
+
         public ushort RealmID
         {
             get
@@ -78,6 +81,123 @@ namespace ACE.Entity
             return Vector3.Normalize(Vector3.Transform(Vector3.UnitY, Rotation));
         }
 
+        /// <summary>
+        /// Returns this vector as a unit vector
+        /// with a length of 1
+        /// </summary>
+        public Vector3 Normalize(Vector3 v)
+        {
+            var invLen = 1.0f / v.Length();
+            return v * invLen;
+        }
+
+        public static readonly Quaternion OneEighty = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.PI);
+
+        public Position InFrontOf(double distanceInFront, bool rotate180 = false)
+        {
+            var pos = Pos + Vector3.Transform(Vector3.UnitY * (float)distanceInFront, Rotation);
+
+            var angle = Rotation;
+            if (rotate180)
+                angle *= OneEighty;
+
+            // move the Z slightly up due to variations in ac physics engine
+            pos.Z += 0.05f;
+
+            return new Position(ObjCellID, pos, angle, true, Instance);
+        }
+
+        /// <summary>
+        /// Handles the Position crossing over landblock boundaries
+        /// </summary>
+        public bool SetLandblock()
+        {
+            if (Indoors) return false;
+
+            var changedBlock = false;
+
+            if (Pos.X < 0)
+            {
+                var blockOffset = (int)Pos.X / BlockLength - 1;
+                var landblock = TransitionX(blockOffset);
+                if (landblock != null)
+                {
+                    ObjCellID = landblock.Value;
+                    _pos.X -= BlockLength * blockOffset;
+                    changedBlock = true;
+                }
+                else
+                    _pos.X = 0;
+            }
+
+            if (Pos.X >= BlockLength)
+            {
+                var blockOffset = (int)Pos.X / BlockLength;
+                var landblock = TransitionX(blockOffset);
+                if (landblock != null)
+                {
+                    ObjCellID = landblock.Value;
+                    _pos.X -= BlockLength * blockOffset;
+                    changedBlock = true;
+                }
+                else
+                    _pos.X = BlockLength;
+            }
+
+            if (Pos.Y < 0)
+            {
+                var blockOffset = (int)Pos.Y / BlockLength - 1;
+                var landblock = TransitionY(blockOffset);
+                if (landblock != null)
+                {
+                    ObjCellID = landblock.Value;
+                    _pos.Y -= BlockLength * blockOffset;
+                    changedBlock = true;
+                }
+                else
+                    _pos.Y = 0;
+            }
+
+            if (Pos.Y >= BlockLength)
+            {
+                var blockOffset = (int)Pos.Y / BlockLength;
+                var landblock = TransitionY(blockOffset);
+                if (landblock != null)
+                {
+                    ObjCellID = landblock.Value;
+                    _pos.Y -= BlockLength * blockOffset;
+                    changedBlock = true;
+                }
+                else
+                    _pos.Y = BlockLength;
+            }
+
+            return changedBlock;
+        }
+
+        /// <summary>
+        /// Determines the outdoor landcell for current position
+        /// </summary>
+
+        public bool SetLandCell()
+        {
+            if (Indoors) return false;
+
+            var cellX = (uint)Pos.X / CellLength;
+            var cellY = (uint)Pos.Y / CellLength;
+
+            var cellID = cellX * CellSide + cellY + 1;
+
+            var curCellID = ObjCellID & 0xFFFF;
+
+            if (cellID == curCellID)
+                return false;
+
+            ObjCellID = (uint)((ObjCellID & 0xFFFF0000) | cellID);
+
+            return true;
+        }
+
         public Position()
         {
             //Pos = Vector3.Zero;
@@ -93,9 +213,9 @@ namespace ACE.Entity
             Instance = pos.Instance;
         }
 
-
         public Position(uint blockCellID, float newPositionX, float newPositionY, float newPositionZ, float newRotationX, float newRotationY, float newRotationZ, float newRotationW, uint instance)
-        { 
+        {
+
             ObjCellID = blockCellID;
 
             Instance = instance;
@@ -106,7 +226,7 @@ namespace ACE.Entity
             if (Cell == 0)
                 SetPosition(_pos);
         }
-
+    
         public Position(uint blockCellID, Vector3 position, Quaternion rotation, bool normalize, uint instance)
         {
             ObjCellID = blockCellID;
@@ -155,147 +275,39 @@ namespace ACE.Entity
             Rotation = Quaternion.Identity;
         }
 
-        private uint GetCellFromBase(uint baseX, uint baseY)
-        {
-            byte blockX = (byte)(baseX >> 3);
-            byte blockY = (byte)(baseY >> 3);
-            byte cellX = (byte)(baseX & 7);
-            byte cellY = (byte)(baseY & 7);
-
-            uint block = (uint)((blockX << 8) | blockY);
-            uint cell = (uint)((cellX << 3) | cellY);
-
-            return (block << 16) | (cell + 1);
-        }
-
-        public static readonly Quaternion OneEighty = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.PI);
-
-        public Position InFrontOf(float distance, bool rotate180 = false)
-        {
-            var pos = Pos + Vector3.Transform(Vector3.UnitY * distance, Rotation);
-
-            var angle = Rotation;
-            if (rotate180)
-                angle *= OneEighty;
-
-            // move the Z slightly up due to variations in ac physics engine
-            pos.Z += 0.05f;
-
-            return new Position(ObjCellID, pos, angle, true, Instance);
-        }
-
-
-        public static readonly int BlockLength = 192;
-
         /// <summary>
-        /// Handles the Position crossing over landblock boundaries
+        /// Given a Vector2 set of coordinates, create a new position object for use in converting from VLOC to LOC
         /// </summary>
-        public bool SetLandblock()
+        /// <param name="coordinates">A set coordinates provided in a Vector2 object with East-West being the X value and North-South being the Y value</param>
+        public Position(Vector2 coordinates)
         {
-            if (Indoors) return false;
+            // convert from (-101.95, 102.05) to (0, 204)
+            coordinates += Vector2.One * 101.95f;
 
-            var changedBlock = false;
+            // 204 = map clicks across dereth
+            // 2040 = number of cells across dereth
+            // 24 = meters per cell
+            //var globalPos = coordinates / 204 * 2040 * 24;
+            var globalPos = coordinates * 240;   // simplified
 
-            if (Pos.X < 0)
-            {
-                var blockOffset = (int)Pos.X / BlockLength - 1;
-                var landblock = TransitionX(blockOffset);
-                if (landblock != null)
-                {
-                    ObjCellID = landblock.Value;
-                    _pos.X -= BlockLength * blockOffset;
-                    changedBlock = true;
-                }
-                else
-                    _pos.X = 0;
-            }
+            // inlining, this logic is in PositionExtensions.FromGlobal()
+            var blockX = (int)globalPos.X / BlockLength;
+            var blockY = (int)globalPos.Y / BlockLength;
 
-            else if (Pos.X >= BlockLength)
-            {
-                var blockOffset = (int)Pos.X / BlockLength;
-                var landblock = TransitionX(blockOffset);
-                if (landblock != null)
-                {
-                    ObjCellID = landblock.Value;
-                    _pos.X -= BlockLength * blockOffset;
-                    changedBlock = true;
-                }
-                else
-                    _pos.X = BlockLength;
-            }
+            var originX = globalPos.X % BlockLength;
+            var originY = globalPos.Y % BlockLength;
 
-            if (Pos.Y < 0)
-            {
-                var blockOffset = (int)Pos.Y / BlockLength - 1;
-                var landblock = TransitionY(blockOffset);
-                if (landblock != null)
-                {
-                    ObjCellID = landblock.Value;
-                    _pos.Y -= BlockLength * blockOffset;
-                    changedBlock = true;
-                }
-                else
-                    _pos.Y = 0;
-            }
+            var cellX = (int)originX / CellLength;
+            var cellY = (int)originY / CellLength;
 
-            else if (Pos.Y >= BlockLength)
-            {
-                var blockOffset = (int)Pos.Y / BlockLength;
-                var landblock = TransitionY(blockOffset);
-                if (landblock != null)
-                {
-                    ObjCellID = landblock.Value;
-                    _pos.Y -= BlockLength * blockOffset;
-                    changedBlock = true;
-                }
-                else
-                    _pos.Y = BlockLength;
-            }
+            var cell = cellX * CellSide + cellY + 1;
 
-            return changedBlock;
-        }
+            var objCellID = (uint)(blockX << 24 | blockY << 16 | cell);
 
-        public uint? TransitionX(int blockOffset)
-        {
-            var newX = LandblockX + blockOffset;
-            if (newX < 0 || newX > 254)
-                return null;
-            else
-                return (uint)(newX << 24 | LandblockY << 16 | Cell);
-        }
 
-        public uint? TransitionY(int blockOffset)
-        {
-            var newY = LandblockY + blockOffset;
-            if (newY < 0 || newY > 254)
-                return null;
-            else
-                return (uint)(LandblockX << 24 | newY << 16 | Cell);
-        }
+            Pos = new Vector3(originX, originY, 0);     // must use PositionExtensions.AdjustMapCoords() to get Z
 
-        public static readonly int CellSide = 8;
-        public static readonly int CellLength = 24;
-
-        /// <summary>
-        /// Determines the outdoor landcell for current position
-        /// </summary>
-        public bool SetLandCell()
-        {
-            if (Indoors) return false;
-
-            var cellX = (uint)Pos.X / CellLength;
-            var cellY = (uint)Pos.Y / CellLength;
-
-            var cellID = cellX * CellSide + cellY + 1;
-
-            var curCellID = ObjCellID & 0xFFFF;
-
-            if (cellID == curCellID)
-                return false;
-
-            ObjCellID = (uint)((ObjCellID & 0xFFFF0000) | cellID);
-
-            return true;
+            Rotation = Quaternion.Identity;
         }
 
         public void Serialize(BinaryWriter payload, bool writeQuaternion = true, bool writeLandblock = true)
@@ -316,24 +328,17 @@ namespace ACE.Entity
             }
         }
 
-        /// <summary>
-        /// Returns the 3D distance between 2 objects
-        /// </summary>
-        public float DistanceTo(Position p)
+        private uint GetCellFromBase(uint baseX, uint baseY)
         {
-            if (Landblock == p.Landblock)
-            {
-                return Vector3.Distance(Pos, p.Pos);
-            }
-            else
-            {
-                var dx = (LandblockX - p.LandblockX) * 192 + Pos.X - p.Pos.X;
-                var dy = (LandblockY - p.LandblockY) * 192 + Pos.Y - p.Pos.Y;
+            byte blockX = (byte)(baseX >> 3);
+            byte blockY = (byte)(baseY >> 3);
+            byte cellX = (byte)(baseX & 7);
+            byte cellY = (byte)(baseY & 7);
 
-                var dz = Pos.Z - p.Pos.Z;
+            uint block = (uint)((blockX << 8) | blockY);
+            uint cell = (uint)((cellX << 3) | cellY);
 
-                return (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
-            }
+            return (block << 16) | (cell + 1);
         }
 
         /// <summary>
@@ -355,6 +360,7 @@ namespace ACE.Entity
                 return dx * dx + dy * dy + dz * dz;
             }
         }
+
 
         /// <summary>
         /// Returns the 2D distance between 2 objects
@@ -398,6 +404,26 @@ namespace ACE.Entity
             }
         }
 
+        /// <summary>
+        /// Returns the 3D distance between 2 objects
+        /// </summary>
+        public float DistanceTo(Position p)
+        {
+            if (Landblock == p.Landblock)
+            {
+                return Vector3.Distance(Pos, p.Pos);
+            }
+            else
+            {
+                var dx = (LandblockX - p.LandblockX) * 192 + Pos.X - p.Pos.X;
+                var dy = (LandblockY - p.LandblockY) * 192 + Pos.Y - p.Pos.Y;
+
+                var dz = Pos.Z - p.Pos.Z;
+
+                return (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
+            }
+        }
+
         public override string ToString()
         {
             return $"{ObjCellID:X8} [{Pos.X} {Pos.Y} {Pos.Z}]";
@@ -407,6 +433,29 @@ namespace ACE.Entity
         {
             return $"0x{ObjCellID:X8} [{Pos.X} {Pos.Y} {Pos.Z}] {Rotation.W} {Rotation.X} {Rotation.Y} {Rotation.Z} {Instance}";
         }
+
+        public uint? TransitionX(int blockOffset)
+        {
+            var newX = LandblockX + blockOffset;
+            if (newX < 0 || newX > 254)
+                return null;
+            else
+                return (uint)(newX << 24 | LandblockY << 16 | Cell);
+        }
+
+        public uint? TransitionY(int blockOffset)
+        {
+            var newY = LandblockY + blockOffset;
+            if (newY < 0 || newY > 254)
+                return null;
+            else
+                return (uint)(LandblockX << 24 | newY << 16 | Cell);
+        }
+
+
+        public static readonly int BlockLength = 192;
+        public static readonly int CellSide = 8;
+        public static readonly int CellLength = 24;
 
         public bool Equals(Position p)
         {
@@ -436,5 +485,6 @@ namespace ACE.Entity
         {
             Instance = InstanceIDFromVars(newRealmId, 0, false);
         }
+
     }
 }

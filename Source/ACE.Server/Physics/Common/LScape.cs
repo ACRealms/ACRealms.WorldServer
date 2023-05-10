@@ -92,7 +92,7 @@ namespace ACE.Server.Physics.Common
 
             return Landblocks[yDiff + xDiff * MidWidth];*/
 
-            var iLandblockID = iBlockCellID | 0xFFFF;
+            var iLandblockID = BlockCell.GetLandblock(iBlockCellID);
 
             // check if landblock is already cached
             if (Landblocks.TryGetValue(iLandblockID, out var landblock))
@@ -117,23 +117,28 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public static bool unload_landblock(ulong iLandblockID)
+
+        public static bool unload_landblock(uint landblockID)
         {
             if (PhysicsEngine.Instance.Server)
             {
                 // todo: Instead of ACE.Server.Entity.Landblock.Unload() calling this function, it should be calling PhysicsLandblock.Unload()
                 // todo: which would then call AdjustCell.AdjustCells.Remove()
 
-                AdjustCell.AdjustCells.Remove(iLandblockID >> 16);
+                AdjustCell.AdjustCells.TryRemove(landblockID >> 16, out _);
                 return true;
             }
 
-            var result = Landblocks.TryRemove(iLandblockID, out _);
+            var result = Landblocks.TryRemove(landblockID, out _);
             // todo: Like mentioned above, the following function should be moved to ACE.Server.Physics.Common.Landblock.Unload()
-            AdjustCell.AdjustCells.Remove(iLandblockID >> 16);
+            AdjustCell.AdjustCells.TryRemove(landblockID >> 16, out _);
             return result;
         }
 
+        /// <summary>
+        /// Gets the landcell from a landblock. If the cell is an indoor cell and hasn't been loaded, it will be loaded.<para />
+        /// This function is thread safe
+        /// </summary>
         public static ObjCell get_landcell(uint blockCellID, uint instance)
         {
             var iBlockCell = BlockCell.GetLongCell(blockCellID, instance);
@@ -141,10 +146,6 @@ namespace ACE.Server.Physics.Common
             return get_landcell(iBlockCell);
         }
 
-        /// <summary>s
-        /// Gets the landcell from a landblock. If the cell is an indoor cell and hasn't been loaded, it will be loaded.<para />
-        /// This function is thread safe
-        /// </summary>
         public static ObjCell get_landcell(ulong iBlockCellID)
         {
             /*if ((iBlockCellID | 0xFFFF) == 0x1D9FFFF)

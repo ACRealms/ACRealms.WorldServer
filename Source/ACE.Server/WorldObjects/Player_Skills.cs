@@ -88,7 +88,7 @@ namespace ACE.Server.WorldObjects
 
             if (amount > amountToEnd)
             {
-                log.Error($"{Name}.SpendSkillXp({creatureSkill.Skill}, {amount}) - player tried to raise skill beyond {amountToEnd} experience");
+                //log.Error($"{Name}.SpendSkillXp({creatureSkill.Skill}, {amount}) - player tried to raise skill beyond {amountToEnd} experience");
                 return false;   // returning error here, instead of setting amount to amountToEnd
             }
 
@@ -292,12 +292,18 @@ namespace ACE.Server.WorldObjects
 
             // refund xp and skill credits
             RefundXP(creatureSkill.ExperienceSpent);
-            AvailableSkillCredits += creditsSpent;
 
-            creatureSkill.AdvancementClass = SkillAdvancementClass.Trained;
-            creatureSkill.InitLevel = 0;
-            creatureSkill.ExperienceSpent = 0;
+            // salvaging / tinkering skills specialized through augmentation only
+            // cannot be unspecialized here, only refund xp
+            if (!IsSkillSpecializedViaAugmentation(skill, out var playerHasAugmentation) || !playerHasAugmentation)
+            {
+                creatureSkill.AdvancementClass = SkillAdvancementClass.Trained;
+                creatureSkill.InitLevel = 0;
+                AvailableSkillCredits += creditsSpent;
+            }
+
             creatureSkill.Ranks = 0;
+            creatureSkill.ExperienceSpent = 0;
 
             return true;
         }
@@ -334,7 +340,13 @@ namespace ACE.Server.WorldObjects
             amount = Math.Min(amount, playerSkill.ExperienceLeft);
 
             GrantXP(amount, XpType.Emote, ShareType.None);
-            HandleActionRaiseSkill(skill, amount);
+            var raiseChain = new ActionChain();
+            raiseChain.AddDelayForOneTick();
+            raiseChain.AddAction(this, () =>
+            {
+                HandleActionRaiseSkill(skill, amount);
+            });
+            raiseChain.EnqueueChain();
 
             if (alertPlayer)
                 Session.Network.EnqueueSend(new GameMessageSystemChat($"You've earned {amount:N0} experience in your {playerSkill.Skill.ToSentence()} skill.", ChatMessageType.Broadcast));
@@ -348,8 +360,6 @@ namespace ACE.Server.WorldObjects
                 amountRemaining = (uint)AvailableExperience;
 
             SpendSkillXp(creatureSkill, amountRemaining, sendNetworkUpdate);
-            if (sendNetworkUpdate)
-                Session.Network.EnqueueSend(new GameMessagePrivateUpdateSkill(this, creatureSkill));
         }
 
         /// <summary>
@@ -460,19 +470,17 @@ namespace ACE.Server.WorldObjects
             return playerSkill.AdvancementClass >= SkillAdvancementClass.Trained && playerSkill.Current >= minSkill;
         }
 
-        public void AddSkillCredits(int amount, bool showText)
+        public void AddSkillCredits(int amount)
         {
             TotalSkillCredits += amount;
             AvailableSkillCredits += amount;
 
             Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.AvailableSkillCredits, AvailableSkillCredits ?? 0));
 
-            if (showText)
-            {
-                var message = string.Format("You have earned {0} skill credit{1}!", amount, amount == 1 ? "" : "s");
-                Session.Network.EnqueueSend(new GameMessageSystemChat(message, ChatMessageType.Advancement));
-                Session.Network.EnqueueSend(new GameMessageSound(Guid, Sound.RaiseTrait, 1f));
-            }
+            if (amount > 1)
+                SendTransientError($"You have been awarded {amount:N0} additional skill credits.");
+            else
+                SendTransientError("You have been awarded an additional skill credit.");
         }
 
         /// <summary>
@@ -828,6 +836,25 @@ namespace ACE.Server.WorldObjects
                 QuestManager.Erase("Forgetfulness6days");
                 QuestManager.Erase("Forgetfulness13days");
                 QuestManager.Erase("Forgetfulness20days");
+            });
+            actionChain.EnqueueChain();
+        }
+
+        public void HandleFreeMasteryResetRenewal()
+        {
+            if (!(GetProperty(PropertyBool.FreeMasteryResetRenewed) ?? false)) return;
+
+            var actionChain = new ActionChain();
+            actionChain.AddDelaySeconds(5.0f);
+            actionChain.AddAction(this, () =>
+            {
+                Session.Network.EnqueueSend(new GameMessageSystemChat("Your opportunity to change your Masteries is renewed!", ChatMessageType.Magic));
+
+                RemoveProperty(PropertyBool.FreeMasteryResetRenewed);
+
+                QuestManager.Erase("UsedFreeMeleeMasteryReset");
+                QuestManager.Erase("UsedFreeRangedMasteryReset");
+                QuestManager.Erase("UsedFreeSummoningMasteryReset");
             });
             actionChain.EnqueueChain();
         }

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using log4net;
@@ -258,6 +259,16 @@ namespace ACE.Server.Managers
         }
 
         /// <summary>
+        /// Used to debug cross-landblock group (and potentially cross-thread) operations
+        /// </summary>
+        public static bool CurrentlyTickingLandblockGroupsMultiThreaded { get; private set; }
+
+        /// <summary>
+        /// Used to debug cross-landblock group (and potentially cross-thread) operations
+        /// </summary>
+        public static readonly ThreadLocal<LandblockGroup> CurrentMultiThreadedTickingLandblockGroup = new ThreadLocal<LandblockGroup>();
+
+        /// <summary>
         /// Processes physics objects in all active landblocks for updating
         /// </summary>
         private static void TickPhysics(double portalYearTicks)
@@ -268,11 +279,19 @@ namespace ACE.Server.Managers
 
             if (ConfigManager.Config.Server.Threading.MultiThreadedLandblockGroupPhysicsTicking)
             {
+                CurrentlyTickingLandblockGroupsMultiThreaded = true;
+
                 Parallel.ForEach(landblockGroups, ConfigManager.Config.Server.Threading.LandblockManagerParallelOptions, landblockGroup =>
                 {
+                    CurrentMultiThreadedTickingLandblockGroup.Value = landblockGroup;
+
                     foreach (var landblock in landblockGroup)
                         landblock.TickPhysics(portalYearTicks, movedObjects);
+
+                    CurrentMultiThreadedTickingLandblockGroup.Value = null;
                 });
+
+                CurrentlyTickingLandblockGroupsMultiThreaded = false;
             }
             else
             {
@@ -301,11 +320,19 @@ namespace ACE.Server.Managers
 
             if (ConfigManager.Config.Server.Threading.MultiThreadedLandblockGroupTicking)
             {
+                CurrentlyTickingLandblockGroupsMultiThreaded = true;
+
                 Parallel.ForEach(landblockGroups, ConfigManager.Config.Server.Threading.LandblockManagerParallelOptions, landblockGroup =>
                 {
+                    CurrentMultiThreadedTickingLandblockGroup.Value = landblockGroup;
+
                     foreach (var landblock in landblockGroup)
                         landblock.TickMultiThreadedWork(Time.GetUnixTime());
+
+                    CurrentMultiThreadedTickingLandblockGroup.Value = null;
                 });
+
+                CurrentlyTickingLandblockGroupsMultiThreaded = false;
             }
             else
             {
@@ -367,24 +394,6 @@ namespace ACE.Server.Managers
                 return landblocks.ContainsKey(objCellID | 0xFFFF);
         }
 
-        public static Landblock GetLandblockBase(uint objCellId, bool loadAdjacents, bool permaload = false)
-        {
-            return GetLandblock((ulong)objCellId, loadAdjacents, permaload);
-        }
-
-        internal static Landblock TryGetLandblock(ulong longLandblockID)
-        {
-            lock(landblockMutex)
-            {
-                Landblock landblock;
-                landblocks.TryGetValue(longLandblockID | 0xFFFF, out landblock);
-                return landblock;
-            }
-        }
-
-        /// <summary>
-        /// Returns a reference to a landblock, loading the landblock if not already active
-        /// </summary>
         public static Landblock GetLandblock(ulong objCellID, bool loadAdjacents, bool permaload = false, EphemeralRealm ephemeralRealm = null)
         {
             Landblock landblock;
@@ -393,11 +402,15 @@ namespace ACE.Server.Managers
             {
                 bool setAdjacents = false;
 
+                var x = BlockCell.GetLandblockX(objCellID);
+                var y = BlockCell.GetLandblockY(objCellID);
+
                 landblocks.TryGetValue(objCellID | 0xFFFF, out landblock);
 
                 if (landblock == null)
                 {
                     // load up this landblock
+
                     landblock = new Landblock(objCellID | 0xFFFF);
                     landblocks.Add(objCellID | 0xFFFF, landblock);
 
@@ -436,6 +449,9 @@ namespace ACE.Server.Managers
         }
 
         /// <summary>
+        /// Returns a reference to a landblock, loading the landblock if not already active
+        /// </summary>
+              /// <summary>
         /// Returns the list of all loaded landblocks
         /// </summary>
         public static List<Landblock> GetLoadedLandblocks()
@@ -604,7 +620,7 @@ namespace ACE.Server.Managers
                             landblocks.Remove(landblock.LongId);
 
                             // remove from landblock group
-                            for (int i = landblockGroups.Count - 1; i >= 0 ; i--)
+                            for (int i = landblockGroups.Count - 1; i >= 0; i--)
                             {
                                 if (landblockGroups[i].Remove(landblock))
                                 {
@@ -712,6 +728,7 @@ namespace ACE.Server.Managers
                     SendGlobalEnvironSound(environChangeType);
             }
         }
+
         public static uint GetFreeInstanceID(bool isTemporaryRuleset, ushort realmId, ushort landblock)
         {
             uint right = ((uint)landblock << 16) | 0xFFFF;
@@ -746,5 +763,21 @@ namespace ACE.Server.Managers
             isTemporaryRuleset = (left & 0x8000) == 0x8000;
             realmId = (ushort)(left & 0x7FFF);
         }
+
+        public static Landblock GetLandblockBase(uint objCellId, bool loadAdjacents, bool permaload = false)
+        {
+            return GetLandblock((ulong)objCellId, loadAdjacents, permaload);
+        }
+
+        internal static Landblock TryGetLandblock(ulong longLandblockID)
+        {
+            lock (landblockMutex)
+            {
+                Landblock landblock;
+                landblocks.TryGetValue(longLandblockID | 0xFFFF, out landblock);
+                return landblock;
+            }
+        }
+
     }
 }

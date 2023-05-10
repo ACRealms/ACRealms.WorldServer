@@ -194,12 +194,19 @@ namespace ACE.Entity.Enum.Properties
         ScoreNumScores                           = 138,
         [SendOnLogin]
         DeathLevel                               = 139,
+        [ServerOnly]
         AiOptions                                = 140,
+        [ServerOnly]
         OpenToEveryone                           = 141,
+        [ServerOnly]
         GeneratorTimeType                        = 142,
+        [ServerOnly]
         GeneratorStartTime                       = 143,
+        [ServerOnly]
         GeneratorEndTime                         = 144,
+        [ServerOnly]
         GeneratorEndDestructionType              = 145,
+        [ServerOnly]
         XpOverride                               = 146,
         NumCrashAndTurns                         = 147,
         ComponentWarningThreshold                = 148,
@@ -218,7 +225,9 @@ namespace ACE.Entity.Enum.Properties
         WieldRequirements                        = 158,
         WieldSkillType                           = 159,
         WieldDifficulty                          = 160,
+        [ServerOnly]
         HouseMaxHooksUsable                      = 161,
+        [ServerOnly][Ephemeral]
         HouseCurrentHooksUsable                  = 162,
         AllegianceMinLevel                       = 163,
         AllegianceMaxLevel                       = 164,
@@ -259,6 +268,7 @@ namespace ACE.Entity.Enum.Properties
         DeathTimestamp                           = 194,
         PkTimestamp                              = 195,
         VictimTimestamp                          = 196,
+        [ServerOnly]
         HookGroup                                = 197,
         AllegianceSwearTimestamp                 = 198,
         [SendOnLogin]
@@ -623,22 +633,22 @@ namespace ACE.Entity.Enum.Properties
         //Realm properties below this line
         [ServerOnly]
         [Clone]
-        HomeRealm                               = 42000,
+        HomeRealm = 42000,
 
         [ServerOnly]
-        SummonTargetRealm                       = 42001,
+        SummonTargetRealm = 42001,
 
         [ServerOnly]
-        SummonTargetRealm2                      = 42002,
+        SummonTargetRealm2 = 42002,
 
         [ServerOnly]
-        SummonTargetRealm3                      = 42003,
+        SummonTargetRealm3 = 42003,
 
         [ServerOnly]
-        RulesetStampVendorType                  = 42004,
+        RulesetStampVendorType = 42004,
 
         [ServerOnly]
-        LastRebuffTimestamp                     = 42005
+        LastRebuffTimestamp = 42005
     }
 
     public static class PropertyIntExtensions
@@ -685,6 +695,7 @@ namespace ACE.Entity.Enum.Properties
                 case PropertyInt.FriendType:
                     return System.Enum.GetName(typeof(CreatureType), value);
                 case PropertyInt.DamageType:
+                case PropertyInt.ResistanceModifierType:
                     return System.Enum.GetName(typeof(DamageType), value);
                 case PropertyInt.CurrentWieldedLocation:
                 case PropertyInt.ValidLocations:
@@ -701,6 +712,7 @@ namespace ACE.Entity.Enum.Properties
                 case PropertyInt.GeneratorType:
                     return System.Enum.GetName(typeof(GeneratorType), value);
                 case PropertyInt.HeritageGroup:
+                case PropertyInt.HeritageSpecificArmor:
                     return System.Enum.GetName(typeof(HeritageGroup), value);
                 case PropertyInt.HookType:
                     return System.Enum.GetName(typeof(HookType), value);
@@ -764,7 +776,7 @@ namespace ACE.Entity.Enum.Properties
 
                 case PropertyInt.GeneratorStartTime:
                 case PropertyInt.GeneratorEndTime:
-                    return DateTimeOffset.FromUnixTimeSeconds(value).DateTime.ToUniversalTime().ToString(CultureInfo.InvariantCulture);
+                    return DateTimeOffset.FromUnixTimeSeconds(value).DateTime.ToString(CultureInfo.InvariantCulture);
 
                 case PropertyInt.ArmorType:
                     return System.Enum.GetName(typeof(ArmorType), value);
@@ -777,6 +789,25 @@ namespace ACE.Entity.Enum.Properties
 
                 case PropertyInt.UseCreatesContractId:
                     return System.Enum.GetName(typeof(ContractId), value);
+
+                case PropertyInt.Faction1Bits:
+                case PropertyInt.Faction2Bits:
+                case PropertyInt.Faction3Bits:
+                case PropertyInt.Hatred1Bits:
+                case PropertyInt.Hatred2Bits:
+                case PropertyInt.Hatred3Bits:
+                    return System.Enum.GetName(typeof(FactionBits), value);
+
+                case PropertyInt.UseRequiresSkill:
+                case PropertyInt.UseRequiresSkillSpec:
+                case PropertyInt.SkillToBeAltered:
+                    return System.Enum.GetName(typeof(Skill), value);
+
+                case PropertyInt.HookGroup:
+                    return System.Enum.GetName(typeof(HookGroupType), value);
+
+                //case PropertyInt.TypeOfAlteration:
+                //    return System.Enum.GetName(typeof(SkillAlterationType), value);
             }
 
             return null;

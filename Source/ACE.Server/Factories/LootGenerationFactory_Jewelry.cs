@@ -4,6 +4,7 @@ using ACE.Common;
 using ACE.Database.Models.World;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
+using ACE.Server.Factories.Entity;
 using ACE.Server.Factories.Tables;
 using ACE.Server.WorldObjects;
 
@@ -36,15 +37,17 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static void MutateJewelry(WorldObject wo, TreasureDeath profile, bool isMagical)
+        private static void MutateJewelry(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
         {
-            //wo.AppraisalLongDescDecoration = AppraisalLongDescDecorations.PrependWorkmanship;
-            wo.LongDesc = wo.Name;
-
-            int materialType = GetMaterialType(wo, profile.Tier);
+            // material type
+            var materialType = GetMaterialType(wo, profile.Tier);
             if (materialType > 0)
-                wo.MaterialType = (MaterialType)materialType;
+                wo.MaterialType = materialType;
 
+            // item color
+            MutateColor(wo);
+
+            // gem count / gem material
             if (wo.GemCode != null)
                 wo.GemCount = GemCountChance.Roll(wo.GemCode.Value, profile.Tier);
             else
@@ -52,30 +55,16 @@ namespace ACE.Server.Factories
 
             wo.GemType = RollGemType(profile.Tier);
 
-            wo.ItemWorkmanship = GetWorkmanship(profile.Tier);
+            // workmanship
+            wo.ItemWorkmanship = WorkmanshipChance.Roll(profile.Tier);
 
-            double materialMod = LootTables.getMaterialValueModifier(wo);
-            double gemMaterialMod = LootTables.getGemMaterialValueModifier(wo);
-            var value = GetValue(profile.Tier, wo.ItemWorkmanship.Value, gemMaterialMod, materialMod);
-            wo.Value = value;
-
-            wo.ItemSkillLevelLimit = null;
-
+            // wield level requirement for t7+
             if (profile.Tier > 6)
-            {
-                wo.WieldRequirements = WieldRequirement.Level;
-                wo.WieldSkillType = (int)Skill.Axe;  // Set by examples from PCAP data
+                RollWieldLevelReq_T7_T8(wo, profile);
 
-                var wield = profile.Tier switch
-                {
-                    7 => 150,// In this instance, used for indicating player level, rather than skill level
-                    _ => 180,// In this instance, used for indicating player level, rather than skill level
-                };
-                wo.WieldDifficulty = wield;
-            }
-
+            // assign magic
             if (isMagical)
-                wo = AssignMagic(wo, profile);
+                AssignMagic(wo, profile, roll);
             else
             {
                 wo.ItemManaCost = null;
@@ -86,7 +75,15 @@ namespace ACE.Server.Factories
                 wo.ManaRate = null;
             }
 
-            RandomizeColor(wo);
+            // gear rating (t8)
+            if (roll != null && profile.Tier == 8)
+                TryMutateGearRating(wo, profile, roll);
+
+            // item value
+            //  if (wo.HasMutateFilter(MutateFilter.Value))     // fixme: data
+                MutateValue(wo, profile.Tier, roll);
+
+            wo.LongDesc = GetLongDesc(wo);
         }
 
         private static bool GetMutateJewelryData(uint wcid)

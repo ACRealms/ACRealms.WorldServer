@@ -104,15 +104,10 @@ namespace ACE.Server.WorldObjects
                 pkPlayer.PkTimestamp = Time.GetUnixTime();
                 pkPlayer.PlayerKillsPk++;
 
-                string globalPKDe;
-                if (pkPlayer.CurrentLandblock.RealmHelpers.IsDuel)
-                    globalPKDe = $"{lastDamager.Name} has defeated {Name} in a duel!";
-                else
-                {
-                    globalPKDe = $"{lastDamager.Name} has defeated {Name}!";
-                    if (!Location.Indoors)
-                        globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
-                }
+                var globalPKDe = $"{lastDamager.Name} has defeated {Name}!";
+
+                if ((Location.Cell & 0xFFFF) < 0x100)
+                    globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
 
                 globalPKDe += "\n[PKDe]";
 
@@ -144,12 +139,16 @@ namespace ACE.Server.WorldObjects
         }
 
 
+        public bool IsInDeathProcess;
+
         /// <summary>
         /// Broadcasts the player death animation, updates vitae, and sends network messages for player death
         /// Queues the action to call TeleportOnDeath and enter portal space soon
         /// </summary>
         protected override void Die(DamageHistoryInfo lastDamager, DamageHistoryInfo topDamager)
         {
+            IsInDeathProcess = true;
+
             if (topDamager?.Guid == Guid && IsPKType)
             {
                 var topDamagerOther = DamageHistory.GetTopDamager(false);
@@ -161,6 +160,12 @@ namespace ACE.Server.WorldObjects
             UpdateVital(Health, 0);
             NumDeaths++;
             suicideInProgress = false;
+
+            // todo: since we are going to be using 'time since Player last died to an OlthoiPlayer'
+            // as a factor in slag generation, this will eventually be moved to after the slag generation
+
+            //if (topDamager != null && topDamager.IsOlthoiPlayer)
+                //OlthoiLootTimestamp = (int)Time.GetUnixTime();
 
             if (CombatMode == CombatMode.Magic && MagicState.IsCasting)
                 FailCast(false);
@@ -194,6 +199,8 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(msgSelfInflictedDeath);
             }
 
+            var hadVitae = HasVitae;
+
             // update vitae
             // players who died in a PKLite fight do not accrue vitae
             var duelRealm = RealmManager.GetRealm(HomeRealm)?.StandardRules?.GetProperty(RealmPropertyBool.IsDuelingRealm) == true ||
@@ -201,7 +208,7 @@ namespace ACE.Server.WorldObjects
             if (!duelRealm && !IsPKLiteDeath(topDamager))
                 InflictVitaePenalty();
 
-            if (!duelRealm && IsPKDeath(topDamager) || AugmentationSpellsRemainPastDeath == 0)
+            if (!duelRealm  && IsPKDeath(topDamager) || AugmentationSpellsRemainPastDeath == 0)
             {
                 var msgPurgeEnchantments = new GameEventMagicPurgeEnchantments(Session);
                 EnchantmentManager.RemoveAllEnchantments();
@@ -218,7 +225,8 @@ namespace ACE.Server.WorldObjects
             dieChain.AddAction(this, () =>
             {
                 if (!duelRealm)
-                    CreateCorpse(topDamager);
+                    CreateCorpse(topDamager, hadVitae);
+
 
                 ThreadSafeTeleportOnDeath(); // enter portal space
 
@@ -247,7 +255,8 @@ namespace ACE.Server.WorldObjects
                 SetLifestoneProtection();
 
                 var teleportChain = new ActionChain();
-                teleportChain.AddDelaySeconds(3.0f);
+                if (!IsLoggingOut) // If we're in the process of logging out, we skip the delay
+                    teleportChain.AddDelaySeconds(3.0f);
                 teleportChain.AddAction(this, () =>
                 {
                     // currently happens while in portal space
@@ -269,6 +278,11 @@ namespace ACE.Server.WorldObjects
                     DamageHistory.Reset();
 
                     OnHealthUpdate();
+
+                    IsInDeathProcess = false;
+
+                    if (IsLoggingOut)
+                        LogOut_Final(true);
                 });
 
                 teleportChain.EnqueueChain();
@@ -315,7 +329,7 @@ namespace ACE.Server.WorldObjects
 
             if (step < SuicideMessages.Count)
             {
-                EnqueueBroadcast(new GameMessageCreatureMessage(SuicideMessages[step], Name, Guid.Full, ChatMessageType.Speech), LocalBroadcastRange);
+                EnqueueBroadcast(new GameMessageHearSpeech(SuicideMessages[step], GetNameWithSuffix(), Guid.Full, ChatMessageType.Speech), LocalBroadcastRange);
 
                 var suicideChain = new ActionChain();
                 suicideChain.AddDelaySeconds(3.0f);
@@ -474,7 +488,7 @@ namespace ACE.Server.WorldObjects
             var inventory = GetAllPossessions();
 
             // exclude pyreals from randomized death item calculation
-            inventory = inventory.Where(i => !i.Name.Equals("Pyreal")).ToList();
+            inventory = inventory.Where(i => i.WeenieClassId != coinStackWcid).ToList();
 
             // exclude wielded items if < level 35
             if (!canDropWielded)
@@ -494,7 +508,7 @@ namespace ACE.Server.WorldObjects
             if (numCoinsDropped > 0)
             {
                 // add pyreals to dropped items
-                var pyreals = SpendCurrency(Vendor.CoinStackWCID, (uint)numCoinsDropped);
+                var pyreals = SpendCurrency(coinStackWcid, (uint)numCoinsDropped);
                 dropItems.AddRange(pyreals);
                 //Console.WriteLine($"Dropping {numCoinsDropped} pyreals");
             }
@@ -932,6 +946,9 @@ namespace ACE.Server.WorldObjects
 
         public void SetMinimumTimeSincePK()
         {
+            if (IsOlthoiPlayer)
+                return;
+
             if (PlayerKillerStatus == PlayerKillerStatus.NPK && MinimumTimeSincePk == null)
                 return;
 
@@ -957,7 +974,7 @@ namespace ACE.Server.WorldObjects
             if (MinimumTimeSincePk == null || (PropertyManager.GetBool("pk_server_safe_training_academy").Item && RecallsDisabled))
                 return;
 
-            if (PkLevel == PKLevel.NPK && !RealmRuleset.GetProperty(RealmPropertyBool.IsPKOnly) && !PropertyManager.GetBool("pkl_server").Item)
+            if (PkLevel == PKLevel.NPK && !PropertyManager.GetBool("pk_server").Item && !PropertyManager.GetBool("pkl_server").Item)
             {
                 MinimumTimeSincePk = null;
                 return;
@@ -973,7 +990,7 @@ namespace ACE.Server.WorldObjects
             var werror = WeenieError.None;
             var pkLevel = PkLevel;
 
-            if (RealmRuleset.GetProperty(RealmPropertyBool.IsPKOnly))
+            if (PropertyManager.GetBool("pk_server").Item)
                 pkLevel = PKLevel.PK;
             else if (PropertyManager.GetBool("pkl_server").Item)
                 pkLevel = PKLevel.PKLite;
@@ -1016,6 +1033,71 @@ namespace ACE.Server.WorldObjects
                 destroyedItems.Add(destroyItem);
             }
             return destroyedItems;
+        }
+
+        private static Database.Models.World.TreasureDeath OlthoiDeathTreasureType => Database.DatabaseManager.World.GetCachedDeathTreasure(2222) ?? new()
+        {
+            TreasureType = 2222,
+            Tier = 8,
+            LootQualityMod = 0,
+            UnknownChances = 19,
+            ItemChance = 100,
+            ItemMinAmount = 1,
+            ItemMaxAmount = 2,
+            ItemTreasureTypeSelectionChances = 8,
+            MagicItemChance = 100,
+            MagicItemMinAmount = 2,
+            MagicItemMaxAmount = 3,
+            MagicItemTreasureTypeSelectionChances = 8,
+            MundaneItemChance = 100,
+            MundaneItemMinAmount = 0,
+            MundaneItemMaxAmount = 1,
+            MundaneItemTypeSelectionChances = 7
+        };
+
+        /// <summary>
+        /// Determines the amount of slag to drop on a Player corpse when killed by an OlthoiPlayer or the loot to drop when an OlthoiPlayer is killed by a Player Killer
+        /// </summary>
+        public List<WorldObject> CalculateDeathItems_Olthoi(Corpse corpse, bool hadVitae, bool killerIsOlthoiPlayer, bool killerIsPkPlayer)
+        {
+            if (killerIsOlthoiPlayer)
+            {
+                var slag = LootGenerationFactory.RollSlag(this, hadVitae);
+
+                if (slag == null)
+                    return new();
+
+                if (!corpse.TryAddToInventory(slag))
+                    log.Warn($"CalculateDeathItems_Olthoi: couldn't add item to {Name}'s corpse: {slag.Name}");
+
+                return new() { slag };
+            }
+            else if (killerIsPkPlayer)
+            {
+                if (hadVitae)
+                    return new();
+
+                var items = LootGenerationFactory.CreateRandomLootObjects(OlthoiDeathTreasureType);
+
+                var gland = LootGenerationFactory.RollGland(this, hadVitae);
+
+                if (gland != null)
+                {
+                    items.Add(gland);
+                }
+
+                foreach (WorldObject wo in items)
+                {
+                    if (!corpse.TryAddToInventory(wo))
+                        log.Warn($"CalculateDeathItems_Olthoi: couldn't add item to {Name}'s corpse: {wo.Name}");
+                }
+
+                return items;
+            }
+            else
+            {
+                return new();
+            }
         }
     }
 }

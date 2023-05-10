@@ -69,6 +69,24 @@ namespace ACE.Server.WorldObjects
         {
             if (player.IsDead) return;
 
+            // verify item is still valid
+            if (player.FindObject(Guid.Full, Player.SearchLocations.MyInventory) == null)
+            {
+                //player.SendWeenieError(WeenieError.ObjectGone);   // results in 'Unable to move object!' transient error
+                player.SendTransientError($"Cannot find the {Name}");   // custom message
+                return;
+            }
+
+            // trying to use a dispel potion while pk timer is active
+            // send error message and cancel - do not consume item
+            if (SpellDID != null)
+            {
+                var spell = new Spell(SpellDID.Value);
+
+                if (spell.MetaSpellType == SpellType.Dispel && !VerifyDispelPKStatus(this, player))
+                    return;
+            }
+
             if (BoosterEnum != PropertyAttribute2nd.Undef)
             {
                 BoostVital(player);
@@ -82,7 +100,8 @@ namespace ACE.Server.WorldObjects
             var soundEvent = new GameMessageSound(player.Guid, GetUseSound(), 1.0f);
             player.EnqueueBroadcast(soundEvent);
 
-            player.TryConsumeFromInventoryWithNetworking(this, 1);
+            if (!UnlimitedUse)
+                player.TryConsumeFromInventoryWithNetworking(this, 1);
         }
 
         public void BoostVital(Player player)
@@ -132,7 +151,7 @@ namespace ACE.Server.WorldObjects
             // should be 'You cast', instead of 'Item cast'
             // omitting the item caster here, so player is also used for enchantment registry caster,
             // which could prevent some scenarios with spamming enchantments from multiple food sources to protect against dispels
-            player.TryCastSpell(spell, player, this, false);
+            player.TryCastSpell(spell, player, this, tryResist: false);
         }
 
         public Sound GetUseSound()

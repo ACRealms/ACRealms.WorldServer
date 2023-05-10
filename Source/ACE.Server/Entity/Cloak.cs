@@ -2,6 +2,7 @@ using System;
 
 using ACE.Common;
 using ACE.Entity.Enum;
+using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects;
 
@@ -10,9 +11,73 @@ namespace ACE.Server.Entity
     public class Cloak
     {
         /// <summary>
+        /// Opt out of the standarad ACE formula and proc at a custom rate
+        /// This setting will affect cloaks with any proc, including -200
+        /// </summary>
+        private static bool UseCustomMath => PropertyManager.GetBool("use_cloak_proc_custom_scale", false).Item;
+
+        /// <summary>
         /// The maximum frequency of cloak procs, in seconds
         /// </summary>
-        private static readonly float MinDelay = 5.0f;
+        private static double MinDelay
+        {
+            get
+            {
+                if (!UseCustomMath)
+                {
+                    return 5.0;
+                }
+                return PropertyManager.GetDouble("cloak_cooldown_seconds").Item;
+            }
+        }
+
+        /// <summary>
+        /// The base maximum percentage at which cloaks will proc
+        /// </summary>
+        private static float MaxProcBase
+        {
+            get
+            {
+                if (!UseCustomMath)
+                {
+                    return 0.25f;
+                }
+                return Convert.ToSingle(PropertyManager.GetDouble("cloak_max_proc_base").Item);
+            }
+        }
+
+        /// <summary>
+        /// The minimum proc chance of a cloak
+        /// </summary>
+        private static float MinProc
+        {
+            get
+            {
+                if (!UseCustomMath)
+                {
+                    return 0f;
+                }
+                return Convert.ToSingle(PropertyManager.GetDouble("cloak_min_proc_base", 0f));
+            }
+        }
+
+        /// <summary>
+        /// The base maxiumum percentage at which cloaks with
+        /// -200 will proc
+        /// </summary>
+        private static float MaxProcBase200
+        {
+            get
+            {
+                if (!UseCustomMath)
+                {
+                    return 0.15f;
+                }
+                return Convert.ToSingle(PropertyManager.GetDouble("cloak_max_proc_base").Item);
+            }
+        }
+
+        private static readonly float TwoThirds = 2.0f / 3.0f;
 
         /// <summary>
         /// Rolls for a chance at procing a cloak spell
@@ -46,9 +111,27 @@ namespace ACE.Server.Entity
 
             if (itemLevel < 1) return false;
 
-            var maxProcRate = 0.25f + (itemLevel - 1) * 0.0125f;
+            var maxProcBase = MaxProcBase;
 
-            var chance = Math.Min(damage_percent, maxProcRate);
+            if (HasDamageProc(cloak))
+            {
+                maxProcBase = MaxProcBase200;
+                damage_percent *= TwoThirds;
+            }
+
+            var maxProcRate = maxProcBase + (itemLevel - 1) * 0.0125f;
+
+            if (UseCustomMath)
+            {
+                // The proc chance should only plateau for damage above a certain configured percentage
+                var maxProcAtDamagePercent = Convert.ToSingle(PropertyManager.GetDouble("cloak_max_proc_damage_percentage", 30.0).Item);
+                // Reduce the damage percent for the calculation if necessary to a fraction of the percentage based on the configuration
+                damage_percent = maxProcRate * (damage_percent / maxProcAtDamagePercent);
+            }
+
+            // take the lowest of the chance between damage and proc rate, then override
+            // with min proc if necessary
+            var chance = Math.Max(Math.Min(damage_percent, maxProcRate), MinProc);
 
             var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
 
@@ -73,8 +156,13 @@ namespace ACE.Server.Entity
             if (spell.NotFound)
             {
                 if (defender is Player player)
-                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"{spell.Name} spell not implemented, yet!", ChatMessageType.System));
+                {
+                    if (spell._spellBase == null)
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"SpellId {cloak.ProcSpell} Invalid.", ChatMessageType.System));
+                    else
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"{spell.Name} spell not implemented, yet!", ChatMessageType.System));
 
+                }
                 return false;
             }
 
@@ -91,9 +179,9 @@ namespace ACE.Server.Entity
 
             var msg = new GameMessageSystemChat($"The cloak of {defender.Name} weaves the magic of {spell.Name}!", ChatMessageType.Spellcasting);
 
-            defender.EnqueueBroadcast(msg, WorldObject.LocalBroadcastRange, ChatMessageType.Magic);
+            defender.EnqueueBroadcast(msg, WorldObject.LocalBroadcastRange, ChatMessageType.Spellcasting);
 
-            defender.TryCastSpell(spell, target, cloak, false, false);
+            defender.TryCastSpell(spell, target, cloak, cloak, true, true, false);
 
             return true;
         }

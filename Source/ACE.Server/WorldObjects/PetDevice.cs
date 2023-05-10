@@ -76,7 +76,9 @@ namespace ACE.Server.WorldObjects
 
             var wcid = (uint)PetClass;
 
-            if (SummonCreature(player, wcid))
+            var result = SummonCreature(player, wcid);
+
+            if (result == null || result.Value)
             {
                 // CombatPet devices should always have structure
                 if (Structure != null)
@@ -117,14 +119,28 @@ namespace ACE.Server.WorldObjects
 
             if (player.CurrentActivePet != null && player.CurrentActivePet is CombatPet)
             {
-                player.SendTransientError($"{player.CurrentActivePet.Name} is already active");
-                return new ActivationResult(false);
-            }
+                if (PropertyManager.GetBool("pet_stow_replace").Item)
+                {
+                    // original ace
+                    player.SendTransientError($"{player.CurrentActivePet.Name} is already active");
+                    return new ActivationResult(false);
+                }
+                else
+                {
+                    // retail stow
+                    var weenie = DatabaseManager.World.GetCachedWeenie((uint)PetClass);
 
+                    if (weenie == null || weenie.WeenieType != WeenieType.Pet)
+                    {
+                        player.SendTransientError($"{player.CurrentActivePet.Name} is already active");
+                        return new ActivationResult(false);
+                    }
+                }
+            }
             return new ActivationResult(true);
         }
 
-        public bool SummonCreature(Player player, uint wcid)
+        public bool? SummonCreature(Player player, uint wcid)
         {
             var wo = WorldObjectFactory.CreateNewWorldObject(wcid);
 
@@ -142,6 +158,8 @@ namespace ACE.Server.WorldObjects
                 return false;
             }
             var success = pet.Init(player, this);
+
+            if (success != true) wo.Destroy();
 
             return success;
         }

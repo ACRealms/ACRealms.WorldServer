@@ -80,7 +80,6 @@ namespace ACE.Database.Adapter
                         RotationX = record.AnglesX,
                         RotationY = record.AnglesY,
                         RotationZ = record.AnglesZ,
-                        Instance = record.Instance,
 
                     };
 
@@ -502,7 +501,6 @@ namespace ACE.Database.Adapter
                     AnglesX = value.AnglesX,
                     AnglesY = value.AnglesY,
                     AnglesZ = value.AnglesZ,
-                    Instance = value.Instance,
                 });
             }
 

@@ -104,11 +104,25 @@ namespace ACE.Server.Entity
         /// This is to handle the odd way retail did DoT ticks
         /// In retail, if a DoT had a duration of 15 seconds,
         /// it would actually perform 4 ticks, instead of 3
-        /// Presumably DoT ticks happend on heartbeats, which are every 5 seconds by default
+        /// Presumably DoT ticks happened on heartbeats, which are every 5 seconds by default
         /// So there could be additional complication here if the target's Heartbeat is something other than 5
         /// This also affects the value that is sent over the wire, which could be further investigated
         /// </summary>
-        public double Duration { get => _spell != null && _spell.DotDuration.HasValue ? _spell.DotDuration.Value + 5.0f : _spellBase.Duration; }
+        public double Duration
+        {
+            get
+            {
+                if (_spell?.DotDuration != null)
+                {
+                    if (HasExtraTick)
+                        return _spell.DotDuration.Value + 5.0f;
+                    else
+                        return _spell.DotDuration.Value;
+                }
+                else
+                    return _spellBase.Duration;
+            }
+        }
 
         /// <summary>
         /// The DoT (damage over time) duration for the spell
@@ -434,6 +448,7 @@ namespace ACE.Server.Entity
         /// A destination location for a spell
         /// </summary>
         public Position Position { get => new Position(_spell.PositionObjCellId ?? 0, new Vector3(_spell.PositionOriginX ?? 0.0f, _spell.PositionOriginY ?? 0.0f, _spell.PositionOriginZ ?? 0.0f), new Quaternion(_spell.PositionAnglesX ?? 0.0f, _spell.PositionAnglesY ?? 0.0f, _spell.PositionAnglesZ ?? 0.0f, _spell.PositionAnglesW ?? 0.0f), false, 0); }
+
 
         /// <summary>
         /// The minimum spell power to dispel (unused?)
