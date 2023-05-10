@@ -47,7 +47,6 @@ namespace ACE.Server.Physics
         public PhysicsObj Parent;
         public ChildList Children;
         public Position Position;
-        public ObjCell CurCell;
         public Landblock CurLandblock;
         public int NumShadowObjects;
         public Dictionary<uint, ShadowObj> ShadowObjects;
@@ -86,6 +85,19 @@ namespace ACE.Server.Physics
         public double PhysicsTimer_CurrentTime;
         public bool DatObject = false;
         public int Order = 1;
+
+        private ObjCell _curCell;
+
+        public ObjCell CurCell
+        {
+            get => _curCell;
+            set
+            {
+                _curCell = value;
+                if (_curCell?.CurLandblock != null)
+                    CurLandblock = _curCell.CurLandblock;
+            }
+        }
 
         /// <summary>
         /// This is managed by MovementManager.MotionInterpreter, and should not be updated anywhere else.
