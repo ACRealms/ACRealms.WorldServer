@@ -362,6 +362,7 @@ namespace ACE.Server.WorldObjects
             return true;
         }
 
+
         /// <summary>
         /// Tries to spend all of the players Xp into Attributes, Vitals and Skills
         /// </summary>
