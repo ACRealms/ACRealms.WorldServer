@@ -52,7 +52,7 @@ namespace ACE.Server.Physics.Common
 
         public Position(ACE.Entity.Position p)
         {
-            ObjCellID = p.Cell;
+            ObjCellID = p.ObjCellID;
             Frame = new AFrame(p.Pos, p.Rotation);
         }
 

@@ -51,7 +51,7 @@ namespace ACE.Server.WorldObjects
                 }
                 var i = housePortals[0];
 
-                if (i.ObjCellId == Location.Cell && housePortals.Count > 1)
+                if (i.ObjCellId == Location.ObjCellID && housePortals.Count > 1)
                     i = housePortals[1];
 
                 var destination = new Position(i.ObjCellId, new Vector3(i.OriginX, i.OriginY, i.OriginZ), new Quaternion(i.AnglesX, i.AnglesY, i.AnglesZ, i.AnglesW));
@@ -77,7 +77,7 @@ namespace ACE.Server.WorldObjects
             if (!(activator is Player player))
                 return new ActivationResult(false);
 
-            if (player.CurrentLandblock.IsDungeon && Destination.LandblockId != player.CurrentLandblock.Id)
+            if (player.CurrentLandblock.IsDungeon && Destination.Landblock != player.Location.Landblock)
                 return new ActivationResult(true);   // allow escape to overworld always
 
             if (player.IgnorePortalRestrictions)
@@ -106,7 +106,7 @@ namespace ACE.Server.WorldObjects
         {
             // if house portal in dungeon,
             // set destination to outdoor house slumlord
-            if (CurrentLandblock != null && CurrentLandblock.IsDungeon && Destination.LandblockId == CurrentLandblock.Id)
+            if (CurrentLandblock != null && CurrentLandblock.IsDungeon && Destination.Landblock == Location.Landblock)
                 SetPosition(PositionType.Destination, new Position(House.RootHouse.SlumLord.Location));
 
             base.ActOnUse(worldObject);

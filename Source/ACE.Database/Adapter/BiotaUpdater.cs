@@ -116,6 +116,7 @@ namespace ACE.Database.Adapter
                     existingValue.AnglesX = kvp.Value.RotationX;
                     existingValue.AnglesY = kvp.Value.RotationY;
                     existingValue.AnglesZ = kvp.Value.RotationZ;
+                    existingValue.Instance = kvp.Value.Instance;
                 }
             }
             foreach (var value in targetBiota.BiotaPropertiesPosition)

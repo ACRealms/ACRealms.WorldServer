@@ -22,7 +22,7 @@ namespace ACE.Server.Network.Structure
 
         public Origin(Position pos)
         {
-            CellID = pos.Cell;
+            CellID = pos.ObjCellID;
             Position = pos.Pos;
         }
     }

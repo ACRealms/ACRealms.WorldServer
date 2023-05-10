@@ -445,11 +445,9 @@ namespace ACE.Server.WorldObjects
             {
                 if (_dungeonLandblockID == null)
                 {
-                    var rootHouseBlock = RootHouse.Location.LandblockId.Raw | 0xFFFF;
-
                     var housePortals = GetHousePortals();
 
-                    var dungeonPortal = housePortals.FirstOrDefault(i => (i.ObjCellId | 0xFFFF) != rootHouseBlock);
+                    var dungeonPortal = housePortals.FirstOrDefault(i => (i.ObjCellId >> 16) != RootHouse.Location.Landblock);
 
                     if (dungeonPortal == null)
                         return 0;
@@ -471,7 +469,7 @@ namespace ACE.Server.WorldObjects
                     if (DungeonLandblockID == 0)
                         return 0;
 
-                    var landblock = (ushort)((DungeonLandblockID >> 16) & 0xFFFF);
+                    var landblock = (ushort)(DungeonLandblockID >> 16);
 
                     var basementGuid = DatabaseManager.World.GetCachedBasementHouseGuid(landblock);
 
@@ -499,10 +497,9 @@ namespace ACE.Server.WorldObjects
                 //if (HouseType == ACE.Entity.Enum.HouseType.Apartment || HouseType == ACE.Entity.Enum.HouseType.Cottage)
                     //return this;
 
-                var landblock = (ushort)((RootGuid.Full >> 12) & 0xFFFF);
+                var landblock = (RootGuid.Full << 4) | 0xFFFF;
 
-                var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
-                var isLoaded = LandblockManager.IsLoaded(landblockId);
+                var isLoaded = LandblockManager.IsLoaded(landblock);
 
                 if (!isLoaded)
                 {
@@ -514,7 +511,7 @@ namespace ACE.Server.WorldObjects
                     return Load(RootGuid.Full);
                 }
                    
-                var loaded = LandblockManager.GetLandblock(landblockId, false);
+                var loaded = LandblockManager.GetLandblock(landblock, false);
                 return loaded.GetObject(RootGuid) as House;
             }
         }
@@ -552,27 +549,25 @@ namespace ACE.Server.WorldObjects
 
         public static House GetHouse(uint houseGuid)
         {
-            var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
+            var landblock = (houseGuid << 4) | 0xFFFF;
 
-            var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
-            var isLoaded = LandblockManager.IsLoaded(landblockId);
+            var isLoaded = LandblockManager.IsLoaded(landblock);
 
             if (!isLoaded)
                 return House.Load(houseGuid);
 
-            var loaded = LandblockManager.GetLandblock(landblockId, false);
+            var loaded = LandblockManager.GetLandblock(landblock, false);
             return loaded.GetObject(new ObjectGuid(houseGuid)) as House;
         }
 
         public House GetDungeonHouse()
         {
-            var landblockId = new LandblockId(DungeonLandblockID);
-            var isLoaded = LandblockManager.IsLoaded(landblockId);
+            var isLoaded = LandblockManager.IsLoaded(DungeonLandblockID);
 
             if (!isLoaded)
-                return House.Load(DungeonHouseGuid, true);
+                return Load(DungeonHouseGuid, true);
 
-            var loaded = LandblockManager.GetLandblock(landblockId, false);
+            var loaded = LandblockManager.GetLandblock(DungeonLandblockID, false);
             var wos = loaded.GetWorldObjectsForPhysicsHandling();
             return wos.FirstOrDefault(wo => wo.WeenieClassId == WeenieClassId) as House;
         }
@@ -583,7 +578,7 @@ namespace ACE.Server.WorldObjects
                 return false;
 
             if (HouseType == HouseType.Apartment)
-                return player.Location.Cell == Location.Cell;
+                return player.Location.ObjCellID == Location.ObjCellID;
 
             if (player.Location.GetOutdoorCell() == Location.GetOutdoorCell())
                 return true;
@@ -594,7 +589,7 @@ namespace ACE.Server.WorldObjects
 
             if (HasDungeon)
             {
-                if ((player.Location.Cell | 0xFFFF) == DungeonLandblockID && (player.Location.Cell & 0xFFFF) >= 0x100)
+                if (player.Location.Indoors && (player.Location.ObjCellID | 0xFFFF) == DungeonLandblockID)
                     return true;
             }
             return false;

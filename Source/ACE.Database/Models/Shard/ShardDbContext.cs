@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -995,6 +995,8 @@ namespace ACE.Database.Models.Shard
                 entity.Property(e => e.AnglesY).HasColumnName("angles_Y");
 
                 entity.Property(e => e.AnglesZ).HasColumnName("angles_Z");
+
+                entity.Property(e => e.Instance).HasColumnName("instance");
 
                 entity.Property(e => e.ObjCellId).HasColumnName("obj_Cell_Id");
 

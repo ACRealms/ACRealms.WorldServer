@@ -50,7 +50,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void TrackObject(WorldObject worldObject, bool delay = false)
         {
-            //Console.WriteLine($"TrackObject({worldObject.Name}, {delay})");
+            //Console.WriteLine($"{Name}.TrackObject({worldObject.Name} {worldObject.Guid})");
 
             if (worldObject == null || worldObject.Guid == Guid)
                 return;
@@ -103,7 +103,10 @@ namespace ACE.Server.WorldObjects
                     Session.Network.EnqueueSend(new GameMessageParentEvent(wo.Wielder, wo));
             }
             else
+            {
+                //Console.WriteLine($"{Name}.DeleteObject({wo.Name} ({wo.Guid})");
                 Session.Network.EnqueueSend(new GameMessageDeleteObject(wo));
+            }
 
             if (wo is Creature creature)
             {
@@ -217,6 +220,21 @@ namespace ACE.Server.WorldObjects
             actionChain.EnqueueChain();
         }
 
+        public void ClearInstance(ulong iBlockCell)
+        {
+            var landblock = BlockCell.GetLandblock(iBlockCell);
+            var instance = BlockCell.GetInstance(iBlockCell);
+
+            var deleteObjs = PhysicsObj.ObjMaint.GetKnownObjectsValuesWhere(i => (i.CurCell?.ID | 0xFFFF) == landblock && i.CurCell.CurLandblock.Instance == instance);
+
+            foreach (var deleteObj in deleteObjs)
+            {
+                //Console.WriteLine($"Clearing {deleteObj.Name} ({deleteObj.ID:X8})");
+                RemoveTrackedObject(deleteObj.WeenieObj.WorldObject, false);
+                PhysicsObj.ObjMaint.RemoveObject(deleteObj);
+            }
+        }
+
         public void HandlePreTeleportVisibility(ACE.Entity.Position newPosition)
         {
             // repro steps without this function:
@@ -236,12 +254,14 @@ namespace ACE.Server.WorldObjects
             // a DO and then a CO is the only thing that fixes this issue (/objsend can help with this)
             // this part probably deviates from retail a bit, but is the equivalent automated fix
 
-            var fixLevel = PropertyManager.GetLong("teleport_visibility_fix").Item;
+            //var fixLevel = PropertyManager.GetLong("teleport_visibility_fix").Item;
+
+            var fixLevel = 3;   // instanced mode always uses level 3
 
             // disabled by default
             if (fixLevel < 1) return;
 
-            if (Location.Cell == newPosition.Cell)
+            if (Location.LongObjCellID == newPosition.LongObjCellID)
                 return;
 
             var knownObjs = GetKnownObjects();

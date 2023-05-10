@@ -181,7 +181,7 @@ namespace ACE.Server.Network.Structure
 
         public static void Write(this BinaryWriter writer, Position position)
         {
-            writer.Write(position.Cell);
+            writer.Write(position.ObjCellID);
             writer.Write(position.Pos);
             writer.Write(position.Rotation);
         }

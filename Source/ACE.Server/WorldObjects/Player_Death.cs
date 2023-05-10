@@ -83,7 +83,7 @@ namespace ACE.Server.WorldObjects
 
                 // instead, we get all of the players in the lifestone landblock + adjacent landblocks,
                 // and possibly limit that to some radius around the landblock?
-                var lifestoneBlock = LandblockManager.GetLandblock(new LandblockId(Sanctuary.Landblock << 16 | 0xFFFF), true);
+                var lifestoneBlock = LandblockManager.GetLandblock(Sanctuary.ObjCellID, true);
                 lifestoneBlock.EnqueueBroadcast(excludePlayers, true, Sanctuary, LocalBroadcastRangeSq, broadcastMsg);
             }
 
@@ -106,7 +106,7 @@ namespace ACE.Server.WorldObjects
 
                 var globalPKDe = $"{lastDamager.Name} has defeated {Name}!";
 
-                if ((Location.Cell & 0xFFFF) < 0x100)
+                if (!Location.Indoors)
                     globalPKDe += $" The kill occured at {Location.GetMapCoordStr()}";
 
                 globalPKDe += "\n[PKDe]";
