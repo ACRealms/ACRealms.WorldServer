@@ -165,7 +165,7 @@ namespace ACE.Server.WorldObjects
                         wo.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
                         wo.ContainerId = Guid.Full;
                         wo.CalculateObjDesc();
-                        DefaultItemsForSale.Add(wo.Guid, wo);
+                        UniqueItemsForSale.Add(wo.Guid, wo);
                     }
                 }
             }

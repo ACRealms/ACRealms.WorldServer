@@ -80,6 +80,15 @@ namespace ACE.Server.WorldObjects
                 }
                 else
                 {
+                    vendor.ApplyService(item, this);
+                }
+            }
+
+            foreach (var item in uniqueItems)
+            {
+                var service = item.GetProperty(PropertyBool.VendorService) ?? false;
+                if (service)
+                {
                     if (item.GetProperty(PropertyInt.HomeRealm).HasValue)
                     {
                         var realmId = item.GetProperty(PropertyInt.HomeRealm).Value;
@@ -88,11 +97,7 @@ namespace ACE.Server.WorldObjects
 
                     vendor.ApplyService(item, this);
                 }
-            }
-
-            foreach (var item in uniqueItems)
-            {
-                if (TryCreateInInventoryWithNetworking(item))
+                else if (TryCreateInInventoryWithNetworking(item))
                 {
                     vendor.UniqueItemsForSale.Remove(item.Guid);
 
