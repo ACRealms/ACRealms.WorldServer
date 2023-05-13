@@ -176,17 +176,18 @@ namespace ACE.Server.Entity
         public Landblock(LandblockId id, uint instance)
         {
             //log.Debug($"Landblock({(id.Raw | 0xFFFF):X8})");
+            RealmHelpers = new RealmShortcuts(this);
 
             Id = id;
             Instance = instance;
 
-            CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id.Raw >> 16 | 0xFFFF);
-            LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>((uint)Id.Landblock << 16 | 0xFFFE);
+            CellLandblock = DatManager.CellDat.ReadFromDat<CellLandblock>(Id.Raw | 0xFFFF);
+            LandblockInfo = DatManager.CellDat.ReadFromDat<LandblockInfo>(Id.Raw & 0xFFFF0000 | 0xFFFE);
 
             lastActiveTime = DateTime.UtcNow;
 
             var cellLandblock = DBObj.GetCellLandblock(Id.Raw | 0xFFFF);
-            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock, instance);
+            PhysicsLandblock = new Physics.Common.Landblock(CellLandblock, instance);
         }
 
         public void Init(EphemeralRealm ephemeralRealm, bool reload = false)

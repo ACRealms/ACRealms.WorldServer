@@ -1306,7 +1306,7 @@ namespace ACE.Server.WorldObjects
                         summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to summon: Invalid realm type.", ChatMessageType.Magic));
                         return false;
                     }
-                    var landblock = RealmManager.GetNewEphemeralLandblock(portal.Destination.LandblockId, portal.Destination.Instance, summoner, summonTargetRealms.Select(x => x.Realm).ToList());
+                    var landblock = RealmManager.GetNewEphemeralLandblock(portal.Destination.LandblockId, summoner, summonTargetRealms.Select(x => x.Realm).ToList());
                     targetPosition.Instance = landblock.Instance;
                 }
             }

@@ -475,12 +475,15 @@ namespace ACE.Server.Physics.Common
 
         public void init_landcell()
         {
+            // REALMS-TODO: Merge conflict here - Old code:
+            /*
             var lbid = ID & 0xFFFF0000;
             for (uint i = 1; i <= 64; i++)
             {
                 var landcell = LScape.get_landcell(lbid | i, Instance);
                 landcell.CurLandblock = this;
             }
+            */
 
             // should be length SideCellCount ^ 2
             foreach (var landCell in LandCells.Values)

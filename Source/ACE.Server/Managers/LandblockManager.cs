@@ -389,17 +389,19 @@ namespace ACE.Server.Managers
             {
                 bool setAdjacents = false;
 
-                landblock = LandblockDictFetch(landblockId.Raw, instance);
+                var landblockIdClean = new LandblockId(landblockId.Raw | 0xFFFF);
 
+                landblock = LandblockDictFetch(landblockIdClean.Raw, instance);
+                
                 if (landblock == null)
                 {
                     // load up this landblock
-                    landblock = new Landblock(landblockId, instance);
-                    LandblockDictCommit(landblockId.Raw, instance, landblock);
+                    landblock = new Landblock(landblockIdClean, instance);
+                    LandblockDictCommit(landblockIdClean.Raw, instance, landblock);
 
                     if (!loadedLandblocks.Add(landblock))
                     {
-                        log.Error($"LandblockManager: failed to add {LandblockKey(landblockId.Raw, instance):X8} to active landblocks!");
+                        log.Error($"LandblockManager: failed to add {LandblockKey(landblockIdClean.Raw, instance):X8} to active landblocks!");
                         return landblock;
                     }
 
@@ -713,7 +715,7 @@ namespace ACE.Server.Managers
                 {
                     iid = GetRandomInstanceID(isTemporaryRuleset, realmId);
                 }
-                while (LandblockDictFetch(landblock.Raw, iid) != null && pendingInstanceIds.Contains(iid));
+                while (LandblockDictFetch(landblock.Raw, iid) != null || pendingInstanceIds.Contains(iid));
                 pendingInstanceIds.Add(iid);
                 return iid;
             }

@@ -55,8 +55,8 @@ namespace ACE.Server.Physics.Common
         /// <param name="blockCellID">Any landblock + cell ID within the landblock</param>
         public static Landblock get_landblock(uint blockCellID, uint instance)
         {
-            var instancedLandblockID = LandblockKey(blockCellID, instance);
             var landblockID = blockCellID | 0xFFFF;
+            var instancedLandblockID = LandblockKey(landblockID, instance);
 
             if (PhysicsEngine.Instance.Server)
             {
