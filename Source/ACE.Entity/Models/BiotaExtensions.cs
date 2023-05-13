@@ -349,7 +349,7 @@ namespace ACE.Entity.Models
                 if (biota.PropertiesPosition == null)
                     biota.PropertiesPosition = new Dictionary<PositionType, PropertiesPosition>();
 
-                var entity = new PropertiesPosition { ObjCellId = value.ObjCellID, PositionX = value.Pos.X, PositionY = value.Pos.Y, PositionZ = value.Pos.Z, RotationW = value.Rotation.W, RotationX = value.Rotation.X, RotationY = value.Rotation.Y, RotationZ = value.Rotation.Z, Instance = value.Instance };
+                var entity = new PropertiesPosition { ObjCellId = value.Cell, PositionX = value.PositionX, PositionY = value.PositionY, PositionZ = value.PositionZ, RotationW = value.RotationW, RotationX = value.RotationX, RotationY = value.RotationY, RotationZ = value.RotationZ, Instance = value.Instance };
 
                 biota.PropertiesPosition[property] = entity;
             }

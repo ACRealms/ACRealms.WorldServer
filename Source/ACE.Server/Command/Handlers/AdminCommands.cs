@@ -1228,6 +1228,8 @@ namespace ACE.Server.Command.Handlers
             else
                 obj.Location = session.Player.Location.InFrontOf((obj.UseRadius ?? 2) > 2 ? obj.UseRadius.Value : 2);
 
+            obj.Location.LandblockId = new LandblockId(obj.Location.GetCell());
+
             LastSpawnPos = obj.Location;
 
             return obj;
@@ -3060,13 +3062,13 @@ namespace ACE.Server.Command.Handlers
 
             if (environChange.IsFog())
             {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Setting Landblock (0x{session.Player.CurrentLandblock.ShortId:X4}), including direct adjacent landblocks, to EnvironChangeType.{environChange.ToString()}.", ChatMessageType.Broadcast));
-                PlayerManager.BroadcastToAuditChannel(session.Player, $"{session.Player.Name} set Landblock (0x{session.Player.CurrentLandblock.ShortId:X4}), including direct adjacent landblocks, to EnvironChangeType.{environChange.ToString()}.");
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Setting Landblock (0x{session.Player.CurrentLandblock.Id.Landblock:X4}), including direct adjacent landblocks, to EnvironChangeType.{environChange.ToString()}.", ChatMessageType.Broadcast));
+                PlayerManager.BroadcastToAuditChannel(session.Player, $"{session.Player.Name} set Landblock (0x{session.Player.CurrentLandblock.Id.Landblock:X4}), including direct adjacent landblocks, to EnvironChangeType.{environChange.ToString()}.");
             }
             else
             {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Sending EnvironChangeType.{environChange.ToString()} to all players on Landblock (0x{session.Player.CurrentLandblock.ShortId:X4}), including direct adjacent landblocks.", ChatMessageType.Broadcast));
-                PlayerManager.BroadcastToAuditChannel(session.Player, $"{session.Player.Name} sent EnvironChangeType.{environChange.ToString()} to all players on Landblock (0x{session.Player.CurrentLandblock.ShortId:X4}), including direct adjacent landblocks.");
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Sending EnvironChangeType.{environChange.ToString()} to all players on Landblock (0x{session.Player.CurrentLandblock.Id.Landblock:X4}), including direct adjacent landblocks.", ChatMessageType.Broadcast));
+                PlayerManager.BroadcastToAuditChannel(session.Player, $"{session.Player.Name} sent EnvironChangeType.{environChange.ToString()} to all players on Landblock (0x{session.Player.CurrentLandblock.Id.Landblock:X4}), including direct adjacent landblocks.");
             }
 
             session.Player.CurrentLandblock?.DoEnvironChange(environChange);
@@ -3155,9 +3157,9 @@ namespace ACE.Server.Command.Handlers
             }
             session.Network.EnqueueSend(new GameMessageSystemChat($"Moving {obj.Name} ({obj.Guid}) to current location", ChatMessageType.Broadcast));
 
-            obj.Location = obj.PhysicsObj.Position.ACEPosition(newLoc);
+            obj.Location = obj.PhysicsObj.Position.ACEPosition(session.Player.Location.Instance);
 
-            if (prevLoc.Landblock != obj.Location.Landblock)
+            if (prevLoc.InstancedLandblock != obj.Location.InstancedLandblock)
             {
                 LandblockManager.RelocateObjectForPhysics(obj, true);
             }

@@ -38,6 +38,7 @@ namespace ACE.Entity
         public static Position InvalidPosition(uint characterId)
         {
             var invalidPosition = new Position();
+            invalidPosition.LandblockId = new LandblockId();
             return invalidPosition;
         }
     }

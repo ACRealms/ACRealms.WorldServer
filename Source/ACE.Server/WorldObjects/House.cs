@@ -119,7 +119,7 @@ namespace ACE.Server.WorldObjects
             var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
 
             var biota = DatabaseManager.Shard.BaseDatabase.GetBiota(houseGuid);
-            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock);
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock, 0);
 
             if (biota == null)
             {
@@ -217,7 +217,7 @@ namespace ACE.Server.WorldObjects
             var house = this;
             if (CurrentLandblock != null && CurrentLandblock.HasDungeon && HouseType != HouseType.Apartment)
             {
-                var biota = DatabaseManager.Shard.BaseDatabase.GetBiotasByWcid(WeenieClassId).Where(bio => bio.BiotaPropertiesPosition.Count > 0).FirstOrDefault(b => b.BiotaPropertiesPosition.FirstOrDefault(p => p.PositionType == (ushort)PositionType.Location).ObjCellId >> 16 != Location.Landblock);
+                var biota = DatabaseManager.Shard.BaseDatabase.GetBiotasByWcid(WeenieClassId).Where(bio => bio.BiotaPropertiesPosition.Count > 0).FirstOrDefault(b => b.BiotaPropertiesPosition.FirstOrDefault(p => p.PositionType == (ushort)PositionType.Location).ObjCellId >> 16 != Location.LandblockShort);
                 if (biota != null)
                 {
                     house = WorldObjectFactory.CreateWorldObject(biota) as House;
@@ -445,9 +445,11 @@ namespace ACE.Server.WorldObjects
             {
                 if (_dungeonLandblockID == null)
                 {
+                    var rootHouseBlock = RootHouse.Location.LandblockId.Raw | 0xFFFF;
+
                     var housePortals = GetHousePortals();
 
-                    var dungeonPortal = housePortals.FirstOrDefault(i => (i.ObjCellId >> 16) != RootHouse.Location.Landblock);
+                    var dungeonPortal = housePortals.FirstOrDefault(i => (i.ObjCellId | 0xFFFF) != rootHouseBlock);
 
                     if (dungeonPortal == null)
                         return 0;
@@ -469,7 +471,7 @@ namespace ACE.Server.WorldObjects
                     if (DungeonLandblockID == 0)
                         return 0;
 
-                    var landblock = (ushort)(DungeonLandblockID >> 16);
+                    var landblock = (ushort)((DungeonLandblockID >> 16) & 0xFFFF);
 
                     var basementGuid = DatabaseManager.World.GetCachedBasementHouseGuid(landblock);
 
@@ -494,12 +496,16 @@ namespace ACE.Server.WorldObjects
         {
             get
             {
+                //Not supported on AC Realms
+                return null;
+
                 //if (HouseType == ACE.Entity.Enum.HouseType.Apartment || HouseType == ACE.Entity.Enum.HouseType.Cottage)
                     //return this;
 
-                var landblock = (RootGuid.Full << 4) | 0xFFFF;
+                var landblock = (ushort)((RootGuid.Full >> 12) & 0xFFFF);
 
-                var isLoaded = LandblockManager.IsLoaded(landblock);
+                var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
+                var isLoaded = LandblockManager.IsLoaded(landblockId, 0);
 
                 if (!isLoaded)
                 {
@@ -511,7 +517,7 @@ namespace ACE.Server.WorldObjects
                     return Load(RootGuid.Full);
                 }
                    
-                var loaded = LandblockManager.GetLandblockBase(landblock, false);
+                var loaded = LandblockManager.GetLandblock(landblockId, 0, null, false);
                 return loaded.GetObject(RootGuid) as House;
             }
         }
@@ -549,27 +555,39 @@ namespace ACE.Server.WorldObjects
 
         public static House GetHouse(uint houseGuid)
         {
-            var landblock = (houseGuid << 4) | 0xFFFF;
+            // Not supported in AC Realms yet
+            return null;
 
-            var isLoaded = LandblockManager.IsLoaded(landblock);
+            /*
+            var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
+
+            var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
+            var isLoaded = LandblockManager.IsLoaded(landblockId);
 
             if (!isLoaded)
                 return House.Load(houseGuid);
 
-            var loaded = LandblockManager.GetLandblockBase(landblock, false);
+            var loaded = LandblockManager.GetLandblock(landblockId, false);
             return loaded.GetObject(new ObjectGuid(houseGuid)) as House;
+            */
         }
 
         public House GetDungeonHouse()
         {
-            var isLoaded = LandblockManager.IsLoaded(DungeonLandblockID);
+            // Not supported in AC Realms yet
+            return null;
+
+            /*
+            var landblockId = new LandblockId(DungeonLandblockID);
+            var isLoaded = LandblockManager.IsLoaded(landblockId);
 
             if (!isLoaded)
-                return Load(DungeonHouseGuid, true);
+                return House.Load(DungeonHouseGuid, true);
 
-            var loaded = LandblockManager.GetLandblockBase(DungeonLandblockID, false);
+            var loaded = LandblockManager.GetLandblock(landblockId, false);
             var wos = loaded.GetWorldObjectsForPhysicsHandling();
             return wos.FirstOrDefault(wo => wo.WeenieClassId == WeenieClassId) as House;
+            */
         }
 
         public bool OnProperty(Player player)
@@ -578,7 +596,7 @@ namespace ACE.Server.WorldObjects
                 return false;
 
             if (HouseType == HouseType.Apartment)
-                return player.Location.ObjCellID == Location.ObjCellID;
+                return player.Location.Cell == Location.Cell;
 
             if (player.Location.GetOutdoorCell() == Location.GetOutdoorCell())
                 return true;
@@ -589,7 +607,7 @@ namespace ACE.Server.WorldObjects
 
             if (HasDungeon)
             {
-                if (player.Location.Indoors && (player.Location.ObjCellID | 0xFFFF) == DungeonLandblockID)
+                if ((player.Location.Cell | 0xFFFF) == DungeonLandblockID && (player.Location.Cell & 0xFFFF) >= 0x100)
                     return true;
             }
             return false;

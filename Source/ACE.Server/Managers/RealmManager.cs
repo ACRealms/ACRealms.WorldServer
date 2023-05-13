@@ -150,16 +150,15 @@ namespace ACE.Server.Managers
             return GetRealm(player.GetPosition(PositionType.EphemeralRealmExitTo)?.RealmID ?? player.HomeRealm);
         }
 
-        internal static Landblock GetNewEphemeralLandblock(uint landcell, Player owner, List<ACE.Entity.Models.Realm> realmTemplates)
+        internal static Landblock GetNewEphemeralLandblock(ACE.Entity.LandblockId landblockId, uint instance, Player owner, List<ACE.Entity.Models.Realm> realmTemplates)
         {
             EphemeralRealm ephemeralRealm;
             lock (realmsLock)
                 ephemeralRealm = EphemeralRealm.Initialize(owner, realmTemplates);
-            var iid = LandblockManager.GetFreeInstanceID(true, ephemeralRealm.RulesetTemplate.Realm.Id, (ushort)(landcell >> 16));
-            var longcell = ((ulong)iid << 32) | landcell;
-            var landblock = LandblockManager.GetLandblock(longcell, false, false, ephemeralRealm);
+            var iid = LandblockManager.RequestNewInstanceID(true, ephemeralRealm.RulesetTemplate.Realm.Id, landblockId);
+            var landblock = LandblockManager.GetLandblock(landblockId, iid, ephemeralRealm, false, false);
 
-            log.Info($"GetNewEphemeralLandblock created for player {owner.Name}, realm ruleset {ephemeralRealm.RulesetTemplate.Realm.Id}, longcell {longcell}.");
+            log.Info($"GetNewEphemeralLandblock created for player {owner.Name}, realm ruleset {ephemeralRealm.RulesetTemplate.Realm.Id}, landcell {landblock.Id.Raw}, instance {iid}.");
             return landblock;
         }
 

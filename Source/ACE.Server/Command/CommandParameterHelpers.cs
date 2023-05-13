@@ -228,7 +228,7 @@ namespace ACE.Server.Command
                                 {
                                     string ns = match.Groups[1].Value;
                                     string ew = match.Groups[2].Value;
-                                    if (!TryParsePosition(new string[] { ns, ew }, out string errorMessage, out position))
+                                    if (!TryParsePosition(session, new string[] { ns, ew }, out string errorMessage, out position))
                                     {
                                         if (session != null)
                                         {
@@ -555,7 +555,7 @@ namespace ACE.Server.Command
         /// <param name="position">the resultant ACE.Entity.Position</param>
         /// <param name="startingElement">the first zero based element index of the 2 contiguous elements in the parameter array</param>
         /// <returns>the parsing was successful or not</returns>
-        public static bool TryParsePosition(string[] parameters, out string errorMessage, out Position position, int startingElement = 0)
+        public static bool TryParsePosition(Session session, string[] parameters, out string errorMessage, out Position position, int startingElement = 0)
         {
             errorMessage = string.Empty;
             position = null;
@@ -605,7 +605,7 @@ namespace ACE.Server.Command
 
             try
             {
-                position = new Position(coordNS, coordEW);
+                position = new Position(coordNS, coordEW, session.Player.Location.Instance);
                 position.AdjustMapCoords();
             }
             catch (Exception e)

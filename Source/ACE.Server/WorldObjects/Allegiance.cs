@@ -276,18 +276,22 @@ namespace ACE.Server.WorldObjects
 
         public House GetHouse()
         {
+            // Housing not supported on AC Realms yet
+            return null;
+
             if (Monarch.Player.HouseInstance == null)
                 return null;
 
             // is landblock loaded?
             var houseGuid = Monarch.Player.HouseInstance.Value;
-            var landblock = (houseGuid << 4) | 0xFFFF;
+            var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
 
-            var isLoaded = LandblockManager.IsLoaded(landblock);
+            var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
+            var isLoaded = LandblockManager.IsLoaded(landblockId, 0);
 
             if (isLoaded)
             {
-                var loaded = LandblockManager.GetLandblockBase(landblock, false);
+                var loaded = LandblockManager.GetLandblock(landblockId, 0, null, false);
                 return loaded.GetObject(new ObjectGuid(houseGuid)) as House;
             }
 

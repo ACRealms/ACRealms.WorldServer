@@ -9,6 +9,7 @@ using ACE.Entity;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.BSP;
 using ACE.Server.Physics.Extensions;
+using ACE.Server.Managers;
 
 namespace ACE.Server.Physics.Common
 {
@@ -148,8 +149,7 @@ namespace ACE.Server.Physics.Common
             var cellY = (int)point.Y / 24;
 
             var blockCellID = (ID & 0xFFFF0000) | (uint)(cellX * 8 + cellY) + 1;
-            var iCellID = ((ulong)Instance << 32) | (ulong)blockCellID;
-            return (LandCell)LScape.get_landcell(iCellID);
+            return (LandCell)LScape.get_landcell((uint)blockCellID, Instance);
         }
 
         public void destroy_buildings()
@@ -475,13 +475,12 @@ namespace ACE.Server.Physics.Common
 
         public void init_landcell()
         {
-			//REALMS-TODO: Merge conflict here - Old code:
-            /*var lbid = ID & 0xFFFF0000;
+            var lbid = ID & 0xFFFF0000;
             for (uint i = 1; i <= 64; i++)
             {
                 var landcell = LScape.get_landcell(lbid | i, Instance);
                 landcell.CurLandblock = this;
-            }*/
+            }
 
             // should be length SideCellCount ^ 2
             foreach (var landCell in LandCells.Values)
@@ -678,7 +677,8 @@ namespace ACE.Server.Physics.Common
             var cellID = startCell;
             for (var i = 0; i < Info.NumCells; i++)
             {
-                var envCell = (EnvCell)LScape.get_landcell(cellID++);
+                // Realms TODO: Fix instance awareness here
+                var envCell = (EnvCell)LScape.get_landcell(cellID++, 0);
                 if (envCell != null)
                     envcells.Add(envCell);
                 else

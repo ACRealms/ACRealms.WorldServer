@@ -120,7 +120,8 @@ namespace ACE.Server.Physics.Common
             {
                 var blockCellID = ID & 0xFFFF0000 | visibleCellID;
                 if (VisibleCells.ContainsKey(blockCellID)) continue;
-                var cell = (EnvCell)LScape.get_landcell(blockCellID, CurLandblock.Instance);
+                //REALMS TODO: Make instance ID available here without breaking the performance. Might be source of ODD bugs otherwise
+                var cell = (EnvCell)LScape.get_landcell(blockCellID, 0);
                 VisibleCells.Add(visibleCellID, cell);
             }
         }
@@ -219,7 +220,7 @@ namespace ACE.Server.Physics.Common
             return null;
         }
 
-        public EnvCell GetVisible(uint cellID)
+        public new EnvCell GetVisible(uint cellID)
         {
             EnvCell envCell = null;
             VisibleCells.TryGetValue(cellID, out envCell);
@@ -405,7 +406,8 @@ namespace ACE.Server.Physics.Common
 
         public static ObjCell get_visible(uint cellID)
         {
-            var cell = (EnvCell)LScape.get_landcell(cellID);
+            // Realms TODO: Original realms production branch (Dec 2020) implicitly casted to ulong effectively making instance id 0. I don't think this was intended but leaving for now
+            var cell = (EnvCell)LScape.get_landcell(cellID, 0); 
             return cell.VisibleCells.Values.First();
         }
 

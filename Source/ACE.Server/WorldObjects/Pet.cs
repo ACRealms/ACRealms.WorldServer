@@ -82,7 +82,7 @@ namespace ACE.Server.WorldObjects
                 Location = player.Location.InFrontOf(5.0f);
             }
 
-            Location.ObjCellID = Location.GetCell();
+            Location.LandblockId = new LandblockId(Location.GetCell());
 
             Name = player.Name + "'s " + Name;
 

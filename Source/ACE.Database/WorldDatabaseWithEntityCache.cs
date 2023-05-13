@@ -511,13 +511,15 @@ namespace ACE.Database
         /// <summary>
         /// Clears the cached landblock instances for a specific landblock
         /// </summary>
-        public bool ClearCachedInstancesByLandblock(ushort landblock)
+        public bool ClearCachedInstancesByLandblock(ushort landblock, ushort realmId)
         {
             return cachedLandblockInstances.TryRemove(landblock, out _);
         }
 
-        public List<LandblockInstance> GetCachedInstancesByLandblock(WorldDbContext context, ushort landblock)
+        public List<LandblockInstance> GetCachedInstancesByLandblock(WorldDbContext context, ushort landblock, ushort realmId)
         {
+            // ACRealms TODO: Support realms in spawn map
+
             if (cachedLandblockInstances.TryGetValue(landblock, out var value))
                 return value;
 
@@ -535,10 +537,10 @@ namespace ACE.Database
         /// <summary>
         /// Returns statics spawn map and their links for the landblock
         /// </summary>
-        public List<LandblockInstance> GetCachedInstancesByLandblock(ushort landblock)
+        public List<LandblockInstance> GetCachedInstancesByLandblock(ushort landblock, ushort realmId)
         {
             using (var context = new WorldDbContext())
-                return GetCachedInstancesByLandblock(context, landblock);
+                return GetCachedInstancesByLandblock(context, landblock, realmId);
         }
 
 

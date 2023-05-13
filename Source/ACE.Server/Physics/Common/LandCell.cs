@@ -65,9 +65,9 @@ namespace ACE.Server.Physics.Common
             return objInfo.ValidateWalkable(checkPos, walkable.Plane, WaterType != LandDefs.WaterType.NotWater, waterDepth, transition, ID);
         }
 
-        public new static LandCell Get(ulong cellID)
+        public new static LandCell Get(uint cellID, uint instance)
         {
-            return (LandCell)LScape.get_landcell(cellID);
+            return (LandCell)LScape.get_landcell(cellID, instance);
         }
 
         public new void Init()
@@ -200,8 +200,7 @@ namespace ACE.Server.Physics.Common
                     if (id >> 16 != cellID >> 16)
                         continue;
 
-                    var longCellID = ((ulong)maincell.CurLandblock.Instance << 32) | cellID;
-                    var cell = LScape.get_landcell(longCellID);
+                    var cell = LScape.get_landcell(cellID, maincell.CurLandblock.Instance);
 
                     cellArray.add_cell(cellID, cell);
                 }
@@ -212,11 +211,11 @@ namespace ACE.Server.Physics.Common
         {
             var x = (uint)_x;
             var y = (uint)_y;
-            ulong iid = ((ulong)instance) << 32;
+
             if (x >= 0 && y >= 0 && x < 2040 && y < 2040)
             {
                 var cellID = (((y >> 3) | 32 * (x & 0xFFFFFFF8)) << 16) | ((y & 7) + 8 * (x & 7) + 1);
-                var landCell = Get(iid | ((ulong)cellID));
+                var landCell = Get(cellID, instance);
                 if (landCell != null)
                     cellArray.add_cell(cellID, landCell);
             }

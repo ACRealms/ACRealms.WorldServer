@@ -607,7 +607,7 @@ namespace ACE.Server.Entity
                 return 0.0f;
 
             // If you are both indoors but in different landblocks.
-            if (earner.Location.Indoors && fellow.Location.Indoors && earner.Location.Landblock != fellow.Location.Landblock)
+            if (earner.Location.Indoors && fellow.Location.Indoors && earner.Location.InstancedLandblock != fellow.Location.InstancedLandblock)
                 return 0.0f;
 
             var dist = earner.Location.Distance2D(fellow.Location);

@@ -124,7 +124,7 @@ namespace ACE.Server.WorldObjects
             var location = slumLord.Location.GetMapCoordStr();
             if (location == null)
             {
-                if (!HouseManager.ApartmentBlocks.TryGetValue(slumLord.Location.Landblock, out location))
+                if (!HouseManager.ApartmentBlocks.TryGetValue(slumLord.Location.LandblockShort, out location))
                     log.Error($"{Name}.GiveDeed() - couldn't find location {slumLord.Location.ToLOCString()}");
             }
 
@@ -811,19 +811,24 @@ namespace ACE.Server.WorldObjects
 
         public House GetHouse(uint? houseInstance)
         {
+            // Not supported yet on AC Realms
+            return null;
+
+            /*
             if (houseInstance == null)
                 return null;
 
             var houseGuid = houseInstance.Value;
-            var landblock = (houseGuid << 4) | 0xFFFF;
+            var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
 
-            var isLoaded = LandblockManager.IsLoaded(landblock);
+            var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
+            var isLoaded = LandblockManager.IsLoaded(landblockId);
 
             if (!isLoaded)
                 return House = House.Load(houseGuid);
 
-            var loaded = LandblockManager.GetLandblockBase(landblock, false);
-            return House = loaded.GetObject(new ObjectGuid(houseGuid)) as House;
+            var loaded = LandblockManager.GetLandblock(landblockId, false);
+            return House = loaded.GetObject(new ObjectGuid(houseGuid)) as House;*/
         }
 
         public void HandleActionAddGuest(string guestName)
@@ -1645,23 +1650,27 @@ namespace ACE.Server.WorldObjects
 
         public House GetHouse(IPlayer player)
         {
+            return null;
+            /*
             if (player.HouseInstance == null)
                 return null;
 
             // is landblock loaded?
             var houseGuid = player.HouseInstance.Value;
-            var landblock = (houseGuid << 4) | 0xFFFF;
+            var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
 
-            var isLoaded = LandblockManager.IsLoaded(landblock);
+            var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
+            var isLoaded = LandblockManager.IsLoaded(landblockId);
 
             if (isLoaded)
             {
-                var loaded = LandblockManager.GetLandblockBase(landblock, false);
+                var loaded = LandblockManager.GetLandblock(landblockId, false);
                 return loaded.GetObject(new ObjectGuid(houseGuid)) as House;
             }
 
             // load an offline copy
             return House.Load(houseGuid);
+            */
         }
 
         public bool IsMultiHouseOwner(bool showMsg = true)

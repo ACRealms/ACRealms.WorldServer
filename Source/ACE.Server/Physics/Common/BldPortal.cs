@@ -24,11 +24,11 @@ namespace ACE.Server.Physics.Common
             StabList = bldPortal.StabList;
         }
 
-        public EnvCell GetOtherCell(ulong landblockID)
+        public EnvCell GetOtherCell(uint landblockID, uint instance)
         {
-            var blockCellID = landblockID & 0xFFFFFFFFFFFF0000 | OtherCellId;
+            var blockCellID = landblockID & 0xFFFF0000 | OtherCellId;
 
-            return (EnvCell)LScape.get_landcell(blockCellID);
+            return (EnvCell)LScape.get_landcell(blockCellID, instance);
         }
 
         public void add_to_stablist(ref List<ushort> stabList, ref uint maxSize, ref uint stabNum)

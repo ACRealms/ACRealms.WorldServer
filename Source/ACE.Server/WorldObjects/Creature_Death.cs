@@ -400,7 +400,7 @@ namespace ACE.Server.WorldObjects
                 atHideout = true;
                 var loc = player.HideoutLocation;
                 //Randomize the location of the corpse within a small square
-                loc = new Position(loc.ObjCellID,
+                loc = new Position(loc.Cell,
                     loc.Pos.X + (float)Common.ThreadSafeRandom.Next(-2f, 2f),
                     loc.Pos.Y + (float)Common.ThreadSafeRandom.Next(-2f, 2f),
                     loc.Pos.Z, loc.Rotation.X, loc.Rotation.Y, loc.Rotation.Z, loc.Rotation.W, loc.Instance);
@@ -413,10 +413,10 @@ namespace ACE.Server.WorldObjects
             {
                 // use the physics location for accuracy,
                 // especially while jumping
-                corpse.Location = PhysicsObj.Position.ACEPosition(Location);
+                corpse.Location = PhysicsObj.Position.ACEPosition(Location.Instance);
             }
             corpse.VictimId = Guid.Full;
-            corpse.Name = $"{prefix} of {Name}ra";
+            corpse.Name = $"{prefix} of {Name}";
 
             // set 'killed by' for looting rights
             var killerName = "misadventure";
@@ -631,7 +631,7 @@ namespace ACE.Server.WorldObjects
             return string.Join(", ", spells.Select(i => i.Name));
         }
 
-        public bool IsOnNoDeathXPLandblock => Location != null ? NoDeathXP_Landblocks.Contains(Location.Landblock) : false;
+        public bool IsOnNoDeathXPLandblock => Location != null ? NoDeathXP_Landblocks.Contains(Location.LandblockId.Landblock) : false;
 
         /// <summary>
         /// A list of landblocks the player gains no xp from creature kills

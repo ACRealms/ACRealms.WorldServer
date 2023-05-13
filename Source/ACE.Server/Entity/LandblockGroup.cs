@@ -95,10 +95,10 @@ namespace ACE.Server.Entity
                 if (landblocks.Count == 1)
                     IsDungeon = landblock.IsDungeon;
 
-                if (landblock.X < xMin) xMin = landblock.X;
-                if (landblock.X > xMax) xMax = landblock.X;
-                if (landblock.Y < yMin) yMin = landblock.Y;
-                if (landblock.Y > yMax) yMax = landblock.Y;
+                if (landblock.Id.LandblockX < xMin) xMin = landblock.Id.LandblockX;
+                if (landblock.Id.LandblockX > xMax) xMax = landblock.Id.LandblockX;
+                if (landblock.Id.LandblockY < yMin) yMin = landblock.Id.LandblockY;
+                if (landblock.Id.LandblockY > yMax) yMax = landblock.Id.LandblockY;
 
                 xCenter = xMin + ((xMax - xMin) / 2.0);
                 yCenter = yMin + ((yMax - yMin) / 2.0);
@@ -120,11 +120,11 @@ namespace ACE.Server.Entity
                 if (landblocks.Count == 0)
                     return true;
 
-                uniqueLandblockIdsRemoved.Add(landblock.Id);
+                uniqueLandblockIdsRemoved.Add(landblock.Id.Raw);
 
                 // If this landblock is on the perimieter of the group, recalculate the boundaries (they may end up the same)
-                if (landblock.X == xMin || landblock.X == xMax ||
-                    landblock.Y == yMin || landblock.Y == yMax)
+                if (landblock.Id.LandblockX == xMin || landblock.Id.LandblockX == xMax ||
+                    landblock.Id.LandblockY == yMin || landblock.Id.LandblockY == yMax)
                 {
                     RecalculateBoundaries();
                 }
@@ -155,10 +155,10 @@ namespace ACE.Server.Entity
 
             foreach (var existing in landblocks)
             {
-                if (existing.X < xMin) xMin = existing.X;
-                if (existing.X > xMax) xMax = existing.X;
-                if (existing.Y < yMin) yMin = existing.Y;
-                if (existing.Y > yMax) yMax = existing.Y;
+                if (existing.Id.LandblockX < xMin) xMin = existing.Id.LandblockX;
+                if (existing.Id.LandblockX > xMax) xMax = existing.Id.LandblockX;
+                if (existing.Id.LandblockY < yMin) yMin = existing.Id.LandblockY;
+                if (existing.Id.LandblockY > yMax) yMax = existing.Id.LandblockY;
             }
 
             xCenter = xMin + ((xMax - xMin) / 2.0);
@@ -267,8 +267,8 @@ namespace ACE.Server.Entity
         public int BoundaryDistance(Landblock landblock)
         {
             return (int)Math.Max(
-                Math.Abs(xCenter - landblock.X) - (width + 1) / 2.0,
-                Math.Abs(yCenter - landblock.Y) - (height + 1) / 2.0);
+                Math.Abs(xCenter - landblock.Id.LandblockX) - (width + 1) / 2.0,
+                Math.Abs(yCenter - landblock.Id.LandblockY) - (height + 1) / 2.0);
         }
 
         /// <summary>

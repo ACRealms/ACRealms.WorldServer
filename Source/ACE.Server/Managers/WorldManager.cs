@@ -204,7 +204,7 @@ namespace ACE.Server.Managers
 
             // If the client is missing a location, we start them off in the starter town they chose
             if (session.Player.Location == null)
-            {    
+            {
                 if (session.Player.Instantiation != null)
                     session.Player.Location = new Position(session.Player.Instantiation);
                 else

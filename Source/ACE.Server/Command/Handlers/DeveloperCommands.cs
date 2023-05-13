@@ -98,7 +98,7 @@ namespace ACE.Server.Command.Handlers
             var pos = session.Player.GetPosition(PositionType.Location);
             if (WorldObject.AdjustDungeonCells(pos))
             {
-                pos._pos.Z += 0.005000f;
+                pos.PositionZ += 0.005000f;
                 var posReadable = PostionAsLandblocksGoogleSpreadsheetFormat(pos);
                 AdminCommands.HandleTeleportLOC(session, posReadable.Split(' '));
                 var positionMessage = new GameMessageSystemChat($"Nudge player to {posReadable}", ChatMessageType.Broadcast);
@@ -118,7 +118,7 @@ namespace ACE.Server.Command.Handlers
 
         static string PostionAsLandblocksGoogleSpreadsheetFormat(Position pos)
         {
-            return $"0x{pos.ObjCellID.ToString("X")} {pos.Pos.X} {pos.Pos.Y} {pos.Pos.Z} {pos.Rotation.W} {pos.Rotation.X} {pos.Rotation.Y} {pos.Rotation.Z}";
+            return $"0x{pos.Cell.ToString("X")} {pos.Pos.X} {pos.Pos.Y} {pos.Pos.Z} {pos.Rotation.W} {pos.Rotation.X} {pos.Rotation.Y} {pos.Rotation.Z}";
         }
 
         /// <summary>
@@ -393,6 +393,7 @@ namespace ACE.Server.Command.Handlers
 
             WorldObject loot = WorldObjectFactory.CreateNewWorldObject(trainingWandTarget);
             loot.Location = session.Player.Location.InFrontOf((loot.UseRadius ?? 2) > 2 ? loot.UseRadius.Value : 2);
+            loot.Location.LandblockId = new LandblockId(loot.Location.GetCell());
 
             loot.EnterWorld();
 
@@ -474,9 +475,12 @@ namespace ACE.Server.Command.Handlers
         /// This is a VERY crude test. It should never be used on a live server.
         /// There isn't really much point to this command other than making sure landblocks can load and are semi-efficient.
         /// </summary>
-/*        [CommandHandler("loadalllandblocks", AccessLevel.Developer, CommandHandlerFlag.None, "Loads all Landblocks. This is VERY crude. Do NOT use it on a live server!!! It will likely crash the server.  Landblock resources will be loaded async and will continue to do work even after all landblocks have been loaded.")]
+        [CommandHandler("loadalllandblocks", AccessLevel.Developer, CommandHandlerFlag.None, "Loads all Landblocks. This is VERY crude. Do NOT use it on a live server!!! It will likely crash the server.  Landblock resources will be loaded async and will continue to do work even after all landblocks have been loaded.")]
         public static void HandleLoadAllLandblocks(Session session, params string[] parameters)
         {
+            //Not supported on AC Realms
+            return;
+
             CommandHandlerHelper.WriteOutputInfo(session, "Loading landblocks. This will likely crash the server. Landblock resources will be loaded async and will continue to do work even after all landblocks have been loaded.");
 
             Task.Run(() =>
@@ -487,15 +491,15 @@ namespace ACE.Server.Command.Handlers
 
                     for (int y = 0; y <= 0xFE; y++)
                     {
-                        var blockid = (uint)(x << 24 | y << 16 | 0xFFFF);
-                        LandblockManager.GetLandblockBase(blockid, false, false);
+                        var blockid = new LandblockId((byte)x, (byte)y);
+                        LandblockManager.GetLandblock(blockid, 0, null, false, false);
                     }
                 }
 
                 CommandHandlerHelper.WriteOutputInfo(session, "Loading landblocks completed. Async landblock resources are likely still loading...");
             });
         }
-*/
+
 
         // ==================================
         // World Object Properties
@@ -509,6 +513,7 @@ namespace ACE.Server.Command.Handlers
             if (target != null)
                 session.Network.EnqueueSend(new GameMessageSystemChat($"\n{target.DebugOutputString(target)}", ChatMessageType.System));
         }
+
 
         // ==================================
         // Player Properties
@@ -745,9 +750,7 @@ namespace ACE.Server.Command.Handlers
         public static void HandleDebugGPS(Session session, params string[] parameters)
         {
             var position = session.Player.Location;
-
-            // should this have quaternion in non-AC order?
-            ChatPacket.SendServerMessage(session, $"Position: [Cell: 0x{position.Landblock:X4} | Offset: {position.Pos.X}, {position.Pos.Y}, {position.Pos.Z} | Facing: {position.Rotation.X}, {position.Rotation.Y}, {position.Rotation.Z}, {position.Rotation.W}]", ChatMessageType.Broadcast);
+            ChatPacket.SendServerMessage(session, $"Position: [Cell: 0x{position.LandblockId.Landblock:X4} | Offset: {position.PositionX}, {position.PositionY}, {position.PositionZ} | Facing: {position.RotationX}, {position.RotationY}, {position.RotationZ}, {position.RotationW}]", ChatMessageType.Broadcast);
         }
 
 
@@ -1615,7 +1618,9 @@ namespace ACE.Server.Command.Handlers
 
             var distance = float.Parse(parameters[0]);
 
-            var newPos = new Position(lastSpawnPos);
+            var newPos = new Position();
+            newPos.LandblockId = new LandblockId(lastSpawnPos.LandblockId.Raw);
+            newPos.Pos = lastSpawnPos.Pos;
             newPos.Rotation = session.Player.Location.Rotation;
 
             var dir = Vector3.Normalize(Vector3.Transform(Vector3.UnitY, newPos.Rotation));
@@ -1632,7 +1637,7 @@ namespace ACE.Server.Command.Handlers
 
             var totalDist2d = Vector2.Distance(new Vector2(globLastSpawnPos.X, globLastSpawnPos.Y), new Vector2(globNewPos.X, globNewPos.Y));
 
-            ChatPacket.SendServerMessage(session, $"Teleporting player to {newPos.ObjCellID:X8} @ {newPos.Pos}", ChatMessageType.System);
+            ChatPacket.SendServerMessage(session, $"Teleporting player to {newPos.Cell:X8} @ {newPos.Pos}", ChatMessageType.System);
 
             ChatPacket.SendServerMessage(session, "2D Distance: " + totalDist2d, ChatMessageType.System);
             ChatPacket.SendServerMessage(session, "3D Distance: " + totalDist, ChatMessageType.System);
@@ -1773,7 +1778,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("myloc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0, "Shows the current player location, from the server perspective", "/myloc")]
         public static void HandleMyLoc(Session session, params string[] parameters)
         {
-            session.Network.EnqueueSend(new GameMessageSystemChat($"CurrentLandblock: {session.Player.CurrentLandblock.LongId:X8}", ChatMessageType.Broadcast));
+            session.Network.EnqueueSend(new GameMessageSystemChat($"CurrentLandblock: {session.Player.CurrentLandblock.Id.Landblock:X4}", ChatMessageType.Broadcast));
             session.Network.EnqueueSend(new GameMessageSystemChat($"Location: {session.Player.Location.ToLOCString()}", ChatMessageType.Broadcast));
             session.Network.EnqueueSend(new GameMessageSystemChat($"Physics : {session.Player.PhysicsObj.Position}", ChatMessageType.Broadcast));
         }
@@ -2175,7 +2180,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("dungeonname", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, "Shows the dungeon name for the current landblock")]
         public static void HandleDungeonName(Session session, params string[] parameters)
         {
-            var landblock = session.Player.Location.Landblock;
+            var landblock = session.Player.Location.InstancedLandblock;
 
             using (var ctx = new WorldDbContext())
             {
@@ -2751,14 +2756,18 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("barrier-test", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, "Shows debug information for house barriers")]
         public static void HandleBarrierTest(Session session, params string[] parameters)
         {
-            var cell = session.Player.Location.ObjCellID;
+            // Not supported on AC Realms
+            return;
+
+            /*
+            var cell = session.Player.Location.Cell;
             Console.WriteLine($"CurCell: {cell:X8}");
 
             if (session.Player.CurrentLandblock.IsDungeon)
             {
                 Console.WriteLine($"Dungeon landblock");
 
-                if (!HouseManager.ApartmentBlocks.ContainsKey(session.Player.Location.Landblock))
+                if (!HouseManager.ApartmentBlocks.ContainsKey(session.Player.Location.InstancedLandblock))
                     return;
             }
             else
@@ -2769,6 +2778,7 @@ namespace ACE.Server.Command.Handlers
 
             var barrier = HouseCell.HouseCells.ContainsKey(cell);
             Console.WriteLine($"Barrier: {barrier}");
+            */
         }
 
         [CommandHandler("targetloc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, "Shows the location of the last appraised object")]
@@ -2804,7 +2814,7 @@ namespace ACE.Server.Command.Handlers
                 }
             }
 
-            session.Network.EnqueueSend(new GameMessageSystemChat($"CurrentLandblock: 0x{wo.CurrentLandblock?.LongId:X8}", ChatMessageType.Broadcast));
+            session.Network.EnqueueSend(new GameMessageSystemChat($"CurrentLandblock: 0x{wo.CurrentLandblock?.Id.Landblock:X4}", ChatMessageType.Broadcast));
             session.Network.EnqueueSend(new GameMessageSystemChat($"Location: {wo.Location?.ToLOCString()}", ChatMessageType.Broadcast));
             session.Network.EnqueueSend(new GameMessageSystemChat($"Physics : {wo.PhysicsObj?.Position}", ChatMessageType.Broadcast));
             session.Network.EnqueueSend(new GameMessageSystemChat($"CurCell: 0x{wo.PhysicsObj?.CurCell?.ID:X8}", ChatMessageType.Broadcast));
@@ -3007,7 +3017,7 @@ namespace ACE.Server.Command.Handlers
         {
             var landblock = session.Player.CurrentLandblock;
 
-            var landblockId = landblock.Id | 0xFFFF;
+            var landblockId = landblock.Id.Raw | 0xFFFF;
 
             session.Network.EnqueueSend(new GameMessageSystemChat($"Reloading 0x{landblockId:X8}", ChatMessageType.Broadcast));
 
@@ -3015,14 +3025,14 @@ namespace ACE.Server.Command.Handlers
             landblock.DestroyAllNonPlayerObjects();
 
             // clear landblock cache
-            DatabaseManager.World.ClearCachedInstancesByLandblock(landblock.ShortId);
+            DatabaseManager.World.ClearCachedInstancesByLandblock(landblock.Id.Landblock, 0);
 
             // reload landblock
             var actionChain = new ActionChain();
             actionChain.AddDelayForOneTick();
             actionChain.AddAction(session.Player, () =>
             {
-                landblock.Init(true);
+                landblock.Init(landblock.InnerRealmInfo, true);
             });
             actionChain.EnqueueChain();
         }

@@ -584,7 +584,7 @@ namespace ACE.Server.WorldObjects
                 if (Location != null)
                 {
                     log.Debug($"0x{Guid}:{Name}.LogOut_Inner: Location is not null, Location = {Location.ToLOCString()}");
-                    var validLoadedLandblock = LandblockManager.GetLandblock(Location.LongObjCellID, false);
+                    var validLoadedLandblock = LandblockManager.GetLandblock(Location.LandblockId, Location.Instance, null, false);
                     if (validLoadedLandblock.GetObject(Guid.Full) != null)
                     {
                         log.Debug($"0x{Guid}:{Name}.LogOut_Inner: Player is still on landblock, removing...");
@@ -860,7 +860,7 @@ namespace ACE.Server.WorldObjects
 
             foreach (var creature in PhysicsObj.ObjMaint.GetKnownObjectsValuesAsCreature())
             {
-                if (isDungeon && Location.Landblock != creature.Location.Landblock)
+                if (isDungeon && Location.InstancedLandblock != creature.Location.InstancedLandblock)
                     continue;
 
                 var distSquared = Location.SquaredDistanceTo(creature.Location);

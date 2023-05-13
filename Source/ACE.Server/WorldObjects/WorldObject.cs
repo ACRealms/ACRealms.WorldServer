@@ -188,18 +188,12 @@ namespace ACE.Server.WorldObjects
             if (PhysicsObj.CurCell != null)
                 return false;
 
-            /*if ((Location.LongObjCellID | 0xFFFF) == 0x1D9FFFF)
-            {
-                Console.WriteLine($"{Name}");
-                var debug = true;
-            }*/
-
             AdjustDungeon(Location);
 
             // exclude linkspots from spawning
             if (WeenieClassId == 10762) return true;
 
-            var cell = LScape.get_landcell(Location.LongObjCellID);
+            var cell = LScape.get_landcell(Location.Cell, Location.Instance);
             if (cell == null)
             {
                 PhysicsObj.DestroyObject();
@@ -234,7 +228,7 @@ namespace ACE.Server.WorldObjects
 
         public void SyncLocation()
         {
-            Location.ObjCellID = PhysicsObj.Position.ObjCellID;
+            Location.LandblockId = new LandblockId(PhysicsObj.Position.ObjCellID);
             Location.Pos = PhysicsObj.Position.Frame.Origin;
             Location.Rotation = PhysicsObj.Position.Frame.Orientation;
         }
@@ -751,22 +745,17 @@ namespace ACE.Server.WorldObjects
         {
             if (pos == null) return false;
 
-            /*if ((pos.LongObjCellID | 0xFFFF) == 0x1D9FFFF)
-            {
-                var debug = true;
-            }*/
-
-            var landblock = LScape.get_landblock(pos.LongObjCellID);
+            var landblock = LScape.get_landblock(pos.Cell, pos.Instance);
             if (landblock == null || !landblock.HasDungeon) return false;
 
-            var dungeonID = pos.LongObjCellID >> 16;
+            var dungeonID = pos.Cell >> 16;
 
-            var adjustCell = AdjustCell.Get(dungeonID);
+            var adjustCell = AdjustCell.Get(dungeonID, pos.Instance);
             var cellID = adjustCell.GetCell(pos.Pos);
 
-            if (cellID != null && pos.ObjCellID != cellID.Value)
+            if (cellID != null && pos.Cell != cellID.Value)
             {
-                pos.ObjCellID = cellID.Value;
+                pos.LandblockId = new LandblockId(cellID.Value);
                 return true;
             }
             return false;
@@ -775,17 +764,12 @@ namespace ACE.Server.WorldObjects
         // todo: This should really be an extension method for Position, or a static method within Position, or even AdjustPos
         public static bool AdjustDungeonPos(Position pos)
         {
-            /*if ((pos.LongObjCellID | 0xFFFF) == 0x1D9FFFF)
-            {
-                var debug = true;
-            }*/
-
             if (pos == null) return false;
 
-            var landblock = LScape.get_landblock(pos.LongObjCellID);
+            var landblock = LScape.get_landblock(pos.Cell, pos.Instance);
             if (landblock == null || !landblock.HasDungeon) return false;
 
-            var dungeonID = pos.ObjCellID >> 16;
+            var dungeonID = pos.Cell >> 16;
 
             var adjusted = AdjustPos.Adjust(dungeonID, pos);
             return adjusted;
@@ -971,8 +955,8 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public Quadrant GetRelativeDir(WorldObject target)
         {
-            var sourcePos = new Vector3(Location.Pos.X, Location.Pos.Y, 0);
-            var targetPos = new Vector3(target.Location.Pos.X, target.Location.Pos.Y, 0);
+            var sourcePos = new Vector3(Location.PositionX, Location.PositionY, 0);
+            var targetPos = new Vector3(target.Location.PositionX, target.Location.PositionY, 0);
             var targetDir = new AFrame(target.Location.Pos, target.Location.Rotation).get_vector_heading();
 
             targetDir.Z = 0;

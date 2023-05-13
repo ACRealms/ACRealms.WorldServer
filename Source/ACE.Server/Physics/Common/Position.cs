@@ -52,7 +52,7 @@ namespace ACE.Server.Physics.Common
 
         public Position(ACE.Entity.Position p)
         {
-            ObjCellID = p.ObjCellID;
+            ObjCellID = p.Cell;
             Frame = new AFrame(p.Pos, p.Rotation);
         }
 
@@ -213,16 +213,16 @@ namespace ACE.Server.Physics.Common
             return heading(position) - Frame.get_heading();
         }
 
-        public uint GetCell(uint blockCellID)
+        public uint GetCell(uint blockCellID, uint instance)
         {
             // is originating cell indoor or outdoor?
             if ((blockCellID & 0xFFFF) >= 0x100)
-                return GetIndoorCell(blockCellID);
+                return GetIndoorCell(blockCellID, instance);
             else
-                return GetOutdoorCell(blockCellID);
+                return GetOutdoorCell(blockCellID, instance);
         }
 
-        public uint GetOutdoorCell(uint blockCellID)
+        public uint GetOutdoorCell(uint blockCellID, uint instance)
         {
             var cellX = (uint)(Frame.Origin.X / LandDefs.CellLength);
             var cellY = (uint)(Frame.Origin.Y / LandDefs.CellLength);
@@ -236,11 +236,11 @@ namespace ACE.Server.Physics.Common
             //return cellID;
         }
 
-        public uint GetIndoorCell(uint blockCellID)
+        public uint GetIndoorCell(uint blockCellID, uint instance)
         {
             var dungeonID = blockCellID >> 16;
 
-            var adjustCell = AdjustCell.Get(dungeonID);
+            var adjustCell = AdjustCell.Get(dungeonID, instance);
             if (adjustCell == null)
             {
                 //Console.WriteLine("Position: couldn't find ObjCellID for indoor cell " + blockCellID.ToString("X8"));

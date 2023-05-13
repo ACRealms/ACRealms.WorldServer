@@ -187,29 +187,64 @@ namespace ACE.DatLoader.FileTypes
 
         public ACE.Entity.Position GetAnimationFinalPositionFromStart(ACE.Entity.Position position, float objScale, MotionCommand currentMotionState, MotionStance style, MotionCommand motion)
         {
+            float length = 0; // init our length var...will return as 0 if not found
+
+            ACE.Entity.Position finalPosition = new ACE.Entity.Position();
+
             uint motionHash = ((uint)currentMotionState & 0xFFFFFF) | ((uint)style << 16);
 
-            if (!Links.TryGetValue(motionHash, out var link) || !link.TryGetValue((uint)motion, out var motionData))
-                return position;
-
-            var finalPosition = new ACE.Entity.Position(position);
-
-            // loop through the animations to get our total count
-            foreach (var anim in motionData.Anims)
+            if (Links.ContainsKey(motionHash))
             {
-                var animation = DatManager.PortalDat.ReadFromDat<Animation>(anim.AnimId);
+                Dictionary<uint, MotionData> links = Links[motionHash];
 
-                var highFrame = anim.HighFrame != -1 ? anim.HighFrame : (int)animation.NumFrames;
-
-                for (var i = anim.LowFrame; i < highFrame; i++)
+                if (links.ContainsKey((uint)motion))
                 {
-                    var posFrame = animation.PosFrames[i];
+                    // loop through all that animations to get our total count
+                    for (int i = 0; i < links[(uint)motion].Anims.Count; i++)
+                    {
+                        AnimData anim = links[(uint)motion].Anims[i];
 
-                    finalPosition.Pos += Vector3.Transform(posFrame.Origin, finalPosition.Rotation) * objScale;
+                        uint numFrames;
 
-                    finalPosition.Rotation *= posFrame.Orientation;
+                        // check if the animation is set to play the whole thing, in which case we need to get the numbers of frames in the raw animation
+                        if ((anim.LowFrame == 0) && (anim.HighFrame == -1))
+                        {
+                            var animation = DatManager.PortalDat.ReadFromDat<Animation>(anim.AnimId);
+                            numFrames = animation.NumFrames;
+
+                            if (animation.PosFrames.Count > 0)
+                            {
+                                finalPosition = position;
+                                var origin = new Vector3(position.PositionX, position.PositionY, position.PositionZ);
+                                var orientation = new Quaternion(position.RotationX, position.RotationY, position.RotationZ, position.RotationW);
+                                foreach (var posFrame in animation.PosFrames)
+                                {
+                                    origin += Vector3.Transform(posFrame.Origin, orientation) * objScale;
+
+                                    orientation *= posFrame.Orientation;
+                                    orientation = Quaternion.Normalize(orientation);
+                                }
+
+                                finalPosition.PositionX = origin.X;
+                                finalPosition.PositionY = origin.Y;
+                                finalPosition.PositionZ = origin.Z;
+
+                                finalPosition.RotationW = orientation.W;
+                                finalPosition.RotationX = orientation.X;
+                                finalPosition.RotationY = orientation.Y;
+                                finalPosition.RotationZ = orientation.Z;
+                            }
+                            else
+                                return position;
+                        }
+                        else
+                            numFrames = (uint)(anim.HighFrame - anim.LowFrame);
+
+                        length += numFrames / Math.Abs(anim.Framerate); // Framerates can be negative, which tells the client to play in reverse
+                    }
                 }
             }
+
             return finalPosition;
         }
     }

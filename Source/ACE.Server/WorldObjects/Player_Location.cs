@@ -495,11 +495,11 @@ namespace ACE.Server.WorldObjects
 
         private static List<Position> pkArenaLocs = new List<Position>()
         {
-            new Position(0x00660117, new Vector3(30, -50, 0.005f), new Quaternion(0, 0, 0, 1),false,0),
-            new Position(0x00660106, new Vector3(10, 0, 0.005f), new Quaternion(0, 0, -0.947071f, 0.321023f),false,0),
-            new Position(0x00660103, new Vector3(0, -30, 0.005f), new Quaternion(0, 0, -0.699713f, 0.714424f),false,0),
-            new Position(0x0066011E, new Vector3(50, 0, 0.005f), new Quaternion(0, 0, -0.961021f, -0.276474f),false,0),
-            new Position(0x00660127, new Vector3(60, -30, 0.005f), new Quaternion(0, 0, 0.681639f, 0.731689f),false,0),
+            new Position(0x00660117, new Vector3(30, -50, 0.005f), new Quaternion(0, 0, 0, 1), 0),
+            new Position(0x00660106, new Vector3(10, 0, 0.005f), new Quaternion(0, 0, -0.947071f, 0.321023f), 0),
+            new Position(0x00660103, new Vector3(0, -30, 0.005f), new Quaternion(0, 0, -0.699713f, 0.714424f), 0),
+            new Position(0x0066011E, new Vector3(50, 0, 0.005f), new Quaternion(0, 0, -0.961021f, -0.276474f), 0),
+            new Position(0x00660127, new Vector3(60, -30, 0.005f), new Quaternion(0, 0, 0.681639f, 0.731689f), 0),
         };
 
         public void HandleActionTeleToPkArena()
@@ -573,11 +573,11 @@ namespace ACE.Server.WorldObjects
 
         private static List<Position> pklArenaLocs = new List<Position>()
         {
-            new Position(0x00670117, new Vector3(30, -50, 0.005f), new Quaternion(0, 0, 0, 1),false,0),
-            new Position(0x00670106, new Vector3(10, 0, 0.005f), new Quaternion(0, 0, -0.947071f, 0.321023f),false,0),
-            new Position(0x00670103, new Vector3(0, -30, 0.005f), new Quaternion(0, 0, -0.699713f, 0.714424f),false,0),
-            new Position(0x0067011E, new Vector3(50, 0, 0.005f), new Quaternion(0, 0, -0.961021f, -0.276474f),false,0),
-            new Position(0x00670127, new Vector3(60, -30, 0.005f), new Quaternion(0, 0, 0.681639f, 0.731689f),false,0),
+            new Position(0x00670117, new Vector3(30, -50, 0.005f), new Quaternion(0, 0, 0, 1), 0),
+            new Position(0x00670106, new Vector3(10, 0, 0.005f), new Quaternion(0, 0, -0.947071f, 0.321023f), 0),
+            new Position(0x00670103, new Vector3(0, -30, 0.005f), new Quaternion(0, 0, -0.699713f, 0.714424f), 0),
+            new Position(0x0067011E, new Vector3(50, 0, 0.005f), new Quaternion(0, 0, -0.961021f, -0.276474f), 0),
+            new Position(0x00670127, new Vector3(60, -30, 0.005f), new Quaternion(0, 0, 0.681639f, 0.731689f), 0),
         };
 
         public void HandleActionTeleToPklArena()
@@ -701,7 +701,8 @@ namespace ACE.Server.WorldObjects
             }
 
             var newPosition = new Position(_newPosition);
-            newPosition._pos.Z += 0.005f * (ObjScale ?? 1.0f);
+            //newPosition.PositionZ += 0.005f;
+            newPosition.PositionZ += 0.005f * (ObjScale ?? 1.0f);
 
             if (_newPosition.Instance != Location.Instance)
             {
@@ -756,6 +757,7 @@ namespace ACE.Server.WorldObjects
             UpdatePlayerPosition(new Position(newPosition), true);
         }
 
+        // Assumes instance is loaded! Do not call directly
         private bool OnTransitionToNewRealm(ushort prevRealmId, ushort newRealmId, Position newLocation)
         {
             var prevrealm = RealmManager.GetRealm(prevRealmId);
@@ -775,7 +777,7 @@ namespace ACE.Server.WorldObjects
             var pk = false;
             if (newLocation.IsEphemeralRealm)
             {
-                var lb = newLocation.TryGetLandblock();
+                var lb = LandblockManager.GetLandblockUnsafe(newLocation.LandblockId, newLocation.Instance);
                 if (lb.RealmHelpers.IsDuel)
                     pk = true;
             }
@@ -881,17 +883,17 @@ namespace ACE.Server.WorldObjects
                             return false;
                         if (!homerealm.StandardRules.GetProperty(RealmPropertyBool.HideoutEnabled))
                             return false;
-                        return new ushort[] { 0x7308, 0x7309 }.Contains(newPosition.Landblock); //Ulgrims only, todo: add other landblocks
+                        return new ushort[] { 0x7308, 0x7309 }.Contains((ushort)newPosition.LandblockShort); //Ulgrims only, todo: add other landblocks
                     default:
                         return false;
                 }
             }
-            if (!destrealm.IsWhitelistedLandblock(newPosition.Landblock))
+            if (!destrealm.IsWhitelistedLandblock((ushort)newPosition.LandblockShort))
                 return false;
 
             if (isTemporaryRuleset)
             {
-                var lb = newPosition.TryGetLandblock();
+                var lb = LandblockManager.GetLandblockUnsafe(newPosition.LandblockId, newPosition.Instance);
                 if (lb?.InnerRealmInfo == null)
                     return false;
                 if (lb.InnerRealmInfo.Owner == this)

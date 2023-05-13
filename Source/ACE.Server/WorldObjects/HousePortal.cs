@@ -36,6 +36,9 @@ namespace ACE.Server.WorldObjects
 
         public override void SetLinkProperties(WorldObject wo)
         {
+            return;
+            
+            /*
             // get properties from parent?
             wo.HouseId = House.HouseId;
             wo.HouseOwner = House.HouseOwner;
@@ -51,16 +54,17 @@ namespace ACE.Server.WorldObjects
                 }
                 var i = housePortals[0];
 
-                if (i.ObjCellId == Location.ObjCellID && housePortals.Count > 1)
+                if (i.ObjCellId == Location.Cell && housePortals.Count > 1)
                     i = housePortals[1];
 
-                var destination = new Position(i.ObjCellId, new Vector3(i.OriginX, i.OriginY, i.OriginZ), new Quaternion(i.AnglesX, i.AnglesY, i.AnglesZ, i.AnglesW), false, 0);
+                var destination = new Position(i.ObjCellId, new Vector3(i.OriginX, i.OriginY, i.OriginZ), new Quaternion(i.AnglesX, i.AnglesY, i.AnglesZ, i.AnglesW));
 
                 wo.SetPosition(PositionType.Destination, destination);
 
                 // set portal destination directly?
                 SetPosition(PositionType.Destination, destination);
             }
+            */
         }
 
         public override ActivationResult CheckUseRequirements(WorldObject activator)
@@ -77,7 +81,7 @@ namespace ACE.Server.WorldObjects
             if (!(activator is Player player))
                 return new ActivationResult(false);
 
-            if (player.CurrentLandblock.IsDungeon && Destination.Landblock != player.Location.Landblock)
+            if (player.CurrentLandblock.IsDungeon && Destination.LandblockId != player.CurrentLandblock.Id)
                 return new ActivationResult(true);   // allow escape to overworld always
 
             if (player.IgnorePortalRestrictions)
@@ -106,7 +110,7 @@ namespace ACE.Server.WorldObjects
         {
             // if house portal in dungeon,
             // set destination to outdoor house slumlord
-            if (CurrentLandblock != null && CurrentLandblock.IsDungeon && Destination.Landblock == Location.Landblock)
+            if (CurrentLandblock != null && CurrentLandblock.IsDungeon && Destination.LandblockId == CurrentLandblock.Id)
                 SetPosition(PositionType.Destination, new Position(House.RootHouse.SlumLord.Location));
 
             base.ActOnUse(worldObject);

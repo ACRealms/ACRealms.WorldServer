@@ -47,7 +47,6 @@ namespace ACE.Server.Physics
         public PhysicsObj Parent;
         public ChildList Children;
         public Position Position;
-
         private ObjCell _curCell;
         public ObjCell CurCell
         {
@@ -1413,8 +1412,7 @@ namespace ACE.Server.Physics
                     LandDefs.AdjustToOutside(newPos);
 
                     // ensure walkable slope
-                    var icellid = ((ulong)transition.Instance << 32) | newPos.ObjCellID;
-                    var landcell = (LandCell)LScape.get_landcell(icellid);
+                    var landcell = (LandCell)LScape.get_landcell(newPos.ObjCellID, transition.Instance);
 
                     Polygon walkable = null;
                     var terrainPoly = landcell.find_terrain_poly(newPos.Frame.Origin, ref walkable);
@@ -1425,11 +1423,11 @@ namespace ACE.Server.Physics
                     // compare: rabbits occasionally spawning in buildings in yaraq,
                     // vs. lich tower @ 3D31FFFF
 
-                    var sortCell = LScape.get_landcell(icellid) as SortCell;
+                    var sortCell = LScape.get_landcell(newPos.ObjCellID, transition.Instance) as SortCell;
                     if (sortCell == null || !sortCell.has_building())
                     {
                         // set to ground pos
-                        var landblock = LScape.get_landblock(icellid);
+                        var landblock = LScape.get_landblock(newPos.ObjCellID, transition.Instance);
                         var groundZ = landblock.GetZ(newPos.Frame.Origin) + 0.05f;
 
                         if (Math.Abs(newPos.Frame.Origin.Z - groundZ) > ScatterThreshold_Z)
@@ -1455,7 +1453,7 @@ namespace ACE.Server.Physics
                 }
                 if (indoors)
                 {
-                    var landblock = LScape.get_landblock(newPos.ObjCellID);
+                    var landblock = LScape.get_landblock(newPos.ObjCellID, transition.Instance);
                     var envcells = landblock.get_envcells();
                     var found = false;
                     foreach (var envCell in envcells)
@@ -3880,7 +3878,7 @@ namespace ACE.Server.Physics
         /// Sets the requested position to the AutonomousPosition
         /// received from the client
         /// </summary>
-        public void set_request_pos(Vector3 pos, Quaternion rotation, uint instance, ObjCell cell, uint blockCellID)
+        public void set_request_pos(Vector3 pos, Quaternion rotation, ObjCell cell, uint blockCellID, uint instance)
         {
             RequestPos.Frame.Origin = pos;
             RequestPos.Frame.Orientation = rotation;
@@ -3895,7 +3893,7 @@ namespace ACE.Server.Physics
             }
 
             if (cell == null)
-                RequestPos.ObjCellID = RequestPos.GetCell(CurCell.ID);
+                RequestPos.ObjCellID = RequestPos.GetCell(CurCell.ID, instance);
             else
                 RequestPos.ObjCellID = cell.ID;
         }
@@ -4244,7 +4242,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// This is for legacy movement system
         /// </summary>
-        public bool update_object_server(bool forcePos, uint instance)
+        public bool update_object_server(uint instance, bool forcePos = true)
         {
             var deltaTime = PhysicsTimer.CurrentTime - UpdateTime;
 
@@ -4254,7 +4252,7 @@ namespace ACE.Server.Physics
                 success = UpdateObjectInternalServer(deltaTime, instance);
 
             if (forcePos && success)
-                set_current_pos(RequestPos, RequestInstance);
+                set_current_pos(RequestPos, instance);
 
             // temp for players
             if ((TransientState & TransientStateFlags.Contact) != 0)
@@ -4266,8 +4264,8 @@ namespace ACE.Server.Physics
 
                 var setPosition = new SetPosition();
                 setPosition.Pos = RequestPos;
-                setPosition.Instance = RequestInstance;
                 setPosition.Flags = SetPositionFlags.SendPositionEvent | SetPositionFlags.Slide | SetPositionFlags.Placement | SetPositionFlags.Teleport;
+                setPosition.Instance = RequestInstance;
 
                 SetPosition(setPosition);
 
@@ -4287,7 +4285,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// This is for full / updated movement system
         /// </summary>
-        public bool update_object_server_new(bool forcePos, uint instance) //forcePos = true
+        public bool update_object_server_new(uint instance, bool forcePos = true)
         {
             if (Parent != null || CurCell == null || State.HasFlag(PhysicsState.Frozen))
             {

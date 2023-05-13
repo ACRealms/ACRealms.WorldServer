@@ -10,6 +10,7 @@ using ACE.Server.Physics.Util;
 
 namespace ACE.Server.Physics.Common
 {
+    //REALMS TODO: Fix caching used here 
     public static class LScape
     {
         public static int MidRadius = 5;
@@ -20,7 +21,7 @@ namespace ACE.Server.Physics.Common
         /// This is not used if PhysicsEngine.Instance.Server is true
         /// </summary>
         public static ConcurrentDictionary<ulong, Landblock> Landblocks = new ConcurrentDictionary<ulong, Landblock>();
-        public static Dictionary<uint, Landblock> BlockDrawList = new Dictionary<uint, Landblock>();
+        //public static Dictionary<uint, Landblock> BlockDrawList = new Dictionary<uint, Landblock>();
 
         public static uint LoadedCellID;
         public static uint ViewerCellID;
@@ -47,29 +48,20 @@ namespace ACE.Server.Physics.Common
 
         public static int LandblocksCount => Landblocks.Count;
 
-        public static Landblock get_landblock(uint blockCellID, uint instance)
-        {
-            var iBlockCell = BlockCell.GetLongCell(blockCellID, instance);
-
-            return get_landblock(iBlockCell);
-        }
-
         /// <summary>
         /// Loads the backing store landblock structure<para />
         /// This function is thread safe
         /// </summary>
-        /// <param name="iBlockCellID">Any instance + landblock + cell ID within the landblock</param>
-        public static Landblock get_landblock(ulong iBlockCellID)
+        /// <param name="blockCellID">Any landblock + cell ID within the landblock</param>
+        public static Landblock get_landblock(uint blockCellID, uint instance)
         {
-            /*if ((iBlockCellID | 0xFFFF) == 0x1D9FFFF)
-            {
-                Console.WriteLine(System.Environment.StackTrace);
-                var debug = true;
-            }*/
+            var instancedLandblockID = LandblockKey(blockCellID, instance);
+            var landblockID = blockCellID | 0xFFFF;
 
             if (PhysicsEngine.Instance.Server)
             {
-                var lbmLandblock = LandblockManager.GetLandblock(iBlockCellID, false, false);
+                var lbid = new LandblockId(landblockID);
+                var lbmLandblock = LandblockManager.GetLandblock(lbid, instance, null, false, false);
 
                 return lbmLandblock.PhysicsLandblock;
             }
@@ -92,80 +84,63 @@ namespace ACE.Server.Physics.Common
 
             return Landblocks[yDiff + xDiff * MidWidth];*/
 
-            var iLandblockID = iBlockCellID | 0xFFFF;
-
             // check if landblock is already cached
-            if (Landblocks.TryGetValue(iLandblockID, out var landblock))
+            if (Landblocks.TryGetValue(instancedLandblockID, out var landblock))
                 return landblock;
 
             lock (landblockMutex)
             {
                 // check if landblock is already cached, this time under the lock.
-                if (Landblocks.TryGetValue(iLandblockID, out landblock))
+                if (Landblocks.TryGetValue(instancedLandblockID, out landblock))
                     return landblock;
 
                 // if not, load into cache
-                var instance = BlockCell.GetInstance(iLandblockID);
-
-                landblock = new Landblock(DBObj.GetCellLandblock((uint)iLandblockID), instance);
-                if (Landblocks.TryAdd(iLandblockID, landblock))
+                landblock = new Landblock(DBObj.GetCellLandblock(landblockID), instance);
+                if (Landblocks.TryAdd(landblockID, landblock))
                     landblock.PostInit();
                 else
-                    Landblocks.TryGetValue(iLandblockID, out landblock);
+                    Landblocks.TryGetValue(landblockID, out landblock);
 
                 return landblock;
             }
         }
 
-        public static bool unload_landblock(ulong iLandblockID)
+        public static bool unload_landblock(uint landblockID)
         {
             if (PhysicsEngine.Instance.Server)
             {
                 // todo: Instead of ACE.Server.Entity.Landblock.Unload() calling this function, it should be calling PhysicsLandblock.Unload()
                 // todo: which would then call AdjustCell.AdjustCells.Remove()
 
-                AdjustCell.AdjustCells.Remove(iLandblockID >> 16);
+                AdjustCell.AdjustCells.Remove(landblockID >> 16);
                 return true;
             }
 
-            var result = Landblocks.TryRemove(iLandblockID, out _);
+            var result = Landblocks.TryRemove(landblockID, out _);
             // todo: Like mentioned above, the following function should be moved to ACE.Server.Physics.Common.Landblock.Unload()
-            AdjustCell.AdjustCells.Remove(iLandblockID >> 16);
+            AdjustCell.AdjustCells.Remove(landblockID >> 16);
             return result;
         }
 
-        public static ObjCell get_landcell(uint blockCellID, uint instance)
-        {
-            var iBlockCell = BlockCell.GetLongCell(blockCellID, instance);
-
-            return get_landcell(iBlockCell);
-        }
-
-        /// <summary>s
+        /// <summary>
         /// Gets the landcell from a landblock. If the cell is an indoor cell and hasn't been loaded, it will be loaded.<para />
         /// This function is thread safe
         /// </summary>
-        public static ObjCell get_landcell(ulong iBlockCellID)
+        public static ObjCell get_landcell(uint blockCellID, uint instance)
         {
-            /*if ((iBlockCellID | 0xFFFF) == 0x1D9FFFF)
-            {
-                Console.WriteLine(System.Environment.StackTrace);
-                var debug = true;
-            }*/
-
             //Console.WriteLine($"get_landcell({blockCellID:X8}");
 
-            var landblock = get_landblock(iBlockCellID);
+            var landblock = get_landblock(blockCellID, instance);
             if (landblock == null)
                 return null;
 
-            var cellID = iBlockCellID & 0xFFFF;
+            var cellID = blockCellID & 0xFFFF;
             ObjCell cell = null;
 
             // outdoor cells
             if (cellID < 0x100)
             {
-                var lcoord = LandDefs.gid_to_lcoord((uint)iBlockCellID, false);
+                var lcoord = LandDefs.gid_to_lcoord(blockCellID, false);
                 if (lcoord == null) return null;
                 var landCellIdx = ((int)lcoord.Value.Y % 8) + ((int)lcoord.Value.X % 8) * landblock.SideCellCount;
                 landblock.LandCells.TryGetValue(landCellIdx, out cell);
@@ -181,7 +156,7 @@ namespace ACE.Server.Physics.Common
                     if (landblock.LandCells.TryGetValue((int)cellID, out cell))
                         return cell;
 
-                    cell = DBObj.GetEnvCell((uint)iBlockCellID);
+                    cell = DBObj.GetEnvCell(blockCellID);
                     cell.CurLandblock = landblock;
 
                     landblock.LandCells.TryAdd((int)cellID, cell);
@@ -190,6 +165,12 @@ namespace ACE.Server.Physics.Common
                 }
             }
             return cell;
+        }
+
+
+        private static ulong LandblockKey(uint blockCellID, uint instance)
+        {
+            return ((ulong)instance << 32) | (blockCellID | 0xFFFF);
         }
     }
 }

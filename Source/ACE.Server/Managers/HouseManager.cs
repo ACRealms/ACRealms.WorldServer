@@ -304,7 +304,7 @@ namespace ACE.Server.Managers
             if (coords == null)
             {
                 // apartment slumlord?
-                if (ApartmentBlocks.TryGetValue(position.Landblock, out var apartmentBlock))
+                if (ApartmentBlocks.TryGetValue(position.LandblockShort, out var apartmentBlock))
                     coords = $"{apartmentBlock} - ";
                 else
                     log.Error($"HouseManager.GetCoords({position}) - couldn't find apartment block");
@@ -689,9 +689,14 @@ namespace ACE.Server.Managers
         /// <param name="callback">called when the slumlord inventory is fully loaded</param>
         public static void GetHouse(uint houseGuid, Action<House> callback)
         {
-            var landblock = (houseGuid << 4) | 0xFFFF;
+            // Not supported yet on AC Realms
+            return;
 
-            var isLoaded = LandblockManager.IsLoaded(landblock);
+            /*
+            var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
+
+            var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
+            var isLoaded = LandblockManager.IsLoaded(landblockId);
 
             if (!isLoaded)
             {
@@ -705,7 +710,7 @@ namespace ACE.Server.Managers
             }
 
             // landblock is loaded, return a reference to the current House object
-            var loaded = LandblockManager.GetLandblockBase(landblock, false);
+            var loaded = LandblockManager.GetLandblock(landblockId, false);
             var house = loaded.GetObject(new ObjectGuid(houseGuid)) as House;
 
             if (house != null && house.SlumLord != null)
@@ -723,6 +728,7 @@ namespace ACE.Server.Managers
             }
             else
                 log.Error($"HouseManager.GetHouse({houseGuid:X8}): couldn't find house on loaded landblock");
+            */
         }
 
         /// <summary>

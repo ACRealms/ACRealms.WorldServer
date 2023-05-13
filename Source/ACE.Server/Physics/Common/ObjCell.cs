@@ -230,7 +230,6 @@ namespace ACE.Server.Physics.Common
                return EnvCell.get_visible(cellID);
             else
                 return LandCell.Get(cellID);*/
-
             return LScape.get_landcell(cellID, instance);
         }
 

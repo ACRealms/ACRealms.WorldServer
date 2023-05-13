@@ -1225,7 +1225,7 @@ namespace ACE.Server.WorldObjects
                         }
 
                         if (summonLoc != null)
-                            summonLoc.ObjCellID = summonLoc.GetCell();
+                            summonLoc.LandblockId = new LandblockId(summonLoc.GetCell());
                         if (SummonPortal(portalId, summonLoc, spell.PortalLifetime, player ?? targetPlayer))
                             EnqueueBroadcast(new GameMessageScript(Guid, spell.CasterEffect, spell.Formula.Scale));
                         else if (player != null)
@@ -1285,25 +1285,30 @@ namespace ACE.Server.WorldObjects
             bool doEphemeralInstance = false;
             if (summonTargetRealms.Count > 0)
                 doEphemeralInstance = true;
-            if (summoner.RealmRuleset.GetProperty(RealmPropertyBool.IsDuelingRealm))
-                doEphemeralInstance = true;
 
-            if (doEphemeralInstance)
+            if (summoner != null)
             {
                 if (summonTargetRealms.Any(x => x == null))
-                { 
+                {
                     log.Error($"SummonTargetRealm for guid {Guid} has an invalid realm ID.");
                     summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to summon: Realm not found.", ChatMessageType.Magic));
                     return false;
                 }
-                if (summonTargetRealms.Any(x => x.Realm.Type != RealmType.Ruleset))
+
+                if (summoner.RealmRuleset.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                    doEphemeralInstance = true;
+
+                if (doEphemeralInstance)
                 {
-                    log.Error($"SummonTargetRealm for guid {Guid} has invalid realm ID {summonTargetRealms.First(x => x.Realm.Type != RealmType.Ruleset).Realm.Id}. Realm must be of type 'Ruleset'");
-                    summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to summon: Invalid realm type.", ChatMessageType.Magic));
-                    return false;
+                    if (summonTargetRealms.Any(x => x.Realm.Type != RealmType.Ruleset))
+                    {
+                        log.Error($"SummonTargetRealm for guid {Guid} has invalid realm ID {summonTargetRealms.First(x => x.Realm.Type != RealmType.Ruleset).Realm.Id}. Realm must be of type 'Ruleset'");
+                        summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"Unable to summon: Invalid realm type.", ChatMessageType.Magic));
+                        return false;
+                    }
+                    var landblock = RealmManager.GetNewEphemeralLandblock(portal.Destination.LandblockId, portal.Destination.Instance, summoner, summonTargetRealms.Select(x => x.Realm).ToList());
+                    targetPosition.Instance = landblock.Instance;
                 }
-                var landblock = RealmManager.GetNewEphemeralLandblock((uint)(portal.Destination.LongLandblockID & 0xFFFFFFFF), summoner, summonTargetRealms.Select(x => x.Realm).ToList());
-                targetPosition.Instance = landblock.Instance;
             }
 
             var gateway = WorldObjectFactory.CreateNewWorldObject("portalgateway") as Portal;
@@ -1522,7 +1527,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public Vector3 CalculateProjectileVelocity(Spell spell, WorldObject target, ProjectileSpellType spellType, Vector3 origin)
         {
-            var casterLoc = PhysicsObj.Position.ACEPosition(Location);
+            var casterLoc = PhysicsObj.Position.ACEPosition(Location.Instance);
 
             var speed = GetProjectileSpeed(spell);
 
@@ -1535,11 +1540,11 @@ namespace ACE.Server.WorldObjects
                 return Vector3.Transform(Vector3.UnitY, casterLoc.Rotation) * speed;
             }
 
-            var targetLoc = target.PhysicsObj.Position.ACEPosition(target.Location);
+            var targetLoc = target.PhysicsObj.Position.ACEPosition(Location.Instance);
 
             var strikeSpell = spellType == ProjectileSpellType.Strike;
 
-            var crossLandblock = !strikeSpell && casterLoc.Landblock != targetLoc.Landblock;
+            var crossLandblock = !strikeSpell && casterLoc.InstancedLandblock != targetLoc.InstancedLandblock;
 
             var qDir = PhysicsObj.Position.GetOffset(target.PhysicsObj.Position);
             var rotate = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.Atan2(-qDir.X, qDir.Y));
@@ -1577,8 +1582,8 @@ namespace ACE.Server.WorldObjects
 
             var spellProjectiles = new List<SpellProjectile>();
 
-            var casterLoc = PhysicsObj.Position.ACEPosition(Location);
-            var targetLoc = target?.PhysicsObj.Position.ACEPosition(target.Location);
+            var casterLoc = PhysicsObj.Position.ACEPosition(Location.Instance);
+            var targetLoc = target?.PhysicsObj.Position.ACEPosition(target.Location.Instance);
 
             for (var i = 0; i < origins.Count; i++)
             {

@@ -134,7 +134,7 @@ namespace ACE.Server.WorldObjects
         {
             var results = new List<WorldObject>();
 
-            foreach(var wo in worldObjects)
+            foreach (var wo in worldObjects)
             {
                 var soldTime = wo.GetProperty(PropertyFloat.SoldTimestamp);
                 if (!soldTime.HasValue)
@@ -452,7 +452,7 @@ namespace ACE.Server.WorldObjects
 
                     playerOutOfInventorySlots = playerFreeInventorySlots < 0;
                 }
-                               
+
                 playerExceedsAvailableBurden = playerAvailableBurden < 0;
 
                 if (playerOutOfInventorySlots || playerOutOfContainerSlots || playerExceedsAvailableBurden)

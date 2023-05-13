@@ -96,7 +96,9 @@ namespace ACE.Server.WorldObjects
 
             proj.ProjectileLauncher = weapon;
 
-            proj.Location = new Position(Location.ObjCellID, origin, orientation, false, Location.Instance);
+            proj.Location = new Position(Location);
+            proj.Location.Pos = origin;
+            proj.Location.Rotation = orientation;
 
             SetProjectilePhysicsState(proj, target, velocity);
 
@@ -222,7 +224,7 @@ namespace ACE.Server.WorldObjects
 
         public Vector3 GetAimVelocity(WorldObject target, float projectileSpeed)
         {
-            var crossLandblock = Location.Landblock != target.Location.Landblock;
+            var crossLandblock = Location.InstancedLandblock != target.Location.InstancedLandblock;
 
             // eye level -> target point
             var origin = crossLandblock ? Location.ToGlobal(false) : Location.Pos;
@@ -240,7 +242,7 @@ namespace ACE.Server.WorldObjects
 
         public Vector3 CalculateProjectileVelocity(Vector3 localOrigin, WorldObject target, float projectileSpeed, out Vector3 origin, out Quaternion rotation)
         {
-            var crossLandblock = Location.Landblock != target.Location.Landblock;
+            var crossLandblock = Location.InstancedLandblock != target.Location.InstancedLandblock;
 
             var startPos = crossLandblock ? Location.ToGlobal(false) : Location.Pos;
             var endPos = crossLandblock ? target.Location.ToGlobal(false) : target.Location.Pos;
