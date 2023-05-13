@@ -4252,7 +4252,7 @@ namespace ACE.Server.Physics
                 success = UpdateObjectInternalServer(deltaTime, instance);
 
             if (forcePos && success)
-                set_current_pos(RequestPos, instance);
+                set_current_pos(RequestPos, RequestInstance);
 
             // temp for players
             if ((TransientState & TransientStateFlags.Contact) != 0)
