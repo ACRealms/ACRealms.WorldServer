@@ -680,7 +680,6 @@ namespace ACE.Server.Physics.Common
             var cellID = startCell;
             for (var i = 0; i < Info.NumCells; i++)
             {
-                // Realms TODO: Fix instance awareness here
                 var envCell = (EnvCell)LScape.get_landcell(cellID++, 0);
                 if (envCell != null)
                     envcells.Add(envCell);

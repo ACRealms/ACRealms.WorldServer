@@ -120,8 +120,7 @@ namespace ACE.Server.Physics.Common
             {
                 var blockCellID = ID & 0xFFFF0000 | visibleCellID;
                 if (VisibleCells.ContainsKey(blockCellID)) continue;
-                //REALMS TODO: Make instance ID available here without breaking the performance. Might be source of ODD bugs otherwise
-                var cell = (EnvCell)LScape.get_landcell(blockCellID, 0);
+                var cell = (EnvCell)LScape.get_landcell(blockCellID, CurLandblock.Instance);
                 VisibleCells.Add(visibleCellID, cell);
             }
         }
