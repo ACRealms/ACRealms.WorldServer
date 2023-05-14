@@ -1,6 +1,6 @@
 using ACE.Database.Models.World;
-using ACE.Entity.Enum;
 using ACE.Server.Factories.Entity;
+using ACE.Server.Factories.Enum;
 
 using WeenieClassName = ACE.Server.Factories.Enum.WeenieClassName;
 
@@ -13,7 +13,7 @@ namespace ACE.Server.Factories.Tables.Wcids
         // shoes: 20%
         // hat:   14%
         // gloves: 8%
-        private static readonly ChanceTable<WeenieClassName> ClothingWcids_Aluvian = new ChanceTable<WeenieClassName>()
+        private static ChanceTable<WeenieClassName> ClothingWcids_Aluvian = new ChanceTable<WeenieClassName>()
         {
             ( WeenieClassName.shirtbaggy,   0.06f ),
             ( WeenieClassName.tunicbaggy,   0.06f ),
@@ -35,7 +35,7 @@ namespace ACE.Server.Factories.Tables.Wcids
         // hat: 20%
         // shoes: 17%
         // gloves: 9%
-        private static readonly ChanceTable<WeenieClassName> ClothingWcids_Gharundim = new ChanceTable<WeenieClassName>()
+        private static ChanceTable<WeenieClassName> ClothingWcids_Gharundim = new ChanceTable<WeenieClassName>()
         {
             ( WeenieClassName.breechesbaggy, 0.07f ),
             ( WeenieClassName.pantsbaggy,    0.07f ),
@@ -60,7 +60,7 @@ namespace ACE.Server.Factories.Tables.Wcids
         // shoes: 17%
         // hat: 16%
         // gloves: 9%
-        private static readonly ChanceTable<WeenieClassName> ClothingWcids_Sho = new ChanceTable<WeenieClassName>()
+        private static ChanceTable<WeenieClassName> ClothingWcids_Sho = new ChanceTable<WeenieClassName>()
         {
             ( WeenieClassName.shirtbaggy,    0.06f ),
             ( WeenieClassName.capcloth,      0.08f ),
@@ -84,7 +84,7 @@ namespace ACE.Server.Factories.Tables.Wcids
         // hat: 18%
         // shoes: 15%
         // gloves: 10%
-        private static readonly ChanceTable<WeenieClassName> ClothingWcids_Viamontian = new ChanceTable<WeenieClassName>()
+        private static ChanceTable<WeenieClassName> ClothingWcids_Viamontian = new ChanceTable<WeenieClassName>()
         {
             ( WeenieClassName.shirtviamontfancy,   0.11f ),
             ( WeenieClassName.shirtviamontpoet,    0.11f ),
@@ -92,28 +92,31 @@ namespace ACE.Server.Factories.Tables.Wcids
             ( WeenieClassName.leggingsviamont,     0.24f ),
             ( WeenieClassName.hatberet,            0.06f ),
             ( WeenieClassName.hatbandana,          0.06f ),
-            ( WeenieClassName.ace44975_hood,       0.06f ),     // ?
-            ( WeenieClassName.shoesviamontloafers, 0.08f ),
-            ( WeenieClassName.shoes,               0.08f ),     // common to all?
+            ( WeenieClassName.ace44975_hood,       0.06f ),     // introduced in 11-2011 - master of design, and has base al 100,
+                                                                // so maybe not in viamontian clothing table?
+            ( WeenieClassName.shoesviamontloafers, 0.075f ),
+            ( WeenieClassName.bootsviamont,        0.075f ),    // in clothing table, instead of leather armor table?
+                                                                // other boots are in leather armor table, but they have much higher al (90 vs. 20)
+                                                                // this would follow the trend of al 20 head/hand/foot wearables being in the clothing tables
             ( WeenieClassName.glovescloth,         0.10f ),
         };
 
         public static WeenieClassName Roll(TreasureDeath treasureDeath)
         {
-            var heritage = HeritageChance.Roll(treasureDeath.UnknownChances);
+            var heritage = HeritageChance.Roll(treasureDeath.UnknownChances, true);
 
             switch (heritage)
             {
-                case HeritageGroup.Aluvian:
+                case TreasureHeritageGroup.Aluvian:
                     return ClothingWcids_Aluvian.Roll();
 
-                case HeritageGroup.Gharundim:
+                case TreasureHeritageGroup.Gharundim:
                     return ClothingWcids_Gharundim.Roll();
 
-                case HeritageGroup.Sho:
+                case TreasureHeritageGroup.Sho:
                     return ClothingWcids_Sho.Roll();
 
-                case HeritageGroup.Viamontian:
+                case TreasureHeritageGroup.Viamontian:
                     return ClothingWcids_Viamontian.Roll();
             }
             return WeenieClassName.undef;

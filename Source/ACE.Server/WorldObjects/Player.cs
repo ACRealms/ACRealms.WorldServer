@@ -503,6 +503,7 @@ namespace ACE.Server.WorldObjects
 
         public void LogOut_Inner(bool clientSessionTerminatedAbruptly = false)
         {
+            IsBusy = true;
             IsLoggingOut = true;
 
             if (Fellowship != null)

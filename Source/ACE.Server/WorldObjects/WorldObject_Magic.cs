@@ -117,137 +117,6 @@ namespace ACE.Server.WorldObjects
         }
 
         /// <summary>
-        /// Determine Player's PK status and whether it matches the target Player
-        /// </summary>
-        /// <returns>
-        /// Returns NULL if either player are target are null
-        /// Returns TRUE if player should be allowed to cast the spell on target player
-        /// Returns FALSE if player shouldn't be allowed to cast the spell on target player
-        /// </returns>
-        protected List<WeenieErrorWithString> CheckPKStatusVsTarget(Player player, WorldObject target, Spell spell)
-        {
-            if (player == null || target == null)
-                return null;
-
-            if (player == target)
-                return null;
-
-            var targetPlayer = target as Player;
-            if (targetPlayer == null && target.WielderId != null)
-            {
-                // handle casting item spells
-                targetPlayer = player.CurrentLandblock.GetObject(target.WielderId.Value) as Player;
-            }
-            if (targetPlayer == null)
-                return null;
-
-            if (player.PlayerKillerStatus == PlayerKillerStatus.Free || targetPlayer.PlayerKillerStatus == PlayerKillerStatus.Free)
-                return null;
-
-            if (spell == null || spell.IsHarmful)
-            {
-                // Ensure that a non-PK cannot cast harmful spells on another player
-                if (player.PlayerKillerStatus == PlayerKillerStatus.NPK)
-                    return new List<WeenieErrorWithString>() { WeenieErrorWithString.YouFailToAffect_YouAreNotPK, WeenieErrorWithString._FailsToAffectYou_TheyAreNotPK };
-
-                if (targetPlayer.PlayerKillerStatus == PlayerKillerStatus.NPK)
-                    return new List<WeenieErrorWithString>() { WeenieErrorWithString.YouFailToAffect_TheyAreNotPK, WeenieErrorWithString._FailsToAffectYou_YouAreNotPK };
-
-                // Ensure not attacking across housing boundary
-                if (!player.CheckHouseRestrictions(targetPlayer))
-                    return new List<WeenieErrorWithString>() { WeenieErrorWithString.YouFailToAffect_AcrossHouseBoundary, WeenieErrorWithString._FailsToAffectYouAcrossHouseBoundary };
-            }
-
-            // additional checks for different PKTypes
-            if (player.PlayerKillerStatus != targetPlayer.PlayerKillerStatus)
-            {
-                // require same pk status, unless beneficial spell being cast on NPK
-                // https://asheron.fandom.com/wiki/Player_Killer
-                // https://asheron.fandom.com/wiki/Player_Killer_Lite
-
-                if (spell == null || spell.IsHarmful || targetPlayer.PlayerKillerStatus != PlayerKillerStatus.NPK)
-                    return new List<WeenieErrorWithString>() { WeenieErrorWithString.YouFailToAffect_NotSamePKType, WeenieErrorWithString._FailsToAffectYou_NotSamePKType };
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Determines whether the target for the spell being cast is invalid
-        /// </summary>
-        protected bool IsInvalidTarget(Player caster, Spell spell, WorldObject target)
-        {
-            var targetPlayer = target as Player;
-            var targetCreature = target as Creature;
-
-            // ensure target is enchantable
-            if (!target.IsEnchantable) return true;
-
-            // Self targeted spells should have a target of self
-            if (spell.Flags.HasFlag(SpellFlags.SelfTargeted) && target != this)
-                return true;
-
-            // Invalidate non Item Enchantment spells cast against non Creatures or Players
-            if (spell.School != MagicSchool.ItemEnchantment && targetCreature == null)
-                return true;
-
-            // Invalidate beneficial spells against Creature/Non-player targets
-            if (targetCreature != null && targetPlayer == null && spell.IsBeneficial)
-                return true;
-
-            // check item spells
-            if (targetCreature == null && target.WielderId != null)
-            {
-                var parent = CurrentLandblock.GetObject(target.WielderId.Value) as Player;
-
-                // Invalidate beneficial spells against monster wielded items
-                if (parent == null && spell.IsBeneficial)
-                    return true;
-
-                // Invalidate harmful spells against player wielded items, depending on pk status
-                if (parent != null && spell.IsHarmful && CheckPKStatusVsTarget(this as Player, parent, spell) != null)
-                    return true;
-            }
-
-            // Cannot cast Weapon Aura spells on targets that are not players or creatures
-            if (spell.Name.Contains("Aura of") && spell.School == MagicSchool.ItemEnchantment)
-            {
-                if (targetCreature == null)
-                    return true;
-            }
-
-            // brittlemail / lure / other negative item spells cannot be cast with player as target
-
-            // TODO: by end of retail, players couldn't cast any negative spells on themselves
-            // this feature is currently in ace for dev testing...
-            if (caster == target && spell.IsNegativeRedirectable)
-                return true;
-
-            if (targetCreature != null && caster != targetCreature && spell.NonComponentTargetType == ItemType.Creature && !caster.CanDamage(targetCreature))
-                return true;
-
-            // Cannot cast Weapon Aura spells on targets that are not players or creatures
-            if ((spell.MetaSpellType == SpellType.Enchantment) && (spell.School == MagicSchool.ItemEnchantment))
-            {
-                if (targetPlayer != null
-                    || (target.WeenieType == WeenieType.Creature)
-                    || (target.WeenieType == WeenieType.Clothing)
-                    || (target.WeenieType == WeenieType.Caster)
-                    || (target.WeenieType == WeenieType.MeleeWeapon)
-                    || (target.WeenieType == WeenieType.MissileLauncher)
-                    || (target.WeenieType == WeenieType.Missile)
-                    || (target.WeenieType == WeenieType.Door)
-                    || (target.WeenieType == WeenieType.Chest)
-                    || target.IsShield)
-                    return false;
-
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Determines whether a spell will be resisted,
         /// based upon the caster's magic skill vs target's magic defense skill
         /// </summary>
@@ -391,7 +260,7 @@ namespace ACE.Server.WorldObjects
             // NonComponentTargetType should be 0 for untargeted spells.
             // Return if the spell type is targeted with no target defined or the target is already dead.
             if ((spellTarget == null || !spellTarget.IsAlive) && spell.NonComponentTargetType != ItemType.None
-                && (spell.DispelSchool != MagicSchool.ItemEnchantment || !PropertyManager.GetBool("item_dispel").Item))
+                && spell.DispelSchool != MagicSchool.ItemEnchantment)
             {
                 damage = 0;
                 return false;
@@ -1771,10 +1640,22 @@ namespace ACE.Server.WorldObjects
         protected bool TryApplyEnchantment(WorldObject target, Spell spell, WorldObject caster)
         {
             var player = this as Player;
+
             var targetPlayer = target as Player;
             var targetCreature = target as Creature;
-            if (player != null && targetCreature != null && targetPlayer == null)
-                player.OnAttackMonster(targetCreature);
+
+            if (player != null)
+            {
+                if (targetCreature != null && targetPlayer == null)
+                    player.OnAttackMonster(targetCreature);
+            }
+            else
+            {
+                var creature = this as Creature;
+
+                if (creature != null && targetPlayer == null)
+                    creature.TryHandleFactionMob(target);
+            }
 
             if (TryResistSpell(target, spell, caster))
                 return false;
@@ -2133,6 +2014,149 @@ namespace ACE.Server.WorldObjects
             enchantment_statModVal *= skillMod * elementalDamageMod * damageRatingMod;
 
             return enchantment_statModVal;
+        }
+
+        protected void TryCastItemEnchantment_WithRedirects(Spell spell, WorldObject target, WorldObject caster = null)
+        {
+            var enchantmentStatus = new EnchantmentStatus(spell);
+
+            caster = caster ?? this;
+
+            var creature = this as Creature;
+            var player = this as Player;
+
+            var targetCreature = target as Creature;
+            var targetPlayer = target as Player;
+
+            // if negative item spell, can be resisted by the wielder
+            if (player != null && spell.IsHarmful)      
+            {
+                var targetResist = targetCreature;
+
+                if (targetResist == null && target?.WielderId != null)
+                    targetResist = CurrentLandblock?.GetObject(target.WielderId.Value) as Creature;
+
+                // skip TryResistSpell() for non-player casters, they already performed it previously
+                if (targetResist != null && TryResistSpell(targetResist, spell, caster))
+                    return;
+            }
+
+            if (spell.IsImpenBaneType)
+            {
+                // impen / bane / brittlemail / lure
+
+                // a lot of these will already be filtered out by IsInvalidTarget()
+                if (targetCreature == null)
+                {
+                    // targeting an individual item / wo
+                    enchantmentStatus = ItemMagic(target, spell);
+
+                    if (target != null)
+                        EnqueueBroadcast(new GameMessageScript(target.Guid, spell.TargetEffect, spell.Formula.Scale));
+
+                    if (player != null && enchantmentStatus.Message != null)
+                        player.Session.Network.EnqueueSend(enchantmentStatus.Message);
+                }
+                else
+                {
+                    // targeting a creature
+                    if (targetPlayer == this)
+                    {
+                        // targeting self
+                        if (creature != null)
+                        {
+                            var items = creature.EquippedObjects.Values.Where(i => (i.WeenieType == WeenieType.Clothing || i.IsShield) && i.IsEnchantable);
+
+                            foreach (var item in items)
+                            {
+                                enchantmentStatus = ItemMagic(item, spell);
+                                if (player != null && enchantmentStatus.Message != null)
+                                    player.Session.Network.EnqueueSend(enchantmentStatus.Message);
+                            }
+                            if (items.Count() > 0)
+                                EnqueueBroadcast(new GameMessageScript(Guid, spell.TargetEffect, spell.Formula.Scale));
+                        }
+                    }
+                    else
+                    {
+                        // targeting another player or monster
+                        var item = targetCreature.EquippedObjects.Values.FirstOrDefault(i => i.IsShield && i.IsEnchantable);
+
+                        if (item != null)
+                        {
+                            enchantmentStatus = ItemMagic(item, spell);
+                            EnqueueBroadcast(new GameMessageScript(item.Guid, spell.TargetEffect, spell.Formula.Scale));
+                            if (player != null && enchantmentStatus.Message != null)
+                                player.Session.Network.EnqueueSend(enchantmentStatus.Message);
+                        }
+                        else
+                        {
+                            // 'fails to affect'?
+                            if (player != null && targetCreature != null)
+                                player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You fail to affect {targetCreature.Name} with {spell.Name}", ChatMessageType.Magic));
+
+                            if (targetPlayer != null && !targetPlayer.SquelchManager.Squelches.Contains(this, ChatMessageType.Magic))
+                                targetPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name} fails to affect you with {spell.Name}", ChatMessageType.Magic));
+                        }
+                    }
+                }
+            }
+            else if (spell.IsOtherNegativeRedirectable)
+            {
+                // blood loather, spirit loather, lure blade, turn blade, leaden weapon, hermetic void
+                if (targetCreature == null)
+                {
+                    // targeting an individual item / wo
+                    enchantmentStatus = ItemMagic(target, spell);
+
+                    if (target != null)
+                        EnqueueBroadcast(new GameMessageScript(target.Guid, spell.TargetEffect, spell.Formula.Scale));
+
+                    if (player != null && enchantmentStatus.Message != null)
+                        player.Session.Network.EnqueueSend(enchantmentStatus.Message);
+                }
+                else
+                {
+                    // targeting a creature, try to redirect to primary weapon
+                    var weapon = spell.NonComponentTargetType switch
+                    {
+                        ItemType.Weapon => targetCreature.GetEquippedWeapon(),
+                        ItemType.Caster => targetCreature.GetEquippedWand(),
+                        ItemType.WeaponOrCaster => targetCreature.GetEquippedWeapon() ?? targetCreature.GetEquippedWand(),
+                        _ => null
+                    };
+
+                    if (weapon != null && weapon.IsEnchantable)
+                    {
+                        enchantmentStatus = ItemMagic(weapon, spell);
+
+                        EnqueueBroadcast(new GameMessageScript(weapon.Guid, spell.TargetEffect, spell.Formula.Scale));
+
+                        if (player != null && enchantmentStatus.Message != null)
+                            player.Session.Network.EnqueueSend(enchantmentStatus.Message);
+                    }
+                    else
+                    {
+                        // 'fails to affect'?
+                        if (player != null)
+                            player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You fail to affect {targetCreature.Name} with {spell.Name}", ChatMessageType.Magic));
+
+                        if (targetPlayer != null && !targetPlayer.SquelchManager.Squelches.Contains(this, ChatMessageType.Magic))
+                            targetPlayer.Session.Network.EnqueueSend(new GameMessageSystemChat($"{Name} fails to affect you with {spell.Name}", ChatMessageType.Magic));
+                    }
+                }
+            }
+            else
+            {
+                // all other item spells, cast directly on target
+                enchantmentStatus = ItemMagic(target, spell);
+
+                if (target != null)
+                    EnqueueBroadcast(new GameMessageScript(target.Guid, spell.TargetEffect, spell.Formula.Scale));
+
+                if (player != null && enchantmentStatus.Message != null)
+                    player.Session.Network.EnqueueSend(enchantmentStatus.Message);
+            }
         }
     }
 }
