@@ -1223,6 +1223,8 @@ namespace ACE.Server.Command.Handlers.Processors
         {
             var sqlCommands = File.ReadAllText(sqlFile);
 
+            sqlCommands = sqlCommands.Replace("\r\n", "\n");
+
             // not sure why ExecuteSqlCommand doesn't parse this correctly..
             var idx = sqlCommands.IndexOf($"/* Lifestoned Changelog:");
             if (idx != -1)
@@ -2481,6 +2483,8 @@ namespace ACE.Server.Command.Handlers.Processors
                     mode = CacheType.Weenie;
                 if (parameters[0].Contains("realm", StringComparison.OrdinalIgnoreCase))
                     mode = CacheType.Realm;
+                if (parameters[0].Contains("wield", StringComparison.OrdinalIgnoreCase))
+                    mode = CacheType.WieldedTreasure;
             }
 
             if (mode.HasFlag(CacheType.Landblock))
@@ -2510,21 +2514,29 @@ namespace ACE.Server.Command.Handlers.Processors
 
             if (mode.HasFlag(CacheType.Realm))
             {
-                CommandHandlerHelper.WriteOutputInfo(session, "Clearing realm cache");
+                CommandHandlerHelper.WriteOutputInfo(session, " Clearing realm cache");
                 DatabaseManager.World.ClearRealmCache();
+            }
+
+            if (mode.HasFlag(CacheType.WieldedTreasure))
+            {
+               
+                CommandHandlerHelper.WriteOutputInfo(session, "Clearing wielded treasure cache");
+                DatabaseManager.World.ClearWieldedTreasureCache();
             }
         }
 
         [Flags]
         public enum CacheType
         {
-            None      = 0x0,
-            Landblock = 0x1,
-            Recipe    = 0x2,
-            Spell     = 0x4,
-            Weenie    = 0x8,
-            Realm     = 0x16,
-            All       = 0xFFFF
+            None            = 0x0,
+            Landblock       = 0x1,
+            Recipe          = 0x2,
+            Spell           = 0x4,
+            Weenie          = 0x8,
+            WieldedTreasure = 0x10,
+            Realm           = 0x16,
+            All             = 0xFFFF
         };
 
         public static FileType GetFileType(string filename)

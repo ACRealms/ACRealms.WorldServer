@@ -1090,5 +1090,10 @@ namespace ACE.Database
                 ClearRealmCache();
             }
         }
+
+        public void ClearWieldedTreasureCache()
+        {
+            cachedWieldedTreasure.Clear();
+        }
     }
 }
