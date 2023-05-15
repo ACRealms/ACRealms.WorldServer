@@ -29,7 +29,7 @@ namespace ACE.Server.Factories
             if (ruleset == null)
                 ruleset = RealmManager.DefaultRuleset;
 
-            if (weenie == null || guid == null)
+            if (weenie == null)
                 return null;
 
             var objWeenieType = weenie.WeenieType;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -6,6 +6,8 @@ namespace ACE.Database.Models.World
 {
     public partial class WorldDbContext : DbContext
     {
+        public bool UsesTransaction { get; set; }
+
         public WorldDbContext()
         {
         }
@@ -83,7 +85,13 @@ namespace ACE.Database.Models.World
             {
                 var config = Common.ConfigManager.Config.MySql.World;
 
-                optionsBuilder.UseMySql($"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database}");
+                optionsBuilder.UseMySql($"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database}", builder =>
+                {
+                    if (!UsesTransaction)
+                    {
+                        builder.EnableRetryOnFailure(10);
+                    }
+                });
             }
 
             optionsBuilder.EnableSensitiveDataLogging(true);

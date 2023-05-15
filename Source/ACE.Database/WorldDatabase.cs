@@ -108,7 +108,7 @@ namespace ACE.Database
                 weenie.WeeniePropertiesSkill = context.WeeniePropertiesSkill.Where(r => r.ObjectId == weenie.ClassId).ToList();
             }
 
-            weenie.WeeniePropertiesSpellBook = context.WeeniePropertiesSpellBook.Where(r => r.ObjectId == weenie.ClassId).ToList();
+            weenie.WeeniePropertiesSpellBook = context.WeeniePropertiesSpellBook.Where(r => r.ObjectId == weenie.ClassId).OrderBy(i => i.Id).ToList();
 
             weenie.WeeniePropertiesTextureMap = context.WeeniePropertiesTextureMap.Where(r => r.ObjectId == weenie.ClassId).ToList();
 
@@ -569,7 +569,7 @@ namespace ACE.Database
             var propsstring = realms.SelectMany(x => x.RealmPropertiesString);
             var links = realmsById.Values.SelectMany(x => x.Links);
 
-            using (var context = new WorldDbContext())
+            using (var context = new WorldDbContext() { UsesTransaction = true })
             {
                 using (var transaction = context.Database.BeginTransaction())
                 {
