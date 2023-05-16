@@ -1476,6 +1476,8 @@ namespace ACE.Server.WorldObjects
             {
                 var dist = StartPos.Distance(PhysicsObj.Position);
 
+                var Windup_MaxMove = RealmRuleset.GetProperty(ACE.Entity.Enum.Properties.RealmPropertyFloat.SpellCastingPvPWindupMaxMove);
+
                 if (dist > Windup_MaxMove && PlayerKillerStatus != PlayerKillerStatus.NPK)
                 {
                     FailCast();

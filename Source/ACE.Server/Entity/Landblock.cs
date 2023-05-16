@@ -192,7 +192,7 @@ namespace ACE.Server.Entity
             lastActiveTime = DateTime.UtcNow;
 
             var cellLandblock = DBObj.GetCellLandblock(Id.Raw | 0xFFFF);
-            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock);
+            PhysicsLandblock = new Physics.Common.Landblock(cellLandblock, instance);
         }
 
         public void Init(EphemeralRealm ephemeralRealm, bool reload = false)
