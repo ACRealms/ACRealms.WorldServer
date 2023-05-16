@@ -11,6 +11,7 @@ using ACE.Entity.Models;
 using ACE.Server.Factories;
 using ACE.Server.Physics.Common;
 using ACE.Server.WorldObjects;
+using System.Numerics;
 
 namespace ACE.Server.Entity
 {
