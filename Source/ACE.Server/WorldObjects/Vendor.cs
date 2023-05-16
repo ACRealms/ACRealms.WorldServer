@@ -234,6 +234,32 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
+            if (!PropertyManager.GetBool("vendor_shop_uses_generator").Item && Biota.PropertiesGenerator != null)
+            {
+                foreach (var item in Biota.PropertiesGenerator.Where(x => x.WhereCreate.HasFlag(RegenLocationType.Shop)))
+                {
+                    WorldObject wo = WorldObjectFactory.CreateNewWorldObject(item.WeenieClassId);
+
+                    if (wo != null)
+                    {
+                        if (item.PaletteId > 0)
+                            wo.PaletteTemplate = (int)item.PaletteId;
+                        if (item.Shade > 0)
+                            wo.Shade = item.Shade;
+                        wo.ContainerId = Guid.Full;
+                        wo.CalculateObjDesc();
+
+                        if (!itemsForSale.ContainsKey((wo.WeenieClassId, wo.PaletteTemplate ?? 0, wo.Shade ?? 0))) 
+                        {
+                            DefaultItemsForSale.Add(wo.Guid, wo);
+                            itemsForSale.Add((wo.WeenieClassId, wo.PaletteTemplate ?? 0, wo.Shade ?? 0), wo.Guid.Full);
+                        }
+                        else
+                            wo.Destroy(false);
+                    }
+                }
+            }
+
             if (GetProperty(PropertyBool.RealmSelectorVendor) == true)
             {
                 var weenie = DatabaseManager.World.GetCachedWeenie("realm-selector-token");
@@ -284,7 +310,6 @@ namespace ACE.Server.WorldObjects
 
             inventoryloaded = true;
         }
-
 
         public void AddDefaultItem(WorldObject item)
         {
