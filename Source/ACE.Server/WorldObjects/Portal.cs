@@ -278,7 +278,7 @@ namespace ACE.Server.WorldObjects
 
             AdjustDungeon(portalDest);
 
-            WorldManager.ThreadSafeTeleport(player, portalDest, new ActionEventDelegate(() =>
+            WorldManager.ThreadSafeTeleport(player, portalDest, false, new ActionEventDelegate(() =>
             {
                 // If the portal just used is able to be recalled to,
                 // save the destination coordinates to the LastPortal character position save table

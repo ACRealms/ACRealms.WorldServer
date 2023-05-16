@@ -421,7 +421,7 @@ namespace ACE.Server.WorldObjects
 
             newPosition.PositionZ += 0.005f * (ObjScale ?? 1.0f);
 
-            if (Location.Landblock != newPosition.Landblock)
+            if (Location.InstancedLandblock != newPosition.InstancedLandblock)
             {
                 log.Error($"{Name} tried to teleport from {Location} to a different landblock {newPosition}");
                 return;

@@ -25,57 +25,6 @@
   <ItemGroup>
     <None Remove="Realms\reserved_realms\default.jsonc" />
     <None Remove="Realms\reserved_realms\hideout.jsonc" />
-    <None Remove="Factories\Entity\Mutations\ArmorLevel\armor_level_extremity.txt" />
-    <None Remove="Factories\Entity\Mutations\ArmorLevel\armor_level_non_extremity.txt" />
-    <None Remove="Factories\Entity\Mutations\ArmorLevel\covenant_armor.txt" />
-    <None Remove="Factories\Entity\Mutations\ArmorLevel\covenant_shield.txt" />
-    <None Remove="Factories\Entity\Mutations\ArmorLevel\olthoi_armor.txt" />
-    <None Remove="Factories\Entity\Mutations\ArmorLevel\olthoi_shield.txt" />
-    <None Remove="Factories\Entity\Mutations\ArmorLevel\shield_level.txt" />
-    <None Remove="Factories\Entity\Mutations\Casters\caster.txt" />
-    <None Remove="Factories\Entity\Mutations\Casters\caster_elemental.txt" />
-    <None Remove="Factories\Entity\Mutations\Casters\caster_non_elemental.txt" />
-    <None Remove="Factories\Entity\Mutations\Casters\weapon_defense.txt" />      
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_axe.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_dagger.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_dagger_ms.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_mace.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_spear.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_staff.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_sword.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_sword_ms.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\heavy_unarmed.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\light_finesse_axe.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\light_finesse_dagger.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\light_finesse_dagger_ms.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\light_finesse_mace.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\light_finesse_mace_jitte.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\light_finesse_spear.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\light_finesse_staff.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\light_finesse_sword.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\light_finesse_sword_ms.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\light_finesse_unarmed.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\two_handed_cleaver.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\Damage_WieldDifficulty_DamageVariance\two_handed_spear.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\axe_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\dagger_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\mace_jitte_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\mace_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\spear_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\staff_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\sword_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\two_handed_axe_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\two_handed_mace_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\two_handed_spear_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\two_handed_sword_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MeleeWeapons\WeaponOffense_WeaponDefense\unarmed_offense_defense.txt" />
-    <None Remove="Factories\Entity\Mutations\MissileWeapons\atlatl_elemental.txt" />
-    <None Remove="Factories\Entity\Mutations\MissileWeapons\atlatl_non_elemental.txt" />
-    <None Remove="Factories\Entity\Mutations\MissileWeapons\bow_elemental.txt" />
-    <None Remove="Factories\Entity\Mutations\MissileWeapons\bow_non_elemental.txt" />
-    <None Remove="Factories\Entity\Mutations\MissileWeapons\crossbow_elemental.txt" />
-    <None Remove="Factories\Entity\Mutations\MissileWeapons\crossbow_non_elemental.txt" />
-    <None Remove="Factories\Entity\Mutations\MissileWeapons\weapon_defense.txt" />
     <None Remove="Entity\Mutations\ArmorLevel\armor_level_extremity.txt" />
     <None Remove="Entity\Mutations\ArmorLevel\armor_level_non_extremity.txt" />
     <None Remove="Entity\Mutations\ArmorLevel\covenant_armor.txt" />
@@ -387,6 +336,12 @@
     <None Include="..\..\Database\Updates\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Updates\" />
     <None Include="..\..\Database\Optional\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Optional\" />
       <None Include="..\..\Database\Custom\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Custom\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Factories\Entity\Mutations\**" />
+    <EmbeddedResource Remove="Factories\Entity\Mutations\**" />
+    <None Remove="Factories\Entity\Mutations\**" />
   </ItemGroup>
 
   <ItemGroup>
