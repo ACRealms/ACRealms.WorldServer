@@ -282,7 +282,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var json_folder = $"{di.FullName}{sep}json{sep}recipes{sep}";
 
-            var prefix = recipeId + " - ";
+            var prefix = recipeId.PadLeft(5, '0') + " - ";
 
             if (recipeId.Equals("all", StringComparison.OrdinalIgnoreCase))
                 prefix = "";
@@ -406,7 +406,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}";
 
-            var prefix = wcid + " ";
+            var prefix = wcid.PadLeft(5, '0') + " ";
 
             if (wcid.Equals("all", StringComparison.OrdinalIgnoreCase))
                 prefix = "";
@@ -434,7 +434,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var sql_folder = $"{di.FullName}{sep}sql{sep}recipes{sep}";
 
-            var prefix = recipeId + " ";
+            var prefix = recipeId.PadLeft(5, '0') + " ";
 
             if (recipeId.Equals("all", StringComparison.OrdinalIgnoreCase))
                 prefix = "";
@@ -2933,9 +2933,11 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var replaceChars = new Dictionary<string, string>()
             {
+                { " ", "_" },
                 { "-", "_" },
                 { "!", "" },
                 { "#", "" },
+                { "?", "" },
             };
 
             using (var ctx = new WorldDbContext())

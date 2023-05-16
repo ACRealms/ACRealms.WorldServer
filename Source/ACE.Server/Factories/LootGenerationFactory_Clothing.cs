@@ -6,6 +6,7 @@ using ACE.Database.Models.World;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity;
+using ACE.Server.Entity.Mutations;
 using ACE.Server.Factories.Entity;
 using ACE.Server.Factories.Enum;
 using ACE.Server.Factories.Tables;
@@ -821,6 +822,9 @@ namespace ACE.Server.Factories
                 wo.CloakWeaveProc = 2;
             }
 
+            // material type
+            wo.MaterialType = GetMaterialType(wo, profile.Tier);
+
             // workmanship
             wo.Workmanship = WorkmanshipChance.Roll(profile.Tier);
 
@@ -969,6 +973,9 @@ namespace ACE.Server.Factories
         {
             if (profile.Tier != 8)
                 return false;
+
+            // shields don't have gear ratings
+            if (wo.IsShield) return false;
 
             var gearRating = GearRatingChance.Roll(wo, profile, roll);
 

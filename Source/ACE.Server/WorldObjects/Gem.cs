@@ -116,6 +116,16 @@ namespace ACE.Server.WorldObjects
         {
             if (player.IsDead) return;
 
+            // trying to use a dispel potion while pk timer is active
+            // send error message and cancel - do not consume item
+            if (SpellDID != null)
+            {
+                var spell = new Spell(SpellDID.Value);
+
+                if (spell.MetaSpellType == SpellType.Dispel && !VerifyDispelPKStatus(this, player))
+                    return;
+            }
+
             if (RareUsesTimer)
             {
                 var currentTime = Time.GetUnixTime();
@@ -136,11 +146,9 @@ namespace ACE.Server.WorldObjects
 
                 // TODO: figure this out better
                 if (spell.MetaSpellType == SpellType.PortalSummon)
-                {
-                    HandlePortalGemSummon(spell, player);
-                }
+                    TryCastSpell(spell, player, this, tryResist: false);
                 else
-                    player.TryCastSpell(spell, player, this, false);
+                    player.TryCastSpell(spell, player, this, tryResist: false);
             }
 
             if (UseCreateContractId > 0)
@@ -163,11 +171,6 @@ namespace ACE.Server.WorldObjects
 
             if ((GetProperty(PropertyBool.UnlimitedUse) ?? false) == false)
                 player.TryConsumeFromInventoryWithNetworking(this, 1);
-        }
-
-        private void HandlePortalGemSummon(Spell spell, Player player)
-        {
-            TryCastSpell(spell, player, this, false);
         }
 
         public bool HandleUseCreateItem(Player player)

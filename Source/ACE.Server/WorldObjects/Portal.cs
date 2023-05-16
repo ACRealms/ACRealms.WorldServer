@@ -2,6 +2,7 @@ using System.Numerics;
 
 using log4net;
 
+using ACE.Common;
 using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
@@ -110,6 +111,12 @@ namespace ACE.Server.WorldObjects
                 ActOnUse(activator);
         }
 
+        /// <summary>
+        /// If a player tries to use 2 portals in under this amount of time,
+        /// they receive an error message
+        /// </summary>
+        private static readonly float minTimeSinceLastPortal = 5.0f;
+
         public override ActivationResult CheckUseRequirements(WorldObject activator)
         {
             if (!(activator is Player player))
@@ -122,6 +129,29 @@ namespace ACE.Server.WorldObjects
             {
                 player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Portal destination for portal ID {WeenieClassId} not yet implemented!", ChatMessageType.System));
                 return new ActivationResult(false);
+            }
+
+            if (player.LastPortalTeleportTimestamp != null)
+            {
+                var currentTime = Time.GetUnixTime();
+
+                var timeSinceLastPortal = currentTime - player.LastPortalTeleportTimestamp.Value;
+
+                if (timeSinceLastPortal < minTimeSinceLastPortal)
+                {
+                    // prevent message spam
+                    if (player.LastPortalTeleportTimestampError != null)
+                    {
+                        var timeSinceLastPortalError = currentTime - player.LastPortalTeleportTimestampError.Value;
+
+                        if (timeSinceLastPortalError < minTimeSinceLastPortal)
+                            return new ActivationResult(false);
+                    }
+
+                    player.LastPortalTeleportTimestampError = currentTime;
+
+                    return new ActivationResult(new GameEventWeenieError(player.Session, WeenieError.YouHaveBeenTeleportedTooRecently));
+                }
             }
 
             if (player.PKTimerActive && !PortalIgnoresPkAttackTimer)
@@ -246,12 +276,9 @@ namespace ACE.Server.WorldObjects
             if (portalDest.Instance == 0)
                 portalDest.SetToDefaultRealmInstance(Location.RealmID);
 
-            WorldObject.AdjustDungeon(portalDest);
+            AdjustDungeon(portalDest);
 
-
-            var exiting = player.Location.LandblockId != Destination.LandblockId;
-
-            WorldManager.ThreadSafeTeleport(player, portalDest, exiting && player.Location.IsEphemeralRealm, new ActionEventDelegate(() =>
+            WorldManager.ThreadSafeTeleport(player, portalDest, new ActionEventDelegate(() =>
             {
                 // If the portal just used is able to be recalled to,
                 // save the destination coordinates to the LastPortal character position save table
@@ -261,7 +288,8 @@ namespace ACE.Server.WorldObjects
                 EmoteManager.OnPortal(player);
 
                 player.SendWeenieError(WeenieError.ITeleported);
-            }));
+
+            }), true);
         }
     }
 }

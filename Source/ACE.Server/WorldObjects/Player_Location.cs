@@ -697,7 +697,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// This is not thread-safe. Consider using WorldManager.ThreadSafeTeleport() instead if you're calling this from a multi-threaded subsection.
         /// </summary>
-        public void Teleport(Position _newPosition, bool teleportingFromInstance = false)
+        public void Teleport(Position _newPosition, bool teleportingFromInstance = false, bool fromPortal = false)
         {
             if (_newPosition.Instance == 0)
                 _newPosition.Instance = Location.Instance;
@@ -759,6 +759,9 @@ namespace ACE.Server.WorldObjects
             Teleporting = true;
             LastTeleportTime = DateTime.UtcNow;
             LastTeleportStartTimestamp = Time.GetUnixTime();
+
+            if (fromPortal)
+                LastPortalTeleportTimestamp = LastTeleportStartTimestamp;
 
             Session.Network.EnqueueSend(new GameMessagePlayerTeleport(this));
 
@@ -991,6 +994,11 @@ namespace ACE.Server.WorldObjects
                 EnqueueBroadcastPhysicsState();
         }
 
+        /// <summary>
+        /// Prevent message spam
+        /// </summary>
+        public double? LastPortalTeleportTimestampError;
+
         public void OnTeleportComplete()
         {
             if (CurrentLandblock != null && !CurrentLandblock.CreateWorldObjectsCompleted)
@@ -1008,6 +1016,7 @@ namespace ACE.Server.WorldObjects
             // this takes the player from pink bubbles -> fully materialized
             if (CloakStatus != CloakStatus.On)
                 ReportCollisions = true;
+
             IgnoreCollisions = false;
             Hidden = false;
             Teleporting = false;
@@ -1016,6 +1025,10 @@ namespace ACE.Server.WorldObjects
             CheckHouse();
 
             EnqueueBroadcastPhysicsState();
+
+            // hijacking this for both start/end on portal teleport
+            if (LastTeleportStartTimestamp == LastPortalTeleportTimestamp)
+                LastPortalTeleportTimestamp = Time.GetUnixTime();
         }
 
         public void SendTeleportedViaMagicMessage(WorldObject itemCaster, Spell spell)
