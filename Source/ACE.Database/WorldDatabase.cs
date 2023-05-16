@@ -504,6 +504,25 @@ namespace ACE.Database
             }
         }
 
+        // =====================================
+        // IsWorldDatabaseGuidRangeValid
+        // =====================================
+
+        public bool IsWorldDatabaseGuidRangeValid(WorldDbContext context)
+        {
+            return context.LandblockInstance.FirstOrDefault(i => i.Guid >= 0x80000000) == null;
+        }
+
+        public bool IsWorldDatabaseGuidRangeValid()
+        {
+            using (var context = new WorldDbContext())
+            {
+                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+                return IsWorldDatabaseGuidRangeValid(context);
+            }
+        }
+
         public virtual Realm GetRealm(uint id)
         {
             using (var context = new WorldDbContext())
