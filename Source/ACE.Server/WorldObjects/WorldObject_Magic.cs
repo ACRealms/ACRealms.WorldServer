@@ -2032,6 +2032,9 @@ namespace ACE.Server.WorldObjects
                     var equippedWeapon = player.GetEquippedWeapon() ?? player.GetEquippedWand();
                     if (player.GetHeritageBonus(equippedWeapon))
                         damageRating += 5;
+
+                    if (target is Player)
+                        damageRating += player.GetPKDamageRating();
                 }
                 damageRatingMod = Creature.GetPositiveRatingMod(damageRating);
             }
