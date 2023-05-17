@@ -1067,5 +1067,7 @@ namespace ACE.Server.WorldObjects
         {
             return ArmorLevel > 0;
         }
+
+        public virtual bool IsBeingTradedOrContainsItemBeingTraded(HashSet<ObjectGuid> guidList) => guidList.Contains(Guid);
     }
 }
