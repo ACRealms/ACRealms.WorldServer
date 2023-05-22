@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using ACE.Entity;
 using ACE.Entity.Enum.Properties;
+using Newtonsoft.Json.Linq;
 
 namespace ACE.Database.Models.World
 {
@@ -196,10 +197,10 @@ namespace ACE.Database.Models.World
         // =====================================
 
         //Slower than SetProperty as it has to use reflection
-        public static void SetPropertyByName(this Realm realm, string propertyName, dynamic value)
+        public static void SetPropertyByName(this Realm realm, string propertyName, JToken value)
         {
             if (Enum.TryParse<RealmPropertyBool>(propertyName, out var boolprop))
-                SetProperty(realm, boolprop, (bool)value);
+                SetProperty(realm, boolprop, ((bool)value));
             else if (Enum.TryParse<RealmPropertyInt>(propertyName, out var intprop))
                 SetProperty(realm, intprop, (int)value);
             else if (Enum.TryParse<RealmPropertyString>(propertyName, out var stringprop))

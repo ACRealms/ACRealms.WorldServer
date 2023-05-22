@@ -674,7 +674,7 @@ namespace ACE.Database
             {
                 using (var transaction = context.Database.BeginTransaction())
                 {
-                    context.Database.ExecuteSqlCommand("DELETE FROM realm;");
+                    context.Database.ExecuteSqlRaw("DELETE FROM realm;");
                     context.Realm.AddRange(realms);
                     context.RealmRulesetLinks.AddRange(links);
                     context.RealmPropertiesBool.AddRange(propsbool);

@@ -1242,7 +1242,7 @@ namespace ACE.Server.Command.Handlers.Processors
             var sqlCommands = File.ReadAllText(sqlFile);
 
             using (var ctx = new ShardDbContext())
-                ctx.Database.ExecuteSqlCommand(sqlCommands);
+                ctx.Database.ExecuteSqlRaw(sqlCommands);
         }
 
         public static LandblockInstanceWriter LandblockInstanceWriter;
