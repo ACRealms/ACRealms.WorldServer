@@ -116,13 +116,13 @@ namespace ACE.Server.WorldObjects
                     ScriptedCollision = false;
                 }
             }
-                
-            // Whirling Blade spells get omega values and "align path" turned off which
+
+            // Projectiles with RotationSpeed get omega values and "align path" turned off which
             // creates the nice swirling animation
-            if (WeenieClassId == 1636 || WeenieClassId == 7268 || WeenieClassId == 20979)
+            if ((RotationSpeed ?? 0) != 0)
             {
                 AlignPath = false;
-                PhysicsObj.Omega = new Vector3(12.56637f, 0, 0);
+                PhysicsObj.Omega = new Vector3((float)(Math.PI * 2 * RotationSpeed), 0, 0);
             }
         }
 
@@ -310,23 +310,18 @@ namespace ACE.Server.WorldObjects
 
             if (damage != null)
             {
-                // handle void magic DoTs:
-                // instead of instant damage, add DoT to target's enchantment registry
-                if (Spell.School == MagicSchool.VoidMagic && Spell.Duration > 0)
+                if (Spell.MetaSpellType == ACE.Entity.Enum.SpellType.EnchantmentProjectile)
                 {
-                    var dot = ProjectileSource.CreateEnchantment(creatureTarget, ProjectileSource, ProjectileLauncher, Spell);
-
-                    if (dot.Message != null && player != null)
-                        player.Session.Network.EnqueueSend(dot.Message);
-
-                    // corruption / corrosion playscript?
-                    //target.EnqueueBroadcast(new GameMessageScript(target.Guid, PlayScript.HealthDownVoid));
-                    //target.EnqueueBroadcast(new GameMessageScript(target.Guid, PlayScript.DirtyFightingDefenseDebuff));
+                    // handle EnchantmentProjectile successfully landing on target
+                    ProjectileSource.CreateEnchantment(creatureTarget, ProjectileSource, ProjectileLauncher, Spell);
                 }
                 else
                 {
                     DamageTarget(creatureTarget, damage.Value, critical, critDefended, overpower);
                 }
+
+                // if this SpellProjectile has a TargetEffect, play it on successful hit
+                DoSpellEffects(Spell, ProjectileSource, creatureTarget, true);
 
                 if (player != null)
                     Proficiency.OnSuccessUse(player, player.GetCreatureSkill(Spell.School), Spell.PowerMod);
