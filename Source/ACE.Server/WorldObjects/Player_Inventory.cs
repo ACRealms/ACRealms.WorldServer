@@ -43,7 +43,6 @@ namespace ACE.Server.WorldObjects
             return results;
         }
 
-
         public int GetEncumbranceCapacity()
         {
             var strength = Attributes[PropertyAttribute.Strength].Current;
@@ -543,7 +542,7 @@ namespace ACE.Server.WorldObjects
                 {
                     if (lastOpenedContainer is Vendor lastUsedVendor)
                     {
-                        if (lastUsedVendor.AllItemsForSale.TryGetValue(objectGuid, out result))
+                        if (lastUsedVendor.TryGetItemForSale(objectGuid, out result))
                         {
                             rootOwner = lastUsedVendor;
                             return result;
@@ -1957,6 +1956,18 @@ namespace ACE.Server.WorldObjects
             if (!PropertyManager.GetBool("use_wield_requirements").Item)
                 return WeenieError.None;
 
+            var heritageSpecificArmor = item.GetProperty(PropertyInt.HeritageSpecificArmor);
+            if (IsOlthoiPlayer)
+            {
+                if (heritageSpecificArmor == null || (HeritageGroup)heritageSpecificArmor != HeritageGroup)
+                    return WeenieError.HeritageRequiresSpecificArmor;
+            }
+            else
+            {
+                if (heritageSpecificArmor != null && (HeritageGroup)heritageSpecificArmor != HeritageGroup)
+                    return WeenieError.ArmorRequiresSpecificHeritage;
+            }
+
             var allowedWielder = item.GetProperty(PropertyInstanceId.AllowedWielder);
             if (allowedWielder != null && (allowedWielder != Guid.Full))
                 return WeenieError.YouDoNotOwnThatItem; // Unsure of the exact message
@@ -2856,7 +2867,14 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            if ((target.Character.CharacterOptions1 & (int)CharacterOptions1.LetOtherPlayersGiveYouItems) != (int)CharacterOptions1.LetOtherPlayersGiveYouItems)
+            if (target.IsOlthoiPlayer || IsOlthoiPlayer)
+            {
+                Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "Olthoi cannot trade items with other players!")); // Custom error message
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
+                return;
+            }
+
+            if ((target.Character.CharacterOptions1 & (int)CharacterOptions1.AllowGive) != (int)CharacterOptions1.AllowGive)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(Session, WeenieErrorWithString._IsNotAcceptingGiftsRightNow, target.Name));
                 Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
@@ -2955,6 +2973,13 @@ namespace ACE.Server.WorldObjects
             if (item.Name == "IOU" && item.WeenieType == WeenieType.Book && target.Name == "Town Crier")
             {
                 HandleIOUTurnIn(target, item);
+                return;
+            }
+
+            if (IsOlthoiPlayer && target.CreatureType != ACE.Entity.Enum.CreatureType.Olthoi)
+            {
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.Full));
+                Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(Session, WeenieErrorWithString._CowersFromYou, target.Name));
                 return;
             }
 
@@ -3301,46 +3326,26 @@ namespace ACE.Server.WorldObjects
             if (emoter is null || weenieClassId == 0)
             {
                 log.Warn($"Player.GiveFromEmote: Emoter is null: {emoter is null} | weenieClassId == 0: {weenieClassId == 0}");
+
                 if (emoter != null)
                     log.Warn($"Player.GiveFromEmote: Emoter is {emoter.Name} (0x{emoter.Guid}) | WCID: {emoter.WeenieClassId}");
+
                 return;
             }
+            var itemsToReceive = new ItemsToReceive(this);
 
-            var playerFreeInventorySlots = GetFreeInventorySlots();
-            var playerFreeContainerSlots = GetFreeContainerSlots();
-            var playerAvailableBurden = GetAvailableBurden();
+            itemsToReceive.Add(weenieClassId, amount);
 
-            var playerOutOfInventorySlots = false;
-            var playerOutOfContainerSlots = false;
-            var playerExceedsAvailableBurden = false;
+            var itemStacks = itemsToReceive.RequiredSlots;
 
-            var itemStacks = PreCheckItem(weenieClassId, amount, playerFreeContainerSlots, playerFreeInventorySlots, playerAvailableBurden, out var itemEncumberance, out bool itemRequiresBackpackSlot);
-
-            if (itemRequiresBackpackSlot)
+            if (itemsToReceive.PlayerExceedsLimits)
             {
-                playerFreeContainerSlots -= itemStacks;
-                playerAvailableBurden -= itemEncumberance;
-
-                playerOutOfContainerSlots = playerFreeContainerSlots < 0;
-            }
-            else
-            {
-                playerFreeInventorySlots -= itemStacks;
-                playerAvailableBurden -= itemEncumberance;
-
-                playerOutOfInventorySlots = playerFreeInventorySlots < 0;
-            }
-
-            playerExceedsAvailableBurden = playerAvailableBurden < 0;
-
-            if (playerOutOfInventorySlots || playerOutOfContainerSlots || playerExceedsAvailableBurden)
-            {
-                //if (playerExceedsAvailableBurden)
-                //    player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, "You are too encumbered to use that!"));
-                //else if (playerOutOfInventorySlots)
-                //    player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, "You do not have enough pack space to use that!"));
-                //else //if (playerOutOfContainerSlots)
-                //    player.Session.Network.EnqueueSend(new GameEventCommunicationTransientString(player.Session, "You do not have enough container slots to use that!"));
+                //if (itemsToReceive.PlayerExceedsAvailableBurden)
+                //    Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You are too encumbered to use that!"));
+                //else if (itemsToReceive.PlayerOutOfInventorySlots)
+                //    Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You do not have enough pack space to use that!"));
+                //else if (itemsToReceive.PlayerOutOfContainerSlots)
+                //    Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You do not have enough container slots to use that!"));
 
                 // Font of Enlightenment and Rebirth tries to give you Attribute Reset Certificate.
                 var itemBeingGiven = DatabaseManager.World.GetCachedWeenie(weenieClassId);
@@ -3352,26 +3357,27 @@ namespace ACE.Server.WorldObjects
 
             if (itemStacks > 0)
             {
-                while (amount > 0)
+                var remaining = amount;
+
+                while (remaining > 0)
                 {
                     var item = WorldObjectFactory.CreateNewWorldObject(weenieClassId);
 
+                    if (item == null)
+                    {
+                        log.Warn($"Player.GiveFromEmote: Emoter is {emoter.Name} (0x{emoter.Guid}) | WCID: {emoter.WeenieClassId} is not able to be created.");
+                        return;
+                    }
+
                     if (item is Stackable)
                     {
-                        // amount contains a max stack
-                        if (item.MaxStackSize <= amount)
-                        {
-                            item.SetStackSize(item.MaxStackSize);
-                            amount -= item.MaxStackSize.Value;
-                        }
-                        else // not a full stack
-                        {
-                            item.SetStackSize(amount);
-                            amount -= amount;
-                        }
+                        var stackSize = Math.Min(remaining, item.MaxStackSize ?? 1);
+
+                        item.SetStackSize(stackSize);
+                        remaining -= stackSize;
                     }
                     else
-                        amount -= 1;
+                        remaining--;
 
                     if (palette > 0)
                         item.PaletteTemplate = palette;
@@ -3419,12 +3425,20 @@ namespace ACE.Server.WorldObjects
             return true;
         }
 
+        public bool CheckUniques(WorldObject obj, WorldObject giver = null)
+        {
+            return CheckUniques(new List<WorldObject>() { obj }, giver);
+        }
+
         /// <summary>
         /// Verifies a player can pick up an object that is unique,
         /// or contains uniques.
-        public bool CheckUniques(WorldObject obj, WorldObject giver = null)
+        public bool CheckUniques(List<WorldObject> objs, WorldObject giver = null)
         {
-            var uniqueObjects = obj.GetUniqueObjects();
+            var uniqueObjects = new List<WorldObject>();
+
+            foreach (var obj in objs)
+                uniqueObjects.AddRange(obj.GetUniqueObjects());
 
             // build dictionary of wcid => count
             var uniqueTable = new UniqueTable(uniqueObjects);
@@ -3548,6 +3562,14 @@ namespace ACE.Server.WorldObjects
                 log.Error($"{Name}.Player_Inventory.MoveItemToFirstContainerSlot() - failed to re-add target item {target.Name} ({target.Guid}) to player inventory");
                 return false;
             }
+
+            if (container != this)
+            {
+                // container is sidepack - update EncumbranceVal and Value for Player
+                EncumbranceVal += (target.EncumbranceVal ?? 0);
+                Value += (target.Value ?? 0);
+            }
+
             return true;
         }
 

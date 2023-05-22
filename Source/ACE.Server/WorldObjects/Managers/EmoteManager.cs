@@ -66,7 +66,7 @@ namespace ACE.Server.WorldObjects.Managers
             var emoteType = (EmoteType)emote.Type;
 
             //if (Debug)
-                //Console.WriteLine($"{WorldObject.Name}.ExecuteEmote({emoteType})");
+            //Console.WriteLine($"{WorldObject.Name}.ExecuteEmote({emoteType})");
 
             var text = emote.Message;
 
@@ -209,7 +209,7 @@ namespace ACE.Server.WorldObjects.Managers
                         castChain.AddDelaySeconds(preCastTime);
                         castChain.AddAction(creature, () =>
                         {
-                            creature.TryCastSpell(spell, spellTarget, creature);
+                            creature.TryCastSpell_WithRedirects(spell, spellTarget, creature);
                             creature.PostCastMotion();
                         });
                         castChain.EnqueueChain();
@@ -226,7 +226,7 @@ namespace ACE.Server.WorldObjects.Managers
                         {
                             var spellTarget = GetSpellTarget(spell, targetObject);
 
-                            WorldObject.TryCastSpell(spell, spellTarget, WorldObject);
+                            WorldObject.TryCastSpell_WithRedirects(spell, spellTarget, WorldObject);
                         }
                     }
                     break;
@@ -375,7 +375,17 @@ namespace ACE.Server.WorldObjects.Managers
                     var stackSize = emote.StackSize ?? 1;
 
                     if (player != null && emote.WeenieClassId != null)
-                        player.GiveFromEmote(WorldObject, emote.WeenieClassId ?? 0, stackSize > 0 ? stackSize : 1, emote.Palette ?? 0, emote.Shade ?? 0);
+                    {
+                        var motionChain = new ActionChain();
+
+                        if (!WorldObject.DontTurnOrMoveWhenGiving && creature != null && targetCreature != null)
+                        {
+                            delay = creature.Rotate(targetCreature);
+                            motionChain.AddDelaySeconds(delay);
+                        }
+                        motionChain.AddAction(WorldObject, () => player.GiveFromEmote(WorldObject, emote.WeenieClassId ?? 0, stackSize > 0 ? stackSize : 1, emote.Palette ?? 0, emote.Shade ?? 0));
+                        motionChain.EnqueueChain();
+                    }
 
                     break;
 
@@ -1106,10 +1116,13 @@ namespace ACE.Server.WorldObjects.Managers
                         Console.Write($" - {emote.Message}");
 
                     message = Replace(emote.Message, WorldObject, targetObject, emoteSet.Quest);
+
+                    var name = WorldObject.CreatureType == CreatureType.Olthoi ? WorldObject.Name + "&" : WorldObject.Name;
+
                     if (emote.Extent > 0)
-                        WorldObject.EnqueueBroadcast(new GameMessageHearRangedSpeech(message, WorldObject.Name, WorldObject.Guid.Full, emote.Extent, ChatMessageType.Emote), WorldObject.LocalBroadcastRange);
+                        WorldObject.EnqueueBroadcast(new GameMessageHearRangedSpeech(message, name, WorldObject.Guid.Full, emote.Extent, ChatMessageType.Emote), WorldObject.LocalBroadcastRange);
                     else
-                        WorldObject.EnqueueBroadcast(new GameMessageHearSpeech(message, WorldObject.Name, WorldObject.Guid.Full, ChatMessageType.Emote), WorldObject.LocalBroadcastRange);
+                        WorldObject.EnqueueBroadcast(new GameMessageHearSpeech(message, name, WorldObject.Guid.Full, ChatMessageType.Emote), WorldObject.LocalBroadcastRange);
                     break;
 
                 case EmoteType.SetAltRacialSkills:

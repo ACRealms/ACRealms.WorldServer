@@ -119,7 +119,6 @@
     <None Remove="Entity\Mutations\Recipes\3800004B - Green Garnet.txt" />
     <None Remove="Entity\Mutations\Recipes\3800004E - Sandstone.txt" />
     <None Remove="Entity\Mutations\Recipes\39000000 - Paragon Weapons.txt" />
-    <None Remove="starterGear.json" />
     <None Include="..\..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -275,7 +274,6 @@
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800004B - Green Garnet.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800004E - Sandstone.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\39000000 - Paragon Weapons.txt" />
-    <EmbeddedResource Include="starterGear.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -323,6 +321,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="log4net.config.example">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="starterGear.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="start_server.bat">
