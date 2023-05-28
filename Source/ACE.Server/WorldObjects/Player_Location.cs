@@ -814,7 +814,7 @@ namespace ACE.Server.WorldObjects
             if (newLocation.IsEphemeralRealm)
             {
                 var lb = LandblockManager.GetLandblockUnsafe(newLocation.LandblockId, newLocation.Instance);
-                if (lb.RealmHelpers.IsDuel)
+                if (lb.RealmHelpers.IsDuel || lb.RealmHelpers.IsPkOnly)
                     pk = true;
             }
 
