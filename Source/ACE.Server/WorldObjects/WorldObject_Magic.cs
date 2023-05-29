@@ -1245,7 +1245,7 @@ namespace ACE.Server.WorldObjects
             if (summonLoc != null)
                 summonLoc.LandblockId = new LandblockId(summonLoc.GetCell());
 
-            var success = SummonPortal(portalId, summonLoc, spell.PortalLifetime, this, player);
+            var success = SummonPortal(portalId, summonLoc, spell.PortalLifetime, this, player ?? targetCreature as Player);
 
             if (!success && player != null)
                 player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.YouFailToSummonPortal));
