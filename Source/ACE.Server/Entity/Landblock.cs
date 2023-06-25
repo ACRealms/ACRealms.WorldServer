@@ -1400,6 +1400,14 @@ namespace ACE.Server.Entity
                     return Landblock.InnerRealmInfo != null && Landblock.RealmRuleset.GetProperty(RealmPropertyBool.IsDuelingRealm);
                 }
             }
+
+            public bool IsPkOnly
+            {
+                get
+                {
+                    return Landblock.RealmRuleset != null && Landblock.RealmRuleset.GetProperty(RealmPropertyBool.IsPKOnly);
+                }
+            }
         }
     }
 }
