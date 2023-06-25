@@ -8,6 +8,7 @@ using ACE.Server.WorldObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text.RegularExpressions;
 
 namespace ACE.Server.Command
@@ -605,7 +606,7 @@ namespace ACE.Server.Command
 
             try
             {
-                position = new Position(coordNS, coordEW, session.Player.Location.Instance);
+                position = new Position(new Vector2(coordEW, coordNS), session.Player.Location.Instance);
                 position.AdjustMapCoords();
             }
             catch (Exception e)
