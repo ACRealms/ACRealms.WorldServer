@@ -373,27 +373,34 @@ namespace ACE.Server.Command.Handlers.Processors
                     return;
                 }
             }
-            switch (contentType)
+            try
             {
-                case FileType.LandblockInstance:
-                    ImportSQLLandblock(session, param);
-                    break;
+                switch (contentType)
+                {
+                    case FileType.LandblockInstance:
+                        ImportSQLLandblock(session, param);
+                        break;
 
-                case FileType.Quest:
-                    ImportSQLQuest(session, param);
-                    break;
+                    case FileType.Quest:
+                        ImportSQLQuest(session, param);
+                        break;
 
-                case FileType.Recipe:
-                    ImportSQLRecipe(session, param);
-                    break;
+                    case FileType.Recipe:
+                        ImportSQLRecipe(session, param);
+                        break;
 
-                case FileType.Weenie:
-                    ImportSQLWeenieWrapped(session, param, parameters.Length >= 3 ? parameters[2] : "");
-                    break;
+                    case FileType.Weenie:
+                        ImportSQLWeenieWrapped(session, param, parameters.Length >= 3 ? parameters[2] : "");
+                        break;
 
-                /*case FileType.Realm:
-                    ImportSQLRealm(session, param);
-                    break;*/
+                    /*case FileType.Realm:
+                        ImportSQLRealm(session, param);
+                        break;*/
+                }
+            }
+            catch(Exception e)
+            {
+                CommandHandlerHelper.WriteOutputError(session, $"There was an error importing the SQL:\n\n{e.Message}");
             }
         }
 
@@ -1901,7 +1908,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            session.Network.EnqueueSend(new GameMessageSystemChat($"Removing encounter @ landblock {obj.Location.LandblockShort:X4}, cellX={cellX}, cellY={cellY}\n{obj.WeenieClassId} - {obj.Name}", ChatMessageType.Broadcast));
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Removing encounter @ landblock {obj.Location.InstancedLandblock:X4}, cellX={cellX}, cellY={cellY}\n{obj.WeenieClassId} - {obj.Name}", ChatMessageType.Broadcast));
 
             encounters.Remove(encounter);
 
@@ -1931,6 +1938,13 @@ namespace ACE.Server.Command.Handlers.Processors
                         DestroyAll(child);
                 }
             }
+        }
+
+        [CommandHandler("export-json-folders", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to JSON file in a WeenieType/ItemType folder structure", "<wcid>")]
+        public static void HandleExportJsonFolder(Session session, params string[] parameters)
+        {
+            var param = parameters[0];
+            ExportJsonWeenie(session, param, true);
         }
 
         [CommandHandler("export-json", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to JSON file", "<wcid>")]
@@ -1969,7 +1983,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
         }
 
-        public static void ExportJsonWeenie(Session session, string param)
+        public static void ExportJsonWeenie(Session session, string param, bool withFolders = false)
         {
             DirectoryInfo di = VerifyContentFolder(session, false);
 
@@ -1994,8 +2008,39 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            var json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}";
-
+            string json_folder = null;
+            if (withFolders)
+            {
+                var weenieType = (WeenieType)weenie.Type;
+                switch (weenieType)
+                {
+                    case WeenieType.Creature: // Export to the "CreatureType" folder
+                        WeeniePropertiesInt cType = (from x in weenie.WeeniePropertiesInt where x.Type == 2 select x).FirstOrDefault();
+                        if (cType == null)
+                            json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}{weenieType}{sep}";
+                        else
+                        {
+                            CreatureType creatureType = (CreatureType)cType.Value;
+                            json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}{weenieType}{sep}{creatureType}{sep}";
+                        }
+                        break;
+                    default: // Otherwise goes to "ItemType" folder
+                        WeeniePropertiesInt iType = (from x in weenie.WeeniePropertiesInt where x.Type == 1 select x).FirstOrDefault();
+                        if (iType == null)
+                            json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}{weenieType}{sep}";
+                        else
+                        {
+                            ItemType itemType = (ItemType)iType.Value;
+                            json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}{weenieType}{sep}{itemType}{sep}";
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                json_folder = $"{di.FullName}{sep}json{sep}weenies{sep}";
+            }
+            
             di = new DirectoryInfo(json_folder);
 
             if (!di.Exists)
@@ -2145,7 +2190,14 @@ namespace ACE.Server.Command.Handlers.Processors
             CommandHandlerHelper.WriteOutputInfo(session, $"Exported {json_folder}{json_filename}");
         }
 
-        [CommandHandler("export-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to SQL file", "<wcid>")]
+        [CommandHandler("export-sql-folders", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports weenie content from database to an SQL file in a WeenieType/ItemType folder structure", "<wcid>")]
+        public static void HandleExportSqlFolder(Session session, params string[] parameters)
+        {
+            var param = parameters[0];
+            ExportSQLWeenie(session, param, true);
+        }
+
+        [CommandHandler("export-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to SQL file", "<wcid> [content-type]")]
         public static void HandleExportSql(Session session, params string[] parameters)
         {
             var param = parameters[0];
@@ -2185,7 +2237,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
         }
 
-        public static void ExportSQLWeenie(Session session, string param)
+        public static void ExportSQLWeenie(Session session, string param, bool withFolders = false)
         {
             DirectoryInfo di = VerifyContentFolder(session, false);
 
@@ -2204,7 +2256,38 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            var sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}";
+            string sql_folder = null;
+            if (withFolders)
+            {
+                var weenieType = (WeenieType)weenie.Type;
+                switch (weenieType)
+                {
+                    case WeenieType.Creature: // Export to the "CreatureType" folder
+                        WeeniePropertiesInt cType = (from x in weenie.WeeniePropertiesInt where x.Type == 2 select x).FirstOrDefault();
+                        if (cType == null)
+                            sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}{weenieType}{sep}";
+                        else
+                        {
+                            CreatureType creatureType = (CreatureType)cType.Value;
+                            sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}{weenieType}{sep}{creatureType}{sep}";
+                        }
+                        break;
+                    default: // Otherwise goes to "ItemType" folder
+                        WeeniePropertiesInt iType = (from x in weenie.WeeniePropertiesInt where x.Type == 1 select x).FirstOrDefault();
+                        if (iType == null)
+                            sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}{weenieType}{sep}";
+                        else
+                        {
+                            ItemType itemType = (ItemType)iType.Value;
+                            sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}{weenieType}{sep}{itemType}{sep}";
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                sql_folder = $"{di.FullName}{sep}sql{sep}weenies{sep}";
+            }
 
             di = new DirectoryInfo(sql_folder);
 
