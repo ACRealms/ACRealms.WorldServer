@@ -326,7 +326,10 @@ namespace ACE.Server.Entity
 
                     var sortCell = LScape.get_landcell(pos.ObjCellID, Instance) as SortCell;
                     if (sortCell != null && sortCell.has_building())
+                    {
+                        wo.Destroy();
                         return;
+                    }
 
                     if (PropertyManager.GetBool("override_encounter_spawn_rates").Item)
                     {
@@ -353,7 +356,8 @@ namespace ACE.Server.Entity
                         }
                     }
 
-                    AddWorldObject(wo);
+                    if (!AddWorldObject(wo))
+                        wo.Destroy();
                 }));
             }
         }

@@ -352,7 +352,12 @@ namespace ACE.Server.Factories
         /// </summary>
         public static WorldObject CreateNewWorldObject(Weenie weenie, AppliedRuleset ruleset)
         {
-            var worldObject = CreateWorldObject(weenie, GuidManager.NewDynamicGuid(), ruleset);
+            var guid = GuidManager.NewDynamicGuid();
+
+            var worldObject = CreateWorldObject(weenie, guid, ruleset);
+
+            if (worldObject == null)
+                GuidManager.RecycleDynamicGuid(guid);
 
             return worldObject;
         }
