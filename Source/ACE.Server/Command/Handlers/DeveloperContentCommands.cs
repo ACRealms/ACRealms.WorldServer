@@ -2134,7 +2134,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             var cookbooks = DatabaseManager.World.GetCookbooksByRecipeId(recipeId);
-            if (cookbooks == null)
+            if (cookbooks == null || cookbooks.Count == 0)
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find recipe id {recipeId}");
                 return;
@@ -2405,7 +2405,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             var cookbooks = DatabaseManager.World.GetCookbooksByRecipeId(recipeId);
-            if (cookbooks == null)
+            if (cookbooks == null || cookbooks.Count == 0)
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find recipe id {recipeId}");
                 return;
