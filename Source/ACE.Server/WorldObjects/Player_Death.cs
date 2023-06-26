@@ -171,8 +171,8 @@ namespace ACE.Server.WorldObjects
             // todo: since we are going to be using 'time since Player last died to an OlthoiPlayer'
             // as a factor in slag generation, this will eventually be moved to after the slag generation
 
-            if (topDamager != null && topDamager.IsOlthoiPlayer)
-                OlthoiLootTimestamp = (int)Time.GetUnixTime();
+            //if (topDamager != null && topDamager.IsOlthoiPlayer)
+                //OlthoiLootTimestamp = (int)Time.GetUnixTime();
 
             if (CombatMode == CombatMode.Magic && MagicState.IsCasting)
                 FailCast(false);
@@ -206,6 +206,8 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(msgSelfInflictedDeath);
             }
 
+            var hadVitae = HasVitae;
+
             // update vitae
             // players who died in a PKLite fight do not accrue vitae
             var duelRealm = RealmManager.GetRealm(HomeRealm)?.StandardRules?.GetProperty(RealmPropertyBool.IsDuelingRealm) == true ||
@@ -230,7 +232,7 @@ namespace ACE.Server.WorldObjects
             dieChain.AddAction(this, () =>
             {
                 if (!duelRealm)
-                    CreateCorpse(topDamager);
+                    CreateCorpse(topDamager, hadVitae);
 
                 ThreadSafeTeleportOnDeath(); // enter portal space
 
@@ -1042,9 +1044,9 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Determines the amount of slag to drop on a Player corpse when killed by an OlthoiPlayer
         /// </summary>
-        public List<WorldObject> CalculateDeathItems_Olthoi(Corpse corpse)
+        public List<WorldObject> CalculateDeathItems_Olthoi(Corpse corpse, bool hadVitae)
         {
-            var slag = LootGenerationFactory.RollSlag(this);
+            var slag = LootGenerationFactory.RollSlag(this, hadVitae);
 
             if (slag == null)
                 return new List<WorldObject>();

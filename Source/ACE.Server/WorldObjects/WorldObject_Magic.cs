@@ -478,8 +478,9 @@ namespace ACE.Server.WorldObjects
             var player = this as Player;
             var creature = this as Creature;
 
-            // double check caster and target are alive
-            if (creature != null && creature.IsDead || targetCreature != null && targetCreature.IsDead)
+            // prevent double deaths from indirect casts
+            // caster is already checked in player/monster, and re-checking caster here would break death emotes such as bunny smite
+            if (targetCreature != null && targetCreature.IsDead)
                 return;
 
             // handle negatives?
@@ -702,8 +703,9 @@ namespace ACE.Server.WorldObjects
 
             var targetPlayer = targetCreature as Player;
 
-            // double check caster and target are alive
-            if (creature != null && creature.IsDead || targetCreature != null && targetCreature.IsDead)
+            // prevent double deaths from indirect casts
+            // caster is already checked in player/monster, and re-checking caster here would break death emotes such as bunny smite
+            if (targetCreature != null && targetCreature.IsDead)
                 return;
 
             // source and destination can be the same creature, or different creatures
