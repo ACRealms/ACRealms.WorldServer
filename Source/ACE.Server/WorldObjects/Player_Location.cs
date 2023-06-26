@@ -274,6 +274,12 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToMarketPlace()
         {
+            if (IsOlthoiPlayer)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
+                return;
+            }
+
             if (PKTimerActive)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveBeenInPKBattleTooRecently));
@@ -336,6 +342,12 @@ namespace ACE.Server.WorldObjects
         public void HandleActionRecallAllegianceHometown()
         {
             //Console.WriteLine($"{Name}.HandleActionRecallAllegianceHometown()");
+
+            if (IsOlthoiPlayer)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
+                return;
+            }
 
             if (PKTimerActive)
             {
@@ -423,6 +435,12 @@ namespace ACE.Server.WorldObjects
         public void HandleActionTeleToMansion()
         {
             //Console.WriteLine($"{Name}.HandleActionTeleToMansion()");
+
+            if (IsOlthoiPlayer)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
+                return;
+            }
 
             if (PKTimerActive)
             {
@@ -616,6 +634,12 @@ namespace ACE.Server.WorldObjects
         public void HandleActionTeleToPklArena()
         {
             //Console.WriteLine($"{Name}.HandleActionTeleToPkLiteArena()");
+
+            if (IsOlthoiPlayer)
+            {
+                Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
+                return;
+            }
 
             if (PlayerKillerStatus != PlayerKillerStatus.PKLite)
             {

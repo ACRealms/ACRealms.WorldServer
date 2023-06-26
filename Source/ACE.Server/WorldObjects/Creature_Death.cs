@@ -20,6 +20,7 @@ namespace ACE.Server.WorldObjects
     partial class Creature
     {
         public TreasureDeath DeathTreasure { get => DeathTreasureType.HasValue ? DatabaseManager.World.GetCachedDeathTreasure(DeathTreasureType.Value) : null; }
+
         private bool onDeathEntered = false;
 
         /// <summary>
@@ -488,6 +489,9 @@ namespace ACE.Server.WorldObjects
             }
             var player = this as Player;
 
+            // use the physics location for accuracy,
+            // especially while jumping
+            corpse.Location = PhysicsObj.Position.ACEPosition(Location.Instance);
 
             bool atHideout = false;
             if (player?.HomeRealm != null &&
@@ -544,41 +548,65 @@ namespace ACE.Server.WorldObjects
             if (player != null)
             {
                 corpse.SetPosition(PositionType.Location, corpse.Location);
-                var dropped = killer != null && killer.IsOlthoiPlayer ? player.CalculateDeathItems_Olthoi(corpse, hadVitae) : player.CalculateDeathItems(corpse);
-                corpse.RecalculateDecayTime(player);
 
-                if (dropped.Count > 0)
-                    saveCorpse = true;
+                var killerIsOlthoiPlayer = killer != null && killer.IsOlthoiPlayer;
+                var killerIsPkPlayer = killer != null && killer.IsPlayer && killer.Guid != Guid;
 
-                if (atHideout)
+                //var dropped = killer != null && killer.IsOlthoiPlayer ? player.CalculateDeathItems_Olthoi(corpse, hadVitae) : player.CalculateDeathItems(corpse);
+
+                if (killerIsOlthoiPlayer || player.IsOlthoiPlayer)
                 {
-                    if (dropped.Count > 0)
-                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your corpse is located at your hideout (/hideout).", ChatMessageType.Broadcast));
-                }
-                else if (!player.Location.Indoors)
-                {
-                    player.SetPosition(PositionType.LastOutsideDeath, new Position(corpse.Location));
-                    player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePosition(player, PositionType.LastOutsideDeath, corpse.Location));
+                    var dropped = player.CalculateDeathItems_Olthoi(corpse, hadVitae, killerIsOlthoiPlayer, killerIsPkPlayer);
+
+                    foreach (var wo in dropped)
+                        DoCantripLogging(killer, wo);
+
+                    corpse.RecalculateDecayTime(player);
 
                     if (dropped.Count > 0)
-                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your corpse is located at ({corpse.Location.GetMapCoordStr()}).", ChatMessageType.Broadcast));
-                }
+                        saveCorpse = true;
 
-                var isPKdeath = player.IsPKDeath(killer);
-                var isPKLdeath = player.IsPKLiteDeath(killer);
-
-                if (isPKdeath)
                     corpse.PkLevel = PKLevel.PK;
-
-                if (!isPKdeath && !isPKLdeath)
-                {
-                    var miserAug = player.AugmentationLessDeathItemLoss * 5;
-                    if (miserAug > 0)
-                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your augmentation has reduced the number of items you can lose by {miserAug}!", ChatMessageType.Broadcast));
                 }
+                else
+                {
+                    var dropped = player.CalculateDeathItems(corpse);
 
-                if (dropped.Count == 0 && !isPKLdeath)
-                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You have retained all your items. You do not need to recover your corpse!", ChatMessageType.Broadcast));
+                    corpse.RecalculateDecayTime(player);
+
+                    if (dropped.Count > 0)
+                        saveCorpse = true;
+
+                    if (atHideout)
+                    {
+                        if (dropped.Count > 0)
+                            player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your corpse is located at your hideout (/hideout).", ChatMessageType.Broadcast));
+                    }
+                    else if ((player.Location.Cell & 0xFFFF) < 0x100)
+                    {
+                        player.SetPosition(PositionType.LastOutsideDeath, new Position(corpse.Location));
+                        player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePosition(player, PositionType.LastOutsideDeath, corpse.Location));
+
+                        if (dropped.Count > 0)
+                            player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your corpse is located at ({corpse.Location.GetMapCoordStr()}).", ChatMessageType.Broadcast));
+                    }
+
+                    var isPKdeath = player.IsPKDeath(killer);
+                    var isPKLdeath = player.IsPKLiteDeath(killer);
+
+                    if (isPKdeath)
+                        corpse.PkLevel = PKLevel.PK;
+
+                    if (!isPKdeath && !isPKLdeath)
+                    {
+                        var miserAug = player.AugmentationLessDeathItemLoss * 5;
+                        if (miserAug > 0)
+                            player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Your augmentation has reduced the number of items you can lose by {miserAug}!", ChatMessageType.Broadcast));
+                    }
+
+                    if (dropped.Count == 0 && !isPKLdeath)
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"You have retained all your items. You do not need to recover your corpse!", ChatMessageType.Broadcast));
+                }
             }
             else
             {
