@@ -357,6 +357,13 @@ namespace ACE.Server.Command.Handlers.Processors
                 ImportJsonQuest(session, json_folder, file.Name);
         }
 
+        [CommandHandler("import-sql-folders", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports all weenie sql data from the Content folder and all sub-folders", "<wcid>")]
+        public static void HandleImportSQLFolders(Session session, params string[] parameters)
+        {
+            var param = parameters[0];
+            ImportSQLWeenie(session, param, true);
+        }
+
         [CommandHandler("import-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports sql data from the Content folder", "<wcid>")]
         public static void HandleImportSQL(Session session, params string[] parameters)
         {
@@ -404,7 +411,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
         }
 
-        public static void ImportSQLWeenie(Session session, string wcid)
+        public static void ImportSQLWeenie(Session session, string wcid, bool withFolders = false)
         {
             DirectoryInfo di = VerifyContentFolder(session);
             if (!di.Exists) return;
@@ -420,7 +427,9 @@ namespace ACE.Server.Command.Handlers.Processors
 
             di = new DirectoryInfo(sql_folder);
 
-            var files = di.Exists ? di.GetFiles($"{prefix}*.sql") : null;
+            EnumerationOptions options = new EnumerationOptions();
+            options.RecurseSubdirectories = withFolders;
+            var files = di.Exists ? di.GetFiles($"{prefix}*.sql", options) : null;
 
             if (files == null || files.Length == 0)
             {
@@ -429,7 +438,8 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             foreach (var file in files)
-                ImportSQLWeenie(session, sql_folder, file.Name);
+                ImportSQLWeenie(session, file.DirectoryName + sep, file.Name);
+                
         }
 
         public static void ImportSQLRecipe(Session session, string recipeId)
