@@ -190,11 +190,12 @@ namespace ACE.Entity.Enum.Properties
         FreeAttributeResetRenewed        = 9008,
         [ServerOnly]
         SkillTemplesTimerReset           = 9009,
+        [ServerOnly]
+        FreeMasteryResetRenewed          = 9010,
 
         /// <summary>
         /// If set to true on a vendor, the vendor will be auto-populated with realm selections.
         /// </summary>
-        [ServerOnly]
         RealmSelectorVendor              = 42000,
 
         /// <summary>
