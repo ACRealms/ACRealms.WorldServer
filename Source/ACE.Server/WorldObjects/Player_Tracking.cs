@@ -262,7 +262,7 @@ namespace ACE.Server.WorldObjects
             // disabled by default
             if (fixLevel < 1) return;
 
-            if (Location.Cell == newPosition.Cell)
+            if (Location.Cell == newPosition.Cell && Location.Instance == newPosition.Instance)
                 return;
 
             var knownObjs = GetKnownObjects();
