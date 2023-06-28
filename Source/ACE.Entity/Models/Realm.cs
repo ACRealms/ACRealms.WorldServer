@@ -218,7 +218,7 @@ namespace ACE.Entity.Models
             return (long)(ulongRand % uRange) + min;
         }
 
-        internal T Compose<T>(T parentValue, T rolledValue)
+        internal Tvar Compose<Tvar>(Tvar parentValue, Tvar rolledValue)
         {
             switch (CompositionType)
             {
@@ -233,26 +233,26 @@ namespace ACE.Entity.Models
             }
         }
 
-        T Add<T>(T oldvalue, T newvalue)
+        Tvar Add<Tvar>(Tvar oldvalue, Tvar newvalue)
         {
-            if (typeof(T) == typeof(double))
-                return (T)(object)((double)(object)oldvalue + (double)(object)newvalue);
-            else if (typeof(T) == typeof(int))
-                return (T)(object)((int)(object)oldvalue + (int)(object)newvalue);
-            else if (typeof(T) == typeof(long))
-                return (T)(object)((long)(object)oldvalue + (long)(object)newvalue);
+            if (typeof(Tvar) == typeof(double))
+                return (Tvar)(object)((double)(object)oldvalue + (double)(object)newvalue);
+            else if (typeof(Tvar) == typeof(int))
+                return (Tvar)(object)((int)(object)oldvalue + (int)(object)newvalue);
+            else if (typeof(Tvar) == typeof(long))
+                return (Tvar)(object)((long)(object)oldvalue + (long)(object)newvalue);
             else
                 return newvalue;
         }
 
-        T Multiply<T>(T oldvalue, T newvalue)
+        Tvar Multiply<Tvar>(Tvar oldvalue, Tvar newvalue)
         {
-            if (typeof(T) == typeof(double))
-                return (T)(object)((double)(object)oldvalue * (double)(object)newvalue);
-            else if (typeof(T) == typeof(int))
-                return (T)(object)((int)(object)oldvalue * (int)(object)newvalue);
+            if (typeof(Tvar) == typeof(double))
+                return (Tvar)(object)((double)(object)oldvalue * (double)(object)newvalue);
+            else if (typeof(Tvar) == typeof(int))
+                return (Tvar)(object)((int)(object)oldvalue * (int)(object)newvalue);
             else if (typeof(T) == typeof(long))
-                return (T)(object)((long)(object)oldvalue * (long)(object)newvalue);
+                return (Tvar)(object)((long)(object)oldvalue * (long)(object)newvalue);
             else
                 return newvalue;
         }
