@@ -39,9 +39,15 @@ namespace ACE.Server.Physics.Common
 
         public static int Default_NumTries = 20;
 
-        public SetPosition() { }
+        private SetPosition() { }
 
-        public SetPosition(Position pos, SetPositionFlags flags, float radius)
+        public SetPosition(uint instance)
+        {
+            Instance = instance;
+        }
+
+        public SetPosition(Position pos, SetPositionFlags flags, float radius, uint instance)
+            : this(instance)
         {
             Pos = pos;
             Flags = flags;
@@ -50,7 +56,8 @@ namespace ACE.Server.Physics.Common
             NumTries = Default_NumTries;
         }
 
-        public SetPosition(Position pos, SetPositionFlags flags)
+        public SetPosition(Position pos, SetPositionFlags flags, uint instance)
+            : this(instance)
         {
             Pos = pos;
             Flags = flags;

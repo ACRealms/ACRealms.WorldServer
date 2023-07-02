@@ -435,7 +435,7 @@ namespace ACE.Server.WorldObjects
             //HandlePreTeleportVisibility(newPosition);
 
             // do the physics teleport
-            var setPosition = new Physics.Common.SetPosition();
+            var setPosition = new Physics.Common.SetPosition(newPosition.Instance);
             setPosition.Pos = new Physics.Common.Position(newPosition);
             setPosition.Flags = Physics.Common.SetPositionFlags.SendPositionEvent | Physics.Common.SetPositionFlags.Slide | Physics.Common.SetPositionFlags.Placement | Physics.Common.SetPositionFlags.Teleport;
 

@@ -384,7 +384,7 @@ namespace ACE.Server.Entity
             // this is due to each randomized position being required to go through the full InitialPlacement process, to verify success
             // if InitialPlacement fails, then we retry up to maxTries
 
-            obj.ScatterPos = new SetPosition(new Physics.Common.Position(obj.Location), SetPositionFlags.RandomScatter, genRadius);
+            obj.ScatterPos = new SetPosition(new Physics.Common.Position(obj.Location), SetPositionFlags.RandomScatter, genRadius, obj.Location.Instance);
 
             var success = obj.EnterWorld();
 

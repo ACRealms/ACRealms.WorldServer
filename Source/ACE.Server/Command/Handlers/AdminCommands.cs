@@ -4706,7 +4706,7 @@ namespace ACE.Server.Command.Handlers
             var newLoc = new Position(session.Player.Location);
             newLoc.Rotation = prevLoc.Rotation;     // keep previous rotation
 
-            var setPos = new Physics.Common.SetPosition(newLoc.PhysPosition(), Physics.Common.SetPositionFlags.Teleport | Physics.Common.SetPositionFlags.Slide);
+            var setPos = new Physics.Common.SetPosition(newLoc.PhysPosition(), Physics.Common.SetPositionFlags.Teleport | Physics.Common.SetPositionFlags.Slide, newLoc.Instance);
             var result = obj.PhysicsObj.SetPosition(setPos);
 
             if (result != Physics.Common.SetPositionError.OK)

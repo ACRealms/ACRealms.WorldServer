@@ -927,7 +927,7 @@ namespace ACE.Server.Physics
             if (CurCell == null || newer_event((int)PhysicsTimeStamp.Teleport, timestamp))
             {
                 teleport_hook(true);
-                var setPos = new SetPosition(pos, SetPositionFlags.Teleport | SetPositionFlags.DontCreateCells);
+                var setPos = new SetPosition(pos, SetPositionFlags.Teleport | SetPositionFlags.DontCreateCells, instance);
                 SetPosition(setPos);
                 return true;
             }
@@ -1373,10 +1373,9 @@ namespace ACE.Server.Physics
 
         public SetPositionError SetPositionSimple(Position pos, bool sliding, uint instance)
         {
-            var setPos = new SetPosition();
+            var setPos = new SetPosition(instance);
             setPos.Pos = pos;
             setPos.Flags = SetPositionFlags.Teleport | SetPositionFlags.SendPositionEvent;
-            setPos.Instance = instance;
 
             if (sliding)
                 setPos.Flags |= SetPositionFlags.Slide;
@@ -2436,9 +2435,8 @@ namespace ACE.Server.Physics
 
             UpdateTime = PhysicsTimer.CurrentTime;
 
-            var setPos = new SetPosition();
+            var setPos = new SetPosition(instance);
             setPos.Pos = Position;
-            setPos.Instance = instance;
             setPos.Flags = SetPositionFlags.Placement;
 
             if (slide)
@@ -3226,10 +3224,10 @@ namespace ACE.Server.Physics
                 TargetManager.ReceiveUpdate(info);
         }
 
-        public bool reenter_visibility()
+        public bool reenter_visibility(uint instance)
         {
             prepare_to_enter_world();
-            var setPos = new SetPosition(Position, SetPositionFlags.Placement | SetPositionFlags.SendPositionEvent);
+            var setPos = new SetPosition(Position, SetPositionFlags.Placement | SetPositionFlags.SendPositionEvent, instance);
             return SetPosition(setPos) == SetPositionError.OK;
         }
 
@@ -4285,10 +4283,9 @@ namespace ACE.Server.Physics
             {
                 //Console.WriteLine($"*** SETTING TELEPORT ***");
 
-                var setPosition = new SetPosition();
+                var setPosition = new SetPosition(RequestInstance);
                 setPosition.Pos = RequestPos;
                 setPosition.Flags = SetPositionFlags.SendPositionEvent | SetPositionFlags.Slide | SetPositionFlags.Placement | SetPositionFlags.Teleport;
-                setPosition.Instance = RequestInstance;
 
                 SetPosition(setPosition);
 
@@ -4383,9 +4380,8 @@ namespace ACE.Server.Physics
             {
                 //Console.WriteLine($"*** SETTING TELEPORT ***");
 
-                var setPosition = new SetPosition();
+                var setPosition = new SetPosition(RequestInstance);
                 setPosition.Pos = RequestPos;
-                setPosition.Instance = RequestInstance;
                 setPosition.Flags = SetPositionFlags.SendPositionEvent | SetPositionFlags.Slide | SetPositionFlags.Placement | SetPositionFlags.Teleport;
 
                 SetPosition(setPosition);

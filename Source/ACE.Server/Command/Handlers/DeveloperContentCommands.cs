@@ -2913,7 +2913,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 var newLoc = new Position(session.Player.Location);
 
                 // slide?
-                var setPos = new Physics.Common.SetPosition(newLoc.PhysPosition(), Physics.Common.SetPositionFlags.Teleport /* | Physics.Common.SetPositionFlags.Slide */);
+                var setPos = new Physics.Common.SetPosition(newLoc.PhysPosition(), Physics.Common.SetPositionFlags.Teleport /* | Physics.Common.SetPositionFlags.Slide */, newLoc.Instance);
                 var result = obj.PhysicsObj.SetPosition(setPos);
 
                 if (result != Physics.Common.SetPositionError.OK)
@@ -2938,7 +2938,7 @@ namespace ACE.Server.Command.Handlers.Processors
                     var homePos = new Position(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW, obj.Location.Instance);
 
                     // slide?
-                    var setPos = new Physics.Common.SetPosition(homePos.PhysPosition(), Physics.Common.SetPositionFlags.Teleport /* | Physics.Common.SetPositionFlags.Slide*/);
+                    var setPos = new Physics.Common.SetPosition(homePos.PhysPosition(), Physics.Common.SetPositionFlags.Teleport /* | Physics.Common.SetPositionFlags.Slide*/, homePos.Instance);
                     var result = obj.PhysicsObj.SetPosition(setPos);
 
                     if (result != Physics.Common.SetPositionError.OK)

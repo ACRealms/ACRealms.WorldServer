@@ -525,7 +525,7 @@ namespace ACE.Server.WorldObjects
             if (DebugMove)
                 Console.WriteLine($"{Name} ({Guid}) - ForceHome({homePos.ToLOCString()})");
 
-            var setPos = new SetPosition();
+            var setPos = new SetPosition(homePos.Instance);
             setPos.Pos = new Physics.Common.Position(homePos);
             setPos.Flags = SetPositionFlags.Teleport;
 
