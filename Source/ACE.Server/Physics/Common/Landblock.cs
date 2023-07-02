@@ -699,7 +699,7 @@ namespace ACE.Server.Physics.Common
             var cellID = startCell;
             for (var i = 0; i < Info.NumCells; i++)
             {
-                var envCell = (EnvCell)LScape.get_landcell(cellID++, 0);
+                var envCell = (EnvCell)LScape.get_landcell(cellID++, Instance);
                 if (envCell != null)
                     envcells.Add(envCell);
                 else

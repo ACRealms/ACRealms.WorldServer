@@ -403,10 +403,9 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public static ObjCell get_visible(uint cellID)
+        public static ObjCell get_visible(uint cellID, uint instance)
         {
-            // Realms TODO: Original realms production branch (Dec 2020) implicitly casted to ulong effectively making instance id 0. I don't think this was intended but leaving for now
-            var cell = (EnvCell)LScape.get_landcell(cellID, 0); 
+            var cell = (EnvCell)LScape.get_landcell(cellID, instance); 
             return cell.VisibleCells.Values.First();
         }
 
