@@ -192,7 +192,7 @@ namespace ACE.Server.Command.Handlers.Processors
             try
             {
                 var fileText = File.ReadAllText(realmsIndexJsonFile);
-                result = JsonConvert.DeserializeObject<Dictionary<string, ushort>>(fileText);
+                result = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, ushort>>(fileText);
 
                 //Map ids
                 foreach (var item in result)
@@ -757,7 +757,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 var metadata = new Adapter.GDLE.Models.Metadata(weenie);
                 if (metadata.HasInfo)
                 {
-                    var jsonEx = JsonSerializer.Serialize(metadata, LifestonedConverter.SerializerSettings);
+                    var jsonEx = System.Text.Json.JsonSerializer.Serialize(metadata, LifestonedConverter.SerializerSettings);
                     sqlFile.WriteLine($"\n/* Lifestoned Changelog:\n{jsonEx}\n*/");
                 }
 
