@@ -4,10 +4,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 using ACE.Adapter.GDLE;
 using ACE.Adapter.Lifestoned;
@@ -70,7 +70,7 @@ namespace ACE.Server.Command.Handlers.Processors
             return FileType.Undefined;
         }
 
-        [CommandHandler("import-json", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports json data from the Content folder", "<wcid>")]
+        [CommandHandler("import-json", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports json data from the Content folder", "<type> <wcid>\n<type> - landblock, quest, recipe, spell, weenie (default if not specified)\n<wcid> - filename prefix to search for. can be 'all' to import all files for this content type")]
         public static void HandleImportJson(Session session, params string[] parameters)
         {
             var param = parameters[0];
@@ -192,7 +192,7 @@ namespace ACE.Server.Command.Handlers.Processors
             try
             {
                 var fileText = File.ReadAllText(realmsIndexJsonFile);
-                result = JsonConvert.DeserializeObject<Dictionary<string, ushort>>(fileText);
+                result = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, ushort>>(fileText);
 
                 //Map ids
                 foreach (var item in result)
@@ -357,14 +357,14 @@ namespace ACE.Server.Command.Handlers.Processors
                 ImportJsonQuest(session, json_folder, file.Name);
         }
 
-        [CommandHandler("import-sql-folders", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports all weenie sql data from the Content folder and all sub-folders", "<wcid>")]
+        [CommandHandler("import-sql-folders", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports all weenie sql data from the Content folder and all sub-folders", "<wcid>\n<wcid> - wcid prefix to search for. can be 'all' to import everything")]
         public static void HandleImportSQLFolders(Session session, params string[] parameters)
         {
             var param = parameters[0];
             ImportSQLWeenie(session, param, true);
         }
 
-        [CommandHandler("import-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports sql data from the Content folder", "<wcid>")]
+        [CommandHandler("import-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Imports sql data from the Content folder", "<type> <wcid>\n<type> - landblock, quest, recipe, spell, weenie (default if not specified)\n<wcid> - filename prefix to search for. can be 'all' to import all files for this content type")]
         public static void HandleImportSQL(Session session, params string[] parameters)
         {
             var param = parameters[0];
@@ -757,7 +757,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 var metadata = new Adapter.GDLE.Models.Metadata(weenie);
                 if (metadata.HasInfo)
                 {
-                    var jsonEx = JsonConvert.SerializeObject(metadata, LifestonedConverter.SerializerSettings);
+                    var jsonEx = System.Text.Json.JsonSerializer.Serialize(metadata, LifestonedConverter.SerializerSettings);
                     sqlFile.WriteLine($"\n/* Lifestoned Changelog:\n{jsonEx}\n*/");
                 }
 
@@ -1187,7 +1187,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             if (File.Exists(json_folder + json_filename) && LifestonedLoader.AppendMetadata(json_folder + json_filename, json_weenie))
             {
-                json = JsonConvert.SerializeObject(json_weenie, LifestonedConverter.SerializerSettings);
+                json = JsonSerializer.Serialize(json_weenie, LifestonedConverter.SerializerSettings);
             }
 
             File.WriteAllText(json_folder + json_filename, json);
@@ -1221,7 +1221,7 @@ namespace ACE.Server.Command.Handlers.Processors
             if (!di.Exists)
                 di.Create();
 
-            var json = JsonConvert.SerializeObject(result, LifestonedConverter.SerializerSettings);
+            var json = JsonSerializer.Serialize(result, LifestonedConverter.SerializerSettings);
 
             File.WriteAllText(json_folder + json_filename, json);
 
@@ -1252,7 +1252,7 @@ namespace ACE.Server.Command.Handlers.Processors
             if (!di.Exists)
                 di.Create();
 
-            var json = JsonConvert.SerializeObject(result, LifestonedConverter.SerializerSettings);
+            var json = JsonSerializer.Serialize(result, LifestonedConverter.SerializerSettings);
 
             File.WriteAllText(json_folder + json_filename, json);
 
@@ -1277,7 +1277,7 @@ namespace ACE.Server.Command.Handlers.Processors
             if (!di.Exists)
                 di.Create();
 
-            var json = JsonConvert.SerializeObject(result, LifestonedConverter.SerializerSettings);
+            var json = JsonSerializer.Serialize(result, LifestonedConverter.SerializerSettings);
 
             File.WriteAllText(json_folder + json_filename, json);
 
@@ -1317,7 +1317,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
         public static LandblockInstanceWriter LandblockInstanceWriter;
 
-        [CommandHandler("createinst", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Spawns a new wcid or classname as a landblock instance", "<wcid or classname>")]
+        [CommandHandler("createinst", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Spawns a new wcid or classname as a landblock instance", "<wcid or classname>\n\nTo create a parent/child relationship: /createinst -p <parent guid> -c <wcid or classname>\nTo automatically get the parent guid from the last appraised object: /createinst -p -c <wcid or classname>\n\nTo manually specify a start guid: /createinst <wcid or classname> <start guid>\nStart guids can be in the range 0x000-0xFFF, or they can be prefixed with 0x7<landblock id>")]
         public static void HandleCreateInst(Session session, params string[] parameters)
         {
             var loc = new Position(session.Player.Location);
@@ -2010,7 +2010,7 @@ namespace ACE.Server.Command.Handlers.Processors
             ExportJsonWeenie(session, param, true);
         }
 
-        [CommandHandler("export-json", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to JSON file", "<wcid>")]
+        [CommandHandler("export-json", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to JSON file", "<optional type> <id>\n<optional type> - landblock, quest, recipe, spell, weenie (default if not specified)\n<id> - wcid or content id to export")]
         public static void HandleExportJson(Session session, params string[] parameters)
         {
             var param = parameters[0];
@@ -2113,7 +2113,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             if (File.Exists(json_folder + json_filename) && LifestonedLoader.AppendMetadata(json_folder + json_filename, json_weenie))
             {
-                json = JsonConvert.SerializeObject(json_weenie, LifestonedConverter.SerializerSettings);
+                json = JsonSerializer.Serialize(json_weenie, LifestonedConverter.SerializerSettings);
             }
 
             File.WriteAllText(json_folder + json_filename, json);
@@ -2163,7 +2163,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var json_filename = $"{recipeId.ToString("00000")} - {desc}.json";
 
-            var json = JsonConvert.SerializeObject(result, LifestonedConverter.SerializerSettings);
+            var json = JsonSerializer.Serialize(result, LifestonedConverter.SerializerSettings);
 
             File.WriteAllText(json_folder + json_filename, json);
 
@@ -2210,7 +2210,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var json_filename = $"{landblockId:X4}.json";
 
-            var json = JsonConvert.SerializeObject(result, LifestonedConverter.SerializerSettings);
+            var json = JsonSerializer.Serialize(result, LifestonedConverter.SerializerSettings);
 
             File.WriteAllText(json_folder + json_filename, json);
 
@@ -2246,7 +2246,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var json_filename = $"{questName}.json";
 
-            var json = JsonConvert.SerializeObject(result, LifestonedConverter.SerializerSettings);
+            var json = JsonSerializer.Serialize(result, LifestonedConverter.SerializerSettings);
 
             File.WriteAllText(json_folder + json_filename, json);
 
@@ -2260,7 +2260,7 @@ namespace ACE.Server.Command.Handlers.Processors
             ExportSQLWeenie(session, param, true);
         }
 
-        [CommandHandler("export-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to SQL file", "<wcid> [content-type]")]
+        [CommandHandler("export-sql", AccessLevel.Developer, CommandHandlerFlag.None, 1, "Exports content from database to SQL file", "<optional type> <id>\n<optional type> - landblock, quest, recipe, spell, weenie (default if not specified)\n<id> - wcid or content id to export")]
         public static void HandleExportSql(Session session, params string[] parameters)
         {
             var param = parameters[0];
