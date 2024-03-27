@@ -151,6 +151,13 @@ namespace ACE.Server.WorldObjects
 
             IsPlayerMovingTo2 = false;
 
+            // possible acrealms related, a null reference exception is thrown sometimes?
+            if (MoveToParams == null)
+            {
+                log.Warn("MoveToParams is null when it shouldn't be, investigate OnMoveComplete_MoveTo2");
+                return;
+            }
+
             if (MoveToParams.Callback == null)
             {
                 // nothing to do -- we are done here
