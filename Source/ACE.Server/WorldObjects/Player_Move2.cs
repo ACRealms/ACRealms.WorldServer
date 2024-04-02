@@ -1,7 +1,11 @@
 using System;
-
+using ACE.Adapter.GDLE.Models;
+using ACE.Database;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
+using ACE.Server.Entity.Actions;
+using ACE.Server.Network;
+using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.Common;
@@ -145,6 +149,34 @@ namespace ACE.Server.WorldObjects
             return mvp;
         }
 
+        private void ReloadLandblock(Session session)
+        {
+
+            var landblock = session.Player.CurrentLandblock;
+
+            if (landblock == null)
+                throw new Exception("Failed to reload landblock");
+
+            var landblockId = landblock.Id.Raw | 0xFFFF;
+
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Reloading 0x{landblockId:X8}", ChatMessageType.Broadcast));
+
+            // destroy all non-player server objects
+            landblock.DestroyAllNonPlayerObjects();
+
+            // clear landblock cache
+            DatabaseManager.World.ClearCachedInstancesByLandblock(landblock.Id.Landblock, 0);
+
+            // reload landblock
+            var actionChain = new ActionChain();
+            actionChain.AddDelayForOneTick();
+            actionChain.AddAction(session.Player, () =>
+            {
+                landblock.Init(landblock.InnerRealmInfo, true);
+            });
+            actionChain.EnqueueChain();
+        }
+
         public void OnMoveComplete_MoveTo2(WeenieError status)
         {
             if (DebugPlayerMoveToStatePhysics)
@@ -155,7 +187,9 @@ namespace ACE.Server.WorldObjects
             // possible acrealms related, a null reference exception is thrown sometimes?
             if (MoveToParams == null)
             {
-                log.Warn("MoveToParams is null when it shouldn't be, investigate OnMoveComplete_MoveTo2");
+                log.Warn("MoveToParams is null when it shouldn't be, investigate OnMoveComplete_MoveTo2, reloading landblock");
+                // this is temporary fix, until it is determined why this is code block is happening
+                ReloadLandblock(Session);
                 return;
             }
 
