@@ -78,6 +78,11 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToHouse()
         {
+            var recallsDisabled = !RealmRuleset.GetProperty(RealmPropertyBool.HasRecalls);
+            if (recallsDisabled)
+                return;
+
+
             if (IsOlthoiPlayer)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
@@ -148,6 +153,10 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToHideout()
         {
+            var recallsDisabled = !RealmRuleset.GetProperty(RealmPropertyBool.HasRecalls);
+            if (recallsDisabled)
+                return;
+
             if (PKTimerActive)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveBeenInPKBattleTooRecently));
@@ -207,6 +216,10 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void HandleActionTeleToLifestone()
         {
+            var recallsDisabled = !RealmRuleset.GetProperty(RealmPropertyBool.HasRecalls);
+            if (recallsDisabled)
+                return;
+
             if (PKTimerActive)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveBeenInPKBattleTooRecently));
@@ -274,6 +287,9 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToMarketPlace()
         {
+            var recallsDisabled = !RealmRuleset.GetProperty(RealmPropertyBool.HasRecalls);
+            if (recallsDisabled)
+                return;
             if (IsOlthoiPlayer)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.OlthoiCanOnlyRecallToLifestone));
@@ -341,6 +357,9 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionRecallAllegianceHometown()
         {
+            var recallsDisabled = !RealmRuleset.GetProperty(RealmPropertyBool.HasRecalls);
+            if (recallsDisabled)
+                return;
             //Console.WriteLine($"{Name}.HandleActionRecallAllegianceHometown()");
 
             if (IsOlthoiPlayer)
@@ -434,6 +453,9 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void HandleActionTeleToMansion()
         {
+            var recallsDisabled = !RealmRuleset.GetProperty(RealmPropertyBool.HasRecalls);
+            if (recallsDisabled)
+                return;
             //Console.WriteLine($"{Name}.HandleActionTeleToMansion()");
 
             if (IsOlthoiPlayer)
@@ -555,6 +577,9 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToPkArena()
         {
+            var recallsDisabled = !RealmRuleset.GetProperty(RealmPropertyBool.HasRecalls);
+            if (recallsDisabled)
+                return;
             //Console.WriteLine($"{Name}.HandleActionTeleToPkArena()");
 
             if (PlayerKillerStatus != PlayerKillerStatus.PK)
@@ -633,6 +658,9 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToPklArena()
         {
+            var recallsDisabled = !RealmRuleset.GetProperty(RealmPropertyBool.HasRecalls);
+            if (recallsDisabled)
+                return;
             //Console.WriteLine($"{Name}.HandleActionTeleToPkLiteArena()");
 
             if (IsOlthoiPlayer)
