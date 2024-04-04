@@ -39,7 +39,10 @@ namespace ACE.Entity.Enum.Properties
         CanInteractWithNeutralZone,
 
         [RealmPropertyBool(true)]
-        SpellCastingPKDoubleCollisionCheck 
+        SpellCastingPKDoubleCollisionCheck,
+
+        [RealmPropertyBool(true)]
+        HasRecalls
     }
 
     public static class RealmPropertyBoolExtensions
