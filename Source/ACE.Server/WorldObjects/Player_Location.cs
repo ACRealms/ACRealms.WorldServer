@@ -853,7 +853,7 @@ namespace ACE.Server.WorldObjects
 
             if (newLocation.IsEphemeralRealm && !Location.IsEphemeralRealm)
             {
-                SetPosition(PositionType.EphemeralRealmExitTo, new Position(Location));
+                SetPosition(PositionType.EphemeralRealmExitTo, new Position(Location.InFrontOf(-7f)));
                 SetPosition(PositionType.EphemeralRealmLastEnteredDrop, new Position(newLocation));
             }
             else if (!newLocation.IsEphemeralRealm)
