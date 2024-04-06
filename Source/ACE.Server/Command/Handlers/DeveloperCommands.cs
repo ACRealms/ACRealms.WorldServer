@@ -98,7 +98,7 @@ namespace ACE.Server.Command.Handlers
         public static void HandleNudge(Session session, params string[] parameters)
         {
             var pos = session.Player.GetPosition(PositionType.Location);
-            if (WorldObject.AdjustDungeonCells(pos))
+            if (WorldObject.AdjustDungeonCells(pos, pos.Instance))
             {
                 pos.PositionZ += 0.005000f;
                 var posReadable = PostionAsLandblocksGoogleSpreadsheetFormat(pos);

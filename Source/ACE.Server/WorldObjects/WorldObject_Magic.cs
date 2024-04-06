@@ -1162,7 +1162,7 @@ namespace ACE.Server.WorldObjects
                     portalRecall.AddAction(targetPlayer, () =>
                     {
                         var teleportDest = new Position(portal.Destination);
-                        AdjustDungeon(teleportDest);
+                        AdjustDungeon(teleportDest, targetPlayer.Location.Instance);
 
                         targetPlayer.Teleport(teleportDest);
                     });
@@ -1366,7 +1366,7 @@ namespace ACE.Server.WorldObjects
                 portalSendingChain.AddAction(targetPlayer, () =>
                 {
                     var teleportDest = new Position(spell.Position);
-                    AdjustDungeon(teleportDest);
+                    AdjustDungeon(teleportDest, targetPlayer.Location.Instance);
 
                     targetPlayer.Teleport(teleportDest);
 
@@ -1379,7 +1379,7 @@ namespace ACE.Server.WorldObjects
                 // monsters can cast some portal spells on themselves too, possibly?
                 // under certain circumstances, such as ensuring the destination is the same landblock
                 var teleportDest = new Position(spell.Position);
-                AdjustDungeon(teleportDest);
+                AdjustDungeon(teleportDest, targetCreature.Location.Instance);
 
                 targetCreature.FakeTeleport(teleportDest);
             }
@@ -1419,7 +1419,7 @@ namespace ACE.Server.WorldObjects
             portalSendingChain.AddAction(targetPlayer, () =>
             {
                 var teleportDest = new Position(spell.Position);
-                AdjustDungeon(teleportDest);
+                AdjustDungeon(teleportDest, targetPlayer.Location.Instance);
 
                 targetPlayer.Teleport(teleportDest);
 

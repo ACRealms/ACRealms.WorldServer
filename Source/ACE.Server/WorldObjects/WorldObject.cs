@@ -740,23 +740,27 @@ namespace ACE.Server.WorldObjects
         }
 
         // todo: This should really be an extension method for Position, or a static method within Position or even AdjustPos
-        public static void AdjustDungeon(Position pos)
+        public static void AdjustDungeon(Position pos, uint? instance = null)
         {
-            AdjustDungeonPos(pos);
-            AdjustDungeonCells(pos);
+            var iid = instance.GetValueOrDefault(pos.Instance);
+            if (iid == 0)
+                log.Error("AdjustDungeon: Instance ID is 0! Instance ID needs to be passed to this method if the position lacks an instance id.");
+            
+            AdjustDungeonPos(pos, iid);
+            AdjustDungeonCells(pos, iid);
         }
 
         // todo: This should really be an extension method for Position, or a static method within Position or even AdjustPos
-        public static bool AdjustDungeonCells(Position pos)
+        public static bool AdjustDungeonCells(Position pos, uint iid)
         {
             if (pos == null) return false;
 
-            var landblock = LScape.get_landblock(pos.Cell, pos.Instance);
+            var landblock = LScape.get_landblock(pos.Cell, iid);
             if (landblock == null || !landblock.HasDungeon) return false;
 
             var dungeonID = pos.Cell >> 16;
 
-            var adjustCell = AdjustCell.Get(dungeonID, pos.Instance);
+            var adjustCell = AdjustCell.Get(dungeonID, iid);
             var cellID = adjustCell.GetCell(pos.Pos);
 
             if (cellID != null && pos.Cell != cellID.Value)
@@ -768,11 +772,11 @@ namespace ACE.Server.WorldObjects
         }
 
         // todo: This should really be an extension method for Position, or a static method within Position, or even AdjustPos
-        public static bool AdjustDungeonPos(Position pos)
+        public static bool AdjustDungeonPos(Position pos, uint iid)
         {
             if (pos == null) return false;
 
-            var landblock = LScape.get_landblock(pos.Cell, pos.Instance);
+            var landblock = LScape.get_landblock(pos.Cell, iid);
             if (landblock == null || !landblock.HasDungeon) return false;
 
             var dungeonID = pos.Cell >> 16;
