@@ -20,7 +20,7 @@ namespace ACE.Server.Physics.Common
         /// <summary>
         /// This is not used if PhysicsEngine.Instance.Server is true
         /// </summary>
-        public static ConcurrentDictionary<ulong, Landblock> Landblocks = new ConcurrentDictionary<ulong, Landblock>();
+        private static ConcurrentDictionary<ulong, Landblock> Landblocks = new ConcurrentDictionary<ulong, Landblock>();
         //public static Dictionary<uint, Landblock> BlockDrawList = new Dictionary<uint, Landblock>();
 
         public static uint LoadedCellID;
@@ -105,20 +105,20 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public static bool unload_landblock(uint landblockID)
+        public static bool unload_landblock(uint dungeonID, uint instance)
         {
             if (PhysicsEngine.Instance.Server)
             {
                 // todo: Instead of ACE.Server.Entity.Landblock.Unload() calling this function, it should be calling PhysicsLandblock.Unload()
                 // todo: which would then call AdjustCell.AdjustCells.Remove()
 
-                AdjustCell.AdjustCells.TryRemove(landblockID >> 16, out _);
+                AdjustCell.TryRemove(dungeonID, instance);
                 return true;
             }
 
-            var result = Landblocks.TryRemove(landblockID, out _);
+            var result = Landblocks.TryRemove(LandblockKey(dungeonID, instance), out _);
             // todo: Like mentioned above, the following function should be moved to ACE.Server.Physics.Common.Landblock.Unload()
-            AdjustCell.AdjustCells.TryRemove(landblockID >> 16, out _);
+            AdjustCell.TryRemove(dungeonID, instance);
             return result;
         }
 

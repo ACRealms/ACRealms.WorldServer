@@ -1176,7 +1176,7 @@ namespace ACE.Server.Entity
             actionQueue.Clear();
 
             // remove physics landblock
-            LScape.unload_landblock(landblockID);
+            LScape.unload_landblock(landblockID, Instance);
 
             PhysicsLandblock.release_shadow_objs();
         }

@@ -9,7 +9,7 @@ namespace ACE.Server.Physics.Util
     public class AdjustCell
     {
         public List<Common.EnvCell> EnvCells;
-        public static ConcurrentDictionary<ulong, AdjustCell> AdjustCells = new ConcurrentDictionary<ulong, AdjustCell>();
+        private static ConcurrentDictionary<ulong, AdjustCell> AdjustCells = new ConcurrentDictionary<ulong, AdjustCell>();
 
         public AdjustCell(uint dungeonID, uint instance)
         {
@@ -55,6 +55,11 @@ namespace ACE.Server.Physics.Util
                 AdjustCells.TryAdd(DictKey(dungeonID, instance), adjustCell);
             }
             return adjustCell;
+        }
+
+        public static void TryRemove(uint dungeonID, uint instance)
+        {
+            AdjustCells.TryRemove(DictKey(dungeonID, instance), out  _);
         }
 
         private static ulong DictKey(uint dungeonID, uint instance)
