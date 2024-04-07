@@ -56,7 +56,7 @@ namespace ACE.Server.WorldObjects
 
         public float GetCylinderDistance(WorldObject wo)
         {
-            return (float)Physics.Common.Position.CylinderDistance(PhysicsObj.GetRadius(), PhysicsObj.GetHeight(), PhysicsObj.Position,
+            return (float)Physics.Common.PhysicsPosition.CylinderDistance(PhysicsObj.GetRadius(), PhysicsObj.GetHeight(), PhysicsObj.Position,
                 wo.PhysicsObj.GetRadius(), wo.PhysicsObj.GetHeight(), wo.PhysicsObj.Position);
         }
 

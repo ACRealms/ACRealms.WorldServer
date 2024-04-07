@@ -27,7 +27,7 @@ namespace ACE.Server.Physics.Command
         public float AutoRunSpeed;
         public uint ActionStamp;
         public DateTime LastSentPositionTime;
-        public Position LastSentPosition;
+        public PhysicsPosition LastSentPosition;
         public Plane LastSentContactPlane;
         public const double TimeBetweenPositionEvents = 1.875f;
 
@@ -44,7 +44,7 @@ namespace ACE.Server.Physics.Command
             ActionStamp = 1;
 
             LastSentPositionTime = DateTime.UtcNow;
-            LastSentPosition = new Position();
+            LastSentPosition = new PhysicsPosition();
             LastSentContactPlane = new Plane();
         }
 

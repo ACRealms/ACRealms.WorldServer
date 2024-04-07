@@ -134,7 +134,7 @@ namespace ACE.Server.WorldObjects
             var currentStance = healer.CurrentMotionState.Stance;
             var animLength = MotionTable.GetAnimationLength(healer.MotionTableId, currentStance, motionCommand);
 
-            var startPos = new Physics.Common.Position(healer.PhysicsObj.Position);
+            var startPos = new Physics.Common.PhysicsPosition(healer.PhysicsObj.Position);
 
             var vital = target.GetCreatureVital(BoosterEnum);
 
@@ -147,7 +147,7 @@ namespace ACE.Server.WorldObjects
             actionChain.AddAction(healer, () =>
             {
                 // check healing move distance cap
-                var endPos = new Physics.Common.Position(healer.PhysicsObj.Position);
+                var endPos = new Physics.Common.PhysicsPosition(healer.PhysicsObj.Position);
                 var dist = startPos.Distance(endPos);
 
                 //Console.WriteLine($"Dist: {dist}");

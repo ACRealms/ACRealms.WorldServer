@@ -9,7 +9,7 @@ using ACE.Server.Physics.Util;
 
 namespace ACE.Server.Physics.Common
 {
-    public class Position: IEquatable<Position>
+    public class PhysicsPosition: IEquatable<PhysicsPosition>
     {
         public uint ObjCellID;
         public AFrame Frame;
@@ -20,24 +20,24 @@ namespace ACE.Server.Physics.Common
 
         public uint LandblockY => (ObjCellID >> 16) & 0xFF;
 
-        public Position()
+        public PhysicsPosition()
         {
             Init();
         }
 
-        public Position(uint objCellID)
+        public PhysicsPosition(uint objCellID)
         {
             ObjCellID = objCellID;
             Init();
         }
 
-        public Position(uint objCellID, AFrame frame)
+        public PhysicsPosition(uint objCellID, AFrame frame)
         {
             ObjCellID = objCellID;
             Frame = frame;
         }
 
-        public Position(Position p)
+        public PhysicsPosition(PhysicsPosition p)
         {
             if (p == null)
             {
@@ -50,7 +50,7 @@ namespace ACE.Server.Physics.Common
             Frame = new AFrame(p.Frame);
         }
 
-        public Position(ACE.Entity.Position p)
+        public PhysicsPosition(ACE.Entity.Position p)
         {
             ObjCellID = p.Cell;
             Frame = new AFrame(p.Pos, p.Rotation);
@@ -61,7 +61,7 @@ namespace ACE.Server.Physics.Common
             Frame = new AFrame();
         }
 
-        public Vector3 LocalToLocal(Position pos, Vector3 offset)
+        public Vector3 LocalToLocal(PhysicsPosition pos, Vector3 offset)
         {
             var cellOffset = pos.Frame.LocalToGlobal(offset);
             var blockOffset = LandDefs.GetBlockOffset(ObjCellID, pos.ObjCellID);
@@ -74,7 +74,7 @@ namespace ACE.Server.Physics.Common
             return Frame.LocalToGlobal(point);
         }
 
-        public Vector3 LocalToGlobal(Position pos, Vector3 point)
+        public Vector3 LocalToGlobal(PhysicsPosition pos, Vector3 point)
         {
             var cellOffset = pos.Frame.LocalToGlobal(point);
             var blockOffset = LandDefs.GetBlockOffset(ObjCellID, pos.ObjCellID);
@@ -87,17 +87,17 @@ namespace ACE.Server.Physics.Common
             return Frame.LocalToGlobalVec(point);
         }
 
-        public float Distance(Position pos)
+        public float Distance(PhysicsPosition pos)
         {
             return GetOffset(pos).Length();
         }
 
-        public float DistanceSquared(Position pos)
+        public float DistanceSquared(PhysicsPosition pos)
         {
             return GetOffset(pos).LengthSquared();
         }
 
-        public static double CylinderDistance(float radius, float height, Position pos, float otherRadius, float otherHeight, Position otherPos)
+        public static double CylinderDistance(float radius, float height, PhysicsPosition pos, float otherRadius, float otherHeight, PhysicsPosition otherPos)
         {
             var offset = pos.GetOffset(otherPos);
             var reach = offset.Length() - (radius + otherRadius);
@@ -114,7 +114,7 @@ namespace ACE.Server.Physics.Common
         }
 
         // custom, based on above
-        public static double CylinderDistanceSq(float radius, float height, Position pos, float otherRadius, float otherHeight, Position otherPos)
+        public static double CylinderDistanceSq(float radius, float height, PhysicsPosition pos, float otherRadius, float otherHeight, PhysicsPosition otherPos)
         {
             var offset = pos.GetOffset(otherPos);
             var reach = offset.Length() - (radius + otherRadius);
@@ -130,7 +130,7 @@ namespace ACE.Server.Physics.Common
                 return reach * reach;
         }
 
-        public static float CylinderDistanceNoZ(float radius, Position pos, float otherRadius, Position otherPos)
+        public static float CylinderDistanceNoZ(float radius, PhysicsPosition pos, float otherRadius, PhysicsPosition otherPos)
         {
             var offset = pos.GetOffset(otherPos);
             return offset.Length() - (radius + otherRadius);
@@ -139,7 +139,7 @@ namespace ACE.Server.Physics.Common
         public static readonly float ThresholdMed = 1.0f / 3.0f;
         public static readonly float ThresholdHigh = 2.0f / 3.0f;
 
-        public Quadrant DetermineQuadrant(float height, Position position)
+        public Quadrant DetermineQuadrant(float height, PhysicsPosition position)
         {
             var hitpoint = LocalToLocal(position, Vector3.Zero);
 
@@ -162,7 +162,7 @@ namespace ACE.Server.Physics.Common
             return Frame.GlobalToLocalVec(point);
         }
 
-        public Vector3 GetOffset(Position pos)
+        public Vector3 GetOffset(PhysicsPosition pos)
         {
             var blockOffset = LandDefs.GetBlockOffset(ObjCellID, pos.ObjCellID);
             var globalOffset = blockOffset + pos.Frame.Origin - Frame.Origin;
@@ -170,7 +170,7 @@ namespace ACE.Server.Physics.Common
             return globalOffset;
         }
 
-        public Vector3 GetOffset(Position pos, Vector3 rotation)
+        public Vector3 GetOffset(PhysicsPosition pos, Vector3 rotation)
         {
             var blockOffset = LandDefs.GetBlockOffset(ObjCellID, pos.ObjCellID);
             return blockOffset + pos.LocalToGlobal(rotation) - Frame.Origin;
@@ -181,7 +181,7 @@ namespace ACE.Server.Physics.Common
             return Frame.Origin;
         }
 
-        public AFrame Subtract(Position pos)
+        public AFrame Subtract(PhysicsPosition pos)
         {
             Frame.Subtract(pos.Frame);
             return Frame;
@@ -197,7 +197,7 @@ namespace ACE.Server.Physics.Common
             LandDefs.AdjustToOutside(this);
         }
 
-        public float heading(Position position)
+        public float heading(PhysicsPosition position)
         {
             var dir = GetOffset(position);
             dir.Z = 0.0f;
@@ -208,7 +208,7 @@ namespace ACE.Server.Physics.Common
             return (450.0f - ((float)Math.Atan2(dir.Y, dir.X)).ToDegrees()) % 360.0f;
         }
 
-        public float heading_diff(Position position)
+        public float heading_diff(PhysicsPosition position)
         {
             return heading(position) - Frame.get_heading();
         }
@@ -261,7 +261,7 @@ namespace ACE.Server.Physics.Common
         /// <summary>
         /// Returns the squared 2D distance between 2 positions
         /// </summary>
-        public float Distance2DSquared(Position p)
+        public float Distance2DSquared(PhysicsPosition p)
         {
             if (Landblock == p.Landblock)
             {
@@ -277,7 +277,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public bool Equals(Position pos)
+        public bool Equals(PhysicsPosition pos)
         {
             return ObjCellID == pos.ObjCellID && Frame.Equals(pos.Frame);
         }

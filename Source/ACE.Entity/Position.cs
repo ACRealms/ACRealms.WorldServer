@@ -19,7 +19,9 @@ namespace ACE.Entity
 
         // FIXME: this is returning landblock + cell
         public uint Cell { get => landblockId.Raw; }
-        public uint Instance;
+
+        // Only defined here for database I/O
+        internal uint Instance;
         
         // REALMS: New fields/props on existing entity classes should be marked as private where possible
         private ulong LongObjCellID => (ulong)Instance << 32 | Cell;
@@ -114,29 +116,6 @@ namespace ACE.Entity
         {
             var invLen = 1.0f / v.Length();
             return v * invLen;
-        }
-
-        public Position InFrontOf(double distanceInFront, bool rotate180 = false)
-        {
-            float qw = RotationW; // north
-            float qz = RotationZ; // south
-
-            double x = 2 * qw * qz;
-            double y = 1 - 2 * qz * qz;
-
-            var heading = Math.Atan2(x, y);
-            var dx = -1 * Convert.ToSingle(Math.Sin(heading) * distanceInFront);
-            var dy = Convert.ToSingle(Math.Cos(heading) * distanceInFront);
-
-            // move the Z slightly up and let gravity pull it down.  just makes things easier.
-            var bumpHeight = 0.05f;
-            if (rotate180)
-            {
-                var rotate = new Quaternion(0, 0, qz, qw) * Quaternion.CreateFromYawPitchRoll(0, 0, (float)Math.PI);
-                return new Position(LandblockId.Raw, PositionX + dx, PositionY + dy, PositionZ + bumpHeight, 0f, 0f, rotate.Z, rotate.W, Instance);
-            }
-            else
-                return new Position(LandblockId.Raw, PositionX + dx, PositionY + dy, PositionZ + bumpHeight, 0f, 0f, qz, qw, Instance);
         }
 
         /// <summary>
@@ -242,6 +221,9 @@ namespace ACE.Entity
             Rotation = pos.Rotation;
         }
 
+        public Position(Position pos, uint instance)
+            : this(pos) { Instance = instance; }
+
         public Position(uint blockCellID, float newPositionX, float newPositionY, float newPositionZ, float newRotationX, float newRotationY, float newRotationZ, float newRotationW, uint instance, bool relativePos = false)
         {
             LandblockId = new LandblockId(blockCellID);
@@ -319,11 +301,7 @@ namespace ACE.Entity
             Rotation = Quaternion.Identity;
         }
 
-        /// <summary>
-        /// Given a Vector2 set of coordinates, create a new position object for use in converting from VLOC to LOC
-        /// </summary>
-        /// <param name="coordinates">A set coordinates provided in a Vector2 object with East-West being the X value and North-South being the Y value</param>
-        public Position(Vector2 coordinates, uint instance)
+        public Position(Vector2 coordinates)
         {
             // convert from (-101.95, 102.05) to (0, 204)
             coordinates += Vector2.One * 101.95f;
@@ -353,7 +331,15 @@ namespace ACE.Entity
             Pos = new Vector3(originX, originY, 0);     // must use PositionExtensions.AdjustMapCoords() to get Z
 
             Rotation = Quaternion.Identity;
+        }
 
+        /// <summary>
+        /// Given a Vector2 set of coordinates, create a new position object for use in converting from VLOC to LOC
+        /// </summary>
+        /// <param name="coordinates">A set coordinates provided in a Vector2 object with East-West being the X value and North-South being the Y value</param>
+        public Position(Vector2 coordinates, uint instance)
+            : this(coordinates)
+        {
             Instance = instance;
         }
 
@@ -571,42 +557,42 @@ namespace ACE.Entity
             Instance = InstanceIDFromVars(newRealmId, 0, false);
         }
 
-        public static Position slocToPosition(string location)
+        // differs from ac physics engine
+        private static readonly float RotationEpsilon = 0.0001f;
+
+        public static bool IsRotationValid(Quaternion q)
         {
-            var parameters = location.Split(' ');
-            uint cell;
+            if (q == Quaternion.Identity)
+                return true;
 
-            if (parameters[0].StartsWith("0x"))
-            {
-                string strippedcell = parameters[0].Substring(2);
-                cell = (uint)int.Parse(strippedcell, System.Globalization.NumberStyles.HexNumber);
-            }
-            else
-                cell = (uint)int.Parse(parameters[0], System.Globalization.NumberStyles.HexNumber);
+            if (float.IsNaN(q.X) || float.IsNaN(q.Y) || float.IsNaN(q.Z) || float.IsNaN(q.W))
+                return false;
 
-            var positionData = new float[7];
-            for (uint i = 0u; i < 7u; i++)
-            {
-                if (i > 2 && parameters.Length < 8)
-                {
-                    positionData[3] = 1;
-                    positionData[4] = 0;
-                    positionData[5] = 0;
-                    positionData[6] = 0;
-                    break;
-                }
+            var length = q.Length();
+            if (float.IsNaN(length))
+                return false;
 
-                if (!float.TryParse(parameters[i + 1].Trim(new Char[] { ' ', '[', ']' }), out var position))
-                    throw new Exception();
+            if (Math.Abs(1.0f - length) > RotationEpsilon)
+                return false;
 
-                positionData[i] = position;
-            }
+            return true;
+        }
 
-            uint inst = 0;
-            if (parameters.Length >= 9)
-                inst = uint.Parse(parameters[8].Trim());
+        public void AttemptToFixRotation()
+        {
+            //log.Warn($"detected bad quaternion x y z w for {wo.Name} (0x{wo.Guid}) | WCID: {wo.WeenieClassId} | WeenieType: {wo.WeenieType} | PositionType: {positionType}");
+            //log.Warn($"before fix: {pos.ToLOCString()}");
 
-            return new Position(cell, positionData[0], positionData[1], positionData[2], positionData[4], positionData[5], positionData[6], positionData[3], inst);
+            var normalized = Quaternion.Normalize(Rotation);
+
+            var success = IsRotationValid(normalized);
+
+            if (success)
+                Rotation = normalized;
+
+            //log.Warn($" after fix: {pos.ToLOCString()}");
+
+            //return success;
         }
     }
 }

@@ -51,7 +51,7 @@ namespace ACE.Server.Physics.Common
             return transitionState;
         }
 
-        public void find_building_transit_cells(Position pos, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
+        public void find_building_transit_cells(PhysicsPosition pos, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
         {
             foreach (var portal in Portals)
             {

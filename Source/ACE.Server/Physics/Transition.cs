@@ -188,7 +188,7 @@ namespace ACE.Server.Physics.Animation
             if (SpherePath.StepDown)
                 return TransitionState.Collided;
 
-            var checkPos = new Position(SpherePath.CheckPos);
+            var checkPos = new PhysicsPosition(SpherePath.CheckPos);
             if ((checkPos.ObjCellID & 0xFFFF) < 0x100)
                 LandDefs.AdjustToOutside(checkPos);
 
@@ -209,7 +209,7 @@ namespace ACE.Server.Physics.Animation
             if (!ObjectInfo.State.HasFlag(ObjectInfoState.OnWalkable) || SpherePath.CheckWalkables())
                 return true;
 
-            SpherePath.BackupCheckPos = new Position(SpherePath.CheckPos);
+            SpherePath.BackupCheckPos = new PhysicsPosition(SpherePath.CheckPos);
             SpherePath.BackupCell = SpherePath.CheckCell;
 
             var stepHeight = ObjectInfo.StepDownHeight;
@@ -634,7 +634,7 @@ namespace ACE.Server.Physics.Animation
             ObjectInfo.Init(obj, objectState);
         }
 
-        public void InitPath(ObjCell beginCell, Position beginPos, Position endPos)
+        public void InitPath(ObjCell beginCell, PhysicsPosition beginPos, PhysicsPosition endPos)
         {
             SpherePath.InitPath(beginCell, beginPos, endPos);
         }
@@ -764,7 +764,7 @@ namespace ACE.Server.Physics.Animation
 
             SpherePath.WalkableAllowance = zLandingValue;
             SpherePath.BackupCell = SpherePath.CheckCell;
-            SpherePath.BackupCheckPos = new Position(SpherePath.CheckPos);
+            SpherePath.BackupCheckPos = new PhysicsPosition(SpherePath.CheckPos);
 
             var stepDown = StepDown(stepDownHeight, zLandingValue);
 
@@ -1084,7 +1084,7 @@ namespace ACE.Server.Physics.Animation
 
         public void SetCurrentCheckPos()
         {
-            SpherePath.CurPos = new Position(SpherePath.CheckPos);
+            SpherePath.CurPos = new PhysicsPosition(SpherePath.CheckPos);
             SpherePath.CurCell = SpherePath.CheckCell;
             SpherePath.CacheGlobalCurrCenter();
 

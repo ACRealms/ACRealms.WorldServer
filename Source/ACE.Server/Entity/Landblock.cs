@@ -318,14 +318,14 @@ namespace ACE.Server.Entity
                     var xPos = Math.Clamp(encounter.CellX * 24.0f, 0.5f, 191.5f);
                     var yPos = Math.Clamp(encounter.CellY * 24.0f, 0.5f, 191.5f);
 
-                    var pos = new Physics.Common.Position();
+                    var pos = new Physics.Common.PhysicsPosition();
                     pos.ObjCellID = (uint)(Id.Landblock << 16) | 1;
                     pos.Frame = new Physics.Animation.AFrame(new Vector3(xPos, yPos, 0), Quaternion.Identity);
                     pos.adjust_to_outside();
 
                     pos.Frame.Origin.Z = PhysicsLandblock.GetZ(pos.Frame.Origin);
 
-                    wo.Location = new Position(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation, Instance);
+                    wo.Location = new InstancedPosition(pos.ObjCellID, pos.Frame.Origin, pos.Frame.Orientation, Instance);
 
                     var sortCell = LScape.get_landcell(pos.ObjCellID, Instance) as SortCell;
                     if (sortCell != null && sortCell.has_building())
@@ -888,7 +888,7 @@ namespace ACE.Server.Entity
 
             wo.CurrentLandblock = this;
 
-            wo.Location.Instance = Instance;
+            //wo.Location.Instance = Instance;
 
             if (wo.PhysicsObj == null)
                 wo.InitPhysicsObj();
@@ -1234,7 +1234,7 @@ namespace ACE.Server.Entity
         /// This is a rarely used method to broadcast network messages to all of the players within a landblock,
         /// and possibly the adjacent landblocks.
         /// </summary>
-        public void EnqueueBroadcast(ICollection<Player> excludeList, bool adjacents, Position pos = null, float? maxRangeSq = null, params GameMessage[] msgs)
+        public void EnqueueBroadcast(ICollection<Player> excludeList, bool adjacents, InstancedPosition pos = null, float? maxRangeSq = null, params GameMessage[] msgs)
         {
             var players = worldObjects.Values.OfType<Player>();
 

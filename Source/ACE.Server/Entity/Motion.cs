@@ -1,6 +1,7 @@
 using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Server.Network.Structure;
+using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
 using log4net;
 
@@ -30,7 +31,7 @@ namespace ACE.Server.Entity
         public ObjectGuid TargetGuid;       // this is dual-purposed for both Target and StickyObject (fixme)
 
         // MoveToObject - targetguid, position, movetoparams, runrate
-        public Position Position;           // used for: MoveTo's
+        public InstancedPosition Position;           // used for: MoveTo's
         public MoveToParameters MoveToParameters = new MoveToParameters();   // used for MoveTo and TurnTo
         public float RunRate;               // used for: MoveTo's
 
@@ -63,14 +64,14 @@ namespace ACE.Server.Entity
                 log.Warn($"{wo.Name} (0x{wo.Guid}) has a null CurrentMotionState, subbing in new Motion(MotionStance.NonCombat) for it.");
             }
             MovementType = type;
-            Position = new Position(target.Location);
+            Position = new InstancedPosition(target.Location);
             TargetGuid = target.Guid;
         }
 
         /// <summary>
         /// Constructs a new MoveToPosition motion
         /// </summary>
-        public Motion(WorldObject wo, Position position)
+        public Motion(WorldObject wo, InstancedPosition position)
         {
             if (wo.CurrentMotionState != null)
                 Stance = wo.CurrentMotionState.Stance;
@@ -80,13 +81,13 @@ namespace ACE.Server.Entity
                 log.Warn($"{wo.Name} (0x{wo.Guid}) has a null CurrentMotionState, subbing in new Motion(MotionStance.NonCombat) for it.");
             }
             MovementType = MovementType.MoveToPosition;
-            Position = new Position(position);
+            Position = new InstancedPosition(position);
         }
 
         /// <summary>
         /// Constructs a new TurnToHeading motion
         /// </summary>
-        public Motion(WorldObject wo, Position position, float heading)
+        public Motion(WorldObject wo, InstancedPosition position, float heading)
         {
             if (wo.CurrentMotionState != null)
                 Stance = wo.CurrentMotionState.Stance;
@@ -96,7 +97,7 @@ namespace ACE.Server.Entity
                 log.Warn($"{wo.Name} (0x{wo.Guid}) has a null CurrentMotionState, subbing in new Motion(MotionStance.NonCombat) for it.");
             }
             MovementType = MovementType.TurnToHeading;
-            Position = new Position(position);
+            Position = new InstancedPosition(position);
             DesiredHeading = heading;
         }
 
@@ -132,7 +133,7 @@ namespace ACE.Server.Entity
             TargetGuid = motion.TargetGuid;
 
             if (motion.Position != null)
-                Position = new Position(motion.Position);
+                Position = new InstancedPosition(motion.Position);
 
             if (motion.MoveToParameters != null)
                 MoveToParameters = new MoveToParameters(motion.MoveToParameters);

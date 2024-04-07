@@ -48,16 +48,19 @@ namespace ACE.Entity.Enum.Properties
         /// <summary>
         /// Current Position
         /// </summary>
+        [Instanced]
         Location = 1,
 
         /// <summary>
         /// May be used to store where we are headed when we teleport (?)
         /// </summary>
+        [Instanced]
         Destination = 2,
 
         /// <summary>
         /// Where will we pop into the world (?)
         /// </summary>
+        [Instanced]
         Instantiation = 3,
 
         /// <summary>
@@ -80,6 +83,7 @@ namespace ACE.Entity.Enum.Properties
         /// <summary>
         /// The the position of target.
         /// </summary>
+        [Instanced]
         Target = 7,
 
         /// <summary>
@@ -175,6 +179,7 @@ namespace ACE.Entity.Enum.Properties
         /// <summary>
         /// Position data is relative to Location
         /// </summary>
+        [Instanced]
         RelativeDestination = 26,
 
         /// <summary>

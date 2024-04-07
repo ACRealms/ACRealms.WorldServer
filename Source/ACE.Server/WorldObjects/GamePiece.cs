@@ -5,6 +5,7 @@ using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
 using ACE.Server.Entity.Chess;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -13,7 +14,7 @@ namespace ACE.Server.WorldObjects
         public ChessMatch ChessMatch;
 
         public GamePieceState GamePieceState;
-        public Position Position;
+        public InstancedPosition Position;
         public GamePiece TargetPiece;
 
         /// <summary>
@@ -54,13 +55,13 @@ namespace ACE.Server.WorldObjects
             killChain.EnqueueChain();
         }
 
-        public void MoveEnqueue(Position dest)
+        public void MoveEnqueue(InstancedPosition dest)
         {
             GamePieceState = GamePieceState.MoveToSquare;
             Position = dest;
         }
 
-        public void AttackEnqueue(Position dest, ObjectGuid victim)
+        public void AttackEnqueue(InstancedPosition dest, ObjectGuid victim)
         {
             GamePieceState = GamePieceState.MoveToAttack;
             Position = dest;
@@ -144,7 +145,7 @@ namespace ACE.Server.WorldObjects
 
         public Motion LastMoveTo;
 
-        public void MoveWeenie(Position to, float distanceToObject, bool finalHeading)
+        public void MoveWeenie(InstancedPosition to, float distanceToObject, bool finalHeading)
         {
             if (MoveSpeed == 0.0f)
                 GetMovementSpeed();
@@ -156,7 +157,7 @@ namespace ACE.Server.WorldObjects
             if (finalHeading)
                 moveToPosition.MoveToParameters.MovementParameters |= MovementParams.UseFinalHeading;
 
-            var physPos = new Physics.Common.Position(to);
+            var physPos = new Physics.Common.PhysicsPosition(to);
             moveToPosition.MoveToParameters.DesiredHeading = physPos.Frame.get_heading();
 
             SetWalkRunThreshold(moveToPosition, to);

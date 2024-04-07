@@ -14,6 +14,8 @@ using ACE.Server.Entity;
 using ACE.Server.Managers;
 using ACE.Server.Network.Structure;
 using ACE.Server.Physics.Extensions;
+using ACE.Server.Realms;
+using static ACE.Server.Physics.Common.LandDefs;
 
 namespace ACE.Server.WorldObjects
 {
@@ -530,16 +532,16 @@ namespace ACE.Server.WorldObjects
         #endregion
 
 
-        private readonly Dictionary<PositionType, Position> ephemeralPositions = new Dictionary<PositionType, Position>();
+        private readonly Dictionary<PositionType, UsablePosition> ephemeralPositions = new Dictionary<PositionType, UsablePosition>();
 
         /// <summary>
         /// Do not reference this directly.<para />
         /// This should only be referenced by GetPosition, SetPosition, RemovePosition and SaveBiotaToDatabase.
         /// </summary>
-        private readonly Dictionary<PositionType, Position> positionCache = new Dictionary<PositionType, Position>();
+        private readonly Dictionary<PositionType, UsablePosition> positionCache = new Dictionary<PositionType, UsablePosition>();
 
         #region GetPosition, SetPosition, RemovePosition, GetAllPositions Functions
-        public Position GetPosition(PositionType positionType)
+        public UsablePosition GetPosition(PositionType positionType)
         {
             if (ephemeralPositions.TryGetValue(positionType, out var ephemeralPosition))
                 return ephemeralPosition;
@@ -547,12 +549,18 @@ namespace ACE.Server.WorldObjects
             if (positionCache.TryGetValue(positionType, out var cachedPosition))
                 return cachedPosition;
 
-            var position = Biota.GetPosition(positionType, BiotaDatabaseLock);
+            var positionRaw = Biota.GetPosition(positionType, BiotaDatabaseLock);
 
-            if (position != null && !position.Rotation.IsRotationValid())
+            if (positionRaw != null && !Position.IsRotationValid(positionRaw.Rotation))
             {
-                position.AttemptToFixRotation(this, positionType);
+                positionRaw.AttemptToFixRotation();
             }
+
+            UsablePosition position;
+            if (InstancedProperties.PositionTypes.Contains(positionType))
+                position = positionRaw.ToInstancedPosition(positionRaw.Instance);
+            else
+                position = new LocalPosition(positionRaw);
 
             positionCache[positionType] = position;
 
@@ -567,7 +575,7 @@ namespace ACE.Server.WorldObjects
         /// The proper way to would be: LandscapeItem.SetPosition(PositionType.Location, new Position(Player.Location))<para />
         /// Any time you want to set a position of a different PositionType, or, positions between WorldObjects, you should use the Position copy constructor.
         /// </summary>
-        public void SetPosition(PositionType positionType, Position position)
+        public void SetPosition(PositionType positionType, UsablePosition position)
         {
             //if (position != null && !position.Rotation.IsRotationValid())
                 //position.AttemptToFixRotation(this, positionType);
@@ -582,7 +590,7 @@ namespace ACE.Server.WorldObjects
                 {
                     positionCache[positionType] = position;
 
-                    Biota.SetPosition(positionType, position, BiotaDatabaseLock);
+                    Biota.SetPosition(positionType, position.Position, BiotaDatabaseLock);
                     ChangesDetected = true;
                 }
             }
@@ -2200,51 +2208,39 @@ namespace ACE.Server.WorldObjects
         // ========================================
         //= ======== Position Properties ==========
         // ========================================
-        public Position Location
+        public InstancedPosition Location
         {
-            get => GetPosition(PositionType.Location);
+            get => (InstancedPosition)GetPosition(PositionType.Location);
             set => SetPosition(PositionType.Location, value);
         }
 
-        public Position Destination
+        public InstancedPosition Destination
         {
-            get { return GetPosition(PositionType.Destination); }
+            get { return (InstancedPosition)GetPosition(PositionType.Destination); }
             set { SetPosition(PositionType.Destination, value); }
         }
 
-        public Position Instantiation
+        public LocalPosition Instantiation
         {
-            get { return GetPosition(PositionType.Instantiation); }
+            get { return (LocalPosition)GetPosition(PositionType.Instantiation); }
             set { SetPosition(PositionType.Instantiation, value); }
         }
 
-        public Position Sanctuary
+        public LocalPosition Sanctuary
         {
-            get { return GetPosition(PositionType.Sanctuary); }
+            get { return (LocalPosition)GetPosition(PositionType.Sanctuary); }
             set { SetPosition(PositionType.Sanctuary, value); }
         }
 
-        public Position Home
+        public LocalPosition Home
         {
-            get { return GetPosition(PositionType.Home); }
+            get { return (LocalPosition)GetPosition(PositionType.Home); }
             set { SetPosition(PositionType.Home, value); }
         }
 
-        public Position ActivationMove
+        public LocalPosition LinkedPortalOne
         {
-            get { return GetPosition(PositionType.ActivationMove); }
-            set { SetPosition(PositionType.ActivationMove, value); }
-        }
-
-        public Position Target
-        {
-            get { return GetPosition(PositionType.Target); }
-            set { SetPosition(PositionType.Target, value); }
-        }
-
-        public Position LinkedPortalOne
-        {
-            get { return GetPosition(PositionType.LinkedPortalOne); }
+            get { return (LocalPosition)GetPosition(PositionType.LinkedPortalOne); }
             set { SetPosition(PositionType.LinkedPortalOne, value); }
         }
 
@@ -2260,9 +2256,9 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyDataId.LinkedPortalTwo); else SetProperty(PropertyDataId.LinkedPortalTwo, value.Value); }
         }
 
-        public Position LastPortal
+        public LocalPosition LastPortal
         {
-            get { return GetPosition(PositionType.LastPortal); }
+            get { return (LocalPosition)GetPosition(PositionType.LastPortal); }
             set { SetPosition(PositionType.LastPortal, value); }
         }
 
@@ -2272,109 +2268,103 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyDataId.LastPortal); else SetProperty(PropertyDataId.LastPortal, value.Value); }
         }
 
-        public Position PortalStorm
+        public LocalPosition PortalStorm
         {
-            get { return GetPosition(PositionType.PortalStorm); }
+            get { return (LocalPosition)GetPosition(PositionType.PortalStorm); }
             set { SetPosition(PositionType.PortalStorm, value); }
         }
 
-        public Position CrashAndTurn
+        public LocalPosition PortalSummonLoc
         {
-            get { return GetPosition(PositionType.CrashAndTurn); }
-            set { SetPosition(PositionType.CrashAndTurn, value); }
-        }
-
-        public Position PortalSummonLoc
-        {
-            get { return GetPosition(PositionType.PortalSummonLoc); }
+            get { return (LocalPosition)GetPosition(PositionType.PortalSummonLoc); }
             set { SetPosition(PositionType.PortalSummonLoc, value); }
         }
 
-        public Position HouseBoot
+        public LocalPosition HouseBoot
         {
-            get { return GetPosition(PositionType.HouseBoot); }
+            get { return (LocalPosition)GetPosition(PositionType.HouseBoot); }
             set { SetPosition(PositionType.HouseBoot, value); }
         }
 
-        public Position LastOutsideDeath
+        public LocalPosition LastOutsideDeath
         {
-            get { return GetPosition(PositionType.LastOutsideDeath); }
+            get { return (LocalPosition)GetPosition(PositionType.LastOutsideDeath); }
             set { SetPosition(PositionType.LastOutsideDeath, value); }
         }
 
-        public Position LinkedLifestone
+        public LocalPosition LinkedLifestone
         {
-            get { return GetPosition(PositionType.LinkedLifestone); }
+            get { return (LocalPosition)GetPosition(PositionType.LinkedLifestone); }
             set { SetPosition(PositionType.LinkedLifestone, value); }
         }
 
-        public Position LinkedPortalTwo
+        public LocalPosition LinkedPortalTwo
         {
-            get { return GetPosition(PositionType.LinkedPortalTwo); }
+            get { return (LocalPosition)GetPosition(PositionType.LinkedPortalTwo); }
             set { SetPosition(PositionType.LinkedPortalTwo, value); }
         }
 
-        public Position Save1
+        public LocalPosition Save1
         {
-            get { return GetPosition(PositionType.Save1); }
+            get { return (LocalPosition)GetPosition(PositionType.Save1); }
             set { SetPosition(PositionType.Save1, value); }
         }
 
-        public Position Save2
+        public LocalPosition Save2
         {
-            get { return GetPosition(PositionType.Save2); }
+            get { return (LocalPosition)GetPosition(PositionType.Save2); }
             set { SetPosition(PositionType.Save2, value); }
         }
 
-        public Position Save3
+        public LocalPosition Save3
         {
-            get { return GetPosition(PositionType.Save3); }
+            get { return (LocalPosition)GetPosition(PositionType.Save3); }
             set { SetPosition(PositionType.Save3, value); }
         }
 
-        public Position Save4
+        public LocalPosition Save4
         {
-            get { return GetPosition(PositionType.Save4); }
+            get { return (LocalPosition)GetPosition(PositionType.Save4); }
             set { SetPosition(PositionType.Save4, value); }
         }
 
-        public Position Save5
+        public LocalPosition Save5
         {
-            get { return GetPosition(PositionType.Save5); }
+            get { return (LocalPosition)GetPosition(PositionType.Save5); }
             set { SetPosition(PositionType.Save5, value); }
         }
 
-        public Position Save6
+        public LocalPosition Save6
         {
-            get { return GetPosition(PositionType.Save6); }
+            get { return (LocalPosition)GetPosition(PositionType.Save6); }
             set { SetPosition(PositionType.Save6, value); }
         }
 
-        public Position Save7
+        public LocalPosition Save7
         {
-            get { return GetPosition(PositionType.Save7); }
+            get { return (LocalPosition)GetPosition(PositionType.Save7); }
             set { SetPosition(PositionType.Save7, value); }
         }
 
-        public Position Save8
+        public LocalPosition Save8
         {
-            get { return GetPosition(PositionType.Save8); }
+            get { return (LocalPosition)GetPosition(PositionType.Save8); }
             set { SetPosition(PositionType.Save8, value); }
         }
 
-        public Position Save9
+        public LocalPosition Save9
         {
-            get { return GetPosition(PositionType.Save9); }
+            get { return (LocalPosition)GetPosition(PositionType.Save9); }
             set { SetPosition(PositionType.Save9, value); }
         }
 
-        public Position RelativeDestination
+        public InstancedPosition RelativeDestination
         {
-            get { return GetPosition(PositionType.RelativeDestination); }
+            get { return (InstancedPosition)GetPosition(PositionType.RelativeDestination); }
             set { SetPosition(PositionType.RelativeDestination, value); }
         }
 
-        public Position TeleportedCharacter
+        public InstancedPosition TeleportedCharacter
         {
             get { return GetPosition(PositionType.TeleportedCharacter); }
             set { SetPosition(PositionType.TeleportedCharacter, value); }

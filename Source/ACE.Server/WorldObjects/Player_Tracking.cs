@@ -9,6 +9,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Common;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -236,7 +237,7 @@ namespace ACE.Server.WorldObjects
         }
         */
 
-        public void HandlePreTeleportVisibility(ACE.Entity.Position newPosition)
+        public void HandlePreTeleportVisibility(InstancedPosition newPosition)
         {
             // repro steps without this function:
 

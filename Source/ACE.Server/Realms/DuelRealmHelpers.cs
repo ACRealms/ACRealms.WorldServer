@@ -96,12 +96,12 @@ namespace ACE.Server.Realms
             actionChain.EnqueueChain();
         }
 
-        public static Position GetDuelingAreaDrop()
+        public static InstancedPosition GetDuelingAreaDrop()
         {
             return GetDuelingAreaDrop(RealmManager.DuelRealm);
         }
 
-        public static Position GetDuelingAreaDrop(WorldRealm realm)
+        public static InstancedPosition GetDuelingAreaDrop(WorldRealm realm)
         {
             var pos = new Position(RealmConstants.DuelStagingAreaDrop);
             pos.Instance = realm.StandardRules.GetDefaultInstanceID();

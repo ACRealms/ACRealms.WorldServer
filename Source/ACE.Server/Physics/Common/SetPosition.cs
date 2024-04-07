@@ -1,3 +1,4 @@
+using ACE.Server.Network.GameAction.Actions;
 using System;
 using System.Numerics;
 
@@ -29,7 +30,7 @@ namespace ACE.Server.Physics.Common
 
     public class SetPosition
     {
-        public Position Pos;
+        public PhysicsPosition Pos;
         public uint Instance;
         public SetPositionFlags Flags;
         public Vector3 Line;
@@ -46,7 +47,7 @@ namespace ACE.Server.Physics.Common
             Instance = instance;
         }
 
-        public SetPosition(Position pos, SetPositionFlags flags, float radius, uint instance)
+        public SetPosition(PhysicsPosition pos, SetPositionFlags flags, float radius, uint instance)
             : this(instance)
         {
             Pos = pos;
@@ -56,7 +57,7 @@ namespace ACE.Server.Physics.Common
             NumTries = Default_NumTries;
         }
 
-        public SetPosition(Position pos, SetPositionFlags flags, uint instance)
+        public SetPosition(PhysicsPosition pos, SetPositionFlags flags, uint instance)
             : this(instance)
         {
             Pos = pos;

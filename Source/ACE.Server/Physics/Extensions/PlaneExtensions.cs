@@ -9,7 +9,7 @@ namespace ACE.Server.Physics.Extensions
 {
     public static class PlaneExtensions
     {
-        public static Plane LocalToGlobal(this Plane plane, Position to, Position from, Plane localPlane)
+        public static Plane LocalToGlobal(this Plane plane, PhysicsPosition to, PhysicsPosition from, Plane localPlane)
         {
             var normal = from.Frame.LocalToGlobalVec(localPlane.Normal);
             var dist = to.LocalToGlobal(from, localPlane.Normal * -localPlane.D);

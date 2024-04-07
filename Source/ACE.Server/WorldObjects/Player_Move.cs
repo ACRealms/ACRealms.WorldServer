@@ -8,6 +8,7 @@ using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.Collision;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -151,7 +152,7 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        public Position StartJump;
+        public InstancedPosition StartJump;
 
         public override void MoveTo(WorldObject target, float runRate = 0.0f)
         {

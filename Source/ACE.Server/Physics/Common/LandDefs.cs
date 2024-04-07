@@ -117,7 +117,7 @@ namespace ACE.Server.Physics.Common
                 LandHeightTable = DatManager.PortalDat.RegionDesc.LandDefs.LandHeightTable;
         }
 
-        public static bool AdjustToOutside(Position pos)
+        public static bool AdjustToOutside(PhysicsPosition pos)
         {
             return AdjustToOutside(ref pos.ObjCellID, ref pos.Frame.Origin);
         }

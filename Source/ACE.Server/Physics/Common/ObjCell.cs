@@ -19,7 +19,7 @@ namespace ACE.Server.Physics.Common
 
         public uint ID;
         public LandDefs.WaterType WaterType;
-        public Position Pos;
+        public PhysicsPosition Pos;
         public int NumObjects;
         public List<PhysicsObj> ObjectList;
         public int NumLights;
@@ -108,7 +108,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public void CheckAttack(uint attackerID, Position attackerPos, float attackerScale, AttackCone attackCone, AttackInfo attackInfo)
+        public void CheckAttack(uint attackerID, PhysicsPosition attackerPos, float attackerScale, AttackCone attackCone, AttackInfo attackInfo)
         {
             readerWriterLockSlim.EnterReadLock();
             try
@@ -242,7 +242,7 @@ namespace ACE.Server.Physics.Common
 
         public void Init()
         {
-            Pos = new Position();
+            Pos = new PhysicsPosition();
             ObjectList = new List<PhysicsObj>();
             ShadowObjectList = new List<ShadowObj>();
             VoyeurTable = new List<uint>();
@@ -332,7 +332,7 @@ namespace ACE.Server.Physics.Common
             return false;
         }
 
-        public static void find_cell_list(Position position, int numSphere, List<Sphere> sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, uint instance)
+        public static void find_cell_list(PhysicsPosition position, int numSphere, List<Sphere> sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, uint instance)
         {
             cellArray.NumCells = 0;
             cellArray.AddedOutside = false;
@@ -413,7 +413,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public static void find_cell_list(Position position, int numCylSphere, List<CylSphere> cylSphere, CellArray cellArray, SpherePath path, uint instance)
+        public static void find_cell_list(PhysicsPosition position, int numCylSphere, List<CylSphere> cylSphere, CellArray cellArray, SpherePath path, uint instance)
         {
             if (numCylSphere > 10)
                 numCylSphere = 10;
@@ -432,7 +432,7 @@ namespace ACE.Server.Physics.Common
             find_cell_list(position, numCylSphere, spheres, cellArray, ref empty, path, instance);
         }
 
-        public static void find_cell_list(Position position, Sphere sphere, CellArray cellArray, SpherePath path, uint instance)
+        public static void find_cell_list(PhysicsPosition position, Sphere sphere, CellArray cellArray, SpherePath path, uint instance)
         {
             var globalSphere = new Sphere();
             globalSphere.Center = position.LocalToGlobal(sphere.Center);
@@ -447,7 +447,7 @@ namespace ACE.Server.Physics.Common
             find_cell_list(path.CheckPos, path.NumSphere, path.GlobalSphere, cellArray, ref checkCell, path, instance);
         }
 
-        public static void find_cell_list(Position position, int numSphere, Sphere sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, uint instance)
+        public static void find_cell_list(PhysicsPosition position, int numSphere, Sphere sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, uint instance)
         {
             find_cell_list(position, numSphere, new List<Sphere>() { sphere }, cellArray, ref currCell, path, instance);
         }
@@ -457,7 +457,7 @@ namespace ACE.Server.Physics.Common
             // empty base
         }
 
-        public virtual void find_transit_cells(Position position, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
+        public virtual void find_transit_cells(PhysicsPosition position, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
         {
             // empty base
         }

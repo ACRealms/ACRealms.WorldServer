@@ -242,7 +242,7 @@ namespace ACE.Server.Physics.Common
                         if (lx < 0 || ly < 0 || lx >= LandDefs.BlockLength || ly >= LandDefs.BlockLength || OnRoad(loc)) continue;
 
                         // load scenery
-                        var pos = new Position(ID);
+                        var pos = new PhysicsPosition(ID);
                         pos.Frame.Origin = loc;
                         var outside = LandDefs.AdjustToOutside(pos);
                         var cell = get_landcell(pos.ObjCellID);
@@ -442,7 +442,7 @@ namespace ACE.Server.Physics.Common
             foreach (var info in Info.Buildings)
             {
                 var building = BuildingObj.makeBuilding(info.ModelId, info.Portals, info.NumLeaves);
-                var position = new Position(ID, new AFrame(info.Frame));
+                var position = new PhysicsPosition(ID, new AFrame(info.Frame));
                 var outside = LandDefs.AdjustToOutside(position);
                 var cell = get_landcell(position.ObjCellID);
                 if (cell == null) continue;
@@ -506,7 +506,7 @@ namespace ACE.Server.Physics.Common
                 {
                     var obj = PhysicsObj.makeObject(info.Id, 0, false);
                     obj.DatObject = true;
-                    var position = new Position(ID, new AFrame(info.Frame));
+                    var position = new PhysicsPosition(ID, new AFrame(info.Frame));
                     var outside = LandDefs.AdjustToOutside(position);
                     var cell = get_landcell(position.ObjCellID);
                     if (cell == null)

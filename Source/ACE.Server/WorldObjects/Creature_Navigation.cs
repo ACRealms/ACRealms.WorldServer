@@ -8,6 +8,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -76,7 +77,7 @@ namespace ACE.Server.WorldObjects
         /// Returns the 2D angle between current direction
         /// and rotation from an input position
         /// </summary>
-        public float GetAngle(Position position)
+        public float GetAngle(InstancedPosition position)
         {
             var currentDir = Location.GetCurrentDir();
             var targetDir = position.GetCurrentDir();
@@ -208,7 +209,7 @@ namespace ACE.Server.WorldObjects
         /// Used by the emote system, which has the target rotation stored in positions
         /// </summary>
         /// <returns>The amount of time in seconds for the rotation to complete</returns>
-        public float TurnTo(Position position)
+        public float TurnTo(InstancedPosition position)
         {
             var frame = new AFrame(position.Pos, position.Rotation);
             var heading = frame.get_heading();
@@ -245,7 +246,7 @@ namespace ACE.Server.WorldObjects
         /// Used by the emote system, which has the target rotation stored in positions
         /// </summary>
         /// <param name="position">Only the rotation information from this position is used here</param>
-        public float GetRotateDelay(Position position)
+        public float GetRotateDelay(InstancedPosition position)
         {
             var angle = GetAngle(position);
             return GetRotateDelay(angle);
@@ -338,7 +339,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Sends a network message for moving a creature to a new position
         /// </summary>
-        public void MoveTo(Position position, float runRate = 1.0f, bool setLoc = true, float? walkRunThreshold = null, float? speed = null)
+        public void MoveTo(InstancedPosition position, float runRate = 1.0f, bool setLoc = true, float? walkRunThreshold = null, float? speed = null)
         {
             // build and send MoveToPosition message to client
             var motion = GetMoveToPosition(position, runRate, walkRunThreshold, speed);
@@ -388,7 +389,7 @@ namespace ACE.Server.WorldObjects
             actionChain.EnqueueChain();
         }
 
-        public Motion GetMoveToPosition(Position position, float runRate = 1.0f, float? walkRunThreshold = null, float? speed = null)
+        public Motion GetMoveToPosition(InstancedPosition position, float runRate = 1.0f, float? walkRunThreshold = null, float? speed = null)
         {
             // TODO: change parameters to accept an optional MoveToParameters
 
@@ -417,9 +418,9 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// For monsters only -- blips to a new position within the same landblock
         /// </summary>
-        public void FakeTeleport(Position _newPosition)
+        public void FakeTeleport(InstancedPosition _newPosition)
         {
-            var newPosition = new Position(_newPosition);
+            var newPosition = new InstancedPosition(_newPosition);
 
             newPosition.PositionZ += 0.005f * (ObjScale ?? 1.0f);
 
@@ -436,7 +437,7 @@ namespace ACE.Server.WorldObjects
 
             // do the physics teleport
             var setPosition = new Physics.Common.SetPosition(newPosition.Instance);
-            setPosition.Pos = new Physics.Common.Position(newPosition);
+            setPosition.Pos = new Physics.Common.PhysicsPosition(newPosition);
             setPosition.Flags = Physics.Common.SetPositionFlags.SendPositionEvent | Physics.Common.SetPositionFlags.Slide | Physics.Common.SetPositionFlags.Placement | Physics.Common.SetPositionFlags.Teleport;
 
             PhysicsObj.SetPosition(setPosition);

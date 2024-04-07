@@ -28,6 +28,7 @@ using ACE.Server.WorldObjects;
 using ACE.Database.Models.Shard;
 using log4net;
 using ACE.Database.Adapter;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Command.Handlers.Processors
 {
@@ -1821,7 +1822,7 @@ namespace ACE.Server.Command.Handlers.Processors
             */
         }
 
-        public static WorldObject SpawnEncounter(Weenie weenie, int cellX, int cellY, Position pos, Session session)
+        public static WorldObject SpawnEncounter(Weenie weenie, int cellX, int cellY, LocalPosition pos, Session session)
         {
             var wo = WorldObjectFactory.CreateNewWorldObject(weenie.ClassId);
 
@@ -1840,7 +1841,7 @@ namespace ACE.Server.Command.Handlers.Processors
             var xPos = Math.Clamp(cellX * 24.0f, 0.5f, 191.5f);
             var yPos = Math.Clamp(cellY * 24.0f, 0.5f, 191.5f);
 
-            var newPos = new Physics.Common.Position();
+            var newPos = new Physics.Common.PhysicsPosition();
             newPos.ObjCellID = pos.Cell;
             newPos.Frame = new Physics.Animation.AFrame(new Vector3(xPos, yPos, 0), Quaternion.Identity);
             newPos.adjust_to_outside();
@@ -2910,7 +2911,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 obj.Ethereal = true;
                 obj.EnqueueBroadcastPhysicsState();
 
-                var newLoc = new Position(session.Player.Location);
+                var newLoc = new InstancedPosition(session.Player.Location);
 
                 // slide?
                 var setPos = new Physics.Common.SetPosition(newLoc.PhysPosition(), Physics.Common.SetPositionFlags.Teleport /* | Physics.Common.SetPositionFlags.Slide */, newLoc.Instance);
@@ -2935,7 +2936,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 {
                     //session.Network.EnqueueSend(new GameMessageSystemChat($"Moving {obj.Name} ({obj.Guid}) to home position: {obj.Location} to {instance.ObjCellId:X8} [{instance.OriginX} {instance.OriginY} {instance.OriginZ}]", ChatMessageType.Broadcast));
 
-                    var homePos = new Position(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW, obj.Location.Instance);
+                    var homePos = new InstancedPosition(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW, obj.Location.Instance);
 
                     // slide?
                     var setPos = new Physics.Common.SetPosition(homePos.PhysPosition(), Physics.Common.SetPositionFlags.Teleport /* | Physics.Common.SetPositionFlags.Slide*/, homePos.Instance);
@@ -2949,7 +2950,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 }
 
                 // perform physics transition
-                var newPos = new Physics.Common.Position(obj.PhysicsObj.Position);
+                var newPos = new Physics.Common.PhysicsPosition(obj.PhysicsObj.Position);
                 newPos.add_offset(nudge.Value);
 
                 var transit = obj.PhysicsObj.transition(obj.PhysicsObj.Position, newPos, true);

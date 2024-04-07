@@ -1,6 +1,7 @@
 using System.IO;
 using System.Numerics;
 using ACE.Entity;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Network.Structure
 {
@@ -20,7 +21,7 @@ namespace ACE.Server.Network.Structure
             Position = position;
         }
 
-        public Origin(Position pos)
+        public Origin(UsablePosition pos)
         {
             CellID = pos.Cell;
             Position = pos.Pos;

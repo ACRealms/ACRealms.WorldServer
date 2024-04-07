@@ -30,7 +30,7 @@ namespace ACE.Server.Physics.Common
             Building = building;
         }
 
-        public override void find_transit_cells(Position position, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
+        public override void find_transit_cells(PhysicsPosition position, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
         {
             if (Building != null)
                 Building.find_building_transit_cells(position, numSphere, sphere, cellArray, path, instance);

@@ -79,7 +79,7 @@ namespace ACE.Server.Physics.Common
             for (var i = 0; i < 2; i++) Polygons.Add(null);
         }
 
-        public static void add_all_outside_cells(Position position, int numSphere, List<Sphere> spheres, CellArray cellArray, uint instance)
+        public static void add_all_outside_cells(PhysicsPosition position, int numSphere, List<Sphere> spheres, CellArray cellArray, uint instance)
         {
             if (cellArray.AddedOutside) return;
 
@@ -136,7 +136,7 @@ namespace ACE.Server.Physics.Common
             {
                 var curPart = parts[i];
 
-                var loc = new Position(curPart.Pos);
+                var loc = new PhysicsPosition(curPart.Pos);
 
                 if (!LandDefs.AdjustToOutside(loc))
                     continue;
@@ -276,7 +276,7 @@ namespace ACE.Server.Physics.Common
             base.find_transit_cells(numParts, parts, cellArray, instance);
         }
 
-        public override void find_transit_cells(Position position, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
+        public override void find_transit_cells(PhysicsPosition position, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
         {
             add_all_outside_cells(position, numSphere, sphere, cellArray, instance);
             base.find_transit_cells(position, numSphere, sphere, cellArray, path, instance);

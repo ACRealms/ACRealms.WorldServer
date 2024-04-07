@@ -9,7 +9,7 @@ namespace ACE.Server.Physics.Animation
         public uint Motion;
         public uint ObjectId;
         public uint TopLevelId;
-        public Position Position;
+        public PhysicsPosition Position;
         public float Radius;
         public float Height;
         public MovementParameters Params;

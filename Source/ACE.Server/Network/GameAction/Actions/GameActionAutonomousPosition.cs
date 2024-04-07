@@ -1,6 +1,7 @@
 using System;
 
 using ACE.Entity;
+using ACE.Server.Entity;
 
 namespace ACE.Server.Network.GameAction.Actions
 {
@@ -28,7 +29,7 @@ namespace ACE.Server.Network.GameAction.Actions
                 session.Player.LastGroundPos = position;
 
             if (!session.Player.Teleporting)
-                session.Player.SetRequestedLocation(position);
+                session.Player.SetRequestedLocation(position.AsLocalPosition());
 
             message.Payload.Align();
         }

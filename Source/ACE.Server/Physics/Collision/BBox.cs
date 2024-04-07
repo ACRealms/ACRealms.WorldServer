@@ -65,7 +65,7 @@ namespace ACE.Server.Physics.Collision
                    (point.Z >= Min.Z && point.Z <= Max.Z);
         }
 
-        public void ConvertToGlobal(Position pos)
+        public void ConvertToGlobal(PhysicsPosition pos)
         {
             var transform = Matrix4x4.CreateFromQuaternion(pos.Frame.Orientation) * Matrix4x4.CreateTranslation(pos.Frame.Origin);
             Min = Vector3.Transform(Min, transform);
@@ -100,7 +100,7 @@ namespace ACE.Server.Physics.Collision
             Max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
         }
 
-        public void LocalToGlobal(BBox fromBox, Position fromPos, Position toPos)
+        public void LocalToGlobal(BBox fromBox, PhysicsPosition fromPos, PhysicsPosition toPos)
         {
             Min = toPos.LocalToGlobal(fromPos, fromBox.Min);
             Max = toPos.LocalToGlobal(fromPos, fromBox.Max);
@@ -113,7 +113,7 @@ namespace ACE.Server.Physics.Collision
             AdjustBBox(toPos.LocalToGlobal(fromPos, new Vector3(fromBox.Min.X, fromBox.Min.Y, fromBox.Max.Z)));
         }
 
-        public void LocalToLocal(BBox fromBox, Position fromPos, Position toPos)
+        public void LocalToLocal(BBox fromBox, PhysicsPosition fromPos, PhysicsPosition toPos)
         {
             Min = toPos.LocalToLocal(fromPos, fromBox.Min);
             Max = toPos.LocalToLocal(fromPos, fromBox.Max);

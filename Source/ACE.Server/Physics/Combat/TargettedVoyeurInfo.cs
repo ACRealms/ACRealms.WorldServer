@@ -7,7 +7,7 @@ namespace ACE.Server.Physics.Combat
         public uint ObjectID;
         public double Quantum;
         public float Radius;
-        public Position LastSentPosition;
+        public PhysicsPosition LastSentPosition;
 
         public TargettedVoyeurInfo() { }
 

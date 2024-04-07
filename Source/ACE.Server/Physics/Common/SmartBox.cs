@@ -6,10 +6,10 @@ namespace ACE.Server.Physics.Common
     public class SmartBox
     {
         public int TestMode;
-        public Position Viewer;
+        public PhysicsPosition Viewer;
         public ObjCell ViewerCell;
         public int HeadIndex;
-        public Position ViewerSoughtPosition;
+        public PhysicsPosition ViewerSoughtPosition;
         public float ViewerLightIntensity;
         public float ViewerLightFalloff;
         //public CameraManager CameraManager;
@@ -45,9 +45,9 @@ namespace ACE.Server.Physics.Common
 
         public void PlayerPhysicsUpdatedCallback()
         {
-            Viewer = new Position();
+            Viewer = new PhysicsPosition();
             ViewerCell = new ObjCell();
-            ViewerSoughtPosition = new Position();
+            ViewerSoughtPosition = new PhysicsPosition();
             GameFOV = 1.5707963705062866f;
         }
     }

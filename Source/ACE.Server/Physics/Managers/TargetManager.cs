@@ -88,11 +88,11 @@ namespace ACE.Server.Physics.Combat
             }
         }
 
-        public Position GetInterpolatedPosition(double quantum)
+        public PhysicsPosition GetInterpolatedPosition(double quantum)
         {
             if (PhysicsObj == null) return null;
 
-            var pos = new Position(PhysicsObj.Position);
+            var pos = new PhysicsPosition(PhysicsObj.Position);
             pos.Frame.Origin += PhysicsObj.get_velocity() * (float)quantum;
             return pos;
         }
@@ -156,13 +156,13 @@ namespace ACE.Server.Physics.Combat
             SendVoyeurUpdate(info, PhysicsObj.Position, TargetStatus.OK);
         }
 
-        public void SendVoyeurUpdate(TargettedVoyeurInfo voyeur, Position pos, TargetStatus status)
+        public void SendVoyeurUpdate(TargettedVoyeurInfo voyeur, PhysicsPosition pos, TargetStatus status)
         {
-            voyeur.LastSentPosition = new Position(pos);    // ref?
+            voyeur.LastSentPosition = new PhysicsPosition(pos);    // ref?
 
             var info = new TargetInfo(0, PhysicsObj.ID, voyeur.Radius, voyeur.Quantum);
             info.TargetPosition = PhysicsObj.Position;
-            info.InterpolatedPosition = new Position(pos);    // ref?
+            info.InterpolatedPosition = new PhysicsPosition(pos);    // ref?
             info.Velocity = PhysicsObj.get_velocity();
             info.Status = status;
 

@@ -38,7 +38,7 @@ namespace ACE.Server.Realms
             return StandardRules.GetDefaultInstanceID();
         }
 
-        internal Position DefaultStartingLocation(Player player)
+        internal LocalPosition DefaultStartingLocation(Player player)
         {
 
             if (StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))

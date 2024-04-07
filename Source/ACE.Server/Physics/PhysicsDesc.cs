@@ -11,7 +11,7 @@ namespace ACE.Server.Physics
         public object MovementBuffer;
         public bool AutonomousMovement;
         public uint AnimFrameID;
-        public Position Pos;
+        public PhysicsPosition Pos;
         public PhysicsState State;
         public float ObjectScale;
         public float Friction;

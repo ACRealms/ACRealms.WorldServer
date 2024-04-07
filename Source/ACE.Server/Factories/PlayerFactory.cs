@@ -13,6 +13,7 @@ using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
 using ACE.Server.WorldObjects;
 using ACE.Server.Managers;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Factories
 {
@@ -395,7 +396,7 @@ namespace ACE.Server.Factories
 
             if (!player.IsOlthoiPlayer)
             {
-                player.Location = new Position(0x8903012E, 87.738312f, -47.704556f, .005f, 0.0f, 0.0f, -0.926821f, 0.375504f, accountId);
+                player.Location = new InstancedPosition(0x8903012E, 87.738312f, -47.704556f, .005f, 0.0f, 0.0f, -0.926821f, 0.375504f, accountId);
                 player.Instantiation = new Position(player.Location);
                 player.Sanctuary = new Position(player.Location);
                 player.SetProperty(PropertyBool.RecallsDisabled, true);

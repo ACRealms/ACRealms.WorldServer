@@ -143,7 +143,7 @@ namespace ACE.Server.WorldObjects
             MagicState.OnCastStart();
             MagicState.SetWindupParams(targetGuid, spellId, casterItem);
 
-            StartPos = new Physics.Common.Position(PhysicsObj.Position);
+            StartPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
 
             if (RecordCast.Enabled)
                 RecordCast.OnCastTargetedSpell(new Spell(spellId), target);
@@ -325,7 +325,7 @@ namespace ACE.Server.WorldObjects
 
             MagicState.OnCastStart();
 
-            StartPos = new Physics.Common.Position(PhysicsObj.Position);
+            StartPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
 
             if (!CreatePlayerSpell(spellId))
                 MagicState.OnCastDone();
@@ -829,7 +829,7 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        public Physics.Common.Position StartPos { get; set; }
+        public Physics.Common.PhysicsPosition StartPos { get; set; }
 
         public void DoCastSpell_Inner(Spell spell, WorldObject casterItem, uint manaUsed, WorldObject target, CastingPreCheckStatus castingPreCheckStatus, bool finishCast = true)
         {

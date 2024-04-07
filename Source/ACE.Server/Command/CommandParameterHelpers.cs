@@ -3,6 +3,7 @@ using ACE.Entity.Enum;
 using ACE.Server.Entity;
 using ACE.Server.Managers;
 using ACE.Server.Network;
+using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
 
 using System;
@@ -223,7 +224,7 @@ namespace ACE.Server.Command
                                 }
                                 break;
                             case ACECommandParameterType.Location:
-                                Position position = null;
+                                LocalPosition position = null;
                                 Match match = Regex.Match(parameterBlob, @"([\d\.]+[ns])[^\d\.]*([\d\.]+[ew])$", RegexOptions.IgnoreCase);
                                 if (match.Success)
                                 {
@@ -556,7 +557,7 @@ namespace ACE.Server.Command
         /// <param name="position">the resultant ACE.Entity.Position</param>
         /// <param name="startingElement">the first zero based element index of the 2 contiguous elements in the parameter array</param>
         /// <returns>the parsing was successful or not</returns>
-        public static bool TryParsePosition(Session session, string[] parameters, out string errorMessage, out Position position, int startingElement = 0)
+        public static bool TryParsePosition(Session session, string[] parameters, out string errorMessage, out LocalPosition position, int startingElement = 0)
         {
             errorMessage = string.Empty;
             position = null;
@@ -606,7 +607,7 @@ namespace ACE.Server.Command
 
             try
             {
-                position = new Position(new Vector2(coordEW, coordNS), session.Player.Location.Instance);
+                var rawPosition = new Position(new Vector2(coordEW, coordNS));
                 position.AdjustMapCoords();
             }
             catch (Exception e)

@@ -17,6 +17,7 @@ using ACE.Server.Network.Sequence;
 using ACE.Server.Network.Structure;
 using ACE.Server.Physics;
 using ACE.Server.Physics.Common;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -304,7 +305,7 @@ namespace ACE.Server.WorldObjects
                 // update position through physics engine
                 if (RequestedLocation != null)
                 {
-                    landblockUpdate = UpdatePlayerPosition(RequestedLocation);
+                    landblockUpdate = UpdatePlayerPosition(GetInstancedPosition(RequestedLocation));
                     RequestedLocation = null;
                 }
 
@@ -417,7 +418,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         /// <param name="newPosition">The new position being requested, before verification through physics engine</param>
         /// <returns>TRUE if object moves to a different landblock</returns>
-        public bool UpdatePlayerPosition(ACE.Entity.Position newPosition, bool forceUpdate = false)
+        public bool UpdatePlayerPosition(InstancedPosition newPosition, bool forceUpdate = false)
         {
             //Console.WriteLine($"{Name}.UpdatePlayerPhysics({newPosition}, {forceUpdate}, {Teleporting})");
             bool verifyContact = false;
@@ -557,7 +558,7 @@ namespace ACE.Server.WorldObjects
             0xD599012C
         };
 
-        public bool ValidateMovement(ACE.Entity.Position newPosition)
+        public bool ValidateMovement(InstancedPosition newPosition)
         {
             if (CurrentLandblock == null)
                 return false;

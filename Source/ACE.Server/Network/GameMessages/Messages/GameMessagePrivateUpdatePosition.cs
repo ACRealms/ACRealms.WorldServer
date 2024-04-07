@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameMessages.Messages
 {
     public class GameMessagePrivateUpdatePosition : GameMessage
     {
-        public GameMessagePrivateUpdatePosition(WorldObject worldObject, PositionType positionType, Position pos)
+        public GameMessagePrivateUpdatePosition(WorldObject worldObject, PositionType positionType, Realms.InstancedPosition pos)
             : base(GameMessageOpcode.PrivateUpdatePosition, GameMessageGroup.UIQueue)
         {
             Writer.Write(worldObject.Sequences.GetNextSequence(Sequence.SequenceType.UpdatePosition, positionType));

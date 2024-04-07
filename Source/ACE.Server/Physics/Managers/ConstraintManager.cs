@@ -8,7 +8,7 @@ namespace ACE.Server.Physics.Animation
         public PhysicsObj PhysicsObj;
         public bool IsConstrained;
         public float ConstraintPosOffset;
-        public Position ConstraintPos;
+        public PhysicsPosition ConstraintPos;
         public float ConstraintDistanceStart;
         public float ConstraintDistanceMax;
 
@@ -24,11 +24,11 @@ namespace ACE.Server.Physics.Animation
             return new ConstraintManager(obj);
         }
 
-        public void ConstrainTo(Position position, float startDistance, float maxDistance)
+        public void ConstrainTo(PhysicsPosition position, float startDistance, float maxDistance)
         {
             IsConstrained = true;
 
-            ConstraintPos = new Position(position);
+            ConstraintPos = new PhysicsPosition(position);
             ConstraintDistanceStart = startDistance;
             ConstraintDistanceMax = maxDistance;
             ConstraintPosOffset = position.Distance(PhysicsObj.Position);

@@ -203,7 +203,7 @@ namespace ACE.Server.WorldObjects
 
             PhysicsObj.Position.ObjCellID = cell.ID;
 
-            var location = new Physics.Common.Position();
+            var location = new Physics.Common.PhysicsPosition();
             location.ObjCellID = cell.ID;
             location.Frame.Origin = Location.Pos;
             location.Frame.Orientation = Location.Rotation;
@@ -312,8 +312,8 @@ namespace ACE.Server.WorldObjects
 
             SightObj.State |= PhysicsState.Missile;
 
-            var startPos = new Physics.Common.Position(PhysicsObj.Position);
-            var targetPos = new Physics.Common.Position(wo.PhysicsObj.Position);
+            var startPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
+            var targetPos = new Physics.Common.PhysicsPosition(wo.PhysicsObj.Position);
 
             if (PhysicsObj.GetBlockDist(startPos, targetPos) > 1)
                 return false;
@@ -341,7 +341,7 @@ namespace ACE.Server.WorldObjects
             return isVisible;
         }
 
-        public bool IsDirectVisible(Position pos)
+        public bool IsDirectVisible(InstancedPosition pos)
         {
             if (PhysicsObj == null)
                 return false;
@@ -350,8 +350,8 @@ namespace ACE.Server.WorldObjects
 
             SightObj.State |= PhysicsState.Missile;
 
-            var startPos = new Physics.Common.Position(PhysicsObj.Position);
-            var targetPos = new Physics.Common.Position(pos);
+            var startPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
+            var targetPos = new Physics.Common.PhysicsPosition(pos);
 
             if (PhysicsObj.GetBlockDist(startPos, targetPos) > 1)
                 return false;
@@ -384,8 +384,8 @@ namespace ACE.Server.WorldObjects
             if (PhysicsObj == null || wo.PhysicsObj == null)
                 return false;
 
-            var startPos = new Physics.Common.Position(PhysicsObj.Position);
-            var targetPos = new Physics.Common.Position(wo.PhysicsObj.Position);
+            var startPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
+            var targetPos = new Physics.Common.PhysicsPosition(wo.PhysicsObj.Position);
 
             PhysicsObj.ProjectileTarget = wo.PhysicsObj;
 
@@ -409,8 +409,8 @@ namespace ACE.Server.WorldObjects
             if (PhysicsObj == null || proj.PhysicsObj == null)
                 return false;
 
-            var startPos = new Physics.Common.Position(proj.PhysicsObj.Position);
-            var targetPos = new Physics.Common.Position(PhysicsObj.Position);
+            var startPos = new Physics.Common.PhysicsPosition(proj.PhysicsObj.Position);
+            var targetPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
 
             // set to eye level
             targetPos.Frame.Origin.Z += PhysicsObj.GetHeight() - proj.PhysicsObj.GetHeight();
@@ -442,7 +442,7 @@ namespace ACE.Server.WorldObjects
 
         public MoveToState LastMoveToState { get; set; }
 
-        public Position RequestedLocation { get; set; }
+        public LocalPosition RequestedLocation { get; set; }
 
         /// <summary>
         /// Flag indicates if RequestedLocation should be broadcast to other players
@@ -740,7 +740,7 @@ namespace ACE.Server.WorldObjects
         }
 
         // todo: This should really be an extension method for Position, or a static method within Position or even AdjustPos
-        public static void AdjustDungeon(Position pos, uint? instance = null)
+        public static void AdjustDungeon(InstancedPosition pos)
         {
             var iid = instance.GetValueOrDefault(pos.Instance);
             if (iid == 0)
@@ -751,7 +751,7 @@ namespace ACE.Server.WorldObjects
         }
 
         // todo: This should really be an extension method for Position, or a static method within Position or even AdjustPos
-        public static bool AdjustDungeonCells(Position pos, uint iid)
+        public static bool AdjustDungeonCells(InstancedPosition pos)
         {
             if (pos == null) return false;
 
@@ -772,7 +772,7 @@ namespace ACE.Server.WorldObjects
         }
 
         // todo: This should really be an extension method for Position, or a static method within Position, or even AdjustPos
-        public static bool AdjustDungeonPos(Position pos, uint iid)
+        public static bool AdjustDungeonPos(InstancedPosition pos)
         {
             if (pos == null) return false;
 
@@ -1106,5 +1106,7 @@ namespace ACE.Server.WorldObjects
                 return Math.Max(0, structureUnitValue);
             }
         }
+
+        public InstancedPosition GetInstancedPosition(LocalPosition pos) => pos.ToInstancedPosition(Location.Instance);
     }
 }

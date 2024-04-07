@@ -1282,7 +1282,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Spawns a portal for SpellType.PortalSummon spells
         /// </summary>
-        protected static bool SummonPortal(uint portalId, Position location, double portalLifetime, WorldObject source, Player summoner)
+        protected static bool SummonPortal(uint portalId, InstancedPosition location, double portalLifetime, WorldObject source, Player summoner)
         {
             var portal = GetPortal(portalId);
 
@@ -1326,7 +1326,7 @@ namespace ACE.Server.WorldObjects
             if (gateway == null)
                 return false;
 
-            gateway.Location = new Position(location);
+            gateway.Location = new InstancedPosition(location);
             gateway.OriginalPortal = portalId;
 
             gateway.UpdatePortalDestination(targetPosition);
@@ -1576,12 +1576,12 @@ namespace ACE.Server.WorldObjects
             if (target == null)
                 return preOffset;
 
-            var startPos = new Physics.Common.Position(PhysicsObj.Position);
+            var startPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
             startPos.Frame.Origin.Z += Height * startFactor;
 
             var endFactor = spellType == ProjectileSpellType.Arc ? ProjHeightArc : ProjHeight;
 
-            var endPos = new Physics.Common.Position(target.PhysicsObj.Position);
+            var endPos = new Physics.Common.PhysicsPosition(target.PhysicsObj.Position);
             endPos.Frame.Origin.Z += target.Height * endFactor;
 
             var globOffset = startPos.GetOffset(endPos);

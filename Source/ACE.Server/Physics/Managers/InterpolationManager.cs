@@ -13,7 +13,7 @@ namespace ACE.Server.Physics.Animation
         public float OriginalDistance;
         public float ProgressQuantum;
         public int NodeFailCounter;
-        public Position BlipToPosition;
+        public PhysicsPosition BlipToPosition;
 
         public static readonly float LargeDistance = 999999.0f;
         public static readonly float MaxInterpolatedVelocity = 7.5f;
@@ -33,7 +33,7 @@ namespace ACE.Server.Physics.Animation
             return new InterpolationManager(obj);
         }
 
-        public void InterpolateTo(Position position, bool keepHeading)
+        public void InterpolateTo(PhysicsPosition position, bool keepHeading)
         {
             if (PhysicsObj == null)
                 return;

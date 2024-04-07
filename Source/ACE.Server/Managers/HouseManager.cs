@@ -18,6 +18,7 @@ using ACE.Server.Factories;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Network.Structure;
 using ACE.Server.WorldObjects;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Managers
 {
@@ -297,7 +298,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Returns a friendly string a house / slumlord position
         /// </summary>
-        public static string GetCoords(Position position)
+        public static string GetCoords(LocalPosition position)
         {
             var coords = position.GetMapCoordStr();
 

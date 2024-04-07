@@ -213,7 +213,7 @@ namespace ACE.Server.WorldObjects
             //var radialDist = dist - (AttackTarget.PhysicsObj.GetRadius() + PhysicsObj.GetRadius());
 
             // always use spheres?
-            var cylDist = (float)Physics.Common.Position.CylinderDistance(PhysicsObj.GetRadius(), PhysicsObj.GetHeight(), PhysicsObj.Position,
+            var cylDist = (float)Physics.Common.PhysicsPosition.CylinderDistance(PhysicsObj.GetRadius(), PhysicsObj.GetHeight(), PhysicsObj.Position,
                 AttackTarget.PhysicsObj.GetRadius(), AttackTarget.PhysicsObj.GetHeight(), AttackTarget.PhysicsObj.Position);
 
             if (DebugMove)
@@ -486,7 +486,7 @@ namespace ACE.Server.WorldObjects
 
             MoveTo(home, RunRate, false, 1.0f);
 
-            var homePos = new Physics.Common.Position(home);
+            var homePos = new Physics.Common.PhysicsPosition(home);
 
             var mvp = GetMovementParameters();
             mvp.DistanceToObject = 0.6f;
@@ -526,7 +526,7 @@ namespace ACE.Server.WorldObjects
                 Console.WriteLine($"{Name} ({Guid}) - ForceHome({homePos.ToLOCString()})");
 
             var setPos = new SetPosition(homePos.Instance);
-            setPos.Pos = new Physics.Common.Position(homePos);
+            setPos.Pos = new Physics.Common.PhysicsPosition(homePos);
             setPos.Flags = SetPositionFlags.Teleport;
 
             PhysicsObj.SetPosition(setPos);

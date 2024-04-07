@@ -863,7 +863,7 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionJump(JumpPack jump)
         {
-            StartJump = new ACE.Entity.Position(Location);
+            StartJump = new InstancedPosition(Location);
             //Console.WriteLine($"JumpPack: Velocity: {jump.Velocity}, Extent: {jump.Extent}");
 
             var strength = Strength.Current;

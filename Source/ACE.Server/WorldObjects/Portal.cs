@@ -12,6 +12,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -56,7 +57,7 @@ namespace ACE.Server.WorldObjects
 
             if (RelativeDestination != null && Location != null && Destination == null)
             {
-                var relativeDestination = new Position(Location);
+                var relativeDestination = new InstancedPosition(Location);
                 relativeDestination.Pos += new Vector3(RelativeDestination.PositionX, RelativeDestination.PositionY, RelativeDestination.PositionZ);
                 relativeDestination.Rotation = new Quaternion(RelativeDestination.RotationX, relativeDestination.RotationY, relativeDestination.RotationZ, relativeDestination.RotationW);
                 relativeDestination.LandblockId = new LandblockId(relativeDestination.GetCell());
@@ -67,7 +68,7 @@ namespace ACE.Server.WorldObjects
             return true;
         }
 
-        public void UpdatePortalDestination(Position destination)
+        public void UpdatePortalDestination(InstancedPosition destination)
         {
             Destination = destination;
 

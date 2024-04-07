@@ -4,6 +4,7 @@ using System.IO;
 using System.Numerics;
 using ACE.Entity;
 using ACE.Entity.Enum;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Network.Structure
 {
@@ -57,7 +58,7 @@ namespace ACE.Server.Network.Structure
             var motd = "";
             var motdSetBy = "";
             uint chatRoomID = 0;
-            var bindPoint = new Position();
+            var bindPoint = new LocalPosition();
             var allegianceName = "";
             uint nameLastSetTime = 0;
             bool isLocked = false;
@@ -189,7 +190,7 @@ namespace ACE.Server.Network.Structure
                 writer.WriteString16L(str);
         }
 
-        public static void Write(this BinaryWriter writer, Position position)
+        public static void Write(this BinaryWriter writer, UsablePosition position)
         {
             writer.Write(position.Cell);
             writer.Write(position.Pos);

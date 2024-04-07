@@ -377,7 +377,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Sends the network commands to move a player towards a position
         /// </summary>
-        public void MoveToPosition(Position position)
+        public void MoveToPosition(InstancedPosition position)
         {
             var moveToPosition = new Motion(this, position);
             moveToPosition.MoveToParameters.DistanceToObject = 0.0f;
@@ -387,7 +387,7 @@ namespace ACE.Server.WorldObjects
             EnqueueBroadcastMotion(moveToPosition);
         }
 
-        public void SetWalkRunThreshold(Motion motion, Position targetLocation)
+        public void SetWalkRunThreshold(Motion motion, InstancedPosition targetLocation)
         {
             // FIXME: WalkRunThreshold (default 15 distance) seems to not be used automatically by client
             // player will always walk instead of run, and if MovementParams.CanCharge is sent, they will always charge
