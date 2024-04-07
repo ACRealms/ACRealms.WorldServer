@@ -1,0 +1,12 @@
+{
+  "name": "creature-hp-boost",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "Boosts creature HP by 10x.",
+    "RulesetStampVendorCategory": 1,
+    "CreatureSpawnHPMultiplier": {
+      "value": 10.0,
+      "compose": "multiply"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Player Tracking - Rapid",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "The server will relay player location tracking to each player 10x as frequently.",
+    "RulesetStampVendorCategory": 2,
+    "SpellCasting_MoveToState_UpdatePosition_Threshold": 0.1
+  }
+}

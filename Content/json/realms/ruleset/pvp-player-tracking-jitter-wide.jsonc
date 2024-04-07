@@ -1,0 +1,13 @@
+{
+  "name": "Player Tracking - Very Jittery",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "The server will relay player location tracking to each player at inconsistent, random intervals. Might appear to be lag.",
+    "RulesetStampVendorCategory": 2,
+    "SpellCasting_MoveToState_UpdatePosition_Threshold": {
+      "low": 0.1,
+      "high": 3.0,
+      "reroll": "always"
+    }
+  }
+}

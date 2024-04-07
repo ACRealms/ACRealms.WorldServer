@@ -1,0 +1,9 @@
+{
+  "name": "No Movement Fizzles",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "You won't fizzle for being too far away from your original spellcasting windup location.",
+    "RulesetStampVendorCategory": 2,
+    "SpellCastingPvPWindupMaxMove": 1000.0
+  }
+}

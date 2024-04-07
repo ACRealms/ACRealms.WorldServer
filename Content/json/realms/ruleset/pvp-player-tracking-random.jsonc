@@ -1,0 +1,13 @@
+{
+  "name": "Player Tracking - Random",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "The server will relay player location tracking to each player consistently, but the rate at which that happens will be randomized each time the landblock is created.",
+    "RulesetStampVendorCategory": 2,
+    "SpellCasting_MoveToState_UpdatePosition_Threshold": {
+      "low": 0.1,
+      "high": 3.0,
+      "reroll": "landblock"
+    }
+  }
+}

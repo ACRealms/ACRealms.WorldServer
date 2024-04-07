@@ -1,0 +1,9 @@
+{
+  "name": "Max Spellcasting Angle - Narrow",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "The maximum spellcasting angle (how close you are to facing directly your target before a spell can be cast at it) is reduced.",
+    "RulesetStampVendorCategory": 2,
+    "Spellcasting_Max_Angle": 10.0
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Max Spellcasting Angle - Wide",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "The maximum spellcasting angle (how close you are to facing directly your target before a spell can be cast at it) is increased.",
+    "RulesetStampVendorCategory": 2,
+    "Spellcasting_Max_Angle": 65.0
+  }
+}

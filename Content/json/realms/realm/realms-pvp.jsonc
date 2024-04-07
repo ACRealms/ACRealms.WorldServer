@@ -1,0 +1,9 @@
+{
+  "name": "Modern Realm (PvP)",
+  "type": "Realm",
+  "parent": "Modern Realm",
+  "properties": {
+    "Description": "The Customized PvP Realm with the latest and greatest features.",
+    "IsPKOnly": true
+  }
+}

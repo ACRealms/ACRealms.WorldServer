@@ -1,0 +1,25 @@
+{
+  "name": "random-test",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "A test ruleset for random properties.",
+    "Spellcasting_Max_Angle": {
+      "low": "5",
+      "high": "180",
+      "reroll": "landblock" /*never, always, landblock, admin */,
+      "locked": true,
+      "probability": 0.5
+    },
+    "CreatureSpawnHPMultiplier": {
+      "low": 0.5,
+      "high": 2.0,
+      "compose": "add"
+    }
+  },
+  "apply_rulesets": ["creature-attribute-randomizer"],
+  "apply_rulesets_random": [
+    [{ "creature-hp-boost": 0.5 }, { "creature-hp-boost": 1.0 }],
+    { "pvp-ruleset": "auto" },
+    { "creature-attribute-randomizer": 0.5 }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "Classic": 1,
+  "Classic PvP": 2,
+  "Modern Realm": 3,
+  "Modern Realm (PvP)": 4,
+  "Duels Only": 5,
+  "pvp-ruleset": 1000,
+  "random-test": 1001,
+  "creature-attribute-randomizer": 1002,
+  "creature-hp-boost": 1003,
+  "Player Tracking - Jittery": 1004,
+  "Player Tracking - Very Jittery": 1005,
+  "Player Tracking - Random": 1006,
+  "Player Tracking - Rapid": 1007,
+  "Player Tracking - Slow": 1008,
+  "Max Spellcasting Angle - Jittery": 1009,
+  "Max Spellcasting Angle - Narrow": 1010,
+  "Max Spellcasting Angle - Random": 1011,
+  "Max Spellcasting Angle - Wide": 1012,
+  "No Movement Fizzles": 1013,
+  "Increased Movement Fizzles": 1014,
+  "Reduced Projectile Accuracy": 1015
+}

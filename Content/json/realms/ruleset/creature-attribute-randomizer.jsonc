@@ -1,0 +1,50 @@
+{
+  "name": "creature-attribute-randomizer",
+  "type": "Ruleset",
+  "properties": {
+    "RulesetStampVendorCategory": 1,
+    "Description": "All creature attributes are modified by 0.2x to 3x",
+    "CreatureSpawnHPMultiplier": {
+      "low": 0.2,
+      "high": 3.0,
+      "compose": "multiply",
+      "reroll": "always"
+    },
+    "CreatureStrengthMultiplier": {
+      "low": 0.2,
+      "high": 3.0,
+      "compose": "multiply",
+      "reroll": "always"
+    },
+    "CreatureEnduranceMultiplier": {
+      "low": 0.2,
+      "high": 3.0,
+      "compose": "multiply",
+      "reroll": "always"
+    },
+    "CreatureCoordinationMultiplier": {
+      "low": 0.2,
+      "high": 3.0,
+      "compose": "multiply",
+      "reroll": "always"
+    },
+    "CreatureQuicknessMultiplier": {
+      "low": 0.2,
+      "high": 3.0,
+      "compose": "multiply",
+      "reroll": "always"
+    },
+    "CreatureFocusMultiplier": {
+      "low": 0.2,
+      "high": 3.0,
+      "compose": "multiply",
+      "reroll": "always"
+    },
+    "CreatureSelfMultiplier": {
+      "low": 0.2,
+      "high": 3.0,
+      "compose": "multiply",
+      "reroll": "always"
+    }
+  }
+}

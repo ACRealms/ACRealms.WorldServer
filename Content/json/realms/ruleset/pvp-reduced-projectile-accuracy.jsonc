@@ -1,0 +1,9 @@
+{
+  "name": "Reduced Projectile Accuracy",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "Projectiles (such as war spells) are less accurate and therefore easier to dodge.",
+    "RulesetStampVendorCategory": 2,
+    "SpellCastingPKDoubleCollisionCheck": false
+  }
+}

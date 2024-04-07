@@ -1,0 +1,8 @@
+{
+  "name": "pvp-ruleset",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "All players are PvP flagged in this area!",
+    "IsPKOnly": true
+  }
+}

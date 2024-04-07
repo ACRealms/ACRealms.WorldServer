@@ -1,0 +1,13 @@
+{
+  "name": "Max Spellcasting Angle - Jittery",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "The maximum spellcasting angle (how close you are to facing directly your target before a spell can be cast at it) is unpredictable for each cast.",
+    "RulesetStampVendorCategory": 2,
+    "Spellcasting_Max_Angle": {
+      "low": 5.0,
+      "high": 90.0,
+      "reroll": "always"
+    }
+  }
+}

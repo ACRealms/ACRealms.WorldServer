@@ -1,0 +1,13 @@
+{
+  "name": "Max Spellcasting Angle - Random",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "The maximum spellcasting angle (how close you are to facing directly your target before a spell can be cast at it) is randomized for each landblock.",
+    "RulesetStampVendorCategory": 2,
+    "Spellcasting_Max_Angle": {
+      "low": 5.0,
+      "high": 90.0,
+      "reroll": "landblock"
+    }
+  }
+}
