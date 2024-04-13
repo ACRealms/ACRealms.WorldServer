@@ -147,7 +147,7 @@ namespace ACE.Server.Managers
             if (!player.Location.IsEphemeralRealm)
                 return GetRealm(player.RealmRuleset.Template.Realm.Id);
 
-            return GetRealm(player.GetPosition(PositionType.EphemeralRealmExitTo)?.RealmID ?? player.HomeRealm);
+            return GetRealm(player.EphemeralRealmExitTo?.RealmID ?? player.HomeRealm);
         }
 
         internal static Landblock GetNewEphemeralLandblock(ACE.Entity.LandblockId landblockId, Player owner, List<ACE.Entity.Models.Realm> realmTemplates)
@@ -552,7 +552,7 @@ namespace ACE.Server.Managers
             player.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
             player.SetProperty(PropertyBool.RecallsDisabled, false);
             var loc = realm.DefaultStartingLocation(player);
-            player.SetPosition(PositionType.Sanctuary, new ACE.Entity.Position(loc));
+            player.Sanctuary = new LocalPosition(loc);
             WorldManager.ThreadSafeTeleport(player, loc, false, new Entity.Actions.ActionEventDelegate(() =>
             {
                 //if (realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))

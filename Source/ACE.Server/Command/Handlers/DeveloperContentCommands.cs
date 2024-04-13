@@ -1321,7 +1321,7 @@ namespace ACE.Server.Command.Handlers.Processors
         [CommandHandler("createinst", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Spawns a new wcid or classname as a landblock instance", "<wcid or classname>\n\nTo create a parent/child relationship: /createinst -p <parent guid> -c <wcid or classname>\nTo automatically get the parent guid from the last appraised object: /createinst -p -c <wcid or classname>\n\nTo manually specify a start guid: /createinst <wcid or classname> <start guid>\nStart guids can be in the range 0x000-0xFFF, or they can be prefixed with 0x7<landblock id>")]
         public static void HandleCreateInst(Session session, params string[] parameters)
         {
-            var loc = new Position(session.Player.Location);
+            var loc = new InstancedPosition(session.Player.Location);
 
             var param = parameters[0];
 
@@ -1469,11 +1469,11 @@ namespace ACE.Server.Command.Handlers.Processors
 
             // spawn as ethereal temporarily, to spawn directly on player position
             wo.Ethereal = true;
-            wo.Location = new Position(loc);
+            wo.Location = new InstancedPosition(loc);
 
             // even on flat ground, objects can sometimes fail to spawn at the player's current Z
             // Position.Z has some weird thresholds when moving around, but i guess the same logic doesn't apply when trying to spawn in...
-            wo.Location.PositionZ += 0.05f;
+            wo.Location = wo.Location.SetPositionZ(wo.Location.PositionZ + 0.05f);
 
             session.Network.EnqueueSend(new GameMessageSystemChat($"Creating new landblock instance {(isLinkChild ? "child object " : "")}@ {loc.ToLOCString()}\n{wo.WeenieClassId} - {wo.Name} ({nextStaticGuid:X8})", ChatMessageType.Broadcast));
 
@@ -1750,144 +1750,6 @@ namespace ACE.Server.Command.Handlers.Processors
         }
 
         public static EncounterSQLWriter LandblockEncounterWriter;
-
-        [CommandHandler("addenc", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Spawns a new wcid or classname in the current outdoor cell as an encounter", "<wcid or classname>")]
-        public static void HandleAddEncounter(Session session, params string[] parameters)
-        {
-            // Not supported in AC Realms
-            return;
-
-            /*
-             
-            var param = parameters[0];
-
-            Weenie weenie = null;
-
-            if (uint.TryParse(param, out var wcid))
-                weenie = DatabaseManager.World.GetWeenie(wcid);   // wcid
-            else
-                weenie = DatabaseManager.World.GetWeenie(param);  // classname
-
-            if (weenie == null)
-            {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find weenie {param}", ChatMessageType.Broadcast));
-                return;
-            }
-
-            var pos = session.Player.Location;
-
-            if ((pos.Cell & 0xFFFF) >= 0x100)
-            {
-                session.Network.EnqueueSend(new GameMessageSystemChat("You must be outdoors to create an encounter!", ChatMessageType.Broadcast));
-                return;
-            }
-
-            var cellX = (int)pos.PositionX / 24;
-            var cellY = (int)pos.PositionY / 24;
-
-            var landblock = (ushort)pos.Landblock;
-
-            // clear any cached encounters for this landblock
-            DatabaseManager.World.ClearCachedEncountersByLandblock(landblock);
-
-            // get existing encounters for this landblock
-            var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(landblock);
-
-            // check for existing encounter
-            if (encounters.Any(i => i.CellX == cellX && i.CellY == cellY))
-            {
-                session.Network.EnqueueSend(new GameMessageSystemChat("This cell already contains an encounter!", ChatMessageType.Broadcast));
-                return;
-            }
-
-            // spawn encounter
-            var wo = SpawnEncounter(weenie, cellX, cellY, pos, session);
-
-            if (wo == null) return;
-
-            session.Network.EnqueueSend(new GameMessageSystemChat($"Creating new encounter @ landblock {pos.Landblock:X4}, cellX={cellX}, cellY={cellY}\n{wo.WeenieClassId} - {wo.Name}", ChatMessageType.Broadcast));
-
-            // add a new encounter (verifications?)
-            var encounter = new Encounter();
-            encounter.Landblock = (int)pos.Landblock;
-            encounter.CellX = cellX;
-            encounter.CellY = cellY;
-            encounter.WeenieClassId = weenie.ClassId;
-            encounter.LastModified = DateTime.Now;
-
-            encounters.Add(encounter);
-
-            // write encounters to sql file / load into db
-            SyncEncounters(session, landblock, encounters);
-            */
-        }
-
-        public static WorldObject SpawnEncounter(Weenie weenie, int cellX, int cellY, LocalPosition pos, Session session)
-        {
-            var wo = WorldObjectFactory.CreateNewWorldObject(weenie.ClassId);
-
-            if (wo == null)
-            {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Failed to create encounter weenie", ChatMessageType.Broadcast));
-                return null;
-            }
-
-            if (!wo.IsGenerator)
-            {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Encounter must be a Generator", ChatMessageType.Broadcast));
-                return null;
-            }
-
-            var xPos = Math.Clamp(cellX * 24.0f, 0.5f, 191.5f);
-            var yPos = Math.Clamp(cellY * 24.0f, 0.5f, 191.5f);
-
-            var newPos = new Physics.Common.PhysicsPosition();
-            newPos.ObjCellID = pos.Cell;
-            newPos.Frame = new Physics.Animation.AFrame(new Vector3(xPos, yPos, 0), Quaternion.Identity);
-            newPos.adjust_to_outside();
-
-            newPos.Frame.Origin.Z = session.Player.CurrentLandblock.PhysicsLandblock.GetZ(newPos.Frame.Origin);
-
-            wo.Location = new Position(newPos.ObjCellID, newPos.Frame.Origin, newPos.Frame.Orientation, session.Player.Location.Instance);
-
-            var sortCell = Physics.Common.LScape.get_landcell(newPos.ObjCellID, pos.Instance) as Physics.Common.SortCell;
-            if (sortCell != null && sortCell.has_building())
-            {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Failed to create encounter near building cell", ChatMessageType.Broadcast));
-                return null;
-            }
-
-            if (PropertyManager.GetBool("override_encounter_spawn_rates").Item)
-            {
-                wo.RegenerationInterval = PropertyManager.GetDouble("encounter_regen_interval").Item;
-
-                wo.ReinitializeHeartbeats();
-
-                if (wo.Biota.PropertiesGenerator != null)
-                {
-                    // While this may be ugly, it's done for performance reasons.
-                    // Common weenie properties are not cloned into the bota on creation. Instead, the biota references simply point to the weenie collections.
-                    // The problem here is that we want to update one of those common collection properties. If the biota is referencing the weenie collection,
-                    // then we'll end up updating the global weenie (from the cache), instead of just this specific biota.
-                    if (wo.Biota.PropertiesGenerator == wo.Weenie.PropertiesGenerator)
-                    {
-                        wo.Biota.PropertiesGenerator = new List<ACE.Entity.Models.PropertiesGenerator>(wo.Weenie.PropertiesGenerator.Count);
-
-                        foreach (var record in wo.Weenie.PropertiesGenerator)
-                            wo.Biota.PropertiesGenerator.Add(record.Clone());
-                    }
-                }
-            }
-
-            var success = wo.EnterWorld();
-
-            if (!success)
-            {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Failed to spawn encounter", ChatMessageType.Broadcast));
-                return null;
-            }
-            return wo;
-        }
 
         /// <summary>
         /// Serializes encounters to XXYY.sql file,
@@ -2974,7 +2836,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             // update ace location
-            var prevLoc = new Position(obj.Location);
+            var prevLoc = new InstancedPosition(obj.Location);
             obj.Location = obj.PhysicsObj.Position.ACEPosition(obj.Location.Instance);
 
             if (prevLoc.InstancedLandblock != obj.Location.InstancedLandblock)
@@ -3121,7 +2983,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             // update physics / ace rotation
             obj.PhysicsObj.Position.Frame.Orientation = newRotation;
-            obj.Location.Rotation = newRotation;
+            obj.Location = obj.Location.SetRotation(newRotation);
 
             // update instance
             instance.AnglesW = newRotation.W;
@@ -3226,7 +3088,7 @@ namespace ACE.Server.Command.Handlers.Processors
 
             // update physics / ace rotation
             obj.PhysicsObj.Position.Frame.Orientation = newRotation;
-            obj.Location.Rotation = newRotation;
+            obj.Location = obj.Location.SetRotation(newRotation);
 
             // update instance
             instance.AnglesW = newRotation.W;
@@ -3369,10 +3231,10 @@ namespace ACE.Server.Command.Handlers.Processors
 
                     try
                     {
-                        var pos = new Position(new Vector2(x, y), 0);
-                        pos.AdjustMapCoords();
-                        pos.Translate(objCellId);
-                        pos.FindZ();
+                        var pos = new LocalPosition(new Position(new Vector2(x, y))).AsInstancedPosition(session.Player, PlayerInstanceSelectMode.Same);
+                        pos = pos.AdjustMapCoords();
+                        pos = pos.Translate(objCellId);
+                        pos = pos.FindZ();
 
                         using (StreamWriter sw = File.AppendText(vlocFile))
                         {

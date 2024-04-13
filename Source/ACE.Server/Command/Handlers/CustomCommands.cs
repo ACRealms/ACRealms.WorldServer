@@ -25,9 +25,8 @@ namespace ACE.Server.Command.Handlers
             if (!ushort.TryParse(parameters[0], out var realmid))
                 return;
 
-            var pos = session.Player.GetPosition(PositionType.Location);
-            var newpos = new Position(pos);
-            newpos.SetToDefaultRealmInstance(realmid);
+            var pos = session.Player.Location;
+            var newpos = new InstancedPosition(pos, InstancedPosition.InstanceIDFromVars(realmid, 0, false));
 
             session.Player.Teleport(newpos);
             var positionMessage = new GameMessageSystemChat($"Teleporting to realm {realmid}.", ChatMessageType.Broadcast);

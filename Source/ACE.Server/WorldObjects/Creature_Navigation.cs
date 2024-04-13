@@ -328,9 +328,9 @@ namespace ACE.Server.WorldObjects
             else
             {
                 // move to position
-                var home = GetPosition(PositionType.Home);
+                var home = Home;
 
-                motion = GetMoveToPosition(home, RunRate, 1.0f);
+                motion = GetMoveToPosition(Home.AsInstancedPosition(this, WorldObjectInstanceSelectMode.Same), RunRate, 1.0f);
             }
 
             player.Session.Network.EnqueueSend(new GameMessageUpdateMotion(this, motion));

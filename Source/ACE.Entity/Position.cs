@@ -21,7 +21,7 @@ namespace ACE.Entity
         public uint Cell { get => landblockId.Raw; }
 
         // Only defined here for database I/O
-        internal uint Instance;
+        public uint Instance;
         
         // REALMS: New fields/props on existing entity classes should be marked as private where possible
         private ulong LongObjCellID => (ulong)Instance << 32 | Cell;
@@ -84,10 +84,6 @@ namespace ACE.Entity
             }
         }
 
-        public void Rotate(Vector3 dir)
-        {
-            Rotation = Quaternion.CreateFromYawPitchRoll(0, 0, (float)Math.Atan2(-dir.X, dir.Y));
-        }
 
         // TODO: delete this, use proper Vector3 and Quaternion
         public float PositionX { get; set; }
@@ -259,11 +255,9 @@ namespace ACE.Entity
                 SetPosition(Pos);
         }
 
-        public Position(BinaryReader payload, uint instance)
+        public Position(BinaryReader payload)
         {
             LandblockId = new LandblockId(payload.ReadUInt32());
-
-            Instance = instance;
 
             PositionX = payload.ReadSingle();
             PositionY = payload.ReadSingle();
@@ -512,6 +506,24 @@ namespace ACE.Entity
             var dz = p.PositionZ - PositionZ;
 
             return new Vector3(dx, dy, dz);
+        }
+
+        public Vector3 ToGlobal(bool skipIndoors = false)
+        {
+            // TODO: Is this necessary? It seemed to be loading rogue physics landblocks. Commented out 2019-04 Mag-nus
+            //var landblock = LScape.get_landblock(p.LandblockId.Raw);
+
+            // TODO: investigate dungeons that are below actual traversable overworld terrain
+            // ex., 010AFFFF
+            //if (landblock.IsDungeon)
+            if (Indoors && skipIndoors)
+                return Pos;
+
+            var x = LandblockId.LandblockX * BlockLength + PositionX;
+            var y = LandblockId.LandblockY * BlockLength + PositionY;
+            var z = PositionZ;
+
+            return new Vector3(x, y, z);
         }
 
         public override string ToString()

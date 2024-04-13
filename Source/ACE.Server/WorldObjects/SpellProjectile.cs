@@ -11,6 +11,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Realms;
 using ACE.Server.WorldObjects.Entity;
 
 namespace ACE.Server.WorldObjects
@@ -20,7 +21,7 @@ namespace ACE.Server.WorldObjects
         public Spell Spell;
         public ProjectileSpellType SpellType { get; set; }
 
-        public Position SpawnPos { get; set; }
+        public InstancedPosition SpawnPos { get; set; }
         public float DistanceToTarget { get; set; }
         public uint LifeProjectileDamage { get; set; }
 

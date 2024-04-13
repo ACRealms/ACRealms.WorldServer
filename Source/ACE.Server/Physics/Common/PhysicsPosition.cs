@@ -50,7 +50,7 @@ namespace ACE.Server.Physics.Common
             Frame = new AFrame(p.Frame);
         }
 
-        public PhysicsPosition(ACE.Entity.Position p)
+        public PhysicsPosition(Realms.InstancedPosition p)
         {
             ObjCellID = p.Cell;
             Frame = new AFrame(p.Pos, p.Rotation);

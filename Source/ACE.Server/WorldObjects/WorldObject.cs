@@ -188,7 +188,7 @@ namespace ACE.Server.WorldObjects
             if (PhysicsObj.CurCell != null)
                 return false;
 
-            AdjustDungeon(Location);
+            Location = AdjustDungeon(Location);
 
             // exclude linkspots from spawning
             if (WeenieClassId == 10762) return true;
@@ -221,22 +221,18 @@ namespace ACE.Server.WorldObjects
             //Console.WriteLine($"AddPhysicsObj: success: {Name} ({Guid})");
             SyncLocation();
 
-            SetPosition(PositionType.Home, new Position(Location));
+            Home = Location;
 
             return true;
         }
 
         public void SyncLocation()
         {
-            Location.LandblockId = new LandblockId(PhysicsObj.Position.ObjCellID);
+            Location = Location.SetLandblockId(new LandblockId(PhysicsObj.Position.ObjCellID));
 
             // skip ObjCellID check when updating from physics
             // TODO: update to newer version of ACE.Entity.Position
-            Location.PositionX = PhysicsObj.Position.Frame.Origin.X;
-            Location.PositionY = PhysicsObj.Position.Frame.Origin.Y;
-            Location.PositionZ = PhysicsObj.Position.Frame.Origin.Z;
-
-            Location.Rotation = PhysicsObj.Position.Frame.Orientation;
+            Location = Location.SetPositions(PhysicsObj.Position.Frame.Origin.X, PhysicsObj.Position.Frame.Origin.Y, PhysicsObj.Position.Frame.Origin.Z, PhysicsObj.Position.Frame.Orientation);
         }
 
         private void InitializePropertyDictionaries()
@@ -723,7 +719,7 @@ namespace ACE.Server.WorldObjects
                 return false;
 
             if (Generator != null)
-                Location.Instance = Generator.Location.Instance;
+                Location = new InstancedPosition(Location, Generator.Location.Instance);
 
             if (!LandblockManager.AddObject(this))
                 return false;
@@ -740,49 +736,43 @@ namespace ACE.Server.WorldObjects
         }
 
         // todo: This should really be an extension method for Position, or a static method within Position or even AdjustPos
-        public static void AdjustDungeon(InstancedPosition pos)
+        public static InstancedPosition AdjustDungeon(InstancedPosition pos)
         {
-            var iid = instance.GetValueOrDefault(pos.Instance);
-            if (iid == 0)
-                log.Error("AdjustDungeon: Instance ID is 0! Instance ID needs to be passed to this method if the position lacks an instance id.");
-            
-            AdjustDungeonPos(pos, iid);
-            AdjustDungeonCells(pos, iid);
+            pos = AdjustDungeonPos(pos);
+            pos = AdjustDungeonCells(pos);
+            return pos;
         }
 
         // todo: This should really be an extension method for Position, or a static method within Position or even AdjustPos
-        public static bool AdjustDungeonCells(InstancedPosition pos)
+        public static InstancedPosition AdjustDungeonCells(InstancedPosition pos)
         {
-            if (pos == null) return false;
+            if (pos == null) return pos;
 
-            var landblock = LScape.get_landblock(pos.Cell, iid);
-            if (landblock == null || !landblock.HasDungeon) return false;
+            var landblock = LScape.get_landblock(pos.Cell, pos.Instance);
+            if (landblock == null || !landblock.HasDungeon) return pos;
 
             var dungeonID = pos.Cell >> 16;
 
-            var adjustCell = AdjustCell.Get(dungeonID, iid);
+            var adjustCell = AdjustCell.Get(dungeonID, pos.Instance);
             var cellID = adjustCell.GetCell(pos.Pos);
 
             if (cellID != null && pos.Cell != cellID.Value)
-            {
-                pos.LandblockId = new LandblockId(cellID.Value);
-                return true;
-            }
-            return false;
+                pos = pos.SetLandblockId(new LandblockId(cellID.Value));
+
+            return pos;
         }
 
         // todo: This should really be an extension method for Position, or a static method within Position, or even AdjustPos
-        public static bool AdjustDungeonPos(InstancedPosition pos)
+        public static InstancedPosition AdjustDungeonPos(InstancedPosition pos)
         {
-            if (pos == null) return false;
+            if (pos == null) return pos;
 
-            var landblock = LScape.get_landblock(pos.Cell, iid);
-            if (landblock == null || !landblock.HasDungeon) return false;
+            var landblock = LScape.get_landblock(pos.Cell, pos.Instance);
+            if (landblock == null || !landblock.HasDungeon) return pos;
 
             var dungeonID = pos.Cell >> 16;
 
-            var adjusted = AdjustPos.Adjust(dungeonID, pos);
-            return adjusted;
+            return AdjustPos.Adjust(dungeonID, pos);
         }
 
         /// <summary>
@@ -1106,7 +1096,5 @@ namespace ACE.Server.WorldObjects
                 return Math.Max(0, structureUnitValue);
             }
         }
-
-        public InstancedPosition GetInstancedPosition(LocalPosition pos) => pos.ToInstancedPosition(Location.Instance);
     }
 }

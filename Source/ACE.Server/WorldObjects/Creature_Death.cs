@@ -14,6 +14,7 @@ using ACE.Server.Factories;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -437,7 +438,7 @@ namespace ACE.Server.WorldObjects
                 {
                     if (!string.IsNullOrEmpty(item.Quest)) // if the item has a Quest string, make the creature a "generator" of the item so that the pickup action applies the quest. 
                         item.GeneratorId = Guid.Full; 
-                    item.Location = new Position(Location);
+                    item.Location = new InstancedPosition(Location);
                     LandblockManager.AddObject(item);
                 }
                 return;
@@ -501,12 +502,12 @@ namespace ACE.Server.WorldObjects
                 atHideout = true;
                 var loc = player.HideoutLocation;
                 //Randomize the location of the corpse within a small square
-                loc = new Position(loc.Cell,
+                loc = new InstancedPosition(loc.Cell,
                     loc.Pos.X + (float)Common.ThreadSafeRandom.Next(-2f, 2f),
                     loc.Pos.Y + (float)Common.ThreadSafeRandom.Next(-2f, 2f),
                     loc.Pos.Z, loc.Rotation.X, loc.Rotation.Y, loc.Rotation.Z, loc.Rotation.W, loc.Instance);
                 var rads = (float)Common.ThreadSafeRandom.Next(0.0f, (float)Math.PI * 2.0f);
-                loc.Rotation = System.Numerics.Quaternion.CreateFromAxisAngle(System.Numerics.Vector3.UnitZ, rads);
+                loc = loc.SetRotation(System.Numerics.Quaternion.CreateFromAxisAngle(System.Numerics.Vector3.UnitZ, rads));
                 
                 corpse.Location = loc;
             }
@@ -547,7 +548,7 @@ namespace ACE.Server.WorldObjects
 
             if (player != null)
             {
-                corpse.SetPosition(PositionType.Location, corpse.Location);
+                corpse.Location = corpse.Location;
 
                 var killerIsOlthoiPlayer = killer != null && killer.IsOlthoiPlayer;
                 var killerIsPkPlayer = killer != null && killer.IsPlayer && killer.Guid != Guid;
@@ -584,7 +585,7 @@ namespace ACE.Server.WorldObjects
                     }
                     else if ((player.Location.Cell & 0xFFFF) < 0x100)
                     {
-                        player.SetPosition(PositionType.LastOutsideDeath, new Position(corpse.Location));
+                        player.SetPosition(PositionType.LastOutsideDeath, corpse.Location.AsLocalPosition());
                         player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePosition(player, PositionType.LastOutsideDeath, corpse.Location));
 
                         if (dropped.Count > 0)

@@ -292,7 +292,7 @@ namespace ACE.Server.WorldObjects
                 var newBlock = newPos.ObjCellID >> 16;
                 var newCell = newPos.ObjCellID & 0xFFFF;
 
-                Location.LandblockId = new LandblockId(newPos.ObjCellID);
+                Location = Location.SetLandblockId(new LandblockId(newPos.ObjCellID));
 
                 if (prevBlock != newBlock)
                 {
@@ -307,11 +307,7 @@ namespace ACE.Server.WorldObjects
 
             // skip ObjCellID check when updating from physics
             // TODO: update to newer version of ACE.Entity.Position
-            Location.PositionX = newPos.Frame.Origin.X;
-            Location.PositionY = newPos.Frame.Origin.Y;
-            Location.PositionZ = newPos.Frame.Origin.Z;
-
-            Location.Rotation = newPos.Frame.Orientation;
+            Location = Location.SetPositions(newPos.Frame.Origin.X, newPos.Frame.Origin.Y, newPos.Frame.Origin.Z, newPos.Frame.Orientation);
 
             if (DebugMove)
                 DebugDistance();
@@ -375,7 +371,7 @@ namespace ACE.Server.WorldObjects
             if (AttackTarget == null) return;
 
             var playerDir = AttackTarget.Location.GetCurrentDir();
-            Location.Pos = AttackTarget.Location.Pos + playerDir * (AttackTarget.PhysicsObj.GetRadius() + PhysicsObj.GetRadius());
+            Location = Location.SetPos(AttackTarget.Location.Pos + playerDir * (AttackTarget.PhysicsObj.GetRadius() + PhysicsObj.GetRadius()));
             SendUpdatePosition();
         }
 
@@ -450,7 +446,7 @@ namespace ACE.Server.WorldObjects
             if (MonsterState == State.Return)
                 return;
 
-            var homePosition = GetPosition(PositionType.Home);
+            var homePosition = Home;
             //var matchIndoors = Location.Indoors == homePosition.Indoors;
 
             //var globalPos = matchIndoors ? Location.ToGlobal() : Location.Pos;
@@ -474,7 +470,7 @@ namespace ACE.Server.WorldObjects
             MonsterState = State.Return;
             AttackTarget = null;
 
-            var home = GetPosition(PositionType.Home);
+            var home = Home;
 
             if (Location.Equals(home))
             {
@@ -520,7 +516,7 @@ namespace ACE.Server.WorldObjects
 
         public void ForceHome()
         {
-            var homePos = GetPosition(PositionType.Home);
+            var homePos = Home;
 
             if (DebugMove)
                 Console.WriteLine($"{Name} ({Guid}) - ForceHome({homePos.ToLOCString()})");

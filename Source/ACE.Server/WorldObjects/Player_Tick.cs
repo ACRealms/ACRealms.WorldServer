@@ -305,7 +305,7 @@ namespace ACE.Server.WorldObjects
                 // update position through physics engine
                 if (RequestedLocation != null)
                 {
-                    landblockUpdate = UpdatePlayerPosition(GetInstancedPosition(RequestedLocation));
+                    landblockUpdate = UpdatePlayerPosition(RequestedLocation.AsInstancedPosition(this, PlayerInstanceSelectMode.Same));
                     RequestedLocation = null;
                 }
 
@@ -343,7 +343,7 @@ namespace ACE.Server.WorldObjects
             PhysicsObj.update_object(Location.Instance);
 
             // sync ace position?
-            Location.Rotation = PhysicsObj.Position.Frame.Orientation;
+            Location = Location.SetRotation(PhysicsObj.Position.Frame.Orientation);
 
             if (!FastTick) return;
 
@@ -494,7 +494,7 @@ namespace ACE.Server.WorldObjects
                                 if (blockDist <= 1)
                                 {
                                     log.Warn($"z-pos hacking detected for {Name}, lastGroundPos: {LastGroundPos.ToLOCString()} - requestPos: {newPosition.ToLOCString()}");
-                                    Location = new ACE.Entity.Position(LastGroundPos);
+                                    Location = new InstancedPosition(LastGroundPos);
                                     Sequences.GetNextSequence(SequenceType.ObjectForcePosition);
                                     SendUpdatePosition();
                                     return false;
@@ -596,7 +596,7 @@ namespace ACE.Server.WorldObjects
 
             var landblockUpdate = blockcell << 16 != CurrentLandblock.Id.Landblock;
 
-            Location = new ACE.Entity.Position(blockcell, pos, rotate, Location.Instance);
+            Location = new InstancedPosition(blockcell, pos, rotate, Location.Instance);
 
             return landblockUpdate;
         }

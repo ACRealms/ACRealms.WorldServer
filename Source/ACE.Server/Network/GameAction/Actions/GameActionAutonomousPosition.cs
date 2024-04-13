@@ -2,6 +2,7 @@ using System;
 
 using ACE.Entity;
 using ACE.Server.Entity;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Network.GameAction.Actions
 {
@@ -16,13 +17,14 @@ namespace ACE.Server.Network.GameAction.Actions
         {
             //Console.WriteLine($"{session.Player.Name}.AutoPos");
 
-            var position = new Position(message.Payload, session.Player.Location.Instance);
+            var pos = new Position(message.Payload);
 
             var instanceTimestamp = message.Payload.ReadUInt16();
             var serverControlTimestamp = message.Payload.ReadUInt16();
             var teleportTimestamp = message.Payload.ReadUInt16();
             var forcePositionTimestamp = message.Payload.ReadUInt16();
 
+            var position = new LocalPosition(pos).AsInstancedPosition(session.Player, PlayerInstanceSelectMode.Same);
             session.Player.LastContact = message.Payload.ReadByte() != 0;   // TRUE if player is currently on ground
 
             if (session.Player.LastContact)

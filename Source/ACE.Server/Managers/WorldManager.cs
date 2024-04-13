@@ -209,9 +209,9 @@ namespace ACE.Server.Managers
             if (session.Player.Location == null)
             {
                 if (session.Player.Instantiation != null)
-                    session.Player.Location = session.Player.Instantiation.AsInstancedPosition(session.Player, PlayerInstanceSelectMode.HomeRealm);
+                    session.Player.Location = session.Player.Instantiation;
                 else
-                    session.Player.Location = RealmManager.GetRealm(session.Player.HomeRealm).DefaultStartingLocation(session.Player).AsInstancedPosition(session.Player, PlayerInstanceSelectMode.HomeRealm);  // realm fallback
+                    session.Player.Location = RealmManager.GetRealm(session.Player.HomeRealm).DefaultStartingLocation(session.Player);  // realm fallback
             }
 
             //var realm = RealmManager.GetRealm(session.Player.Location.RealmID);
@@ -255,7 +255,7 @@ namespace ACE.Server.Managers
             if (!success)
             {
                 // send to lifestone, or fallback location
-                var fixLoc = (session.Player.Sanctuary ?? RealmManager.GetRealm(session.Player.HomeRealm).DefaultStartingLocation(session.Player))
+                var fixLoc = (session.Player.Sanctuary ?? RealmManager.GetRealm(session.Player.HomeRealm).DefaultStartingLocation(session.Player).AsLocalPosition())
                     .AsInstancedPosition(session.Player, PlayerInstanceSelectMode.HomeRealm);
 
                 log.Error($"WorldManager.DoPlayerEnterWorld: failed to spawn {session.Player.Name}, relocating to {fixLoc.ToLOCString()}");

@@ -22,7 +22,7 @@ namespace ACE.Server.WorldObjects
 {
     partial class Player
     {
-        private static readonly LocalPosition MarketplaceDrop = DatabaseManager.World.GetCachedWeenie("portalmarketplace")?.GetPosition(PositionType.Destination) ?? new Position(0x016C01BC, 49.206f, -31.935f, 0.005f, 0, 0, -0.707107f, 0.707107f, 0);
+        private static readonly LocalPosition MarketplaceDrop = new LocalPosition(DatabaseManager.World.GetCachedWeenie("portalmarketplace")?.GetPosition(PositionType.Destination)) ?? new LocalPosition(0x016C01BC, 49.206f, -31.935f, 0.005f, 0, 0, -0.707107f, 0.707107f);
 
         private uint HideoutInstanceId
         {
@@ -34,10 +34,10 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        public LocalPosition HideoutLocation => UlgrimsHideout;
+        public InstancedPosition HideoutLocation => UlgrimsHideout.AsInstancedPosition(this, PlayerInstanceSelectMode.PersonalRealm);
         private LocalPosition UlgrimsHideout
         {
-            get { return new LocalPosition(0x7308001Fu, 80f, 163.4f, 12.004999f, 0f, 0f, 0.4475889f, 0.8942394f, HideoutInstanceId); }
+            get { return new LocalPosition(0x7308001Fu, 80f, 163.4f, 12.004999f, 0f, 0f, 0.4475889f, 0.8942394f); }
         }
         
         public bool DebugLoc { get; set; }
@@ -53,9 +53,11 @@ namespace ACE.Server.WorldObjects
 
             if (position != null)
             {
-                var teleportDest = new Position(position);
-                teleportDest.SetToDefaultRealmInstance(Location.RealmID);
-                AdjustDungeon(teleportDest);
+                if (position is LocalPosition p)
+                    position = p.AsInstancedPosition(this, PlayerInstanceSelectMode.PerRuleset);
+
+                var teleportDest = new InstancedPosition((InstancedPosition)position);
+                teleportDest = teleportDest = AdjustDungeon(teleportDest);
 
                 Teleport(teleportDest);
                 return true;
@@ -127,7 +129,7 @@ namespace ACE.Server.WorldObjects
 
             SendMotionAsCommands(MotionCommand.HouseRecall, MotionStance.NonCombat);
 
-            var startPos = new Position(Location);
+            var startPos = new InstancedPosition(Location);
 
             // Wait for animation
             var actionChain = new ActionChain();
@@ -139,7 +141,7 @@ namespace ACE.Server.WorldObjects
             actionChain.AddAction(this, () =>
             {
                 IsBusy = false;
-                var endPos = new Position(Location);
+                var endPos = new InstancedPosition(Location);
                 if (startPos.SquaredDistanceTo(endPos) > RecallMoveThresholdSq)
                 {
                     Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveMovedTooFar));
@@ -187,7 +189,7 @@ namespace ACE.Server.WorldObjects
 
             SendMotionAsCommands(MotionCommand.HouseRecall, MotionStance.NonCombat);
 
-            var startPos = new Position(Location);
+            var startPos = new InstancedPosition(Location);
 
             // Wait for animation
             var actionChain = new ActionChain();
@@ -199,7 +201,7 @@ namespace ACE.Server.WorldObjects
             actionChain.AddAction(this, () =>
             {
                 IsBusy = false;
-                var endPos = new Position(Location);
+                var endPos = new InstancedPosition(Location);
                 if (startPos.SquaredDistanceTo(endPos) > RecallMoveThresholdSq)
                 {
                     Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveMovedTooFar));
@@ -259,7 +261,7 @@ namespace ACE.Server.WorldObjects
 
             SendMotionAsCommands(MotionCommand.LifestoneRecall, MotionStance.NonCombat);
 
-            var startPos = new Position(Location);
+            var startPos = new InstancedPosition(Location);
 
             // Wait for animation
             ActionChain lifestoneChain = new ActionChain();
@@ -270,14 +272,14 @@ namespace ACE.Server.WorldObjects
             lifestoneChain.AddAction(this, () =>
             {
                 IsBusy = false;
-                var endPos = new Position(Location);
+                var endPos = new InstancedPosition(Location);
                 if (startPos.SquaredDistanceTo(endPos) > RecallMoveThresholdSq)
                 {
                     Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveMovedTooFar));
                     return;
                 }
 
-                Teleport(Sanctuary);
+                Teleport(Sanctuary.AsInstancedPosition(this, PlayerInstanceSelectMode.PerRuleset));
             });
 
             lifestoneChain.EnqueueChain();
@@ -326,7 +328,7 @@ namespace ACE.Server.WorldObjects
 
             SendMotionAsCommands(MotionCommand.MarketplaceRecall, MotionStance.NonCombat);
 
-            var startPos = new Position(Location);
+            var startPos = new InstancedPosition(Location);
 
             // TODO: (OptimShi): Actual animation length is longer than in retail. 18.4s
             // float mpAnimationLength = MotionTable.GetAnimationLength((uint)MotionTableId, MotionCommand.MarketplaceRecall);
@@ -339,14 +341,14 @@ namespace ACE.Server.WorldObjects
             mpChain.AddAction(this, () =>
             {
                 IsBusy = false;
-                var endPos = new Position(Location);
+                var endPos = new InstancedPosition(Location);
                 if (startPos.SquaredDistanceTo(endPos) > RecallMoveThresholdSq)
                 {
                     Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveMovedTooFar));
                     return;
                 }
 
-                Teleport(MarketplaceDrop);
+                Teleport(MarketplaceDrop.AsInstancedPosition(this, PlayerInstanceSelectMode.PerRuleset));
             });
 
             // Set the chain to run
@@ -402,7 +404,7 @@ namespace ACE.Server.WorldObjects
 
             SendMotionAsCommands(MotionCommand.AllegianceHometownRecall, MotionStance.NonCombat);
 
-            var startPos = new Position(Location);
+            var startPos = new InstancedPosition(Location);
 
             // Wait for animation
             var actionChain = new ActionChain();
@@ -414,7 +416,7 @@ namespace ACE.Server.WorldObjects
             actionChain.AddAction(this, () =>
             {
                 IsBusy = false;
-                var endPos = new Position(Location);
+                var endPos = new InstancedPosition(Location);
                 if (startPos.SquaredDistanceTo(endPos) > RecallMoveThresholdSq)
                 {
                     Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveMovedTooFar));
@@ -425,7 +427,7 @@ namespace ACE.Server.WorldObjects
                 if (!VerifyRecallAllegianceHometown())
                     return;
 
-                Teleport(Allegiance.Sanctuary);
+                Teleport(Allegiance.Sanctuary.AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm));
             });
 
             actionChain.EnqueueChain();
@@ -499,7 +501,7 @@ namespace ACE.Server.WorldObjects
 
             SendMotionAsCommands(MotionCommand.HouseRecall, MotionStance.NonCombat);
 
-            var startPos = new Position(Location);
+            var startPos = new InstancedPosition(Location);
 
             // Wait for animation
             var actionChain = new ActionChain();
@@ -512,7 +514,7 @@ namespace ACE.Server.WorldObjects
             actionChain.AddAction(this, () =>
             {
                 IsBusy = false;
-                var endPos = new Position(Location);
+                var endPos = new InstancedPosition(Location);
                 if (startPos.SquaredDistanceTo(endPos) > RecallMoveThresholdSq)
                 {
                     Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveMovedTooFar));
@@ -566,14 +568,14 @@ namespace ACE.Server.WorldObjects
 
         private static readonly Motion motionPkArenaRecall = new Motion(MotionStance.NonCombat, MotionCommand.PKArenaRecall);
 
-        private static List<LocalPosition> pkArenaLocs = new List<LocalPosition>()
+        private static List<LocalPosition> pkArenaLocs = new List<Position>()
         {
             new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew1")?.GetPosition(PositionType.Destination) ?? new Position(0x00660117, 30, -50, 0.005f, 0, 0,  0.000000f,  1.000000f, 0)),
             new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew2")?.GetPosition(PositionType.Destination) ?? new Position(0x00660106, 10,   0, 0.005f, 0, 0, -0.947071f,  0.321023f, 0)),
             new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew3")?.GetPosition(PositionType.Destination) ?? new Position(0x00660103, 30, -30, 0.005f, 0, 0, -0.699713f,  0.714424f, 0)),
             new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew4")?.GetPosition(PositionType.Destination) ?? new Position(0x0066011E, 50,   0, 0.005f, 0, 0, -0.961021f, -0.276474f, 0)),
-            new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew5")?.GetPosition(PositionType.Destination) ?? new Position(0x00660127, 60, -30, 0.005f, 0, 0,  0.681639f,  0.731689f, 0)),
-        };
+            new Position(DatabaseManager.World.GetCachedWeenie("portalpkarenanew5")?.GetPosition(PositionType.Destination) ?? new Position(0x00660127, 60, -30, 0.005f, 0, 0,  0.681639f,  0.731689f, 0))
+        }.Select(p => new LocalPosition(p)).ToList();
 
         public void HandleActionTeleToPkArena()
         {
@@ -618,7 +620,7 @@ namespace ACE.Server.WorldObjects
 
             SendMotionAsCommands(MotionCommand.PKArenaRecall, MotionStance.NonCombat);
 
-            var startPos = new Position(Location);
+            var startPos = new InstancedPosition(Location);
 
             // Wait for animation
             var actionChain = new ActionChain();
@@ -631,7 +633,7 @@ namespace ACE.Server.WorldObjects
             actionChain.AddAction(this, () =>
             {
                 IsBusy = false;
-                var endPos = new Position(Location);
+                var endPos = new InstancedPosition(Location);
                 if (startPos.SquaredDistanceTo(endPos) > RecallMoveThresholdSq)
                 {
                     Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YouHaveMovedTooFar));
@@ -639,7 +641,7 @@ namespace ACE.Server.WorldObjects
                 }
 
                 var rng = ThreadSafeRandom.Next(0, pkArenaLocs.Count - 1);
-                var loc = pkArenaLocs[rng];
+                var loc = pkArenaLocs[rng].AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm);
 
                 Teleport(loc);
             });
@@ -726,7 +728,7 @@ namespace ACE.Server.WorldObjects
                 }
 
                 var rng = ThreadSafeRandom.Next(0, pklArenaLocs.Count - 1);
-                var loc = pklArenaLocs[rng];
+                var loc = pklArenaLocs[rng].AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm);
 
                 Teleport(loc);
             });
@@ -757,9 +759,6 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void Teleport(InstancedPosition newPosition, bool teleportingFromInstance = false, bool fromPortal = false)
         {
-            if (newPosition.Instance == 0)
-                newPosition.Instance = Location.Instance;
-
             Position.ParseInstanceID(Location.Instance, out var isTemporaryRuleset, out ushort _a, out ushort _b);
             if (isTemporaryRuleset)
             {
@@ -785,7 +784,7 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
-            var newPosition = new Position(newPosition);
+            newPosition = new InstancedPosition(newPosition);
             //newPosition.PositionZ += 0.005f;
             newPosition.PositionZ += 0.005f * (ObjScale ?? 1.0f);
 
@@ -842,7 +841,7 @@ namespace ACE.Server.WorldObjects
 
             HandlePreTeleportVisibility(newPosition);
 
-            UpdatePlayerPosition(new Position(newPosition), true);
+            UpdatePlayerPosition(new InstancedPosition(newPosition), true);
         }
 
         // Assumes instance is loaded! Do not call directly
@@ -930,13 +929,10 @@ namespace ACE.Server.WorldObjects
 
         public void TeleportToHomeRealm()
         {
-            var homerealm = RealmManager.GetRealm(HomeRealm);
-            if (homerealm == null)
-                homerealm = RealmManager.GetRealm(0);
-
-            var iid = homerealm.GetDefaultInstanceID(this);
-            var pos = new Position(Home) { Instance = iid };
-            Teleport(pos);
+            Teleport(
+                Sanctuary?.AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm) ??
+                Home.AsLocalPosition().AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm)
+            );
         }
 
         private void TeleportToHideout()
@@ -1013,16 +1009,15 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(new GameMessageSystemChat($"You are not in an instance!", ChatMessageType.System));
                 return false;
             }
-            var loc = GetPosition(PositionType.EphemeralRealmExitTo);
+            var loc = EphemeralRealmExitTo;
             if (loc == null || !ValidatePlayerRealmPosition(loc))
             {
-                loc = GetPosition(PositionType.Sanctuary) ?? GetPosition(PositionType.Home);
-                loc.Instance = Position.InstanceIDFromVars(HomeRealm, 0, false);
+                loc = Sanctuary.AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm) ?? Home;
             }
             WorldManager.ThreadSafeTeleport(this, loc, true, new ActionEventDelegate(() =>
             {
-                this.SetPosition(PositionType.EphemeralRealmExitTo, null);
-                this.SetPosition(PositionType.EphemeralRealmLastEnteredDrop, null);
+                EphemeralRealmExitTo = null;
+                EphemeralRealmLastEnteredDrop = null;
             }));
             return true;
         }

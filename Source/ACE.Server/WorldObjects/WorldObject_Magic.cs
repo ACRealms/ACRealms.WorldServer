@@ -963,7 +963,7 @@ namespace ACE.Server.WorldObjects
                     if (target.WeenieType == WeenieType.LifeStone)
                     {
                         player.SendChatMessage(this, "You have successfully linked with the life stone.", ChatMessageType.Magic);
-                        player.LinkedLifestone = target.Location;
+                        player.LinkedLifestone = target.Location.AsLocalPosition();
                     }
                     else
                         player.SendChatMessage(this, "You cannot link that.", ChatMessageType.Magic);
@@ -1089,9 +1089,9 @@ namespace ACE.Server.WorldObjects
 
                 case SpellId.LifestoneSending1:
 
-                    if (player != null && player.GetPosition(PositionType.Sanctuary) != null)
+                    if (player != null && player.Sanctuary != null)
                         recall = PositionType.Sanctuary;
-                    else if (targetPlayer != null && targetPlayer.GetPosition(PositionType.Sanctuary) != null)
+                    else if (targetPlayer != null && targetPlayer.Sanctuary != null)
                         recall = PositionType.Sanctuary;
 
                     break;
@@ -1161,8 +1161,8 @@ namespace ACE.Server.WorldObjects
                     portalRecall.AddDelaySeconds(2.0f);  // 2 second delay
                     portalRecall.AddAction(targetPlayer, () =>
                     {
-                        var teleportDest = new Position(portal.Destination);
-                        AdjustDungeon(teleportDest, targetPlayer.Location.Instance);
+                        var teleportDest = portal.Destination.AsInstancedPosition(targetPlayer, PlayerInstanceSelectMode.PerRuleset);
+                        teleportDest = AdjustDungeon(teleportDest);
 
                         targetPlayer.Teleport(teleportDest);
                     });
@@ -1209,7 +1209,7 @@ namespace ACE.Server.WorldObjects
                 linkSummoned = source.GetProperty(PropertyBool.LinkedPortalTwoSummon) ?? false;
             }
 
-            Position summonLoc = null;
+            InstancedPosition summonLoc = null;
 
             if (player != null)
             {
@@ -1242,7 +1242,7 @@ namespace ACE.Server.WorldObjects
             else if (itemCaster != null)
             {
                 if (itemCaster.PortalSummonLoc != null)
-                    summonLoc = new Position(PortalSummonLoc);
+                    summonLoc = PortalSummonLoc.AsInstancedPosition(itemCaster, WorldObjectInstanceSelectMode.Same);
                 else
                 {
                     if (itemCaster.Location != null)
@@ -1250,13 +1250,6 @@ namespace ACE.Server.WorldObjects
                     else if (targetCreature != null && targetCreature.Location != null)
                         summonLoc = targetCreature.Location.InFrontOf(3.0f);
                 }
-            }
-
-            if (summonLoc != null)
-            {
-                summonLoc.LandblockId = new LandblockId(summonLoc.GetCell());
-                if (summonLoc.Instance == 0)
-                    summonLoc.Instance = Location.Instance;
             }
 
             var success = SummonPortal(portalId, summonLoc, spell.PortalLifetime, this, player ?? targetCreature as Player);
@@ -1289,7 +1282,7 @@ namespace ACE.Server.WorldObjects
             if (portal == null || location == null)
                 return false;
 
-            Position targetPosition = new Position(portal.Destination);
+            var targetPosition = new LocalPosition(portal.Destination).AsInstancedPosition(source, WorldObjectInstanceSelectMode.PerRuleset);
             var summonTargetRealms = source.GetRealmsToApply();
 
             bool doEphemeralInstance = false;
@@ -1317,7 +1310,7 @@ namespace ACE.Server.WorldObjects
                         return false;
                     }
                     var landblock = RealmManager.GetNewEphemeralLandblock(portal.Destination.LandblockId, summoner, summonTargetRealms.Select(x => x.Realm).ToList());
-                    targetPosition.Instance = landblock.Instance;
+                    targetPosition = new InstancedPosition(targetPosition, landblock.Instance); // REALMS-TODO: Add destination instance id that isn't part of regular position
                 }
             }
 
@@ -1369,8 +1362,8 @@ namespace ACE.Server.WorldObjects
                 portalSendingChain.AddAction(targetPlayer, () => targetPlayer.DoPreTeleportHide());
                 portalSendingChain.AddAction(targetPlayer, () =>
                 {
-                    var teleportDest = new Position(spell.Position);
-                    AdjustDungeon(teleportDest, targetPlayer.Location.Instance);
+                    var teleportDest = new LocalPosition(spell.Position).AsInstancedPosition(targetPlayer, PlayerInstanceSelectMode.SameIfSameLandblock);
+                    teleportDest = AdjustDungeon(teleportDest);
 
                     targetPlayer.Teleport(teleportDest);
 
@@ -1382,8 +1375,8 @@ namespace ACE.Server.WorldObjects
             {
                 // monsters can cast some portal spells on themselves too, possibly?
                 // under certain circumstances, such as ensuring the destination is the same landblock
-                var teleportDest = new Position(spell.Position);
-                AdjustDungeon(teleportDest, targetCreature.Location.Instance);
+                var teleportDest = spell.Position.AsInstancedPosition(targetCreature, WorldObjectInstanceSelectMode.Same);
+                teleportDest = AdjustDungeon(teleportDest);
 
                 targetCreature.FakeTeleport(teleportDest);
             }
@@ -1422,8 +1415,8 @@ namespace ACE.Server.WorldObjects
             portalSendingChain.AddAction(targetPlayer, () => targetPlayer.DoPreTeleportHide());
             portalSendingChain.AddAction(targetPlayer, () =>
             {
-                var teleportDest = new Position(spell.Position);
-                AdjustDungeon(teleportDest, targetPlayer.Location.Instance);
+                var teleportDest = new LocalPosition(spell.Position).AsInstancedPosition(targetPlayer, PlayerInstanceSelectMode.HomeRealm);
+                teleportDest = AdjustDungeon(teleportDest);
 
                 targetPlayer.Teleport(teleportDest);
 
@@ -1830,8 +1823,8 @@ namespace ACE.Server.WorldObjects
                     rotate = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.Atan2(-qDir.X, qDir.Y));
                 }
 
-                sp.Location = strikeSpell ? new Position(targetLoc) : new Position(casterLoc);
-                sp.Location.Pos += Vector3.Transform(origin, strikeSpell ? rotate * OneEighty : rotate);
+                sp.Location = strikeSpell ? new InstancedPosition(targetLoc) : new InstancedPosition(casterLoc);
+                sp.Location = sp.Location.AddPos(Vector3.Transform(origin, strikeSpell ? rotate * OneEighty : rotate));
 
                 sp.PhysicsObj.Velocity = velocity;
 
@@ -1846,7 +1839,7 @@ namespace ACE.Server.WorldObjects
                 // set orientation
                 var dir = Vector3.Normalize(sp.Velocity);
                 sp.PhysicsObj.Position.Frame.set_vector_heading(dir);
-                sp.Location.Rotation = sp.PhysicsObj.Position.Frame.Orientation;
+                sp.Location = sp.Location.SetRotation(sp.PhysicsObj.Position.Frame.Orientation);
 
                 sp.ProjectileSource = this;
                 sp.FromProc = fromProc;
@@ -1859,7 +1852,7 @@ namespace ACE.Server.WorldObjects
                 sp.IsWeaponSpell = isWeaponSpell;
 
                 sp.SetProjectilePhysicsState(sp.ProjectileTarget, useGravity);
-                sp.SpawnPos = new Position(sp.Location);
+                sp.SpawnPos = new InstancedPosition(sp.Location);
 
                 sp.LifeProjectileDamage = lifeProjectileDamage;
 

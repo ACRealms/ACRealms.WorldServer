@@ -57,18 +57,16 @@ namespace ACE.Server.WorldObjects
 
             if (RelativeDestination != null && Location != null && Destination == null)
             {
-                var relativeDestination = new InstancedPosition(Location);
-                relativeDestination.Pos += new Vector3(RelativeDestination.PositionX, RelativeDestination.PositionY, RelativeDestination.PositionZ);
-                relativeDestination.Rotation = new Quaternion(RelativeDestination.RotationX, relativeDestination.RotationY, relativeDestination.RotationZ, relativeDestination.RotationW);
-                relativeDestination.LandblockId = new LandblockId(relativeDestination.GetCell());
-
-                UpdatePortalDestination(relativeDestination);
+                var relativeDestination = Location.AddPos(new Vector3(RelativeDestination.PositionX, RelativeDestination.PositionY, RelativeDestination.PositionZ));
+                relativeDestination = relativeDestination.SetRotation(new Quaternion(RelativeDestination.RotationX, relativeDestination.RotationY, relativeDestination.RotationZ, relativeDestination.RotationW));
+                relativeDestination = relativeDestination.SetLandblockId(new LandblockId(relativeDestination.GetCell()));
+                UpdatePortalDestination(relativeDestination.AsLocalPosition());
             }
 
             return true;
         }
 
-        public void UpdatePortalDestination(InstancedPosition destination)
+        public void UpdatePortalDestination(LocalPosition destination)
         {
             Destination = destination;
 
@@ -88,7 +86,7 @@ namespace ACE.Server.WorldObjects
         public override void SetLinkProperties(WorldObject wo)
         {
             if (wo.IsLinkSpot)
-                SetPosition(PositionType.Destination, new Position(wo.Location));
+                Destination = wo.Location.AsLocalPosition();
         }
 
         public bool IsGateway { get => WeenieClassId == 1955; }
@@ -275,11 +273,9 @@ namespace ACE.Server.WorldObjects
 #if DEBUG
             // player.Session.Network.EnqueueSend(new GameMessageSystemChat("Portal sending player to destination", ChatMessageType.System));
 #endif
-            var portalDest = new Position(Destination);
-            if (portalDest.Instance == 0)
-                portalDest.SetToDefaultRealmInstance(Location.RealmID);
+            var portalDest = Destination.AsInstancedPosition(player, PlayerInstanceSelectMode.PerRuleset);
 
-            AdjustDungeon(portalDest);
+            portalDest = AdjustDungeon(portalDest);
 
             WorldManager.ThreadSafeTeleport(player, portalDest, false, new ActionEventDelegate(() =>
             {

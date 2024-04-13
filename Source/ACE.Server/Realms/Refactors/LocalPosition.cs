@@ -1,12 +1,16 @@
 using ACE.Database.Adapter;
+using ACE.Database.Models.Auth;
 using ACE.Database.Models.World;
 using ACE.Entity;
+using ACE.Entity.Enum.Properties;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameAction.Actions;
 using ACE.Server.WorldObjects;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,8 +21,10 @@ namespace ACE.Server.Realms
         public LocalPosition() : this(new Position()) { }
 
         public LocalPosition(Position pos)
-            : base(pos)
-        { }
+            : base(pos) { }
+
+        public LocalPosition(LocalPosition pos)
+            : this(pos.Position) { }
 
         //public InstancedPosition ToInstancedPosition();
 
@@ -27,10 +33,20 @@ namespace ACE.Server.Realms
                         float newRotationZ, float newRotationW, bool relativePos = false)
         : this(new Position(blockCellID, newPositionX, newPositionY, newPositionZ, newRotationX, newRotationY, newRotationZ, newRotationW, 0, relativePos)) { }
 
+        public LocalPosition(uint blockCellID, Vector3 position, Quaternion rotation)
+            : this(new Position(blockCellID, position, rotation, 0)) { }
+
+        public LocalPosition(BinaryReader reader)
+            : this(new Position(reader)) { }
+
         public bool Equals(LocalPosition p) => Position.Equals(p.Position);
 
-        public InstancedPosition AsInstancedPosition(Player player, PlayerInstanceSelectMode mode)
+        public InstancedPosition AsInstancedPosition(uint instanceId) => new InstancedPosition(Position, instanceId);
+        public InstancedPosition AsInstancedPosition(Player player, PlayerInstanceSelectMode mode, PlayerInstanceSelectMode backupMode = PlayerInstanceSelectMode.PerRuleset)
         {
+            if (mode == backupMode && mode != PlayerInstanceSelectMode.HomeRealm)
+                return AsInstancedPosition(player, mode, PlayerInstanceSelectMode.HomeRealm);
+
             uint instanceId;
             switch (mode)
             {
@@ -38,12 +54,22 @@ namespace ACE.Server.Realms
                     throw new ArgumentException("mode is undefined");
                 case PlayerInstanceSelectMode.Same:
                     instanceId = player.Location.Instance; break;
+                case PlayerInstanceSelectMode.SameIfSameLandblock:
+                    if (player.Location.LandblockShort == LandblockShort)
+                        instanceId = player.Location.Instance;
+                    else
+                        return AsInstancedPosition(player, PlayerInstanceSelectMode.PerRuleset, backupMode);
+                    break;
                 case PlayerInstanceSelectMode.RealmDefaultInstanceID:
                     instanceId = player.RealmRuleset.GetDefaultInstanceID(); break;
                 case PlayerInstanceSelectMode.HomeRealm:
                     instanceId = Position.InstanceIDFromVars(player.HomeRealm, 0, false); break;
+                case PlayerInstanceSelectMode.PersonalRealm:
+                    var realm = RealmManager.GetReservedRealm(ReservedRealm.hideout);
+                    instanceId = Position.InstanceIDFromVars(realm.Realm.Id, (ushort)(player.Account.AccountId), false); break;
                 case PlayerInstanceSelectMode.PerRuleset:
-                    throw new NotImplementedException();
+                    // REALMS-TODO: To implement later
+                    return AsInstancedPosition(player, PlayerInstanceSelectMode.HomeRealm);
                 default: throw new NotImplementedException();
             }
 
@@ -67,6 +93,25 @@ namespace ACE.Server.Realms
             }
             
             return new InstancedPosition(Position, instanceId);
+        }
+
+        public LocalPosition Translate(uint blockCell)
+        {
+            var newBlockX = blockCell >> 24;
+            var newBlockY = (blockCell >> 16) & 0xFF;
+
+            var xDiff = (int)newBlockX - LandblockX;
+            var yDiff = (int)newBlockY - LandblockY;
+
+            var pos = new Position(Position);
+            //pos.Origin.X -= xDiff * 192;
+            pos.PositionX -= xDiff * 192;
+            //pos.Origin.Y -= yDiff * 192;
+            pos.PositionY -= yDiff * 192;
+
+            //pos.ObjCellID = blockCell;
+            pos.LandblockId = new LandblockId(blockCell);
+            return new LocalPosition(pos);
         }
     }
 }

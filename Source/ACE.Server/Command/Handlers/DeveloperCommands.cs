@@ -2145,7 +2145,7 @@ namespace ACE.Server.Command.Handlers
 
                 var pos = new Position(dest.ObjCellId, dest.OriginX, dest.OriginY, dest.OriginZ, dest.AnglesX, dest.AnglesY, dest.AnglesZ, dest.AnglesW, session.Player.Location.Instance);
                 pos.SetToDefaultRealmInstance(session.Player.Location.RealmID);
-                WorldObject.AdjustDungeon(pos);
+                pos = WorldObject.AdjustDungeon(pos);
 
                 session.Player.Teleport(pos);
             }
@@ -2180,7 +2180,7 @@ namespace ACE.Server.Command.Handlers
 
                 var pos = new Position(dest.ObjCellId, dest.OriginX, dest.OriginY, dest.OriginZ, dest.AnglesX, dest.AnglesY, dest.AnglesZ, dest.AnglesW, session.Player.Location.Instance);
                 pos.SetToDefaultRealmInstance(session.Player.Location.RealmID);
-                WorldObject.AdjustDungeon(pos);
+                pos = WorldObject.AdjustDungeon(pos);
 
                 session.Player.Teleport(pos);
             }

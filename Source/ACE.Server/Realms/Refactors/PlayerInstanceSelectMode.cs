@@ -10,7 +10,9 @@ namespace ACE.Server.Realms
     {
         Undefined,
         Same,
+        SameIfSameLandblock,
         HomeRealm,
+        PersonalRealm,
         RealmDefaultInstanceID,
         PerRuleset
     }

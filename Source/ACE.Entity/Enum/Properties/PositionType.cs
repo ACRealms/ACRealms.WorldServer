@@ -54,7 +54,6 @@ namespace ACE.Entity.Enum.Properties
         /// <summary>
         /// May be used to store where we are headed when we teleport (?)
         /// </summary>
-        [Instanced]
         Destination = 2,
 
         /// <summary>
@@ -73,6 +72,7 @@ namespace ACE.Entity.Enum.Properties
         /// It's usually the position the object first spawned in at.
         /// </summary>
         [Ephemeral]
+        [Instanced]
         Home = 5,
 
         /// <summary>
@@ -191,9 +191,11 @@ namespace ACE.Entity.Enum.Properties
         PCAPRecordedLocation = 8040,
 
         [ServerOnly]
+        [Instanced]
         EphemeralRealmLastEnteredDrop = 42000,
 
         [ServerOnly]
+        [Instanced]
         EphemeralRealmExitTo = 42001
     }
 }

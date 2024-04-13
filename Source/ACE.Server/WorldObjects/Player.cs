@@ -63,8 +63,8 @@ namespace ACE.Server.WorldObjects
 
         public DateTime LastJumpTime;
 
-        public ACE.Entity.Position LastGroundPos;
-        public ACE.Entity.Position SnapPos;
+        public InstancedPosition LastGroundPos;
+        public InstancedPosition SnapPos;
 
         public ConfirmationManager ConfirmationManager;
 

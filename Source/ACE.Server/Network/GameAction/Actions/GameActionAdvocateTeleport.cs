@@ -4,7 +4,7 @@ using ACE.Common.Extensions;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
 using ACE.Server.Physics.Common;
-
+using ACE.Server.Realms;
 using Position = ACE.Entity.Position;
 
 namespace ACE.Server.Network.GameAction.Actions
@@ -13,12 +13,13 @@ namespace ACE.Server.Network.GameAction.Actions
     {
         [GameAction(GameActionType.AdvocateTeleport)]
         public static void Handle(ClientMessage message, Session session)
-        {
-            var target = message.Payload.ReadString16L();
-            var position = new Position(message.Payload, session.Player.Location.Instance);
+        {          
             // this check is also done clientside, see: PlayerDesc::PlayerIsPSR
             if (!session.Player.IsAdmin && !session.Player.IsArch && !session.Player.IsPsr)
                 return;
+
+            var target = message.Payload.ReadString16L();
+            var position = new LocalPosition(message.Payload).AsInstancedPosition(session.Player, PlayerInstanceSelectMode.PerRuleset);
 
             //Console.WriteLine($"Handle minimap teleport");
             //Console.WriteLine($"Client sent position: {position}");

@@ -897,8 +897,8 @@ namespace ACE.Server.Command.Handlers
                     return;
                 var weenie = DatabaseManager.World.GetCachedWeenie(teleportPOI.WeenieClassId);
                 var portalDest = new LocalPosition(weenie.GetPosition(PositionType.Destination)).AsInstancedPosition(session.Player, PlayerInstanceSelectMode.Same);
-                
-                WorldObject.AdjustDungeon(portalDest);
+
+                portalDest = WorldObject.AdjustDungeon(portalDest);
                 session.Player.Teleport(portalDest);
             }
         }

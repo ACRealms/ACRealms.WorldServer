@@ -38,7 +38,7 @@ namespace ACE.Server.Realms
             return StandardRules.GetDefaultInstanceID();
         }
 
-        internal LocalPosition DefaultStartingLocation(Player player)
+        internal InstancedPosition DefaultStartingLocation(Player player)
         {
 
             if (StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
@@ -50,7 +50,7 @@ namespace ACE.Server.Realms
             else
             {
                 //Holtburg
-                return new Position(0xA9B40019, 84f, 7.1f, 94.005005f, 0f, 0f, -0.078459f, 0.996917f, GetDefaultInstanceID(player));
+                return new LocalPosition(0xA9B40019, 84f, 7.1f, 94.005005f, 0f, 0f, -0.078459f, 0.996917f).AsInstancedPosition(player, PlayerInstanceSelectMode.HomeRealm);
             }
         }
 

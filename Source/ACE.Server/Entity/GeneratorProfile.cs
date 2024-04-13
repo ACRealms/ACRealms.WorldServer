@@ -13,6 +13,7 @@ using ACE.Server.Factories;
 using ACE.Server.Managers;
 using ACE.Server.Physics.Common;
 using ACE.Server.WorldObjects;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Entity
 {
@@ -353,7 +354,7 @@ namespace ACE.Server.Entity
         public bool Spawn_Scatter(WorldObject obj)
         {
             float genRadius = (float)(Generator.GetProperty(PropertyFloat.GeneratorRadius) ?? 0f);
-            obj.Location = new ACE.Entity.Position(Generator.Location);
+            obj.Location = new InstancedPosition(Generator.Location);
 
             // Skipping using same offset code above for offsetting scatter pos due to issues with rotation that were not expected at time content was rebuilt (Colo, others)
             // perhaps it should be same or similar but not able to spend time on verifying it out and making rotational adjustments at this time.
@@ -371,12 +372,10 @@ namespace ACE.Server.Entity
 
             if ((Biota.ObjCellId ?? 0) == 0) // if ObjCellId is specific, throw out that position (probably a linkable) and just use the generator's position else use the data as an offset. It is also possible that scatter always throws out all of it all cases.
             {
-                obj.Location.PositionX += Biota.OriginX ?? 0;
-                obj.Location.PositionY += Biota.OriginY ?? 0;
-                obj.Location.PositionZ += Biota.OriginZ ?? 0;
+                obj.Location = obj.Location.SetPositions(obj.Location.PositionX + Biota.OriginX ?? 0, obj.Location.PositionY + Biota.OriginY ?? 0, obj.Location.PositionZ + Biota.OriginZ ?? 0);
             }
 
-            obj.Location.PositionZ += 0.05f;
+            obj.Location = obj.Location.SetPositionZ(obj.Location.PositionZ + 0.05f);
 
             // we are going to delay this scatter logic until the physics engine,
             // where the remnants of this function are in the client (SetScatterPositionInternal)
@@ -384,7 +383,7 @@ namespace ACE.Server.Entity
             // this is due to each randomized position being required to go through the full InitialPlacement process, to verify success
             // if InitialPlacement fails, then we retry up to maxTries
 
-            obj.ScatterPos = new SetPosition(new Physics.Common.Position(obj.Location), SetPositionFlags.RandomScatter, genRadius, obj.Location.Instance);
+            obj.ScatterPos = new SetPosition(new Physics.Common.PhysicsPosition(obj.Location), SetPositionFlags.RandomScatter, genRadius, obj.Location.Instance);
 
             var success = obj.EnterWorld();
 

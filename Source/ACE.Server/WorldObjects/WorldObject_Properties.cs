@@ -558,7 +558,7 @@ namespace ACE.Server.WorldObjects
 
             UsablePosition position;
             if (InstancedProperties.PositionTypes.Contains(positionType))
-                position = positionRaw.ToInstancedPosition(positionRaw.Instance);
+                position = new InstancedPosition(positionRaw, positionRaw.Instance);
             else
                 position = new LocalPosition(positionRaw);
 
@@ -590,7 +590,7 @@ namespace ACE.Server.WorldObjects
                 {
                     positionCache[positionType] = position;
 
-                    Biota.SetPosition(positionType, position.Position, BiotaDatabaseLock);
+                    Biota.SetPosition(positionType, position.GetPosition(), BiotaDatabaseLock);
                     ChangesDetected = true;
                 }
             }
@@ -609,15 +609,15 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        public Dictionary<PositionType, Position> GetAllPositions()
+        public Dictionary<PositionType, UsablePosition> GetAllPositions()
         {
-            var results = new Dictionary<PositionType, Position>();
+            var results = new Dictionary<PositionType, UsablePosition>();
 
             BiotaDatabaseLock.EnterReadLock();
             try
             {
                 foreach (var kvp in Biota.PropertiesPosition)
-                    results[kvp.Key] = new Position(kvp.Value.ObjCellId, kvp.Value.PositionX, kvp.Value.PositionY, kvp.Value.PositionZ, kvp.Value.RotationX, kvp.Value.RotationY, kvp.Value.RotationZ, kvp.Value.RotationW, kvp.Value.Instance ?? 0);
+                    results[kvp.Key] = new InstancedPosition(kvp.Value.ObjCellId, kvp.Value.PositionX, kvp.Value.PositionY, kvp.Value.PositionZ, kvp.Value.RotationX, kvp.Value.RotationY, kvp.Value.RotationZ, kvp.Value.RotationW, kvp.Value.Instance ?? 0);
             }
             finally
             {
@@ -2214,15 +2214,15 @@ namespace ACE.Server.WorldObjects
             set => SetPosition(PositionType.Location, value);
         }
 
-        public InstancedPosition Destination
+        public LocalPosition Destination
         {
-            get { return (InstancedPosition)GetPosition(PositionType.Destination); }
+            get { return (LocalPosition)GetPosition(PositionType.Destination); }
             set { SetPosition(PositionType.Destination, value); }
         }
 
-        public LocalPosition Instantiation
+        public InstancedPosition Instantiation
         {
-            get { return (LocalPosition)GetPosition(PositionType.Instantiation); }
+            get { return (InstancedPosition)GetPosition(PositionType.Instantiation); }
             set { SetPosition(PositionType.Instantiation, value); }
         }
 
@@ -2232,9 +2232,9 @@ namespace ACE.Server.WorldObjects
             set { SetPosition(PositionType.Sanctuary, value); }
         }
 
-        public LocalPosition Home
+        public InstancedPosition Home
         {
-            get { return (LocalPosition)GetPosition(PositionType.Home); }
+            get { return (InstancedPosition)GetPosition(PositionType.Home); }
             set { SetPosition(PositionType.Home, value); }
         }
 
@@ -2366,8 +2366,20 @@ namespace ACE.Server.WorldObjects
 
         public InstancedPosition TeleportedCharacter
         {
-            get { return GetPosition(PositionType.TeleportedCharacter); }
+            get { return (InstancedPosition)GetPosition(PositionType.TeleportedCharacter); }
             set { SetPosition(PositionType.TeleportedCharacter, value); }
+        }
+
+        public InstancedPosition EphemeralRealmExitTo
+        {
+            get { return (InstancedPosition)GetPosition(PositionType.EphemeralRealmExitTo); }
+            set { SetPosition(PositionType.EphemeralRealmExitTo, value); }
+        }
+
+        public InstancedPosition EphemeralRealmLastEnteredDrop
+        {
+            get { return (InstancedPosition)GetPosition(PositionType.EphemeralRealmLastEnteredDrop); }
+            set { SetPosition(PositionType.EphemeralRealmLastEnteredDrop, value); }
         }
 
         public uint? CurrentCombatTarget

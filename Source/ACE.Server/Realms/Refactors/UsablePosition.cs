@@ -14,13 +14,14 @@ using ACE.DatLoader.Entity;
 using ACE.Server.WorldObjects;
 using log4net;
 using ACE.Server.Entity;
+using ACE.Server.Physics.Common;
 
 namespace ACE.Server.Realms
 {
     public abstract class UsablePosition
     {
         protected Position Position { get; }
-
+        public Position GetPosition() => new Position(Position);
         private UsablePosition() { }
         public UsablePosition(Position pos) { Position = new Position(pos); }
 
@@ -94,6 +95,8 @@ namespace ACE.Server.Realms
         public Vector3 GetOffset(UsablePosition p)
             => Position.GetOffset(p.Position);
 
+        public Vector3 ToGlobal(bool skipIndoors = false) => Position.ToGlobal(skipIndoors);
+
         public override string ToString() => Position.ToString();
 
         public string ToLOCString() => Position.ToLOCString();
@@ -102,6 +105,45 @@ namespace ACE.Server.Realms
         public static readonly int CellSide = Position.CellSide;
         public static readonly int CellLength = Position.CellLength;
 
-        public Position GetPosition() => new Position(Position);
+        public Vector2? GetMapCoords()
+        {
+            // no map coords available for dungeons / indoors?
+            if ((Cell & 0xFFFF) >= 0x100)
+                return null;
+
+            var globalPos = ToGlobal();
+
+            // 1 landblock = 192 meters
+            // 1 landblock = 0.8 map units
+
+            // 1 map unit = 1.25 landblocks
+            // 1 map unit = 240 meters
+
+            var mapCoords = new Vector2(globalPos.X / 240, globalPos.Y / 240);
+
+            // dereth is 204 map units across, -102 to +102
+            mapCoords -= Vector2.One * 102;
+
+            return mapCoords;
+        }
+
+        public string GetMapCoordStr()
+        {
+            var mapCoords = GetMapCoords();
+
+            if (mapCoords == null)
+                return null;
+
+            var northSouth = mapCoords.Value.Y >= 0 ? "N" : "S";
+            var eastWest = mapCoords.Value.X >= 0 ? "E" : "W";
+
+            return string.Format("{0:0.0}", Math.Abs(mapCoords.Value.Y) - 0.05f) + northSouth + ", "
+                 + string.Format("{0:0.0}", Math.Abs(mapCoords.Value.X) - 0.05f) + eastWest;
+        }
+
+        public PhysicsPosition PhysPosition()
+        {
+            return new PhysicsPosition(Position.Cell, new Physics.Animation.AFrame(Position.Pos, Position.Rotation));
+        }
     }
 }

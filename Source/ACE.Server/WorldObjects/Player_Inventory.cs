@@ -18,6 +18,7 @@ using ACE.Server.Managers;
 using ACE.Server.Network;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -1254,7 +1255,7 @@ namespace ACE.Server.WorldObjects
         {
             //Console.WriteLine($"-> DoHandleActionPutItemInContainer({item.Name}, {itemRootOwner?.Name}, {itemWasEquipped}, {container?.Name}, {containerRootOwner?.Name}, {placement})");
 
-            Position prevLocation = null;
+            InstancedPosition prevLocation = null;
             Landblock prevLandblock = null;
 
             var prevContainer = item.Container;
@@ -1263,7 +1264,7 @@ namespace ACE.Server.WorldObjects
 
             if (item.CurrentLandblock != null) // Movement is an item pickup off the landblock
             {
-                prevLocation = new Position(item.Location);
+                prevLocation = new InstancedPosition(item.Location);
                 prevLandblock = item.CurrentLandblock;
 
                 item.CurrentLandblock.RemoveWorldObject(item.Guid, false, true);
@@ -1316,7 +1317,7 @@ namespace ACE.Server.WorldObjects
                     landblockReturn.AddDelaySeconds(1);
                     landblockReturn.AddAction(prevLandblock, () =>
                     {
-                        item.Location = new Position(prevLocation);
+                        item.Location = new InstancedPosition(prevLocation);
                         LandblockManager.AddObject(item);
                     });
                     landblockReturn.EnqueueChain();
@@ -1456,7 +1457,7 @@ namespace ACE.Server.WorldObjects
 
         private bool TryDropItem(WorldObject item)
         {
-            item.Location = new Position(Location);
+            item.Location = new InstancedPosition(Location);
             item.Placement = ACE.Entity.Enum.Placement.Resting;  // This is needed to make items lay flat on the ground.
 
             // increased precision for non-ethereal objects
@@ -1468,7 +1469,6 @@ namespace ACE.Server.WorldObjects
 
             // use radius?
             var targetPos = Location.InFrontOf(1.1f);
-            targetPos.LandblockId = new LandblockId(targetPos.GetCell());
 
             // try slide to new position
             var transit = item.PhysicsObj.transition(item.PhysicsObj.Position, new Physics.Common.Position(targetPos), false);
