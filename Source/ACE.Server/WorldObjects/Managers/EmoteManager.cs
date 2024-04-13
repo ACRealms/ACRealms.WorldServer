@@ -11,6 +11,7 @@ using ACE.DatLoader;
 using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Entity.Enum.RealmProperties;
 using ACE.Entity.Models;
 using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
@@ -1347,7 +1348,7 @@ namespace ACE.Server.WorldObjects.Managers
                             if (emote.ObjCellId.Value > 0)
                             {
                                 var destination = new LocalPosition(emote.ObjCellId.Value, emote.OriginX.Value, emote.OriginY.Value, emote.OriginZ.Value, emote.AnglesX.Value, emote.AnglesY.Value, emote.AnglesZ.Value, emote.AnglesW.Value)
-                                    .AsInstancedPosition(player, PlayerInstanceSelectMode.PerRuleset);
+                                    .AsInstancedPosition(player, PlayerInstanceSelectMode.SameIfSameLandblock, PlayerInstanceSelectMode.HomeRealm);
 
                                 destination = WorldObject.AdjustDungeon(destination);
                                 WorldManager.ThreadSafeTeleport(player, destination, false);

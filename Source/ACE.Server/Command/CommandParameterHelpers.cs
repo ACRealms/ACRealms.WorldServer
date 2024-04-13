@@ -1,5 +1,6 @@
 using ACE.Entity;
 using ACE.Entity.Enum;
+using ACE.Entity.Enum.RealmProperties;
 using ACE.Server.Entity;
 using ACE.Server.Managers;
 using ACE.Server.Network;

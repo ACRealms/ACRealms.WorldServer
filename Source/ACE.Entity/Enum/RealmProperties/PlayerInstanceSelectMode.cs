@@ -4,16 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACE.Server.Realms
+namespace ACE.Entity.Enum.RealmProperties
 {
-    public enum PlayerInstanceSelectMode : ushort
+    public enum PlayerInstanceSelectMode : uint
     {
         Undefined,
         Same,
         SameIfSameLandblock,
         HomeRealm,
         PersonalRealm,
-        RealmDefaultInstanceID,
-        PerRuleset
+        RealmDefaultInstanceID
     }
 }

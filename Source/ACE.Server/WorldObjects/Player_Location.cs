@@ -17,6 +17,7 @@ using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Managers;
 using ACE.Server.Realms;
+using ACE.Entity.Enum.RealmProperties;
 
 namespace ACE.Server.WorldObjects
 {
@@ -54,7 +55,7 @@ namespace ACE.Server.WorldObjects
             if (position != null)
             {
                 if (position is LocalPosition p)
-                    position = p.AsInstancedPosition(this, PlayerInstanceSelectMode.PerRuleset);
+                    position = p.AsInstancedPosition(this, RealmRuleset.RecallInstanceSelectMode);
 
                 var teleportDest = new InstancedPosition((InstancedPosition)position);
                 teleportDest = teleportDest = AdjustDungeon(teleportDest);
@@ -73,7 +74,7 @@ namespace ACE.Server.WorldObjects
         public static float RecallMoveThreshold = 8.0f;
         public static float RecallMoveThresholdSq = RecallMoveThreshold * RecallMoveThreshold;
 
-        public InstancedPosition SanctuaryEffective { get => Sanctuary.AsInstancedPosition(this, PlayerInstanceSelectMode.PerRuleset); }
+        public InstancedPosition SanctuaryEffective { get => Sanctuary.AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm); }
         public bool TooBusyToRecall
         {
             get => IsBusy || suicideInProgress;     // recalls could be started from portal space?
@@ -280,7 +281,7 @@ namespace ACE.Server.WorldObjects
                     return;
                 }
 
-                Teleport(Sanctuary.AsInstancedPosition(this, PlayerInstanceSelectMode.PerRuleset));
+                Teleport(Sanctuary.AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm));
             });
 
             lifestoneChain.EnqueueChain();
@@ -349,7 +350,7 @@ namespace ACE.Server.WorldObjects
                     return;
                 }
 
-                Teleport(MarketplaceDrop.AsInstancedPosition(this, PlayerInstanceSelectMode.PerRuleset));
+                Teleport(MarketplaceDrop.AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm));
             });
 
             // Set the chain to run

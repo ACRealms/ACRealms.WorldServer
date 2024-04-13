@@ -1,3 +1,4 @@
+using ACE.Entity.Enum.RealmProperties;
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -45,6 +46,12 @@ namespace ACE.Entity.Enum.Properties
 
         [RealmPropertyInt(0, -100000, 100000)]
         FoodRestoreAmountAdded,
+
+        [RealmPropertyInt((int)PlayerInstanceSelectMode.HomeRealm)]
+        RecallInstanceSelectMode,
+
+        [RealmPropertyInt((int)PlayerInstanceSelectMode.HomeRealm)]
+        PortalInstanceSelectMode,
     }
 
     public static class RealmPropertyIntExtensions

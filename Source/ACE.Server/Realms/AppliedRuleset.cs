@@ -248,7 +248,7 @@ namespace ACE.Server.Realms
     }
 
     //Properties may be changed freely
-    public class AppliedRuleset : Ruleset
+    public partial class AppliedRuleset : Ruleset
     {
         public Landblock Landblock { get; set; }
 

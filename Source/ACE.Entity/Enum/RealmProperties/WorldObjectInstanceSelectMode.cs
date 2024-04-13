@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACE.Server.Realms
+namespace ACE.Entity.Enum.RealmProperties
 {
-    public enum WorldObjectInstanceSelectMode : ushort
+    public enum WorldObjectInstanceSelectMode : uint
     {
         Undefined,
         Same,

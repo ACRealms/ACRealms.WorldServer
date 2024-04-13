@@ -25,6 +25,7 @@ using ACE.Server.Physics.Common;
 using Character = ACE.Database.Models.Shard.Character;
 using Position = ACE.Entity.Position;
 using ACE.Server.Realms;
+using ACE.Entity.Enum.RealmProperties;
 
 namespace ACE.Server.Managers
 {

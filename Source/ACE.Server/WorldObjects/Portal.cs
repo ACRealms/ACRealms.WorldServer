@@ -13,6 +13,7 @@ using ACE.Server.Managers;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Realms;
+using ACE.Entity.Enum.RealmProperties;
 
 namespace ACE.Server.WorldObjects
 {
@@ -273,7 +274,7 @@ namespace ACE.Server.WorldObjects
 #if DEBUG
             // player.Session.Network.EnqueueSend(new GameMessageSystemChat("Portal sending player to destination", ChatMessageType.System));
 #endif
-            var portalDest = Destination.AsInstancedPosition(player, PlayerInstanceSelectMode.PerRuleset);
+            var portalDest = Destination.AsInstancedPosition(player, player.RealmRuleset.PortalInstanceSelectMode);
 
             portalDest = AdjustDungeon(portalDest);
 

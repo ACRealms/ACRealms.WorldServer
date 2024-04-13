@@ -3,6 +3,7 @@ using ACE.Database.Models.Auth;
 using ACE.Database.Models.World;
 using ACE.Entity;
 using ACE.Entity.Enum.Properties;
+using ACE.Entity.Enum.RealmProperties;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameAction.Actions;
 using ACE.Server.WorldObjects;
@@ -42,7 +43,7 @@ namespace ACE.Server.Realms
         public bool Equals(LocalPosition p) => Position.Equals(p.Position);
 
         public InstancedPosition AsInstancedPosition(uint instanceId) => new InstancedPosition(Position, instanceId);
-        public InstancedPosition AsInstancedPosition(Player player, PlayerInstanceSelectMode mode, PlayerInstanceSelectMode backupMode = PlayerInstanceSelectMode.PerRuleset)
+        public InstancedPosition AsInstancedPosition(Player player, PlayerInstanceSelectMode mode, PlayerInstanceSelectMode backupMode = PlayerInstanceSelectMode.HomeRealm)
         {
             if (mode == backupMode && mode != PlayerInstanceSelectMode.HomeRealm)
                 return AsInstancedPosition(player, mode, PlayerInstanceSelectMode.HomeRealm);
@@ -58,7 +59,7 @@ namespace ACE.Server.Realms
                     if (player.Location.LandblockShort == LandblockShort)
                         instanceId = player.Location.Instance;
                     else
-                        return AsInstancedPosition(player, PlayerInstanceSelectMode.PerRuleset, backupMode);
+                        return AsInstancedPosition(player, backupMode);
                     break;
                 case PlayerInstanceSelectMode.RealmDefaultInstanceID:
                     instanceId = player.RealmRuleset.GetDefaultInstanceID(); break;
@@ -67,9 +68,6 @@ namespace ACE.Server.Realms
                 case PlayerInstanceSelectMode.PersonalRealm:
                     var realm = RealmManager.GetReservedRealm(ReservedRealm.hideout);
                     instanceId = Position.InstanceIDFromVars(realm.Realm.Id, (ushort)(player.Account.AccountId), false); break;
-                case PlayerInstanceSelectMode.PerRuleset:
-                    // REALMS-TODO: To implement later
-                    return AsInstancedPosition(player, PlayerInstanceSelectMode.HomeRealm);
                 default: throw new NotImplementedException();
             }
 
@@ -87,8 +85,6 @@ namespace ACE.Server.Realms
                     instanceId = obj.Location.Instance; break;
                 case WorldObjectInstanceSelectMode.RealmDefaultInstanceID:
                     instanceId = obj.RealmRuleset.GetDefaultInstanceID(); break;
-                case WorldObjectInstanceSelectMode.PerRuleset:
-                    throw new NotImplementedException();
                 default: throw new NotImplementedException();
             }
             

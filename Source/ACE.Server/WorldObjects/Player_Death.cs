@@ -15,6 +15,7 @@ using ACE.Server.Managers;
 using ACE.Server.Network.Structure;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Entity.Enum.RealmProperties;
 
 namespace ACE.Server.WorldObjects
 {
@@ -251,7 +252,7 @@ namespace ACE.Server.WorldObjects
         public void ThreadSafeTeleportOnDeath()
         {
             // teleport to sanctuary or best location
-            var newPosition = Sanctuary.AsInstancedPosition(this, Realms.PlayerInstanceSelectMode.PerRuleset) ?? Instantiation ?? Location;
+            var newPosition = Sanctuary.AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm) ?? Instantiation ?? Location;
 
             WorldManager.ThreadSafeTeleport(this, newPosition, true, new ActionEventDelegate(() =>
             {

@@ -29,6 +29,7 @@ using ACE.Database.Models.Shard;
 using log4net;
 using ACE.Database.Adapter;
 using ACE.Server.Realms;
+using ACE.Entity.Enum.RealmProperties;
 
 namespace ACE.Server.Command.Handlers.Processors
 {

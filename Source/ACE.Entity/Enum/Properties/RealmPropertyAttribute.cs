@@ -7,7 +7,7 @@ namespace ACE.Entity.Enum.Properties
         public int DefaultValue { get; }
         public int MinValue { get; }
         public int MaxValue { get; }
-        public RealmPropertyIntAttribute(int defaultValue, int minValue, int maxValue)
+        public RealmPropertyIntAttribute(int defaultValue, int minValue = Int32.MinValue, int maxValue = Int32.MaxValue)
         {
             this.DefaultValue = defaultValue;
             this.MinValue = minValue;

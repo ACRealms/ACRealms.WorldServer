@@ -2,6 +2,7 @@ using System;
 
 using ACE.Common.Extensions;
 using ACE.Entity.Enum;
+using ACE.Entity.Enum.RealmProperties;
 using ACE.Server.Entity;
 using ACE.Server.Physics.Common;
 using ACE.Server.Realms;
@@ -19,7 +20,7 @@ namespace ACE.Server.Network.GameAction.Actions
                 return;
 
             var target = message.Payload.ReadString16L();
-            var position = new LocalPosition(message.Payload).AsInstancedPosition(session.Player, PlayerInstanceSelectMode.PerRuleset);
+            var position = new LocalPosition(message.Payload).AsInstancedPosition(session.Player, PlayerInstanceSelectMode.Same);
 
             //Console.WriteLine($"Handle minimap teleport");
             //Console.WriteLine($"Client sent position: {position}");

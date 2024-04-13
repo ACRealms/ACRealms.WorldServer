@@ -555,7 +555,12 @@ namespace ACE.Server.WorldObjects
             {
                 positionRaw.AttemptToFixRotation();
             }
-
+            if (positionRaw == null)
+            {
+                positionCache[positionType] = null;
+                return null;
+            }
+            
             UsablePosition position;
             if (InstancedProperties.PositionTypes.Contains(positionType))
                 position = new InstancedPosition(positionRaw, positionRaw.Instance);
