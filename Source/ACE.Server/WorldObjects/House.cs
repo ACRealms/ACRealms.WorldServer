@@ -88,7 +88,7 @@ namespace ACE.Server.WorldObjects
         public HouseData GetHouseData(IPlayer owner)
         {
             var houseData = new HouseData();
-            houseData.Position = Location;
+            houseData.Position = Location.GetPosition();
             houseData.Type = HouseType;
 
             if (SlumLord == null)

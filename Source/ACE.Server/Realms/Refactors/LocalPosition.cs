@@ -34,7 +34,7 @@ namespace ACE.Server.Realms
         : this(new Position(blockCellID, newPositionX, newPositionY, newPositionZ, newRotationX, newRotationY, newRotationZ, newRotationW, 0, relativePos)) { }
 
         public LocalPosition(uint blockCellID, Vector3 position, Quaternion rotation)
-            : this(new Position(blockCellID, position, rotation, 0)) { }
+            : this(new Position(blockCellID, position, rotation)) { }
 
         public LocalPosition(BinaryReader reader)
             : this(new Position(reader)) { }

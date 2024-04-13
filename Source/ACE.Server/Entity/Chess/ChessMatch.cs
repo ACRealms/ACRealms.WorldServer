@@ -12,6 +12,7 @@ using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.Structure;
 using ACE.Server.Physics.Animation;
 using ACE.Server.WorldObjects;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Entity.Chess
 {
@@ -599,9 +600,9 @@ namespace ACE.Server.Entity.Chess
             //Console.WriteLine($"AddWeeniePiece: {weeniename}, {piece.Coord}, {frame.Origin}");
 
             // add to position, spawn
-            wo.Location = new Position(ChessBoard.Location);
-            wo.Location.Pos = frame.Origin;
-            wo.Location.Rotation = frame.Orientation;
+            wo.Location = new InstancedPosition(ChessBoard.Location);
+            wo.Location = wo.Location.SetPos(frame.Origin);
+            wo.Location = wo.Location.SetRotation(frame.Orientation);
 
             wo.EnterWorld();
 
@@ -623,9 +624,9 @@ namespace ACE.Server.Entity.Chess
             var frame = new AFrame(ChessBoard.PhysicsObj.Position.Frame);
             CalculateWeeniePosition(piece.Coord, piece.Color, frame);
 
-            var position = new Position(ChessBoard.Location);
-            position.Pos = frame.Origin;
-            position.Rotation = frame.Orientation;
+            var position = new InstancedPosition(ChessBoard.Location);
+            position = position.SetPos(frame.Origin);
+            position = position.SetRotation(frame.Orientation);
 
             gamePiece.MoveEnqueue(position);
 
@@ -645,9 +646,9 @@ namespace ACE.Server.Entity.Chess
             var frame = new AFrame(ChessBoard.PhysicsObj.Position.Frame);
             CalculateWeeniePosition(piece.Coord, piece.Color, frame);
 
-            var position = new Position(ChessBoard.Location);
-            position.Pos = frame.Origin;
-            position.Rotation = frame.Orientation;
+            var position = new InstancedPosition(ChessBoard.Location);
+            position = position.SetPos(frame.Origin);
+            position = position.SetRotation(frame.Orientation);
 
             gamePiece.AttackEnqueue(position, victim);
 

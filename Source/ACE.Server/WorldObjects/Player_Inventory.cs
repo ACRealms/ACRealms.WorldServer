@@ -1471,7 +1471,7 @@ namespace ACE.Server.WorldObjects
             var targetPos = Location.InFrontOf(1.1f);
 
             // try slide to new position
-            var transit = item.PhysicsObj.transition(item.PhysicsObj.Position, new Physics.Common.Position(targetPos), false);
+            var transit = item.PhysicsObj.transition(item.PhysicsObj.Position, new Physics.Common.PhysicsPosition(targetPos), false);
 
             if (transit != null && transit.SpherePath.CurCell != null)
             {

@@ -1322,7 +1322,7 @@ namespace ACE.Server.WorldObjects
             gateway.Location = new InstancedPosition(location);
             gateway.OriginalPortal = portalId;
 
-            gateway.UpdatePortalDestination(targetPosition);
+            gateway.UpdatePortalDestination(targetPosition.AsLocalPosition());
 
             gateway.TimeToRot = portalLifetime;
 

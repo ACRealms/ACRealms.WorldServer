@@ -73,6 +73,7 @@ namespace ACE.Server.WorldObjects
         public static float RecallMoveThreshold = 8.0f;
         public static float RecallMoveThresholdSq = RecallMoveThreshold * RecallMoveThreshold;
 
+        public InstancedPosition SanctuaryEffective { get => Sanctuary.AsInstancedPosition(this, PlayerInstanceSelectMode.PerRuleset); }
         public bool TooBusyToRecall
         {
             get => IsBusy || suicideInProgress;     // recalls could be started from portal space?
@@ -784,9 +785,8 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
-            newPosition = new InstancedPosition(newPosition);
+            newPosition = new InstancedPosition(newPosition).SetPositionZ(newPosition.PositionZ + 0.005f * (ObjScale ?? 1.0f));
             //newPosition.PositionZ += 0.005f;
-            newPosition.PositionZ += 0.005f * (ObjScale ?? 1.0f);
 
             if (newPosition.Instance != Location.Instance)
             {
@@ -852,8 +852,8 @@ namespace ACE.Server.WorldObjects
 
             if (newLocation.IsEphemeralRealm && !Location.IsEphemeralRealm)
             {
-                SetPosition(PositionType.EphemeralRealmExitTo, new Position(Location.InFrontOf(-7f)));
-                SetPosition(PositionType.EphemeralRealmLastEnteredDrop, new Position(newLocation));
+                EphemeralRealmExitTo = Location.InFrontOf(-7f);
+                EphemeralRealmLastEnteredDrop = new InstancedPosition(newLocation);
             }
             else if (!newLocation.IsEphemeralRealm)
             {

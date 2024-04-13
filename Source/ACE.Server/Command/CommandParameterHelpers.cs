@@ -607,8 +607,10 @@ namespace ACE.Server.Command
 
             try
             {
-                var rawPosition = new Position(new Vector2(coordEW, coordNS));
-                position.AdjustMapCoords();
+                position = new LocalPosition(new Position(new Vector2(coordEW, coordNS)))
+                    .AsInstancedPosition(session.Player, PlayerInstanceSelectMode.Same)
+                    .AdjustMapCoords()
+                    .AsLocalPosition();
             }
             catch (Exception e)
             {

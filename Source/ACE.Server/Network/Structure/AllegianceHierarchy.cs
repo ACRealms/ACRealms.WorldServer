@@ -149,7 +149,7 @@ namespace ACE.Server.Network.Structure
             writer.WriteString16L(motd);
             writer.WriteString16L(motdSetBy);
             writer.Write(chatRoomID);
-            writer.Write(bindPoint);
+            writer.Write(bindPoint.GetPosition());
             writer.WriteString16L(allegianceName);
             writer.Write(nameLastSetTime);
             writer.Write(Convert.ToUInt32(isLocked));
@@ -190,7 +190,7 @@ namespace ACE.Server.Network.Structure
                 writer.WriteString16L(str);
         }
 
-        public static void Write(this BinaryWriter writer, UsablePosition position)
+        public static void Write(this BinaryWriter writer, Position position)
         {
             writer.Write(position.Cell);
             writer.Write(position.Pos);

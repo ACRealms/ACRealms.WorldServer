@@ -7,6 +7,7 @@ using ACE.Database.Models.World;
 using ACE.Database.Models.Shard;
 using ACE.Entity;
 using ACE.Server.Factories;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -44,7 +45,8 @@ namespace ACE.Server.WorldObjects
 
                 if (wo == null) continue;
 
-                wo.Location = new Position(link.ObjCellId, link.OriginX, link.OriginY, link.OriginZ, link.AnglesX, link.AnglesY, link.AnglesZ, link.AnglesW, 0);
+                var instanceId = CurrentLandblock?.Instance ?? parent.Location.Instance;
+                wo.Location = new InstancedPosition(link.ObjCellId, link.OriginX, link.OriginY, link.OriginZ, link.AnglesX, link.AnglesY, link.AnglesZ, link.AnglesW, instanceId);
                 parent.SetLinkProperties(wo);
                 CurrentLandblock?.AddWorldObject(wo);
                 if (wo.PhysicsObj != null)

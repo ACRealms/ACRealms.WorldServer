@@ -152,7 +152,7 @@ namespace ACE.Server.Command.Handlers
 
             player.SendMotionAsCommands(MotionCommand.MarketplaceRecall, MotionStance.NonCombat);
 
-            var startPos = new Position(player.Location);
+            var startPos = new InstancedPosition(player.Location);
 
             // TODO: (OptimShi): Actual animation length is longer than in retail. 18.4s
             // float mpAnimationLength = MotionTable.GetAnimationLength((uint)MotionTableId, MotionCommand.MarketplaceRecall);
@@ -165,7 +165,7 @@ namespace ACE.Server.Command.Handlers
             mpChain.AddAction(player, () =>
             {
                 player.IsBusy = false;
-                var endPos = new Position(player.Location);
+                var endPos = new InstancedPosition(player.Location);
                 if (startPos.SquaredDistanceTo(endPos) > Player.RecallMoveThresholdSq)
                 {
                     session.Network.EnqueueSend(new GameEventWeenieError(session, WeenieError.YouHaveMovedTooFar));

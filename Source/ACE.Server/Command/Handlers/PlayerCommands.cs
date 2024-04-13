@@ -107,7 +107,7 @@ namespace ACE.Server.Command.Handlers
             if (!confirmed)
             {
                 var houseType = $"{keepHouse.HouseType}".ToLower();
-                var loc = HouseManager.GetCoords(keepHouse.SlumLord.Location);
+                var loc = HouseManager.GetCoords(keepHouse.SlumLord.Location.AsLocalPosition());
 
                 var msg = $"Are you sure you want to keep the {houseType} at\n{loc}?";
                 if (!session.Player.ConfirmationManager.EnqueueSend(new Confirmation_Custom(session.Player.Guid, () => HandleHouseSelect(session, true, parameters)), msg))

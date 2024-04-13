@@ -9,6 +9,7 @@ using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
 using ACE.Server.Entity;
 using ACE.Server.Network.GameEvent.Events;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -141,7 +142,7 @@ namespace ACE.Server.WorldObjects
             // if house portal in dungeon,
             // set destination to outdoor house slumlord
             if (CurrentLandblock != null && CurrentLandblock.IsDungeon && Destination.LandblockId == CurrentLandblock.Id)
-                SetPosition(PositionType.Destination, new Position(House.RootHouse.SlumLord.Location));
+                Destination = House.RootHouse.SlumLord.Location.AsLocalPosition();
 
             base.ActOnUse(worldObject);
         }

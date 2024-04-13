@@ -5,6 +5,7 @@ using ACE.Server.Managers;
 using ACE.Server.Network;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Common;
+using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
 using System.Collections.Generic;
 
@@ -196,7 +197,7 @@ namespace ACE.Server.Command.Handlers
                 $"{aceParams[1].AsPosition.PositionY}, {aceParams[1].AsPosition.PositionZ} | Facing: {aceParams[1].AsPosition.RotationX}, {aceParams[1].AsPosition.RotationY}, " +
                 $"{ aceParams[1].AsPosition.RotationZ}, {aceParams[1].AsPosition.RotationW}]", ChatMessageType.Broadcast);
 
-            aceParams[0].AsPlayer.Teleport(aceParams[1].AsPosition);
+            aceParams[0].AsPlayer.Teleport(new LocalPosition(aceParams[1].AsPosition).AsInstancedPosition(session.Player, PlayerInstanceSelectMode.Same));
         }
     }
 }

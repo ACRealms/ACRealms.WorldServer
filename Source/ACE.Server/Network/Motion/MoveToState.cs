@@ -1,4 +1,5 @@
 using ACE.Entity;
+using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
 using System.IO;
 
@@ -13,7 +14,7 @@ namespace ACE.Server.Network.Structure
 
         public RawMotionState RawMotionState;       // the raw movement commands sent by the client
                                                     // these are in turn translated to an InterpretedMotionState
-        public Position Position;
+        public LocalPosition Position;
 
         public ushort InstanceSequence;
         public ushort ServerControlSequence;
@@ -33,7 +34,7 @@ namespace ACE.Server.Network.Structure
             WorldObject = wo;
 
             RawMotionState = new RawMotionState(this, reader);
-            Position = new Position(reader, wo.Location.Instance);
+            Position = new LocalPosition(reader);
 
             InstanceSequence = reader.ReadUInt16();
             ServerControlSequence = reader.ReadUInt16();

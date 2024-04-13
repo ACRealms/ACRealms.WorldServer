@@ -119,8 +119,7 @@ namespace ACE.Server.WorldObjects
                 {
                     if (corpse.TryRemoveFromInventory(guid, out var item))
                     {
-                        item.Location = new Position(corpse.Location);
-                        item.Location.PositionZ += 0.05f * (item.ObjScale ?? 1.0f);
+                        item.Location = corpse.Location.SetPositionZ(item.Location.PositionZ + 0.05f * (item.ObjScale ?? 1.0f));
                         item.Placement = ACE.Entity.Enum.Placement.Resting; // This is needed to make items lay flat on the ground.
                         CurrentLandblock.AddWorldObject(item);
                         item.SaveBiotaToDatabase();

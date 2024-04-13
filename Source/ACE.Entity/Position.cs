@@ -242,11 +242,9 @@ namespace ACE.Entity
             }
         }
 
-        public Position(uint blockCellID, Vector3 position, Quaternion rotation, uint instance)
+        public Position(uint blockCellID, Vector3 position, Quaternion rotation)
         {
             LandblockId = new LandblockId(blockCellID);
-
-            Instance = instance;
 
             Pos = position;
             Rotation = rotation;
@@ -270,7 +268,7 @@ namespace ACE.Entity
             RotationZ = payload.ReadSingle();
         }
 
-        public Position(float northSouth, float eastWest, uint instance)
+        public Position(float northSouth, float eastWest)
         {
             northSouth = (northSouth - 0.5f) * 10.0f;
             eastWest = (eastWest - 0.5f) * 10.0f;
@@ -286,8 +284,6 @@ namespace ACE.Entity
             // float zOffset = GetZFromCellXY(LandblockId.Raw, xOffset, yOffset);
             const float zOffset = 0.0f;
 
-            Instance = instance;
-
             LandblockId = new LandblockId(GetCellFromBase(baseX, baseY));
             PositionX = xOffset;
             PositionY = yOffset;
@@ -295,6 +291,10 @@ namespace ACE.Entity
             Rotation = Quaternion.Identity;
         }
 
+        /// <summary>
+        /// Given a Vector2 set of coordinates, create a new position object for use in converting from VLOC to LOC
+        /// </summary>
+        /// <param name="coordinates">A set coordinates provided in a Vector2 object with East-West being the X value and North-South being the Y value</param>
         public Position(Vector2 coordinates)
         {
             // convert from (-101.95, 102.05) to (0, 204)
@@ -327,15 +327,6 @@ namespace ACE.Entity
             Rotation = Quaternion.Identity;
         }
 
-        /// <summary>
-        /// Given a Vector2 set of coordinates, create a new position object for use in converting from VLOC to LOC
-        /// </summary>
-        /// <param name="coordinates">A set coordinates provided in a Vector2 object with East-West being the X value and North-South being the Y value</param>
-        public Position(Vector2 coordinates, uint instance)
-            : this(coordinates)
-        {
-            Instance = instance;
-        }
 
         public void Serialize(BinaryWriter payload, PositionFlags positionFlags, int animationFrame, bool writeLandblock = true)
         {

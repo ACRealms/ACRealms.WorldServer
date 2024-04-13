@@ -21,11 +21,7 @@ namespace ACE.Server.Entity
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static void FindZ(this LocalPosition pos)
-        {
-            var envCell = DatManager.CellDat.ReadFromDat<DatLoader.FileTypes.EnvCell>(pos.Cell);
-            pos.PositionZ = envCell.Position.Origin.Z;
-        }
+
 
         /// <summary>
         /// Returns TRUE if outdoor position is located on walkable slope

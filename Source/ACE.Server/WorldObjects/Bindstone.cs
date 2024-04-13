@@ -79,7 +79,7 @@ namespace ACE.Server.WorldObjects
             {
                 if (player.IsWithinUseRadiusOf(this))
                 {
-                    player.Allegiance.Sanctuary = new Position(player.Location);
+                    player.Allegiance.Sanctuary = player.Location.AsLocalPosition();
                     player.Allegiance.SaveBiotaToDatabase();
 
                     player.Session.Network.EnqueueSend(new GameMessageSystemChat(GetProperty(PropertyString.UseMessage), ChatMessageType.Magic));

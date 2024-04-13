@@ -961,7 +961,7 @@ namespace ACE.Server.Command.Handlers
                 if (inst == 0)
                     pos = posLocal.AsInstancedPosition(session.Player, PlayerInstanceSelectMode.Same);
                 else
-                    pos = posLocal.ToInstancedPosition(inst);
+                    pos = posLocal.AsInstancedPosition(inst);
 
                 session.Player.Teleport(pos);
             }
@@ -2828,7 +2828,7 @@ namespace ACE.Server.Command.Handlers
             else if (wo is Player player)
             {
                 var items = new List<WorldObject>();
-                var playerLoc = new Position(player.Location);
+                var playerLoc = new InstancedPosition(player.Location);
 
                 foreach (var item in player.Inventory)
                 {
@@ -2846,8 +2846,8 @@ namespace ACE.Server.Command.Handlers
 
                 foreach (var item in items)
                 {
-                    item.Location = new Position(playerLoc);
-                    item.Location.PositionZ += .5f;
+                    item.Location = new InstancedPosition(playerLoc);
+                    item.Location = item.Location.SetPositionZ(item.Location.PositionZ + .5f);
                     item.Placement = Placement.Resting;  // This is needed to make items lay flat on the ground.
 
                     // increased precision for non-ethereal objects
@@ -2856,10 +2856,10 @@ namespace ACE.Server.Command.Handlers
 
                     if (session.Player.CurrentLandblock?.AddWorldObject(item) ?? false)
                     {
-                        item.Location.LandblockId = new LandblockId(item.Location.GetCell());
+                        item.Location = item.Location.SetLandblockId(new LandblockId(item.Location.GetCell()));
 
                         // try slide to new position
-                        var transit = item.PhysicsObj.transition(item.PhysicsObj.Position, new Physics.Common.Position(item.Location), false);
+                        var transit = item.PhysicsObj.transition(item.PhysicsObj.Position, new Physics.Common.PhysicsPosition(item.Location), false);
 
                         if (transit != null && transit.SpherePath.CurCell != null)
                         {
@@ -4719,7 +4719,7 @@ namespace ACE.Server.Command.Handlers
 
             var prevLoc = obj.Location;
             var newLoc = new InstancedPosition(session.Player.Location);
-            newLoc.Rotation = prevLoc.Rotation;     // keep previous rotation
+            newLoc = newLoc.SetRotation(prevLoc.Rotation); // keep previous rotation
 
             var setPos = new Physics.Common.SetPosition(newLoc.PhysPosition(), Physics.Common.SetPositionFlags.Teleport | Physics.Common.SetPositionFlags.Slide, newLoc.Instance);
             var result = obj.PhysicsObj.SetPosition(setPos);

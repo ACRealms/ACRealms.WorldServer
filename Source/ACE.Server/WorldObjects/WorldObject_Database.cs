@@ -51,7 +51,7 @@ namespace ACE.Server.WorldObjects
             foreach (var kvp in positionCache)
             {
                 if (kvp.Value != null)
-                    Biota.SetPosition(kvp.Key, kvp.Value, BiotaDatabaseLock);
+                    Biota.SetPosition(kvp.Key, kvp.Value.GetPosition(), BiotaDatabaseLock);
             }
 
             LastRequestedDatabaseSave = DateTime.UtcNow;

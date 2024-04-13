@@ -552,7 +552,7 @@ namespace ACE.Server.Managers
             player.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
             player.SetProperty(PropertyBool.RecallsDisabled, false);
             var loc = realm.DefaultStartingLocation(player);
-            player.Sanctuary = new LocalPosition(loc);
+            player.Sanctuary = loc.AsLocalPosition();
             WorldManager.ThreadSafeTeleport(player, loc, false, new Entity.Actions.ActionEventDelegate(() =>
             {
                 //if (realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))

@@ -330,7 +330,7 @@ namespace ACE.Server.WorldObjects
                 // move to position
                 var home = Home;
 
-                motion = GetMoveToPosition(Home.AsInstancedPosition(this, WorldObjectInstanceSelectMode.Same), RunRate, 1.0f);
+                motion = GetMoveToPosition(Home, RunRate, 1.0f);
             }
 
             player.Session.Network.EnqueueSend(new GameMessageUpdateMotion(this, motion));
@@ -352,7 +352,7 @@ namespace ACE.Server.WorldObjects
                 PhysicsObj.UpdateTime = Physics.Common.PhysicsTimer.CurrentTime;
 
             var mvp = new MovementParameters(motion.MoveToParameters);
-            PhysicsObj.MoveToPosition(new Physics.Common.Position(position), mvp);
+            PhysicsObj.MoveToPosition(new Physics.Common.PhysicsPosition(position), mvp);
 
             AddMoveToTick();
         }
@@ -420,9 +420,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void FakeTeleport(InstancedPosition _newPosition)
         {
-            var newPosition = new InstancedPosition(_newPosition);
-
-            newPosition.PositionZ += 0.005f * (ObjScale ?? 1.0f);
+            var newPosition = _newPosition.SetPositionZ(_newPosition.PositionZ + 0.005f * (ObjScale ?? 1.0f));
 
             if (Location.InstancedLandblock != newPosition.InstancedLandblock)
             {

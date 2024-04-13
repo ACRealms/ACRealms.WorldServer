@@ -23,7 +23,6 @@ namespace ACE.Server.Realms
             if (instance == 0)
                 throw new ArgumentException("Instance ID may not be 0");
             Instance = instance;
-            Position = new Position(pos) { Instance = instance };
         }
 
         public InstancedPosition(LocalPosition pos, uint instance)

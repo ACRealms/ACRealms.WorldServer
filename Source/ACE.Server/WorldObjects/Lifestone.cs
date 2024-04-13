@@ -63,7 +63,7 @@ namespace ACE.Server.WorldObjects
             {
                 if (player.IsWithinUseRadiusOf(this))
                 {
-                    player.Sanctuary = new Position(player.Location);
+                    player.Sanctuary = player.Location.AsLocalPosition();
                     player.Session.Network.EnqueueSend(new GameMessageSystemChat(GetProperty(PropertyString.UseMessage), ChatMessageType.Magic));
                     var newStamina = (uint)Math.Round(player.Stamina.Current / 2f);
                     player.UpdateVital(player.Stamina, newStamina);

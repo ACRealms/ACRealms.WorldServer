@@ -103,9 +103,7 @@ namespace ACE.Server.Realms
 
         public static InstancedPosition GetDuelingAreaDrop(WorldRealm realm)
         {
-            var pos = new Position(RealmConstants.DuelStagingAreaDrop);
-            pos.Instance = realm.StandardRules.GetDefaultInstanceID();
-            return pos;
+            return new InstancedPosition(RealmConstants.DuelStagingAreaDrop, realm.StandardRules.GetDefaultInstanceID());
         }
     }
 }

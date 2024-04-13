@@ -15,6 +15,7 @@ using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics;
 using ACE.Server.Physics.Extensions;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -97,9 +98,9 @@ namespace ACE.Server.WorldObjects
             proj.ProjectileLauncher = weapon;
             proj.ProjectileAmmo = ammo;
 
-            proj.Location = new Position(Location);
-            proj.Location.Pos = origin;
-            proj.Location.Rotation = orientation;
+            proj.Location = new InstancedPosition(Location);
+            proj.Location = proj.Location.SetPos(origin);
+            proj.Location = proj.Location.SetRotation(orientation);
 
             SetProjectilePhysicsState(proj, target, velocity);
 

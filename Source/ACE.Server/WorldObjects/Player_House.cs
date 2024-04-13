@@ -1845,7 +1845,7 @@ namespace ACE.Server.WorldObjects
                     log.Error($"{Name}.IsMultiHouseOwner(): {house.Guid} slumlord is null!");
                     continue;
                 }
-                var coords = HouseManager.GetCoords(slumlord.Location);
+                var coords = HouseManager.GetCoords(slumlord.Location.AsLocalPosition());
                 Session.Network.EnqueueSend(new GameMessageSystemChat($"{i + 1}. {coords}", ChatMessageType.Broadcast));
             }
             Session.Network.EnqueueSend(new GameMessageSystemChat($"Please choose the house you want to keep with /house-select # , where # is 1-{houses.Count}", ChatMessageType.Broadcast));
