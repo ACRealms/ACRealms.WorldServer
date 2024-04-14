@@ -67,7 +67,3 @@ VALUES (0x701AC00F, 4200029, 0x01AC0116, 30.6764, -11.1475, 0.005596, 0.382407, 
 INSERT INTO `landblock_instance` (`guid`, `weenie_Class_Id`, `obj_Cell_Id`, `origin_X`, `origin_Y`, `origin_Z`, `angles_W`, `angles_X`, `angles_Y`, `angles_Z`, `is_Link_Child`, `last_Modified`)
 VALUES (0x701AC010, 4200032, 0x01AC0116, 33.094, -8.08235, 0.005, 0.370334, 0, 0, -0.928899, False, '2020-10-23 18:39:20'); /* PvP Portal Gems */
 /* @teleloc 0x01AC0116 [33.094002 -8.082350 0.005000] 0.370334 0.000000 0.000000 -0.928899 */
-
-INSERT INTO `landblock_instance` (`guid`, `weenie_Class_Id`, `obj_Cell_Id`, `origin_X`, `origin_Y`, `origin_Z`, `angles_W`, `angles_X`, `angles_Y`, `angles_Z`, `is_Link_Child`, `last_Modified`)
-VALUES (0x701AC011, 4200002, 0x01AC011F, 35.08511, -19.52238, 0.005, -0.702822, 0, 0, -0.711366, False, '2023-05-09 22:01:05'); /* Blaine */
-/* @teleloc 0x01AC011F [35.085110 -19.522381 0.005000] -0.702822 0.000000 0.000000 -0.711366 */
