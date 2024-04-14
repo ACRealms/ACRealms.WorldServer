@@ -1,41 +1,63 @@
-# ACEmulator Core Server
+# ACRealms V2
 
-[![Discord](https://img.shields.io/discord/261242462972936192.svg?label=play+now!&style=for-the-badge&logo=discord)](https://discord.gg/C2WzhP9)
+This is a fork of https://github.com/ACEmulator/ACE/. I'm considering recreating the repository as a fork.
 
-Build status: [![GitHub last commit (master)](https://img.shields.io/github/last-commit/acemulator/ace/master)](https://github.com/ACEmulator/ACE/commits/master) [![Windows CI](https://ci.appveyor.com/api/projects/status/rqebda31cgu8u59w/branch/master?svg=true)](https://ci.appveyor.com/project/LtRipley36706/ace/branch/master) [![docker build](https://github.com/ACEmulator/ACE/actions/workflows/docker-image.yml/badge.svg)](https://hub.docker.com/r/acemulator/ace)
+Focus areas:
+ - Instanced Landblocks (multiple logical dungeons in same 'physical' landblock space)
+ - Ruleset Composition (Realms are composed of ruleset definitions chained together recursively)
+ - Ephemeral Realms (Temporary landblocks that may be assigned additional rulesets, including those defined by the player through crafting, inspired by the map device in Path of Exile)
 
-[![Download Latest Server Release](https://img.shields.io/github/v/release/ACEmulator/ACE?label=latest%20server%20release) ![GitHub Release Date](https://img.shields.io/github/release-date/acemulator/ace)](https://github.com/ACEmulator/ACE/releases/latest)
-[![Download Latest World Database Release](https://img.shields.io/github/v/release/ACEmulator/ACE-World-16PY-Patches?label=latest%20world%20database%20release) ![GitHub Release Date](https://img.shields.io/github/release-date/acemulator/ACE-World-16PY-Patches)](https://github.com/ACEmulator/ACE-World-16PY-Patches/releases/latest)
+ This is a work in progress, expect bugs and rough edges (but the project is rapidly improving as of v2). Contributions and feedback greatly appreciated.
 
-[![GitHub All Releases](https://img.shields.io/github/downloads/acemulator/ace/total?label=server%20downloads)](https://github.com/ACEmulator/ACE/releases) [![GitHub All Releases](https://img.shields.io/github/downloads/acemulator/ACE-World-16PY-Patches/total?label=database%20downloads)](https://github.com/ACEmulator/ACE-World-16PY-Patches/releases) [![Docker Pulls](https://img.shields.io/docker/pulls/acemulator/ace)](https://hub.docker.com/r/acemulator/ace)
 
-**ACEmulator is a custom, completely from-scratch open source server implementation for Asheron's Call built on C#**
- * MySQL and MariaDB are used as the database engine.
- * Latest client supported.
- * [![License](https://img.shields.io/github/license/acemulator/ace)](https://github.com/ACEmulator/ACE/blob/master/LICENSE)
+## Servers using AC Realms
 
-***
-## Disclaimer
-**This project is for educational and non-commercial purposes only, use of the game client is for interoperability with the emulated server.**
-- Asheron's Call was a registered trademark of Turbine, Inc. and WB Games Inc which has since expired.
-- ACEmulator is not associated or affiliated in any way with Turbine, Inc. or WB Games Inc.
-***
-## Getting Started
-Extended documentation can be found on the project [Wiki](https://github.com/ACEmulator/ACE/wiki).
-* [Developing ACE](https://github.com/ACEmulator/ACE/wiki/ACE-Development)
-* [Hosting ACE](https://github.com/ACEmulator/ACE/wiki/ACE-Hosting)
-* [Content Creation](https://github.com/ACEmulator/ACE/wiki/Content-Creation)
+This project has been used in three servers that I am aware of.
+1. ACRealms Alpha (late 2020)
+2. Escape From Dereth (mid 2023)
+3. Pourtide 3 (April 2024)
 
-## Contributions
-* Contributions in the form of issues and pull requests are welcomed and encouraged.
-* The preferred way to contribute is to fork the repo and submit a pull request on GitHub.
-* Code style information can be found on the [Wiki](https://github.com/ACEmulator/ACE/wiki/Code-Style).
+## Content Structure (differences from ACE)
 
-Please note that this project is released with a [Contributor Code of Conduct](https://github.com/ACEmulator/ACE/blob/master/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
-## Bug Reports
-* Please use the [issue tracker](https://github.com/ACEmulator/ACE/issues) provided by GitHub to send us bug reports.
-* You may also discuss issues and bug reports on our discord listed below.
+## Known Issues
+
+#### GUID Table
+
+GUIDs in Asheron's Call are stored and used as 32-bit unsigned integers (normally displayed in hexidecimal).
+These GUIDs are sometimes dynamically assigned, but sometimes statically assigned, with the landblock ID composing the first 16 bits, and only the remaining 16 bits used for a local component of this GUID.
+Because ACRealms makes it possible to have multiple landblocks with the same 16-bit identifier, it is therefore possible to have multiple objects with the same statically assigned GUID.
+
+There are only a few cases where this becomes a problem, such as collision detection and housing. We knew about the housing limitation from the start of the project (2020), but the collision detection issue was not discovered until very recently, April 2024.
+
+The good news is that given these assumptions, the issue is fixable (it just hasn't been done yet):
+1. GUID collisions will always occur between objects in different instances
+2. A player can only be in one instance at a time
+3. Objects with statically assigned GUIDs will never swap instances
+
+ACE.Server.Physics.Managers.ServerObjectManager contains a global table with 32-bit GUID as a key. The idea is to identify statically assigned GUIDs, and translate them into a 64-bit version of the GUID, using the instance ID as the first 32 bits, and the original GUID as the last 32 bits.
+
+
+## Developer notes
+
+Property IDs (ACE.Entity.Enum.Properties.PropertyXXX) from 42000-42999 are reserved by AC Realms Core. 
+
+Realm Property IDs (ACE.Entity.Enum.Properties.RealmPropertyXXX) from 0-9999 are reserved by AC Realms Core in a similar manner.
+
+If using this project in your own server, please do not add new properties with IDs in this range.
 
 ## Contact
-* [Discord Channel](https://discord.gg/C2WzhP9)
+
+`russellfannin0@gmail.com`
+
+
+## License
+
+AGPL v3
+
+## Server Operator Guidelines
+
+We have the same guidelines as https://github.com/ACEmulator/ACE/, which ACRealms is forked from.
+
+> We have a NO financial solicitation and donation policy. If you solicit or accept donations or gifts in direct relation to ACRealms, your perks will be revoked and discord tags removed. If you come back into compliance with this policy, your perks and access will be restored.
+> If you are in violation of our ACRealms AGPL-3.0 license, you will be removed from our discord server. We may also petition to have your servers removed from public servers lists
