@@ -6,7 +6,6 @@ using ACE.Entity.Enum.RealmProperties;
 using ACE.Server.Entity;
 using ACE.Server.Physics.Common;
 using ACE.Server.Realms;
-using Position = ACE.Entity.Position;
 
 namespace ACE.Server.Network.GameAction.Actions
 {

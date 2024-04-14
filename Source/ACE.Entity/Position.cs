@@ -327,7 +327,6 @@ namespace ACE.Entity
             Rotation = Quaternion.Identity;
         }
 
-
         public void Serialize(BinaryWriter payload, PositionFlags positionFlags, int animationFrame, bool writeLandblock = true)
         {
             payload.Write((uint)positionFlags);

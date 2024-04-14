@@ -25,10 +25,11 @@ namespace ACE.Server.Physics.Animation
         public CollisionInfo CollisionInfo;
         public CellArray CellArray;
         //public ObjCell NewCellPtr;
-        public uint Instance;
+        public uint Instance { get; }
 
-        public Transition()
+        public Transition(uint instance)
         {
+            Instance = instance;
             Init();
         }
 
@@ -690,7 +691,7 @@ namespace ACE.Server.Physics.Animation
         /// <returns></returns>
         public static Transition MakeTransition(uint instance)
         {
-            var transition = new Transition() { Instance = instance };
+            var transition = new Transition(instance);
             transition.Init();
             return transition;
         }

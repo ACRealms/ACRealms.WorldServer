@@ -29,7 +29,7 @@ namespace ACE.Server.WorldObjects
         {
             get
             {
-                //TODO: Support account IDs > 65535
+                //REALMS-TODO: Support account IDs > 65535
                 var realm = RealmManager.GetReservedRealm(ReservedRealm.hideout);
                 return Position.InstanceIDFromVars(realm.Realm.Id, (ushort)Account.AccountId, false);
             }
@@ -853,7 +853,7 @@ namespace ACE.Server.WorldObjects
 
             if (newLocation.IsEphemeralRealm && !Location.IsEphemeralRealm)
             {
-                EphemeralRealmExitTo = Location.InFrontOf(-7f);
+                EphemeralRealmExitTo = Location.InFrontOf(-7f); //REALMS-TODO: Do adjustdungeon
                 EphemeralRealmLastEnteredDrop = new InstancedPosition(newLocation);
             }
             else if (!newLocation.IsEphemeralRealm)

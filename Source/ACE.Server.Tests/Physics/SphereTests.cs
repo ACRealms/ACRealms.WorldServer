@@ -79,7 +79,7 @@ namespace ACE.Server.Tests.Physics
             var sphere = new Sphere(Vector3.Zero, 5.0f);
 
             // represents the movement path
-            var transition = new Transition();
+            var transition = new Transition(0);
             transition.SpherePath.GlobalCurrCenter.Add(new Sphere(new Vector3(20, 20, 20), 5.0f));    
 
             // the point we are checking against is represented with this sphere...
@@ -115,7 +115,7 @@ namespace ACE.Server.Tests.Physics
             var sphereNonCollide = new Sphere(new Vector3(10, 10, 10), 5.0f);
 
             // represents the movement path
-            var transition = new Transition();
+            var transition = new Transition(0);
             transition.SpherePath.NumSphere = 1;
             transition.SpherePath.InsertType = InsertType.Placement;
             transition.SpherePath.GlobalSphere.Add(sphereNonCollide);
@@ -183,7 +183,7 @@ namespace ACE.Server.Tests.Physics
         public void Sphere_LandOnSphere()
         {
             var sphere = new Sphere(Vector3.Zero, 5.0f);
-            var transition = new Transition();
+            var transition = new Transition(0);
 
             // defines the collision normal
             transition.SpherePath.GlobalCurrCenter.Add(new Sphere(new Vector3(0, 0, -1), 5.0f));
@@ -203,7 +203,7 @@ namespace ACE.Server.Tests.Physics
         public void Sphere_StepSphereUp()
         {
             var sphere = new Sphere(Vector3.Zero, 5.0f);
-            var transition = new Transition();
+            var transition = new Transition(0);
 
             // the location being stepped up to
             var disp = new Vector3(0, 0, 1);
@@ -218,7 +218,7 @@ namespace ACE.Server.Tests.Physics
         {
             var sphere = new Sphere(Vector3.Zero, 5.0f);
 
-            var transition = new Transition();
+            var transition = new Transition(0);
             transition.SpherePath.StepDownAmt = -10.0f;     // the amount being stepped down this frame
             transition.SpherePath.WalkInterp = 10.0f;
 
@@ -236,7 +236,7 @@ namespace ACE.Server.Tests.Physics
             var sphere = new Sphere(Vector3.Zero, 5.0f);
             var collisionNormal = new Vector3(0, 0, -1);
 
-            var transition = new Transition();
+            var transition = new Transition(0);
 
             var transitionState = sphere.SlideSphere(transition, ref collisionNormal, Vector3.Zero);
             Assert.AreEqual(transitionState, TransitionState.Slid);
