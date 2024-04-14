@@ -128,7 +128,7 @@ namespace ACE.Server.Entity
         /// <summary>
         /// Landblocks which have been inactive for this many seconds will be unloaded
         /// </summary>
-        public static readonly TimeSpan UnloadInterval = TimeSpan.FromMinutes(5);
+        public TimeSpan UnloadInterval => TimeSpan.FromMinutes(RealmRuleset.GetProperty(RealmPropertyInt.LandblockUnloadInterval));
 
 
         /// <summary>

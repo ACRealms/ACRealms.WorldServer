@@ -11,47 +11,53 @@ namespace ACE.Entity.Enum.Properties
         Undef                                    = 0,
 
         [RealmPropertyInt(0, 0, 0xFFFF)]
-        RulesetStampVendorCategory,
+        RulesetStampVendorCategory = 1,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureStrengthAdded,
+        CreatureStrengthAdded = 2,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureEnduranceAdded,
+        CreatureEnduranceAdded = 3,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureCoordinationAdded,
+        CreatureCoordinationAdded = 4,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureQuicknessAdded,
+        CreatureQuicknessAdded = 5,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureFocusAdded,
+        CreatureFocusAdded = 6,
 
         [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
-        CreatureSelfAdded,
+        CreatureSelfAdded = 7,
 
         /*Below not implemented*/
         [RealmPropertyInt(0, -100000, 100000)]
-        PlayerDamageMeleeAdded,
+        PlayerDamageMeleeAdded = 8,
 
         [RealmPropertyInt(0, -100000, 100000)]
-        PlayerDamageMagicAdded,
+        PlayerDamageMagicAdded = 9,
 
         [RealmPropertyInt(0, -100000, 100000)]
-        PlayerDamageMissileAdded,
+        PlayerDamageMissileAdded = 10,
 
         [RealmPropertyInt(0, -100000, 100000)]
-        HealingKitHealAdded,
+        HealingKitHealAdded = 11,
 
         [RealmPropertyInt(0, -100000, 100000)]
-        FoodRestoreAmountAdded,
+        FoodRestoreAmountAdded = 12,
 
         [RealmPropertyInt((int)PlayerInstanceSelectMode.HomeRealm)]
-        RecallInstanceSelectMode,
+        RecallInstanceSelectMode = 13,
 
         [RealmPropertyInt((int)PlayerInstanceSelectMode.HomeRealm)]
-        PortalInstanceSelectMode,
+        PortalInstanceSelectMode = 14,
+
+        /// <summary>
+        /// Landblocks which have been inactive for this many minutes will be unloaded
+        /// </summary>
+        [RealmPropertyInt(5, 1, 1440)]
+        LandblockUnloadInterval = 15,
     }
 
     public static class RealmPropertyIntExtensions

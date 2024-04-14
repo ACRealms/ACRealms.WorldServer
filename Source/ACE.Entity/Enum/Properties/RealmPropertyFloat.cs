@@ -8,101 +8,101 @@ namespace ACE.Entity.Enum.Properties
         Undef                          = 0,
 
         [RealmPropertyFloat(1f, 0.1f, 5f)]
-        SpellCasting_MoveToState_UpdatePosition_Threshold,
+        SpellCasting_MoveToState_UpdatePosition_Threshold = 1,
 
         [RealmPropertyFloat(5f, 1f, 360f)]
-        Spellcasting_Max_Angle,
+        Spellcasting_Max_Angle = 2,
 
         [RealmPropertyFloat(6f, 1f, 1000f)]
-        SpellCastingPvPWindupMaxMove,
+        SpellCastingPvPWindupMaxMove = 3,
 
         [RealmPropertyFloat(1f, 0.001f, 100f)]
-        CreatureSpawnHPMultiplier,
+        CreatureSpawnHPMultiplier = 4,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureSpawnRateMultiplier,
+        CreatureSpawnRateMultiplier = 5,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureDamageMultiplier,
+        CreatureDamageMultiplier = 6,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureStrengthMultiplier,
+        CreatureStrengthMultiplier = 7,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureEnduranceMultiplier,
+        CreatureEnduranceMultiplier = 8,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureCoordinationMultiplier,
+        CreatureCoordinationMultiplier = 9,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureQuicknessMultiplier,
+        CreatureQuicknessMultiplier = 10,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureFocusMultiplier,
+        CreatureFocusMultiplier = 11,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureSelfMultiplier,
+        CreatureSelfMultiplier = 12,
 
         /*Below is not implemented*/
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        PlayerDamageGlobalMultiplier,
+        PlayerDamageGlobalMultiplier = 13,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        PlayerDamageMeleeMultiplier,
+        PlayerDamageMeleeMultiplier = 14,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        PlayerDamageMissileMultiplier,
+        PlayerDamageMissileMultiplier = 15,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        PlayerDamageMagicMultiplier,
+        PlayerDamageMagicMultiplier = 16,
 
         [RealmPropertyFloat(1f, 0f, 1f)]
-        PlayerChanceToEvadeMeleeCap,
+        PlayerChanceToEvadeMeleeCap = 17,
 
         [RealmPropertyFloat(1f, 0f, 1f)]
-        PlayerChanceToDodgeMissileCap,
+        PlayerChanceToDodgeMissileCap = 18,
 
         [RealmPropertyFloat(1f, 0f, 1f)]
-        PlayerChanceToResistMagicCap,
+        PlayerChanceToResistMagicCap = 19,
 
         [RealmPropertyFloat(1f, 0f, 1f)]
-        CreatureChanceToEvadeMeleeCap,
+        CreatureChanceToEvadeMeleeCap = 20,
 
         [RealmPropertyFloat(1f, 0f, 1f)]
-        CreatureChanceToDodgeMissileCap,
+        CreatureChanceToDodgeMissileCap = 21,
 
         [RealmPropertyFloat(1f, 0f, 1f)]
-        CreatureChanceToResistMagicCap,
+        CreatureChanceToResistMagicCap = 22,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureDamageGlobalMultiplier,
+        CreatureDamageGlobalMultiplier = 23,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureDamageMeleeMultiplier,
+        CreatureDamageMeleeMultiplier = 24,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        CreatureDamageMagicMultiplier,
+        CreatureDamageMagicMultiplier = 25,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        PlayerCriticalDamageMultiplier,
+        PlayerCriticalDamageMultiplier = 26,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        HealingKitHealMultiplier,
+        HealingKitHealMultiplier = 27,
 
         [RealmPropertyFloat(1f, 0.01f, 100f)]
-        FoodRestoreAmountMultiplier,
+        FoodRestoreAmountMultiplier = 28,
 
         [RealmPropertyFloat(1f, 0.001f, 1000f)]
-        ExperienceMultiplierAll,
+        ExperienceMultiplierAll = 29,
 
         [RealmPropertyFloat(1f, 0.001f, 1000f)]
-        ExperienceMultiplierQuest,
+        ExperienceMultiplierQuest = 30,
 
         [RealmPropertyFloat(1f, 0.001f, 1000f)]
-        ExperienceMultiplierKills,
+        ExperienceMultiplierKills = 31,
 
         [RealmPropertyFloat(33f, -10f, 100f)]
-        TinkeringBaseImbueChanceCap,
+        TinkeringBaseImbueChanceCap = 32,
     }
 
     public static class RealmPropertyFloatExtensions

@@ -14,6 +14,7 @@ using ACE.Entity.Enum;
 using ACE.Server.Entity;
 using ACE.Server.WorldObjects;
 using ACE.Server.Realms;
+using ACE.Server.Network.GameAction.Actions;
 
 namespace ACE.Server.Managers
 {
@@ -28,6 +29,7 @@ namespace ACE.Server.Managers
         /// Locking mechanism provides concurrent access to collections
         /// </summary>
         private static readonly object landblockMutex = new object();
+        private static readonly object ephemeralInstanceMutex = new object();
 
         //Important: As of AC Realms, reading and writing to this must be done via LandblockDictFetch and LandblockDictCommit
         /// <summary>
@@ -35,6 +37,7 @@ namespace ACE.Server.Managers
         /// Landblocks which aren't currently loaded will be null here
         /// </summary>
         private static readonly Dictionary<ulong, Landblock> landblocks = new Dictionary<ulong, Landblock>();
+        private static readonly Dictionary<uint, Landblock> ephemeralInstanceLandblocks = new Dictionary<uint, Landblock>();
         private static readonly HashSet<uint> pendingInstanceIds = new HashSet<uint>();
 
         /// <summary>
@@ -400,6 +403,17 @@ namespace ACE.Server.Managers
             return LandblockDictFetch(landblockId.Raw, instance);
         }
 
+        public static Landblock GetEphemeralLandblockUnsafe(uint instance)
+        {
+            if ((instance & 0x8000000) > 0)
+            {
+                log.Error("Attempted to get ephemeral landblock with instance ID out of range");
+                return null;
+            }
+            Landblock lb = null;
+            ephemeralInstanceLandblocks.TryGetValue(instance, out lb);
+            return lb;
+        }
         /// <summary>
         /// Returns a reference to a landblock, loading the landblock if not already active
         /// </summary>
@@ -429,6 +443,11 @@ namespace ACE.Server.Managers
                     if (!loadedLandblocks.Add(landblock))
                     {
                         log.Error($"LandblockManager: failed to add {LandblockKey(landblockIdClean.Raw, instance):X8} to active landblocks!");
+                        return landblock;
+                    }
+                    if (ephemeralRealm != null && !ephemeralInstanceLandblocks.TryAdd(landblock.Instance, landblock))
+                    {
+                        log.Error($"LandblockManager: failed to add {instance:X8} to ephemeral landblocks!");
                         return landblock;
                     }
 
@@ -733,14 +752,15 @@ namespace ACE.Server.Managers
                     SendGlobalEnvironSound(environChangeType);
             }
         }
-        public static uint RequestNewInstanceID(bool isTemporaryRuleset, ushort realmId, LandblockId landblock)
+
+        public static uint RequestNewRealmInstanceID(ushort realmId, LandblockId landblock)
         {
             lock (landblockMutex)
             {
                 uint iid;
                 do
                 {
-                    iid = GetRandomInstanceID(isTemporaryRuleset, realmId);
+                    iid = GetRandomRealmInstanceID(realmId);
                 }
                 while (LandblockDictFetch(landblock.Raw, iid) != null || pendingInstanceIds.Contains(iid));
                 pendingInstanceIds.Add(iid);
@@ -748,14 +768,42 @@ namespace ACE.Server.Managers
             }
         }
 
+        public static uint RequestNewEphemeralInstanceIDv1(ushort homeRealmId)
+        {
+            lock (ephemeralInstanceMutex)
+            {
+                uint iid;
+                do
+                {
+                    iid = GetRandomEphemeralInstanceIDv1(homeRealmId);
+                }
+                while (ephemeralInstanceLandblocks.TryGetValue(iid, out _) || pendingInstanceIds.Contains(iid));
+                pendingInstanceIds.Add(iid);
+                return iid;
+            }
+        }
+
         static Random random = new Random();
-        private static uint GetRandomInstanceID(bool isTemporaryRuleset, ushort realmId)
+
+        // To be implemented when ephemeral realms are reworked to allow for recursion on existing ephemeral realm
+        //private static uint GetRandomEphemeralInstanceIDv2() => 0x80000000 | (uint)random.NextInt64(1, 0x7FFFFFFF);
+
+        private static uint GetRandomEphemeralInstanceIDv1(ushort homeRealmId)
+        {
+            ushort left = homeRealmId;
+            if ((homeRealmId & 0x8000) != 0)
+                throw new InvalidOperationException("Realm IDs may not be higher than 0x7FFF");
+            left |= 0x8000;
+            var id = (ushort)random.Next(1, 0xFFFE);
+            uint result = (((uint)left) << 16) | id;
+            return result;
+        }
+
+        private static uint GetRandomRealmInstanceID(ushort realmId)
         {
             ushort left = realmId;
             if ((realmId & 0x8000) != 0)
                 throw new InvalidOperationException("Realm IDs may not be higher than 0x7FFF");
-            if (isTemporaryRuleset)
-                left |= 0x8000;
             var id = (ushort)random.Next(1, 0xFFFE);
             uint result = (((uint)left) << 16) | id;
             return result;

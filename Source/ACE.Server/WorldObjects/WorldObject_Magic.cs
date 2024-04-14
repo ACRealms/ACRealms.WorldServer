@@ -1283,15 +1283,16 @@ namespace ACE.Server.WorldObjects
             if (portal == null || location == null)
                 return false;
 
-            var targetPosition = new LocalPosition(portal.Destination).AsInstancedPosition(source, WorldObjectInstanceSelectMode.PerRuleset);
-            var summonTargetRealms = source.GetRealmsToApply();
-
-            bool doEphemeralInstance = false;
-            if (summonTargetRealms.Count > 0)
-                doEphemeralInstance = true;
+            uint? forceInstanceId = null;
 
             if (summoner != null)
             {
+                var summonTargetRealms = source.GetRealmsToApply();
+
+                bool doEphemeralInstance = false;
+                if (summonTargetRealms.Count > 0)
+                    doEphemeralInstance = true;
+
                 if (summonTargetRealms.Any(x => x == null))
                 {
                     log.Error($"SummonTargetRealm for guid {source.Guid} has an invalid realm ID.");
@@ -1311,7 +1312,15 @@ namespace ACE.Server.WorldObjects
                         return false;
                     }
                     var landblock = RealmManager.GetNewEphemeralLandblock(portal.Destination.LandblockId, summoner, summonTargetRealms.Select(x => x.Realm).ToList());
-                    targetPosition = new InstancedPosition(targetPosition, landblock.Instance); // REALMS-TODO: Add destination instance id that isn't part of regular position
+                    forceInstanceId = landblock.Instance;
+
+                    // If the ruleset dictates that the landblock is to be unloaded if empty for less time than the portal is active for, we need to shorten this portal's duration
+                    var maxPortalTime = Math.Min(portalLifetime, TimeSpan.FromMinutes(0.5 + landblock.RealmRuleset.GetProperty(RealmPropertyInt.LandblockUnloadInterval)).TotalSeconds);
+                    if (portalLifetime > maxPortalTime)
+                    {
+                        summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"The portal duration has been reduced from #{portalLifetime} to #{maxPortalTime} seconds due to the ruleset's limit on inactive landblock lifespans!", ChatMessageType.Magic));
+                        portalLifetime = maxPortalTime;
+                    }
                 }
             }
 
@@ -1322,20 +1331,21 @@ namespace ACE.Server.WorldObjects
 
             gateway.Location = new InstancedPosition(location);
             gateway.OriginalPortal = portalId;
-
-            gateway.UpdatePortalDestination(targetPosition.AsLocalPosition());
-
+            gateway.UpdatePortalDestination(portal.Destination);
             gateway.TimeToRot = portalLifetime;
-
             gateway.MinLevel = portal.MinLevel;
             gateway.MaxLevel = portal.MaxLevel;
             gateway.PortalRestrictions = portal.PortalRestrictions;
             gateway.AccountRequirements = portal.AccountRequirements;
             gateway.AdvocateQuest = portal.AdvocateQuest;
-
             gateway.Quest = portal.Quest;
             gateway.QuestRestriction = portal.QuestRestriction;
-
+            if (forceInstanceId.HasValue)
+            {
+                gateway.EphemeralRealmPortalInstanceID = forceInstanceId;
+                gateway.IsEphemeralRealmPortal = true;
+            }
+            
             gateway.Biota.PropertiesEmote = portal.Biota.PropertiesEmote;
 
             gateway.PortalRestrictions |= PortalBitmask.NoSummon; // all gateways are marked NoSummon but by default ruleset, the OriginalPortal is the one that is checked against

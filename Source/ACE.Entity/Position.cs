@@ -536,11 +536,11 @@ namespace ACE.Entity
             return Cell == p.Cell && Pos.Equals(p.Pos) && Rotation.Equals(p.Rotation);
         }
 
-        public static void ParseInstanceID(uint instanceId, out bool isTemporaryRuleset, out ushort realmId, out ushort shortInstanceId)
+        public static void ParseInstanceID(uint instanceId, out bool isEphemeralRealm, out ushort realmId, out ushort shortInstanceId)
         {
             shortInstanceId = (ushort)(instanceId & 0xFFFF);
             ushort left = (ushort)(instanceId >> 16);
-            isTemporaryRuleset = (left & 0x8000) == 0x8000;
+            isEphemeralRealm = (left & 0x8000) == 0x8000;
             realmId = (ushort)(left & 0x7FFF);
         }
 

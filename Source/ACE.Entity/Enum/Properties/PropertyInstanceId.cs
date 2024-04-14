@@ -78,7 +78,14 @@ namespace ACE.Entity.Enum.Properties
         [ServerOnly]
         PCAPRecordedObjectIID            = 8000,
         [ServerOnly]
-        PCAPRecordedParentIID            = 8008
+        PCAPRecordedParentIID            = 8008,
+
+        /// <summary>
+        /// Instance ID of the ephemeral realm portal
+        /// 
+        /// </summary>
+        [Ephemeral]
+        EphemeralRealmPortalInstanceID   = 42000,
     }
 
     public static class PropertyInstanceIdExtensions

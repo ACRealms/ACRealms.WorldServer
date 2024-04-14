@@ -6,9 +6,9 @@ namespace ACE.Entity.Enum.Properties
 {
     public enum RealmPropertyRerollType : byte
     {
-        never,
-        always,
-        landblock,
-        manual
+        never = 1,
+        always = 2,
+        landblock = 3,
+        manual = 4,
     }
 }

@@ -275,7 +275,25 @@ namespace ACE.Server.WorldObjects
             // player.Session.Network.EnqueueSend(new GameMessageSystemChat("Portal sending player to destination", ChatMessageType.System));
 #endif
             var portalDest = Destination.AsInstancedPosition(player, player.RealmRuleset.PortalInstanceSelectMode);
-
+            if (IsEphemeralRealmPortal)
+            {
+                if (EphemeralRealmPortalInstanceID.HasValue)
+                {
+                    var landblock = LandblockManager.GetEphemeralLandblockUnsafe(EphemeralRealmPortalInstanceID.Value);
+                    if (landblock == null)
+                    {
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Ephemeral instance not found (This may be an error).", ChatMessageType.System));
+                        return;
+                    }
+                    portalDest = new InstancedPosition(portalDest, landblock.Instance);
+                }
+                else
+                {
+                    player.Session.Network.EnqueueSend(new GameMessageSystemChat($"The instance attached to this portal no longer exists.", ChatMessageType.System));
+                    TimeToRot = 0;
+                    return;
+                }
+            }
             portalDest = AdjustDungeon(portalDest);
 
             WorldManager.ThreadSafeTeleport(player, portalDest, false, new ActionEventDelegate(() =>

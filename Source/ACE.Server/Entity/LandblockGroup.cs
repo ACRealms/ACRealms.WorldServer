@@ -37,7 +37,7 @@ namespace ACE.Server.Entity
 
         public bool IsDungeon { get; private set; }
 
-        public static readonly TimeSpan TrySplitInterval = Landblock.UnloadInterval * 2;
+        public static readonly TimeSpan TrySplitInterval = TimeSpan.FromMinutes(10);
 
         public DateTime NextTrySplitTime { get; private set; } = DateTime.UtcNow.Add(TrySplitInterval);
 

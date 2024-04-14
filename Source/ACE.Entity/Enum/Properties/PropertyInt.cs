@@ -630,25 +630,21 @@ namespace ACE.Entity.Enum.Properties
         [ServerOnly]
         InventoryOrder                          = 9015,
 
-        //Realm properties below this line
+        // AC Realms property IDs are reserved start with 42000-42999
+        //
         [ServerOnly]
         [Clone]
         HomeRealm                               = 42000,
 
-        [ServerOnly]
         SummonTargetRealm                       = 42001,
-
-        [ServerOnly]
         SummonTargetRealm2                      = 42002,
-
-        [ServerOnly]
         SummonTargetRealm3                      = 42003,
-
-        [ServerOnly]
         RulesetStampVendorType                  = 42004,
 
         [ServerOnly]
-        LastRebuffTimestamp                     = 42005
+        LastRebuffTimestamp                     = 42005,
+
+        CrossRealmPortalRealmID                 = 42006
     }
 
     public static class PropertyIntExtensions

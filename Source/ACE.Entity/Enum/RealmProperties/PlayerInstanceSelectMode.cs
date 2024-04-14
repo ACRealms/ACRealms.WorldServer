@@ -8,11 +8,11 @@ namespace ACE.Entity.Enum.RealmProperties
 {
     public enum PlayerInstanceSelectMode : uint
     {
-        Undefined,
-        Same,
-        SameIfSameLandblock,
-        HomeRealm,
-        PersonalRealm,
-        RealmDefaultInstanceID
+        Undefined = 0,
+        Same = 1,
+        SameIfSameLandblock = 2,
+        HomeRealm = 3,
+        PersonalRealm = 4,
+        RealmDefaultInstanceID = 5,
     }
 }

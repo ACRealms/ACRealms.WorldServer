@@ -139,6 +139,9 @@ namespace ACE.Server.Managers
         /// <returns></returns>
         internal static WorldRealm GetBaseRealm(Player player)
         {
+            // Always use the home realm for now
+            return GetRealm(player.HomeRealm);
+            /*
             //Hideouts will use the player's home realm
             if (player.Location.RealmID == (ushort)ReservedRealm.hideout)
                 return GetRealm(player.HomeRealm);
@@ -147,16 +150,16 @@ namespace ACE.Server.Managers
             if (!player.Location.IsEphemeralRealm)
                 return GetRealm(player.RealmRuleset.Template.Realm.Id);
 
-            return GetRealm(player.EphemeralRealmExitTo?.RealmID ?? player.HomeRealm);
+            return GetRealm(player.EphemeralRealmExitTo?.RealmID ?? player.HomeRealm);*/
         }
 
-        internal static Landblock GetNewEphemeralLandblock(ACE.Entity.LandblockId landblockId, Player owner, List<ACE.Entity.Models.Realm> realmTemplates)
+        internal static Landblock GetNewEphemeralLandblock(ACE.Entity.LandblockId physicalLandblockId, Player owner, List<ACE.Entity.Models.Realm> realmTemplates)
         {
             EphemeralRealm ephemeralRealm;
             lock (realmsLock)
                 ephemeralRealm = EphemeralRealm.Initialize(owner, realmTemplates);
-            var iid = LandblockManager.RequestNewInstanceID(true, ephemeralRealm.RulesetTemplate.Realm.Id, landblockId);
-            var landblock = LandblockManager.GetLandblock(landblockId, iid, ephemeralRealm, false, false);
+            var iid = LandblockManager.RequestNewEphemeralInstanceIDv1(owner.HomeRealm);
+            var landblock = LandblockManager.GetLandblock(physicalLandblockId, iid, ephemeralRealm, false, false);
 
             log.Info($"GetNewEphemeralLandblock created for player {owner.Name}, realm ruleset {ephemeralRealm.RulesetTemplate.Realm.Id}, landcell {landblock.Id.Raw}, instance {iid}.");
             return landblock;
