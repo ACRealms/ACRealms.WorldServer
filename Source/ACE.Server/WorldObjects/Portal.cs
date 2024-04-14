@@ -279,6 +279,19 @@ namespace ACE.Server.WorldObjects
             {
                 if (EphemeralRealmPortalInstanceID.HasValue)
                 {
+                    Position.ParseInstanceID(EphemeralRealmPortalInstanceID.Value, out bool isEphemeralRealm, out ushort realmId, out _);
+                    if (!isEphemeralRealm)
+                    {
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Invalid Instance ID.", ChatMessageType.System));
+                        return;
+                    }
+                    if (realmId != player.HomeRealm)
+                    {
+                        // ephemeral realms may only be for the player's home realm until specifications exist for allowing cross-realm players to access to ephemeral realms
+                        player.Session.Network.EnqueueSend(new GameMessageSystemChat($"HomeRealm must be equal to summoner HomeRealm (this will be fixed eventually).", ChatMessageType.System));
+                        return;
+                    }
+
                     var landblock = LandblockManager.GetEphemeralLandblockUnsafe(EphemeralRealmPortalInstanceID.Value);
                     if (landblock == null)
                     {
