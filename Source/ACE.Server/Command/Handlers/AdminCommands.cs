@@ -1890,7 +1890,7 @@ namespace ACE.Server.Command.Handlers
             DoCopyChar(session, existingCharName, existingPlayer.Guid.Full, false, newCharName);
         }
 
-        private static void DoCopyChar(Session session, string existingCharName, uint existingCharId, bool isDeletedChar, string newCharacterName = null, uint newAccountId = 0)
+        private static void DoCopyChar(Session session, string existingCharName, ulong existingCharId, bool isDeletedChar, string newCharacterName = null, uint newAccountId = 0)
         {
             DatabaseManager.Shard.GetCharacter(existingCharId, existingCharacter =>
             {
@@ -1951,7 +1951,7 @@ namespace ACE.Server.Command.Handlers
                             foreach (var entry in existingCharacter.CharacterPropertiesTitleBook)
                                 newCharacter.CharacterPropertiesTitleBook.Add(new Database.Models.Shard.CharacterPropertiesTitleBook { CharacterId = newPlayerGuid.Full, TitleId = entry.TitleId });
 
-                            var idSwaps = new ConcurrentDictionary<uint, uint>();
+                            var idSwaps = new ConcurrentDictionary<ulong, ulong>();
 
                             var newPlayerBiota = Database.Adapter.BiotaConverter.ConvertToEntityBiota(existingPlayerBiota);
 

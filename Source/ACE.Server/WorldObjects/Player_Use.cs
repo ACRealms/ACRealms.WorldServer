@@ -26,7 +26,7 @@ namespace ACE.Server.WorldObjects
         /// when player double clicks an inventory item resulting in a target indicator
         /// and then clicks another item
         /// </summary>
-        public void HandleActionUseWithTarget(uint sourceObjectGuid, uint targetObjectGuid)
+        public void HandleActionUseWithTarget(ObjectGuid sourceObjectGuid, ObjectGuid targetObjectGuid)
         {
             if (PKLogout)
             {
@@ -47,7 +47,7 @@ namespace ACE.Server.WorldObjects
             }
 
             // Resolve the guid to an object that is either in our possession or on the Landblock
-            var target = FindObject(targetObjectGuid, SearchLocations.MyInventory | SearchLocations.MyEquippedItems | SearchLocations.Landblock);
+            var target = FindObject(targetObjectGuid.Full, SearchLocations.MyInventory | SearchLocations.MyEquippedItems | SearchLocations.Landblock);
 
             if (target == null)
             {
@@ -173,7 +173,7 @@ namespace ACE.Server.WorldObjects
         /// Handles the 'GameAction 0x36 - UseItem' network message
         /// when player double clicks an item
         /// </summary>
-        public void HandleActionUseItem(uint itemGuid)
+        public void HandleActionUseItem(ObjectGuid itemGuid)
         {
             if (PKLogout)
             {
@@ -183,7 +183,7 @@ namespace ACE.Server.WorldObjects
 
             StopExistingMoveToChains();
 
-            var item = FindObject(itemGuid, SearchLocations.MyInventory | SearchLocations.MyEquippedItems | SearchLocations.Landblock);
+            var item = FindObject(itemGuid.Full, SearchLocations.MyInventory | SearchLocations.MyEquippedItems | SearchLocations.Landblock);
 
             if (IsTrading && item.IsBeingTradedOrContainsItemBeingTraded(ItemsInTradeWindow))
             {
@@ -255,7 +255,7 @@ namespace ACE.Server.WorldObjects
         /// This is raised when we:
         /// - have a container open and open up a second container without closing the first container.
         /// </summary>
-        public void HandleActionNoLongerViewingContents(uint objectGuid)
+        public void HandleActionNoLongerViewingContents(ObjectGuid objectGuid)
         {
             var container = CurrentLandblock?.GetObject(objectGuid) as Container;
 

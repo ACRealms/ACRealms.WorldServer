@@ -25,7 +25,7 @@ namespace ACE.Database.SQLFormatters.Shard
         /// <summary>
         /// Default is formed from: id.ToString("X8") + " " + name
         /// </summary>
-        public static string GetDefaultFileName(uint id, string name)
+        public static string GetDefaultFileName(ulong id, string name)
         {
             var result = id.ToString("X8");
 
@@ -181,7 +181,7 @@ namespace ACE.Database.SQLFormatters.Shard
             }
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesInt> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesInt> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_int` (`object_Id`, `type`, `value`)");
 
@@ -199,7 +199,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesInt64> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesInt64> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_int64` (`object_Id`, `type`, `value`)");
 
@@ -208,7 +208,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesBool> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesBool> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_bool` (`object_Id`, `type`, `value`)");
 
@@ -217,7 +217,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesFloat> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesFloat> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_float` (`object_Id`, `type`, `value`)");
 
@@ -226,7 +226,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesString> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesString> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_string` (`object_Id`, `type`, `value`)");
 
@@ -235,7 +235,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesDID> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesDID> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_d_i_d` (`object_Id`, `type`, `value`)");
 
@@ -253,7 +253,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesPosition> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesPosition> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_position` (`object_Id`, `position_Type`, `obj_Cell_Id`, `origin_X`, `origin_Y`, `origin_Z`, `angles_W`, `angles_X`, `angles_Y`, `angles_Z`)");
 
@@ -262,7 +262,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesIID> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesIID> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_i_i_d` (`object_Id`, `type`, `value`)");
 
@@ -271,7 +271,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesAttribute> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesAttribute> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_attribute` (`object_Id`, `type`, `init_Level`, `level_From_C_P`, `c_P_Spent`)");
 
@@ -280,7 +280,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesAttribute2nd> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesAttribute2nd> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_attribute_2nd` (`object_Id`, `type`, `init_Level`, `level_From_C_P`, `c_P_Spent`, `current_Level`)");
 
@@ -289,7 +289,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesSkill> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesSkill> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_skill` (`object_Id`, `type`, `level_From_P_P`, `s_a_c`, `p_p`, `init_Level`, `resistance_At_Last_Check`, `last_Used_Time`)");
 
@@ -308,7 +308,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesBodyPart> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesBodyPart> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_body_part` (`object_Id`, `key`, " +
                              "`d_Type`, `d_Val`, `d_Var`, " +
@@ -348,7 +348,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesSpellBook> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesSpellBook> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_spell_book` (`object_Id`, `spell`, `probability`)");
 
@@ -365,7 +365,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesEventFilter> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesEventFilter> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_event_filter` (`object_Id`, `event`)");
 
@@ -382,7 +382,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesEmote> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesEmote> input, StreamWriter writer)
         {
             foreach (var value in input)
             {
@@ -565,7 +565,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesCreateList> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesCreateList> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_create_list` (`object_Id`, `destination_Type`, `biota_Class_Id`, `stack_Size`, `palette`, `shade`, `try_To_Bond`)");
 
@@ -590,14 +590,14 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, BiotaPropertiesBook input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, BiotaPropertiesBook input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_book` (`object_Id`, `max_Num_Pages`, `max_Num_Chars_Per_Page`)");
 
             writer.WriteLine($"VALUES ({id}, {input.MaxNumPages}, {input.MaxNumCharsPerPage});");
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesBookPageData> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesBookPageData> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_book_page_data` (`object_Id`, `page_Id`, `author_Id`, `author_Name`, `author_Account`, `ignore_Author`, `page_Text`)");
 
@@ -606,7 +606,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesGenerator> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesGenerator> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_generator` (`object_Id`, `probability`, `biota_Class_Id`, " +
                              "`delay`, `init_Create`, `max_Create`, `when_Create`, `where_Create`, `stack_Size`, `palette_Id`, `shade`, " +
@@ -650,7 +650,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesPalette> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesPalette> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_palette` (`object_Id`, `sub_Palette_Id`, `offset`, `length`, `order`)");
 
@@ -659,7 +659,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesTextureMap> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesTextureMap> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_texture_map` (`object_Id`, `index`, `old_Id`, `new_Id`, `order`)");
 
@@ -668,7 +668,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesAnimPart> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesAnimPart> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_anim_part` (`object_Id`, `index`, `animation_Id`, `order`)");
 
@@ -677,7 +677,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint id, IList<BiotaPropertiesEnchantmentRegistry> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong id, IList<BiotaPropertiesEnchantmentRegistry> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `biota_properties_enchantment_registry` (`object_Id`, `enchantment_Category`, `spell_Id`, `layer_Id`" +
                              ", `has_Spell_Set_Id`" +

@@ -53,7 +53,7 @@ namespace ACE.Database
         /// <summary>
         /// Will return uint.MaxValue if no records were found within the range provided.
         /// </summary>
-        public uint GetMaxGuidFoundInRange(uint min, uint max)
+        public ulong GetMaxGuidFoundInRange(ulong min, ulong max)
         {
             using (var context = new ShardDbContext())
             {
@@ -64,7 +64,7 @@ namespace ACE.Database
                     .FirstOrDefault();
 
                 if (result == null)
-                    return uint.MaxValue;
+                    return (ulong)(uint.MaxValue);
 
                 return result.Id;
             }
@@ -192,7 +192,7 @@ namespace ACE.Database
             biota.PopulatedCollectionFlags = (uint)populatedCollectionFlags;
         }
 
-        public virtual Biota GetBiota(ShardDbContext context, uint id, bool doNotAddToCache = false)
+        public virtual Biota GetBiota(ShardDbContext context, ulong id, bool doNotAddToCache = false)
         {
             var biota = context.Biota
                 .FirstOrDefault(r => r.Id == id);
@@ -231,7 +231,7 @@ namespace ACE.Database
             return biota;
         }
 
-        public virtual Biota GetBiota(uint id, bool doNotAddToCache = false)
+        public virtual Biota GetBiota(ulong id, bool doNotAddToCache = false)
         {
             using (var context = new ShardDbContext())
                 return GetBiota(context, id, doNotAddToCache);
@@ -351,7 +351,7 @@ namespace ACE.Database
             return result;
         }
 
-        public virtual bool RemoveBiota(uint id)
+        public virtual bool RemoveBiota(ulong id)
         {
             using (var context = new ShardDbContext())
             {
@@ -372,7 +372,7 @@ namespace ACE.Database
                     context.SaveChanges();
 
                     if (firstException != null)
-                        log.Debug($"[DATABASE] RemoveBiota 0x{id:X8} retry succeeded after initial exception of: {firstException.GetFullMessage()}");
+                        log.Debug($"[DATABASE] RemoveBiota 0x{id:X16} retry succeeded after initial exception of: {firstException.GetFullMessage()}");
 
                     return true;
                 }
@@ -385,14 +385,14 @@ namespace ACE.Database
                     }
 
                     // Character name might be in use or some other fault
-                    log.Error($"[DATABASE] RemoveBiota 0x{id:X8} failed first attempt with exception: {firstException.GetFullMessage()}");
-                    log.Error($"[DATABASE] RemoveBiota 0x{id:X8} failed second attempt with exception: {ex.GetFullMessage()}");
+                    log.Error($"[DATABASE] RemoveBiota 0x{id:X16} failed first attempt with exception: {firstException.GetFullMessage()}");
+                    log.Error($"[DATABASE] RemoveBiota 0x{id:X16} failed second attempt with exception: {ex.GetFullMessage()}");
                     return false;
                 }
             }
         }
 
-        public bool RemoveBiotasInParallel(IEnumerable<uint> ids)
+        public bool RemoveBiotasInParallel(IEnumerable<ulong> ids)
         {
             var result = true;
 
@@ -406,7 +406,7 @@ namespace ACE.Database
         }
 
 
-        public PossessedBiotas GetPossessedBiotasInParallel(uint id)
+        public PossessedBiotas GetPossessedBiotasInParallel(ulong id)
         {
             var inventory = GetInventoryInParallel(id, true);
 
@@ -415,7 +415,7 @@ namespace ACE.Database
             return new PossessedBiotas(inventory, wieldedItems);
         }
 
-        public List<Biota> GetInventoryInParallel(uint parentId, bool includedNestedItems)
+        public List<Biota> GetInventoryInParallel(ulong parentId, bool includedNestedItems)
         {
             var inventory = new ConcurrentBag<Biota>();
 
@@ -449,7 +449,7 @@ namespace ACE.Database
             return inventory.ToList();
         }
 
-        public List<Biota> GetWieldedItemsInParallel(uint parentId)
+        public List<Biota> GetWieldedItemsInParallel(ulong parentId)
         {
             var wieldedItems = new ConcurrentBag<Biota>();
 
@@ -473,13 +473,13 @@ namespace ACE.Database
             return wieldedItems.ToList();
         }
 
-        public List<Biota> GetStaticObjectsByLandblock(ushort landblockId)
+        public List<Biota> GetStaticObjectsByLandblock(ushort landblockId, uint instance)
         {
             var staticObjects = new List<Biota>();
 
             var staticLandblockId = (uint)(0x70000 | landblockId);
 
-            var min = staticLandblockId << 12;
+            var min = ((ulong)instance << 32) | (staticLandblockId << 12);
             var max = min | 0xFFF;
 
             using (var context = new ShardDbContext())
@@ -571,12 +571,12 @@ namespace ACE.Database
             return GetCharacterList(accountId, includeDeleted);
         }
 
-        public Character GetCharacter(uint characterId)
+        public Character GetCharacter(ulong characterId)
         {
             return GetCharacterList(0, true, characterId).FirstOrDefault();
         }
 
-        private static List<Character> GetCharacterList(uint accountID, bool includeDeleted, uint characterID = 0)
+        private static List<Character> GetCharacterList(uint accountID, bool includeDeleted, ulong characterID = 0)
         {
             var context = new ShardDbContext();
 
@@ -625,7 +625,7 @@ namespace ACE.Database
             return result;
         }
 
-        public Character GetCharacterStubByGuid(uint guid)
+        public Character GetCharacterStubByGuid(ulong guid)
         {
             var context = new ShardDbContext();
 
@@ -763,7 +763,7 @@ namespace ACE.Database
             return biotas.ToList();
         }
 
-        public uint? GetAllegianceID(uint monarchID)
+        public ulong? GetAllegianceID(ulong monarchID)
         {
             using (var context = new ShardDbContext())
             {

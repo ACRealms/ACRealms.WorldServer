@@ -5,13 +5,13 @@ namespace ACE.Server.WorldObjects
 {
     partial class Container
     {
-        public uint Viewer
+        public ulong Viewer
         {
             get => GetProperty(PropertyInstanceId.Viewer) ?? 0;
             set { if (value == 0) RemoveProperty(PropertyInstanceId.Viewer); else SetProperty(PropertyInstanceId.Viewer, value); }
         }
 
-        public uint? LastUnlocker
+        public ulong? LastUnlocker
         {
             get => GetProperty(PropertyInstanceId.LastUnlocker);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.LastUnlocker); else SetProperty(PropertyInstanceId.LastUnlocker, value.Value); }

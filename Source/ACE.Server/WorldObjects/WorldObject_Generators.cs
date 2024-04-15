@@ -694,7 +694,7 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        public uint? GetStaticGuid(uint dynamicGuid)
+        public ulong? GetStaticGuid(ulong dynamicGuid)
         {
             foreach (var profile in GeneratorProfiles)
             {

@@ -29,14 +29,14 @@ namespace ACE.Server.Managers
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly ReaderWriterLockSlim playersLock = new ReaderWriterLockSlim();
-        private static readonly Dictionary<uint, Player> onlinePlayers = new Dictionary<uint, Player>();
-        private static readonly Dictionary<uint, OfflinePlayer> offlinePlayers = new Dictionary<uint, OfflinePlayer>();
+        private static readonly Dictionary<ulong, Player> onlinePlayers = new Dictionary<ulong, Player>();
+        private static readonly Dictionary<ulong, OfflinePlayer> offlinePlayers = new Dictionary<ulong, OfflinePlayer>();
 
         // indexed by player name
         private static readonly Dictionary<string, IPlayer> playerNames = new Dictionary<string, IPlayer>(StringComparer.OrdinalIgnoreCase);
 
         // indexed by account id
-        private static readonly Dictionary<uint, Dictionary<uint, IPlayer>> playerAccounts = new Dictionary<uint, Dictionary<uint, IPlayer>>();
+        private static readonly Dictionary<uint, Dictionary<ulong, IPlayer>> playerAccounts = new Dictionary<uint, Dictionary<ulong, IPlayer>>();
 
         /// <summary>
         /// OfflinePlayers will be saved to the database every 1 hour
@@ -68,7 +68,7 @@ namespace ACE.Server.Managers
                     {
                         if (!playerAccounts.TryGetValue(offlinePlayer.Account.AccountId, out var playerAccountsDict))
                         {
-                            playerAccountsDict = new Dictionary<uint, IPlayer>();
+                            playerAccountsDict = new Dictionary<ulong, IPlayer>();
                             playerAccounts[offlinePlayer.Account.AccountId] = playerAccountsDict;
                         }
                         playerAccountsDict[offlinePlayer.Guid.Full] = offlinePlayer;
@@ -158,7 +158,7 @@ namespace ACE.Server.Managers
 
                 if (!playerAccounts.TryGetValue(offlinePlayer.Account.AccountId, out var playerAccountsDict))
                 {
-                    playerAccountsDict = new Dictionary<uint, IPlayer>();
+                    playerAccountsDict = new Dictionary<ulong, IPlayer>();
                     playerAccounts[offlinePlayer.Account.AccountId] = playerAccountsDict;
                 }
                 playerAccountsDict[offlinePlayer.Guid.Full] = offlinePlayer;
@@ -180,7 +180,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the player wasn't found.
         /// </summary>
-        public static OfflinePlayer GetOfflinePlayer(uint guid)
+        public static OfflinePlayer GetOfflinePlayer(ulong guid)
         {
             playersLock.EnterReadLock();
             try
@@ -232,7 +232,7 @@ namespace ACE.Server.Managers
             return allPlayers;
         }
 
-        public static Dictionary<uint, IPlayer> GetAccountPlayers(uint accountId)
+        public static Dictionary<ulong, IPlayer> GetAccountPlayers(uint accountId)
         {
             playersLock.EnterReadLock();
             try
@@ -301,7 +301,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the player wasn't found.
         /// </summary>
-        public static Player GetOnlinePlayer(uint guid)
+        public static Player GetOnlinePlayer(ulong guid)
         {
             playersLock.EnterReadLock();
             try
@@ -435,7 +435,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Called when a character is initially deleted on the character select screen
         /// </summary>
-        public static void HandlePlayerDelete(uint characterGuid)
+        public static void HandlePlayerDelete(ulong characterGuid)
         {
             AllegianceManager.HandlePlayerDelete(characterGuid);
 
@@ -446,7 +446,7 @@ namespace ACE.Server.Managers
         /// This will return true if the player was successfully found and removed from the OfflinePlayers dictionary.
         /// It will return false if the player was not found in the OfflinePlayers dictionary (which should never happen).
         /// </summary>
-        public static bool ProcessDeletedPlayer(uint guid)
+        public static bool ProcessDeletedPlayer(ulong guid)
         {
             playersLock.EnterWriteLock();
             try
@@ -514,7 +514,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the guid was not found.
         /// </summary>
-        public static IPlayer FindByGuid(uint guid)
+        public static IPlayer FindByGuid(ulong guid)
         {
             return FindByGuid(guid, out _);
         }
@@ -522,7 +522,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the guid was not found.
         /// </summary>
-        public static IPlayer FindByGuid(uint guid, out bool isOnline)
+        public static IPlayer FindByGuid(ulong guid, out bool isOnline)
         {
             playersLock.EnterReadLock();
             try

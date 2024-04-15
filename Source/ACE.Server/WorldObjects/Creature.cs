@@ -46,7 +46,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// A table of players who currently have their targeting reticule on this creature
         /// </summary>
-        private Dictionary<uint, WorldObjectInfo> selectedTargets;
+        private Dictionary<ulong, WorldObjectInfo> selectedTargets;
 
         /// <summary>
         /// Currently used to handle some edge cases for faction mobs
@@ -224,7 +224,7 @@ namespace ACE.Server.WorldObjects
 
             CurrentMotionState = new Motion(MotionStance.NonCombat, MotionCommand.Ready);
 
-            selectedTargets = new Dictionary<uint, WorldObjectInfo>();
+            selectedTargets = new Dictionary<ulong, WorldObjectInfo>();
         }
 
         // verify logic

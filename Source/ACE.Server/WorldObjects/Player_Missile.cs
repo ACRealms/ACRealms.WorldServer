@@ -37,13 +37,13 @@ namespace ACE.Server.WorldObjects
         /// <param name="targetGuid">The target guid</param>
         /// <param name="attackHeight">The attack height 1-3</param>
         /// <param name="accuracyLevel">The 0-1 accuracy bar level</param>
-        public void HandleActionTargetedMissileAttack(uint targetGuid, uint attackHeight, float accuracyLevel)
+        public void HandleActionTargetedMissileAttack(ACE.Entity.ObjectGuid targetGuid, uint attackHeight, float accuracyLevel)
         {
             //log.Info($"-");
 
             if (CombatMode != CombatMode.Missile)
             {
-                log.Error($"{Name}.HandleActionTargetedMissileAttack({targetGuid:X8}, {attackHeight}, {accuracyLevel}) - CombatMode mismatch {CombatMode}, LastCombatMode: {LastCombatMode}");
+                log.Error($"{Name}.HandleActionTargetedMissileAttack({targetGuid}, {attackHeight}, {accuracyLevel}) - CombatMode mismatch {CombatMode}, LastCombatMode: {LastCombatMode}");
 
                 if (LastCombatMode == CombatMode.Missile)
                     CombatMode = CombatMode.Missile;

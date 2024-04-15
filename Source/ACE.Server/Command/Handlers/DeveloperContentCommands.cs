@@ -1371,7 +1371,7 @@ namespace ACE.Server.Command.Handlers.Processors
                         return;
                     }
 
-                    parentGuid = parent.Guid.Full;
+                    parentGuid = parent.Guid.ClientGUID;
                 }
             }
 
@@ -1494,7 +1494,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 var link = new LandblockInstanceLink();
 
                 link.ParentGuid = parentGuid.Value;
-                link.ChildGuid = wo.Guid.Full;
+                link.ChildGuid = wo.Guid.ClientGUID;
                 link.LastModified = DateTime.Now;
 
                 parentInstance.LandblockInstanceLink.Add(link);
@@ -1565,7 +1565,7 @@ namespace ACE.Server.Command.Handlers.Processors
         {
             var instance = new LandblockInstance();
 
-            instance.Guid = wo.Guid.Full;
+            instance.Guid = wo.Guid.ClientGUID;
 
             instance.Landblock = (int)wo.Location.LandblockShort;
 

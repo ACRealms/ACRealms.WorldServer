@@ -406,12 +406,12 @@ namespace ACE.Server.Managers
 
         // This function is called from a database callback.
         // We must add thread safety to prevent AllegianceManager corruption
-        public static void HandlePlayerDelete(uint playerGuid)
+        public static void HandlePlayerDelete(ulong playerGuid)
         {
             WorldManager.EnqueueAction(new ActionEventDelegate(() => DoHandlePlayerDelete(playerGuid)));
         }
 
-        private static void DoHandlePlayerDelete(uint playerGuid)
+        private static void DoHandlePlayerDelete(ulong playerGuid)
         {
             var player = PlayerManager.FindByGuid(playerGuid);
             if (player == null)

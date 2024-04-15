@@ -93,7 +93,7 @@ namespace ACE.Database
         /// <summary>
         /// Will return uint.MaxValue if no records were found within the range provided.
         /// </summary>
-        public void GetMaxGuidFoundInRange(uint min, uint max, Action<uint> callback)
+        public void GetMaxGuidFoundInRange(uint min, uint max, Action<ulong> callback)
         {
             _queue.Add(new Task(() =>
             {
@@ -135,7 +135,7 @@ namespace ACE.Database
             }));
         }
 
-        public void RemoveBiota(uint id, Action<bool> callback)
+        public void RemoveBiota(ulong id, Action<bool> callback)
         {
             _queue.Add(new Task(() =>
             {
@@ -144,7 +144,7 @@ namespace ACE.Database
             }));
         }
 
-        public void RemoveBiota(uint id, Action<bool> callback, Action<TimeSpan, TimeSpan> performanceResults)
+        public void RemoveBiota(ulong id, Action<bool> callback, Action<TimeSpan, TimeSpan> performanceResults)
         {
             var initialCallTime = DateTime.UtcNow;
 
@@ -158,7 +158,7 @@ namespace ACE.Database
             }));
         }
 
-        public void RemoveBiotasInParallel(IEnumerable<uint> ids, Action<bool> callback, Action<TimeSpan, TimeSpan> performanceResults)
+        public void RemoveBiotasInParallel(IEnumerable<ulong> ids, Action<bool> callback, Action<TimeSpan, TimeSpan> performanceResults)
         {
             var initialCallTime = DateTime.UtcNow;
 
@@ -173,7 +173,7 @@ namespace ACE.Database
         }
 
 
-        public void GetPossessedBiotasInParallel(uint id, Action<PossessedBiotas> callback)
+        public void GetPossessedBiotasInParallel(ulong id, Action<PossessedBiotas> callback)
         {
             _queue.Add(new Task(() =>
             {
@@ -182,7 +182,7 @@ namespace ACE.Database
             }));
         }
 
-        public void GetInventoryInParallel(uint parentId, bool includedNestedItems, Action<List<Biota>> callback)
+        public void GetInventoryInParallel(ulong parentId, bool includedNestedItems, Action<List<Biota>> callback)
         {
             _queue.Add(new Task(() =>
             {
@@ -211,7 +211,7 @@ namespace ACE.Database
             }));
         }
 
-        public void GetCharacter(uint characterId, Action<Character> callback)
+        public void GetCharacter(ulong characterId, Action<Character> callback)
         {
             _queue.Add(new Task(() =>
             {

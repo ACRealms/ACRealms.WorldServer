@@ -33,28 +33,44 @@ namespace ACE.Entity
         public static uint DynamicMin { get; } = 0x80000000;
         public static uint DynamicMax { get; } = 0xFFFFFFFE; // Ends at E because uint.Max is reserved for "invalid"
 
-        public static bool IsPlayer(uint guid) { return (guid >= PlayerMin && guid <= PlayerMax); }
-        public static bool IsStatic(uint guid) { return (guid >= StaticObjectMin && guid <= StaticObjectMax); }
-        public static bool IsDynamic(uint guid) { return (guid >= DynamicMin && guid <= DynamicMax); }
+        public static bool IsPlayer(ulong guid) { return (TranslateToClientGuid(guid) >= PlayerMin && TranslateToClientGuid(guid) <= PlayerMax); }
+        public static bool IsStatic(ulong guid) { return (TranslateToClientGuid(guid) >= StaticObjectMin && TranslateToClientGuid(guid) <= StaticObjectMax); }
+        public static bool IsDynamic(ulong guid) { return (TranslateToClientGuid(guid) >= DynamicMin && TranslateToClientGuid(guid) <= DynamicMax); }
 
-        public uint Full { get; }
-        public uint Low => Full & 0xFFFFFF;
-        public uint High => (Full >> 24);
+        public ulong Full { get; }
+        public uint ClientGUID => TranslateToClientGuid(Full);
+        public uint Low => (uint)(Full & 0xFFFFFF);
+        public uint High => (uint)(Full >> 56);
+        public uint Instance => (uint)(Full >> 32);
         public GuidType Type { get; }
 
-        public ObjectGuid(uint full)
+        public static uint TranslateToClientGuid(ulong fullGuid) => (uint)(fullGuid & 0xFFFFFFFF);
+        public static ulong TranslateToServerGuid(uint clientGuid, uint instance)
+        {
+            if (!IsStatic(clientGuid))
+                return clientGuid;
+            return ((ulong)instance << 32) | clientGuid;
+        }
+
+        public ObjectGuid(ulong full)
         {
             Full = full;
-
-            if (IsPlayer(full))
+            var clientGUID = TranslateToClientGuid(full);
+            if (IsPlayer(clientGUID))
                 Type = GuidType.Player;
-            else if (IsStatic(full))
+            else if (IsStatic(clientGUID))
                 Type = GuidType.Static;
-            else if (IsDynamic(full))
+            else if (IsDynamic(clientGUID))
                 Type = GuidType.Dynamic;
             else
                 Type = GuidType.Undef;
+
+            if (Type != GuidType.Static)
+                Full = clientGUID;
         }
+
+        public ObjectGuid(uint clientGUID, uint instance)
+            : this(TranslateToServerGuid(clientGUID, instance)) { }
 
         public bool IsPlayer()
         {
@@ -93,7 +109,10 @@ namespace ACE.Entity
 
         public override string ToString()
         {
-            return Full.ToString("X8");
+            if (Instance == 0)
+                return Full.ToString("X8");
+            else
+                return Full.ToString("X16");
         }
     }
 }

@@ -658,7 +658,7 @@ namespace ACE.Server.WorldObjects
             return cost;
         }
 
-        public int CalculatePayoutCoinAmount(Dictionary<uint, WorldObject> items)
+        public int CalculatePayoutCoinAmount(Dictionary<ulong, WorldObject> items)
         {
             var payout = 0;
 
@@ -673,7 +673,7 @@ namespace ACE.Server.WorldObjects
         /// In both cases, the item will be removed from the database.<para />
         /// The item should already have been removed from the players inventory
         /// </summary>
-        public void ProcessItemsForPurchase(Player player, Dictionary<uint, WorldObject> items)
+        public void ProcessItemsForPurchase(Player player, Dictionary<ulong, WorldObject> items)
         {
             foreach (var item in items.Values)
             {

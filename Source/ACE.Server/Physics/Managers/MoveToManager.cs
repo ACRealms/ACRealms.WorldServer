@@ -21,8 +21,8 @@ namespace ACE.Server.Physics.Animation
         public float OriginalDistance;
         public double OriginalDistanceTime;
         public int FailProgressCount;
-        public uint SoughtObjectID;
-        public uint TopLevelObjectID;
+        public ulong SoughtObjectID;
+        public ulong TopLevelObjectID;
         public float SoughtObjectRadius;
         public float SoughtObjectHeight;
         public uint CurrentCommand;
@@ -111,7 +111,7 @@ namespace ACE.Server.Physics.Animation
             return WeenieError.None;
         }
 
-        public void MoveToObject(uint objectID, uint topLevelID, float radius, float height, MovementParameters movementParams)
+        public void MoveToObject(ulong objectID, ulong topLevelID, float radius, float height, MovementParameters movementParams)
         {
             //Console.WriteLine("MoveToObject");
 
@@ -227,7 +227,7 @@ namespace ACE.Server.Physics.Animation
             BeginNextNode();
         }
 
-        public void TurnToObject(uint objectID, uint topLevelID, MovementParameters movementParams)
+        public void TurnToObject(ulong objectID, ulong topLevelID, MovementParameters movementParams)
         {
             //Console.WriteLine("TurnToObject");
 

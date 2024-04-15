@@ -83,7 +83,7 @@ namespace ACE.Server.Network.Structure
         public static void Write(this BinaryWriter writer, HouseProfile profile)
         {
             writer.Write(profile.DwellingID);
-            writer.Write(profile.OwnerID.Full);
+            writer.Write(profile.OwnerID.ClientGUID);
             writer.Write((uint)profile.Bitmask);
             writer.Write(profile.MinLevel);
             writer.Write(profile.MaxLevel);

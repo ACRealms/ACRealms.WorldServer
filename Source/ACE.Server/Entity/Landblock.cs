@@ -240,7 +240,7 @@ namespace ACE.Server.Entity
         private void CreateWorldObjects()
         {
             var objects = DatabaseManager.World.GetCachedInstancesByLandblock(Id.Landblock, RealmRuleset.Realm.Id);
-            var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(Id.Landblock);
+            var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(Id.Landblock, Instance);
             var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects, null, Instance, RealmRuleset);
 
             actionQueue.EnqueueAction(new ActionEventDelegate(() =>
@@ -1057,7 +1057,7 @@ namespace ACE.Server.Entity
             return worldObjects.Values.ToList();
         }
 
-        public WorldObject GetObject(uint objectId)
+        public WorldObject GetObject(ulong objectId)
         {
             return GetObject(new ObjectGuid(objectId));
         }
@@ -1090,7 +1090,7 @@ namespace ACE.Server.Entity
             return null;
         }
 
-        public WorldObject GetWieldedObject(uint objectGuid, bool searchAdjacents = true)
+        public WorldObject GetWieldedObject(ulong objectGuid, bool searchAdjacents = true)
         {
             return GetWieldedObject(new ObjectGuid(objectGuid), searchAdjacents); // todo fix
         }

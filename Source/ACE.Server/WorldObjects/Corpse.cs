@@ -144,7 +144,7 @@ namespace ACE.Server.WorldObjects
         /// with this combination of factors, a table is required here to keep track of which permittees opened a permitter's locked corpse,
         /// so they can repeatedly open/close it
         /// </summary>
-        private HashSet<uint> permitteeOpened = null;
+        private HashSet<ulong> permitteeOpened = null;
 
         /// <summary>
         /// Returns TRUE if input player has permission to loot this corpse
@@ -168,7 +168,7 @@ namespace ACE.Server.WorldObjects
                 {
                     // this is the retail default. see the comments for 'permitteeOpened' for an explanation of why this table is needed
                     if (permitteeOpened == null)
-                        permitteeOpened = new HashSet<uint>();
+                        permitteeOpened = new HashSet<ulong>();
 
                     // these are technically side effects, and HasPermission() is not the best place for this logic to mutate state,
                     // however with the current lone calling pattern for corpse ActOnUse -> TryOpen -> HasPermission -> Open

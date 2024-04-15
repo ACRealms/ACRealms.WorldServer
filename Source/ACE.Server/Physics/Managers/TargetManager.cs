@@ -10,7 +10,7 @@ namespace ACE.Server.Physics.Combat
     {
         public PhysicsObj PhysicsObj;
         public TargetInfo TargetInfo;
-        public Dictionary<uint, TargettedVoyeurInfo> VoyeurTable;
+        public Dictionary<ulong, TargettedVoyeurInfo> VoyeurTable;
         public double LastUpdateTime;
 
         public TargetManager() { }
@@ -20,7 +20,7 @@ namespace ACE.Server.Physics.Combat
             PhysicsObj = physObj;
         }
 
-        public void SetTarget(uint contextID, uint objectID, float radius, double quantum)
+        public void SetTarget(uint contextID, ulong objectID, float radius, double quantum)
         {
             if (PhysicsObj == null) return;
 
@@ -135,7 +135,7 @@ namespace ACE.Server.Physics.Combat
                 ClearTarget();
         }
 
-        public void AddVoyeur(uint objectID, float radius, double quantum)
+        public void AddVoyeur(ulong objectID, float radius, double quantum)
         {
             if (VoyeurTable != null)
             {
@@ -148,7 +148,7 @@ namespace ACE.Server.Physics.Combat
                 }
             }
             else
-                VoyeurTable = new Dictionary<uint, TargettedVoyeurInfo>();
+                VoyeurTable = new Dictionary<ulong, TargettedVoyeurInfo>();
 
             var info = new TargettedVoyeurInfo(objectID, radius, quantum);
             VoyeurTable.Add(objectID, info);
@@ -171,7 +171,7 @@ namespace ACE.Server.Physics.Combat
                 voyeurObj.receive_target_update(info);
         }
 
-        public bool RemoveVoyeur(uint objectID)
+        public bool RemoveVoyeur(ulong objectID)
         {
             if (VoyeurTable == null) return false;
 

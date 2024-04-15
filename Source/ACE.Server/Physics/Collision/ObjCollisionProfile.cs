@@ -20,7 +20,7 @@ namespace ACE.Server.Physics.Collision
 
     public class ObjCollisionProfile
     {
-        public uint ID;
+        public ulong ID;
         public Vector3 Velocity;
         public uint WCID;
         public ItemType ItemType;
@@ -28,7 +28,7 @@ namespace ACE.Server.Physics.Collision
 
         public ObjCollisionProfile() { }
 
-        public ObjCollisionProfile(uint id, Vector3 velocity, bool missile, bool contact, bool myContact)
+        public ObjCollisionProfile(ulong id, Vector3 velocity, bool missile, bool contact, bool myContact)
         {
             ID = id;
             Velocity = velocity;

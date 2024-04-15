@@ -4,7 +4,7 @@ namespace ACE.Entity.Models
 {
     public class PropertiesBookPageData
     {
-        public uint AuthorId { get; set; }
+        public ulong AuthorId { get; set; }
         public string AuthorName { get; set; }
         public string AuthorAccount { get; set; }
         public bool IgnoreAuthor { get; set; }

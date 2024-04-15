@@ -75,7 +75,7 @@ namespace ACE.Database.SQLFormatters.Shard
             }
         }
 
-        public void CreateSQLINSERTStatement(uint characterId, IList<CharacterPropertiesContractRegistry> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong characterId, IList<CharacterPropertiesContractRegistry> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `character_properties_contract_registry` (`character_Id`, `contract_Id`, `delete_Contract`, `set_As_Display_Contract`)");
 
@@ -84,7 +84,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint characterId, IList<CharacterPropertiesFillCompBook> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong characterId, IList<CharacterPropertiesFillCompBook> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `character_properties_fill_comp_book` (`character_Id`, `spell_Component_Id`, `quantity_To_Rebuy`)");
 
@@ -93,7 +93,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint characterId, IList<CharacterPropertiesFriendList> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong characterId, IList<CharacterPropertiesFriendList> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `character_properties_friend_list` ( `character_Id`, `friend_Id`)");
 
@@ -102,7 +102,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint characterId, IList<CharacterPropertiesQuestRegistry> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong characterId, IList<CharacterPropertiesQuestRegistry> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `character_properties_quest_registry` (`character_Id`, `quest_Name`, `last_Time_Completed`, `num_Times_Completed`)");
 
@@ -111,7 +111,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint characterId, IList<CharacterPropertiesShortcutBar> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong characterId, IList<CharacterPropertiesShortcutBar> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `character_properties_shortcut_bar` (`character_Id`, `shortcut_Bar_Index`, `shortcut_Object_Id`)");
 
@@ -120,7 +120,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint characterId, IList<CharacterPropertiesSpellBar> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong characterId, IList<CharacterPropertiesSpellBar> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `character_properties_spell_bar` (`character_Id`, `spell_Bar_Number`, `spell_Bar_Index`, `spell_Id`)");
 
@@ -129,7 +129,7 @@ namespace ACE.Database.SQLFormatters.Shard
             ValuesWriter(input.Count, lineGenerator, writer);
         }
 
-        public void CreateSQLINSERTStatement(uint characterId, IList<CharacterPropertiesTitleBook> input, StreamWriter writer)
+        public void CreateSQLINSERTStatement(ulong characterId, IList<CharacterPropertiesTitleBook> input, StreamWriter writer)
         {
             writer.WriteLine("INSERT INTO `character_properties_title_book` (`character_Id`, `title_Id`)");
 

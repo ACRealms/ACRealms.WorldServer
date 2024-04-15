@@ -6,7 +6,7 @@ namespace ACE.Server.Entity
     public class PlayerHouse: IComparable<PlayerHouse>
     {
         public uint AccountId;
-        public uint PlayerGuid;
+        public ulong PlayerGuid;
         public string PlayerName;
         public House House;
         public DateTime RentDue;

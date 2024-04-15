@@ -251,7 +251,7 @@ namespace ACE.Server.WorldObjects
         /// This method will check all containers in our possession
         /// in main inventory or any side packs
         /// </summary>
-        public WorldObject GetInventoryItem(uint objectGuid)
+        public WorldObject GetInventoryItem(ulong objectGuid)
         {
             return GetInventoryItem(new ObjectGuid(objectGuid), out _); // todo remove this so it doesnt' create a new ObjectGuid
         }

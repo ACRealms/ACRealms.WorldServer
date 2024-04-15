@@ -43,13 +43,13 @@ namespace ACE.Server.Physics.Common
         ///
         /// - This is only maintained for players.
         /// </remarks>
-        private Dictionary<uint, PhysicsObj> KnownObjects { get; } = new Dictionary<uint, PhysicsObj>();
+        private Dictionary<ulong, PhysicsObj> KnownObjects { get; } = new Dictionary<ulong, PhysicsObj>();
 
         /// <summary>
         /// This list of objects that are currently within PVS / VisibleCell range
         /// only maintained for players
         /// </summary>
-        private Dictionary<uint, PhysicsObj> VisibleObjects { get; } = new Dictionary<uint, PhysicsObj>();
+        private Dictionary<ulong, PhysicsObj> VisibleObjects { get; } = new Dictionary<ulong, PhysicsObj>();
 
         /// <summary>
         /// Objects that were previously visible to the client,
@@ -62,14 +62,14 @@ namespace ACE.Server.Physics.Common
         /// A list of players that currently know about this object
         /// This is maintained for all server-spawned WorldObjects, and is used for broadcasting
         /// </summary>
-        private Dictionary<uint, PhysicsObj> KnownPlayers { get; } = new Dictionary<uint, PhysicsObj>();
+        private Dictionary<ulong, PhysicsObj> KnownPlayers { get; } = new Dictionary<ulong, PhysicsObj>();
 
         /// <summary>
         /// For monster and CombatPet FindNextTarget
         /// - for monsters, contains players and combat pets
         /// - for combat pets, contains monsters
         /// </summary>
-        private Dictionary<uint, PhysicsObj> VisibleTargets { get; } = new Dictionary<uint, PhysicsObj>();
+        private Dictionary<ulong, PhysicsObj> VisibleTargets { get; } = new Dictionary<ulong, PhysicsObj>();
 
         /// <summary>
         /// Handles monsters targeting things they would not normally target
@@ -77,7 +77,7 @@ namespace ACE.Server.Physics.Common
         /// - For regular monsters, retaliate against faction mobs
         /// - For regular monsters that do *not* have a FoeType, retaliate against monsters that are foes with this creature
         /// </summary>
-        private Dictionary<uint, PhysicsObj> RetaliateTargets { get; } = new Dictionary<uint, PhysicsObj>();
+        private Dictionary<ulong, PhysicsObj> RetaliateTargets { get; } = new Dictionary<ulong, PhysicsObj>();
 
         // Client structures -
         // When client unloads a cell/landblock, but still knows about objects in those cells?
@@ -94,7 +94,7 @@ namespace ACE.Server.Physics.Common
         }
 
 
-        public PhysicsObj GetKnownObject(uint objectGuid)
+        public PhysicsObj GetKnownObject(ulong objectGuid)
         {
             rwLock.EnterReadLock();
             try
@@ -121,7 +121,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public bool KnownObjectsContainsKey(uint guid)
+        public bool KnownObjectsContainsKey(ulong guid)
         {
             rwLock.EnterReadLock();
             try
@@ -147,7 +147,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public List<KeyValuePair<uint, PhysicsObj>> GetKnownObjectsWhere(Func<KeyValuePair<uint, PhysicsObj>, bool> predicate)
+        public List<KeyValuePair<ulong, PhysicsObj>> GetKnownObjectsWhere(Func<KeyValuePair<ulong, PhysicsObj>, bool> predicate)
         {
             rwLock.EnterReadLock();
             try
@@ -266,7 +266,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public bool VisibleObjectsContainsKey(uint key)
+        public bool VisibleObjectsContainsKey(ulong key)
         {
             rwLock.EnterReadLock();
             try
@@ -279,7 +279,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public List<KeyValuePair<uint, PhysicsObj>> GetVisibleObjectsWhere(Func<KeyValuePair<uint, PhysicsObj>, bool> predicate)
+        public List<KeyValuePair<ulong, PhysicsObj>> GetVisibleObjectsWhere(Func<KeyValuePair<ulong, PhysicsObj>, bool> predicate)
         {
             rwLock.EnterReadLock();
             try
@@ -688,7 +688,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public List<KeyValuePair<uint, PhysicsObj>> GetKnownPlayersWhere(Func<KeyValuePair<uint, PhysicsObj>, bool> predicate)
+        public List<KeyValuePair<ulong, PhysicsObj>> GetKnownPlayersWhere(Func<KeyValuePair<ulong, PhysicsObj>, bool> predicate)
         {
             rwLock.EnterReadLock();
             try
@@ -841,7 +841,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public bool VisibleTargetsContainsKey(uint key)
+        public bool VisibleTargetsContainsKey(ulong key)
         {
             rwLock.EnterReadLock();
             try
@@ -854,7 +854,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public bool RetaliateTargetsContainsKey(uint key)
+        public bool RetaliateTargetsContainsKey(ulong key)
         {
             rwLock.EnterReadLock();
             try

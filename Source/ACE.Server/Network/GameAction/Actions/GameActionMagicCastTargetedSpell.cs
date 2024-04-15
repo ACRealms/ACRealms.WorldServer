@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.CastTargetedSpell)]
         public static void Handle(ClientMessage message, Session session)
         {
-            var targetGuid = message.Payload.ReadUInt32();
+            var targetGuid = message.Payload.ReadGuid(session);
             var spellId = message.Payload.ReadUInt32();
 
             session.Player.HandleActionCastTargetedSpell(targetGuid, spellId);

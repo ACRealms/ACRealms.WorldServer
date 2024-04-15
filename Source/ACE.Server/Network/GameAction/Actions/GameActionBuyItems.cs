@@ -9,7 +9,7 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.Buy)]
         public static void Handle(ClientMessage message, Session session)
         {
-            var vendorGuid = message.Payload.ReadUInt32();
+            var vendorGuid = message.Payload.ReadGuid(session);
             var numItems = message.Payload.ReadUInt32();
 
             var items = new List<ItemProfile>();

@@ -97,11 +97,11 @@ namespace ACE.Server.WorldObjects
             else
                 inscription = "";
 
-            var bookDataResponse = new GameEventBookDataResponse(player.Session, Guid.Full, maxChars, maxPages, pages, inscription, authorID, authorName, ignoreAuthor);
+            var bookDataResponse = new GameEventBookDataResponse(player.Session, Guid.ClientGUID, maxChars, maxPages, pages, inscription, authorID, authorName, ignoreAuthor);
             player.Session.Network.EnqueueSend(bookDataResponse);
         }
 
-        public PropertiesBookPageData AddPage(uint authorId, string authorName, string authorAccount, bool ignoreAuthor, string pageText, out int index)
+        public PropertiesBookPageData AddPage(ulong authorId, string authorName, string authorAccount, bool ignoreAuthor, string pageText, out int index)
         {
             if (Biota.PropertiesBookPageData.GetPageCount(BiotaDatabaseLock) >= Biota.PropertiesBook.MaxNumPages)
             {

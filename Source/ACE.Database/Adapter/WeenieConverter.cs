@@ -40,7 +40,7 @@ namespace ACE.Database.Adapter
             }
             if (weenie.WeeniePropertiesIID != null && (instantiateEmptyCollections || weenie.WeeniePropertiesIID.Count > 0))
             {
-                result.PropertiesIID = new Dictionary<PropertyInstanceId, uint>(weenie.WeeniePropertiesIID.Count);
+                result.PropertiesIID = new Dictionary<PropertyInstanceId, ulong>(weenie.WeeniePropertiesIID.Count);
                 foreach (var value in weenie.WeeniePropertiesIID)
                     result.PropertiesIID[(PropertyInstanceId)value.Type] = value.Value;
             }

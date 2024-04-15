@@ -1171,12 +1171,12 @@ namespace ACE.Server.WorldObjects
         /// Updates a property on the server, and broadcasts to appropriate players
         /// </summary>
         /// <param name="broadcast">If true, also broadcasts to all players who know about this player</param>
-        public void UpdateProperty(PropertyInstanceId prop, uint? value, bool broadcast = false)
+        public void UpdateProperty(PropertyInstanceId prop, ulong? value, bool broadcast = false)
         {
             UpdateProperty(this, prop, value, broadcast);
         }
 
-        public void UpdateProperty(WorldObject obj, PropertyInstanceId prop, uint? value, bool broadcast = false)
+        public void UpdateProperty(WorldObject obj, PropertyInstanceId prop, ulong? value, bool broadcast = false)
         {
             if (value != null)
                 obj.SetProperty(prop, value.Value);
@@ -1279,7 +1279,7 @@ namespace ACE.Server.WorldObjects
             set { if (value == 0) RemoveProperty(PropertyInt.SquelchGlobal); else SetProperty(PropertyInt.SquelchGlobal, (int)value); }
         }
 
-        public uint? RequestedAppraisalTarget
+        public ulong? RequestedAppraisalTarget
         {
             get => GetProperty(PropertyInstanceId.RequestedAppraisalTarget);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.RequestedAppraisalTarget); else SetProperty(PropertyInstanceId.RequestedAppraisalTarget, value.Value); }
@@ -1294,7 +1294,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// ACE is currently using this for the last successful appraised object guid
         /// </summary>
-        public uint? CurrentAppraisalTarget
+        public ulong? CurrentAppraisalTarget
         {
             get => GetProperty(PropertyInstanceId.CurrentAppraisalTarget);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.CurrentAppraisalTarget); else SetProperty(PropertyInstanceId.CurrentAppraisalTarget, value.Value); }

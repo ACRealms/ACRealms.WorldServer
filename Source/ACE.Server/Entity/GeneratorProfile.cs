@@ -27,9 +27,9 @@ namespace ACE.Server.Entity
         /// <summary>
         /// The id for the profile. This id will be either a GUID from Landblock_Instances or an incremental id based on profile order from biota entry. 
         /// </summary>
-        public uint Id;
+        public ulong Id;
 
-        public string LinkId => Id > 0x70000000 ? $"0x{Id:X8}" : $"{Id}";
+        public string LinkId => Id > 0x70000000 ? $"0x{Id:16}" : $"{Id}";
 
         /// <summary>
         /// The biota with all the generator profile info
@@ -40,7 +40,7 @@ namespace ACE.Server.Entity
         /// A list of objects that have been spawned by this generator
         /// Mapping of object guid => registry node, which provides a bunch of detailed info about the spawn
         /// </summary>
-        public readonly Dictionary<uint, WorldObjectInfo> Spawned = new Dictionary<uint, WorldObjectInfo>();
+        public readonly Dictionary<ulong, WorldObjectInfo> Spawned = new Dictionary<ulong, WorldObjectInfo>();
 
         /// <summary>
         /// The list of pending times awaiting respawning

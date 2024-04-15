@@ -8,6 +8,7 @@ using ACE.Entity.Enum;
 using ACE.Server.Managers;
 using ACE.Server.WorldObjects;
 using ACE.Server.WorldObjects.Managers;
+using System.Linq;
 
 namespace ACE.Server.Network.Structure
 {
@@ -25,14 +26,14 @@ namespace ACE.Server.Network.Structure
         /// Key: not sure if this was account name, or character name
         /// Index: not sure if this was account id, or character id
         /// </summary>
-        public Dictionary<string, uint> Accounts;
+        public Dictionary<string, ulong> Accounts;
 
         /// <summary>
         /// Character squelches
         ///
         /// Even though this is called Characters, it contains both the Character and Account squelches (denoted by SquelchInfo.Account)
         /// </summary>
-        public Dictionary<uint, SquelchInfo> Characters;
+        public Dictionary<ulong, SquelchInfo> Characters;
 
         /// <summary>
         /// Global squelches
@@ -44,8 +45,8 @@ namespace ACE.Server.Network.Structure
         /// </summary>
         public SquelchDB(List<CharacterPropertiesSquelch> squelches, SquelchMask globals)
         {
-            Accounts = new Dictionary<string, uint>();
-            Characters = new Dictionary<uint, SquelchInfo>();
+            Accounts = new Dictionary<string, ulong>();
+            Characters = new Dictionary<ulong, SquelchInfo>();
             Globals = new SquelchInfo();
 
             foreach (var squelch in squelches)
@@ -79,11 +80,11 @@ namespace ACE.Server.Network.Structure
         /// <summary>
         /// Merges accounts + character for sending to clients
         /// </summary>
-        public Dictionary<uint, SquelchInfo> CharactersPlus
+        public Dictionary<ulong, SquelchInfo> CharactersPlus
         {
             get
             {
-                var charactersPlus = new Dictionary<uint, SquelchInfo>(Characters);
+                var charactersPlus = new Dictionary<ulong, SquelchInfo>(Characters);
 
                 foreach (var account in Accounts)
                 {
@@ -144,7 +145,7 @@ namespace ACE.Server.Network.Structure
             //writer.Write(squelches.Accounts);
             writer.Write(new Dictionary<string, uint>());   // this part of the structure is always empty in retail pcaps, even with account squelches
                                                             // perhaps for security reasons, always send account squelches in the characters section + account bool?
-            writer.Write(squelches.CharactersPlus);
+            writer.Write(squelches.CharactersPlus.ToDictionary(x => new ACE.Entity.ObjectGuid(x.Key).ClientGUID, x => x.Value));
             writer.Write(squelches.Globals);
         }
 

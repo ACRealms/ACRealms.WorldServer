@@ -123,7 +123,7 @@ namespace ACE.Server.Entity
             var equippedObjects = player.EquippedObjects.Keys.ToList();
 
             foreach (var equippedObject in equippedObjects)
-                player.HandleActionPutItemInContainer(equippedObject.Full, player.Guid.Full, 0);
+                player.HandleActionPutItemInContainer(equippedObject, player.Guid, 0);
         }
 
         public static void RemoveAbility(Player player)

@@ -30,7 +30,7 @@ namespace ACE.Server.Network.Structure
         public Dictionary<PropertyFloat, double> PropertiesFloat;
         public Dictionary<PropertyString, string> PropertiesString;
         public Dictionary<PropertyDataId, uint> PropertiesDID;
-        public Dictionary<PropertyInstanceId, uint> PropertiesIID;
+        public Dictionary<PropertyInstanceId, ulong> PropertiesIID;
 
         public List<uint> SpellBook;
 

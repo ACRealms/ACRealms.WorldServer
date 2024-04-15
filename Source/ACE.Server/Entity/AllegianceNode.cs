@@ -16,7 +16,7 @@ namespace ACE.Server.Entity
 
         public readonly AllegianceNode Monarch;
         public readonly AllegianceNode Patron;
-        public Dictionary<uint, AllegianceNode> Vassals;
+        public Dictionary<ulong, AllegianceNode> Vassals;
 
         public uint Rank;
 
@@ -47,11 +47,11 @@ namespace ACE.Server.Entity
             Patron = patron;
         }
 
-        public void BuildChain(Allegiance allegiance, List<IPlayer> players, Dictionary<uint, List<IPlayer>> patronVassals)
+        public void BuildChain(Allegiance allegiance, List<IPlayer> players, Dictionary<ulong, List<IPlayer>> patronVassals)
         {
             patronVassals.TryGetValue(PlayerGuid.Full, out var vassals);
 
-            Vassals = new Dictionary<uint, AllegianceNode>();
+            Vassals = new Dictionary<ulong, AllegianceNode>();
 
             if (vassals != null)
             {

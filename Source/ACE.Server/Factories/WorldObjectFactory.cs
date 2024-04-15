@@ -293,11 +293,11 @@ namespace ACE.Server.Factories
                 if (restrict_wcid != null && restrict_wcid.Value != instance.WeenieClassId)
                     continue;
 
-                var guid = new ObjectGuid(instance.Guid);
+                var guid = new ObjectGuid(instance.Guid, iid);
 
                 WorldObject worldObject;
 
-                var biota = biotas.FirstOrDefault(b => b.Id == instance.Guid);
+                var biota = biotas.FirstOrDefault(b => b.Id == guid.Full);
                 if (biota == null)
                 {
                     worldObject = CreateWorldObject(weenie, guid, ruleset);

@@ -8,7 +8,7 @@ namespace ACE.Server.Network.Structure
     public class Shortcut
     {
         public uint Index;          // position on shortcut bar
-        public uint ObjectId;
+        public ulong ObjectId;
         public LayeredSpell Spell;  // unused?
 
         public Shortcut() { }

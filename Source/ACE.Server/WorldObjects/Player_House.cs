@@ -889,7 +889,7 @@ namespace ACE.Server.WorldObjects
             return accountHouseOwner;
         }
 
-        public uint? GetHouseInstance()
+        public ulong? GetHouseInstance()
         {
             return GetHouseOwner()?.HouseInstance;
         }
@@ -918,7 +918,7 @@ namespace ACE.Server.WorldObjects
             });
         }
 
-        public House LoadHouse(uint? houseInstance, bool forceLoad = false)
+        public House LoadHouse(ulong? houseInstance, bool forceLoad = false)
         {
             if (House != null && !forceLoad)
                 return House;
@@ -938,7 +938,7 @@ namespace ACE.Server.WorldObjects
             return GetHouse(houseInstance);
         }
 
-        public House GetHouse(uint? houseInstance)
+        public House GetHouse(ulong? houseInstance)
         {
             // Not supported yet on AC Realms
             return null;

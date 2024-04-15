@@ -49,7 +49,7 @@ namespace ACE.Server.Network.GameAction.Actions
                 //return;
             }
 
-            var tell = new GameEventTell(targetPlayer.Session, message, session.Player.GetNameWithSuffix(), session.Player.Guid.Full, targetPlayer.Guid.Full, ChatMessageType.Tell);
+            var tell = new GameEventTell(targetPlayer.Session, message, session.Player.GetNameWithSuffix(), session.Player.Guid.ClientGUID, targetPlayer.Guid.ClientGUID, ChatMessageType.Tell);
             targetPlayer.Session.Network.EnqueueSend(tell);
         }
     }

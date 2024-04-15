@@ -254,7 +254,7 @@ namespace ACE.Server.Command.Handlers
                 if (parameters.Length > 1)
                     float.TryParse(parameters[1], out volume);
 
-                uint guid = session.Player.Guid.Full;
+                uint guid = session.Player.Guid.ClientGUID;
 
                 if (parameters.Length > 2)
                     uint.TryParse(parameters[2].TrimStart("0x"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out guid);
@@ -399,7 +399,7 @@ namespace ACE.Server.Command.Handlers
 
             loot.EnterWorld();
 
-            session.Player.HandleActionPutItemInContainer(loot.Guid.Full, session.Player.Guid.Full);
+            session.Player.HandleActionPutItemInContainer(loot.Guid, session.Player.Guid);
         }
 
         /// <summary>
@@ -3927,7 +3927,7 @@ namespace ACE.Server.Command.Handlers
 
             //session.Player.TryCastSpell(spell, target, tryResist: false);
 
-            session.Player.HandleActionUseWithTarget(guid, target.Guid.Full);
+            session.Player.HandleActionUseWithTarget(new ObjectGuid(guid, session.Player.Location.Instance), target.Guid);
         }
 
         [CommandHandler("portalstorm", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Tests starting a portal storm on yourself", "storm_level [0=Brewing, 1=Imminent, 2=Stormed, 3=Subsided]")]

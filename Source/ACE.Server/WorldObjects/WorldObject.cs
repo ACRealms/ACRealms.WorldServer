@@ -159,7 +159,7 @@ namespace ACE.Server.WorldObjects
                 }
                 // TODO: REMOVE ME?
 
-                PhysicsObj = PhysicsObj.makeObject(setupTableId, Guid.Full, isDynamic);
+                PhysicsObj = PhysicsObj.makeObject(setupTableId, Guid.ClientGUID, isDynamic);
             }
             else
             {
@@ -612,7 +612,7 @@ namespace ACE.Server.WorldObjects
             if (this is Creature creature)
                 healthPercentage = (float)creature.Health.Current / creature.Health.MaxValue;
 
-            var updateHealth = new GameEventUpdateHealth(examiner, Guid.Full, healthPercentage);
+            var updateHealth = new GameEventUpdateHealth(examiner, Guid.ClientGUID, healthPercentage);
             examiner.Network.EnqueueSend(updateHealth);
         }
 
@@ -630,7 +630,7 @@ namespace ACE.Server.WorldObjects
             if (success == 0) // according to retail PCAPs, if success = 0, mana = 0.
                 manaPercentage = 0;
 
-            var updateMana = new GameEventQueryItemManaResponse(examiner, Guid.Full, manaPercentage, success);
+            var updateMana = new GameEventQueryItemManaResponse(examiner, Guid.ClientGUID, manaPercentage, success);
             examiner.Network.EnqueueSend(updateMana);
         }
 

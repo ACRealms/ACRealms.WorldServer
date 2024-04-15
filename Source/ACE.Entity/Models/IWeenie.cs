@@ -19,7 +19,7 @@ namespace ACE.Entity.Models
         IDictionary<PropertyBool, bool> PropertiesBool { get; set; }
         IDictionary<PropertyDataId, uint> PropertiesDID { get; set; }
         IDictionary<PropertyFloat, double> PropertiesFloat { get; set; }
-        IDictionary<PropertyInstanceId, uint> PropertiesIID { get; set; }
+        IDictionary<PropertyInstanceId, ulong> PropertiesIID { get; set; }
         IDictionary<PropertyInt, int> PropertiesInt { get; set; }
         IDictionary<PropertyInt64, long> PropertiesInt64 { get; set; }
         IDictionary<PropertyString, string> PropertiesString { get; set; }

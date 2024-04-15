@@ -6,8 +6,8 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.PutItemInContainer)]
         public static void Handle(ClientMessage message, Session session)
         {
-            var itemGuid = message.Payload.ReadUInt32();
-            var containerGuid = message.Payload.ReadUInt32();
+            var itemGuid = message.Payload.ReadGuid(session);
+            var containerGuid = message.Payload.ReadGuid(session);
             var placement = message.Payload.ReadInt32();
 
             session.Player.HandleActionPutItemInContainer(itemGuid, containerGuid, placement);

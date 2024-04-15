@@ -77,13 +77,13 @@ namespace ACE.Server.WorldObjects
         /// Handles player targeted casting message
         /// </summary>
         /// <param name="builtInSpell">If TRUE, casting a built-in spell from a weapon</param>
-        public void HandleActionCastTargetedSpell(uint targetGuid, uint spellId, WorldObject casterItem = null)
+        public void HandleActionCastTargetedSpell(ObjectGuid targetGuid, uint spellId, WorldObject casterItem = null)
         {
             //Console.WriteLine($"{Name}.HandleActionCastTargetedSpell({targetGuid:X8}, {spellId}, {builtInSpell})");
 
             if (CombatMode != CombatMode.Magic)
             {
-                log.Error($"{Name}.HandleActionCastTargetedSpell({targetGuid:X8}, {spellId}, {casterItem?.Name}) - CombatMode mismatch {CombatMode}, LastCombatMode: {LastCombatMode}");
+                log.Error($"{Name}.HandleActionCastTargetedSpell({targetGuid}, {spellId}, {casterItem?.Name}) - CombatMode mismatch {CombatMode}, LastCombatMode: {LastCombatMode}");
 
                 if (LastCombatMode == CombatMode.Magic)
                     CombatMode = CombatMode.Magic;
@@ -116,7 +116,7 @@ namespace ACE.Server.WorldObjects
 
             if (IsBusy && MagicState.CanQueue)
             {
-                MagicState.CastQueue = new CastQueue(CastQueueType.Targeted, targetGuid, spellId, casterItem);
+                MagicState.CastQueue = new CastQueue(CastQueueType.Targeted, targetGuid.Full, spellId, casterItem);
                 MagicState.CanQueue = false;
                 return;
             }
@@ -132,7 +132,7 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            var targetCategory = GetTargetCategory(targetGuid, spellId, out var target);
+            var targetCategory = GetTargetCategory(targetGuid.Full, spellId, out var target);
 
             if (target == null || target.Teleporting)
             {
@@ -141,7 +141,7 @@ namespace ACE.Server.WorldObjects
             }
 
             MagicState.OnCastStart();
-            MagicState.SetWindupParams(targetGuid, spellId, casterItem);
+            MagicState.SetWindupParams(targetGuid.Full, spellId, casterItem);
 
             StartPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
 
@@ -170,7 +170,7 @@ namespace ACE.Server.WorldObjects
                 actionChain.AddAction(this, () =>
                 {
                     // ensure target still exists
-                    targetCategory = GetTargetCategory(targetGuid, spellId, out target);
+                    targetCategory = GetTargetCategory(targetGuid.Full, spellId, out target);
 
                     if (target == null)
                     {
@@ -218,7 +218,7 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        public TargetCategory GetTargetCategory(uint targetGuid, uint spellId, out WorldObject target)
+        public TargetCategory GetTargetCategory(ulong targetGuid, uint spellId, out WorldObject target)
         {
             // fellowship spell
             var spell = new Spell(spellId);
@@ -595,7 +595,7 @@ namespace ACE.Server.WorldObjects
 
             var spellWords = spell._spellBase.GetSpellWords(DatManager.PortalDat.SpellComponentsTable);
             if (!string.IsNullOrWhiteSpace(spellWords) && !isWeaponSpell)
-                EnqueueBroadcast(new GameMessageHearSpeech(spellWords, GetNameWithSuffix(), Guid.Full, ChatMessageType.Spellcasting), LocalBroadcastRange, ChatMessageType.Spellcasting);
+                EnqueueBroadcast(new GameMessageHearSpeech(spellWords, GetNameWithSuffix(), Guid.ClientGUID, ChatMessageType.Spellcasting), LocalBroadcastRange, ChatMessageType.Spellcasting);
         }
 
         public static float CastSpeed = 2.0f;       // from retail pcaps, player animation speed for windup / first half of cast gesture
@@ -1372,7 +1372,7 @@ namespace ACE.Server.WorldObjects
             if (MagicState.CastQueue != null)
             {
                 if (MagicState.CastQueue.Type == CastQueueType.Targeted)
-                    HandleActionCastTargetedSpell(MagicState.CastQueue.TargetGuid, MagicState.CastQueue.SpellId, MagicState.CastQueue.CasterItem);
+                    HandleActionCastTargetedSpell(new ObjectGuid(MagicState.CastQueue.TargetGuid), MagicState.CastQueue.SpellId, MagicState.CastQueue.CasterItem);
                 else
                     HandleActionMagicCastUnTargetedSpell(MagicState.CastQueue.SpellId);
             }

@@ -133,7 +133,7 @@ namespace ACE.Database.OfflineTools.Shard
                 partialBiotas = context.Biota.Where(r => r.Id >= startingGuid).OrderByDescending(r => r.Id).ToList();
             }
 
-            var idConversions = new ConcurrentDictionary<uint, uint>();
+            var idConversions = new ConcurrentDictionary<ulong, ulong>();
 
             // Process ConsolidatableBasicWeenieTypes first
             Parallel.ForEach(partialBiotas, ConfigManager.Config.Server.Threading.DatabaseParallelOptions, partialBiota =>
@@ -187,7 +187,7 @@ namespace ACE.Database.OfflineTools.Shard
                         return;
                     }
 
-                    idConversions[fullBiota.Id] = newId;
+                    idConversions[(uint)fullBiota.Id] = newId;
 
                     // Copy our original biota into a new biota and set the new id
                     var converted = BiotaConverter.ConvertToEntityBiota(fullBiota);
@@ -202,7 +202,7 @@ namespace ACE.Database.OfflineTools.Shard
                     }
 
                     // Finally, remove the original biota
-                    if (!shardDatabase.RemoveBiota(fullBiota.Id))
+                    if (!shardDatabase.RemoveBiota((uint)fullBiota.Id))
                     {
                         Interlocked.Increment(ref numOfErrors);
                         log.Fatal($"Failed to remove original biota with id 0x{fullBiota.Id:X8} from database. Please rollback your shard.");
@@ -275,7 +275,7 @@ namespace ACE.Database.OfflineTools.Shard
                         break;
                     }
 
-                    idConversions[fullBiota.Id] = newId;
+                    idConversions[(uint)fullBiota.Id] = newId;
 
                     // Copy our original biota into a new biota and set the new id
                     var converted = BiotaConverter.ConvertToEntityBiota(fullBiota);

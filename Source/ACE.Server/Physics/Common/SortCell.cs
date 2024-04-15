@@ -42,7 +42,7 @@ namespace ACE.Server.Physics.Common
                 Building.find_building_transit_cells(numParts, parts, cellArray, instance);
         }
 
-        public PhysicsObj get_object(int objectID)
+        public PhysicsObj get_object(ulong objectID)
         {
             var obj = GetObject(objectID);
 

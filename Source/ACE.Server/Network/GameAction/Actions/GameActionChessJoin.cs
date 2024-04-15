@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.ChessJoin)]
         public static void Handle(ClientMessage message, Session session)
         {
-            var boardGuid = message.Payload.ReadUInt32();   // chessboard guid
+            var boardGuid = message.Payload.ReadGuid(session);   // chessboard guid
             var color = message.Payload.ReadInt32();        // expecting -1 here, unused?
 
             session.Player.HandleActionChessJoin(boardGuid);

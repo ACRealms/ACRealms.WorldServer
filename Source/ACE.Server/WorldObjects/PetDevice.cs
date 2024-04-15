@@ -29,7 +29,7 @@ namespace ACE.Server.WorldObjects
             set { if (value.HasValue) SetProperty(PropertyInt.PetClass, value.Value); else RemoveProperty(PropertyInt.PetClass); }
         }
 
-        public uint? Pet
+        public ulong? Pet
         {
             get => GetProperty(PropertyInstanceId.Pet);
             set { if (value.HasValue) SetProperty(PropertyInstanceId.Pet, value.Value); else RemoveProperty(PropertyInstanceId.Pet); }

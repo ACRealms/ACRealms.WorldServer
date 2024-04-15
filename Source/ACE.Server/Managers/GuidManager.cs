@@ -32,7 +32,7 @@ namespace ACE.Server.Managers
         private class PlayerGuidAllocator
         {
             private readonly uint max;
-            private uint current;
+            private ulong current;
             private readonly string name;
 
             public PlayerGuidAllocator(uint min, uint max, string name)
@@ -71,7 +71,7 @@ namespace ACE.Server.Managers
                 this.name = name;
             }
 
-            public uint Alloc()
+            public ulong Alloc()
             {
                 lock (this)
                 {
@@ -84,7 +84,7 @@ namespace ACE.Server.Managers
                     if (current == max - LowIdLimit)
                         log.Warn($"Running dangerously low on {name} GUIDs, need to defrag");
 
-                    uint ret = current;
+                    ulong ret = current;
                     current += 1;
 
                     return ret;
@@ -95,7 +95,7 @@ namespace ACE.Server.Managers
             /// For information purposes only, do not use the result. Use Alloc() instead
             /// This value represents the current DbMax + 1
             /// </summary>
-            public uint Current()
+            public ulong Current()
             {
                 return current;
             }
@@ -107,12 +107,12 @@ namespace ACE.Server.Managers
         private class DynamicGuidAllocator
         {
             private readonly uint max;
-            private uint current;
+            private ulong current;
             private readonly string name;
 
             private static readonly TimeSpan recycleTime = TimeSpan.FromMinutes(360);
 
-            private readonly Queue<Tuple<DateTime, uint>> recycledGuids = new Queue<Tuple<DateTime, uint>>();
+            private readonly Queue<Tuple<DateTime, ulong>> recycledGuids = new Queue<Tuple<DateTime, ulong>>();
 
             /// <summary>
             /// The value here is the result of two factors:
@@ -185,7 +185,7 @@ namespace ACE.Server.Managers
                 this.name = name;
             }
 
-            public uint Alloc()
+            public ulong Alloc()
             {
                 lock (this)
                 {
@@ -232,7 +232,7 @@ namespace ACE.Server.Managers
                     if (current == max - LowIdLimit)
                         log.Warn($"Running dangerously low on {name} GUIDs, need to defrag");
 
-                    uint ret = current;
+                    ulong ret = current;
                     current += 1;
 
                     return ret;
@@ -244,15 +244,15 @@ namespace ACE.Server.Managers
             /// This is the value that might be used in the event that there are no recycled guid available and sequence gap guids have been exhausted
             /// This value represents the current DbMax + 1
             /// </summary>
-            public uint Current()
+            public ulong Current()
             {
                 return current;
             }
 
-            public void Recycle(uint guid)
+            public void Recycle(ulong guid)
             {
                 lock (this)
-                    recycledGuids.Enqueue(new Tuple<DateTime, uint>(DateTime.UtcNow, guid));
+                    recycledGuids.Enqueue(new Tuple<DateTime, ulong>(DateTime.UtcNow, guid));
             }
 
             public override string ToString()

@@ -10,7 +10,7 @@ namespace ACE.Server.Physics.Animation
 {
     public class StickyManager
     {
-        public uint TargetID;
+        public ulong TargetID;
         public float TargetRadius;
         public PhysicsPosition TargetPosition;
         public PhysicsObj PhysicsObj;
@@ -70,7 +70,7 @@ namespace ACE.Server.Physics.Animation
             PhysicsObj = obj;
         }
 
-        public void StickTo(uint objectID, float targetRadius, float targetHeight)
+        public void StickTo(ulong objectID, float targetRadius, float targetHeight)
         {
             if (TargetID != 0)
                 ClearTarget();

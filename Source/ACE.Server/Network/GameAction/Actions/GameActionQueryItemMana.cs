@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.QueryItemMana)]
         public static void Handle(ClientMessage message, Session session)
         {
-            uint objectGuid = message.Payload.ReadUInt32();
+            var objectGuid = message.Payload.ReadGuid(session);
 
             session.Player.HandleActionQueryItemMana(objectGuid);
         }

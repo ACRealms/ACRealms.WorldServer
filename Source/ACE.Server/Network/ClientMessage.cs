@@ -1,12 +1,24 @@
+using ACE.Entity;
 using System.IO;
 
 namespace ACE.Server.Network
 {
     public class ClientMessage
     {
+        public class RealmBinaryReader : BinaryReader
+        {
+            public RealmBinaryReader(MemoryStream stream)
+                : base(stream) { }
+
+            public ObjectGuid ReadGuid(Session session)
+            {
+                return new ObjectGuid(base.ReadUInt32(), session.Player.Location.Instance);
+            }
+        }
+
         public MemoryStream Data { get; }
 
-        public BinaryReader Payload { get; }
+        public RealmBinaryReader Payload { get; }
 
         public uint Opcode { get; }
 
@@ -14,7 +26,7 @@ namespace ACE.Server.Network
         public ClientMessage(MemoryStream stream)
         {
             Data = stream;
-            Payload = new BinaryReader(Data);
+            Payload = new RealmBinaryReader(Data);
             Opcode = Payload.ReadUInt32();
         }
 
@@ -22,7 +34,7 @@ namespace ACE.Server.Network
         public ClientMessage(byte[] data)
         {
             Data = new MemoryStream(data);
-            Payload = new BinaryReader(Data);
+            Payload = new RealmBinaryReader(Data);
             Opcode = Payload.ReadUInt32();
         }
     }

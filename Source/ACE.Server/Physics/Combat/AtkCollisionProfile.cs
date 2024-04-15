@@ -10,7 +10,7 @@ namespace ACE.Server.Physics.Combat
 
         public AtkCollisionProfile() { }
 
-        public AtkCollisionProfile(uint id, int part, Quadrant location)
+        public AtkCollisionProfile(ulong id, int part, Quadrant location)
         {
             ID = id;
             Part = part;

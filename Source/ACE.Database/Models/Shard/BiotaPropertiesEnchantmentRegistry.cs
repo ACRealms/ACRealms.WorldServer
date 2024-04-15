@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -7,7 +7,7 @@ namespace ACE.Database.Models.Shard
 {
     public partial class BiotaPropertiesEnchantmentRegistry
     {
-        public uint ObjectId { get; set; }
+        public ulong ObjectId { get; set; }
         public uint EnchantmentCategory { get; set; }
         public int SpellId { get; set; }
         public ushort LayerId { get; set; }
@@ -16,7 +16,7 @@ namespace ACE.Database.Models.Shard
         public uint PowerLevel { get; set; }
         public double StartTime { get; set; }
         public double Duration { get; set; }
-        public uint CasterObjectId { get; set; }
+        public ulong CasterObjectId { get; set; }
         public float DegradeModifier { get; set; }
         public float DegradeLimit { get; set; }
         public double LastTimeDegraded { get; set; }

@@ -154,7 +154,7 @@ namespace ACE.Server.WorldObjects
             {
                 var spellWords = spell._spellBase.GetSpellWords(DatManager.PortalDat.SpellComponentsTable);
                 if (!string.IsNullOrWhiteSpace(spellWords))
-                    EnqueueBroadcast(new GameMessageHearSpeech(spellWords, Name, Guid.Full, ChatMessageType.Spellcasting), LocalBroadcastRange, ChatMessageType.Spellcasting);
+                    EnqueueBroadcast(new GameMessageHearSpeech(spellWords, Name, Guid.ClientGUID, ChatMessageType.Spellcasting), LocalBroadcastRange, ChatMessageType.Spellcasting);
             }
 
             var preCastTime = PreCastMotion(AttackTarget);

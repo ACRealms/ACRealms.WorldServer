@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -7,7 +7,7 @@ namespace ACE.Database.Models.Shard
 {
     public partial class CharacterPropertiesQuestRegistry
     {
-        public uint CharacterId { get; set; }
+        public ulong CharacterId { get; set; }
         public string QuestName { get; set; }
         public uint LastTimeCompleted { get; set; }
         public int NumTimesCompleted { get; set; }

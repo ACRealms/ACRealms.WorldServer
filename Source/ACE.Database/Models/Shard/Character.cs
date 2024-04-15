@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -20,7 +20,7 @@ namespace ACE.Database.Models.Shard
             CharacterPropertiesTitleBook = new HashSet<CharacterPropertiesTitleBook>();
         }
 
-        public uint Id { get; set; }
+        public ulong Id { get; set; }
         public uint AccountId { get; set; }
         public string Name { get; set; }
         public bool IsPlussed { get; set; }

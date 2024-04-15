@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.IdentifyObject)]
         public static void Handle(ClientMessage message, Session session)
         {
-            var objectGuid = message.Payload.ReadUInt32();
+            var objectGuid = message.Payload.ReadGuid(session);
 
             session.Player.HandleActionIdentifyObject(objectGuid);
         }

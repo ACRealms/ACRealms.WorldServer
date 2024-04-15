@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.OpenTradeNegotiations)]
         public static void Handle(ClientMessage message, Session session)
         {
-            var tradePartnerGuid = message.Payload.ReadUInt32();
+            var tradePartnerGuid = message.Payload.ReadGuid(session);
 
             session.Player.HandleActionOpenTradeNegotiations(tradePartnerGuid, true);
         }

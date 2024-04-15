@@ -10,7 +10,7 @@ namespace ACE.Entity.Adapter
 {
     public static class WeenieConverter
     {
-        public static Biota ConvertToBiota(this Weenie weenie, uint id, bool instantiateEmptyCollections = false, bool referenceWeenieCollectionsForCommonProperties = false)
+        public static Biota ConvertToBiota(this Weenie weenie, ulong id, bool instantiateEmptyCollections = false, bool referenceWeenieCollectionsForCommonProperties = false)
         {
             var result = new Biota();
 
@@ -25,7 +25,7 @@ namespace ACE.Entity.Adapter
             if (weenie.PropertiesFloat != null && (instantiateEmptyCollections || weenie.PropertiesFloat.Count > 0))
                 result.PropertiesFloat = new Dictionary<PropertyFloat, double>(weenie.PropertiesFloat);
             if (weenie.PropertiesIID != null && (instantiateEmptyCollections || weenie.PropertiesIID.Count > 0))
-                result.PropertiesIID = new Dictionary<PropertyInstanceId, uint>(weenie.PropertiesIID);
+                result.PropertiesIID = new Dictionary<PropertyInstanceId, ulong>(weenie.PropertiesIID);
             if (weenie.PropertiesInt != null && (instantiateEmptyCollections || weenie.PropertiesInt.Count > 0))
                 result.PropertiesInt = new Dictionary<PropertyInt, int>(weenie.PropertiesInt);
             if (weenie.PropertiesInt64 != null && (instantiateEmptyCollections || weenie.PropertiesInt64.Count > 0))

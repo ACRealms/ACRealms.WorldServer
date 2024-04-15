@@ -11,7 +11,7 @@ namespace ACE.Server.Network.GameEvent.Events
         public GameEventOpponentTurn(Session session, ObjectGuid boardGuid, ChessMoveData moveData)
             : base(GameEventType.OpponentTurn, GameMessageGroup.UIQueue, session)
         {
-            Writer.Write(boardGuid.Full);
+            Writer.Write(boardGuid.ClientGUID);
             Writer.Write((int)moveData.Color);
             Writer.Write(moveData);
         }

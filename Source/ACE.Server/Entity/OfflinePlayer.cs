@@ -77,7 +77,7 @@ namespace ACE.Server.Entity
         {
             return Biota.GetProperty(property, BiotaDatabaseLock);
         }
-        public uint? GetProperty(PropertyInstanceId property)
+        public ulong? GetProperty(PropertyInstanceId property)
         {
             return Biota.GetProperty(property, BiotaDatabaseLock);
         }
@@ -114,7 +114,7 @@ namespace ACE.Server.Entity
             if (changed)
                 ChangesDetected = true;
         }
-        public void SetProperty(PropertyInstanceId property, uint value)
+        public void SetProperty(PropertyInstanceId property, ulong value)
         {
             Biota.SetProperty(property, value, BiotaDatabaseLock, out var changed);
             if (changed)
@@ -188,13 +188,13 @@ namespace ACE.Server.Entity
         public int? Gender => GetProperty(PropertyInt.Gender);
 
 
-        public uint? MonarchId
+        public ulong? MonarchId
         {
             get => GetProperty(PropertyInstanceId.Monarch);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Monarch); else SetProperty(PropertyInstanceId.Monarch, value.Value); }
         }
 
-        public uint? PatronId
+        public ulong? PatronId
         {
             get => GetProperty(PropertyInstanceId.Patron);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Patron); else SetProperty(PropertyInstanceId.Patron, value.Value); }
@@ -236,7 +236,7 @@ namespace ACE.Server.Entity
         /// <summary>
         /// Used for allegiance recall to monarch's mansion / villa
         /// </summary>
-        public uint? HouseInstance
+        public ulong? HouseInstance
         {
             get => GetProperty(PropertyInstanceId.House);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.House); else SetProperty(PropertyInstanceId.House, value.Value); }
@@ -276,7 +276,7 @@ namespace ACE.Server.Entity
 
         public AllegianceNode AllegianceNode { get; set; }
 
-        public void UpdateProperty(PropertyInstanceId prop, uint? value, bool broadcast = false)
+        public void UpdateProperty(PropertyInstanceId prop, ulong? value, bool broadcast = false)
         {
             if (value != null)
                 SetProperty(prop, value.Value);

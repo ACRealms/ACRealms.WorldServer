@@ -48,13 +48,13 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Called when a player first initiates a melee attack
         /// </summary>
-        public void HandleActionTargetedMeleeAttack(uint targetGuid, uint attackHeight, float powerLevel)
+        public void HandleActionTargetedMeleeAttack(ACE.Entity.ObjectGuid targetGuid, uint attackHeight, float powerLevel)
         {
             //log.Info($"-");
 
             if (CombatMode != CombatMode.Melee)
             {
-                log.Error($"{Name}.HandleActionTargetedMeleeAttack({targetGuid:X8}, {attackHeight}, {powerLevel}) - CombatMode mismatch {CombatMode}, LastCombatMode {LastCombatMode}");
+                log.Error($"{Name}.HandleActionTargetedMeleeAttack({targetGuid}, {attackHeight}, {powerLevel}) - CombatMode mismatch {CombatMode}, LastCombatMode {LastCombatMode}");
 
                 if (LastCombatMode == CombatMode.Melee)
                     CombatMode = CombatMode.Melee;
@@ -112,7 +112,7 @@ namespace ACE.Server.WorldObjects
             var creatureTarget = target as Creature;
             if (creatureTarget == null)
             {
-                log.Warn($"{Name}.HandleActionTargetedMeleeAttack({targetGuid:X8}, {AttackHeight}, {powerLevel}) - target guid not creature");
+                log.Warn($"{Name}.HandleActionTargetedMeleeAttack({targetGuid}, {AttackHeight}, {powerLevel}) - target guid not creature");
                 OnAttackDone();
                 return;
             }

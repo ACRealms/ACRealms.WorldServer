@@ -43,7 +43,7 @@ namespace ACE.Server.Managers
             }
 
         }
-        public uint IDtoUseForQuestRegistry
+        public ulong IDtoUseForQuestRegistry
         {
             get
             {
@@ -530,7 +530,7 @@ namespace ACE.Server.Managers
 
             if (player == null) return;
 
-            var error = new GameEventInventoryServerSaveFailed(player.Session, wo.Guid.Full, WeenieError.ItemRequiresQuestToBePickedUp);
+            var error = new GameEventInventoryServerSaveFailed(player.Session, wo.Guid.ClientGUID, WeenieError.ItemRequiresQuestToBePickedUp);
             player.Session.Network.EnqueueSend(error);
         }
 

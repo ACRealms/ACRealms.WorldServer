@@ -30,7 +30,7 @@ namespace ACE.Database
 
         private readonly object biotaCacheMutex = new object();
 
-        private readonly Dictionary<uint, CacheObject<Biota>> biotaCache = new Dictionary<uint, CacheObject<Biota>>();
+        private readonly Dictionary<ulong, CacheObject<Biota>> biotaCache = new Dictionary<ulong, CacheObject<Biota>>();
 
         private static readonly TimeSpan MaintenanceInterval = TimeSpan.FromMinutes(1);
 
@@ -44,7 +44,7 @@ namespace ACE.Database
             if (lastMaintenanceInterval + MaintenanceInterval > DateTime.UtcNow)
                 return;
 
-            var removals = new Collection<uint>();
+            var removals = new Collection<ulong>();
 
             foreach (var kvp in biotaCache)
             {
@@ -80,14 +80,14 @@ namespace ACE.Database
             }
         }
 
-        public List<uint> GetBiotaCacheKeys()
+        public List<ulong> GetBiotaCacheKeys()
         {
             lock (biotaCacheMutex)
                 return biotaCache.Keys.ToList();
         }
 
 
-        public override Biota GetBiota(ShardDbContext context, uint id, bool doNotAddToCache = false)
+        public override Biota GetBiota(ShardDbContext context, ulong id, bool doNotAddToCache = false)
         {
             lock (biotaCacheMutex)
             {
@@ -109,7 +109,7 @@ namespace ACE.Database
             return biota;
         }
 
-        public override Biota GetBiota(uint id, bool doNotAddToCache = false)
+        public override Biota GetBiota(ulong id, bool doNotAddToCache = false)
         {
             if (ObjectGuid.IsPlayer(id))
             {
@@ -193,7 +193,7 @@ namespace ACE.Database
             return false;
         }
 
-        public override bool RemoveBiota(uint id)
+        public override bool RemoveBiota(ulong id)
         {
             lock (biotaCacheMutex)
                 biotaCache.Remove(id);

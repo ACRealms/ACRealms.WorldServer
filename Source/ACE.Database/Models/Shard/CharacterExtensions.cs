@@ -235,7 +235,7 @@ namespace ACE.Database.Models.Shard
             }
         }
 
-        public static bool HasAsFriend(this Character character, uint friendId, ReaderWriterLockSlim rwLock)
+        public static bool HasAsFriend(this Character character, ulong friendId, ReaderWriterLockSlim rwLock)
         {
             rwLock.EnterReadLock();
             try
@@ -254,7 +254,7 @@ namespace ACE.Database.Models.Shard
             }
         }
 
-        public static CharacterPropertiesFriendList AddFriend(this Character character, uint friendId, ReaderWriterLockSlim rwLock, out bool friendAlreadyExists)
+        public static CharacterPropertiesFriendList AddFriend(this Character character, ulong friendId, ReaderWriterLockSlim rwLock, out bool friendAlreadyExists)
         {
             rwLock.EnterUpgradeableReadLock();
             try
@@ -452,7 +452,7 @@ namespace ACE.Database.Models.Shard
             }
         }
 
-        public static void AddOrUpdateShortcut(this Character character, uint index, uint objectId, ReaderWriterLockSlim rwLock)
+        public static void AddOrUpdateShortcut(this Character character, uint index, ulong objectId, ReaderWriterLockSlim rwLock)
         {
             rwLock.EnterUpgradeableReadLock();
             try
@@ -625,7 +625,7 @@ namespace ACE.Database.Models.Shard
             }
         }
 
-        public static void AddOrUpdateSquelch(this Character character, uint squelchCharacterId, uint squelchAccountId, uint type, ReaderWriterLockSlim rwLock)
+        public static void AddOrUpdateSquelch(this Character character, ulong squelchCharacterId, uint squelchAccountId, uint type, ReaderWriterLockSlim rwLock)
         {
             rwLock.EnterUpgradeableReadLock();
             try
@@ -656,7 +656,7 @@ namespace ACE.Database.Models.Shard
             }
         }
 
-        public static bool TryRemoveSquelch(this Character character, uint squelchCharacterId, uint squelchAccountId, out CharacterPropertiesSquelch entity, ReaderWriterLockSlim rwLock)
+        public static bool TryRemoveSquelch(this Character character, ulong squelchCharacterId, uint squelchAccountId, out CharacterPropertiesSquelch entity, ReaderWriterLockSlim rwLock)
         {
             rwLock.EnterUpgradeableReadLock();
             try

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -7,7 +7,7 @@ namespace ACE.Database.Models.Shard
 {
     public partial class BiotaPropertiesBook
     {
-        public uint ObjectId { get; set; }
+        public ulong ObjectId { get; set; }
         public int MaxNumPages { get; set; }
         public int MaxNumCharsPerPage { get; set; }
 

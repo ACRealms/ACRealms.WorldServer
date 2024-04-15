@@ -13,7 +13,7 @@ namespace ACE.Server.Network.Structure
     /// </summary>
     public class RestrictionDB
     {
-        public uint HouseOwner;
+        public ulong HouseOwner;
         public uint Version = 0x10000002;   // If high word is not 0, this value indicates the version of the message.
         public bool OpenStatus;             // 0 = private dwelling, 1 = open to public
         public ObjectGuid MonarchID;        // Allegiance monarch (if allegiance access granted)
@@ -75,7 +75,7 @@ namespace ACE.Server.Network.Structure
         {
             writer.Write(restrictions.Version);
             writer.Write(Convert.ToUInt32(restrictions.OpenStatus));
-            writer.Write(restrictions.MonarchID.Full);
+            writer.Write(restrictions.MonarchID.ClientGUID);
             writer.Write(restrictions.Table);
         }
 
@@ -99,7 +99,7 @@ namespace ACE.Server.Network.Structure
 
             foreach (var kvp in sorted)
             {
-                writer.Write(kvp.Key.Full);
+                writer.Write(kvp.Key.ClientGUID);
                 writer.Write(kvp.Value);
             }
         }

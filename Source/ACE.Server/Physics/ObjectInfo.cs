@@ -31,7 +31,7 @@ namespace ACE.Server.Physics.Animation
         public float StepDownHeight;
         public bool Ethereal;
         public bool StepDown;
-        public uint TargetID;
+        public ulong TargetID;
 
         public float GetWalkableZ()
         {

@@ -7,8 +7,8 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.UseWithTarget)]
         public static void Handle(ClientMessage message, Session session)
         {
-            uint sourceObjectGuid = message.Payload.ReadUInt32();
-            uint targetObjectGuid = message.Payload.ReadUInt32();
+            var sourceObjectGuid = message.Payload.ReadGuid(session);
+            var targetObjectGuid = message.Payload.ReadGuid(session);
 
             //Console.WriteLine($"{session.Player.Name}.UseWithTarget({sourceObjectGuid:X8}, {targetObjectGuid:X8})");
 

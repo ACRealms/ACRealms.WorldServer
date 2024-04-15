@@ -72,7 +72,7 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static uint? GetProperty(this Biota biota, PropertyInstanceId property, ReaderWriterLockSlim rwLock)
+        public static ulong? GetProperty(this Biota biota, PropertyInstanceId property, ReaderWriterLockSlim rwLock)
         {
             if (biota.PropertiesIID == null)
                 return null;
@@ -249,13 +249,13 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static void SetProperty(this Biota biota, PropertyInstanceId property, uint value, ReaderWriterLockSlim rwLock, out bool changed)
+        public static void SetProperty(this Biota biota, PropertyInstanceId property, ulong value, ReaderWriterLockSlim rwLock, out bool changed)
         {
             rwLock.EnterWriteLock();
             try
             {
                 if (biota.PropertiesIID == null)
-                    biota.PropertiesIID = new Dictionary<PropertyInstanceId, uint>();
+                    biota.PropertiesIID = new Dictionary<PropertyInstanceId, ulong>();
 
                 changed = (!biota.PropertiesIID.TryGetValue(property, out var existing) || value != existing);
 
@@ -745,15 +745,15 @@ namespace ACE.Entity.Models
         // HousePermissions
         // =====================================
 
-        public static Dictionary<uint, bool> CloneHousePermissions(this Biota biota, ReaderWriterLockSlim rwLock)
+        public static Dictionary<ulong, bool> CloneHousePermissions(this Biota biota, ReaderWriterLockSlim rwLock)
         {
             rwLock.EnterReadLock();
             try
             {
                 if (biota.HousePermissions == null)
-                    return new Dictionary<uint, bool>();
+                    return new Dictionary<ulong, bool>();
 
-                return new Dictionary<uint, bool>(biota.HousePermissions);
+                return new Dictionary<ulong, bool>(biota.HousePermissions);
             }
             finally
             {
@@ -777,7 +777,7 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static bool? GetHouseGuestStoragePermission(this Biota biota, uint guestGuid, ReaderWriterLockSlim rwLock)
+        public static bool? GetHouseGuestStoragePermission(this Biota biota, ulong guestGuid, ReaderWriterLockSlim rwLock)
         {
             rwLock.EnterReadLock();
             try
@@ -796,13 +796,13 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static void AddOrUpdateHouseGuest(this Biota biota, uint guestGuid, bool storage, ReaderWriterLockSlim rwLock)
+        public static void AddOrUpdateHouseGuest(this Biota biota, ulong guestGuid, bool storage, ReaderWriterLockSlim rwLock)
         {
             rwLock.EnterWriteLock();
             try
             {
                 if (biota.HousePermissions == null)
-                    biota.HousePermissions = new Dictionary<uint, bool>();
+                    biota.HousePermissions = new Dictionary<ulong, bool>();
 
                 biota.HousePermissions[guestGuid] = storage;
             }
@@ -812,7 +812,7 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static bool RemoveHouseGuest(this Biota biota, uint guestGuid, ReaderWriterLockSlim rwLock)
+        public static bool RemoveHouseGuest(this Biota biota, ulong guestGuid, ReaderWriterLockSlim rwLock)
         {
             rwLock.EnterWriteLock();
             try

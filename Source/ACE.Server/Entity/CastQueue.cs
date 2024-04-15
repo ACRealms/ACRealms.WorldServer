@@ -8,12 +8,12 @@ namespace ACE.Server.Entity
     public class CastQueue
     {
         public CastQueueType Type;
-        public uint TargetGuid;
+        public ulong TargetGuid;
         public uint SpellId;
         //public bool BuiltInSpell;
         public WorldObject CasterItem;
 
-        public CastQueue(CastQueueType type, uint targetGuid, uint spellId, WorldObject casterItem)
+        public CastQueue(CastQueueType type, ulong targetGuid, uint spellId, WorldObject casterItem)
         {
             Type = type;
             TargetGuid = targetGuid;

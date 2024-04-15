@@ -116,8 +116,6 @@ namespace ACE.Server.Network
             writer.BaseStream.Position = originalPosition;
         }
 
-        public static ObjectGuid ReadGuid(this BinaryReader reader) { return new ObjectGuid(reader.ReadUInt32()); }
-
-        public static void WriteGuid(this BinaryWriter writer, ObjectGuid guid) { writer.Write(guid.Full); }
+        public static void WriteGuid(this BinaryWriter writer, ObjectGuid guid) { writer.Write(guid.ClientGUID); }
     }
 }

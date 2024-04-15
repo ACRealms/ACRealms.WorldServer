@@ -69,7 +69,7 @@ namespace ACE.Server.WorldObjects
         private void InitializePropertyDictionaries()
         {
             if (Biota.HousePermissions == null)
-                Biota.HousePermissions = new Dictionary<uint, bool>();
+                Biota.HousePermissions = new Dictionary<ulong, bool>();
         }
 
         private void SetEphemeralValues()
@@ -115,7 +115,7 @@ namespace ACE.Server.WorldObjects
             return houseData;
         }
 
-        public static House Load(uint houseGuid, bool isBasement = false)
+        public static House Load(ulong houseGuid, bool isBasement = false)
         {
             var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
 
@@ -334,7 +334,7 @@ namespace ACE.Server.WorldObjects
 
             var housePermissions = Biota.CloneHousePermissions(BiotaDatabaseLock);
 
-            var deleted = new List<uint>();
+            var deleted = new List<ulong>();
 
             foreach (var kvp in housePermissions)
             {
@@ -535,8 +535,8 @@ namespace ACE.Server.WorldObjects
             {
                 if (_rootGuid == null)
                 {
-                    if (HouseCell.RootGuids.TryGetValue(Guid.Full, out var rootGuid))
-                        _rootGuid = new ObjectGuid(rootGuid);
+                    if (HouseCell.RootGuids.TryGetValue(Guid.ClientGUID, out var rootGuid))
+                        _rootGuid = new ObjectGuid(rootGuid, Guid.Instance);
                     else
                     {
                         log.Error($"House.RootGuid - couldn't find root guid for house guid {Guid}");

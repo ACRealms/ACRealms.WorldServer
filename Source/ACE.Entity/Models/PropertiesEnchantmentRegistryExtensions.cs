@@ -58,7 +58,7 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static PropertiesEnchantmentRegistry GetEnchantmentBySpell(this ICollection<PropertiesEnchantmentRegistry> value, int spellId, uint? casterGuid, ReaderWriterLockSlim rwLock)
+        public static PropertiesEnchantmentRegistry GetEnchantmentBySpell(this ICollection<PropertiesEnchantmentRegistry> value, int spellId, ulong? casterGuid, ReaderWriterLockSlim rwLock)
         {
             if (value == null)
                 return null;
@@ -276,7 +276,7 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static bool TryRemoveEnchantment(this ICollection<PropertiesEnchantmentRegistry> value, int spellId, uint casterObjectId, ReaderWriterLockSlim rwLock)
+        public static bool TryRemoveEnchantment(this ICollection<PropertiesEnchantmentRegistry> value, int spellId, ulong casterObjectId, ReaderWriterLockSlim rwLock)
         {
             if (value == null)
                 return false;

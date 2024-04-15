@@ -173,7 +173,7 @@ namespace ACE.Server.WorldObjects
 
             var healthPercent = (float)target.Health.Current / target.Health.MaxValue;
 
-            Session.Network.EnqueueSend(new GameEventUpdateHealth(Session, target.Guid.Full, healthPercent));
+            Session.Network.EnqueueSend(new GameEventUpdateHealth(Session, target.Guid.ClientGUID, healthPercent));
         }
 
         /// <summary>

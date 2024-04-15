@@ -13,14 +13,14 @@ namespace ACE.Entity.Models
     /// </summary>
     public class Biota : IWeenie
     {
-        public uint Id { get; set; }
+        public ulong Id { get; set; }
         public uint WeenieClassId { get; set; }
         public WeenieType WeenieType { get; set; }
 
         public IDictionary<PropertyBool, bool> PropertiesBool { get; set; }
         public IDictionary<PropertyDataId, uint> PropertiesDID { get; set; }
         public IDictionary<PropertyFloat, double> PropertiesFloat { get; set; }
-        public IDictionary<PropertyInstanceId, uint> PropertiesIID { get; set; }
+        public IDictionary<PropertyInstanceId, ulong> PropertiesIID { get; set; }
         public IDictionary<PropertyInt, int> PropertiesInt { get; set; }
         public IDictionary<PropertyInt64, long> PropertiesInt64 { get; set; }
         public IDictionary<PropertyString, string> PropertiesString { get; set; }
@@ -50,8 +50,8 @@ namespace ACE.Entity.Models
         public IList<PropertiesBookPageData> PropertiesBookPageData { get; set; }
 
         // Biota additions over Weenie
-        public IDictionary<uint /* Character ID */, PropertiesAllegiance> PropertiesAllegiance { get; set; }
+        public IDictionary<ulong /* Character ID */, PropertiesAllegiance> PropertiesAllegiance { get; set; }
         public ICollection<PropertiesEnchantmentRegistry> PropertiesEnchantmentRegistry { get; set; }
-        public IDictionary<uint /* Player GUID */, bool /* Storage */> HousePermissions { get; set; }
+        public IDictionary<ulong /* Player GUID */, bool /* Storage */> HousePermissions { get; set; }
     }
 }

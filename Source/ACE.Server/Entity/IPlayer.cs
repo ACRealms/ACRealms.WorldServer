@@ -20,7 +20,7 @@ namespace ACE.Server.Entity
         bool? GetProperty(PropertyBool property);
         uint? GetProperty(PropertyDataId property);
         double? GetProperty(PropertyFloat property);
-        uint? GetProperty(PropertyInstanceId property);
+        ulong? GetProperty(PropertyInstanceId property);
         int? GetProperty(PropertyInt property);
         long? GetProperty(PropertyInt64 property);
         string GetProperty(PropertyString property);
@@ -28,7 +28,7 @@ namespace ACE.Server.Entity
         void SetProperty(PropertyBool property, bool value);
         void SetProperty(PropertyDataId property, uint value);
         void SetProperty(PropertyFloat property, double value);
-        void SetProperty(PropertyInstanceId property, uint value);
+        void SetProperty(PropertyInstanceId property, ulong value);
         void SetProperty(PropertyInt property, int value);
         void SetProperty(PropertyInt64 property, long value);
         void SetProperty(PropertyString property, string value);
@@ -55,9 +55,9 @@ namespace ACE.Server.Entity
         bool IsPendingDeletion { get; }
 
 
-        uint? MonarchId { get; set; }
+        ulong? MonarchId { get; set; }
 
-        uint? PatronId { get; set; }
+        ulong? PatronId { get; set; }
 
         ulong AllegianceXPCached { get; set; }
 
@@ -71,7 +71,7 @@ namespace ACE.Server.Entity
 
         uint? HouseId { get; set; }
 
-        uint? HouseInstance { get; set; }
+        ulong? HouseInstance { get; set; }
 
         int? HousePurchaseTimestamp { get; set; }
 
@@ -94,6 +94,6 @@ namespace ACE.Server.Entity
         /// </summary>
         void SaveBiotaToDatabase(bool enqueueSave = true);
 
-        void UpdateProperty(PropertyInstanceId prop, uint? value, bool broadcast = false);
+        void UpdateProperty(PropertyInstanceId prop, ulong? value, bool broadcast = false);
     }
 }

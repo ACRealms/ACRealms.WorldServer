@@ -73,7 +73,7 @@ namespace ACE.Server.WorldObjects
 
         public uint? EphemeralRealmPortalInstanceID
         {
-            get => GetProperty(PropertyInstanceId.EphemeralRealmPortalInstanceID);
+            get => (uint?)GetProperty(PropertyInstanceId.EphemeralRealmPortalInstanceID);
             set { if (value == null) RemoveProperty(PropertyInstanceId.EphemeralRealmPortalInstanceID); else SetProperty(PropertyInstanceId.EphemeralRealmPortalInstanceID, value.Value); }
         }
     }

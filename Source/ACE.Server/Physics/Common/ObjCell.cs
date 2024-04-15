@@ -108,7 +108,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public void CheckAttack(uint attackerID, PhysicsPosition attackerPos, float attackerScale, AttackCone attackCone, AttackInfo attackInfo)
+        public void CheckAttack(ulong attackerID, PhysicsPosition attackerPos, float attackerScale, AttackCone attackCone, AttackInfo attackInfo)
         {
             readerWriterLockSlim.EnterReadLock();
             try
@@ -209,7 +209,7 @@ namespace ACE.Server.Physics.Common
             return LandCell.Get(cellID);
         }
 
-        public PhysicsObj GetObject(int id)
+        public PhysicsObj GetObject(ulong id)
         {
             readerWriterLockSlim.EnterReadLock();
             try

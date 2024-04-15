@@ -26,7 +26,7 @@ namespace ACE.Server.Entity
         public static int MaxFellows = 9;
 
         public string FellowshipName;
-        public uint FellowshipLeaderGuid;
+        public ulong FellowshipLeaderGuid;
 
         public bool DesiredShareXP;     // determined by the leader's 'ShareFellowshipExpAndLuminance' client option when fellowship is created
         public bool ShareLoot;          // determined by the leader's 'ShareFellowshipLoot' client option when fellowship is created
@@ -37,9 +37,9 @@ namespace ACE.Server.Entity
         public bool Open;               // indicates if non-leaders can invite new fellowship members
         public bool IsLocked;           // only set through emotes. if a fellowship is locked, new fellowship members cannot be added
 
-        public Dictionary<uint, WeakReference<Player>> FellowshipMembers;
+        public Dictionary<ulong, WeakReference<Player>> FellowshipMembers;
 
-        public Dictionary<uint, int> DepartedMembers;
+        public Dictionary<ulong, int> DepartedMembers;
 
         public Dictionary<string, FellowshipLockData> FellowshipLocks;
 
@@ -60,13 +60,13 @@ namespace ACE.Server.Entity
             FellowshipName = fellowshipName;
             EvenShare = false;
 
-            FellowshipMembers = new Dictionary<uint, WeakReference<Player>>() { { leader.Guid.Full, new WeakReference<Player>(leader) } };
+            FellowshipMembers = new Dictionary<ulong, WeakReference<Player>>() { { leader.Guid.Full, new WeakReference<Player>(leader) } };
 
             Open = false;
 
             QuestManager = new QuestManager(this);
             IsLocked = false;
-            DepartedMembers = new Dictionary<uint, int>();
+            DepartedMembers = new Dictionary<ulong, int>();
             FellowshipLocks = new Dictionary<string, FellowshipLockData>();
         }
 
@@ -321,14 +321,14 @@ namespace ACE.Server.Entity
 
                     player.Fellowship = null;
 
-                    player.Session.Network.EnqueueSend(new GameEventFellowshipQuit(player.Session, player.Guid.Full));
+                    player.Session.Network.EnqueueSend(new GameEventFellowshipQuit(player.Session, player.Guid.ClientGUID));
                     player.Session.Network.EnqueueSend(new GameMessageSystemChat("You no longer have permission to loot anyone else's kills.", ChatMessageType.Broadcast));
 
                     var fellowshipMembers = GetFellowshipMembers();
 
                     foreach (var member in fellowshipMembers.Values)
                     {
-                        member.Session.Network.EnqueueSend(new GameEventFellowshipQuit(member.Session, player.Guid.Full));
+                        member.Session.Network.EnqueueSend(new GameEventFellowshipQuit(member.Session, player.Guid.ClientGUID));
 
                         if (ShareLoot)
                         {
@@ -353,13 +353,13 @@ namespace ACE.Server.Entity
                         DepartedMembers[player.Guid.Full] = timestamp;
                 }
 
-                player.Session.Network.EnqueueSend(new GameEventFellowshipQuit(player.Session, player.Guid.Full));
+                player.Session.Network.EnqueueSend(new GameEventFellowshipQuit(player.Session, player.Guid.ClientGUID));
 
                 var fellowshipMembers = GetFellowshipMembers();
 
                 foreach (var member in fellowshipMembers.Values)
                 {
-                    member.Session.Network.EnqueueSend(new GameEventFellowshipQuit(member.Session, player.Guid.Full));
+                    member.Session.Network.EnqueueSend(new GameEventFellowshipQuit(member.Session, player.Guid.ClientGUID));
 
                     if (ShareLoot)
                     {
@@ -735,10 +735,10 @@ namespace ACE.Server.Entity
             }
         }
 
-        public Dictionary<uint, Player> GetFellowshipMembers()
+        public Dictionary<ulong, Player> GetFellowshipMembers()
         {
-            var results = new Dictionary<uint, Player>();
-            var dropped = new HashSet<uint>();
+            var results = new Dictionary<ulong, Player>();
+            var dropped = new HashSet<ulong>();
 
             foreach (var kvp in FellowshipMembers)
             {
@@ -760,7 +760,7 @@ namespace ACE.Server.Entity
             return results;
         }
 
-        public void ProcessDropList(Dictionary<uint, WeakReference<Player>> fellowshipMembers, HashSet<uint> fellowGuids)
+        public void ProcessDropList(Dictionary<ulong, WeakReference<Player>> fellowshipMembers, HashSet<ulong> fellowGuids)
         {
             foreach (var fellowGuid in fellowGuids)
             {
@@ -782,11 +782,12 @@ namespace ACE.Server.Entity
     {
         private static readonly HashComparer hashComparer = new HashComparer(32);
 
-        public static void Write(this BinaryWriter writer, Dictionary<uint, int> departedFellows)
+        public static void Write(this BinaryWriter writer, Dictionary<ulong, int> departedFellows)
         {
-            PackableHashTable.WriteHeader(writer, departedFellows.Count, hashComparer.NumBuckets);
+            var departedFellows2 = departedFellows.ToDictionary(x => new ObjectGuid(x.Key).ClientGUID, x => x.Value);
+            PackableHashTable.WriteHeader(writer, departedFellows2.Count, hashComparer.NumBuckets);
 
-            var sorted = new SortedDictionary<uint, int>(departedFellows, hashComparer);
+            var sorted = new SortedDictionary<uint, int>(departedFellows2, hashComparer);
 
             foreach (var departed in sorted)
             {

@@ -16,7 +16,7 @@ namespace ACE.Server.Network.GameAction.Actions
         public static void Handle(ClientMessage clientMessage, Session session)
         {
             var message = clientMessage.Payload.ReadString16L();
-            var targetGuid = clientMessage.Payload.ReadUInt32();
+            var targetGuid = clientMessage.Payload.ReadGuid(session);
 
             var creature = session.Player.CurrentLandblock?.GetObject(targetGuid) as Creature;
             if (creature == null)
@@ -43,7 +43,7 @@ namespace ACE.Server.Network.GameAction.Actions
                     return;
                 }
 
-                var tell = new GameEventTell(targetPlayer.Session, message, session.Player.GetNameWithSuffix(), session.Player.Guid.Full, targetPlayer.Guid.Full, ChatMessageType.Tell);
+                var tell = new GameEventTell(targetPlayer.Session, message, session.Player.GetNameWithSuffix(), session.Player.Guid.ClientGUID, targetPlayer.Guid.ClientGUID, ChatMessageType.Tell);
                 targetPlayer.Session.Network.EnqueueSend(tell);
             }
             else

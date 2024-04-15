@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.AddToTrade)]
         public static void Handle(ClientMessage message, Session session)
         {
-            var itemGuid = message.Payload.ReadUInt32();
+            var itemGuid = message.Payload.ReadGuid(session);
             var tradeSlot = message.Payload.ReadUInt32();
 
             session.Player.HandleActionAddToTrade(itemGuid, tradeSlot);

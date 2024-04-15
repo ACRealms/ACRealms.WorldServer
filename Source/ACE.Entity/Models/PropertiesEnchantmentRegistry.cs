@@ -14,7 +14,7 @@ namespace ACE.Entity.Models
         public uint PowerLevel { get; set; }
         public double StartTime { get; set; }
         public double Duration { get; set; }
-        public uint CasterObjectId { get; set; }
+        public ulong CasterObjectId { get; set; }
         public float DegradeModifier { get; set; }
         public float DegradeLimit { get; set; }
         public double LastTimeDegraded { get; set; }

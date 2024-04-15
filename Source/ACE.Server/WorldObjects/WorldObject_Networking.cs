@@ -127,10 +127,10 @@ namespace ACE.Server.WorldObjects
                 writer.Write(MaxStackSize ?? (ushort)0);
 
             if ((weenieFlags & WeenieHeaderFlag.Container) != 0)
-                writer.Write(ContainerId ?? 0);
+                writer.Write(new ObjectGuid(ContainerId ?? 0).ClientGUID);
 
             if ((weenieFlags & WeenieHeaderFlag.Wielder) != 0)
-                writer.Write(WielderId ?? 0);
+                writer.Write(new ObjectGuid(WielderId ?? 0).ClientGUID);
 
             if ((weenieFlags & WeenieHeaderFlag.ValidLocations) != 0)
                 writer.Write((uint?)ValidLocations ?? 0u);
@@ -167,7 +167,7 @@ namespace ACE.Server.WorldObjects
                 if (house != null && house.HouseType == HouseType.Mansion)
                     houseOwner = house.LinkedHouses[0].HouseOwner;
 
-                writer.Write(houseOwner ?? 0);
+                writer.Write(new ObjectGuid(houseOwner ?? 0).ClientGUID);
             }
 
             if ((weenieFlags & WeenieHeaderFlag.HouseRestrictions) != 0)
@@ -194,7 +194,7 @@ namespace ACE.Server.WorldObjects
                 writer.Write((uint?)HookItemType ?? 0);
 
             if ((weenieFlags & WeenieHeaderFlag.Monarch) != 0)
-                writer.Write(MonarchId ?? 0);
+                writer.Write(new ObjectGuid(MonarchId ?? 0).ClientGUID);
 
             if ((weenieFlags & WeenieHeaderFlag.HookType) != 0)
                 writer.Write(HookType ?? 0);
@@ -215,7 +215,7 @@ namespace ACE.Server.WorldObjects
                 writer.Write((double?)CooldownDuration ?? 0u);
 
             if ((weenieFlags2 & WeenieHeaderFlag2.PetOwner) != 0)
-                writer.Write(PetOwner ?? 0);
+                writer.Write(new ObjectGuid(PetOwner ?? 0).ClientGUID);
 
             writer.Align();
         }
@@ -335,7 +335,7 @@ namespace ACE.Server.WorldObjects
 
             if ((physicsDescriptionFlag & PhysicsDescriptionFlag.Parent) != 0)
             {
-                writer.Write(WielderId ?? 0);
+                writer.Write(new ObjectGuid(WielderId ?? 0).ClientGUID);
                 writer.Write((uint)(ParentLocation ?? 0));
             }
 
@@ -344,7 +344,7 @@ namespace ACE.Server.WorldObjects
                 writer.Write(Children.Count);
                 foreach (var child in Children)
                 {
-                    writer.Write(child.Guid);
+                    writer.Write(new ObjectGuid(child.Guid).ClientGUID);
                     writer.Write(child.LocationId);
                 }
             }

@@ -11,7 +11,7 @@ namespace ACE.Server.Network.GameEvent.Events
         {
             var appraiseInfo = new AppraiseInfo(obj, session.Player, success);
 
-            Writer.Write(obj.Guid.Full);
+            Writer.Write(obj.Guid.ClientGUID);
             Writer.Write(appraiseInfo);
         }
 

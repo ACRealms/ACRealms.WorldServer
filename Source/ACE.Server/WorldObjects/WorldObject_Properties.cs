@@ -33,7 +33,7 @@ namespace ACE.Server.WorldObjects
         private Dictionary<PropertyBool, bool?> ephemeralPropertyBools { get; set; }
         private Dictionary<PropertyDataId, uint?> ephemeralPropertyDataIds { get; set; }
         private Dictionary<PropertyFloat, double?> ephemeralPropertyFloats { get; set; }
-        private Dictionary<PropertyInstanceId, uint?> ephemeralPropertyInstanceIds { get; set; }
+        private Dictionary<PropertyInstanceId, ulong?> ephemeralPropertyInstanceIds { get; set; }
         protected Dictionary<PropertyInt, int?> ephemeralPropertyInts { get; set; }
         private Dictionary<PropertyInt64, long?> ephemeralPropertyInt64s { get; set; }
         private Dictionary<PropertyString, string> ephemeralPropertyStrings { get; set; }
@@ -60,7 +60,7 @@ namespace ACE.Server.WorldObjects
 
             return Biota.GetProperty(property, BiotaDatabaseLock);
         }
-        public uint? GetProperty(PropertyInstanceId property)
+        public ulong? GetProperty(PropertyInstanceId property)
         {
             if (ephemeralPropertyInstanceIds != null && ephemeralPropertyInstanceIds.TryGetValue(property, out var value))
                 return value;
@@ -144,12 +144,12 @@ namespace ACE.Server.WorldObjects
             var prop = GetProperty(property) ?? 0;
             SetProperty(property, prop + value);
         }
-        public void SetProperty(PropertyInstanceId property, uint value)
+        public void SetProperty(PropertyInstanceId property, ulong value)
         {
             if (EphemeralProperties.PropertiesInstanceId.Contains(property))
             {
                 if (ephemeralPropertyInstanceIds == null)
-                    ephemeralPropertyInstanceIds = new Dictionary<PropertyInstanceId, uint?>();
+                    ephemeralPropertyInstanceIds = new Dictionary<PropertyInstanceId, ulong?>();
                 ephemeralPropertyInstanceIds[property] = value;
             }
             else
@@ -402,9 +402,9 @@ namespace ACE.Server.WorldObjects
             return results;
         }
 
-        public Dictionary<PropertyInstanceId, uint> GetAllPropertyInstanceId()
+        public Dictionary<PropertyInstanceId, ulong> GetAllPropertyInstanceId()
         {
-            var results = new Dictionary<PropertyInstanceId, uint>();
+            var results = new Dictionary<PropertyInstanceId, ulong>();
 
             BiotaDatabaseLock.EnterReadLock();
             try
@@ -1231,13 +1231,13 @@ namespace ACE.Server.WorldObjects
 
         public WorldObject Container;
 
-        public uint? ContainerId
+        public ulong? ContainerId
         {
             get => GetProperty(PropertyInstanceId.Container);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Container); else SetProperty(PropertyInstanceId.Container, value.Value); }
         }
 
-        public uint? WielderId
+        public ulong? WielderId
         {
             get => GetProperty(PropertyInstanceId.Wielder);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Wielder); else SetProperty(PropertyInstanceId.Wielder, value.Value); }
@@ -1375,13 +1375,13 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyDataId.HouseId); else SetProperty(PropertyDataId.HouseId, value.Value); }
         }
 
-        public uint? HouseInstance
+        public ulong? HouseInstance
         {
             get => GetProperty(PropertyInstanceId.House);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.House); else SetProperty(PropertyInstanceId.House, value.Value); }
         }
 
-        public uint? HouseOwner
+        public ulong? HouseOwner
         {
             get => GetProperty(PropertyInstanceId.HouseOwner);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.HouseOwner); else SetProperty(PropertyInstanceId.HouseOwner, value.Value); }
@@ -1417,13 +1417,13 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyInt.HookPlacement); else SetProperty(PropertyInt.HookPlacement, value.Value); }
         }
 
-        public uint? MonarchId
+        public ulong? MonarchId
         {
             get => GetProperty(PropertyInstanceId.Monarch);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Monarch); else SetProperty(PropertyInstanceId.Monarch, value.Value); }
         }
 
-        public uint? PatronId
+        public ulong? PatronId
         {
             get => GetProperty(PropertyInstanceId.Patron);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Patron); else SetProperty(PropertyInstanceId.Patron, value.Value); }
@@ -1506,7 +1506,7 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyFloat.CooldownDuration); else SetProperty(PropertyFloat.CooldownDuration, value.Value); }
         }
 
-        public uint? PetOwner
+        public ulong? PetOwner
         {
             get => GetProperty(PropertyInstanceId.PetOwner);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.PetOwner); else SetProperty(PropertyInstanceId.PetOwner, value.Value); }
@@ -1841,7 +1841,7 @@ namespace ACE.Server.WorldObjects
         }
 
 
-        public uint? ScribeIID
+        public ulong? ScribeIID
         {
             get => GetProperty(PropertyInstanceId.Scribe);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Scribe); else SetProperty(PropertyInstanceId.Scribe, value.Value); }
@@ -2387,55 +2387,55 @@ namespace ACE.Server.WorldObjects
             set { SetPosition(PositionType.EphemeralRealmLastEnteredDrop, value); }
         }
 
-        public uint? CurrentCombatTarget
+        public ulong? CurrentCombatTarget
         {
             get => GetProperty(PropertyInstanceId.CurrentCombatTarget);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.CurrentCombatTarget); else SetProperty(PropertyInstanceId.CurrentCombatTarget, value.Value); }
         }
 
-        public uint? CurrentEnemy
+        public ulong? CurrentEnemy
         {
             get => GetProperty(PropertyInstanceId.CurrentEnemy);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.CurrentEnemy); else SetProperty(PropertyInstanceId.CurrentEnemy, value.Value); }
         }
 
-        public uint? CurrentAttacker
+        public ulong? CurrentAttacker
         {
             get => GetProperty(PropertyInstanceId.CurrentAttacker);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.CurrentAttacker); else SetProperty(PropertyInstanceId.CurrentAttacker, value.Value); }
         }
 
-        public uint? CurrentDamager
+        public ulong? CurrentDamager
         {
             get => GetProperty(PropertyInstanceId.CurrentDamager);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.CurrentDamager); else SetProperty(PropertyInstanceId.CurrentDamager, value.Value); }
         }
 
-        public uint? CurrentFollowTarget
+        public ulong? CurrentFollowTarget
         {
             get => GetProperty(PropertyInstanceId.CurrentFollowTarget);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.CurrentFollowTarget); else SetProperty(PropertyInstanceId.CurrentFollowTarget, value.Value); }
         }
 
-        public uint? CurrentFellowshipAppraisalTarget
+        public ulong? CurrentFellowshipAppraisalTarget
         {
             get => GetProperty(PropertyInstanceId.CurrentFellowshipAppraisalTarget);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.CurrentFellowshipAppraisalTarget); else SetProperty(PropertyInstanceId.CurrentFellowshipAppraisalTarget, value.Value); }
         }
 
-        public uint? CombatTarget
+        public ulong? CombatTarget
         {
             get => GetProperty(PropertyInstanceId.CombatTarget);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.CombatTarget); else SetProperty(PropertyInstanceId.CombatTarget, value.Value); }
         }
 
-        public uint? HealthQueryTarget
+        public ulong? HealthQueryTarget
         {
             get => GetProperty(PropertyInstanceId.HealthQueryTarget);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.HealthQueryTarget); else SetProperty(PropertyInstanceId.HealthQueryTarget, value.Value); }
         }
 
-        public uint? ManaQueryTarget
+        public ulong? ManaQueryTarget
         {
             get => GetProperty(PropertyInstanceId.ManaQueryTarget);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.ManaQueryTarget); else SetProperty(PropertyInstanceId.ManaQueryTarget, value.Value); }
@@ -2505,13 +2505,13 @@ namespace ACE.Server.WorldObjects
             set { if (!value) RemoveProperty(PropertyBool.FirstEnterWorldDone); else SetProperty(PropertyBool.FirstEnterWorldDone, value); }
         }
 
-        public uint? OwnerId
+        public ulong? OwnerId
         {
             get => GetProperty(PropertyInstanceId.Owner);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Owner); else SetProperty(PropertyInstanceId.Owner, value.Value); }
         }
 
-        public uint ActivationTarget
+        public ulong ActivationTarget
         {
             get => GetProperty(PropertyInstanceId.ActivationTarget) ?? 0;
             set { if (value == 0) RemoveProperty(PropertyInstanceId.ActivationTarget); else SetProperty(PropertyInstanceId.ActivationTarget, value); }
@@ -2528,14 +2528,14 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyFloat.TimeToRot); else SetProperty(PropertyFloat.TimeToRot, value.Value); }
         }
 
-        public uint? AllowedActivator
+        public ulong? AllowedActivator
         {
             get => GetProperty(PropertyInstanceId.AllowedActivator);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.AllowedActivator); else SetProperty(PropertyInstanceId.AllowedActivator, value.Value); }
         }
 
         // generator properties
-        public uint? GeneratorId
+        public ulong? GeneratorId
         {
             get => GetProperty(PropertyInstanceId.Generator);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Generator); else SetProperty(PropertyInstanceId.Generator, value.Value); }
@@ -2709,13 +2709,13 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyInt.ResistLockpick); else SetProperty(PropertyInt.ResistLockpick, value.Value); }
         }
 
-        public uint? VictimId
+        public ulong? VictimId
         {
             get => GetProperty(PropertyInstanceId.Victim);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Victim); else SetProperty(PropertyInstanceId.Victim, value.Value); }
         }
 
-        public uint? KillerId
+        public ulong? KillerId
         {
             get => GetProperty(PropertyInstanceId.Killer);
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Killer); else SetProperty(PropertyInstanceId.Killer, value.Value); }

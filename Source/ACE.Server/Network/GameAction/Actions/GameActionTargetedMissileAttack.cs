@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.TargetedMissileAttack)]
         public static void Handle(ClientMessage message, Session session)
         {
-            var targetGuid = message.Payload.ReadUInt32();
+            var targetGuid = message.Payload.ReadGuid(session);
             var attackHeight = message.Payload.ReadUInt32();
             var accuracyLevel = message.Payload.ReadSingle();
 

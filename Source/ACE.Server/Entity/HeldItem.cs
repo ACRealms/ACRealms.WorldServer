@@ -1,4 +1,4 @@
-﻿using ACE.Entity.Enum;
+using ACE.Entity.Enum;
 
 namespace ACE.Server.Entity
 {
@@ -7,13 +7,13 @@ namespace ACE.Server.Entity
     /// </summary>
     public class HeldItem
     {
-        public uint Guid { get; }
+        public ulong Guid { get; }
 
         public int LocationId { get; }
 
         public EquipMask EquipMask { get; }
 
-        public HeldItem(uint guid, int locationId, EquipMask equipmask)
+        public HeldItem(ulong guid, int locationId, EquipMask equipmask)
         {
             Guid = guid;
             EquipMask = equipmask;

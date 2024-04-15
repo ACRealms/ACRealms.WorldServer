@@ -75,7 +75,7 @@ namespace ACE.Server.WorldObjects
             CreateMoveToChain(patron, (success) => SwearAllegiance(patron.Guid.Full, success), Allegiance_MaxSwearDistance);
         }
 
-        public void SwearAllegiance(uint targetGuid, bool success, bool confirmed = false)
+        public void SwearAllegiance(ulong targetGuid, bool success, bool confirmed = false)
         {
             if (!success) return;
 
@@ -452,7 +452,7 @@ namespace ACE.Server.WorldObjects
                 foreach (var member in Allegiance.OnlinePlayers)
                 {
                     if (member.Guid != Guid && member.GetCharacterOption(CharacterOption.ShowAllegianceLogons))
-                        member.Session.Network.EnqueueSend(new GameEventAllegianceLoginNotification(member.Session, Guid.Full, isLoggedIn: true));
+                        member.Session.Network.EnqueueSend(new GameEventAllegianceLoginNotification(member.Session, Guid.ClientGUID, isLoggedIn: true));
                 }
             }
         }
@@ -464,7 +464,7 @@ namespace ACE.Server.WorldObjects
                 foreach (var member in Allegiance.OnlinePlayers)
                 {
                     if (member.Guid != Guid && member.GetCharacterOption(CharacterOption.ShowAllegianceLogons))
-                        member.Session.Network.EnqueueSend(new GameEventAllegianceLoginNotification(member.Session, Guid.Full, isLoggedIn: false));
+                        member.Session.Network.EnqueueSend(new GameEventAllegianceLoginNotification(member.Session, Guid.ClientGUID, isLoggedIn: false));
                 }
             }
         }
@@ -943,7 +943,7 @@ namespace ACE.Server.WorldObjects
             }
             var profile = new AllegianceProfile(Allegiance, allegianceNode);
 
-            Session.Network.EnqueueSend(new GameEventAllegianceInfoResponse(Session, player.Guid.Full, profile));
+            Session.Network.EnqueueSend(new GameEventAllegianceInfoResponse(Session, player.Guid.ClientGUID, profile));
         }
 
         public void HandleActionDoAllegianceLockAction(AllegianceLockAction action)

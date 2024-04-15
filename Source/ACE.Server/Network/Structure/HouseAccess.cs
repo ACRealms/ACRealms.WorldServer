@@ -90,7 +90,7 @@ namespace ACE.Server.Network.Structure
         {
             writer.Write(har.Version);
             writer.Write((uint)har.Bitmask);
-            writer.Write(har.MonarchID.Full);
+            writer.Write(har.MonarchID.ClientGUID);
             writer.Write(har.GuestList);
             writer.Write(har.Roommates);
         }
@@ -106,7 +106,7 @@ namespace ACE.Server.Network.Structure
 
             foreach (var kvp in sorted)
             {
-                writer.Write(kvp.Key.Full);
+                writer.Write(kvp.Key.ClientGUID);
                 writer.Write(kvp.Value);
             }
         }
@@ -118,7 +118,7 @@ namespace ACE.Server.Network.Structure
             writer.Write(roommates.Count);
 
             foreach (var roommate in roommates)
-                writer.Write(roommate.Full);
+                writer.Write(roommate.ClientGUID);
         }
     }
 }

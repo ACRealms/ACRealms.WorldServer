@@ -10,7 +10,7 @@ namespace ACE.Server.Network.GameEvent.Events
         public GameEventGameOver(Session session, ObjectGuid boardGuid, int teamWinner)
             : base(GameEventType.GameOver, GameMessageGroup.UIQueue, session)
         {
-            Writer.Write(boardGuid.Full);
+            Writer.Write(boardGuid.ClientGUID);
             Writer.Write(teamWinner);
         }
     }

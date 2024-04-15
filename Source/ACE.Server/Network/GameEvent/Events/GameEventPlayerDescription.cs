@@ -182,12 +182,12 @@ namespace ACE.Server.Network.GameEvent.Events
 
                 PackableHashTable.WriteHeader(Writer, _propertiesIid.Count, PropertyInstanceIdComparer.NumBuckets);
 
-                var propertiesIid = new SortedDictionary<PropertyInstanceId, uint>(_propertiesIid, PropertyInstanceIdComparer);
+                var propertiesIid = new SortedDictionary<PropertyInstanceId, ulong>(_propertiesIid, PropertyInstanceIdComparer);
 
                 foreach (var property in propertiesIid)
                 {
                     Writer.Write((uint)property.Key);
-                    Writer.Write(property.Value);
+                    Writer.Write(new ACE.Entity.ObjectGuid(property.Value).ClientGUID);
                 }
             }
 
@@ -402,13 +402,13 @@ namespace ACE.Server.Network.GameEvent.Events
             // write out all of the non-containers and foci
             foreach (var item in Session.Player.Inventory.Values.Where(i => !i.UseBackpackSlot).OrderBy(i => i.PlacementPosition))
             {
-                Writer.Write(item.Guid.Full);
+                Writer.Write(item.Guid.ClientGUID);
                 Writer.Write((uint)ContainerType.NonContainer);
             }
             // Containers and foci go in side slots, they come last with their own placement order.
             foreach (var item in Session.Player.Inventory.Values.Where(i => i.UseBackpackSlot).OrderBy(i => i.PlacementPosition))
             {
-                Writer.Write(item.Guid.Full);
+                Writer.Write(item.Guid.ClientGUID);
                 if (item.WeenieType == WeenieType.Container)
                     Writer.Write((uint)ContainerType.Container);
                 else
@@ -418,7 +418,7 @@ namespace ACE.Server.Network.GameEvent.Events
             Writer.Write((uint)Session.Player.EquippedObjects.Values.Count);
             foreach (var item in Session.Player.EquippedObjects.Values)
             {
-                Writer.Write(item.Guid.Full);
+                Writer.Write(item.Guid.ClientGUID);
                 Writer.Write((uint)(item.CurrentWieldedLocation ?? 0));
                 Writer.Write((uint)(item.ClothingPriority ?? 0));
             }

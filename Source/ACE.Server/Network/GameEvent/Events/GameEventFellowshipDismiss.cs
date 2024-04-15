@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameEvent.Events
             : base(GameEventType.FellowshipDismiss, GameMessageGroup.UIQueue, session)
         {
             // can be both S2C and C2S?
-            Writer.Write(dismissedPlayer.Guid.Full);
+            Writer.Write(dismissedPlayer.Guid.ClientGUID);
         }
     }
 }

@@ -156,7 +156,7 @@ namespace ACE.Server.WorldObjects
                 _ => 0u
             };
 
-            Session.Network.EnqueueSend(new GameEventSetTurbineChatChannels(Session, allegianceChannel, societyChannel));
+            Session.Network.EnqueueSend(new GameEventSetTurbineChatChannels(Session, new ObjectGuid(allegianceChannel).ClientGUID, societyChannel));
         }
 
         public void JoinTurbineChatChannel(string channelName)

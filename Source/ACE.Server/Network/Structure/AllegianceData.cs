@@ -66,7 +66,7 @@ namespace ACE.Server.Network.Structure
                 var playerGuid = node.PlayerGuid;
                 var player = PlayerManager.FindByGuid(playerGuid, out var playerIsOnline);
                 
-                characterID = player.Guid.Full;
+                characterID = player.Guid.ClientGUID;
                 cpCached = (uint)Math.Min(player.AllegianceXPCached, uint.MaxValue);
                 cpTithed = (uint)Math.Min(player.AllegianceXPGenerated, uint.MaxValue);
 

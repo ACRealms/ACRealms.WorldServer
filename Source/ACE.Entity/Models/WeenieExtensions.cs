@@ -46,7 +46,7 @@ namespace ACE.Entity.Models
             return null;
         }
 
-        public static uint? GetProperty(this Weenie weenie, PropertyInstanceId property)
+        public static ulong? GetProperty(this Weenie weenie, PropertyInstanceId property)
         {
             if (weenie.PropertiesIID == null)
                 return null;

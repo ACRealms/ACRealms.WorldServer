@@ -27,7 +27,7 @@ namespace ACE.Server.WorldObjects
 
         public bool TradeTransferInProgress;
 
-        public void HandleActionOpenTradeNegotiations(uint tradePartnerGuid, bool initiator = false)
+        public void HandleActionOpenTradeNegotiations(ObjectGuid tradePartnerGuid, bool initiator = false)
         {
             if (IsOlthoiPlayer)
             {
@@ -79,7 +79,7 @@ namespace ACE.Server.WorldObjects
 
                     Session.Network.EnqueueSend(new GameEventRegisterTrade(Session, Guid, tradePartner.Guid));
 
-                    tradePartner.HandleActionOpenTradeNegotiations(Guid.Full, false);
+                    tradePartner.HandleActionOpenTradeNegotiations(Guid, false);
                 });
             }
             else
@@ -113,7 +113,7 @@ namespace ACE.Server.WorldObjects
             Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.TradeClosed));
         }
 
-        public void HandleActionAddToTrade(uint itemGuid, uint tradeWindowSlotNumber)
+        public void HandleActionAddToTrade(ObjectGuid itemGuid, uint tradeWindowSlotNumber)
         {
             if (TradeTransferInProgress)
                 return;
@@ -122,7 +122,7 @@ namespace ACE.Server.WorldObjects
 
             var target = PlayerManager.GetOnlinePlayer(TradePartner);
 
-            if (target == null || itemGuid == 0)
+            if (target == null || itemGuid.ClientGUID == 0)
                 return;
 
             target.TradeAccepted = false;
@@ -140,27 +140,27 @@ namespace ACE.Server.WorldObjects
             if (wo.IsAttunedOrContainsAttuned)
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You cannot trade that!"));
-                Session.Network.EnqueueSend(new GameEventTradeFailure(Session, itemGuid, WeenieError.AttunedItem));
+                Session.Network.EnqueueSend(new GameEventTradeFailure(Session, itemGuid.ClientGUID, WeenieError.AttunedItem));
                 return;
             }
 
             if (wo is PetDevice petDevice && petDevice.Pet is not null)
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You must unsummon your pet before you can trade this item!"));
-                Session.Network.EnqueueSend(new GameEventTradeFailure(Session, itemGuid, WeenieError.AttunedItem));
+                Session.Network.EnqueueSend(new GameEventTradeFailure(Session, itemGuid.ClientGUID, WeenieError.AttunedItem));
                 return;
             }
 
             if (wo.IsUniqueOrContainsUnique && !target.CheckUniques(wo, this))
             {
                 // WeenieError.TooManyUniqueItems / WeenieErrorWithString._CannotCarryAnymore?
-                Session.Network.EnqueueSend(new GameEventTradeFailure(Session, itemGuid, WeenieError.None));
+                Session.Network.EnqueueSend(new GameEventTradeFailure(Session, itemGuid.ClientGUID, WeenieError.None));
                 return;
             }
 
-            ItemsInTradeWindow.Add(new ObjectGuid(itemGuid));
+            ItemsInTradeWindow.Add(itemGuid);
 
-            Session.Network.EnqueueSend(new GameEventAddToTrade(Session, itemGuid, TradeSide.Self));
+            Session.Network.EnqueueSend(new GameEventAddToTrade(Session, itemGuid.ClientGUID, TradeSide.Self));
 
             target.AddKnownTradeObj(Guid, wo.Guid);
             target.TrackObject(wo);
@@ -169,7 +169,7 @@ namespace ACE.Server.WorldObjects
             actionChain.AddDelaySeconds(0.001f);
             actionChain.AddAction(target, () =>
             {
-                target.Session.Network.EnqueueSend(new GameEventAddToTrade(target.Session, itemGuid, TradeSide.Partner));
+                target.Session.Network.EnqueueSend(new GameEventAddToTrade(target.Session, itemGuid.ClientGUID, TradeSide.Partner));
             });
             actionChain.EnqueueChain();
         }

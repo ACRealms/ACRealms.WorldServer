@@ -382,9 +382,9 @@ namespace ACE.Server.Command.Handlers
             var fixStr = fix ? " -- fixed" : "";
             var foundIssues = false;
 
-            HashSet<uint> oswaldSkillCredit = null;
-            HashSet<uint> ralireaSkillCredit = null;
-            Dictionary<uint, int> lumAugSkillCredits = null;
+            HashSet<ulong> oswaldSkillCredit = null;
+            HashSet<ulong> ralireaSkillCredit = null;
+            Dictionary<ulong, int> lumAugSkillCredits = null;
 
             using (var ctx = new ShardDbContext())
             {
@@ -894,7 +894,7 @@ namespace ACE.Server.Command.Handlers
 
             var results = new List<VerifyXpResult>();
 
-            HashSet<uint> lesserBenediction = null;
+            HashSet<ulong> lesserBenediction = null;
 
             using (var ctx = new ShardDbContext())
             {
@@ -1109,7 +1109,7 @@ namespace ACE.Server.Command.Handlers
             return hash;
         }
 
-        public static Dictionary<uint, int> GetResistMagic()
+        public static Dictionary<ulong, int> GetResistMagic()
         {
             using (var ctx = new ShardDbContext())
             {
@@ -1119,7 +1119,7 @@ namespace ACE.Server.Command.Handlers
             }
         }
 
-        public static Dictionary<uint, string> GetTinkerLogs()
+        public static Dictionary<ulong, string> GetTinkerLogs()
         {
             using (var ctx = new ShardDbContext())
             {
@@ -1129,7 +1129,7 @@ namespace ACE.Server.Command.Handlers
             }
         }
 
-        public static Dictionary<uint, int> GetNumTimesTinkered()
+        public static Dictionary<ulong, int> GetNumTimesTinkered()
         {
             using (var ctx = new ShardDbContext())
             {
@@ -1139,7 +1139,7 @@ namespace ACE.Server.Command.Handlers
             }
         }
 
-        public static Dictionary<uint, int> GetImbuedEffect()
+        public static Dictionary<ulong, int> GetImbuedEffect()
         {
             using (var ctx = new ShardDbContext())
             {

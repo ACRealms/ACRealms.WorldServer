@@ -40,7 +40,7 @@ namespace ACE.Database.Adapter
             }
             if (biota.BiotaPropertiesIID != null && (instantiateEmptyCollections || biota.BiotaPropertiesIID.Count > 0))
             {
-                result.PropertiesIID = new Dictionary<PropertyInstanceId, uint>(biota.BiotaPropertiesIID.Count);
+                result.PropertiesIID = new Dictionary<PropertyInstanceId, ulong>(biota.BiotaPropertiesIID.Count);
                 foreach (var value in biota.BiotaPropertiesIID)
                     result.PropertiesIID[(PropertyInstanceId)value.Type] = value.Value;
             }
@@ -419,7 +419,7 @@ namespace ACE.Database.Adapter
 
             if (biota.BiotaPropertiesAllegiance != null && (instantiateEmptyCollections || biota.BiotaPropertiesAllegiance.Count > 0))
             {
-                result.PropertiesAllegiance = new Dictionary<uint, PropertiesAllegiance>(biota.BiotaPropertiesAllegiance.Count);
+                result.PropertiesAllegiance = new Dictionary<ulong, PropertiesAllegiance>(biota.BiotaPropertiesAllegiance.Count);
 
                 foreach (var record in biota.BiotaPropertiesAllegiance)
                 {
@@ -465,7 +465,7 @@ namespace ACE.Database.Adapter
 
             if (biota.HousePermission != null && (instantiateEmptyCollections || biota.HousePermission.Count > 0))
             {
-                result.HousePermissions = new Dictionary<uint, bool>(biota.HousePermission.Count);
+                result.HousePermissions = new Dictionary<ulong, bool>(biota.HousePermission.Count);
 
                 foreach (var record in biota.HousePermission)
                     result.HousePermissions[record.PlayerGuid] = record.Storage;

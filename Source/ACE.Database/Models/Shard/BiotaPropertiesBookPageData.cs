@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -8,9 +8,9 @@ namespace ACE.Database.Models.Shard
     public partial class BiotaPropertiesBookPageData
     {
         public uint Id { get; set; }
-        public uint ObjectId { get; set; }
+        public ulong ObjectId { get; set; }
         public uint PageId { get; set; }
-        public uint AuthorId { get; set; }
+        public ulong AuthorId { get; set; }
         public string AuthorName { get; set; }
         public string AuthorAccount { get; set; }
         public bool IgnoreAuthor { get; set; }

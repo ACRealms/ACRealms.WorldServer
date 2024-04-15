@@ -953,7 +953,7 @@ namespace ACE.Server.Managers
 
             foreach (var requirement in iidReqs)
             {
-                uint? value = obj.GetProperty((PropertyInstanceId)requirement.Stat);
+                ulong? value = obj.GetProperty((PropertyInstanceId)requirement.Stat);
                 double? normalized = value != null ? (double?)Convert.ToDouble(value.Value) : null;
 
                 if (Debug)
@@ -1089,7 +1089,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Returns a list of object guids that have been modified
         /// </summary>
-        public static HashSet<uint> CreateDestroyItems(Player player, Recipe recipe, WorldObject source, WorldObject target, double successChance, bool success)
+        public static HashSet<ulong> CreateDestroyItems(Player player, Recipe recipe, WorldObject source, WorldObject target, double successChance, bool success)
         {
             var destroyTargetChance = success ? recipe.SuccessDestroyTargetChance : recipe.FailDestroyTargetChance;
             var destroySourceChance = success ? recipe.SuccessDestroySourceChance : recipe.FailDestroySourceChance;
@@ -1235,9 +1235,9 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Returns a list of object guids that have been modified
         /// </summary>
-        public static HashSet<uint> ModifyItem(Player player, Recipe recipe, WorldObject source, WorldObject target, WorldObject result, bool success)
+        public static HashSet<ulong> ModifyItem(Player player, Recipe recipe, WorldObject source, WorldObject target, WorldObject result, bool success)
         {
-            var modified = new HashSet<uint>();
+            var modified = new HashSet<ulong>();
 
             foreach (var mod in recipe.RecipeMod)
             {
@@ -1306,7 +1306,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        public static void ModifyBool(Player player, RecipeModsBool boolMod, WorldObject source, WorldObject target, WorldObject result, HashSet<uint> modified)
+        public static void ModifyBool(Player player, RecipeModsBool boolMod, WorldObject source, WorldObject target, WorldObject result, HashSet<ulong> modified)
         {
             var op = (ModificationOperation)boolMod.Enum;
             var prop = (PropertyBool)boolMod.Stat;
@@ -1327,7 +1327,7 @@ namespace ACE.Server.Managers
                 Console.WriteLine($"{targetMod.Name}.SetProperty({prop}, {value}) - {op}");
         }
 
-        public static void ModifyInt(Player player, RecipeModsInt intMod, WorldObject source, WorldObject target, WorldObject result, HashSet<uint> modified)
+        public static void ModifyInt(Player player, RecipeModsInt intMod, WorldObject source, WorldObject target, WorldObject result, HashSet<ulong> modified)
         {
             var op = (ModificationOperation)intMod.Enum;
             var prop = (PropertyInt)intMod.Stat;
@@ -1385,7 +1385,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        public static void ModifyFloat(Player player, RecipeModsFloat floatMod, WorldObject source, WorldObject target, WorldObject result, HashSet<uint> modified)
+        public static void ModifyFloat(Player player, RecipeModsFloat floatMod, WorldObject source, WorldObject target, WorldObject result, HashSet<ulong> modified)
         {
             var op = (ModificationOperation)floatMod.Enum;
             var prop = (PropertyFloat)floatMod.Stat;
@@ -1422,7 +1422,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        public static void ModifyString(Player player, RecipeModsString stringMod, WorldObject source, WorldObject target, WorldObject result, HashSet<uint> modified)
+        public static void ModifyString(Player player, RecipeModsString stringMod, WorldObject source, WorldObject target, WorldObject result, HashSet<ulong> modified)
         {
             var op = (ModificationOperation)stringMod.Enum;
             var prop = (PropertyString)stringMod.Stat;
@@ -1454,7 +1454,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        public static void ModifyInstanceID(Player player, RecipeModsIID iidMod, WorldObject source, WorldObject target, WorldObject result, HashSet<uint> modified)
+        public static void ModifyInstanceID(Player player, RecipeModsIID iidMod, WorldObject source, WorldObject target, WorldObject result, HashSet<ulong> modified)
         {
             var op = (ModificationOperation)iidMod.Enum;
             var prop = (PropertyInstanceId)iidMod.Stat;
@@ -1486,7 +1486,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        private static uint ModifyInstanceIDRuleSet(PropertyInstanceId property, WorldObject sourceMod, WorldObject targetMod)
+        private static ulong ModifyInstanceIDRuleSet(PropertyInstanceId property, WorldObject sourceMod, WorldObject targetMod)
         {
             switch (property)
             {
@@ -1500,7 +1500,7 @@ namespace ACE.Server.Managers
             return sourceMod.GetProperty(property) ?? 0;
         }
 
-        public static void ModifyDataID(Player player, RecipeModsDID didMod, WorldObject source, WorldObject target, WorldObject result, HashSet<uint> modified)
+        public static void ModifyDataID(Player player, RecipeModsDID didMod, WorldObject source, WorldObject target, WorldObject result, HashSet<ulong> modified)
         {
             var op = (ModificationOperation)didMod.Enum;
             var prop = (PropertyDataId)didMod.Stat;
@@ -1537,7 +1537,7 @@ namespace ACE.Server.Managers
         /// </summary>
         private static readonly bool useMutateNative = false;
 
-        public static bool TryMutate(Player player, WorldObject source, WorldObject target, Recipe recipe, uint dataId, HashSet<uint> modified)
+        public static bool TryMutate(Player player, WorldObject source, WorldObject target, Recipe recipe, uint dataId, HashSet<ulong> modified)
         {
             if (useMutateNative)
                 return TryMutateNative(player, source, target, recipe, dataId);

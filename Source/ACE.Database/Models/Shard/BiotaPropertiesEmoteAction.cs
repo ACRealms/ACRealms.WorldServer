@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -7,7 +7,7 @@ namespace ACE.Database.Models.Shard
 {
     public partial class BiotaPropertiesEmoteAction
     {
-        public uint Id { get; set; }
+        public ulong Id { get; set; }
         public uint EmoteId { get; set; }
         public uint Order { get; set; }
         public uint Type { get; set; }

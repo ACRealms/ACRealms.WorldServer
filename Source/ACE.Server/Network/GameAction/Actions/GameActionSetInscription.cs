@@ -11,7 +11,7 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.SetInscription)]
         public static void Handle(ClientMessage message, Session session)
         {
-            uint objectGuid = message.Payload.ReadUInt32();
+            var objectGuid = message.Payload.ReadGuid(session);
             string inscriptionText = message.Payload.ReadString16L();
 
             session.Player.HandleActionSetInscription(objectGuid, inscriptionText);

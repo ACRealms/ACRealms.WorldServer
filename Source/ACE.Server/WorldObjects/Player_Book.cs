@@ -7,14 +7,14 @@ namespace ACE.Server.WorldObjects
 {
     partial class Player
     {
-        public void ReadBook(uint bookGuid)
+        public void ReadBook(ObjectGuid bookGuid)
         {
             // This appears to have been sent in response 0x00AA (not pcapped)
             // When a book is blank, client automatically adds a "blank" page after opening, gets a GameEventBookAddPageResponse success and then sends 0x00AA, expecting this response or the page/book is not writable or usable, unless it is closed and opened again
 
             // TODO: Do we want to throttle this request, like appraisals?
 
-            var book = FindObject(new ObjectGuid(bookGuid), SearchLocations.MyInventory | SearchLocations.LastUsedHook, out var container, out var rootOwner, out var wasEquipped) as Book;
+            var book = FindObject(bookGuid, SearchLocations.MyInventory | SearchLocations.LastUsedHook, out var container, out var rootOwner, out var wasEquipped) as Book;
             if (book == null) return;
 
             // found book
@@ -48,18 +48,18 @@ namespace ACE.Server.WorldObjects
                 else
                     inscription = "";
 
-                var bookDataResponse = new GameEventBookDataResponse(Session, book.Guid.Full, maxChars, maxPages, pages, inscription, authorID, authorName, ignoreAuthor);
+                var bookDataResponse = new GameEventBookDataResponse(Session, book.Guid.ClientGUID, maxChars, maxPages, pages, inscription, authorID, authorName, ignoreAuthor);
                 Session.Network.EnqueueSend(bookDataResponse);
             }
         }
 
-        public void ReadBookPage(uint bookGuid, int pageNum)
+        public void ReadBookPage(ObjectGuid bookGuid, int pageNum)
         {
             // This is completely unused. 
 
             // TODO: Do we want to throttle this request, like appraisals?
 
-            var book = FindObject(new ObjectGuid(bookGuid), SearchLocations.MyInventory | SearchLocations.LastUsedHook, out var container, out var rootOwner, out var wasEquipped) as Book;
+            var book = FindObject(bookGuid, SearchLocations.MyInventory | SearchLocations.LastUsedHook, out var container, out var rootOwner, out var wasEquipped) as Book;
             if (book == null) return;
 
             // found book
@@ -69,7 +69,7 @@ namespace ACE.Server.WorldObjects
 
                 if (page != null)
                 {
-                    var pdr = new GameEventBookPageDataResponse(Session, book.Guid.Full, pageNum, page);
+                    var pdr = new GameEventBookPageDataResponse(Session, book.Guid.ClientGUID, pageNum, page);
 
                     Session.Network.EnqueueSend(pdr);
                 }

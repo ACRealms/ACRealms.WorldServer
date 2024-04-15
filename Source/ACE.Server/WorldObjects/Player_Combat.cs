@@ -204,7 +204,7 @@ namespace ACE.Server.WorldObjects
 
             CurrentAttacker = currentAttacker.Guid.Full;
 
-            Session.Network.EnqueueSend(new GameMessagePrivateUpdateInstanceID(this, PropertyInstanceId.CurrentAttacker, currentAttacker.Guid.Full));
+            Session.Network.EnqueueSend(new GameMessagePrivateUpdateInstanceID(this, PropertyInstanceId.CurrentAttacker, currentAttacker.Guid.ClientGUID));
         }
 
         /// <summary>
@@ -709,7 +709,7 @@ namespace ACE.Server.WorldObjects
             return IsPKDeath(topDamager?.Guid.Full);
         }
 
-        public bool IsPKDeath(uint? killerGuid)
+        public bool IsPKDeath(ulong? killerGuid)
         {
             return PlayerKillerStatus.HasFlag(PlayerKillerStatus.PK) && new ObjectGuid(killerGuid ?? 0).IsPlayer() && killerGuid != Guid.Full;
         }
@@ -722,7 +722,7 @@ namespace ACE.Server.WorldObjects
             return IsPKLiteDeath(topDamager?.Guid.Full);
         }
 
-        public bool IsPKLiteDeath(uint? killerGuid)
+        public bool IsPKLiteDeath(ulong? killerGuid)
         {
             return PlayerKillerStatus.HasFlag(PlayerKillerStatus.PKLite) && new ObjectGuid(killerGuid ?? 0).IsPlayer() && killerGuid != Guid.Full;
         }

@@ -7,13 +7,13 @@ namespace ACE.Entity.Models
 {
     public static class PropertiesAllegianceExtensions
     {
-        public static Dictionary<uint, PropertiesAllegiance> GetApprovedVassals(this IDictionary<uint, PropertiesAllegiance> value, ReaderWriterLockSlim rwLock)
+        public static Dictionary<ulong, PropertiesAllegiance> GetApprovedVassals(this IDictionary<ulong, PropertiesAllegiance> value, ReaderWriterLockSlim rwLock)
         {
             rwLock.EnterReadLock();
             try
             {
                 if (value == null)
-                    return new Dictionary<uint, PropertiesAllegiance>();
+                    return new Dictionary<ulong, PropertiesAllegiance>();
 
                 return value.Where(i => i.Value.ApprovedVassal).ToDictionary(i => i.Key, i => i.Value);
             }
@@ -23,10 +23,10 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static Dictionary<uint, PropertiesAllegiance> GetBanList(this IDictionary<uint, PropertiesAllegiance> value, ReaderWriterLockSlim rwLock)
+        public static Dictionary<ulong, PropertiesAllegiance> GetBanList(this IDictionary<ulong, PropertiesAllegiance> value, ReaderWriterLockSlim rwLock)
         {
             if (value == null)
-                return new Dictionary<uint, PropertiesAllegiance>();
+                return new Dictionary<ulong, PropertiesAllegiance>();
 
             rwLock.EnterReadLock();
             try
@@ -39,7 +39,7 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static PropertiesAllegiance GetFirstOrDefaultByCharacterId(this IDictionary<uint, PropertiesAllegiance> value, uint characterId, ReaderWriterLockSlim rwLock)
+        public static PropertiesAllegiance GetFirstOrDefaultByCharacterId(this IDictionary<ulong, PropertiesAllegiance> value, ulong characterId, ReaderWriterLockSlim rwLock)
         {
             if (value == null)
                 return null;
@@ -57,7 +57,7 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static void AddOrUpdateAllegiance(this IDictionary<uint, PropertiesAllegiance> value, uint characterId, bool isBanned, bool approvedVassal, ReaderWriterLockSlim rwLock)
+        public static void AddOrUpdateAllegiance(this IDictionary<ulong, PropertiesAllegiance> value, ulong characterId, bool isBanned, bool approvedVassal, ReaderWriterLockSlim rwLock)
         {
             rwLock.EnterWriteLock();
             try
@@ -78,7 +78,7 @@ namespace ACE.Entity.Models
             }
         }
 
-        public static bool TryRemoveAllegiance(this IDictionary<uint, PropertiesAllegiance> value, uint characterId, ReaderWriterLockSlim rwLock)
+        public static bool TryRemoveAllegiance(this IDictionary<ulong, PropertiesAllegiance> value, ulong characterId, ReaderWriterLockSlim rwLock)
         {
             if (value == null)
                 return false;

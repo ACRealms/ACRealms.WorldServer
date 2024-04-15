@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -35,7 +35,7 @@ namespace ACE.Database.Models.Shard
             HousePermission = new HashSet<HousePermission>();
         }
 
-        public uint Id { get; set; }
+        public ulong Id { get; set; }
         public uint WeenieClassId { get; set; }
         public int WeenieType { get; set; }
         public uint PopulatedCollectionFlags { get; set; }

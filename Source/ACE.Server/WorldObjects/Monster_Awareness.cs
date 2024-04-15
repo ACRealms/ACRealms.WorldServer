@@ -436,7 +436,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// AttackTarget => last alerted time
         /// </summary>
-        private Dictionary<uint, DateTime> Alerted;
+        private Dictionary<ulong, DateTime> Alerted;
 
         public void AlertFriendly()
         {
@@ -497,7 +497,7 @@ namespace ACE.Server.WorldObjects
             if (alerted)
             {
                 if (Alerted == null)
-                    Alerted = new Dictionary<uint, DateTime>();
+                    Alerted = new Dictionary<ulong, DateTime>();
 
                 Alerted[AttackTarget.Guid.Full] = DateTime.UtcNow;
             }

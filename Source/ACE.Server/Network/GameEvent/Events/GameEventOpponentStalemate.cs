@@ -12,7 +12,7 @@ namespace ACE.Server.Network.GameEvent.Events
         public GameEventOpponentStalemate(Session session, ObjectGuid boardGuid, ChessColor color, bool stalemate)
             : base(GameEventType.OpponentStalemate, GameMessageGroup.UIQueue, session)
         {
-            Writer.Write(boardGuid.Full);
+            Writer.Write(boardGuid.ClientGUID);
             Writer.Write((int)color);
             Writer.Write(Convert.ToInt32(stalemate));  // 1 = offering stalemate, 0 = retracting stalemate
         }

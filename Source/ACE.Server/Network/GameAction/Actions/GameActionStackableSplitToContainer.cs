@@ -14,7 +14,7 @@ namespace ACE.Server.Network.GameAction.Actions
         {
             // Read in the applicable data.
             uint stackId = message.Payload.ReadUInt32();
-            uint containerId = message.Payload.ReadUInt32();
+            var containerId = message.Payload.ReadGuid(session);
             int place = message.Payload.ReadInt32();
             int amount = message.Payload.ReadInt32();
 

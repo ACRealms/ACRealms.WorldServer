@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -8,7 +8,7 @@ namespace ACE.Database.Models.Shard
     public partial class BiotaPropertiesCreateList
     {
         public uint Id { get; set; }
-        public uint ObjectId { get; set; }
+        public ulong ObjectId { get; set; }
         public sbyte DestinationType { get; set; }
         public uint WeenieClassId { get; set; }
         public int StackSize { get; set; }

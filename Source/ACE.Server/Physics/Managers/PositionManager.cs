@@ -40,7 +40,7 @@ namespace ACE.Server.Physics.Animation
             return new PositionManager(physicsObj);
         }
 
-        public uint GetStickyObjectID()
+        public ulong GetStickyObjectID()
         {
             if (StickyManager == null) return 0;
             return StickyManager.TargetID;
@@ -90,7 +90,7 @@ namespace ACE.Server.Physics.Animation
                 ConstraintManager.SetPhysicsObject(obj);
         }
 
-        public void StickTo(uint objectID, float radius, float height)
+        public void StickTo(ulong objectID, float radius, float height)
         {
             if (StickyManager == null)
                 MakeStickyManager();

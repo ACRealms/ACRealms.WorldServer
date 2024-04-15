@@ -28,7 +28,7 @@ namespace ACE.Server.WorldObjects
 
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public uint? PetDevice
+        public ulong? PetDevice
         {
             get => GetProperty(PropertyInstanceId.PetDevice);
             set { if (value.HasValue) SetProperty(PropertyInstanceId.PetDevice, value.Value); else RemoveProperty(PropertyInstanceId.PetDevice); }

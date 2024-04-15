@@ -25,8 +25,8 @@ namespace ACE.Server.WorldObjects
     }
     public interface Lock
     {
-        UnlockResults Unlock(uint unlockerGuid, Key key, string keyCode = null);
-        UnlockResults Unlock(uint unlockerGuid, uint playerLockpickSkillLvl, ref int difficulty);
+        UnlockResults Unlock(ulong unlockerGuid, Key key, string keyCode = null);
+        UnlockResults Unlock(ulong unlockerGuid, uint playerLockpickSkillLvl, ref int difficulty);
     }
     public class UnlockerHelper
     {

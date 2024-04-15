@@ -64,7 +64,7 @@ namespace ACE.Server.Physics
             return GfxObj.GfxBoundBox;
         }
 
-        public uint GetPhysObjID()
+        public ulong GetPhysObjID()
         {
             if (PhysicsObj == null)
                 return 0;

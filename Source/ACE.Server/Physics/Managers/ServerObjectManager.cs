@@ -8,7 +8,7 @@ namespace ACE.Server.Physics.Managers
         /// <summary>
         /// Custom lookup table of PhysicsObjs for the server
         /// </summary>
-        public static ConcurrentDictionary<uint, PhysicsObj> ServerObjects { get; } = new ConcurrentDictionary<uint, PhysicsObj>();
+        public static ConcurrentDictionary<ulong, PhysicsObj> ServerObjects { get; } = new ConcurrentDictionary<ulong, PhysicsObj>();
 
         /// <summary>
         /// Adds a PhysicsObj to the static list of server-wide objects
@@ -31,7 +31,7 @@ namespace ACE.Server.Physics.Managers
         /// <summary>
         /// Returns a PhysicsObj for an object ID
         /// </summary>
-        public static PhysicsObj GetObjectA(uint objectID)
+        public static PhysicsObj GetObjectA(ulong objectID)
         {
             ServerObjects.TryGetValue(objectID, out var obj);
 

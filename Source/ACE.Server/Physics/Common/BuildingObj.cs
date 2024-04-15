@@ -97,7 +97,7 @@ namespace ACE.Server.Physics.Common
                 add_cells_recursive(visibleCell);
         }
 
-        public PhysicsObj get_object(int objectID)
+        public PhysicsObj get_object(ulong objectID)
         {
             // visited cells?
             return null;

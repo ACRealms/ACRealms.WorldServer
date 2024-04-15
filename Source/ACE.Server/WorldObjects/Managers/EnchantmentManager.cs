@@ -62,7 +62,7 @@ namespace ACE.Server.WorldObjects.Managers
         /// <summary>
         /// Returns the enchantments for a specific spell
         /// </summary>
-        public PropertiesEnchantmentRegistry GetEnchantment(uint spellID, uint? casterGuid = null)
+        public PropertiesEnchantmentRegistry GetEnchantment(uint spellID, ulong? casterGuid = null)
         {
             return WorldObject.Biota.PropertiesEnchantmentRegistry.GetEnchantmentBySpell((int)spellID, casterGuid, WorldObject.BiotaDatabaseLock);
         }

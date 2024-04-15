@@ -45,7 +45,7 @@ namespace ACE.Server.Network.Structure
         public static void Write(this BinaryWriter writer, ChessMoveData data)
         {
             writer.Write((int)data.Type);
-            writer.Write(data.PlayerGuid.Full);
+            writer.Write(data.PlayerGuid.ClientGUID);
             //writer.Write((int)data.Color);
 
             // only ChessMoveType.FromTo used?
@@ -63,7 +63,7 @@ namespace ACE.Server.Network.Structure
                     break;
 
                 case ChessMoveType.SelectedPiece:
-                    writer.Write(data.PieceGuid.Full);
+                    writer.Write(data.PieceGuid.ClientGUID);
                     break;
             }
         }

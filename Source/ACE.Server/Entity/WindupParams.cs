@@ -4,12 +4,12 @@ namespace ACE.Server.Entity
 {
     public class WindupParams
     {
-        public uint TargetGuid;
+        public ulong TargetGuid;
         public uint SpellId;
         //public bool BuiltInSpell;
         public WorldObject CasterItem;
 
-        public WindupParams(uint targetGuid, uint spellId, WorldObject casterItem)
+        public WindupParams(ulong targetGuid, uint spellId, WorldObject casterItem)
         {
             TargetGuid = targetGuid;
             SpellId = spellId;
@@ -19,7 +19,7 @@ namespace ACE.Server.Entity
 
         public override string ToString()
         {
-            return $"TargetGuid: {TargetGuid:X8}, SpellID: {SpellId}, CasterItem: {CasterItem?.Name}";
+            return $"TargetGuid: {TargetGuid:X16}, SpellID: {SpellId}, CasterItem: {CasterItem?.Name}";
         }
     }
 }

@@ -11,7 +11,7 @@ namespace ACE.Server.WorldObjects
         /// Joins a chess game
         /// </summary>
         /// <param name="boardGuid">The guid of the chess board</param>
-        public void HandleActionChessJoin(uint boardGuid)
+        public void HandleActionChessJoin(ACE.Entity.ObjectGuid boardGuid)
         {
             var chessboard = CurrentLandblock.GetObject(boardGuid) as Game;
             if (chessboard == null)

@@ -22,7 +22,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Called when player clicks 'Buy Items'
         /// </summary>
-        public void HandleActionBuyItem(uint vendorGuid, List<ItemProfile> items)
+        public void HandleActionBuyItem(ACE.Entity.ObjectGuid vendorGuid, List<ItemProfile> items)
         {
             if (IsBusy)
             {
@@ -122,7 +122,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Called when player clicks 'Sell Items'
         /// </summary>
-        public void HandleActionSellItem(uint vendorGuid, List<ItemProfile> itemProfiles)
+        public void HandleActionSellItem(ACE.Entity.ObjectGuid vendorGuid, List<ItemProfile> itemProfiles)
         {
             if (IsBusy)
             {
@@ -151,7 +151,7 @@ namespace ACE.Server.WorldObjects
 
             if (sellList.Count == 0)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid.Full));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid.ClientGUID));
                 SendUseDoneEvent();
                 return;
             }
@@ -164,7 +164,7 @@ namespace ACE.Server.WorldObjects
                 log.Warn($"[VENDOR] {Name} (0x({Guid}) tried to sell something to {vendor.Name} (0x{vendor.Guid}) resulting in a payout of {payoutCoinAmount} pyreals.");
 
                 SendTransientError("Transaction failed.");
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid.Full));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid.ClientGUID));
 
                 SendUseDoneEvent();
 
@@ -183,7 +183,7 @@ namespace ACE.Server.WorldObjects
                 else if (itemsToReceive.PlayerOutOfInventorySlots)
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You do not have enough free pack space to sell that!"));
 
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid.Full));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid.ClientGUID));
                 SendUseDoneEvent();     // WeenieError.FullInventoryLocation?
                 return;
             }
@@ -226,13 +226,13 @@ namespace ACE.Server.WorldObjects
         /// Filters the list of ItemProfiles the player is attempting to sell to the vendor
         /// to the list of verified WorldObjects in the player's inventory w/ validations
         /// </summary>
-        private Dictionary<uint, WorldObject> VerifySellItems(List<ItemProfile> sellItems, Vendor vendor)
+        private Dictionary<ulong, WorldObject> VerifySellItems(List<ItemProfile> sellItems, Vendor vendor)
         {
             var allPossessions = GetAllPossessions().ToDictionary(i => i.Guid.Full, i => i);
 
             var acceptedItemTypes = (ItemType)(vendor.MerchandiseItemTypes ?? 0);
 
-            var verified = new Dictionary<uint, WorldObject>();
+            var verified = new Dictionary<ulong, WorldObject>();
 
             foreach (var sellItem in sellItems)
             {

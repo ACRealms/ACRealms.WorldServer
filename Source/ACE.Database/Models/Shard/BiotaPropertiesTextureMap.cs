@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -8,7 +8,7 @@ namespace ACE.Database.Models.Shard
     public partial class BiotaPropertiesTextureMap
     {
         public uint Id { get; set; }
-        public uint ObjectId { get; set; }
+        public ulong ObjectId { get; set; }
         public byte Index { get; set; }
         public uint OldId { get; set; }
         public uint NewId { get; set; }

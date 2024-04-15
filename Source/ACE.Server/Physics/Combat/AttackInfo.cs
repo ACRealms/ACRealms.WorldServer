@@ -12,7 +12,7 @@ namespace ACE.Server.Physics.Combat
         public int NumObjects;
         public List<AtkObjInfo> ObjectList;
 
-        public void AddObject(uint objectID, Quadrant hitLocation)
+        public void AddObject(ulong objectID, Quadrant hitLocation)
         {
 
         }

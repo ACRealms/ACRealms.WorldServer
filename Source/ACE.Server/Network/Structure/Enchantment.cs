@@ -34,13 +34,13 @@ namespace ACE.Server.Network.Structure
         public Spell Spell;
         public EnchantmentMask EnchantmentMask;
 
-        public Enchantment(WorldObject target, uint casterGuid, uint spellId, ushort layer, EnchantmentMask enchantmentMask, float? statModVal = null)
+        public Enchantment(WorldObject target, ulong casterGuid, uint spellId, ushort layer, EnchantmentMask enchantmentMask, float? statModVal = null)
         {
             // 2 references left, can this use BiotaPropertiesEnchantment?
             Init(new Spell(spellId));
 
             Layer = layer;
-            CasterGuid = casterGuid;
+            CasterGuid = new ACE.Entity.ObjectGuid(casterGuid).ClientGUID;
             StatModValue = statModVal ?? Spell.StatModVal;
 
             Target = target;
@@ -53,7 +53,7 @@ namespace ACE.Server.Network.Structure
             Init(new Spell(spellBase.MetaSpellId));
 
             Layer = layer;
-            CasterGuid = target.Guid.Full;
+            CasterGuid = target.Guid.ClientGUID;
             StatModValue = statModVal ?? 35.0f;
 
             Target = target;
@@ -73,7 +73,7 @@ namespace ACE.Server.Network.Structure
             Layer = entry.LayerId;
             StartTime = entry.StartTime;
             Duration = entry.Duration;      // item spells can have -1, overriding the spell duration
-            CasterGuid = entry.CasterObjectId;
+            CasterGuid = new ACE.Entity.ObjectGuid(entry.CasterObjectId).ClientGUID;
             StatModValue = entry.StatModValue;
             SpellSetID = (uint)entry.SpellSetId;
 
@@ -105,7 +105,7 @@ namespace ACE.Server.Network.Structure
             SpellCategory = (ushort)entry.SpellCategory;
             StartTime = entry.StartTime;
             Duration = entry.Duration;
-            CasterGuid = entry.CasterObjectId;
+            CasterGuid = new ACE.Entity.ObjectGuid(entry.CasterObjectId).ClientGUID;
             DegradeModifier = entry.DegradeModifier;
             DegradeLimit = entry.DegradeLimit;
             LastTimeDegraded = entry.LastTimeDegraded;

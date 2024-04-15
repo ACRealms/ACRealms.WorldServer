@@ -250,13 +250,13 @@ namespace ACE.Server.Network.Structure
 
         public int Compare(ObjectGuid a, ObjectGuid b)
         {
-            var keyA = a.Full % NumBuckets;
-            var keyB = b.Full % NumBuckets;
+            var keyA = a.ClientGUID % NumBuckets;
+            var keyB = b.ClientGUID % NumBuckets;
 
             var result = keyA.CompareTo(keyB);
 
             if (result == 0)
-                result = a.Full.CompareTo(b.Full);
+                result = a.ClientGUID.CompareTo(b.ClientGUID);
 
             return result;
         }

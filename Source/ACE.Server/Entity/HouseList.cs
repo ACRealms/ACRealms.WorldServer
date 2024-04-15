@@ -49,7 +49,7 @@ namespace ACE.Server.Entity
             Console.WriteLine($"Total houses: {AllHouses.Count}");
         }
 
-        public static HashSet<uint> GetHousesOwned()
+        public static HashSet<ulong> GetHousesOwned()
         {
             // select * from biota where weenie_Type=53;
 
@@ -58,7 +58,7 @@ namespace ACE.Server.Entity
             Console.WriteLine($"Owned houses: {housesOwned.Count}");
 
             // build owned hashset
-            var owned = new HashSet<uint>();
+            var owned = new HashSet<ulong>();
 
             foreach (var house in housesOwned)
             {
@@ -72,7 +72,7 @@ namespace ACE.Server.Entity
             return owned;
         }
 
-        public static void BuildAvailable(HashSet<uint> housesOwned)
+        public static void BuildAvailable(HashSet<ulong> housesOwned)
         {
             Available = new Dictionary<HouseType, List<HouseListResults>>();
             Available.Add(HouseType.Apartment, new List<HouseListResults>());
