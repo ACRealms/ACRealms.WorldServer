@@ -104,3 +104,10 @@ We have the same guidelines as https://github.com/ACEmulator/ACE/, which ACRealm
 
 > We have a NO financial solicitation and donation policy. If you solicit or accept donations or gifts in direct relation to ACRealms, your perks will be revoked and discord tags removed. If you come back into compliance with this policy, your perks and access will be restored.
 > If you are in violation of our ACRealms AGPL-3.0 license, you will be removed from our discord server. We may also petition to have your servers removed from public servers lists
+
+## Credits
+
+AC Emulator Team
+gmriggs - Wrote the first proof of concept for instanced landblocks, which was the original inspiration for the project
+Vodka (https://github.com/darktidelegend) - Early adopter, brought this project back from the dead in 2023
+OptimShi - Brought attention to the static GUID limitations that ended up helping fix some obscure but critical bugs
