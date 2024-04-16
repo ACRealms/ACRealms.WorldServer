@@ -107,7 +107,7 @@ We have the same guidelines as https://github.com/ACEmulator/ACE/, which ACRealm
 
 ## Credits
 
-AC Emulator Team
-gmriggs - Wrote the first proof of concept for instanced landblocks, which was the original inspiration for the project
-Vodka (https://github.com/darktidelegend) - Early adopter, brought this project back from the dead in 2023
-OptimShi - Brought attention to the static GUID limitations that ended up helping fix some obscure but critical bugs
+- AC Emulator Team
+- gmriggs - Wrote the first proof of concept for instanced landblocks, which was the original inspiration for the project
+- Vodka (https://github.com/darktidelegend) - Early adopter, brought this project back from the dead in 2023
+- OptimShi - Brought attention to the static GUID limitations that ended up helping fix some obscure but critical bugs
