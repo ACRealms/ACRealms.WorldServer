@@ -12,6 +12,11 @@ namespace ACE.Entity
             Raw = raw;
         }
 
+        public LandblockId(ushort rawShort)
+        {
+            Raw = (uint)rawShort << 16;
+        }
+
         public LandblockId(byte x, byte y)
         {
             Raw = (uint)x << 24 | (uint)y << 16;

@@ -29,7 +29,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// A lookup table of HouseId => HouseGuid
         /// </summary>
-        private static Dictionary<ulong, List<ulong>> HouseIdToGuid { get; set; }
+        private static Dictionary<uint, List<uint>> HouseIdToGuid { get; set; }
 
         /// <summary>
         /// A list of all player-owned houses on the server,
@@ -72,7 +72,7 @@ namespace ACE.Server.Managers
 
                 var results = query.ToList();
 
-                HouseIdToGuid = new Dictionary<ulong, List<ulong>>();
+                HouseIdToGuid = new Dictionary<uint, List<uint>>();
 
                 foreach (var result in results)
                 {
@@ -87,7 +87,7 @@ namespace ACE.Server.Managers
 
                     if (!HouseIdToGuid.TryGetValue(houseId, out var houseGuids))
                     {
-                        houseGuids = new List<ulong>();
+                        houseGuids = new List<uint>();
                         HouseIdToGuid.Add(houseId, houseGuids);
                     }
                     houseGuids.Add(guid);
@@ -176,7 +176,7 @@ namespace ACE.Server.Managers
         {
             //Console.WriteLine($"AddRentQueue({player.Name}, {houseGuid:X8})");
 
-            var house = House.Load(houseGuid);
+            var house = House.Load(new ObjectGuid(houseGuid));
             if (house == null)      // this can happen for basement dungeons
                 return;
 
@@ -184,7 +184,7 @@ namespace ACE.Server.Managers
 
             if (player.HouseRentTimestamp == null)
             {
-                log.Warn($"[HOUSE] HouseManager.AddRentQueue({player.Name}, {houseGuid:X8}): player has null HouseRentTimestamp");
+                log.Warn($"[HOUSE] HouseManager.AddRentQueue({player.Name}, {houseGuid:X16}): player has null HouseRentTimestamp");
                 player.HouseRentTimestamp = (int)house.GetRentDue(purchaseTime);
                 //return;
             }
@@ -357,7 +357,7 @@ namespace ACE.Server.Managers
         private static void ProcessRent(PlayerHouse playerHouse)
         {
             // load the most up-to-date copy of the house data
-            GetHouse(playerHouse.House.Guid.Full, (house) =>
+            GetHouse(playerHouse.House.Guid, (house) =>
             {
                 playerHouse.House = house;
 
@@ -642,7 +642,7 @@ namespace ACE.Server.Managers
                 return;
 
             // load the most up-to-date copy of house data
-            GetHouse(playerHouse.House.Guid.Full, (house) =>
+            GetHouse(playerHouse.House.Guid, (house) =>
             {
                 playerHouse.House = house;
 
@@ -687,11 +687,12 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Returns the house guid for a slumlord guid
         /// </summary>
-        private static ulong GetHouseGuid(ulong slumlord_guid, List<ulong> house_guids)
+        private static ulong GetHouseGuid(ulong slumlord_guid, List<uint> house_guids)
         {
-            var slumlord_prefix = slumlord_guid >> 12;
+            var instance = new ObjectGuid(slumlord_guid).Instance.Value;
+            var slumlord_prefix = (slumlord_guid >> 12) & 0xFFFFFFFF;
             // REALMS-TODO: Verify this
-            return house_guids.FirstOrDefault(i => slumlord_prefix == (i >> 12));
+            return new ObjectGuid(house_guids.FirstOrDefault(i => slumlord_prefix == (i >> 12)), instance).Full;
         }
 
         /// <summary>
@@ -699,16 +700,10 @@ namespace ACE.Server.Managers
         /// else return a copy of the House biota from the latest info in the db
         ///
         /// <param name="callback">called when the slumlord inventory is fully loaded</param>
-        public static void GetHouse(ulong houseGuid, Action<House> callback)
+        public static void GetHouse(ObjectGuid houseGuid, Action<House> callback)
         {
-            // Not supported yet on AC Realms
-            return;
-
-            /*
-            var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
-
-            var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
-            var isLoaded = LandblockManager.IsLoaded(landblockId);
+            var landblockId = new LandblockId(houseGuid.StaticObjectLandblock.Value);
+            var isLoaded = LandblockManager.IsLoaded(landblockId, houseGuid.Instance.Value);
 
             if (!isLoaded)
             {
@@ -722,8 +717,8 @@ namespace ACE.Server.Managers
             }
 
             // landblock is loaded, return a reference to the current House object
-            var loaded = LandblockManager.GetLandblock(landblockId, false);
-            var house = loaded.GetObject(new ObjectGuid(houseGuid)) as House;
+            var loaded = LandblockManager.GetLandblock(landblockId, houseGuid.Instance.Value, null, false);
+            var house = loaded.GetObject(houseGuid) as House;
 
             if (house != null && house.SlumLord != null)
             {
@@ -739,8 +734,7 @@ namespace ACE.Server.Managers
                 RegisterCallback(houseBiota, callback);
             }
             else
-                log.Error($"HouseManager.GetHouse({houseGuid:X8}): couldn't find house on loaded landblock");
-            */
+                log.Error($"HouseManager.GetHouse({houseGuid}): couldn't find house on loaded landblock");
         }
 
         /// <summary>
@@ -836,7 +830,7 @@ namespace ACE.Server.Managers
         private static void PayRent(PlayerHouse playerHouse)
         {
             // load the most up-to-date copy of the house data
-            GetHouse(playerHouse.House.Guid.Full, (house) =>
+            GetHouse(playerHouse.House.Guid, (house) =>
             {
                 playerHouse.House = house;
 

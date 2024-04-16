@@ -27,7 +27,6 @@ namespace ACE.Server.Network.GameMessages
 
         protected GameMessage(GameMessageOpcode opCode, GameMessageGroup group)
         {
-            log.Debug($"GameMessage {GetType()}");
             Opcode = opCode;
 
             Group = group;

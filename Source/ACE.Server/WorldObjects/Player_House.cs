@@ -911,7 +911,7 @@ namespace ACE.Server.WorldObjects
             if (House == null)
                 LoadHouse(houseInstance);
 
-            HouseManager.GetHouse(houseInstance.Value, (house) =>
+            HouseManager.GetHouse(new ObjectGuid(houseInstance.Value), (house) =>
             {
                 var houseData = house.GetHouseData(houseOwner);
                 Session.Network.EnqueueSend(new GameEventHouseData(Session, houseData));
@@ -926,7 +926,7 @@ namespace ACE.Server.WorldObjects
             if (houseInstance == null)
                 return House;
 
-            House = House.Load(houseInstance.Value);
+            House = House.Load(new ObjectGuid(houseInstance.Value));
 
             return House;
         }
@@ -940,24 +940,20 @@ namespace ACE.Server.WorldObjects
 
         public House GetHouse(ulong? houseInstance)
         {
-            // Not supported yet on AC Realms
-            return null;
-
-            /*
             if (houseInstance == null)
                 return null;
 
-            var houseGuid = houseInstance.Value;
-            var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
+            var houseGuid = new ObjectGuid(houseInstance.Value);
+            var landblock = houseGuid.StaticObjectLandblock.Value;
 
-            var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
-            var isLoaded = LandblockManager.IsLoaded(landblockId);
+            var landblockId = new LandblockId(landblock);
+            var isLoaded = LandblockManager.IsLoaded(landblockId, houseGuid.Instance.Value);
 
             if (!isLoaded)
                 return House = House.Load(houseGuid);
 
-            var loaded = LandblockManager.GetLandblock(landblockId, false);
-            return House = loaded.GetObject(new ObjectGuid(houseGuid)) as House;*/
+            var loaded = LandblockManager.GetLandblock(landblockId, houseGuid.Instance.Value, null, false);
+            return House = loaded.GetObject(houseGuid) as House;
         }
 
         public void HandleActionAddGuest(string guestName)
@@ -1762,7 +1758,7 @@ namespace ACE.Server.WorldObjects
 
             var accountHouseOwner = GetAccountHouseOwner();
 
-            if (accountHouseOwner != null)
+            if (accountHouseOwner == null)
                 return null;
 
             //Console.WriteLine($"Account House Owner: {accountHouseOwner.Name}");
@@ -1772,27 +1768,24 @@ namespace ACE.Server.WorldObjects
 
         public House GetHouse(IPlayer player)
         {
-            return null;
-            /*
             if (player.HouseInstance == null)
                 return null;
 
             // is landblock loaded?
-            var houseGuid = player.HouseInstance.Value;
-            var landblock = (ushort)((houseGuid >> 12) & 0xFFFF);
+            var houseGuid = new ObjectGuid(player.HouseInstance.Value);
+            var landblock = houseGuid.StaticObjectLandblock.Value;
 
-            var landblockId = new LandblockId((uint)(landblock << 16 | 0xFFFF));
-            var isLoaded = LandblockManager.IsLoaded(landblockId);
+            var landblockId = new LandblockId(landblock);
+            var isLoaded = LandblockManager.IsLoaded(landblockId, houseGuid.Instance.Value);
 
             if (isLoaded)
             {
-                var loaded = LandblockManager.GetLandblock(landblockId, false);
-                return loaded.GetObject(new ObjectGuid(houseGuid)) as House;
+                var loaded = LandblockManager.GetLandblock(landblockId, houseGuid.Instance.Value, null, false);
+                return loaded.GetObject(houseGuid) as House;
             }
 
             // load an offline copy
             return House.Load(houseGuid);
-            */
         }
 
         public bool IsMultiHouseOwner(bool showMsg = true)

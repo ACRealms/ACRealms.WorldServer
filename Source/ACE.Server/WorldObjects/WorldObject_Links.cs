@@ -34,9 +34,9 @@ namespace ACE.Server.WorldObjects
             foreach (var link in LinkedInstances)
             {
                 WorldObject wo = null;
-                var biota = biotas.FirstOrDefault(b => b.Id == link.Guid);
+                var biota = biotas.FirstOrDefault(b => b.Id == new ObjectGuid(link.Guid, parent.Guid.Instance ?? 0).Full);
                 if (biota == null)
-                    wo = WorldObjectFactory.CreateWorldObject(DatabaseManager.World.GetCachedWeenie(link.WeenieClassId), new ObjectGuid(link.Guid, Location.Instance));
+                    wo = WorldObjectFactory.CreateWorldObject(DatabaseManager.World.GetCachedWeenie(link.WeenieClassId), new ObjectGuid(link.Guid, parent.Location.Instance));
                 else
                 {
                     wo = WorldObjectFactory.CreateWorldObject(biota);
@@ -45,7 +45,7 @@ namespace ACE.Server.WorldObjects
 
                 if (wo == null) continue;
 
-                var instanceId = CurrentLandblock?.Instance ?? parent.Location.Instance;
+                var instanceId = CurrentLandblock?.Instance ?? Guid.Instance ?? parent.Location.Instance;
                 wo.Location = new InstancedPosition(link.ObjCellId, link.OriginX, link.OriginY, link.OriginZ, link.AnglesX, link.AnglesY, link.AnglesZ, link.AnglesW, instanceId);
                 parent.SetLinkProperties(wo);
                 CurrentLandblock?.AddWorldObject(wo);

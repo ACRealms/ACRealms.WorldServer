@@ -90,9 +90,9 @@ namespace ACE.Database
                       "  @available_ids:=0,"                                                            + Environment.NewLine +
                       "  IF(@rownum=id, 0, @rownum:=id) AS gap_ends_at_not_inclusive"                   + Environment.NewLine +
                       " FROM"                                                                           + Environment.NewLine +
-                      "  (SELECT @rownum:=(SELECT MIN(id)-1 FROM biota WHERE id > " + min + ")) AS a"   + Environment.NewLine +
+                     $"  (SELECT @rownum:=(SELECT MIN(id)-1 FROM biota WHERE id > {min} AND id < {uint.MaxValue})) AS a"   + Environment.NewLine +
                       "  JOIN biota"                                                                    + Environment.NewLine +
-                      "  WHERE id > " + min                                                             + Environment.NewLine +
+                     $"  WHERE id > {min} AND id < {uint.MaxValue}"                                     + Environment.NewLine +
                       "  ORDER BY id"                                                                   + Environment.NewLine +
                       " ) AS z"                                                                         + Environment.NewLine +
                       "WHERE z.gap_ends_at_not_inclusive!=0 AND @available_ids<" + limitAvailableIDsReturned + "; ";
@@ -510,7 +510,7 @@ namespace ACE.Database
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
                 var results = context.BiotaPropertiesPosition
-                    .Where(p => p.PositionType == 1 && p.ObjCellId >= min && p.ObjCellId <= max && p.ObjectId >= 0x80000000 && (p.Instance ?? 0) == instance)
+                    .Where(p => p.PositionType == 1 && p.ObjCellId >= min && p.ObjCellId <= max && p.ObjectId >= 0x80000000 && p.ObjectId <= 0xFFFFFFFF && (p.Instance ?? 0) == instance)
                     .ToList();
 
                 foreach (var result in results)

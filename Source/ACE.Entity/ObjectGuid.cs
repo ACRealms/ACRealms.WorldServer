@@ -41,7 +41,19 @@ namespace ACE.Entity
         public uint ClientGUID => TranslateToClientGuid(Full);
         public uint Low => (uint)(Full & 0xFFFFFF);
         public uint High => (uint)(Full >> 56);
-        public uint Instance => (uint)(Full >> 32);
+        public uint? Instance
+        {
+            get
+            {
+                if (Type != GuidType.Static)
+                    return null;
+                var instance = (uint)(Full >> 32);
+                if (instance == 0)
+                    return null;
+                return instance;
+            }
+        }
+        
         public GuidType Type { get; }
 
         public static uint TranslateToClientGuid(ulong fullGuid) => (uint)(fullGuid & 0xFFFFFFFF);
@@ -82,6 +94,24 @@ namespace ACE.Entity
             return Type == GuidType.Static;
         }
 
+        public ushort? StaticObjectLandblock
+        {
+            get
+            {
+                if (Type != GuidType.Static)
+                    return null;
+                return (ushort)((ClientGUID >> 12) & (uint)0xFFFF);
+            }
+        }
+        public ushort? StaticObjectIndex
+        {
+            get
+            {
+                if (Type != GuidType.Static)
+                    return null;
+                return (ushort)(ClientGUID & (uint)0xFFF);
+            }
+        }
         public bool IsDynamic()
         {
             return Type == GuidType.Dynamic;

@@ -307,6 +307,11 @@ namespace ACE.Server.WorldObjects
                     return;
                 }
             }
+            else if (this is HousePortal)
+            {
+                portalDest = Destination.AsInstancedPosition(player, PlayerInstanceSelectMode.Same);
+            }
+
             portalDest = AdjustDungeon(portalDest);
 
             WorldManager.ThreadSafeTeleport(player, portalDest, false, new ActionEventDelegate(() =>

@@ -1501,7 +1501,7 @@ namespace ACE.Server.Command.Handlers
 
         private static void DumpHouse(Session session, House targetHouse, WorldObject wo)
         {
-            HouseManager.GetHouse(targetHouse.Guid.Full, (house) =>
+            HouseManager.GetHouse(targetHouse.Guid, (house) =>
             {
                 var msg = "";
                 msg = $"House Dump for {wo.Name} (0x{wo.Guid})\n";

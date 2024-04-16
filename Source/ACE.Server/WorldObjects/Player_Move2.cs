@@ -165,7 +165,7 @@ namespace ACE.Server.WorldObjects
             landblock.DestroyAllNonPlayerObjects();
 
             // clear landblock cache
-            DatabaseManager.World.ClearCachedInstancesByLandblock(landblock.Id.Landblock, 0);
+            DatabaseManager.World.ClearCachedInstancesByLandblock(landblock.Id.Landblock);
 
             // reload landblock
             var actionChain = new ActionChain();

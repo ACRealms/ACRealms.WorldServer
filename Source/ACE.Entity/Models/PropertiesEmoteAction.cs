@@ -9,7 +9,7 @@ namespace ACE.Entity.Models
         /// <summary>
         /// This is only used to tie this property back to a specific database row
         /// </summary>
-        public ulong DatabaseRecordId { get; set; }
+        public uint DatabaseRecordId { get; set; }
 
         public uint Type { get; set; }
         public float Delay { get; set; }

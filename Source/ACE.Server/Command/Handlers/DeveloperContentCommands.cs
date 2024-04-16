@@ -677,7 +677,7 @@ namespace ACE.Server.Command.Handlers.Processors
             CommandHandlerHelper.WriteOutputInfo(session, $"Imported {sqlFile}");
 
             // clear any cached instances for this landblock
-            DatabaseManager.World.ClearCachedInstancesByLandblock(landblockId, 0);
+            DatabaseManager.World.ClearCachedInstancesByLandblock(landblockId);
         }
 
         private static void ImportJsonQuest(Session session, string json_folder, string json_file)
@@ -1114,10 +1114,10 @@ namespace ACE.Server.Command.Handlers.Processors
             CommandHandlerHelper.WriteOutputInfo(session, $"Imported {sql_file}");
 
             // clear any cached instances for this landblock
-            DatabaseManager.World.ClearCachedInstancesByLandblock(landblockId, 0);
+            DatabaseManager.World.ClearCachedInstancesByLandblock(landblockId);
 
             // load landblock instances from database
-            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblockId, 0);
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblockId);
 
             // convert to json file
             sql2json_landblock(session, instances, sql_folder, sql_file);
@@ -1387,9 +1387,9 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             // clear any cached instances for this landblock
-            DatabaseManager.World.ClearCachedInstancesByLandblock(landblock, 0);
+            DatabaseManager.World.ClearCachedInstancesByLandblock(landblock);
 
-            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock, 0);
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock);
 
             // for link mode, ensure parent guid instance exists
             WorldObject parentObj = null;
@@ -1558,7 +1558,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             // clear landblock instances for this landblock (again)
-            DatabaseManager.World.ClearCachedInstancesByLandblock(landblock, 0);
+            DatabaseManager.World.ClearCachedInstancesByLandblock(landblock);
         }
 
         public static LandblockInstance CreateLandblockInstance(WorldObject wo, bool isLinkChild = false)
@@ -1646,7 +1646,7 @@ namespace ACE.Server.Command.Handlers.Processors
                     guid = staticGuid.Value;
             }
 
-            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock, 0);
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock);
 
             var instance = instances.FirstOrDefault(i => i.Guid == guid);
 
@@ -2046,7 +2046,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblockId, 0);
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblockId);
             if (instances == null)
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find landblock {landblockId:X4}");
@@ -2393,7 +2393,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 return;
             }
 
-            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblockId, 0);
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblockId);
             if (instances == null)
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find landblock {landblockId:X4}");
@@ -2751,7 +2751,7 @@ namespace ACE.Server.Command.Handlers.Processors
             var landblock_id = (ushort)(obj.Guid.Full >> 12);
 
             // get instances for landblock
-            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock_id, 0);
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock_id);
 
             // find instance
             var instance = instances.FirstOrDefault(i => i.Guid == obj.Guid.Full);
@@ -2966,10 +2966,10 @@ namespace ACE.Server.Command.Handlers.Processors
             newRotation = Quaternion.Normalize(newRotation);
 
             // get landblock for static guid
-            var landblock_id = (ushort)(obj.Guid.Full >> 12);
+            var landblock_id = obj.Guid.StaticObjectLandblock.Value;
 
             // get instances for landblock
-            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock_id, obj.Location.RealmID);
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock_id);
 
             // find instance
             var instance = instances.FirstOrDefault(i => i.Guid == obj.Guid.Full);
@@ -3071,21 +3071,21 @@ namespace ACE.Server.Command.Handlers.Processors
             var newRotation = Quaternion.Normalize(obj.PhysicsObj.Position.Frame.Orientation * q);
 
             // get landblock for static guid
-            var landblock_id = (ushort)(obj.Guid.Full >> 12);
+            var landblock_id = obj.Guid.StaticObjectLandblock.Value;
 
             // get instances for landblock
-            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock_id, 0);
+            var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblock_id);
 
             // find instance
-            var instance = instances.FirstOrDefault(i => i.Guid == obj.Guid.Full);
+            var instance = instances.FirstOrDefault(i => i.Guid == obj.Guid.ClientGUID);
 
             if (instance == null)
             {
-                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find instance for {obj.Name} ({obj.Guid})", ChatMessageType.Broadcast));
+                session.Network.EnqueueSend(new GameMessageSystemChat($"Couldn't find instance for {obj.Name} ({obj.Guid.ClientGUID})", ChatMessageType.Broadcast));
                 return;
             }
 
-            session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid}) new rotation: {newRotation}", ChatMessageType.Broadcast));
+            session.Network.EnqueueSend(new GameMessageSystemChat($"{obj.Name} ({obj.Guid.ClientGUID}) new rotation: {newRotation}", ChatMessageType.Broadcast));
 
             // update physics / ace rotation
             obj.PhysicsObj.Position.Frame.Orientation = newRotation;
