@@ -1,6 +1,6 @@
 # ACRealms V2
 
-This is a fork of https://github.com/ACEmulator/ACE/. I'm considering recreating the repository as a fork.
+This is a fork of https://github.com/ACEmulator/ACE/. I'm considering recreating the repository as a fork. For now. if you want to see a full list of code changes (diff), you can git clone the project, and add the upstream ACE project as a second git remote, and use your preferred git client to do a diff between ACE tag `v1.58.4480' and `master`.
 
 Focus areas:
  - Instanced Landblocks (multiple logical dungeons in same 'physical' landblock space)
