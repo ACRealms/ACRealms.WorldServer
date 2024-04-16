@@ -125,7 +125,7 @@ namespace ACE.Server.Command
             /// The resultant parsed Value (or the default value)
             /// </summary>
             public object Value { get; set; } = null;
-            public Position AsPosition => (Position)Value;
+            public LocalPosition AsPosition => (LocalPosition)Value;
             public Player AsPlayer => (Player)Value;
             public ulong AsULong => (ulong)Value;
             public long AsLong => (long)Value;
