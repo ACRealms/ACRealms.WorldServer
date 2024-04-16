@@ -19,24 +19,66 @@ This project has been used in three servers that I am aware of.
 
 ## Content Structure (differences from ACE)
 
+#### Realms.jsonc
+realms.jsonc contains a list of realm and ruleset names mapped to realm ids. These ids can be changed to anything between 1 and 0x7FFE (32766), and may not be changed to new values after the first run of the server.  
+New realms can still be added to the list as long as they are not changed after the next time the server is started.
+The realm name must match the name specified in the realm file (not the filename).
+If a realm file exists, it must have a corresponding entry in this file, and vice versa. It's not the most user-friendly process but there is room for improvement.
+
+#### Realm and Ruleset JSON
+
+A realm file exists under `Content/json/realms/realm/xxx.jsonc`, and a ruleset file exists under `Content/json/realms/ruleset/xxx.jsonc`. They have the same basic structure.
+The key difference between a realm and a ruleset is that a realm may exist as a permanent home location for a player. A ruleset does not. Rulesets are intended to be composed on top of realms, to produce "ephemeral realms" (temporary rulesets).
+Realm definitions may also be composed in a similar manner, but the result is a permanent world
+
+Example:
+```json
+{
+  "name": "Modern Realm",
+  "type": "Realm",
+  "properties": {
+    "Description": "The Customized Realm with the latest and greatest features.",
+    "CanBeHomeworld": true,
+    "CanInteractWithNeutralZone": true,
+    "HideoutEnabled": true
+  }
+}
+```
+
+Valid keys:
+- `name` (required): The name of the realm. Must be unique and must match an entry in `realms.jsonc`
+- `type` (required): "Realm" for realm, "Ruleset" for a ruleset
+- `parent` (optional): The `name` of the realm or ruleset from which to inherit properties from. A realm may only inherit from an entry with `type` = Realm. 
+- `apply_rulesets` (optional): An array of ruleset names to compose on top of this one (the properties in the current ruleset file are first applied from the result of the parent ruleset, and then the rulesets defined in `apply_rulesets` are applied afterward)
+- `apply_rulesets_random` (optional): An array where the elements may be either a hash or an array.
+  If a hash: The key is the ruleset name, and the value is either a floating point number between 0 and 1, for the probability, or "auto" to automatically assign probabilities equally.
+  If an array: The element of the array contains one or more hashes described like above, where one of the elements is chosen at random.
+  See [random-test.jsonc](https://github.com/ACRealms/ACRealms.WorldServer/blob/master/Content/json/realms/ruleset/random-test.jsonc) for an example
+- `properties` (required): A hash of properties, where the key is equal to an enum entry defined in ACE.Entity.Enum.Properties.RealmPropertyXXX.cs, and the value is either a Hash of type 'property entry' described below, or a constant scalar value deserializable to the corresponding type.
+  The realm properties in the Enum definition itself (.cs file) will also have absolute minimums and maximums. If the value is outside this range (after composition and randomization), it will be adjusted to fit the range. For example, if the range is from 0 to 50, and the composed value is 60, the effective value will be 50. No errors or warnings will be emitted, by design.
+- `properties_random_count`: An integer to specify that instead of all properties being applied, this many properties from the ruleset will be selected at random (excluding the description). This occurs during landblock load as part of the ruleset activation pipeline.
+
+Property entry hash valid keys:
+- `value`: A default value, matching the type of the corresponding property. May not be present if `low` or `high` is present. This takes precedence over the default value defined in the enum type.
+- `low`: The minimum value when rerolled. If present, `high` must also be defined. The absolute minimum defined in the enum type will take precedence if there is a conflict. 
+- `high`: The maximum value when rerolled. If present, `low` must also be defined. The absolute maximum defined in the enum type will take precedence if there is a conflict.
+- `reroll`: One of:
+  - `landblock` (default): Reroll once during landblock load
+  - `always`: Reroll each time the property is accessed by game logic
+  - `never`: Use the default value
+- `compose`: One of:
+  - `add`: Add the result of the two rulesets together
+  - `multiply`: Multiply the result of the two rulesets together
+  - `replace`: Discard the previous value and replace it with the result from this ruleset.
+- `locked`: Rulesets that inherit from this ruleset will ignore any properties that are locked here instead of composing them.
+- `probability`: (Not implemented yet): A floating-point number between 0 and 1 representing the probability of this property taking effect.
+
 
 ## Known Issues
 
-#### GUID Table
-
-GUIDs in Asheron's Call are stored and used as 32-bit unsigned integers (normally displayed in hexidecimal).
-These GUIDs are sometimes dynamically assigned, but sometimes statically assigned, with the landblock ID composing the first 16 bits, and only the remaining 16 bits used for a local component of this GUID.
-Because ACRealms makes it possible to have multiple landblocks with the same 16-bit identifier, it is therefore possible to have multiple objects with the same statically assigned GUID.
-
-There are only a few cases where this becomes a problem, such as collision detection and housing. We knew about the housing limitation from the start of the project (2020), but the collision detection issue was not discovered until very recently, April 2024.
-
-The good news is that given these assumptions, the issue is fixable (it just hasn't been done yet):
-1. GUID collisions will always occur between objects in different instances
-2. A player can only be in one instance at a time
-3. Objects with statically assigned GUIDs will never swap instances
-
-ACE.Server.Physics.Managers.ServerObjectManager contains a global table with 32-bit GUID as a key. The idea is to identify statically assigned GUIDs, and translate them into a 64-bit version of the GUID, using the instance ID as the first 32 bits, and the original GUID as the last 32 bits.
-
+- Housing is working, but not tested in full yet. Purchasing houses, villa portals
+- Realm properties were originally intended to be changed without a restart of the database, and a very early version of this project allowed it, but there were issues with caching. I still want to fix that because restarting the server is not convenient when experimenting with ideas for new rulesets.
+- The ruleset specification is complex and not covered by any unit tests. If you notice any unexpected behavior with rulesets, please report it!
 
 ## Developer notes
 

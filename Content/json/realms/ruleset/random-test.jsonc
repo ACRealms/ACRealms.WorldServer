@@ -6,7 +6,7 @@
     "Spellcasting_Max_Angle": {
       "low": "5",
       "high": "180",
-      "reroll": "landblock" /*never, always, landblock, admin */,
+      "reroll": "landblock" /*never, always, landblock, manual */,
       "locked": true,
       "probability": 0.5
     },
