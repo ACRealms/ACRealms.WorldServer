@@ -77,7 +77,7 @@ Property entry hash valid keys:
 ## Known Issues
 
 - Housing is working, but not tested in full yet. Purchasing houses, abandoning houses, villa portals, villa storage have been tested. I haven't tried mansions, apartments, allegiance housing, booting, or permissions yet. I'm sure not everything works yet but it is just a matter of fixing minor things. The hard technical problems related to housing have already been solved, however.
-- Realm properties were originally intended to be changed without a restart of the database, and a very early version of this project allowed it, but there were issues with caching. I still want to fix that because restarting the server is not convenient when experimenting with ideas for new rulesets.
+- Ruleset and realm files were originally intended to be updatable without a restart of the server, and a very early version of this project allowed it, but there were issues with caching. I still want to fix that because restarting the server is not convenient when experimenting with ideas for new rulesets.
 - The ruleset specification is complex and not covered by any unit tests. If you notice any unexpected behavior with rulesets, please report it!
 
 ## Developer notes
