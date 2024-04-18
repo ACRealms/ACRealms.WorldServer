@@ -112,7 +112,7 @@ namespace ACE.Server
 
                 while ((line = sr.ReadLine()) != null)
                 {
-                    line = line.Replace("ace_world", dbname);
+                    line = line.Replace("realms_world", dbname);
                     //do minimal amount of work here
                     if (line.EndsWith(";"))
                     {
@@ -197,7 +197,7 @@ namespace ACE.Server
                     {
                         Console.Write($"Found {file.FullName} .... ");
                         var sqlDBFile = File.ReadAllText(file.FullName);
-                        sqlDBFile = sqlDBFile.Replace("ace_world", ConfigManager.Config.MySql.World.Database);
+                        sqlDBFile = sqlDBFile.Replace("realms_world", ConfigManager.Config.MySql.World.Database);
                         var script = new MySqlConnector.MySqlCommand(sqlDBFile, sqlConnect);
 
                         Console.Write($"Importing into World database on SQL server at {ConfigManager.Config.MySql.World.Host}:{ConfigManager.Config.MySql.World.Port} .... ");
@@ -291,9 +291,9 @@ namespace ACE.Server
                         break;
                 }
                 var sqlConnect = new MySqlConnector.MySqlConnection($"server={host};port={port};user={username};password={password};database={database};DefaultCommandTimeout=120;SslMode=None;AllowPublicKeyRetrieval=true");
-                sqlDBFile = sqlDBFile.Replace("ace_auth", authDB);
-                sqlDBFile = sqlDBFile.Replace("ace_shard", shardDB);
-                sqlDBFile = sqlDBFile.Replace("ace_world", worldDB);
+                sqlDBFile = sqlDBFile.Replace("realms_auth", authDB);
+                sqlDBFile = sqlDBFile.Replace("realms_shard", shardDB);
+                sqlDBFile = sqlDBFile.Replace("realms_world", worldDB);
                 var script = new MySqlConnector.MySqlCommand(sqlDBFile, sqlConnect);
 
                 Console.Write($"Importing into {database} database on SQL server at {host}:{port} .... ");

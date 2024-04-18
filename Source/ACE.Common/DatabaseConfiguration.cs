@@ -6,7 +6,7 @@ namespace ACE.Common
         {
             Host     = "127.0.0.1",
             Port     = 3306,
-            Database = "ace_auth",
+            Database = "realms_auth",
             Username = "root",
             Password = ""
         };
@@ -15,7 +15,7 @@ namespace ACE.Common
         {
             Host = "127.0.0.1",
             Port = 3306,
-            Database = "ace_shard",
+            Database = "realms_shard",
             Username = "root",
             Password = ""
         };
@@ -24,7 +24,7 @@ namespace ACE.Common
         {
             Host = "127.0.0.1",
             Port = 3306,
-            Database = "ace_world",
+            Database = "realms_world",
             Username = "root",
             Password = ""
         };

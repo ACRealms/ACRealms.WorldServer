@@ -4,7 +4,7 @@ namespace ACE.Common
 {
     public class GameConfiguration
     {
-        public string WorldName { get; set; } = "ACEmulator";
+        public string WorldName { get; set; } = "AC Realms";
 
         public NetworkSettings Network { get; set; } = new NetworkSettings();
 

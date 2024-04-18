@@ -22,7 +22,7 @@ namespace ACE.Server.Command.Handlers
                             + "Use @help to get more information about commands supported by the client.\n"
                             + "Available help:\n"
                             + "@acehelp commands - Lists all commands.\n"
-                            + "You can also use @acecommands to get a complete list of the supported ACEmulator commands available to you.\n"
+                            + "You can also use @acecommands to get a complete list of the supported AC Realms commands available to you.\n"
                             + "To get more information about a specific command, use @acehelp command\n";
                     session.Network.EnqueueSend(new GameMessageSystemChat(msg, ChatMessageType.Broadcast));
                 }

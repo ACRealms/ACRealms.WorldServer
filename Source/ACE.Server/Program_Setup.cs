@@ -31,7 +31,7 @@ namespace ACE.Server
                 }
                 else
                 {
-                    Console.WriteLine("config.js Configuration file is missing, ACEmulator is running in a container, cloning from docker file.");
+                    Console.WriteLine("config.js Configuration file is missing, AC Realms is running in a container, cloning from docker file.");
                     var configJsDocker = Path.Combine(exeLocation, "Config.js.docker");
                     File.Copy(configJsDocker, configFile, true);
                 }
@@ -40,11 +40,11 @@ namespace ACE.Server
                 config = JsonSerializer.Deserialize<MasterConfiguration>(fileText, ConfigManager.SerializerOptions);
             }
 
-            Console.WriteLine("Performing setup for ACEmulator...");
+            Console.WriteLine("Performing setup for AC Realms...");
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine();
-            Console.WriteLine("Welcome to ACEmulator! To configure your world for first use, please follow the instructions below. Press enter at each prompt to accept default values.");
+            Console.WriteLine("Welcome to AC Realms! To configure your world for first use, please follow the instructions below. Press enter at each prompt to accept default values.");
             Console.WriteLine();
             Console.WriteLine();
 
@@ -267,7 +267,7 @@ namespace ACE.Server
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine();
-            Console.Write("Do you want to ACEmulator to attempt to initialize your SQL databases? This will erase any existing ACEmulator specific databases that may already exist on the server (Y/n): ");
+            Console.Write("Do you want to AC Realms to attempt to initialize your SQL databases? This will erase any existing ACEmulator specific databases that may already exist on the server (Y/n): ");
             variable = Console.ReadLine();
             var sqlConnectInfo = $"server={config.MySql.World.Host};port={config.MySql.World.Port};user={config.MySql.World.Username};password={config.MySql.World.Password};{config.MySql.World.ConnectionOptions}";
             var sqlConnect = new MySqlConnector.MySqlConnection(sqlConnectInfo);
@@ -324,16 +324,16 @@ namespace ACE.Server
                     {
                         case "AuthenticationBase.sql":
                             sqlConnectInfo = $"server={config.MySql.Authentication.Host};port={config.MySql.Authentication.Port};user={config.MySql.Authentication.Username};password={config.MySql.Authentication.Password};{config.MySql.Shard.ConnectionOptions}";
-                            sqlDBFile = sqlDBFile.Replace("ace_auth", config.MySql.Authentication.Database);
+                            sqlDBFile = sqlDBFile.Replace("realms_auth", config.MySql.Authentication.Database);
                             break;
                         case "ShardBase.sql":
                             sqlConnectInfo = $"server={config.MySql.Shard.Host};port={config.MySql.Shard.Port};user={config.MySql.Shard.Username};password={config.MySql.Shard.Password};{config.MySql.Shard.ConnectionOptions}";
-                            sqlDBFile = sqlDBFile.Replace("ace_shard", config.MySql.Shard.Database);
+                            sqlDBFile = sqlDBFile.Replace("realms_shard", config.MySql.Shard.Database);
                             break;
                         case "WorldBase.sql":
                         default:
                             //sqlConnectInfo = $"server={config.MySql.World.Host};port={config.MySql.World.Port};user={config.MySql.World.Username};password={config.MySql.World.Password};{config.MySql.Shard.ConnectionOptions}";
-                            sqlDBFile = sqlDBFile.Replace("ace_world", config.MySql.World.Database);
+                            sqlDBFile = sqlDBFile.Replace("realms_world", config.MySql.World.Database);
                             break;
                     }
                     var script = new MySqlConnector.MySqlCommand(sqlDBFile, sqlConnect);
@@ -414,7 +414,7 @@ namespace ACE.Server
 
                     while ((line = sr.ReadLine()) != null)
                     {
-                        line = line.Replace("ace_world", dbname);
+                        line = line.Replace("realms_world", dbname);
                         //do minimal amount of work here
                         if (line.EndsWith(";"))
                         {
@@ -443,7 +443,7 @@ namespace ACE.Server
             }
 
             CleanupConnection(sqlConnect);
-            Console.WriteLine("exiting setup for ACEmulator.");
+            Console.WriteLine("exiting setup for AC Realms.");
         }
 
         private static void ExecuteScript(MySqlConnector.MySqlCommand scriptCommand)

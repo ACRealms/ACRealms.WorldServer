@@ -41,7 +41,7 @@ namespace ACE.Server
 
         public static void Main(string[] args)
         {
-            var consoleTitle = $"ACEmulator - v{ServerBuildInfo.FullVersion}";
+            var consoleTitle = $"AC Realms - v{ServerBuildInfo.FullVersion}";
 
             Console.Title = consoleTitle;
 
@@ -74,7 +74,7 @@ namespace ACE.Server
                 var exampleFile = new FileInfo(log4netConfigExample);
                 if (!exampleFile.Exists)
                 {
-                    Console.WriteLine("log4net Configuration file is missing.  Please copy the file log4net.config.example to log4net.config and edit it to match your needs before running ACE.");
+                    Console.WriteLine("log4net Configuration file is missing.  Please copy the file log4net.config.example to log4net.config and edit it to match your needs before running AC Realms.");
                     throw new Exception("missing log4net configuration file");
                 }
                 else
@@ -88,7 +88,7 @@ namespace ACE.Server
                     {                        
                         if (!File.Exists(log4netConfigContainer))
                         {
-                            Console.WriteLine("log4net Configuration file is missing, ACEmulator is running in a container,  cloning from docker file.");
+                            Console.WriteLine("log4net Configuration file is missing, AC Realms Emulator is running in a container,  cloning from docker file.");
                             var log4netConfigDocker = Path.Combine(exeLocation, "log4net.config.docker");
                             File.Copy(log4netConfigDocker, log4netConfig);
                             File.Copy(log4netConfigDocker, log4netConfigContainer);
@@ -106,7 +106,7 @@ namespace ACE.Server
             XmlConfigurator.ConfigureAndWatch(logRepository, log4netFileInfo);
 
             if (Environment.ProcessorCount < 2)
-                log.Warn("Only one vCPU was detected. ACE may run with limited performance. You should increase your vCPU count for anything more than a single player server.");
+                log.Warn("Only one vCPU was detected. AC Realms may run with limited performance. You should increase your vCPU count for anything more than a single player server.");
 
             // Do system specific initializations here
             try
@@ -122,10 +122,10 @@ namespace ACE.Server
                 log.Error(ex.ToString());
             }
 
-            log.Info("Starting ACEmulator...");
+            log.Info("Starting AC Realms...");
 
             if (IsRunningInContainer)
-                log.Info("ACEmulator is running in a container...");
+                log.Info("AC Realms is running in a container...");
             
             var configFile = Path.Combine(exeLocation, "Config.js");
             var configConfigContainer = Path.Combine(containerConfigDirectory, "Config.js");
@@ -152,7 +152,7 @@ namespace ACE.Server
             log.Info("Initializing ConfigManager...");
             ConfigManager.Initialize();
 
-            if (ConfigManager.Config.Server.WorldName != "ACEmulator")
+            if (ConfigManager.Config.Server.WorldName != "AC Realms")
             {
                 consoleTitle = $"{ConfigManager.Config.Server.WorldName} | {consoleTitle}";
                 Console.Title = consoleTitle;
@@ -222,7 +222,7 @@ namespace ACE.Server
             // pre-load starterGear.json, abort startup if file is not found as it is required to create new characters.
             if (Factories.StarterGearFactory.GetStarterGearConfiguration() == null)
             {
-                log.Fatal("Unable to load or parse starterGear.json. ACEmulator will now abort startup.");
+                log.Fatal("Unable to load or parse starterGear.json. AC Realms will now abort startup.");
                 ServerManager.StartupAbort();
                 Environment.Exit(0);
             }
@@ -246,7 +246,7 @@ namespace ACE.Server
 
             if (DatabaseManager.InitializationFailure)
             {
-                log.Fatal("DatabaseManager initialization failed. ACEmulator will now abort startup.");
+                log.Fatal("DatabaseManager initialization failed. AC Realms will now abort startup.");
                 ServerManager.StartupAbort();
                 Environment.Exit(0);
             }

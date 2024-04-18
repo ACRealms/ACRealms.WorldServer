@@ -117,7 +117,7 @@ namespace ACE.Server.Command
 
             if (NonInteractiveConsole)
             {
-                log.Info("ACEmulator command prompt disabled - Environment.GetEnvironmentVariable(ACE_NONINTERACTIVE_CONSOLE) was true");
+                log.Info("AC Realms command prompt disabled - Environment.GetEnvironmentVariable(ACE_NONINTERACTIVE_CONSOLE) was true");
                 return;
             }
 
@@ -130,14 +130,14 @@ namespace ACE.Server.Command
         private static void CommandThread()
         {
             Console.WriteLine("");
-            Console.WriteLine("ACEmulator command prompt ready.");
+            Console.WriteLine("AC Realms command prompt ready.");
             Console.WriteLine("");
             Console.WriteLine("Type \"acecommands\" for help.");
             Console.WriteLine("");
 
             for (; ; )
             {
-                Console.Write("ACE >> ");
+                Console.Write("ACRealms >> ");
 
                 string commandLine = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(commandLine))

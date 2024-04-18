@@ -298,7 +298,7 @@ namespace ACE.Server.Managers
                 session.Network.EnqueueSend(new GameEventPopupString(session, AppendLines(popup_header, popup_motd)));
             }
 
-            var info = "Welcome to Asheron's Call\n  powered by ACEmulator\n\nFor more information on commands supported by this server, type @acehelp\n";
+            var info = "Welcome to Asheron's Call\n  powered by AC Realms\n\nFor more information on commands supported by this server, type @acehelp\n";
             session.Network.EnqueueSend(new GameMessageSystemChat(info, ChatMessageType.Broadcast));
 
             var server_motd = PropertyManager.GetString("server_motd").Item;

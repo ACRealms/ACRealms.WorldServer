@@ -18,6 +18,6 @@ namespace ACE.Common
         /// Common connection options used when connecting to SQL database engine.
         /// </summary>
         [JsonIgnore]
-        public string ConnectionOptions { get; } = "DefaultCommandTimeout=120;TreatTinyAsBoolean=False;SslMode=None;AllowPublicKeyRetrieval=True;AllowUserVariables=True;ApplicationName=ACEmulator";
+        public string ConnectionOptions { get; } = "DefaultCommandTimeout=120;TreatTinyAsBoolean=False;SslMode=None;AllowPublicKeyRetrieval=True;AllowUserVariables=True;ApplicationName=ACRealms";
     }
 }

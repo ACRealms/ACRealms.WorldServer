@@ -3467,11 +3467,11 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            if (iouToTurnIn is Book book && book.ScribeName == "ACEmulator" && book.ScribeAccount == "prewritten")
+            if (iouToTurnIn is Book book && book.ScribeName == "AC Realms" && book.ScribeAccount == "prewritten")
             {
                 var page = book.GetPage(0);
 
-                if (page != null && page.AuthorName == "ACEmulator" && page.AuthorAccount == "prewritten" && page.AuthorId == uint.MaxValue)
+                if (page != null && page.AuthorName == "AC Realms" && page.AuthorAccount == "prewritten" && page.AuthorId == uint.MaxValue)
                 {
                     var pageText = page.PageText;
 

@@ -16,7 +16,7 @@ namespace ACE.Server
         {
             var databaseVersion = DatabaseManager.World.GetVersion();
 
-            var msg = $"Server binaries version {FullVersion} - compiled {CompilationTimestampUtc:ddd MMM d HH:mm:ss yyyy} : ACEmulator\n";
+            var msg = $"Server binaries version {FullVersion} - compiled {CompilationTimestampUtc:ddd MMM d HH:mm:ss yyyy} : AC Realms\n";
 
             msg += $"Server database version Base: {databaseVersion.BaseVersion} Patch: {databaseVersion.PatchVersion} - compiled {databaseVersion.LastModified:ddd MMM d HH:mm:ss yyyy}\n";
 

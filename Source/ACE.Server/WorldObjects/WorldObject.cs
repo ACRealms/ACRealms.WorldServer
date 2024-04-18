@@ -465,8 +465,8 @@ namespace ACE.Server.WorldObjects
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine("ACE Debug Output:");
-            sb.AppendLine("ACE Class File: " + GetType().Name + ".cs");
+            sb.AppendLine("ACRealms Debug Output:");
+            sb.AppendLine("ACRealms Class File: " + GetType().Name + ".cs");
             sb.AppendLine("Guid: " + obj.Guid.Full + " (0x" + obj.Guid.Full.ToString("X") + ")");
 
             sb.AppendLine("----- Private Fields -----");

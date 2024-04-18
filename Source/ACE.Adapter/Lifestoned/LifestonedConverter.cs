@@ -1081,7 +1081,7 @@ namespace ACE.Adapter.Lifestoned
                 result.Changelog.Add(new ChangelogEntry
                 {
                     Author = "ACE.Adapter",
-                    Comment = "Weenie exported from ACEmulator world database using ACE.Adapter",
+                    Comment = "Weenie exported from AC Realms world database using ACE.Adapter",
                     Created = DateTime.UtcNow
                 });
 

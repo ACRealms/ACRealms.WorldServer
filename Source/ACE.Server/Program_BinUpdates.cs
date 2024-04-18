@@ -30,7 +30,7 @@ namespace ACE.Server
                 // Status returns > 0 if the GitHub version is newer. (0 if the same, or < 0 if older.)
                 if (versionStatus > 0)
                 {
-                    log.Warn("There is a newer version of ACE available!");
+                    log.Warn("There is a newer version of AC Realms available!");
                     log.Warn($"Please visit {json.GetProperty("html_url").GetString()} for more information.");
 
                     // the Console.Title.Get() only works on Windows...

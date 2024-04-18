@@ -164,7 +164,7 @@ namespace ACE.Adapter.Lifestoned
                 weenie.Changelog = metadata.Changelog;
             }
 
-            weenie.UserChangeSummary = "Weenie exported from ACEmulator world database using ACE.Adapter";
+            weenie.UserChangeSummary = "Weenie exported from AC Realms world database using ACE.Adapter";
             weenie.IsDone = metadata.IsDone;
 
             return true;
