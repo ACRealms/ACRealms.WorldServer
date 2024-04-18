@@ -93,6 +93,7 @@ If using this project in your own server, please do not add new properties with 
 
 `russellfannin0@gmail.com`
 
+Discord Link: https://discord.gg/pN65pYqZeS
 
 ## License
 
