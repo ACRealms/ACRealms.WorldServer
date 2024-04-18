@@ -7,10 +7,12 @@ using ACE.Server.Managers;
 using ACE.Server.Network;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Physics.Common;
 using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ACE.Server.Command.Handlers
@@ -178,5 +180,35 @@ namespace ACE.Server.Command.Handlers
             // Set the chain to run
             mpChain.EnqueueChain();
         }
+
+        [CommandHandler("reload-all-landblocks", AccessLevel.Admin, CommandHandlerFlag.None, 0, "Reloads all landblocks currently loaded.")]
+        public static void HandleReloadAllLandblocks(Session session, params string[] parameters)
+        {
+            ActionChain lbResetChain = new ActionChain();
+            var lbs = LandblockManager.GetLoadedLandblocks().Select(x => (id: x.Id, instance: x.Instance));
+            var enumerator = lbs.GetEnumerator();
+
+            ActionEventDelegate resetLandblockAction = null;
+            resetLandblockAction = new ActionEventDelegate(() =>
+            {
+                if (!enumerator.MoveNext())
+                    return;
+                if (LandblockManager.IsLoaded(enumerator.Current.id, enumerator.Current.instance))
+                {
+                    var lb = LandblockManager.GetLandblockUnsafe(enumerator.Current.id, enumerator.Current.instance);
+                    if (lb != null)
+                    {
+                        if (session?.Player?.CurrentLandblock != lb)
+                            CommandHandlerHelper.WriteOutputInfo(session, $"Reloading 0x{lb.LongId:X16}", ChatMessageType.Broadcast);
+                        lb.Reload();
+                    }
+                }
+                lbResetChain.AddDelayForOneTick();
+                lbResetChain.AddAction(WorldManager.ActionQueue, resetLandblockAction);
+            });
+            lbResetChain.AddAction(WorldManager.ActionQueue, resetLandblockAction);
+            lbResetChain.EnqueueChain();
+        }
+
     }
 }

@@ -28,6 +28,7 @@ using ACE.Server.WorldObjects;
 
 using Position = ACE.Entity.Position;
 using ACE.Server.Realms;
+using ACE.Server.Network.GameMessages.Messages;
 
 namespace ACE.Server.Entity
 {
@@ -216,6 +217,26 @@ namespace ACE.Server.Entity
             });
 
             //LoadMeshes(objects);
+        }
+
+        public void Reload()
+        {
+            var landblockId = Id.Raw | 0xFFFF;
+
+            foreach(var player in players)
+                player.Session.Network.EnqueueSend(new GameMessageSystemChat($"Reloading 0x{LongId:X16}", ChatMessageType.Broadcast));
+
+            DestroyAllNonPlayerObjects();
+            DatabaseManager.World.ClearCachedInstancesByLandblock(Id.Landblock);
+
+            // reload landblock
+            var actionChain = new ActionChain();
+            actionChain.AddDelayForOneTick();
+            actionChain.AddAction(this, () =>
+            {
+                Init(InnerRealmInfo, true);
+            });
+            actionChain.EnqueueChain();
         }
 
         private AppliedRuleset GetOrApplyRuleset(EphemeralRealm ephemeralRealm = null)
