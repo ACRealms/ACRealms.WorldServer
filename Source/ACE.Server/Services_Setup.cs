@@ -9,7 +9,7 @@ using ACE.Common;
 
 namespace ACE.Server
 {
-    partial class Program
+    partial class Services
     {
         private static void DoOutOfBoxSetup(string configFile)
         {

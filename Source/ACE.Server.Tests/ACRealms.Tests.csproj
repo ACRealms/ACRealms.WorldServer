@@ -29,12 +29,13 @@
   <ItemGroup>
     <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.console" Version="2.4.1">
+    <PackageReference Include="xunit" Version="2.7.1" />
+    <PackageReference Include="Xunit.DependencyInjection" Version="9.1.0" />
+    <PackageReference Include="xunit.runner.console" Version="2.7.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -50,6 +51,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ACE.Common\ACE.Common.csproj" />
+    <ProjectReference Include="..\ACE.Database\ACE.Database.csproj" />
     <ProjectReference Include="..\ACE.Server\ACE.Server.csproj" />
   </ItemGroup>
 
@@ -61,11 +64,17 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Command\" />
-      <Folder Include="Entity\" />
-      <Folder Include="Factories\" />
-      <Folder Include="Network\" />
-      <Folder Include="WorldObjects\" />
+      <Folder Include="Tests\Server\Entity\" />
+      <Folder Include="Tests\Server\Factories\" />
+      <Folder Include="Tests\Server\Managers\" />
+      <Folder Include="Tests\Server\Network\" />
+      <Folder Include="Tests\Server\WorldObjects\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Config.js">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

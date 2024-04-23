@@ -128,7 +128,7 @@ namespace ACE.Server.Command.Handlers.Processors
             if (realms != null)
                 ImportJsonRealmsIndex(session, realms_index, realms);
 
-            session?.Network.EnqueueSend(new GameMessageSystemChat($"Synced {realms.Count} realms in {(DateTime.Now - now)}.", ChatMessageType.Broadcast));
+            session?.Network.EnqueueSend(new GameMessageSystemChat($"Synced {realms.Count} realms in {(DateTime.Now - now).TotalSeconds} seconds.", ChatMessageType.Broadcast));
         }
 
         private static List<RealmToImport> ImportJsonRealmsFromSubFolder(Session session, string json_folder)
@@ -154,8 +154,6 @@ namespace ACE.Server.Command.Handlers.Processors
             }
             return list;
         }
-
-        
 
         private static List<RealmToImport> ImportJsonRealmsFolder(Session session, string json_folder)
         {
@@ -1302,7 +1300,7 @@ namespace ACE.Server.Command.Handlers.Processors
             if (idx != -1)
                 sqlCommands = sqlCommands.Substring(0, idx);
 
-            using (var ctx = new WorldDbContext())
+            using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
                 ctx.Database.ExecuteSqlRaw(sqlCommands);
         }
 
@@ -1553,7 +1551,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 // handle special case: deleting the last instance from landblock
                 File.Delete(sqlFilename);
 
-                using (var ctx = new WorldDbContext())
+                using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
                     ctx.Database.ExecuteSqlRaw($"DELETE FROM landblock_instance WHERE landblock={landblock};");
             }
 
@@ -1795,7 +1793,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 // handle special case: deleting the last encounter from landblock
                 File.Delete(sqlFilename);
 
-                using (var ctx = new WorldDbContext())
+                using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
                     ctx.Database.ExecuteSqlRaw($"DELETE FROM encounter WHERE landblock={landblock};");
             }
 
@@ -3117,7 +3115,7 @@ namespace ACE.Server.Command.Handlers.Processors
                 { "?", "" },
             };
 
-            using (var ctx = new WorldDbContext())
+            using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
             {
                 var weenies = ctx.Weenie.OrderBy(i => i.ClassId);
 

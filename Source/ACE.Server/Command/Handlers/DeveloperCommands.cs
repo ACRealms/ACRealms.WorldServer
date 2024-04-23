@@ -2123,7 +2123,7 @@ namespace ACE.Server.Command.Handlers
 
         public static void HandleTeleDungeonBlock(Session session, uint landblock)
         {
-            using (var ctx = new WorldDbContext())
+            using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
             {
                 var query = from weenie in ctx.Weenie
                             join wpos in ctx.WeeniePropertiesPosition on weenie.ClassId equals wpos.ObjectId
@@ -2156,7 +2156,7 @@ namespace ACE.Server.Command.Handlers
         {
             var searchName = string.Join(" ", parameters);
 
-            using (var ctx = new WorldDbContext())
+            using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
             {
                 var query = from weenie in ctx.Weenie
                             join wstr in ctx.WeeniePropertiesString on weenie.ClassId equals wstr.ObjectId
@@ -2198,7 +2198,7 @@ namespace ACE.Server.Command.Handlers
             var blockStart = landblock << 16;
             var blockEnd = blockStart | 0xFFFF;
 
-            using (var ctx = new WorldDbContext())
+            using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
             {
                 var query = from weenie in ctx.Weenie
                             join wstr in ctx.WeeniePropertiesString on weenie.ClassId equals wstr.ObjectId
@@ -3376,7 +3376,7 @@ namespace ACE.Server.Command.Handlers
                 CommandHandlerHelper.WriteOutputInfo(session, "Please enter a tier between 1-8");
                 return;
             }
-            using (var ctx = new WorldDbContext())
+            using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
             {
                 var query = from weenie in ctx.Weenie
                             join deathTreasure in ctx.WeeniePropertiesDID on weenie.ClassId equals deathTreasure.ObjectId

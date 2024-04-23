@@ -1,27 +1,31 @@
 using System;
 
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ACE.Database
 {
-    public static class DatabaseManager
+    public class DatabaseManager
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static AuthenticationDatabase Authentication { get; } = new AuthenticationDatabase();
+        public static AuthenticationDatabase Authentication { get; private set; }
 
-        public static WorldDatabaseWithEntityCache World { get; } = new WorldDatabaseWithEntityCache();
+        public static WorldDatabaseWithEntityCache World { get; private set; }
 
         private static SerializedShardDatabase serializedShardDb;
 
         public static SerializedShardDatabase Shard { get; private set; }
 
-        public static ShardConfigDatabase ShardConfig { get; } = new ShardConfigDatabase();
+        public static ShardConfigDatabase ShardConfig { get; private set; }
 
         public static bool InitializationFailure = false;
 
-        public static void Initialize(bool autoRetry = true)
+        public static void Initialize(IServiceProvider services, bool autoRetry = true)
         {
+            Authentication = new AuthenticationDatabase(services);
+            World = new WorldDatabaseWithEntityCache(services);
+
             Authentication.Exists(true);
 
             if (Authentication.GetListofAccountsByAccessLevel(ACE.Entity.Enum.AccessLevel.Admin).Count == 0)
@@ -50,10 +54,10 @@ namespace ACE.Database
             }
 
             // By default, we hold on to player biotas a little bit longer to help with offline updates like pass-up xp, allegiance updates, etc...
-            var shardDb = new ShardDatabaseWithCaching(TimeSpan.FromMinutes(Common.ConfigManager.Config.Server.ShardPlayerBiotaCacheTime), TimeSpan.FromMinutes(Common.ConfigManager.Config.Server.ShardNonPlayerBiotaCacheTime));
+            var shardDb = new ShardDatabaseWithCaching(services, TimeSpan.FromMinutes(Common.ConfigManager.Config.Server.ShardPlayerBiotaCacheTime), TimeSpan.FromMinutes(Common.ConfigManager.Config.Server.ShardNonPlayerBiotaCacheTime));
             serializedShardDb = new SerializedShardDatabase(shardDb);
             Shard = serializedShardDb;
-
+            ShardConfig = new ShardConfigDatabase(services);
             shardDb.Exists(true);
         }
 

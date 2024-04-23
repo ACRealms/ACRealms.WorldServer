@@ -1031,7 +1031,7 @@ namespace ACE.Server.Command.Handlers
             /// wcid => emote hash => list of order ids with delay 0
             var emoteCache = new Dictionary<uint, Dictionary<int, HashSet<uint>>>();
 
-            using (var ctx = new WorldDbContext())
+            using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
             {
                 var query = from emote in ctx.WeeniePropertiesEmote
                             join action in ctx.WeeniePropertiesEmoteAction on emote.Id equals action.EmoteId

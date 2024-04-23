@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Numerics;
 using ACE.Entity;
+using ACRealms.Tests.Fixtures;
 using Xunit;
 
 namespace ACE.Server.Tests.Realm
 {
+    [CollectionDefinition("Dependency Injection")]
     public class RealmTests
     {
         [Fact]

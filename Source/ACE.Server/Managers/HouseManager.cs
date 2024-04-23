@@ -59,7 +59,7 @@ namespace ACE.Server.Managers
         /// </summary>
         private static void BuildHouseIdToGuid()
         {
-            using (var ctx = new WorldDbContext())
+            using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
             {
                 var query = from weenie in ctx.Weenie
                             join inst in ctx.LandblockInstance on weenie.ClassId equals inst.WeenieClassId

@@ -6,6 +6,7 @@ using System.Threading;
 
 using ACE.Database.Models.Shard;
 using ACE.Entity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ACE.Database
 {
@@ -14,7 +15,8 @@ namespace ACE.Database
         public TimeSpan PlayerBiotaRetentionTime { get; set; }
         public TimeSpan NonPlayerBiotaRetentionTime { get; set; }
 
-        public ShardDatabaseWithCaching(TimeSpan playerBiotaRetentionTime, TimeSpan nonPlayerBiotaRetentionTime)
+        public ShardDatabaseWithCaching(IServiceProvider services, TimeSpan playerBiotaRetentionTime, TimeSpan nonPlayerBiotaRetentionTime)
+            : base(services)
         {
             PlayerBiotaRetentionTime = playerBiotaRetentionTime;
             NonPlayerBiotaRetentionTime = nonPlayerBiotaRetentionTime;

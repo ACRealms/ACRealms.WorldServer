@@ -14,6 +14,8 @@ using ACE.Database.Models.World;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Database.Adapter;
+using ACE.Database.Models.Auth;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ACE.Database
 {
@@ -21,13 +23,20 @@ namespace ACE.Database
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public IDbContextFactory<WorldDbContext> ContextFactory { get; }
+
+        public WorldDatabase(IServiceProvider services)
+        {
+            ContextFactory = services.GetRequiredService<IDbContextFactory<WorldDbContext>>();
+        }
+
         public bool Exists(bool retryUntilFound)
         {
             var config = Common.ConfigManager.Config.MySql.World;
 
             for (; ; )
             {
-                using (var context = new WorldDbContext())
+                using (var context = ContextFactory.CreateDbContext())
                 {
                     if (((RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>()).Exists())
                     {
@@ -120,7 +129,7 @@ namespace ACE.Database
         /// </summary>
         public virtual List<Weenie> GetAllWeenies()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.Weenie.Load();
 
@@ -176,7 +185,7 @@ namespace ACE.Database
         /// </summary>
         public Weenie GetWeenie(uint weenieClassId)
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -203,7 +212,7 @@ namespace ACE.Database
         /// </summary>
         public Weenie GetWeenie(string weenieClassName)
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -221,7 +230,7 @@ namespace ACE.Database
 
         public Dictionary<uint, string> GetAllWeenieNames()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -237,7 +246,7 @@ namespace ACE.Database
 
         public Dictionary<uint, string> GetAllWeenieClassNames()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -248,7 +257,7 @@ namespace ACE.Database
 
         public List<HouseListResults> GetHousesAll()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var query = from weenie in context.Weenie
                             join winst in context.LandblockInstance on weenie.ClassId equals winst.WeenieClassId
@@ -294,7 +303,7 @@ namespace ACE.Database
 
         public virtual List<CookBook> GetAllCookbooks()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.CookBook.Load();
 
@@ -321,7 +330,7 @@ namespace ACE.Database
 
         public CookBook GetCookbook(uint sourceWeenieClassId, uint targetWeenieClassId)
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -333,7 +342,7 @@ namespace ACE.Database
         {
             var results = new List<CookBook>();
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -356,7 +365,7 @@ namespace ACE.Database
 
         public Recipe GetRecipe(uint recipeId)
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -414,7 +423,7 @@ namespace ACE.Database
         /// </summary>
         public List<Event> GetAllEvents()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -441,7 +450,7 @@ namespace ACE.Database
 
         public LandblockInstance GetLandblockInstanceByGuid(uint guid)
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -459,7 +468,7 @@ namespace ACE.Database
 
         public List<LandblockInstance> GetLandblockInstancesByWcid(uint wcid)
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -490,7 +499,7 @@ namespace ACE.Database
 
         public Dictionary<uint, string> GetAllSpellNames()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -511,7 +520,7 @@ namespace ACE.Database
 
         public Dictionary<uint, TreasureDeath> GetAllTreasureDeath()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -549,7 +558,7 @@ namespace ACE.Database
 
         public Dictionary<uint, List<TreasureWielded>> GetAllTreasureWielded()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -578,7 +587,7 @@ namespace ACE.Database
         /// </summary>
         public ACE.Database.Models.World.Version GetVersion()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -597,7 +606,7 @@ namespace ACE.Database
 
         public bool IsWorldDatabaseGuidRangeValid()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -607,7 +616,7 @@ namespace ACE.Database
 
         public virtual Realm GetRealm(uint id)
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
                 return GetRealm(context, id);
         }
 
@@ -632,7 +641,7 @@ namespace ACE.Database
 
         public virtual List<Realm> GetAllRealms()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.Realm.ToList();
 
@@ -670,22 +679,26 @@ namespace ACE.Database
             var propsstring = realms.SelectMany(x => x.RealmPropertiesString);
             var links = realmsById.Values.SelectMany(x => x.Links);
 
-            using (var context = new WorldDbContext() { UsesTransaction = true })
+            using (var context = ContextFactory.CreateDbContext())
             {
-                using (var transaction = context.Database.BeginTransaction())
+                var executionStrategy = context.Database.CreateExecutionStrategy();
+                executionStrategy.Execute(() =>
                 {
-                    context.Database.ExecuteSqlRaw("DELETE FROM realm;");
-                    context.Realm.AddRange(realms);
-                    context.RealmRulesetLinks.AddRange(links);
-                    context.RealmPropertiesBool.AddRange(propsbool);
-                    context.RealmPropertiesInt.AddRange(propsint);
-                    context.RealmPropertiesInt64.AddRange(propsint64);
-                    context.RealmPropertiesFloat.AddRange(propsfloat);
-                    context.RealmPropertiesString.AddRange(propsstring);
-                    
-                    context.SaveChanges();
-                    transaction.Commit();
-                }
+                    using (var transaction = context.Database.BeginTransaction())
+                    {
+                        context.Database.ExecuteSqlRaw("DELETE FROM realm;");
+                        context.Realm.AddRange(realms);
+                        context.RealmRulesetLinks.AddRange(links);
+                        context.RealmPropertiesBool.AddRange(propsbool);
+                        context.RealmPropertiesInt.AddRange(propsint);
+                        context.RealmPropertiesInt64.AddRange(propsint64);
+                        context.RealmPropertiesFloat.AddRange(propsfloat);
+                        context.RealmPropertiesString.AddRange(propsstring);
+
+                        context.SaveChanges();
+                        transaction.Commit();
+                    }
+                });
             }
         }
     }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-
+using ACE.Database;
 using ACE.Database.Models.World;
 using ACE.Server.Factories.Entity;
 
@@ -16,7 +16,7 @@ namespace ACE.Server.Factories.Tables
 
         static GemCountChance()
         {
-            using (var ctx = new WorldDbContext())
+            using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
             {
                 var gemCounts = ctx.TreasureGemCount.Where(i => i.Chance > 0);
 

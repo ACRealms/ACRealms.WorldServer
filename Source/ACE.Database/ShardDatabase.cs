@@ -18,12 +18,21 @@ using ACE.Database.Entity;
 using ACE.Database.Models.Shard;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using Microsoft.Extensions.DependencyInjection;
+using ACE.Database.Models.World;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace ACE.Database
 {
     public class ShardDatabase
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        public IDbContextFactory<ShardDbContext> ContextFactory { get; }
+
+        public ShardDatabase(IServiceProvider services)
+        {
+            ContextFactory = services.GetRequiredService<IDbContextFactory<ShardDbContext>>();
+        }
 
         public bool Exists(bool retryUntilFound)
         {
@@ -31,7 +40,7 @@ namespace ACE.Database
 
             for (; ; )
             {
-                using (var context = new ShardDbContext())
+                using (var context = ContextFactory.CreateDbContext())
                 {
                     if (((RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>()).Exists())
                     {
@@ -55,7 +64,7 @@ namespace ACE.Database
         /// </summary>
         public ulong GetMaxGuidFoundInRange(ulong min, ulong max)
         {
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var result = context.Biota
                     .AsNoTracking()
@@ -97,7 +106,7 @@ namespace ACE.Database
                       " ) AS z"                                                                         + Environment.NewLine +
                       "WHERE z.gap_ends_at_not_inclusive!=0 AND @available_ids<" + limitAvailableIDsReturned + "; ";
 
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
 
@@ -125,7 +134,7 @@ namespace ACE.Database
 
         public int GetBiotaCount()
         {
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
                 return context.Biota.Count();
         }
 
@@ -233,13 +242,13 @@ namespace ACE.Database
 
         public virtual Biota GetBiota(ulong id, bool doNotAddToCache = false)
         {
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
                 return GetBiota(context, id, doNotAddToCache);
         }
 
         public List<Biota> GetBiotasByWcid(uint wcid)
         {
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -259,7 +268,7 @@ namespace ACE.Database
         public List<Biota> GetBiotasByType(WeenieType type)
         {
             // warning: this query is currently unindexed!
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -311,7 +320,7 @@ namespace ACE.Database
 
         public virtual bool SaveBiota(ACE.Entity.Models.Biota biota, ReaderWriterLockSlim rwLock)
         {
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var existingBiota = GetBiota(context, biota.Id);
 
@@ -353,7 +362,7 @@ namespace ACE.Database
 
         public virtual bool RemoveBiota(ulong id)
         {
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var existingBiota = context.Biota
                     .AsNoTracking()
@@ -419,7 +428,7 @@ namespace ACE.Database
         {
             var inventory = new ConcurrentBag<Biota>();
 
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -453,7 +462,7 @@ namespace ACE.Database
         {
             var wieldedItems = new ConcurrentBag<Biota>();
 
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -482,7 +491,7 @@ namespace ACE.Database
             var min = ((ulong)instance << 32) | (staticLandblockId << 12);
             var max = min | 0xFFF;
 
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -505,7 +514,7 @@ namespace ACE.Database
             var min = (uint)(landblockId << 16);
             var max = min | 0xFFFF;
 
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -534,7 +543,7 @@ namespace ACE.Database
 
         public List<Biota> GetHousesOwned()
         {
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
@@ -552,7 +561,7 @@ namespace ACE.Database
 
         public bool IsCharacterNameAvailable(string name)
         {
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var result = context.Character
                     .AsNoTracking()
@@ -576,9 +585,9 @@ namespace ACE.Database
             return GetCharacterList(0, true, characterId).FirstOrDefault();
         }
 
-        private static List<Character> GetCharacterList(uint accountID, bool includeDeleted, ulong characterID = 0)
+        private List<Character> GetCharacterList(uint accountID, bool includeDeleted, ulong characterID = 0)
         {
-            var context = new ShardDbContext();
+            var context = ContextFactory.CreateDbContext();
 
             IQueryable<Character> query;
 
@@ -617,7 +626,7 @@ namespace ACE.Database
 
         public Character GetCharacterStubByName(string name) // When searching by name, only non-deleted characters matter
         {
-            var context = new ShardDbContext();
+            var context = ContextFactory.CreateDbContext();
 
             var result = context.Character
                 .FirstOrDefault(r => r.Name == name && !r.IsDeleted);
@@ -627,7 +636,7 @@ namespace ACE.Database
 
         public Character GetCharacterStubByGuid(ulong guid)
         {
-            var context = new ShardDbContext();
+            var context = ContextFactory.CreateDbContext();
 
             var result = context.Character
                 .FirstOrDefault(r => r.Id == guid);
@@ -674,7 +683,7 @@ namespace ACE.Database
                 }
             }
 
-            var context = new ShardDbContext();
+            var context = ContextFactory.CreateDbContext();
 
             CharacterContexts.Add(character, context);
 
@@ -738,7 +747,7 @@ namespace ACE.Database
         {
             var biotas = new ConcurrentBag<ACE.Entity.Models.Biota>();
 
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.Character
                     .Where(r => !r.IsDeleted)
@@ -765,7 +774,7 @@ namespace ACE.Database
 
         public ulong? GetAllegianceID(ulong monarchID)
         {
-            using (var context = new ShardDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var query = from biota in context.Biota
                             join iid in context.BiotaPropertiesIID on biota.Id equals iid.ObjectId
@@ -818,7 +827,7 @@ namespace ACE.Database
 
             character.Name = newName;
 
-            var context = new ShardDbContext();
+            var context = ContextFactory.CreateDbContext();
 
             CharacterContexts.Add(character, context);
 

@@ -24,6 +24,10 @@ namespace ACE.Database
 
         private readonly ConcurrentDictionary<string /* Class Name */, uint /* WCID */> weenieClassNameToClassIdCache = new ConcurrentDictionary<string, uint>();
 
+
+        public WorldDatabaseWithEntityCache(IServiceProvider services)
+            : base(services) { }
+
         /// <summary>
         /// This will populate all sub collections except the following: LandblockInstances, PointsOfInterest<para />
         /// This will also update the weenie cache.
@@ -173,7 +177,7 @@ namespace ACE.Database
             {
                 if (!weenieSpecificCachesPopulated)
                 {
-                    using (var context = new WorldDbContext())
+                    using (var context = ContextFactory.CreateDbContext())
                     {
                         var results = context.Weenie
                             .AsNoTracking()
@@ -227,7 +231,7 @@ namespace ACE.Database
             {
                 if (!weenieSpecificCachesPopulated)
                 {
-                    using (var context = new WorldDbContext())
+                    using (var context = ContextFactory.CreateDbContext())
                     {
                         var query = from weenieRecord in context.Weenie
                                     join did in context.WeeniePropertiesDID on weenieRecord.ClassId equals did.ObjectId
@@ -255,7 +259,7 @@ namespace ACE.Database
             if (creatureWeenieNamesLowerInvariantCache.TryGetValue(name.ToLowerInvariant(), out _))
                 return true;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 return IsCreatureNameInWorldDatabase(context, name);
             }
@@ -433,7 +437,7 @@ namespace ACE.Database
             if (cachedEncounters.TryGetValue(landblock, out var value))
                 return value;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.Encounter
                     .AsNoTracking()
@@ -482,7 +486,7 @@ namespace ACE.Database
             if (cachedEvents.TryGetValue(nameToLower, out var value))
                 return value;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var result = context.Event
                     .AsNoTracking()
@@ -505,7 +509,7 @@ namespace ACE.Database
         /// </summary>
         public void CacheAllHousePortals()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.HousePortal
                     .AsNoTracking()
@@ -522,7 +526,7 @@ namespace ACE.Database
             if (cachedHousePortals.TryGetValue(houseId, out var value))
                 return value;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.HousePortal
                     .AsNoTracking()
@@ -543,7 +547,7 @@ namespace ACE.Database
             if (cachedHousePortalsByLandblock.TryGetValue(landblockId, out var value))
                 return value;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.HousePortal
                     .AsNoTracking()
@@ -608,7 +612,7 @@ namespace ACE.Database
         /// </summary>
         public List<LandblockInstance> GetCachedInstancesByLandblock(ushort landblock)
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
                 return GetCachedInstancesByLandblock(context, landblock);
         }
 
@@ -620,7 +624,7 @@ namespace ACE.Database
             if (cachedBasementHouseGuids.TryGetValue(landblock, out var value))
                 return value;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var result = context.LandblockInstance
                     .AsNoTracking()
@@ -653,7 +657,7 @@ namespace ACE.Database
         /// </summary>
         public void CacheAllPointsOfInterest()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.PointsOfInterest
                     .AsNoTracking();
@@ -686,7 +690,7 @@ namespace ACE.Database
             if (cachedPointsOfInterest.TryGetValue(nameToLower, out var value))
                 return value;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var result = context.PointsOfInterest
                     .AsNoTracking()
@@ -714,7 +718,7 @@ namespace ACE.Database
             if (cachedQuest.TryGetValue(questName, out var quest))
                 return quest;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 quest = context.Quest.FirstOrDefault(q => q.Name.Equals(questName));
                 cachedQuest[questName] = quest;
@@ -740,7 +744,7 @@ namespace ACE.Database
         /// </summary>
         public void CacheAllSpells()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.Spell
                     .AsNoTracking();
@@ -768,7 +772,7 @@ namespace ACE.Database
             if (spellCache.TryGetValue(spellId, out var spell))
                 return spell;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var result = context.Spell
                     .AsNoTracking()
@@ -792,7 +796,7 @@ namespace ACE.Database
         /// </summary>
         public void CacheAllTreasuresDeath()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.TreasureDeath
                     .AsNoTracking();
@@ -815,7 +819,7 @@ namespace ACE.Database
             if (cachedDeathTreasure.TryGetValue(dataId, out var value))
                 return value;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var result = context.TreasureDeath
                     .AsNoTracking()
@@ -837,7 +841,7 @@ namespace ACE.Database
         
         public void CacheAllTreasureMaterialBase()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var table = new Dictionary<int, Dictionary<int, List<TreasureMaterialBase>>>();
 
@@ -912,7 +916,7 @@ namespace ACE.Database
         
         public void CacheAllTreasureMaterialColor()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var table = new Dictionary<int, Dictionary<int, List<TreasureMaterialColor>>>();
 
@@ -988,7 +992,7 @@ namespace ACE.Database
 
         public void CacheAllTreasureMaterialGroups()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var table = new Dictionary<int, Dictionary<int, List<TreasureMaterialGroups>>>();
 
@@ -1068,7 +1072,7 @@ namespace ACE.Database
         /// </summary>
         public void CacheAllTreasureWielded()
         {
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.TreasureWielded
                     .AsNoTracking()
@@ -1094,7 +1098,7 @@ namespace ACE.Database
             if (cachedWieldedTreasure.TryGetValue(dataId, out var value))
                 return value;
 
-            using (var context = new WorldDbContext())
+            using (var context = ContextFactory.CreateDbContext())
             {
                 var results = context.TreasureWielded
                     .AsNoTracking()
