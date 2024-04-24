@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,5 +17,8 @@ namespace ACRealms.Tests.Helpers
                 directory = directory.Parent;
             return directory.FullName;
         })();
+
+        public static string LocalDataPath { get; } =
+            Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "tests_data");
     }
 }
