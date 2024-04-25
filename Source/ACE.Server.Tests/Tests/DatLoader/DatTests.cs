@@ -2,34 +2,37 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using ACE.Common;
+using ACE.DatLoader;
+using MonoMod.Utils;
+using Xunit;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace ACE.DatLoader.Tests
+namespace ACRealms.Tests.DatLoader
 {
-    [TestClass]
     public class DatTests
     {
-        private static string cellDatLocation = @"C:\Turbine\Asheron's Call\client_cell_1.dat";
+        static string DatFileDir { get; } = ConfigManager.Config.Server.DatFilesDirectory;
+
+        private static string cellDatLocation = $@"{DatFileDir}\client_cell_1.dat";
         private static int expectedCellDatFileCount = 805003;
 
-        private static string portalDatLocation = @"C:\Turbine\Asheron's Call\client_portal.dat";
+        private static string portalDatLocation = $@"{DatFileDir}\client_portal.dat";
         private static int expectedPortalDatFileCount = 79694;
 
-        private static string localEnglishDatLocation = @"C:\Turbine\Asheron's Call\client_local_English.dat";
+        private static string localEnglishDatLocation = $@"{DatFileDir}\client_local_English.dat";
         private static int expectedLocalEnglishDatFileCount = 118;
 
 
-        [TestMethod]
+        [Fact]
         public void LoadCellDat_NoExceptions()
         {
             DatDatabase dat = new DatDatabase(cellDatLocation);
             int count = dat.AllFiles.Count;
             //Assert.AreEqual(ExpectedCellDatFileCount, count);
-            Assert.IsTrue(expectedCellDatFileCount <= count, $"Insufficient files parsed from .dat. Expected: >= {expectedCellDatFileCount}, Actual: {count}");
+            Assert.True(expectedCellDatFileCount <= count, $"Insufficient files parsed from .dat. Expected: >= {expectedCellDatFileCount}, Actual: {count}");
         }
 
-        [TestMethod]
+        [Fact]
         public void LoadPortalDat_NoExceptions()
         {
             // Init our text encoding options. This will allow us to use more than standard ANSI text, which the client also supports.
@@ -38,10 +41,10 @@ namespace ACE.DatLoader.Tests
             DatDatabase dat = new DatDatabase(portalDatLocation);
             int count = dat.AllFiles.Count;
             //Assert.AreEqual(expectedPortalDatFileCount, count);
-            Assert.IsTrue(expectedPortalDatFileCount <= count, $"Insufficient files parsed from .dat. Expected: >= {expectedPortalDatFileCount}, Actual: {count}");
+            Assert.True(expectedPortalDatFileCount <= count, $"Insufficient files parsed from .dat. Expected: >= {expectedPortalDatFileCount}, Actual: {count}");
         }
 
-        [TestMethod]
+        [Fact]
         public void LoadLocalEnglishDat_NoExceptions()
         {
             // Init our text encoding options. This will allow us to use more than standard ANSI text, which the client also supports.
@@ -50,11 +53,11 @@ namespace ACE.DatLoader.Tests
             DatDatabase dat = new DatDatabase(localEnglishDatLocation);
             int count = dat.AllFiles.Count;
             //Assert.AreEqual(expectedPortalDatFileCount, count);
-            Assert.IsTrue(expectedLocalEnglishDatFileCount <= count, $"Insufficient files parsed from .dat. Expected: >= {expectedLocalEnglishDatFileCount}, Actual: {count}");
+            Assert.True(expectedLocalEnglishDatFileCount <= count, $"Insufficient files parsed from .dat. Expected: >= {expectedLocalEnglishDatFileCount}, Actual: {count}");
         }
 
 
-        [TestMethod]
+        [Fact]
         public void UnpackCellDatFiles_NoExceptions()
         {
             var assembly = typeof(DatDatabase).GetTypeInfo().Assembly;
@@ -78,8 +81,8 @@ namespace ACE.DatLoader.Tests
                 if ((kvp.Key & 0xFFFF) == 0xFFFE) fileType = DatFileType.LandBlockInfo;
                 if ((kvp.Key & 0xFFFF) == 0xFFFF) fileType = DatFileType.LandBlock;
 
-                //Assert.IsNotNull(fileType, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}, BitFlags:, 0x{kvp.Value.BitFlags:X8}");
-                Assert.IsNotNull(fileType, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}");
+                //Assert.True(fileType != null, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}, BitFlags:, 0x{kvp.Value.BitFlags:X8}");
+                Assert.True(fileType != null, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}");
 
                 var type = types
                     .SelectMany(m => m.GetCustomAttributes(typeof(DatFileTypeAttribute), false), (m, a) => new { m, a })
@@ -111,7 +114,7 @@ namespace ACE.DatLoader.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void UnpackPortalDatFiles_NoExceptions()
         {
             var assembly = typeof(DatDatabase).GetTypeInfo().Assembly;
@@ -129,8 +132,8 @@ namespace ACE.DatLoader.Tests
 
                 var fileType = kvp.Value.GetFileType(DatDatabaseType.Portal);
 
-                //Assert.IsNotNull(fileType, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}, BitFlags:, 0x{kvp.Value.BitFlags:X8}");
-                Assert.IsNotNull(fileType, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}");
+                //Assert.True(fileType != null, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}, BitFlags:, 0x{kvp.Value.BitFlags:X8}");
+                Assert.True(fileType != null, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}");
 
                 // These file types aren't converted yet
                 if (fileType == DatFileType.KeyMap) continue;
@@ -170,7 +173,7 @@ namespace ACE.DatLoader.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void UnpackLocalEnglishDatFiles_NoExceptions()
         {
             var assembly = typeof(DatDatabase).GetTypeInfo().Assembly;
@@ -188,8 +191,8 @@ namespace ACE.DatLoader.Tests
 
                 var fileType = kvp.Value.GetFileType(DatDatabaseType.Language);
 
-                //Assert.IsNotNull(fileType, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}, BitFlags:, 0x{kvp.Value.BitFlags:X8}");
-                Assert.IsNotNull(fileType, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}");
+                //Assert.True(fileType != null, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}, BitFlags:, 0x{kvp.Value.BitFlags:X8}");
+                Assert.True(fileType != null, $"Key: 0x{kvp.Key:X8}, ObjectID: 0x{kvp.Value.ObjectId:X8}, FileSize: {kvp.Value.FileSize}");
 
                 // These file types aren't converted yet
                 if (fileType == DatFileType.UiLayout) continue;
@@ -225,19 +228,19 @@ namespace ACE.DatLoader.Tests
         }
 
         // uncomment if you want to run this
-        // [TestMethod]
+        // [Fact]
         public void ExtractCellDatByLandblock()
         {
-            string output = @"c:\Turbine\cell_dat_export_by_landblock";
+            string output = @$"{Helpers.Paths.LocalDataPath}\cell_dat_export_by_landblock";
             CellDatDatabase db = new CellDatDatabase(cellDatLocation);
             db.ExtractLandblockContents(output);
         }
 
         // uncomment if you want to run this
-        // [TestMethod]
+        // [Fact]
         public void ExportPortalDatsWithTypeInfo()
         {
-            string output = @"c:\Turbine\typed_portal_dat_export";
+            string output = @$"{Helpers.Paths.LocalDataPath}\typed_portal_dat_export";
             PortalDatDatabase db = new PortalDatDatabase(portalDatLocation);
             db.ExtractCategorizedPortalContents(output);
         }

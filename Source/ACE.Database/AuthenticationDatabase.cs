@@ -133,6 +133,15 @@ namespace ACE.Database
             }
         }
 
+        public void DeleteAccount(Account account)
+        {
+            using (var context = ContextFactory.CreateDbContext())
+            {
+                context.Entry(account).State = EntityState.Deleted;
+                context.SaveChanges();
+            }
+        }
+
         public bool UpdateAccountAccessLevel(uint accountId, AccessLevel accessLevel)
         {
             using (var context = ContextFactory.CreateDbContext())
