@@ -219,7 +219,7 @@ namespace ACE.Server.Physics.Common
             return null;
         }
 
-        public new EnvCell GetVisible(uint cellID)
+        public EnvCell GetVisible(uint cellID)
         {
             EnvCell envCell = null;
             VisibleCells.TryGetValue(cellID, out envCell);

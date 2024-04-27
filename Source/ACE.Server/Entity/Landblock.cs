@@ -196,7 +196,7 @@ namespace ACE.Server.Entity
             PhysicsLandblock = new Physics.Common.Landblock(cellLandblock, instance);
         }
 
-        public void Init(EphemeralRealm ephemeralRealm, bool reload = false)
+        public void Init(EphemeralRealm ephemeralRealm, bool reload = false, bool wait = false)
         {
             if (Instance == 0)
                 log.Error("Error: Loading Landblock with Instance ID = 0");
@@ -207,16 +207,21 @@ namespace ACE.Server.Entity
             if (!reload)
                 PhysicsLandblock.PostInit();
 
-            Task.Run(() =>
+            var loadAction = () =>
             {
-                CreateWorldObjects();
+                CreateWorldObjects(wait: wait);
+                SpawnDynamicShardObjects(wait: wait);
+                SpawnEncounters(wait: wait);
+            };
 
-                SpawnDynamicShardObjects();
-
-                SpawnEncounters();
-            });
-
-            //LoadMeshes(objects);
+            // Waiting should only happen when running in tests project
+            if (wait)
+            {
+                loadAction.Invoke();
+                ProcessPendingWorldObjectAdditionsAndRemovals();
+            }
+            else
+                Task.Run(loadAction);
         }
 
         public void Reload()
@@ -258,13 +263,13 @@ namespace ACE.Server.Entity
         /// Monster Locations, Generators<para />
         /// This will be called from a separate task from our constructor. Use thread safety when interacting with this landblock.
         /// </summary>
-        private void CreateWorldObjects()
+        private void CreateWorldObjects(bool wait = false)
         {
             var objects = DatabaseManager.World.GetCachedInstancesByLandblock(Id.Landblock);
             var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(Id.Landblock, Instance);
             var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects, null, Instance, RealmRuleset);
 
-            actionQueue.EnqueueAction(new ActionEventDelegate(() =>
+            var action = () =>
             {
                 // for mansion linking
                 var houses = new List<House>();
@@ -300,30 +305,39 @@ namespace ACE.Server.Entity
                 CreateWorldObjectsCompleted = true;
 
                 PhysicsLandblock.SortObjects();
-            }));
+            };
+
+            if (wait)
+                action.Invoke();
+            else
+                actionQueue.EnqueueAction(new ActionEventDelegate(action));
         }
 
         /// <summary>
         /// Corpses<para />
         /// This will be called from a separate task from our constructor. Use thread safety when interacting with this landblock.
         /// </summary>
-        private void SpawnDynamicShardObjects()
+        private void SpawnDynamicShardObjects(bool wait = false)
         {
             var dynamics = DatabaseManager.Shard.BaseDatabase.GetDynamicObjectsByLandblock(Id.Landblock, Instance);
             var factoryShardObjects = WorldObjectFactory.CreateWorldObjects(dynamics);
 
-            actionQueue.EnqueueAction(new ActionEventDelegate(() =>
+            var action = () =>
             {
                 foreach (var fso in factoryShardObjects)
                     AddWorldObject(fso);
-            }));
+            };
+            if (wait)
+                action.Invoke();
+            else
+                actionQueue.EnqueueAction(new ActionEventDelegate(action));
         }
 
         /// <summary>
         /// Spawns the semi-randomized monsters scattered around the outdoors<para />
         /// This will be called from a separate task from our constructor. Use thread safety when interacting with this landblock.
         /// </summary>
-        private void SpawnEncounters()
+        private void SpawnEncounters(bool wait = false)
         {
             // get the encounter spawns for this landblock
             var encounters = DatabaseManager.World.GetCachedEncountersByLandblock(Id.Landblock);
@@ -334,7 +348,7 @@ namespace ACE.Server.Entity
 
                 if (wo == null) continue;
 
-                actionQueue.EnqueueAction(new ActionEventDelegate(() =>
+                var action = () =>
                 {
                     var xPos = Math.Clamp(encounter.CellX * 24.0f, 0.5f, 191.5f);
                     var yPos = Math.Clamp(encounter.CellY * 24.0f, 0.5f, 191.5f);
@@ -382,7 +396,12 @@ namespace ACE.Server.Entity
 
                     if (!AddWorldObject(wo))
                         wo.Destroy();
-                }));
+                };
+
+                if (wait)
+                    action.Invoke();
+                else
+                    actionQueue.EnqueueAction(new ActionEventDelegate(action));
             }
         }
 

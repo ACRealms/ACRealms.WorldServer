@@ -5,7 +5,7 @@ using ACE.Entity;
 using ACRealms.Tests.Fixtures;
 using Xunit;
 
-namespace ACE.Server.Tests.Realm
+namespace ACRealms.Tests.Server.Realms
 {
     [CollectionDefinition("Dependency Injection")]
     public class RealmTests

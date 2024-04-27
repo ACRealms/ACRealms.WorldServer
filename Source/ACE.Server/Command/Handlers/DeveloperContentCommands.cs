@@ -155,7 +155,7 @@ namespace ACE.Server.Command.Handlers.Processors
             return list;
         }
 
-        private static List<RealmToImport> ImportJsonRealmsFolder(Session session, string json_folder)
+        public static List<RealmToImport> ImportJsonRealmsFolder(Session session, string json_folder)
         {
             var sep = Path.DirectorySeparatorChar;
             var json_folder_realm = $"{json_folder}{sep}realm{sep}";
@@ -167,14 +167,11 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var list2 = ImportJsonRealmsFromSubFolder(session, json_folder_ruleset);
             if (list2 != null)
-            {
                 list.AddRange(list2);
-                return list;
-            }
-            return null;
+            return list;
         }
 
-        private static void ImportJsonRealmsIndex(Session session, string realmsIndexJsonFile, List<RealmToImport> realms)
+        public static void ImportJsonRealmsIndex(Session session, string realmsIndexJsonFile, List<RealmToImport> realms)
         {
             Dictionary<string, RealmToImport> realmsDict = null;
             Dictionary<ushort, RealmToImport> realmsById = new Dictionary<ushort, RealmToImport>();

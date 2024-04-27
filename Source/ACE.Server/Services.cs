@@ -30,6 +30,8 @@ namespace ACE.Server
 {
     public static partial class Services
     {
+        public interface IACRealmsService { }
+
         /// <summary>
         /// The timeBeginPeriod function sets the minimum timer resolution for an application or device driver. Used to manipulate the timer frequency.
         /// https://docs.microsoft.com/en-us/windows/desktop/api/timeapi/nf-timeapi-timebeginperiod
@@ -285,6 +287,7 @@ namespace ACE.Server
 
             log.Info("Initializing DatManager...");
             DatManager.Initialize(ConfigManager.Config.Server.DatFilesDirectory, true);
+            Physics.Common.LandDefs.LandHeightTable = DatManager.PortalDat.RegionDesc.LandDefs.LandHeightTable;
 
             if (ConfigManager.Config.DDD.EnableDATPatching)
             {

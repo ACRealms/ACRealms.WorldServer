@@ -18,7 +18,9 @@ namespace ACE.Server
             log.Info($"Automatic World Database Update not available for AC Realms.");
             return;
 
+#pragma warning disable CS0162 // Unreachable code detected
             log.Info($"Automatic World Database Update started...");
+
             try
             {
                 var worldDb = DatabaseManager.World;
@@ -69,6 +71,7 @@ namespace ACE.Server
                 log.Info($"Unable to continue with Automatic World Database Update due to the following error: {ex}");
             }
             log.Info($"Automatic World Database Update complete.");
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         private static void UpdateToLatestWorldDatabase(string dbURL, string dbFileName)

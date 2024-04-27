@@ -483,7 +483,7 @@ namespace ACE.Server.Command.Handlers
         {
             //Not supported on AC Realms
             return;
-
+#pragma warning disable CS0162 // Unreachable code detected
             CommandHandlerHelper.WriteOutputInfo(session, "Loading landblocks. This will likely crash the server. Landblock resources will be loaded async and will continue to do work even after all landblocks have been loaded.");
 
             Task.Run(() =>
@@ -501,6 +501,7 @@ namespace ACE.Server.Command.Handlers
 
                 CommandHandlerHelper.WriteOutputInfo(session, "Loading landblocks completed. Async landblock resources are likely still loading...");
             });
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
 

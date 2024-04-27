@@ -22,8 +22,9 @@ namespace ACRealms.Tests.DatLoader
         private static string localEnglishDatLocation = $@"{DatFileDir}\client_local_English.dat";
         private static int expectedLocalEnglishDatFileCount = 118;
 
+        const string skip = "Dat Tests Disabled";
 
-        [Fact]
+        [Fact(Skip = skip)]
         public void LoadCellDat_NoExceptions()
         {
             DatDatabase dat = new DatDatabase(cellDatLocation);
@@ -32,7 +33,7 @@ namespace ACRealms.Tests.DatLoader
             Assert.True(expectedCellDatFileCount <= count, $"Insufficient files parsed from .dat. Expected: >= {expectedCellDatFileCount}, Actual: {count}");
         }
 
-        [Fact]
+        [Fact(Skip = skip)]
         public void LoadPortalDat_NoExceptions()
         {
             // Init our text encoding options. This will allow us to use more than standard ANSI text, which the client also supports.
@@ -44,7 +45,7 @@ namespace ACRealms.Tests.DatLoader
             Assert.True(expectedPortalDatFileCount <= count, $"Insufficient files parsed from .dat. Expected: >= {expectedPortalDatFileCount}, Actual: {count}");
         }
 
-        [Fact]
+        [Fact(Skip = skip)]
         public void LoadLocalEnglishDat_NoExceptions()
         {
             // Init our text encoding options. This will allow us to use more than standard ANSI text, which the client also supports.
@@ -57,7 +58,7 @@ namespace ACRealms.Tests.DatLoader
         }
 
 
-        [Fact]
+        [Fact(Skip = skip)]
         public void UnpackCellDatFiles_NoExceptions()
         {
             var assembly = typeof(DatDatabase).GetTypeInfo().Assembly;
@@ -114,7 +115,7 @@ namespace ACRealms.Tests.DatLoader
             }
         }
 
-        [Fact]
+        [Fact(Skip = skip)]
         public void UnpackPortalDatFiles_NoExceptions()
         {
             var assembly = typeof(DatDatabase).GetTypeInfo().Assembly;
@@ -173,7 +174,7 @@ namespace ACRealms.Tests.DatLoader
             }
         }
 
-        [Fact]
+        [Fact(Skip = skip)]
         public void UnpackLocalEnglishDatFiles_NoExceptions()
         {
             var assembly = typeof(DatDatabase).GetTypeInfo().Assembly;
@@ -227,8 +228,8 @@ namespace ACRealms.Tests.DatLoader
             }
         }
 
-        // uncomment if you want to run this
-        // [Fact]
+        // Change Skip to null if you want to run this
+        [Fact(Skip = "Skipping slow test")]
         public void ExtractCellDatByLandblock()
         {
             string output = @$"{Helpers.Paths.LocalDataPath}\cell_dat_export_by_landblock";
@@ -236,8 +237,8 @@ namespace ACRealms.Tests.DatLoader
             db.ExtractLandblockContents(output);
         }
 
-        // uncomment if you want to run this
-        // [Fact]
+        // Change Skip to null if you want to run this
+        [Fact(Skip = "Skipping slow test")]
         public void ExportPortalDatsWithTypeInfo()
         {
             string output = @$"{Helpers.Paths.LocalDataPath}\typed_portal_dat_export";

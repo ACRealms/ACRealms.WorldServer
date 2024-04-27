@@ -39,6 +39,10 @@ namespace ACRealms.Tests.Fixtures.Database
         public static string TestUserName { get; } = "acrealms_test_db_user";
         private static string TestUserFull { get; } = $"'{TestUserName}'@'localhost'";
         public static string TestUserPassword { get; } = RandomPassword();
+
+        // Can be temporarily false when trying to make specific tests pass (faster execution), but some tests need this to be true
+        const bool RESET_DB_EACH_RUN = true;
+
         public static string AuthDbName { get; } = "acrealms_test_auth";
         public static string WorldDbName { get; } = "acrealms_test_world";
         public static string ShardDbName { get; } = "acrealms_test_shard";
@@ -56,7 +60,6 @@ namespace ACRealms.Tests.Fixtures.Database
         public const string WorldDbScriptMD5 = "bc912cf0ecaec2704347ddd338818bf1";
         public static string WorldDbLocalZip { get; } = $"{WorldDbLocalScript}.zip";
         
-
         public static void Initialize(IServiceCollection services)
         {
             CleanupDbState();
@@ -69,9 +72,9 @@ namespace ACRealms.Tests.Fixtures.Database
                 var command = connection.CreateCommand();
                 command.CommandText = @$"
                     CREATE USER {TestUserFull} IDENTIFIED BY '{TestUserPassword}';
-                    CREATE DATABASE `{AuthDbName}`;
-                    CREATE DATABASE `{WorldDbName}`;
-                    CREATE DATABASE `{ShardDbName}`;
+                    CREATE DATABASE IF NOT EXISTS `{AuthDbName}`;
+                    CREATE DATABASE IF NOT EXISTS `{WorldDbName}`;
+                    CREATE DATABASE IF NOT EXISTS `{ShardDbName}`;
                     GRANT ALL PRIVILEGES ON {AuthDbName}.* TO {TestUserFull};
                     GRANT ALL PRIVILEGES ON {WorldDbName}.* TO {TestUserFull};
                     GRANT ALL PRIVILEGES ON {ShardDbName}.* TO {TestUserFull};";
@@ -84,13 +87,11 @@ namespace ACRealms.Tests.Fixtures.Database
             {
                 var connectionString = $"{connectionStringBase};database={AuthDbName}";
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-            });
-            services.AddDbContextFactory<WorldDbContext>(options =>
+            }).AddDbContextFactory<WorldDbContext>(options =>
             {
                 var connectionString = $"{connectionStringBase};database={WorldDbName}";
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-            });
-            services.AddDbContextFactory<ShardDbContext>(options =>
+            }).AddDbContextFactory<ShardDbContext>(options =>
             {
                 var connectionString = $"{connectionStringBase};database={ShardDbName}";
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
@@ -99,6 +100,11 @@ namespace ACRealms.Tests.Fixtures.Database
 
         public static void BuildDBs(IServiceProvider provider)
         {
+            if (!RESET_DB_EACH_RUN)
+#pragma warning disable CS0162 // Unreachable code detected
+                return;
+#pragma warning restore CS0162 // Unreachable code detected
+
             EnsureWorldDbDownloaded();
 
             using (var context = provider.GetRequiredService<IDbContextFactory<AuthDbContext>>().CreateDbContext())
@@ -129,7 +135,7 @@ namespace ACRealms.Tests.Fixtures.Database
                             {
                                 command.ExecuteNonQuery();
                             }
-                            catch (MySqlConnector.MySqlException ex)
+                            catch (MySqlConnector.MySqlException)
                             {
                             }
                             completeSQLline = string.Empty;
@@ -245,11 +251,21 @@ namespace ACRealms.Tests.Fixtures.Database
                 var connection = context.Database.GetDbConnection();
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = @$"
+                if (RESET_DB_EACH_RUN) // Can be temporarily false when trying to make specific tests pass, but some tests need this to be true
+                {
+                    command.CommandText = @$"
                     DROP DATABASE IF EXISTS `{AuthDbName}`;
                     DROP DATABASE IF EXISTS `{WorldDbName}`;
                     DROP DATABASE IF EXISTS `{ShardDbName}`;
                     DROP USER IF EXISTS {TestUserFull};";
+                }
+                else
+                {
+#pragma warning disable CS0162 // Unreachable code detected
+                    command.CommandText = $"DROP USER IF EXISTS {TestUserFull};";
+#pragma warning restore CS0162 // Unreachable code detected
+                }
+                
                 command.ExecuteNonQuery();
             }
         }
@@ -262,7 +278,7 @@ namespace ACRealms.Tests.Fixtures.Database
             string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
             StringBuilder res = new StringBuilder();
             var len = 32;
-            using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
             {
                 byte[] uintBuffer = new byte[sizeof(uint)];
 

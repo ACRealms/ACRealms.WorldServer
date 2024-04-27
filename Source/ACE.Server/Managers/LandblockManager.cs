@@ -28,7 +28,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Locking mechanism provides concurrent access to collections
         /// </summary>
-        private static readonly object landblockMutex = new object();
+        public static readonly object landblockMutex = new object();
         private static readonly object ephemeralInstanceMutex = new object();
 
         //Important: As of AC Realms, reading and writing to this must be done via LandblockDictFetch and LandblockDictCommit
@@ -417,7 +417,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Returns a reference to a landblock, loading the landblock if not already active
         /// </summary>
-        public static Landblock GetLandblock(LandblockId landblockId, uint instance, EphemeralRealm ephemeralRealm, bool loadAdjacents, bool permaload = false)
+        public static Landblock GetLandblock(LandblockId landblockId, uint instance, EphemeralRealm ephemeralRealm, bool loadAdjacents, bool permaload = false, bool wait = false)
         {
             if (loadAdjacents && ephemeralRealm != null)
             {
@@ -453,9 +453,12 @@ namespace ACE.Server.Managers
 
                     landblockGroupPendingAdditions.Add(landblock);
 
-                    landblock.Init(ephemeralRealm);
+                    if (wait)
+                        SetAdjacents(landblock, true, true);
+                    else
+                        setAdjacents = true;
 
-                    setAdjacents = true;
+                    landblock.Init(ephemeralRealm, wait: wait);
                 }
 
                 if (permaload)
