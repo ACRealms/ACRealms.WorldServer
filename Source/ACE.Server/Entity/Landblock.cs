@@ -1127,6 +1127,18 @@ namespace ACE.Server.Entity
                 }
             }
 
+            if (guid.Instance == 0 && guid.IsStatic() && this.Instance != 0)
+            {
+                // ClientGUID 
+                var locatedObject = GetObject(new ObjectGuid(guid.ClientGUID, Instance));
+                if (locatedObject != null)
+                {
+                    log.Warn(@$"Landblock.GetObject was called with a static ClientGUID but found with a LongGuid ({locatedObject.Guid}).
+Object Type: {locatedObject.WeenieType}. Object Name: {locatedObject.Name}.
+Please report this to the ACRealms developer.");
+                    return locatedObject;
+                }
+            }
             return null;
         }
 
