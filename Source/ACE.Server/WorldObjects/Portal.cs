@@ -102,6 +102,10 @@ namespace ACE.Server.WorldObjects
 
         public virtual void OnCollideObject(Player player)
         {
+            // Must "use" Ephemeral Realm Portal Directly
+            if (IsEphemeralRealmPortal)
+                return;
+
             OnActivate(player);
         }
 

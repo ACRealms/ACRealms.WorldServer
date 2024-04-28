@@ -853,7 +853,9 @@ namespace ACE.Server.WorldObjects
 
             if (newLocation.IsEphemeralRealm && !Location.IsEphemeralRealm)
             {
-                EphemeralRealmExitTo = Location.InFrontOf(-7f); //REALMS-TODO: Do adjustdungeon
+                // This used to Location.InFrontOf(-7) but there's no simple way to prevent returning inside of a wall.
+                // So these portals must be activated manually and the return point exactly where the player previously was. 
+                EphemeralRealmExitTo = Location;
                 EphemeralRealmLastEnteredDrop = new InstancedPosition(newLocation);
             }
             else if (!newLocation.IsEphemeralRealm)
