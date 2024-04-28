@@ -1428,6 +1428,42 @@ namespace ACE.Server.Entity
                 SendEnvironSound(environChangeType);
         }
 
+        public bool IsEphemeral
+        {
+            get
+            {
+                Position.ParseInstanceID(Instance, out var isEphemeralRealm, out _, out _);
+                return isEphemeralRealm;
+            }
+        }
+
+        public ushort? WorldRealmID
+        {
+            get
+            {
+                if (IsEphemeral)
+                    return null;
+                Position.ParseInstanceID(Instance, out _, out var realmId, out _);
+                return realmId;
+            }
+        }
+
+        // Non-ephemeral realms may have up to 65536 instances per landblock
+        public ushort? ShortInstanceID
+        {
+            get
+            {
+                if (IsEphemeral)
+                    return null;
+                Position.ParseInstanceID(Instance, out _, out _, out var shortInstanceID);
+                return shortInstanceID;
+            }
+        }
+
+        public WorldRealm WorldRealm => WorldRealmID.HasValue ? RealmManager.GetRealm(WorldRealmID) : null;
+        public bool IsPrimaryForWorldRealm => ShortInstanceID == 0;
+        public bool IsHomeInstanceForPlayer(Player player) => IsPrimaryForWorldRealm && player.HomeRealm == WorldRealmID;
+
         public class RealmShortcuts
         {
             Landblock Landblock { get; }

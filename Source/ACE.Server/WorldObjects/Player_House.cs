@@ -27,10 +27,17 @@ namespace ACE.Server.WorldObjects
         /// Called when player clicks the 'Buy house' button,
         /// after adding the items required
         /// </summary>
-        public void HandleActionBuyHouse(uint slumlord_id, List<uint> item_ids)
+        public void HandleActionBuyHouse(ObjectGuid slumlord_id, List<uint> item_ids)
         {
             //Console.WriteLine($"\n{Name}.HandleActionBuyHouse()");
             log.Info($"[HOUSE] {Name}.HandleActionBuyHouse()");
+
+            if (!CurrentLandblock.IsHomeInstanceForPlayer(this))
+            {
+                Session.Network.EnqueueSend(new GameMessageSystemChat("You may only purchase a house in your home realm.", ChatMessageType.Broadcast));
+                log.Info($"[HOUSE] {Name}.HandleActionBuyHouse(): Failed pre-purchase requirement - Not in home realm instance");
+                return;
+            }
 
             // verify player doesn't already own a house
             var houseInstance = GetHouseInstance();

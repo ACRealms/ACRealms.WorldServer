@@ -14,7 +14,7 @@ namespace ACE.Server.Network.GameAction.Actions
         {
             //Console.WriteLine("Received 0x21C - BuyHouse");
 
-            var slumlord = message.Payload.ReadUInt32();
+            var slumlord = message.Payload.ReadGuid(session);
             var items = message.Payload.ReadListUInt32();
 
             session.Player.HandleActionBuyHouse(slumlord, items);
