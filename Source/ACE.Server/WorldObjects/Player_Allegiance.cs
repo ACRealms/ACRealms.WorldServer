@@ -313,6 +313,12 @@ namespace ACE.Server.WorldObjects
                 return false;
             }
 
+            if (target.HomeRealm != HomeRealm)
+            {
+                Session.Network.EnqueueSend(new GameMessageSystemChat($"You may only swear allegiance to players from your own realm.", ChatMessageType.Broadcast));
+                return false;
+            }
+
             // check ignore allegiance requests
             if (target.GetCharacterOption(CharacterOption.IgnoreAllegianceRequests))
             {
