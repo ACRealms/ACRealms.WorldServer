@@ -73,6 +73,26 @@ Property entry hash valid keys:
 - `locked`: Rulesets that inherit from this ruleset will ignore any properties that are locked here instead of composing them. If applying a ruleset with `apply_rulesets` or `apply_rulesets_random`, that value will become locked if specified.
 - `probability`: (Not implemented yet): A floating-point number between 0 and 1 representing the probability of this property taking effect.
 
+#### RealmProperty Enums
+
+These are shared by all realms, application-wide, and list the possible realm properties that can be used. If the property is in this list, it can be used in a realm definition.
+```C#
+    public enum RealmPropertyFloat : ushort
+    {
+        [RealmPropertyFloat(defaultValue: 0f, minValue: 0f, maxValue: 0f)]
+        Undef                          = 0,
+
+        // First param is the default, second is the min, third is the max.
+        [RealmPropertyFloat(1f, 0.1f, 5f)]
+        SpellCasting_MoveToState_UpdatePosition_Threshold = 1,
+
+        // If defaultFromServerProperty is defined, the corresponding property from PropertyManager (/fetchdouble in this case) will used in place of the default.
+        // If the server property with the given name is missing from the database, the defaultValue parameter will be used as a fallback. 
+        [RealmPropertyFloat(defaultFromServerProperty: "spellcast_max_angle", 20f, 0f, 360f)]
+        Spellcasting_Max_Angle = 2,
+        ...
+    }
+```
 
 ## Known Issues
 

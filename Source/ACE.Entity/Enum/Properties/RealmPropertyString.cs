@@ -4,7 +4,7 @@ namespace ACE.Entity.Enum.Properties
 {
     public enum RealmPropertyString : ushort
     {
-        [RealmPropertyString("")]
+        [RealmPropertyString(defaultValue: "")]
         Undef                           = 0,
         [RealmPropertyString("No Description")]
         Description                     = 1

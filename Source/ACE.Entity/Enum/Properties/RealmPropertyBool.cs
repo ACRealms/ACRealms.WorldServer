@@ -4,7 +4,7 @@ namespace ACE.Entity.Enum.Properties
 {
     public enum RealmPropertyBool : ushort
     {
-        [RealmPropertyBool(false)]
+        [RealmPropertyBool(defaultValue: false)]
         Undef                            = 0,
 
         [RealmPropertyBool(false)]

@@ -352,10 +352,14 @@ namespace ACE.Server.Realms
 
         public bool GetProperty(RealmPropertyBool property)
         {
+            var att = RealmConverter.PropertyDefinitionsBool[property];
             if (PropertiesBool.TryGetValue(property, out var value))
                 return value.Value;
-            return RealmConverter.PropertyDefinitionsBool[property].DefaultValue;
+            if (att.DefaultFromServerProperty != null)
+                return PropertyManager.GetBool(att.DefaultFromServerProperty, att.DefaultValue).Item;
+            return att.DefaultValue;
         }
+
         public double GetProperty(RealmPropertyFloat property)
         {
             var att = RealmConverter.PropertyDefinitionsFloat[property];
@@ -366,7 +370,12 @@ namespace ACE.Server.Realms
                 val = Math.Min(val, att.MaxValue);
                 return val;
             }
-            return att.DefaultValue;
+            var retval = att.DefaultValue;
+            if (att.DefaultFromServerProperty != null)
+                retval = PropertyManager.GetDouble(att.DefaultFromServerProperty, att.DefaultValue).Item;
+            retval = Math.Max(retval, att.MinValue);
+            retval = Math.Min(retval, att.MaxValue);
+            return retval;
         }
 
         public int GetProperty(RealmPropertyInt property)
@@ -379,7 +388,20 @@ namespace ACE.Server.Realms
                 val = Math.Min(val, att.MaxValue);
                 return val;
             }
-            return att.DefaultValue;
+            var retval = att.DefaultValue;
+            if (att.DefaultFromServerProperty != null)
+            {
+                var longval = PropertyManager.GetLong(att.DefaultFromServerProperty, att.DefaultValue).Item;
+                longval = Math.Max(longval, att.MinValue);
+                longval = Math.Min(longval, att.MaxValue);
+                retval = (int)longval;
+            }
+            else
+            {
+                retval = Math.Max(retval, att.MinValue);
+                retval = Math.Min(retval, att.MaxValue);
+            }
+            return retval;
         }
 
         public long GetProperty(RealmPropertyInt64 property)
@@ -392,14 +414,22 @@ namespace ACE.Server.Realms
                 val = Math.Min(val, att.MaxValue);
                 return val;
             }
-            return att.DefaultValue;
+            var retval = att.DefaultValue;
+            if (att.DefaultFromServerProperty != null)
+                retval = PropertyManager.GetLong(att.DefaultFromServerProperty, att.DefaultValue).Item;
+            retval = Math.Max(retval, att.MinValue);
+            retval = Math.Min(retval, att.MaxValue);
+            return retval;
         }
 
         public string GetProperty(RealmPropertyString property)
         {
+            var att = RealmConverter.PropertyDefinitionsString[property];
             if (PropertiesString.TryGetValue(property, out var result))
                 return result.Value;
-            return RealmConverter.PropertyDefinitionsString[property].DefaultValue;
+            if (att.DefaultFromServerProperty != null)
+                return PropertyManager.GetString(att.DefaultFromServerProperty, att.DefaultValue).Item;
+            return att.DefaultValue;
         }
 
         public uint GetDefaultInstanceID()
