@@ -2,7 +2,7 @@
 {
     public class GameEventPingResponse : GameEventMessage
     {
-        public GameEventPingResponse(Session session)
+        public GameEventPingResponse(ISession session)
             : base(GameEventType.PingResponse, GameMessageGroup.UIQueue, session) { }
     }
 }

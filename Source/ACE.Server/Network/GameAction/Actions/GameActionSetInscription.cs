@@ -9,7 +9,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionSetInscription
     {
         [GameAction(GameActionType.SetInscription)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var objectGuid = message.Payload.ReadGuid(session);
             string inscriptionText = message.Payload.ReadString16L();

@@ -4,7 +4,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventFellowshipDismiss : GameEventMessage
     {
-        public GameEventFellowshipDismiss(Session session, Player dismissedPlayer)
+        public GameEventFellowshipDismiss(ISession session, Player dismissedPlayer)
             : base(GameEventType.FellowshipDismiss, GameMessageGroup.UIQueue, session)
         {
             // can be both S2C and C2S?

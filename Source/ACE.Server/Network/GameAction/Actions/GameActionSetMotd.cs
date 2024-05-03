@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionSetMotd
     {
         [GameAction(GameActionType.SetMotd)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var motd = message.Payload.ReadString16L();
 

@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionAcceptTrade
     {
         [GameAction(GameActionType.AcceptTrade)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             uint partnerGuid = message.Payload.ReadUInt32();
             double tradeStamp = message.Payload.ReadDouble();

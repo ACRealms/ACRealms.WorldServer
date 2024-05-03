@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionModifyCharacterSquelch
     {
         [GameAction(GameActionType.ModifyCharacterSquelch)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var squelch = Convert.ToBoolean(message.Payload.ReadUInt32());
             var playerGuid = message.Payload.ReadUInt32();

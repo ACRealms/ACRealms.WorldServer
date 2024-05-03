@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionStackableSplitToWield
     {
         [GameAction(GameActionType.StackableSplitToWield)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             // Read in the applicable data.
             ObjectGuid stackId = message.Payload.ReadGuid(session);

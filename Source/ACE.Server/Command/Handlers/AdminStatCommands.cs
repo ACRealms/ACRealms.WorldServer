@@ -25,7 +25,7 @@ namespace ACE.Server.Command.Handlers
 
         // allstats
         [CommandHandler("allstats", AccessLevel.Advocate, CommandHandlerFlag.None, 0, "Displays a summary of all server statistics and usage")]
-        public static void HandleAllStats(Session session, params string[] parameters)
+        public static void HandleAllStats(ISession session, params string[] parameters)
         {
             HandleServerStatus(session, parameters);
 
@@ -40,7 +40,7 @@ namespace ACE.Server.Command.Handlers
 
         // serverstatus
         [CommandHandler("serverstatus", AccessLevel.Advocate, CommandHandlerFlag.None, 0, "Displays a summary of server statistics and usage")]
-        public static void HandleServerStatus(Session session, params string[] parameters)
+        public static void HandleServerStatus(ISession session, params string[] parameters)
         {
             // This is formatted very similarly to GDL.
 
@@ -130,7 +130,7 @@ namespace ACE.Server.Command.Handlers
 
         // serverstatus
         [CommandHandler("serverperformance", AccessLevel.Advocate, CommandHandlerFlag.None, 0, "Displays a summary of server performance statistics")]
-        public static void HandleServerPerformance(Session session, params string[] parameters)
+        public static void HandleServerPerformance(ISession session, params string[] parameters)
         {
             if (parameters != null && (parameters.Length == 1 || parameters.Length == 2))
             {
@@ -184,7 +184,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("landblockperformance", AccessLevel.Advocate, CommandHandlerFlag.None, 0, "Displays a summary of landblock performance statistics")]
-        public static void HandleLandblockPerformance(Session session, params string[] parameters)
+        public static void HandleLandblockPerformance(ISession session, params string[] parameters)
         {
             var sb = new StringBuilder();
 
@@ -244,7 +244,7 @@ namespace ACE.Server.Command.Handlers
 
         // gcstatus
         [CommandHandler("gcstatus", AccessLevel.Advocate, CommandHandlerFlag.None, 0, "Displays a summary of server GC Information")]
-        public static void HandleGCStatus(Session session, params string[] parameters)
+        public static void HandleGCStatus(ISession session, params string[] parameters)
         {
             var sb = new StringBuilder();
 

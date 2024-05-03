@@ -304,7 +304,7 @@ namespace ACE.Server.WorldObjects
             return true;
         }
 
-        public void HandleActionDeclineTrade(Session session)
+        public void HandleActionDeclineTrade(ISession session)
         {
             if (session.Player.TradeTransferInProgress) return;
 
@@ -322,7 +322,7 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        public void HandleActionTradeSwitchToCombatMode(Session session)
+        public void HandleActionTradeSwitchToCombatMode(ISession session)
         {
             if (session.Player.CombatMode != CombatMode.NonCombat && session.Player.IsTrading)
             {

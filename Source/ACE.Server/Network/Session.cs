@@ -21,7 +21,105 @@ using ACE.Server.Network.Managers;
 
 namespace ACE.Server.Network
 {
-    public class Session
+    public interface ISession
+    {
+        AccessLevel AccessLevel { get; }
+        string Account { get; }
+        uint AccountId { get; }
+        string BootSessionReason { get; }
+        List<Character> Characters { get; }
+        IPEndPoint EndPointC2S { get; }
+        IPEndPoint EndPointS2C { get; }
+        uint GameEventSequence { get; set; }
+        DateTime LastPassTime { get; set; }
+        string LoggingIdentifier { get; }
+        INetworkSession Network { get; set; }
+        SessionTerminationDetails PendingTermination { get; set; }
+        Player Player { get; }
+        SessionState State { get; set; }
+        public bool DatWarnCell { get; set; }
+        public bool DatWarnPortal { get; set; }
+        public bool DatWarnLanguage { get; set; }
+        public DateTime logOffRequestTime { get; set; }
+        public DateTime lastCharacterSelectPingReply { get; set; }
+        public bool BeginDDDSent { get; set; }
+        public DateTime BeginDDDSentTime { get; set; }
+
+        bool AddToDDDQueue(uint datFileId, DatDatabaseType datDatabaseType);
+        void CheckCharactersForDeletion();
+        void DropSession();
+        void InitSessionForWorldLogin();
+        void LogOffPlayer(bool forceImmediate = false);
+        void ProcessPacket(ClientPacket packet);
+        void SendCharacterError(CharacterError error);
+        void SetAccessLevel(AccessLevel accountAccesslevel);
+        void SetAccount(uint accountId, string account, AccessLevel accountAccesslevel);
+        void SetPlayer(Player player);
+        void SetS2CEndpoint(IPEndPoint endPoint);
+        void Terminate(SessionTerminationReason reason, GameMessage message = null, ServerPacket packet = null, string extraReason = "");
+        void TickOutbound();
+        void UpdateCharacters(IEnumerable<Character> characters);
+        void WorldBroadcast(string broadcastMessage);
+    }
+
+    //public interface ISession
+    //{
+    //    public IPEndPoint EndPointC2S { get; }
+
+    //    public IPEndPoint EndPointS2C { get; }
+
+    //    public NetworkSession Network { get; set; }
+
+    //    public uint GameEventSequence { get; set; }
+
+    //    public SessionState State { get; set; }
+
+
+    //    public uint AccountId { get; }
+
+    //    public string Account { get; }
+
+    //    public string LoggingIdentifier { get; }
+
+    //    public AccessLevel AccessLevel { get; }
+
+    //    public List<Character> Characters { get; }
+
+    //    public Player Player { get; }
+
+    //    public DateTime logOffRequestTime { get; set; }
+
+    //    public DateTime lastCharacterSelectPingReply { get; set; }
+
+    //    public SessionTerminationDetails PendingTermination { get; set; }
+
+    //    public string BootSessionReason { get; }
+
+    //    public bool DatWarnCell { get; set; }
+    //    public bool DatWarnPortal { get; set; }
+    //    public bool DatWarnLanguage { get; set; }
+
+    //    /// <summary>
+    //    /// This boolean is set to true if GameMessageDDDBeginDDD is sent to the client. Used to determine when response is needed for DDD_EndDDD
+    //    /// </summary>
+    //    public bool BeginDDDSent { get; set; }
+    //    /// <summary>
+    //    /// The time at which the BeginDDD message was sent to the client. Used to determine when to start processing dddDataQueue initially.
+    //    /// </summary>
+    //    public DateTime BeginDDDSentTime { get; set; }
+
+    //    public DateTime LastPassTime { get; set; }
+
+
+    //    public void ProcessPacket(ClientPacket packet);
+    //    public void TickOutbound();
+    //    public void SetAccount(uint accountId, string account, AccessLevel accountAccesslevel);
+    //    public void UpdateCharacters(IEnumerable<Character> characters);
+    //    public void CheckCharactersForDeletion();
+
+    //}
+
+    public class Session : ISession
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -29,7 +127,7 @@ namespace ACE.Server.Network
 
         public IPEndPoint EndPointS2C { get; private set; }
 
-        public NetworkSession Network { get; set; }
+        public INetworkSession Network { get; set; }
 
         public uint GameEventSequence { get; set; }
 
@@ -49,26 +147,26 @@ namespace ACE.Server.Network
         public Player Player { get; private set; }
 
 
-        public DateTime logOffRequestTime;
+        public DateTime logOffRequestTime { get; set; }
 
-        public DateTime lastCharacterSelectPingReply;
+        public DateTime lastCharacterSelectPingReply { get; set; }
 
         public SessionTerminationDetails PendingTermination { get; set; } = null;
 
         public string BootSessionReason { get; private set; }
 
-        public bool DatWarnCell;
-        public bool DatWarnPortal;
-        public bool DatWarnLanguage;
+        public bool DatWarnCell { get; set; }
+        public bool DatWarnPortal { get; set; }
+        public bool DatWarnLanguage { get; set; }
 
         /// <summary>
         /// This boolean is set to true if GameMessageDDDBeginDDD is sent to the client. Used to determine when response is needed for DDD_EndDDD
         /// </summary>
-        public bool BeginDDDSent;
+        public bool BeginDDDSent { get; set; }
         /// <summary>
         /// The time at which the BeginDDD message was sent to the client. Used to determine when to start processing dddDataQueue initially.
         /// </summary>
-        public DateTime BeginDDDSentTime;
+        public DateTime BeginDDDSentTime { get; set; }
         /// <summary>
         /// Queue for data files missing at time of connection (Portal/Cell/Language DAT), and data files requested by client (Cell DAT)
         /// </summary>
@@ -345,7 +443,7 @@ namespace ACE.Server.Network
         {
             EndPointS2C = endPoint;
         }
-      
+
         /// <summary>
         /// This will enqueue a file to be sent by ProcessDDDQueue.
         /// </summary>

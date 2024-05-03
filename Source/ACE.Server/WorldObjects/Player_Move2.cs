@@ -149,7 +149,7 @@ namespace ACE.Server.WorldObjects
             return mvp;
         }
 
-        private void ReloadLandblock(Session session)
+        private void ReloadLandblock(ISession session)
         {
 
             var landblock = session.Player.CurrentLandblock;

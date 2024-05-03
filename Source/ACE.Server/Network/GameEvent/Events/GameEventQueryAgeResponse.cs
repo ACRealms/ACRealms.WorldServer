@@ -2,7 +2,7 @@
 {
     public class GameEventQueryAgeResponse : GameEventMessage
     {
-        public GameEventQueryAgeResponse(Session session, string targetName, string age)
+        public GameEventQueryAgeResponse(ISession session, string targetName, string age)
             : base(GameEventType.QueryAgeResponse, GameMessageGroup.UIQueue, session)
         {
             Writer.WriteString16L(targetName);

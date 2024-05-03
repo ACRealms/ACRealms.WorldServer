@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventApproachVendor : GameEventMessage
     {
-        public GameEventApproachVendor(Session session, Vendor vendor, uint altCurrencySpent)
+        public GameEventApproachVendor(ISession session, Vendor vendor, uint altCurrencySpent)
             : base(GameEventType.ApproachVendor, GameMessageGroup.UIQueue, session)
         {        
             Writer.Write(vendor.Guid.ClientGUID);

@@ -26,17 +26,17 @@ namespace ACE.Server.Command.Handlers.Processors
             29947,  // Bracelet of Creature Enchantments
         };
 
-        private static bool SessionIsStillInWorld(Session session)
+        private static bool SessionIsStillInWorld(ISession session)
         {
             return session.State == Network.Enum.SessionState.WorldConnected && session.Player != null;
         }
 
-        public void RunAsync(Session session, int biotasPerTest = DefaultBiotasTestCount)
+        public void RunAsync(ISession session, int biotasPerTest = DefaultBiotasTestCount)
         {
             Task.Run(() => Run(session, biotasPerTest));
         }
 
-        private void Run(Session session, int biotasPerTest)
+        private void Run(ISession session, int biotasPerTest)
         {
             CommandHandlerHelper.WriteOutputInfo(session, $"Starting Shard Database Performance Tests.\nBiotas per test: {biotasPerTest}\nThis may take several minutes to complete...\nCurrent database queue count: {DatabaseManager.Shard.QueueCount}");
 
@@ -344,7 +344,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
         }
 
-        private static void ReportResult(Session session, string testDescription, int biotasPerTest, TimeSpan duration, TimeSpan queueWaitTime, TimeSpan totalQueryExecutionTime, long trueResults, long falseResults)
+        private static void ReportResult(ISession session, string testDescription, int biotasPerTest, TimeSpan duration, TimeSpan queueWaitTime, TimeSpan totalQueryExecutionTime, long trueResults, long falseResults)
         {
             if (session != null && !SessionIsStillInWorld(session))
                 return;

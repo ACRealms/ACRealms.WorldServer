@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionBookModifyPage
     {
         [GameAction(GameActionType.BookModifyPage)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var bookGuid = message.Payload.ReadUInt32();
             var page = message.Payload.ReadInt32();    // 0-based

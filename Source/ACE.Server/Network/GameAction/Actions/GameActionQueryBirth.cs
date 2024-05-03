@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionQueryBirth
     {
         [GameAction(GameActionType.QueryBirth)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var target = message.Payload.ReadString16L();
             DateTime playerDOB = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);

@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionRemoveFromPlayerConsentList
     {
         [GameAction(GameActionType.RemoveFromPlayerConsentList)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             // the granter we are removing from consent list
             var playerName = message.Payload.ReadString16L();

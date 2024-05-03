@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionSetSingleCharacterOption
     {
         [GameAction(GameActionType.SetSingleCharacterOption)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var option = (CharacterOption)message.Payload.ReadUInt32();
             var optionValue = message.Payload.ReadUInt32() != 0;

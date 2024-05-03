@@ -27,9 +27,9 @@ namespace ACE.Server.Network.Managers
             public GameActionAttribute Attribute { get; set; }
         }
 
-        public delegate void MessageHandler(ClientMessage message, Session session);
+        public delegate void MessageHandler(ClientMessage message, ISession session);
 
-        public delegate void ActionHandler(ClientMessage message, Session session);
+        public delegate void ActionHandler(ClientMessage message, ISession session);
 
         private static Dictionary<GameMessageOpcode, MessageHandlerInfo> messageHandlers;
 
@@ -85,7 +85,7 @@ namespace ACE.Server.Network.Managers
             }
         }
 
-        public static void HandleClientMessage(ClientMessage message, Session session)
+        public static void HandleClientMessage(ClientMessage message, ISession session)
         {
             var opcode = (GameMessageOpcode)message.Opcode;
 
@@ -123,7 +123,7 @@ namespace ACE.Server.Network.Managers
         /// InboundMessageManager.HandleClientMessage() queues work into NetworkManager.InboundMessageQueue that is run in WorldManager.UpdateWorld()
         /// That work invokes GameActionPacket.HandleGameAction() which calls this.
         /// </summary>
-        public static void HandleGameAction(GameActionType opcode, ClientMessage message, Session session)
+        public static void HandleGameAction(GameActionType opcode, ClientMessage message, ISession session)
         {
             if (actionHandlers.TryGetValue(opcode, out var actionHandlerInfo))
             {

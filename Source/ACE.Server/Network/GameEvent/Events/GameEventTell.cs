@@ -18,7 +18,7 @@ namespace ACE.Server.Network.GameEvent.Events
             Writer.Write(0u); // This is not documented in the xml's, but is found in the pcaps. The functionality seems the same with or without it.
         }
 
-        public GameEventTell(Session session, string messageText, string senderName, uint senderID, uint targetID, ChatMessageType chatMessageType)
+        public GameEventTell(ISession session, string messageText, string senderName, uint senderID, uint targetID, ChatMessageType chatMessageType)
             : base(GameEventType.Tell, GameMessageGroup.UIQueue, session)
         {
             Writer.WriteString16L(messageText);

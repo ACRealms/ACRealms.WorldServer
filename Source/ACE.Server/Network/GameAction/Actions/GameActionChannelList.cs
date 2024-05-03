@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionChannelList
     {
         [GameAction(GameActionType.ListChannels)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var chatChannelID = (Channel)message.Payload.ReadUInt32();
 

@@ -3,7 +3,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionFellowshipDismiss
     {
         [GameAction(GameActionType.FellowshipDismiss)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             uint playerIdToDismiss = message.Payload.ReadUInt32();
 

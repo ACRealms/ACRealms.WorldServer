@@ -14,7 +14,7 @@ namespace ACE.Server.Network.GameAction.Actions
         /// with the latest position from the client
         /// </summary>
         [GameAction(GameActionType.AutonomousPosition)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             //Console.WriteLine($"{session.Player.Name}.AutoPos");
 

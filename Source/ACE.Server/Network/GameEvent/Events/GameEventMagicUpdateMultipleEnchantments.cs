@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameEvent.Events
     /// </summary>
     public class GameEventMagicUpdateMultipleEnchantments : GameEventMessage
     {
-        public GameEventMagicUpdateMultipleEnchantments(Session session, List<Enchantment> enchantments)
+        public GameEventMagicUpdateMultipleEnchantments(ISession session, List<Enchantment> enchantments)
             : base(GameEventType.MagicUpdateMultipleEnchantments, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(enchantments);

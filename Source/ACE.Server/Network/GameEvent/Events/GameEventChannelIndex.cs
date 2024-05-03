@@ -2,7 +2,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventChannelIndex : GameEventMessage
     {
-        public GameEventChannelIndex(Session session) : base(GameEventType.ChannelIndex, GameMessageGroup.UIQueue, session)
+        public GameEventChannelIndex(ISession session) : base(GameEventType.ChannelIndex, GameMessageGroup.UIQueue, session)
         {
             WriteEventBody();
         }

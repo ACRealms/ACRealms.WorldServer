@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionHouseQueryLord
     {
         [GameAction(GameActionType.QueryLord)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             //Console.WriteLine("Received 0x258 - House - QueryLord");
 

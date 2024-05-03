@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionRemovePlayerPermission
     {
         [GameAction(GameActionType.RemovePlayerPermission)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             // player to revoke corpse looting permissions from
             var playerName = message.Payload.ReadString16L();

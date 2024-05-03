@@ -13,7 +13,7 @@ namespace ACE.Server.Network.GameAction.Actions
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [GameAction(GameActionType.TalkDirect)]
-        public static void Handle(ClientMessage clientMessage, Session session)
+        public static void Handle(ClientMessage clientMessage, ISession session)
         {
             var message = clientMessage.Payload.ReadString16L();
             var targetGuid = clientMessage.Payload.ReadGuid(session);

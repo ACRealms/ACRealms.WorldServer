@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionEmote
     {
         [GameAction(GameActionType.Emote)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var emote = message.Payload.ReadString16L();
 

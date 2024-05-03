@@ -12,7 +12,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionAdvocateTeleport
     {
         [GameAction(GameActionType.AdvocateTeleport)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {          
             // this check is also done clientside, see: PlayerDesc::PlayerIsPSR
             if (!session.Player.IsAdmin && !session.Player.IsArch && !session.Player.IsPsr)

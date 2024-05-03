@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionStackableMerge
     {
         [GameAction(GameActionType.StackableMerge)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var mergeFromGuid = message.Payload.ReadGuid(session);
             var mergeToGuid = message.Payload.ReadGuid(session);

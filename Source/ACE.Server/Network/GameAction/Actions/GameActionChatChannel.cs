@@ -10,7 +10,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionChatChannel
     {
         [GameAction(GameActionType.ChatChannel)]
-        public static void Handle(ClientMessage clientMessage, Session session)
+        public static void Handle(ClientMessage clientMessage, ISession session)
         {
             var groupChatType = (Channel)clientMessage.Payload.ReadUInt32();
             var message = clientMessage.Payload.ReadString16L();

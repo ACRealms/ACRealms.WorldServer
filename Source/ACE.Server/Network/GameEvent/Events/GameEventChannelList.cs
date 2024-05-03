@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventChannelList : GameEventMessage
     {
-        public GameEventChannelList(Session session, Channel chatChannel) : base(GameEventType.ChannelList, GameMessageGroup.UIQueue, session)
+        public GameEventChannelList(ISession session, Channel chatChannel) : base(GameEventType.ChannelList, GameMessageGroup.UIQueue, session)
         {
             uint numClientsConnected = 0;
             List<string> playerNames = new List<string>();

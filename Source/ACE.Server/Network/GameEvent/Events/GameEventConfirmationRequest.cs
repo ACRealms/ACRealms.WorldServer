@@ -4,7 +4,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventConfirmationRequest : GameEventMessage
     {
-        public GameEventConfirmationRequest(Session session, ConfirmationType confirmationType, uint context, string text)
+        public GameEventConfirmationRequest(ISession session, ConfirmationType confirmationType, uint context, string text)
             : base(GameEventType.CharacterConfirmationRequest, GameMessageGroup.UIQueue, session)
         {
             Writer.Write((uint)confirmationType);

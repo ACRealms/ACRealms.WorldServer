@@ -12,7 +12,7 @@ namespace ACE.Server.Command.Handlers
     {
         // acehelp (command)
         [CommandHandler("acehelp", AccessLevel.Player, CommandHandlerFlag.None, 0, "Displays help.", "(command)")]
-        public static void HandleACEHelp(Session session, params string[] parameters)
+        public static void HandleACEHelp(ISession session, params string[] parameters)
         {         
             if (parameters?.Length <= 0)
             {
@@ -76,7 +76,7 @@ namespace ACE.Server.Command.Handlers
 
         // acecommands
         [CommandHandler("acecommands", AccessLevel.Player, CommandHandlerFlag.None, 0, "Lists all commands.", "<access level or search>")]
-        public static void HandleACECommands(Session session, params string[] parameters)
+        public static void HandleACECommands(ISession session, params string[] parameters)
         {
             var commandList = new List<string>();
 

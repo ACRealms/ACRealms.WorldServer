@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionFellowshipCreate
     {
         [GameAction(GameActionType.FellowshipCreate)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var fellowshipName = message.Payload.ReadString16L();
             bool shareXp = message.Payload.ReadUInt32() > 0;

@@ -400,7 +400,7 @@ namespace ACE.Server.Managers
             EphemeralRealmCache[key] = template;
         }
 
-        internal static RealmToImport DeserializeRealmJson(Network.Session session, string filename, string fileContent)
+        internal static RealmToImport DeserializeRealmJson(Network.ISession session, string filename, string fileContent)
         {
             try
             {

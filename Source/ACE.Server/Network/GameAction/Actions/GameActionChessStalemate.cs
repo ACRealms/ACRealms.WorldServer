@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionChessStalemate
     {
         [GameAction(GameActionType.ChessStalemate)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var stalemate = Convert.ToBoolean(message.Payload.ReadInt32());
             session.Player.HandleActionChessStalemate(stalemate);

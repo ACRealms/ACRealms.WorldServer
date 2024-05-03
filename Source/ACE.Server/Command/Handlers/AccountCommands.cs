@@ -20,7 +20,7 @@ namespace ACE.Server.Command.Handlers
             "username password (accesslevel)\n" +
             "accesslevel can be a number or enum name\n" +
             "0 = Player | 1 = Advocate | 2 = Sentinel | 3 = Envoy | 4 = Developer | 5 = Admin")]
-        public static void HandleAccountCreate(Session session, params string[] parameters)
+        public static void HandleAccountCreate(ISession session, params string[] parameters)
         {
             AccessLevel defaultAccessLevel = (AccessLevel)Common.ConfigManager.Config.Server.Accounts.DefaultAccessLevel;
 
@@ -73,7 +73,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("accountget", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 1,
             "Gets an account.",
             "username")]
-        public static void HandleAccountGet(Session session, params string[] parameters)
+        public static void HandleAccountGet(ISession session, params string[] parameters)
         {
             var account = DatabaseManager.Authentication.GetAccountByName(parameters[0]);
             Console.WriteLine($"User: {account.AccountName}, ID: {account.AccountId}");
@@ -85,7 +85,7 @@ namespace ACE.Server.Command.Handlers
             "accountname (accesslevel)\n" +
             "accesslevel can be a number or enum name\n" +
             "0 = Player | 1 = Advocate | 2 = Sentinel | 3 = Envoy | 4 = Developer | 5 = Admin")]
-        public static void HandleAccountUpdateAccessLevel(Session session, params string[] parameters)
+        public static void HandleAccountUpdateAccessLevel(ISession session, params string[] parameters)
         {
             string accountName  = parameters[0].ToLower();
 
@@ -130,7 +130,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("set-accountpassword", AccessLevel.Admin, CommandHandlerFlag.None, 2,
             "Set the account password.",
             "accountname newpassword\n")]
-        public static void HandleAccountSetPassword(Session session, params string[] parameters)
+        public static void HandleAccountSetPassword(ISession session, params string[] parameters)
         {
             string accountName = parameters[0].ToLower();
 
@@ -165,7 +165,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("passwd", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, 2,
             "Change your account password.",
             "oldpassword newpassword\n")]
-        public static void HandlePasswd(Session session, params string[] parameters)
+        public static void HandlePasswd(ISession session, params string[] parameters)
         {
             if (session == null)
             {

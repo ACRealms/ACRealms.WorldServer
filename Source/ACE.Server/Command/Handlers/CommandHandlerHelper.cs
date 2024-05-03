@@ -17,7 +17,7 @@ namespace ACE.Server.Command.Handlers
         /// If the session is null, the output will be sent to the console. If the session is not null, and the session.Player is in the world, it will be sent to the session.<para />
         /// Messages sent to the console will be sent using log.Info()
         /// </summary>
-        public static void WriteOutputInfo(Session session, string output, ChatMessageType chatMessageType = ChatMessageType.Broadcast)
+        public static void WriteOutputInfo(ISession session, string output, ChatMessageType chatMessageType = ChatMessageType.Broadcast)
         {
             if (session != null)
             {
@@ -33,7 +33,7 @@ namespace ACE.Server.Command.Handlers
         /// If the session is null, the output will be sent to the console. If the session is not null, and the session.Player is in the world, it will be sent to the session.<para />
         /// Messages sent to the console will be sent using log.Debug()
         /// </summary>
-        public static void WriteOutputDebug(Session session, string output, ChatMessageType chatMessageType = ChatMessageType.Broadcast)
+        public static void WriteOutputDebug(ISession session, string output, ChatMessageType chatMessageType = ChatMessageType.Broadcast)
         {
             if (session != null)
             {
@@ -49,7 +49,7 @@ namespace ACE.Server.Command.Handlers
         /// If the session is null, the output will be sent to the console. If the session is not null, and the session.Player is in the world, it will be sent to the session.<para />
         /// Messages sent to the console will be sent using log.Debug()
         /// </summary>
-        public static void WriteOutputError(Session session, string output, ChatMessageType chatMessageType = ChatMessageType.Broadcast)
+        public static void WriteOutputError(ISession session, string output, ChatMessageType chatMessageType = ChatMessageType.Broadcast)
         {
             if (session != null)
             {
@@ -63,7 +63,7 @@ namespace ACE.Server.Command.Handlers
         /// <summary>
         /// Returns the last appraised WorldObject
         /// </summary>
-        public static WorldObject GetLastAppraisedObject(Session session)
+        public static WorldObject GetLastAppraisedObject(ISession session)
         {
             var targetID = session.Player.RequestedAppraisalTarget;
             if (targetID == null)

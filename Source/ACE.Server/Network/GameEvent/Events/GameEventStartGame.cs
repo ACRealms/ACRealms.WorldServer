@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameEvent.Events
     /// </summary>
     public class GameEventStartGame: GameEventMessage
     {
-        public GameEventStartGame(Session session, ObjectGuid boardGuid, ChessColor color)
+        public GameEventStartGame(ISession session, ObjectGuid boardGuid, ChessColor color)
             : base(GameEventType.StartGame, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(boardGuid.ClientGUID);

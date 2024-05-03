@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionJump
     {
         [GameAction(GameActionType.Jump)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var jumpPack = new JumpPack(message.Payload);
 

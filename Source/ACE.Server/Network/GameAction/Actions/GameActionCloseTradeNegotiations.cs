@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionCloseTradeNegotiations
     {
         [GameAction(GameActionType.CloseTradeNegotiations)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var target = PlayerManager.GetOnlinePlayer(session.Player.TradePartner);
 

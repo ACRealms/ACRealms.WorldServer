@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventHouseUpdateRestrictions : GameEventMessage
     {
-        public GameEventHouseUpdateRestrictions(Session session, WorldObject obj, RestrictionDB restrictions)
+        public GameEventHouseUpdateRestrictions(ISession session, WorldObject obj, RestrictionDB restrictions)
             : base(GameEventType.HouseUpdateRestrictions, GameMessageGroup.UIQueue, session)
         {
             //Console.WriteLine("Sending 0x248 - House - UpdateRestrictions");

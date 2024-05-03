@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionRaiseAttribute
     {
         [GameAction(GameActionType.RaiseAttribute)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var attribute = (PropertyAttribute)message.Payload.ReadUInt32();
             var xpSpent = message.Payload.ReadUInt32();

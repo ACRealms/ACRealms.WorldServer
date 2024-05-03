@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionHouseRequestFullGuestList
     {
         [GameAction(GameActionType.RequestFullGuestList)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             //Console.WriteLine("Received 0x24D - House - RequestFullGuestList");
 

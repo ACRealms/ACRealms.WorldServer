@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventBookPageDataResponse : GameEventMessage
     {
-        public GameEventBookPageDataResponse(Session session, uint bookID, int pageIndex, PropertiesBookPageData pageData)
+        public GameEventBookPageDataResponse(ISession session, uint bookID, int pageIndex, PropertiesBookPageData pageData)
             : base(GameEventType.BookPageDataResponse, GameMessageGroup.UIQueue, session)
         {
             // unused?

@@ -386,7 +386,7 @@ namespace ACE.Server.Managers
         //    }
         //}
 
-        public static bool AddToQueue(Session session, uint datFileId, DatDatabaseType datDatabaseType)
+        public static bool AddToQueue(ISession session, uint datFileId, DatDatabaseType datDatabaseType)
         {
             //dddDataQueue.Enqueue((session, datFileId, datDatabaseType));
             //session.AddToDDDQueue(datFileId, datDatabaseType);

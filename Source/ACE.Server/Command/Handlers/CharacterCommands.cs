@@ -20,7 +20,7 @@ namespace ACE.Server.Command.Handlers
             "charactername (accesslevel)\n" +
             "accesslevel can be a number or enum name\n" +
             "0 = Player | 1 = Advocate | 2 = Sentinel | 3 = Envoy | 4 = Developer | 5 = Admin")]
-        public static void HandleCharacterTokenization(Session session, params string[] parameters)
+        public static void HandleCharacterTokenization(ISession session, params string[] parameters)
         {
             string characterName = parameters[0];
 
@@ -52,7 +52,7 @@ namespace ACE.Server.Command.Handlers
             "Deletes a character and removes it from players restore list",
             "[character name]\n" +
             "Given the name of a character, this command deletes that character, booting it if in game, and removes it from character's restore list.  (You can find the name for a character using the @finger command.)\n")]
-        public static void HandleCharacterForcedDelete(Session session, params string[] parameters)
+        public static void HandleCharacterForcedDelete(ISession session, params string[] parameters)
         {
             var characterName = string.Join(" ", parameters);
 

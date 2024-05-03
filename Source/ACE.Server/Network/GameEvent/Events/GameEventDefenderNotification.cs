@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventDefenderNotification : GameEventMessage
     {
-        public GameEventDefenderNotification(Session session, string attackerName, DamageType damageType, float percent, uint damage, DamageLocation damageLocation, bool criticalHit, AttackConditions attackConditions)
+        public GameEventDefenderNotification(ISession session, string attackerName, DamageType damageType, float percent, uint damage, DamageLocation damageLocation, bool criticalHit, AttackConditions attackConditions)
             : base(GameEventType.DefenderNotification, GameMessageGroup.UIQueue, session)
         {
             Writer.WriteString16L(attackerName);

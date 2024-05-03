@@ -20,7 +20,7 @@ namespace ACE.Server.Command.Handlers
     public static class CustomCommands
     {
         [CommandHandler("telerealm", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0, "Teleports the current player to another realm.")]
-        public static void HandleMoveRealm(Session session, params string[] parameters)
+        public static void HandleMoveRealm(ISession session, params string[] parameters)
         {
             if (parameters.Length < 1)
                 return;
@@ -36,50 +36,50 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("zoneinfo", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Lists all properties for the current realm.")]
-        public static void HandleZoneInfo(Session session, params string[] parameters)
+        public static void HandleZoneInfo(ISession session, params string[] parameters)
         {
             session.Network.EnqueueSend(new GameMessageSystemChat($"\n{session.Player.CurrentLandblock.RealmRuleset.DebugOutputString()}", ChatMessageType.System));
         }
 
         [CommandHandler("exitinstance", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
-        public static void HandleExitInstance(Session session, params string[] parameters)
+        public static void HandleExitInstance(ISession session, params string[] parameters)
         {
             session.Player.ExitInstance();
         }
 
         [CommandHandler("exitinst", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
-        public static void HandleExitInst(Session session, params string[] parameters)
+        public static void HandleExitInst(ISession session, params string[] parameters)
         {
             session.Player.ExitInstance();
         }
 
 
         [CommandHandler("exiti", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
-        public static void HandleExitI(Session session, params string[] parameters)
+        public static void HandleExitI(ISession session, params string[] parameters)
         {
             session.Player.ExitInstance();
         }
 
         [CommandHandler("leaveinstance", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
-        public static void HandleLeaveInstance(Session session, params string[] parameters)
+        public static void HandleLeaveInstance(ISession session, params string[] parameters)
         {
             session.Player.ExitInstance();
         }
 
         [CommandHandler("leaveinst", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
-        public static void HandleLeaveInst(Session session, params string[] parameters)
+        public static void HandleLeaveInst(ISession session, params string[] parameters)
         {
             session.Player.ExitInstance();
         }
 
         [CommandHandler("leavei", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
-        public static void HandleLeaveI(Session session, params string[] parameters)
+        public static void HandleLeaveI(ISession session, params string[] parameters)
         {
             session.Player.ExitInstance();
         }
 
         [CommandHandler("hideout", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Recalls to your hideout.")]
-        public static void HandleHideout(Session session, params string[] parameters)
+        public static void HandleHideout(ISession session, params string[] parameters)
         {
             if (session?.Player?.HomeRealm == null)
                 return;
@@ -94,7 +94,7 @@ namespace ACE.Server.Command.Handlers
 
         [CommandHandler("rebuff", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, 0,
             "Buffs you with all beneficial spells. Only usable in certain realms.")]
-        public static void HandleRebuff(Session session, params string[] parameters)
+        public static void HandleRebuff(ISession session, params string[] parameters)
         {
             var player = session.Player;
             var realm = RealmManager.GetRealm(player.HomeRealm);
@@ -116,7 +116,7 @@ namespace ACE.Server.Command.Handlers
 
         [CommandHandler("duels", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, 0,
          "Recalls you to the duel staging area.")]
-        public static void HandleRecallDuels(Session session, params string[] parameters)
+        public static void HandleRecallDuels(ISession session, params string[] parameters)
         {
             if (RealmManager.DuelRealm == null)
                 return;
@@ -182,7 +182,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("reload-all-landblocks", AccessLevel.Admin, CommandHandlerFlag.None, 0, "Reloads all landblocks currently loaded.")]
-        public static void HandleReloadAllLandblocks(Session session, params string[] parameters)
+        public static void HandleReloadAllLandblocks(ISession session, params string[] parameters)
         {
             ActionChain lbResetChain = new ActionChain();
             var lbs = LandblockManager.GetLoadedLandblocks().Select(x => (id: x.Id, instance: x.Instance));

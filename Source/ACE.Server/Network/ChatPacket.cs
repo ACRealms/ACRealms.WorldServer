@@ -5,7 +5,7 @@ namespace ACE.Server.Network
 {
     public static class ChatPacket
     {
-        public static void SendServerMessage(Session session, string message, ChatMessageType chatMessageType)
+        public static void SendServerMessage(ISession session, string message, ChatMessageType chatMessageType)
         {
             if (session == null)
             {

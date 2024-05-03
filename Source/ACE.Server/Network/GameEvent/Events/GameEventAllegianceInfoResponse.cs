@@ -4,7 +4,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventAllegianceInfoResponse : GameEventMessage
     {
-        public GameEventAllegianceInfoResponse(Session session, uint playerGuid, AllegianceProfile profile)
+        public GameEventAllegianceInfoResponse(ISession session, uint playerGuid, AllegianceProfile profile)
             : base(GameEventType.AllegianceInfoResponse, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(playerGuid);

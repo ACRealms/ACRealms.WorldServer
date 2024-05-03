@@ -414,7 +414,7 @@ namespace ACE.Server.WorldObjects
             LastUpdatePosition = DateTime.UtcNow;
         }
 
-        public virtual void SendPartialUpdates(Session targetSession, List<GenericPropertyId> properties)
+        public virtual void SendPartialUpdates(ISession targetSession, List<GenericPropertyId> properties)
         {
             foreach (var property in properties)
             {

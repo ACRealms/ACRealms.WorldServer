@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionBookData
     {
         [GameAction(GameActionType.BookData)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var bookGuid = message.Payload.ReadGuid(session);
 

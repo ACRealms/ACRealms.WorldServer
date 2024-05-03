@@ -22,7 +22,22 @@ using log4net;
 
 namespace ACE.Server.Network
 {
-    public class NetworkSession
+    public interface INetworkSession
+    {
+        ushort ClientId { get; }
+        ushort ServerId { get; }
+        long TimeoutTick { get; set; }
+        bool sendResync { get; set; }
+        SessionConnectionData ConnectionData { get; }
+
+        void EnqueueSend(params GameMessage[] messages);
+        void EnqueueSend(params ServerPacket[] packets);
+        void ProcessPacket(ClientPacket packet);
+        void ReleaseResources();
+        void Update();
+    }
+
+    public class NetworkSession : INetworkSession
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly ILog packetLog = LogManager.GetLogger(System.Reflection.Assembly.GetEntryAssembly(), "Packets");
@@ -31,7 +46,7 @@ namespace ACE.Server.Network
         private const int timeBetweenTimeSync = 20000; // 20s
         private const int timeBetweenAck = 2000; // 2s
 
-        private readonly Session session;
+        private readonly ISession session;
         private readonly ConnectionListener connectionC2S; // This is the connection the client transmits on. In retail this would be port 9000 for GLS; For world servers, examples would be port 9002 / 9004 / 9006 / 9008.
         private readonly ConnectionListener connectionS2C; // This is the connection the server transmits on. In retail this would be port 9001 for GLS; For world servers, examples would be port 9003 / 9005 / 9007 / 9009.
 
@@ -46,7 +61,7 @@ namespace ACE.Server.Network
 
         // Resync will be started after ConnectResponse, and should immediately be sent then, so no delay here.
         // Fun fact: even though we send the server time in the ConnectRequest, client doesn't seem to use it?  Therefore we must TimeSync early so client doesn't see a skew when we send it later.
-        public bool sendResync;
+        public bool sendResync { get; set; }
         private DateTime nextResync = DateTime.UtcNow;
 
         // Ack should be sent after a 2 second delay, so start enabled with the delay.
@@ -80,7 +95,7 @@ namespace ACE.Server.Network
         /// </summary>
         private readonly ConcurrentQueue<ServerPacket> packetQueue = new ConcurrentQueue<ServerPacket>();
 
-        public readonly SessionConnectionData ConnectionData = new SessionConnectionData();
+        public SessionConnectionData ConnectionData { get; } = new SessionConnectionData();
 
         /// <summary>
         /// Stores the tick value for the when an active session will timeout. If this value is in the past, the session is dead/inactive.
@@ -90,7 +105,7 @@ namespace ACE.Server.Network
         public ushort ClientId { get; }
         public ushort ServerId { get; }
 
-        public NetworkSession(Session session, ConnectionListener connectionListener, ushort clientId, ushort serverId)
+        public NetworkSession(ISession session, ConnectionListener connectionListener, ushort clientId, ushort serverId)
         {
             this.session = session;
             connectionC2S = connectionListener;

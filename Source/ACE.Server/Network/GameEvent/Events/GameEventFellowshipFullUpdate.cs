@@ -11,7 +11,7 @@ namespace ACE.Server.Network.GameEvent.Events
     {
         private static readonly HashComparer FellowComparer = new HashComparer(16);
 
-        public GameEventFellowshipFullUpdate(Session session)
+        public GameEventFellowshipFullUpdate(ISession session)
             : base(GameEventType.FellowshipFullUpdate, GameMessageGroup.UIQueue, session)
         {
             var fellowship = session.Player.Fellowship;

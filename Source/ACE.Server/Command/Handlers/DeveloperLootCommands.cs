@@ -8,7 +8,7 @@ namespace ACE.Server.Command.Handlers
     public static class DeveloperLootCommands
     {
         [CommandHandler("testlootgen", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 1, "Generates Loot for testing LootFactories.  Do testlootgen -info for examples.", "<number of items> <loot tier> <melee, missile, caster, armor, pet, aetheria (optional)>")]
-        public static void TestLootGenerator(Session session, params string[] parameters)
+        public static void TestLootGenerator(ISession session, params string[] parameters)
         {
             if (parameters[0] == "-info")
             {
@@ -87,7 +87,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("testlootgencorpse", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 1, "Generates Corpses for testing LootFactories", "<DID> <number corpses> <display table - melee, missile, caster, armor, pet, aetheria>")]
-        public static void TestLootGeneratorCorpse(Session session, params string[] parameters)
+        public static void TestLootGeneratorCorpse(ISession session, params string[] parameters)
         {
             if (parameters[0] == "-info")
             {

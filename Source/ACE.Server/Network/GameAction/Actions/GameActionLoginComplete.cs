@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameAction.Actions
         /// It includes initial login, as well as portaling / teleporting
         /// </summary>
         [GameAction(GameActionType.LoginComplete)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             session.Player.OnTeleportComplete();
 

@@ -27,7 +27,7 @@ namespace ACE.Server.Command.Handlers
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [CommandHandler("verify-player-data", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any bugs with player data. Runs all of the verify* commands.")]
-        public static void HandleVerifyAll(Session session, params string[] parameters)
+        public static void HandleVerifyAll(ISession session, params string[] parameters)
         {
             HandleVerifyAttributes(session, parameters);
             HandleVerifyVitals(session, parameters);
@@ -43,7 +43,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("verify-attributes", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any bugs with player attribute data")]
-        public static void HandleVerifyAttributes(Session session, params string[] parameters)
+        public static void HandleVerifyAttributes(ISession session, params string[] parameters)
         {
             var players = PlayerManager.GetAllOffline();
 
@@ -160,7 +160,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("verify-vitals", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any bugs with player vitals data")]
-        public static void HandleVerifyVitals(Session session, params string[] parameters)
+        public static void HandleVerifyVitals(ISession session, params string[] parameters)
         {
             var players = PlayerManager.GetAllOffline();
 
@@ -239,7 +239,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("verify-skills", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any bugs with player skill data")]
-        public static void HandleVerifySkills(Session session, params string[] parameters)
+        public static void HandleVerifySkills(ISession session, params string[] parameters)
         {
             var players = PlayerManager.GetAllOffline();
 
@@ -374,7 +374,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("verify-skill-credits", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any bugs with player skill credits")]
-        public static void HandleVerifySkillCredits(Session session, params string[] parameters)
+        public static void HandleVerifySkillCredits(ISession session, params string[] parameters)
         {
             var players = PlayerManager.GetAllOffline();
 
@@ -706,7 +706,7 @@ namespace ACE.Server.Command.Handlers
 
 
         [CommandHandler("verify-heritage-augs", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies all players have their heritage augs.")]
-        public static void HandleVerifyHeritageAugs(Session session, params string[] parameters)
+        public static void HandleVerifyHeritageAugs(ISession session, params string[] parameters)
         {
             var players = PlayerManager.GetAllOffline();
 
@@ -785,7 +785,7 @@ namespace ACE.Server.Command.Handlers
 
 
         [CommandHandler("verify-max-augs", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any bugs with the # of augs each player has")]
-        public static void HandleVerifyMaxAugs(Session session, params string[] parameters)
+        public static void HandleVerifyMaxAugs(ISession session, params string[] parameters)
         {
             var players = PlayerManager.GetAllOffline();
 
@@ -884,7 +884,7 @@ namespace ACE.Server.Command.Handlers
 
 
         [CommandHandler("verify-xp", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any bugs with player xp")]
-        public static void HandleVerifyExperience(Session session, params string[] parameters)
+        public static void HandleVerifyExperience(ISession session, params string[] parameters)
         {
             var players = PlayerManager.GetAllOffline();
 

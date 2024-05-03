@@ -20,7 +20,7 @@ namespace ACE.Server.Command.Handlers
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [CommandHandler("databasequeueinfo", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Show database queue information.")]
-        public static void HandleDatabaseQueueInfo(Session session, params string[] parameters)
+        public static void HandleDatabaseQueueInfo(ISession session, params string[] parameters)
         {
             CommandHandlerHelper.WriteOutputInfo(session, $"Current database queue count: {DatabaseManager.Shard.QueueCount}");
 
@@ -31,7 +31,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("databaseperftest", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Test server/database performance.", "biotasPerTest\n" + "optional parameter biotasPerTest if omitted 1000")]
-        public static void HandleDatabasePerfTest(Session session, params string[] parameters)
+        public static void HandleDatabasePerfTest(ISession session, params string[] parameters)
         {
             int biotasPerTest = DatabasePerfTest.DefaultBiotasTestCount;
 
@@ -43,7 +43,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("fix-shortcut-bars", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Fixes the players with duplicate items on their shortcut bars.", "<execute>")]
-        public static void HandleFixShortcutBars(Session session, params string[] parameters)
+        public static void HandleFixShortcutBars(ISession session, params string[] parameters)
         {
             Console.WriteLine();
 
@@ -145,7 +145,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("database-shard-cache-pbrt", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Shard Database, Player Biota Cache - Retention Time (in minutes)")]
-        public static void HandleDatabaseShardCachePBRT(Session session, params string[] parameters)
+        public static void HandleDatabaseShardCachePBRT(ISession session, params string[] parameters)
         {
             if (!(DatabaseManager.Shard.BaseDatabase is ShardDatabaseWithCaching shardDatabaseWithCaching))
             {
@@ -174,7 +174,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("database-shard-cache-npbrt", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Shard Database, Non-Player Biota Cache - Retention Time (in minutes)")]
-        public static void HandleDatabaseShardCacheNPBRT(Session session, params string[] parameters)
+        public static void HandleDatabaseShardCacheNPBRT(ISession session, params string[] parameters)
         {
             if (!(DatabaseManager.Shard.BaseDatabase is ShardDatabaseWithCaching shardDatabaseWithCaching))
             {
@@ -203,7 +203,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("fix-spell-bars", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Fixes the players spell bars.", "<execute>")]
-        public static void HandleFixSpellBars(Session session, params string[] parameters)
+        public static void HandleFixSpellBars(ISession session, params string[] parameters)
         {
             Console.WriteLine();
 

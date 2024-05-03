@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionAllegianceChatBoot
     {
         [GameAction(GameActionType.AllegianceChatBoot)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var playerName = message.Payload.ReadString16L();
             var reason = message.Payload.ReadString16L();

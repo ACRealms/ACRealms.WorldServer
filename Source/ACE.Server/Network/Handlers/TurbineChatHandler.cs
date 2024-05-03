@@ -17,7 +17,7 @@ namespace ACE.Server.Network.Handlers
     public static class TurbineChatHandler
     {
         [GameMessage(GameMessageOpcode.TurbineChat, SessionState.WorldConnected)]
-        public static void TurbineChatReceived(ClientMessage clientMessage, Session session)
+        public static void TurbineChatReceived(ClientMessage clientMessage, ISession session)
         {
             if (!PropertyManager.GetBool("use_turbine_chat").Item)
                 return;
@@ -326,7 +326,7 @@ namespace ACE.Server.Network.Handlers
                 Console.WriteLine($"Unhandled TurbineChatHandler ChatNetworkBlobType: 0x{(uint)chatBlobType:X4}");
         }
 
-        private static void HandleChatReject(Session session, uint contextId, ChatType chatType, GameMessageTurbineChat gameMessageTurbineChat, string rejectReason)
+        private static void HandleChatReject(ISession session, uint contextId, ChatType chatType, GameMessageTurbineChat gameMessageTurbineChat, string rejectReason)
         {
             if (PropertyManager.GetBool("chat_echo_reject").Item)
                 session.Network.EnqueueSend(gameMessageTurbineChat);

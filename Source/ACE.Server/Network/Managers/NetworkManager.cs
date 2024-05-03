@@ -35,7 +35,7 @@ namespace ACE.Server.Network.Managers
         public static uint DefaultSessionTimeout = ConfigManager.Config.Server.Network.DefaultSessionTimeout;
 
         private static readonly ReaderWriterLockSlim sessionLock = new ReaderWriterLockSlim();
-        private static readonly Session[] sessionMap = new Session[ConfigManager.Config.Server.Network.MaximumAllowedSessions];
+        private static readonly ISession[] sessionMap = new ISession[ConfigManager.Config.Server.Network.MaximumAllowedSessions];
 
         /// <summary>
         /// Handles ClientMessages in InboundMessageManager
@@ -55,7 +55,7 @@ namespace ACE.Server.Network.Managers
                     // This should be set on the second packet to the server from the client.
                     // This completes the three-way handshake.
                     sessionLock.EnterReadLock();
-                    Session session = null;
+                    ISession session = null;
                     try
                     {
                         session =
@@ -174,7 +174,7 @@ namespace ACE.Server.Network.Managers
             SendLoginRequestReject(tempSession, error);
         }
 
-        public static void SendLoginRequestReject(Session session, CharacterError error)
+        public static void SendLoginRequestReject(ISession session, CharacterError error)
         {
             // First we must send the connect request response
             var connectRequest = new PacketOutboundConnectRequest(
@@ -260,9 +260,9 @@ namespace ACE.Server.Network.Managers
             }
         }
 
-        public static Session FindOrCreateSession(ConnectionListener connectionListener, IPEndPoint endPoint)
+        public static ISession FindOrCreateSession(ConnectionListener connectionListener, IPEndPoint endPoint)
         {
-            Session session;
+            ISession session;
 
             sessionLock.EnterUpgradeableReadLock();
             try
@@ -298,7 +298,7 @@ namespace ACE.Server.Network.Managers
             return session;
         }
 
-        public static Session Find(uint accountId)
+        public static ISession Find(uint accountId)
         {
             sessionLock.EnterReadLock();
             try
@@ -311,7 +311,7 @@ namespace ACE.Server.Network.Managers
             }
         }
 
-        public static Session Find(string account)
+        public static ISession Find(string account)
         {
             sessionLock.EnterReadLock();
             try
@@ -327,7 +327,7 @@ namespace ACE.Server.Network.Managers
         /// <summary>
         /// Removes a session, network client and network endpoint from the various tracker objects.
         /// </summary>
-        public static void RemoveSession(Session session)
+        public static void RemoveSession(ISession session)
         {
             sessionLock.EnterWriteLock();
             try

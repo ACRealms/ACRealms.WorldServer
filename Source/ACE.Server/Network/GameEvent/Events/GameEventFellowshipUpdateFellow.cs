@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventFellowshipUpdateFellow : GameEventMessage
     {
-        public GameEventFellowshipUpdateFellow(Session session, Player player, bool shareLoot, FellowUpdateType fellowUpdateType = FellowUpdateType.Full)
+        public GameEventFellowshipUpdateFellow(ISession session, Player player, bool shareLoot, FellowUpdateType fellowUpdateType = FellowUpdateType.Full)
             : base(GameEventType.FellowshipUpdateFellow, GameMessageGroup.UIQueue, session)
         {
             // Information about fellow being added

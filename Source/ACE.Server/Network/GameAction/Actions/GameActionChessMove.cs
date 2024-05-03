@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionChessMove
     {
         [GameAction(GameActionType.ChessMove)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var from = message.Payload.ReadChessPieceCoord();
             var to = message.Payload.ReadChessPieceCoord();

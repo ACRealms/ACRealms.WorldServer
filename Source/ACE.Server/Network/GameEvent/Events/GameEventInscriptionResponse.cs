@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameEvent.Events
         /// <summary>
         /// THIS EVENT IS DEPRECIATED AND HAS NO HANDLER IN ACCLIENT
         /// </summary>
-        public GameEventInscriptionResponse(Session session, WorldObject worldObject)
+        public GameEventInscriptionResponse(ISession session, WorldObject worldObject)
                 : base(GameEventType.GetInscriptionResponse, GameMessageGroup.UIQueue, session)
         {
             Writer.WriteGuid(worldObject.Guid);

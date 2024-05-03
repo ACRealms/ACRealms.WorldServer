@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameEvent.Events
     /// </summary>
     public class GameEventMagicRemoveEnchantment : GameEventMessage
     {
-        public GameEventMagicRemoveEnchantment(Session session, ushort spellID, ushort layer)
+        public GameEventMagicRemoveEnchantment(ISession session, ushort spellID, ushort layer)
             : base(GameEventType.MagicRemoveEnchantment, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(spellID);

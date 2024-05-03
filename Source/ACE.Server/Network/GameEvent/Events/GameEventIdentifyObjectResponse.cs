@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventIdentifyObjectResponse : GameEventMessage
     {
-        public GameEventIdentifyObjectResponse(Session session, WorldObject obj, bool success)
+        public GameEventIdentifyObjectResponse(ISession session, WorldObject obj, bool success)
             : base(GameEventType.IdentifyObjectResponse, GameMessageGroup.UIQueue, session)
         {
             var appraiseInfo = new AppraiseInfo(obj, session.Player, success);
@@ -16,7 +16,7 @@ namespace ACE.Server.Network.GameEvent.Events
         }
 
         // Empty Appraisal response, for when you only have a guid and nothing else.
-        public GameEventIdentifyObjectResponse(Session session, uint objectGuid)
+        public GameEventIdentifyObjectResponse(ISession session, uint objectGuid)
             : base(GameEventType.IdentifyObjectResponse, GameMessageGroup.UIQueue, session)
         {
             var appraiseInfo = new AppraiseInfo();

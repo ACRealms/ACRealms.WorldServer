@@ -2,7 +2,7 @@
 {
     public class GameEventQueryItemManaResponse : GameEventMessage
     {
-        public GameEventQueryItemManaResponse(Session session, uint target, float mana, uint success)
+        public GameEventQueryItemManaResponse(ISession session, uint target, float mana, uint success)
             : base(GameEventType.QueryItemManaResponse, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(target);

@@ -19,7 +19,7 @@ namespace ACE.Server.Command.Handlers
             "Sets whether monsters will attack you or not.",
             "[ on | off ]\n"
             + "This command sets whether monsters will attack you unprovoked.\n When turned on, monsters will attack you as if you are a normal player.\n When turned off, monsters will ignore you.")]
-        public static void HandleAttackable(Session session, params string[] parameters)
+        public static void HandleAttackable(ISession session, params string[] parameters)
         {
             // usage: @attackable { on,off}
             // This command sets whether monsters will attack you unprovoked.When turned on, monsters will attack you as if you are a normal player.  When turned off, monsters will ignore you.
@@ -48,7 +48,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("bestow", AccessLevel.Advocate, CommandHandlerFlag.RequiresWorld, 2,
             "Sets a character's Advocate Level.",
             "<name> <level>\nAdvocates can bestow any level less than their own.")]
-        public static void HandleBestow(Session session, params string[] parameters)
+        public static void HandleBestow(ISession session, params string[] parameters)
         {
             var charName = string.Join(" ", parameters).Trim();
 
@@ -120,7 +120,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("remove", AccessLevel.Advocate, CommandHandlerFlag.RequiresWorld, 1,
             "Removes the specified character from the Advocate ranks.",
             "<character name>\nAdvocates can remove Advocate status for any Advocate of lower level than their own.")]
-        public static void HandleRemove(Session session, params string[] parameters)
+        public static void HandleRemove(ISession session, params string[] parameters)
         {
             var charName = string.Join(" ", parameters).Trim();
 
@@ -159,7 +159,7 @@ namespace ACE.Server.Command.Handlers
             "Teleports you(or a player) to some location.",
             "[name] <longitude> <latitude>\nExample: /tele 0n0w\nExample: /tele plats4days 37s,67w\n"
             + "This command teleports yourself (or the specified character) to the given longitude and latitude.")]
-        public static void HandleTele(Session session, params string[] parameters)
+        public static void HandleTele(ISession session, params string[] parameters)
         {
             // Used PhatAC source to implement most of this.  Thanks Pea!
 

@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     class GameEventPortalStormSubsided : GameEventMessage
     {
-        public GameEventPortalStormSubsided(Session session)
+        public GameEventPortalStormSubsided(ISession session)
             : base(GameEventType.MiscPortalstormSubsided, GameMessageGroup.UIQueue, session)
         {
         }

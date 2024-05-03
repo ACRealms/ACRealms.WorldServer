@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionConfirmationResponse
     {
         [GameAction(GameActionType.ConfirmationResponse)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var confirmType = (ConfirmationType)message.Payload.ReadInt32();
             var context = message.Payload.ReadUInt32();

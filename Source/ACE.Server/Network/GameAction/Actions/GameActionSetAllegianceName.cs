@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionSetAllegianceName
     {
         [GameAction(GameActionType.SetAllegianceName)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var allegianceName = message.Payload.ReadString16L();
 

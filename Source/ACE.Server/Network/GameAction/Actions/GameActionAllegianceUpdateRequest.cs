@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionAllegianceUpdateRequest
     {
         [GameAction(GameActionType.AllegianceUpdateRequest)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var uiPanel = Convert.ToBoolean(message.Payload.ReadUInt32());
 

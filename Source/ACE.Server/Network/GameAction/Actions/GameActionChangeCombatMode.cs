@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionChangeCombatMode
     {
         [GameAction(GameActionType.ChangeCombatMode)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             uint newCombatMode = message.Payload.ReadUInt32();
 

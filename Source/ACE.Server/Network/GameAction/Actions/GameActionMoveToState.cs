@@ -10,7 +10,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionMoveToState
     {
         [GameAction(GameActionType.MoveToState)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             //Console.WriteLine($"{session.Player.Name}.MoveToState");
 

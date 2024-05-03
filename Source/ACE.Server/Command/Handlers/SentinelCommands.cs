@@ -34,7 +34,7 @@ namespace ACE.Server.Command.Handlers
             "< off > You will show up as a normal.\n" +
             "< player > You will appear as a player. (No + and a white radar dot.)\n" +
             "< creature > You will appear as a creature. (No + and an orange radar dot.)")]
-        public static void HandleCloak(Session session, params string[] parameters)
+        public static void HandleCloak(ISession session, params string[] parameters)
         {
             // Please specify if you want cloaking on or off.usage: @cloak < on / off / player / creature >
             // This command sets your current cloaking state.
@@ -107,7 +107,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("neversaydie", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 0,
             "Turn immortality on or off.",
             "[ on | off ]\n" + "Defaults to on.")]
-        public static void HandleNeverSayDie(Session session, params string[] parameters)
+        public static void HandleNeverSayDie(ISession session, params string[] parameters)
         {
             // @neversaydie [on/off] - Turn immortality on or off. Defaults to on.
 
@@ -136,7 +136,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("portal_bypass", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 0,
             "Toggles the ability to bypass portal restrictions.",
             "")]
-        public static void HandlePortalBypass(Session session, params string[] parameters)
+        public static void HandlePortalBypass(ISession session, params string[] parameters)
         {
             // @portal_bypass - Toggles the ability to bypass portal restrictions.
 
@@ -160,7 +160,7 @@ namespace ACE.Server.Command.Handlers
             "Buffs your fellowship (or a player's fellowship) with all beneficial spells.",
             "[name]\n"
             + "This command buffs your fellowship (or the fellowship of the specified character).")]
-        public static void HandleFellowBuff(Session session, params string[] parameters)
+        public static void HandleFellowBuff(ISession session, params string[] parameters)
         {
             List<CommandParameterHelpers.ACECommandParameter> aceParams = new List<CommandParameterHelpers.ACECommandParameter>()
             {
@@ -188,7 +188,7 @@ namespace ACE.Server.Command.Handlers
             "Buffs you (or a player) with all beneficial spells.",
             "[name] [maxLevel]\n"
             + "This command buffs yourself (or the specified character).")]
-        public static void HandleBuff(Session session, params string[] parameters)
+        public static void HandleBuff(ISession session, params string[] parameters)
         {
             List<CommandParameterHelpers.ACECommandParameter> aceParams = new List<CommandParameterHelpers.ACECommandParameter>()
             {
@@ -213,7 +213,7 @@ namespace ACE.Server.Command.Handlers
             "Temporarily boosts your run skill.",
             "( on | off | toggle | check )\n"
             + "Boosts the run skill of the PSR so they can pursue the \"bad folks\". The enchantment will wear off after a while. This command defaults to toggle.")]
-        public static void HandleRun(Session session, params string[] parameters)
+        public static void HandleRun(ISession session, params string[] parameters)
         {
             // usage: @run on| off | toggle | check
             // Boosts the run skill of the PSR so they can pursue the "bad folks".The enchantment will wear off after a while.This command defaults to toggle.
@@ -264,7 +264,7 @@ namespace ACE.Server.Command.Handlers
             + "         @boot account AccountName\n"
             + "         @boot iid 0x51234567\n"
             + "         @boot char Character Name, Reason for being booted\n")]
-        public static void HandleBoot(Session session, params string[] parameters)
+        public static void HandleBoot(ISession session, params string[] parameters)
         {
             // usage: @boot { account,char, iid} who
             // This command boots the specified character out of the game.You can specify who to boot by account, character name, or player instance id.  'who' is the account / character / instance id to actually boot.
@@ -288,7 +288,7 @@ namespace ACE.Server.Command.Handlers
             }
 
             string whatToBoot = null;
-            Session sessionToBoot = null;
+            ISession sessionToBoot = null;
             switch (parameters[0].ToLower())
             {
                 case "char":
@@ -343,7 +343,7 @@ namespace ACE.Server.Command.Handlers
             + "This command bans the specified player account for the specified time. This player will not be able to enter the game with any character until the time expires.\n"
             + "Example: @ban AccountName 0 0 5\n"
             + "Example: @ban AccountName 1 0 0 banned 1 day because reasons\n")]
-        public static void HandleBanAccount(Session session, params string[] parameters)
+        public static void HandleBanAccount(ISession session, params string[] parameters)
         {
             // usage: @ban < acct > < days > < hours > < minutes >
             // This command bans the specified player account for the specified time.This player will not be able to enter the game with any character until the time expires.
@@ -431,7 +431,7 @@ namespace ACE.Server.Command.Handlers
             "Unbans the specified player account.",
             "[accountname]\n" +
             "This command removes the ban from the specified account. The player will then be able to log into the game.")]
-        public static void HandleUnBanAccount(Session session, params string[] parameters)
+        public static void HandleUnBanAccount(ISession session, params string[] parameters)
         {
             // usage: @unban acct
             // This command removes the ban from the specified account.The player will then be able to log into the game.
@@ -463,7 +463,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("banlist", AccessLevel.Sentinel, CommandHandlerFlag.None, 0,
             "Lists all banned accounts on this world.",
             "")]
-        public static void HandleBanlist(Session session, params string[] parameters)
+        public static void HandleBanlist(ISession session, params string[] parameters)
         {
             // @banlist - Lists all banned accounts on this world.
 
@@ -484,7 +484,7 @@ namespace ACE.Server.Command.Handlers
 
         // deaf < on / off >
         [CommandHandler("deaf", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 1)]
-        public static void HandleDeaf(Session session, params string[] parameters)
+        public static void HandleDeaf(ISession session, params string[] parameters)
         {
             // @deaf - Block @tells except for the player you are currently helping.
             // @deaf on -Make yourself deaf to players.
@@ -495,7 +495,7 @@ namespace ACE.Server.Command.Handlers
 
         // deaf < hear | mute > < player >
         [CommandHandler("deaf", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 2)]
-        public static void HandleDeafHearOrMute(Session session, params string[] parameters)
+        public static void HandleDeafHearOrMute(ISession session, params string[] parameters)
         {
             // @deaf hear[name] -add a player to the list of players that you can hear.
             // @deaf mute[name] -remove a player from the list of players you can hear.

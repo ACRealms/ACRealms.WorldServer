@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameEvent.Events
     /// </summary>
     public class GameEventOpponentTurn : GameEventMessage
     {
-        public GameEventOpponentTurn(Session session, ObjectGuid boardGuid, ChessMoveData moveData)
+        public GameEventOpponentTurn(ISession session, ObjectGuid boardGuid, ChessMoveData moveData)
             : base(GameEventType.OpponentTurn, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(boardGuid.ClientGUID);

@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     {
         [GameAction(GameActionType.DropItem)]
 
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var itemGuid = message.Payload.ReadGuid(session);
 

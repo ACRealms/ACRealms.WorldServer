@@ -3,7 +3,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionMagicCastTargetedSpell
     {
         [GameAction(GameActionType.CastTargetedSpell)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var targetGuid = message.Payload.ReadGuid(session);
             var spellId = message.Payload.ReadUInt32();

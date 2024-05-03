@@ -10,7 +10,7 @@ namespace ACE.Server.Network.GameEvent.Events
     /// </summary>
     public class GameEventHouseAvailableHouses : GameEventMessage
     {
-        public GameEventHouseAvailableHouses(Session session, HouseType type, List<uint> locations, int totalAvailable)
+        public GameEventHouseAvailableHouses(ISession session, HouseType type, List<uint> locations, int totalAvailable)
             : base(GameEventType.AvailableHouses, GameMessageGroup.UIQueue, session)
         {
             //Console.WriteLine("Sending 0x271 - GameEvent - AvailableHouses");

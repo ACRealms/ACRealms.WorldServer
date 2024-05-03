@@ -20,7 +20,7 @@ namespace ACE.Server.Network.GameAction.Actions
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [GameAction(GameActionType.SetCharacterOptions)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             if (!session.Player.FirstEnterWorldDone)
             {

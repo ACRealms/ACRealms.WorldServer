@@ -9,7 +9,7 @@ namespace ACE.Server.Network.GameEvent.Events
     /// </summary>
     public class GameEventUpdateHAR : GameEventMessage
     {
-        public GameEventUpdateHAR(Session session, House house)
+        public GameEventUpdateHAR(ISession session, House house)
             : base(GameEventType.UpdateHAR, GameMessageGroup.UIQueue, session)
         {
             //Console.WriteLine("Sending 0x257 - Update House Access Records (HAR)");

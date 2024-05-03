@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionSetAllegianceOfficer
     {
         [GameAction(GameActionType.SetAllegianceOfficer)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var playerName = message.Payload.ReadString16L();     // The allegiance officer's name
             var officerLevel = message.Payload.ReadUInt32();

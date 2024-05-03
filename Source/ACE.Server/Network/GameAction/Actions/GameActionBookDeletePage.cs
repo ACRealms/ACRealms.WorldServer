@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionBookDeletePage
     {
         [GameAction(GameActionType.BookDeletePage)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             uint bookGuid = message.Payload.ReadUInt32();
             int page = message.Payload.ReadInt32();    // 0-based

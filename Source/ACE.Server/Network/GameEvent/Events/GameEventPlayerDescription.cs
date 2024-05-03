@@ -37,7 +37,7 @@ namespace ACE.Server.Network.GameEvent.Events
             Enchantment = 0x0200
         }
 
-        public GameEventPlayerDescription(Session session)
+        public GameEventPlayerDescription(ISession session)
             : base(GameEventType.PlayerDescription, GameMessageGroup.UIQueue, session)
         {
             WriteEventBody();
@@ -234,74 +234,74 @@ namespace ACE.Server.Network.GameEvent.Events
 
                 if ((attributeFlags & AttributeCache.Strength) != 0)
                 {
-                    Writer.Write(Session.Player.Strength.Ranks);
-                    Writer.Write(Session.Player.Strength.StartingValue);
-                    Writer.Write(Session.Player.Strength.ExperienceSpent);
+                    Writer.Write((uint)Session.Player.Strength.Ranks);
+                    Writer.Write((uint)Session.Player.Strength.StartingValue);
+                    Writer.Write((uint)Session.Player.Strength.ExperienceSpent);
                 }
 
                 if ((attributeFlags & AttributeCache.Endurance) != 0)
                 {
-                    Writer.Write(Session.Player.Endurance.Ranks);
-                    Writer.Write(Session.Player.Endurance.StartingValue);
-                    Writer.Write(Session.Player.Endurance.ExperienceSpent);
+                    Writer.Write((uint)Session.Player.Endurance.Ranks);
+                    Writer.Write((uint)Session.Player.Endurance.StartingValue);
+                    Writer.Write((uint)Session.Player.Endurance.ExperienceSpent);
                 }
 
                 if ((attributeFlags & AttributeCache.Quickness) != 0)
                 {
-                    Writer.Write(Session.Player.Quickness.Ranks);
-                    Writer.Write(Session.Player.Quickness.StartingValue);
-                    Writer.Write(Session.Player.Quickness.ExperienceSpent);
+                    Writer.Write((uint)Session.Player.Quickness.Ranks);
+                    Writer.Write((uint)Session.Player.Quickness.StartingValue);
+                    Writer.Write((uint)Session.Player.Quickness.ExperienceSpent);
                 }
 
                 if ((attributeFlags & AttributeCache.Coordination) != 0)
                 {
-                    Writer.Write(Session.Player.Coordination.Ranks);
-                    Writer.Write(Session.Player.Coordination.StartingValue);
-                    Writer.Write(Session.Player.Coordination.ExperienceSpent);
+                    Writer.Write((uint)Session.Player.Coordination.Ranks);
+                    Writer.Write((uint)Session.Player.Coordination.StartingValue);
+                    Writer.Write((uint)Session.Player.Coordination.ExperienceSpent);
                 }
 
                 if ((attributeFlags & AttributeCache.Focus) != 0)
                 {
-                    Writer.Write(Session.Player.Focus.Ranks);
-                    Writer.Write(Session.Player.Focus.StartingValue);
-                    Writer.Write(Session.Player.Focus.ExperienceSpent);
+                    Writer.Write((uint)Session.Player.Focus.Ranks);
+                    Writer.Write((uint)Session.Player.Focus.StartingValue);
+                    Writer.Write((uint)Session.Player.Focus.ExperienceSpent);
                 }
 
                 if ((attributeFlags & AttributeCache.Self) != 0)
                 {
-                    Writer.Write(Session.Player.Self.Ranks);
-                    Writer.Write(Session.Player.Self.StartingValue);
-                    Writer.Write(Session.Player.Self.ExperienceSpent);
+                    Writer.Write((uint)Session.Player.Self.Ranks);
+                    Writer.Write((uint)Session.Player.Self.StartingValue);
+                    Writer.Write((uint)Session.Player.Self.ExperienceSpent);
                 }
 
                 if ((attributeFlags & AttributeCache.Health) != 0)
                 {
-                    Writer.Write(Session.Player.Health.Ranks);
-                    Writer.Write(Session.Player.Health.StartingValue); // init_level - always appears to be 0
-                    Writer.Write(Session.Player.Health.ExperienceSpent);
-                    Writer.Write(Session.Player.Health.Current);
+                    Writer.Write((uint)Session.Player.Health.Ranks);
+                    Writer.Write((uint)Session.Player.Health.StartingValue); // init_level - always appears to be 0
+                    Writer.Write((uint)Session.Player.Health.ExperienceSpent);
+                    Writer.Write((uint)Session.Player.Health.Current);
                 }
 
                 if ((attributeFlags & AttributeCache.Stamina) != 0)
                 {
-                    Writer.Write(Session.Player.Stamina.Ranks);
-                    Writer.Write(Session.Player.Stamina.StartingValue); // init_level - always appears to be 0
-                    Writer.Write(Session.Player.Stamina.ExperienceSpent);
-                    Writer.Write(Session.Player.Stamina.Current);
+                    Writer.Write((uint)Session.Player.Stamina.Ranks);
+                    Writer.Write((uint)Session.Player.Stamina.StartingValue); // init_level - always appears to be 0
+                    Writer.Write((uint)Session.Player.Stamina.ExperienceSpent);
+                    Writer.Write((uint)Session.Player.Stamina.Current);
                 }
 
                 if ((attributeFlags & AttributeCache.Mana) != 0)
                 {
-                    Writer.Write(Session.Player.Mana.Ranks);
-                    Writer.Write(Session.Player.Mana.StartingValue); // init_level - always appears to be 0
-                    Writer.Write(Session.Player.Mana.ExperienceSpent);
-                    Writer.Write(Session.Player.Mana.Current);
+                    Writer.Write((uint)Session.Player.Mana.Ranks);
+                    Writer.Write((uint)Session.Player.Mana.StartingValue); // init_level - always appears to be 0
+                    Writer.Write((uint)Session.Player.Mana.ExperienceSpent);
+                    Writer.Write((uint)Session.Player.Mana.Current);
                 }
             }
 
             if ((vectorFlags & DescriptionVectorFlag.Skill) != 0)
             {
-                PackableHashTable.WriteHeader(Writer, Session.Player.Skills.Count, SkillComparer.NumBuckets);
+                PackableHashTable.WriteHeader(Writer, (int)Session.Player.Skills.Count, SkillComparer.NumBuckets);
 
                 var skills = new SortedDictionary<Skill, CreatureSkill>(Session.Player.Skills, SkillComparer);
 
@@ -356,7 +356,7 @@ namespace ACE.Server.Network.GameEvent.Events
             optionFlags |= CharacterOptionDataFlag.SpellbookFilters;
 
             Writer.Write((uint)optionFlags);
-            Writer.Write(Session.Player.Character.CharacterOptions1);
+            Writer.Write((int)Session.Player.Character.CharacterOptions1);
 
             if (shortcuts.Count > 0)
                 Writer.Write(shortcuts);
@@ -381,17 +381,17 @@ namespace ACE.Server.Network.GameEvent.Events
                 Writer.WriteOld(fillComps);     // verify
 
             //if ((optionFlags & CharacterOptionDataFlag.SpellbookFilters) != 0)
-            Writer.Write(Session.Player.Character.SpellbookFilters);
+            Writer.Write((uint)Session.Player.Character.SpellbookFilters);
 
             if ((optionFlags & CharacterOptionDataFlag.CharacterOptions2) != 0)
-                Writer.Write(Session.Player.Character.CharacterOptions2);
+                Writer.Write((int)Session.Player.Character.CharacterOptions2);
 
             /*if ((optionFlags & DescriptionOptionFlag.Unk100) != 0)
             {
             }*/
 
             if ((optionFlags & CharacterOptionDataFlag.GameplayOptions) != 0)
-                Writer.Write(Session.Player.Character.GameplayOptions);
+                Writer.Write((byte[])Session.Player.Character.GameplayOptions);
 
             /*if ((optionFlags & DescriptionOptionFlag.Unk400) != 0)
             {

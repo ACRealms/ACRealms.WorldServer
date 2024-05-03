@@ -6,7 +6,7 @@ namespace ACE.Server.Network.Handlers
     public static class ControlHandler
     {
         [GameMessage(GameMessageOpcode.ForceObjectDescSend, SessionState.WorldConnected)]
-        public static void ControlResponse(ClientMessage message, Session session)
+        public static void ControlResponse(ClientMessage message, ISession session)
         {
             var itemGuid = message.Payload.ReadGuid(session);
             session.Player.HandleActionForceObjDescSend(itemGuid);

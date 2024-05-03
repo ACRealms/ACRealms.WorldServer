@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventSalvageOperationsResult : GameEventMessage
     {
-        public GameEventSalvageOperationsResult(Session session, Skill skill, List<SalvageMessage> messages)
+        public GameEventSalvageOperationsResult(ISession session, Skill skill, List<SalvageMessage> messages)
             : base(GameEventType.SalvageOperationsResult, GameMessageGroup.UIQueue, session)
         {
             Writer.Write((uint)skill);

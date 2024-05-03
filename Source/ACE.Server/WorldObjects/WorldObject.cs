@@ -604,7 +604,7 @@ namespace ACE.Server.WorldObjects
             return sb.ToString().Replace("\r", "");
         }
 
-        public void QueryHealth(Session examiner)
+        public void QueryHealth(ISession examiner)
         {
             float healthPercentage = 1f;
 
@@ -615,7 +615,7 @@ namespace ACE.Server.WorldObjects
             examiner.Network.EnqueueSend(updateHealth);
         }
 
-        public void QueryItemMana(Session examiner)
+        public void QueryItemMana(ISession examiner)
         {
             float manaPercentage = 1f;
             uint success = 0;

@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameEvent.Events
     /// </summary>
     public class GameEventMagicUpdateSpell : GameEventMessage
     {
-        public GameEventMagicUpdateSpell(Session session, ushort spellId, ushort layer = 0)
+        public GameEventMagicUpdateSpell(ISession session, ushort spellId, ushort layer = 0)
             : base(GameEventType.MagicUpdateSpell, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(spellId);

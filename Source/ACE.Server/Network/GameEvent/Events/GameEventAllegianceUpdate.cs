@@ -10,7 +10,7 @@ namespace ACE.Server.Network.GameEvent.Events
         /// <summary>
         /// Returns info related to a player's monarch, patron, and vassals.
         /// </summary>
-        public GameEventAllegianceUpdate(Session session, Allegiance allegiance, AllegianceNode node)
+        public GameEventAllegianceUpdate(ISession session, Allegiance allegiance, AllegianceNode node)
             : base(GameEventType.AllegianceUpdate, GameMessageGroup.UIQueue, session)
         {
             var startPos = Writer.BaseStream.Position;

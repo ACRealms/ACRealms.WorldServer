@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionSellItems
     {
         [GameAction(GameActionType.Sell)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var vendorGuid = message.Payload.ReadGuid(session);
             var numItems = message.Payload.ReadUInt32();

@@ -40,7 +40,7 @@ namespace ACE.Server.WorldObjects
 
         public Character Character { get; }
 
-        public Session Session { get; }
+        public ISession Session { get; }
 
         public ContractManager ContractManager;
 
@@ -111,7 +111,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// Restore a WorldObject from the database.
         /// </summary>
-        public Player(Biota biota, IEnumerable<ACE.Database.Models.Shard.Biota> inventory, IEnumerable<ACE.Database.Models.Shard.Biota> wieldedItems, Character character, Session session) : base(biota)
+        public Player(Biota biota, IEnumerable<ACE.Database.Models.Shard.Biota> inventory, IEnumerable<ACE.Database.Models.Shard.Biota> wieldedItems, Character character, ISession session) : base(biota)
         {
             Character = character;
             Session = session;

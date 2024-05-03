@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionChessMovePass
     {
         [GameAction(GameActionType.ChessMovePass)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             session.Player.HandleActionChessMovePass();
         }

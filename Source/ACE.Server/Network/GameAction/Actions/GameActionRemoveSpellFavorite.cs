@@ -4,7 +4,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionRemoveSpellFavorite
     {
         [GameAction(GameActionType.RemoveSpellFavorite)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             uint spellId = message.Payload.ReadUInt32();
             uint spellBarId = message.Payload.ReadUInt32();

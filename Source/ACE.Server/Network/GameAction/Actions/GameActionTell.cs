@@ -12,7 +12,7 @@ namespace ACE.Server.Network.GameAction.Actions
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [GameAction(GameActionType.Tell)]
-        public static void Handle(ClientMessage clientMessage, Session session)
+        public static void Handle(ClientMessage clientMessage, ISession session)
         {
             var message = clientMessage.Payload.ReadString16L(); // The client seems to do the trimming for us
             var target = clientMessage.Payload.ReadString16L(); // Needs to be trimmed because it may contain white spaces after the name and before the ,

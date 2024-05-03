@@ -26,6 +26,8 @@ using Character = ACE.Database.Models.Shard.Character;
 using Position = ACE.Entity.Position;
 using ACE.Server.Realms;
 using ACE.Entity.Enum.RealmProperties;
+using ACE.Server.Network.Enum;
+using System.Linq;
 
 namespace ACE.Server.Managers
 {
@@ -92,7 +94,69 @@ namespace ACE.Server.Managers
                 PlayerManager.BootAllPlayers();
         }
 
-        public static void PlayerEnterWorld(Session session, Character character)
+        public static void PlayerInitForWorld(ISession session, uint guid, string clientString)
+        {
+            if (ServerManager.ShutdownInProgress)
+            {
+                session.SendCharacterError(CharacterError.LogonServerFull);
+                return;
+            }
+
+            if (clientString != session.Account)
+            {
+                session.SendCharacterError(CharacterError.EnterGameCharacterNotOwned);
+                return;
+            }
+
+            var character = session.Characters.SingleOrDefault(c => c.Id == guid);
+            if (character == null)
+            {
+                session.SendCharacterError(CharacterError.EnterGameCharacterNotOwned);
+                return;
+            }
+
+            if (character.IsDeleted || character.DeleteTime > 0)
+            {
+                session.SendCharacterError(CharacterError.EnterGameCharacterNotOwned);
+                return;
+            }
+
+            if (PlayerManager.GetOnlinePlayer(guid) != null)
+            {
+                // If this happens, it could be that the previous session for this Player terminated in a way that didn't transfer the player to offline via PlayerManager properly.
+                session.SendCharacterError(CharacterError.EnterGameCharacterInWorld);
+                return;
+            }
+
+            var offlinePlayer = PlayerManager.GetOfflinePlayer(guid);
+
+            if (offlinePlayer == null)
+            {
+                // This would likely only happen if the account tried to log in a character that didn't exist.
+                session.SendCharacterError(CharacterError.EnterGameGeneric);
+                return;
+            }
+
+            if (offlinePlayer.IsDeleted || offlinePlayer.IsPendingDeletion)
+            {
+                session.SendCharacterError(CharacterError.EnterGameCharacterNotOwned);
+                return;
+            }
+
+            if ((offlinePlayer.Heritage == (int)HeritageGroup.Olthoi || offlinePlayer.Heritage == (int)HeritageGroup.OlthoiAcid) && PropertyManager.GetBool("olthoi_play_disabled").Item)
+            {
+                session.SendCharacterError(CharacterError.EnterGameCouldntPlaceCharacter);
+                return;
+            }
+
+            session.InitSessionForWorldLogin();
+
+            session.State = SessionState.WorldConnected;
+
+            PlayerEnterWorld(session, character);
+        }
+
+        public static void PlayerEnterWorld(ISession session, Character character)
         {
             var offlinePlayer = PlayerManager.GetOfflinePlayer(character.Id);
 
@@ -111,7 +175,7 @@ namespace ACE.Server.Managers
             });
         }
 
-        private static void DoPlayerEnterWorld(Session session, Character character, Biota playerBiota, PossessedBiotas possessedBiotas)
+        private static void DoPlayerEnterWorld(ISession session, Character character, Biota playerBiota, PossessedBiotas possessedBiotas)
         {
             Player player;
 

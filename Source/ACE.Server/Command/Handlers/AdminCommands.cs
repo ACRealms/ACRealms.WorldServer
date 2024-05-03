@@ -51,7 +51,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("adminvision", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 1,
             "Allows the admin to see admin-only visible items.", "{ on | off | toggle | check }\n" +
             "Controls whether or not the admin can see admin-only visible items. Note that if you turn this feature off, you will need to log out and back in before the visible items become invisible.")]
-        public static void HandleAdminvision(Session session, params string[] parameters)
+        public static void HandleAdminvision(ISession session, params string[] parameters)
         {
             // @adminvision { on | off | toggle | check}
             // Controls whether or not the admin can see admin-only visible items. Note that if you turn this feature off, you will need to log out and back in before the visible items become invisible.
@@ -79,7 +79,7 @@ namespace ACE.Server.Command.Handlers
 
         // adminui
         [CommandHandler("adminui", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleAdminui(Session session, params string[] parameters)
+        public static void HandleAdminui(ISession session, params string[] parameters)
         {
             // usage: @adminui
             // This command toggles whether the Admin UI is visible.
@@ -89,7 +89,7 @@ namespace ACE.Server.Command.Handlers
 
         // delete
         [CommandHandler("delete", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0, "Deletes the selected object.", "Players may not be deleted this way.")]
-        public static void HandleDeleteSelected(Session session, params string[] parameters)
+        public static void HandleDeleteSelected(ISession session, params string[] parameters)
         {
             // @delete - Deletes the selected object. Players may not be deleted this way.
 
@@ -138,7 +138,7 @@ namespace ACE.Server.Command.Handlers
 
         // draw
         [CommandHandler("draw", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleDraw(Session session, params string[] parameters)
+        public static void HandleDraw(ISession session, params string[] parameters)
         {
             // @draw - Draws undrawable things.
 
@@ -150,7 +150,7 @@ namespace ACE.Server.Command.Handlers
             "Show the given character's account name or vice-versa.",
             "[ [-a] character] [-m account]\n"
             + "Given a character name, this command displays the name of the owning account.\nIf the -m option is specified, the argument is considered an account name and the characters owned by that account are displayed.\nIf the -a option is specified, then the character name is fingered but their account is implicitly fingered as well.")]
-        public static void HandleFinger(Session session, params string[] parameters)
+        public static void HandleFinger(ISession session, params string[] parameters)
         {
             // usage: @finger[ [-a] character] [-m account]
             // Given a character name, this command displays the name of the owning account.If the -m option is specified, the argument is considered an account name and the characters owned by that account are displayed.If the -a option is specified, then the character name is fingered but their account is implicitly fingered as well.
@@ -252,7 +252,7 @@ namespace ACE.Server.Command.Handlers
 
         // freeze
         [CommandHandler("freeze", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleFreeze(Session session, params string[] parameters)
+        public static void HandleFreeze(ISession session, params string[] parameters)
         {
             // @freeze - Freezes the selected target for 10 minutes or until unfrozen.
 
@@ -261,7 +261,7 @@ namespace ACE.Server.Command.Handlers
 
         // unfreeze
         [CommandHandler("unfreeze", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleUnFreeze(Session session, params string[] parameters)
+        public static void HandleUnFreeze(ISession session, params string[] parameters)
         {
             // @unfreeze - Unfreezes the selected target.
 
@@ -272,7 +272,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("gag", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 1,
             "Prevents a character from talking.",
             "< char name >\nThe character will not be able to @tell or use chat normally.")]
-        public static void HandleGag(Session session, params string[] parameters)
+        public static void HandleGag(ISession session, params string[] parameters)
         {
             // usage: @gag < char name >
             // This command gags the specified character for five minutes.  The character will not be able to @tell or use chat normally.
@@ -301,7 +301,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("ungag", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 1,
             "Allows a gagged character to talk again.",
             "< char name >\nThe character will again be able to @tell and use chat normally.")]
-        public static void HandleUnGag(Session session, params string[] parameters)
+        public static void HandleUnGag(ISession session, params string[] parameters)
         {
             // usage: @ungag < char name >
             // @ungag -Allows a gagged character to talk again.
@@ -332,7 +332,7 @@ namespace ACE.Server.Command.Handlers
             "Teleports you to your sanctuary position.",
             "< recall number > - Recalls to a saved position, valid values are 1 - 9.\n" +
             "NOTE: Calling @home without a number recalls your sanctuary position; calling it with a number will teleport you to the corresponding saved position.")]
-        public static void HandleHome(Session session, params string[] parameters)
+        public static void HandleHome(ISession session, params string[] parameters)
         {
             // @home has the alias @recall
             string parsePositionString = "0";
@@ -421,7 +421,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("mrt", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 0,
             "Toggles the ability to bypass housing boundaries",
             "")]
-        public static void HandleMRT(Session session, params string[] parameters)
+        public static void HandleMRT(ISession session, params string[] parameters)
         {
             // @mrt - Toggles the ability to bypass housing boundaries.
             session.Player.HandleMRT();
@@ -429,7 +429,7 @@ namespace ACE.Server.Command.Handlers
 
         // limbo [on / off]
         [CommandHandler("limbo", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleLimbo(Session session, params string[] parameters)
+        public static void HandleLimbo(ISession session, params string[] parameters)
         {
             // @limbo[on / off] - Puts the targeted player in 'limbo' which means that the player cannot damage anything or be damaged by anything.The player will not recieve direct tells, or channel messages, such as fellowship messages and allegiance chat.  The player will be unable to salvage.This status times out after 15 minutes, use '@limbo on' again on the player to reset the timer. You and the player will be notifed when limbo wears off.If neither on or off are specified, on is assumed.
             // @limbo - Puts the selected target in limbo.
@@ -440,7 +440,7 @@ namespace ACE.Server.Command.Handlers
         // myiid
         [CommandHandler("myiid", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0,
             "Displays your Instance ID (IID)")]
-        public static void HandleMyIID(Session session, params string[] parameters)
+        public static void HandleMyIID(ISession session, params string[] parameters)
         {
             // @myiid - Displays your Instance ID(IID).
 
@@ -449,7 +449,7 @@ namespace ACE.Server.Command.Handlers
 
         // myserver
         [CommandHandler("myserver", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleMyServer(Session session, params string[] parameters)
+        public static void HandleMyServer(ISession session, params string[] parameters)
         {
             // @myserver - Displays the number of the game server on which you are currently located.
 
@@ -466,7 +466,7 @@ namespace ACE.Server.Command.Handlers
             "< pk > You can attack player killers and monsters.\n" +
             "< pkl > You can attack player killer lites and monsters\n" +
             "< free > You can attack players, player killers, player killer lites, monsters, and npcs")]
-        public static void HandlePk(Session session, params string[] parameters)
+        public static void HandlePk(ISession session, params string[] parameters)
         {
             // @pk - Toggles or sets your own PK state.
 
@@ -511,7 +511,7 @@ namespace ACE.Server.Command.Handlers
 
         // querypluginlist
         [CommandHandler("querypluginlist", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleQuerypluginlist(Session session, params string[] parameters)
+        public static void HandleQuerypluginlist(ISession session, params string[] parameters)
         {
             // @querypluginlist (-fresh) - View list of plug-ins the selected character is running. If you do not use the -fresh paramater, you will get results that where cached at login. That way, you will not be sending an alert to the player that you are querying thier plugin list.  If you use -fresh, then you will get fresh data from the player's client and they will recieve notification that you have asked for thier plugin list.NOTE: Results are dependent upon 3rd party authors providing correct information.
             // @querypluginlist - View list of plug - ins the selected character is running.
@@ -523,7 +523,7 @@ namespace ACE.Server.Command.Handlers
 
         // queryplugin
         [CommandHandler("queryplugin", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 1)]
-        public static void HandleQueryplugin(Session session, params string[] parameters)
+        public static void HandleQueryplugin(ISession session, params string[] parameters)
         {
             // @queryplugin < pluginname > -View information about a specific plugin.
 
@@ -532,7 +532,7 @@ namespace ACE.Server.Command.Handlers
 
         // repeat < Num > < Command >
         [CommandHandler("repeat", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 2)]
-        public static void HandleRepeat(Session session, params string[] parameters)
+        public static void HandleRepeat(ISession session, params string[] parameters)
         {
             // @repeat < Num > < Command > -Repeat a command a number of times.
             // EX: "@repeat 5 @say Hi" - say Hi 5 times.
@@ -545,7 +545,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("regen", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0,
             "Sends the selected generator a regeneration message.",
             "")]
-        public static void HandleRegen(Session session, params string[] parameters)
+        public static void HandleRegen(ISession session, params string[] parameters)
         {
             // @regen - Sends the selected generator a regeneration message.
 
@@ -582,7 +582,7 @@ namespace ACE.Server.Command.Handlers
             "Sets your sanctuary position or a named recall point.",
             "< recall number > - Saves your position into the numbered recall, valid values are 1 - 9.\n" +
             "NOTE: Calling @save without a number saves your sanctuary (Lifestone Recall) position.")]
-        public static void HandleSave(Session session, params string[] parameters)
+        public static void HandleSave(ISession session, params string[] parameters)
         {
             // Set the default of 0 to save the sanctuary portal if no parameter is passed.
             string parsePositionString = "0";
@@ -667,7 +667,7 @@ namespace ACE.Server.Command.Handlers
 
         // serverlist
         [CommandHandler("serverlist", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleServerlist(Session session, params string[] parameters)
+        public static void HandleServerlist(ISession session, params string[] parameters)
         {
             // The @serverlist command shows a list of the servers in the current server farm. The format is as follows:
             // -The server ID
@@ -686,7 +686,7 @@ namespace ACE.Server.Command.Handlers
 
         // snoop [start / stop] [Character Name]
         [CommandHandler("snoop", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 2)]
-        public static void HandleSnoop(Session session, params string[] parameters)
+        public static void HandleSnoop(ISession session, params string[] parameters)
         {
             // @snoop[start / stop][Character Name]
             // - If no character name is supplied, the currently selected character will be used.If neither start nor stop is specified, start will be assumed.
@@ -696,7 +696,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("smite", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0, "Kills the selected target or all monsters in radar range if \"all\" is specified.", "[all, Player's Name]")]
-        public static void HandleSmite(Session session, params string[] parameters)
+        public static void HandleSmite(ISession session, params string[] parameters)
         {
             // @smite [all] - Kills the selected target or all monsters in radar range if "all" is specified.
 
@@ -783,7 +783,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("teleto", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 1,
             "Teleport yourself to a player",
             "[Player's Name]\n")]
-        public static void HandleTeleto(Session session, params string[] parameters)
+        public static void HandleTeleto(ISession session, params string[] parameters)
         {
             // @teleto - Teleports you to the specified character.
             var playerName = string.Join(" ", parameters);
@@ -800,7 +800,7 @@ namespace ACE.Server.Command.Handlers
         /// Teleports a player to your current location
         /// </summary>
         [CommandHandler("teletome", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 1, "Teleports a player to your current location.", "PlayerName")]
-        public static void HandleTeleToMe(Session session, params string[] parameters)
+        public static void HandleTeleToMe(ISession session, params string[] parameters)
         {
             var playerName = string.Join(" ", parameters);
             var player = PlayerManager.GetOnlinePlayer(playerName);
@@ -821,7 +821,7 @@ namespace ACE.Server.Command.Handlers
         /// Teleports a player to their previous position
         /// </summary>
         [CommandHandler("telereturn", AccessLevel.Sentinel, CommandHandlerFlag.RequiresWorld, 1, "Return a player to their previous location.", "PlayerName")]
-        public static void HandleTeleReturn(Session session, params string[] parameters)
+        public static void HandleTeleReturn(ISession session, params string[] parameters)
         {
             var playerName = string.Join(" ", parameters);
             var player = PlayerManager.GetOnlinePlayer(playerName);
@@ -846,7 +846,7 @@ namespace ACE.Server.Command.Handlers
 
         // teleallto [char]
         [CommandHandler("teleallto", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0, "Teleports all players to a player. If no target is specified, all players will be teleported to you.", "[Player's Name]\n")]
-        public static void HandleTeleAllTo(Session session, params string[] parameters)
+        public static void HandleTeleAllTo(ISession session, params string[] parameters)
         {
             Player destinationPlayer = null;
 
@@ -876,7 +876,7 @@ namespace ACE.Server.Command.Handlers
             "@telepoi Arwic\n" +
             "Get the list of POIs\n" +
             "@telepoi list")]
-        public static void HandleTeleportPoi(Session session, params string[] parameters)
+        public static void HandleTeleportPoi(ISession session, params string[] parameters)
         {
             var poi = String.Join(" ", parameters);
 
@@ -912,7 +912,7 @@ namespace ACE.Server.Command.Handlers
             "Example: @teleloc 0x7F0401AD [12.319900 -28.482000 0.005000] -0.338946 0.000000 0.000000 -0.940806\n" +
             "Example: @teleloc 0x7F0401AD 12.319900 -28.482000 0.005000 -0.338946 0.000000 0.000000 -0.940806\n" +
             "Example: @teleloc 7F0401AD 12.319900 -28.482000 0.005000")]
-        public static void HandleTeleportLOC(Session session, params string[] parameters)
+        public static void HandleTeleportLOC(ISession session, params string[] parameters)
         {
             try
             {
@@ -980,7 +980,7 @@ namespace ACE.Server.Command.Handlers
         // time
         [CommandHandler("time", AccessLevel.Envoy, CommandHandlerFlag.None, 0,
             "Displays the server's current game time.")]
-        public static void HandleTime(Session session, params string[] parameters)
+        public static void HandleTime(ISession session, params string[] parameters)
         {
             // @time - Displays the server's current game time.
 
@@ -999,7 +999,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("trophies", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0,
             "Shows a list of the trophies dropped by the target creature, and the percentage chance of dropping.",
             "")]
-        public static void HandleTrophies(Session session, params string[] parameters)
+        public static void HandleTrophies(ISession session, params string[] parameters)
         {
             // @trophies - Shows a list of the trophies dropped by the target creature, and the percentage chance of dropping.
 
@@ -1067,7 +1067,7 @@ namespace ACE.Server.Command.Handlers
 
         // unlock {-all | IID}
         [CommandHandler("unlock", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 1)]
-        public static void HandleUnlock(Session session, params string[] parameters)
+        public static void HandleUnlock(ISession session, params string[] parameters)
         {
             // usage: @unlock {-all | IID}
             // Cleans the SQL lock on either everyone or the given player.
@@ -1082,7 +1082,7 @@ namespace ACE.Server.Command.Handlers
             "<message>\n" +
             "This command sends a world-wide broadcast to everyone in the game. Text is prefixed with 'Broadcast from (admin-name)> '.\n" +
             "See Also: @gamecast, @gamecastemote, @gamecastlocal, @gamecastlocalemote.")]
-        public static void HandleGamecast(Session session, params string[] parameters)
+        public static void HandleGamecast(ISession session, params string[] parameters)
         {
             // > Broadcast from usage: @gamecast<message>
             // This command sends a world-wide broadcast to everyone in the game. Text is prefixed with 'Broadcast from (admin-name)> '.
@@ -1099,7 +1099,7 @@ namespace ACE.Server.Command.Handlers
 
         // add <spell>
         [CommandHandler("addspell", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Adds the specified spell to your own spellbook.", "<spellid>")]
-        public static void HandleAddSpell(Session session, params string[] parameters)
+        public static void HandleAddSpell(ISession session, params string[] parameters)
         {
             if (Enum.TryParse(parameters[0], true, out SpellId spellId))
             {
@@ -1109,7 +1109,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("removespell", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Removes the specified spell to your own spellbook.", "<spellid>")]
-        public static void HandleRemoveSpell(Session session, params string[] parameters)
+        public static void HandleRemoveSpell(ISession session, params string[] parameters)
         {
             if (!Enum.TryParse(parameters[0], true, out SpellId spellId))
             {
@@ -1127,7 +1127,7 @@ namespace ACE.Server.Command.Handlers
 
         // adminhouse
         [CommandHandler("adminhouse", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, 0, "House management tools for admins.")]
-        public static void HandleAdminhouse(Session session, params string[] parameters)
+        public static void HandleAdminhouse(ISession session, params string[] parameters)
         {
             // @adminhouse dump: dumps info about currently selected house or house owned by currently selected player.
             // @adminhouse dump name<name>: dumps info about house owned by the account of the named player.
@@ -1499,7 +1499,7 @@ namespace ACE.Server.Command.Handlers
             }    
         }
 
-        private static void DumpHouse(Session session, House targetHouse, WorldObject wo)
+        private static void DumpHouse(ISession session, House targetHouse, WorldObject wo)
         {
             HouseManager.GetHouse(targetHouse.Guid, (house) =>
             {
@@ -1654,7 +1654,7 @@ namespace ACE.Server.Command.Handlers
             });
         }
 
-        private static House GetSelectedHouse(Session session, out WorldObject target)
+        private static House GetSelectedHouse(ISession session, out WorldObject target)
         {
             ObjectGuid objectId;
             if (session.Player.HealthQueryTarget.HasValue)
@@ -1768,7 +1768,7 @@ namespace ACE.Server.Command.Handlers
             "Given the ID of a deleted character, this command restores that character to its owner.  (You can find the ID of a deleted character using the @finger command.)\n" +
             "If the deleted character's name has since been taken by a new character, you can specify a new name for the restored character as the second parameter.  (You can find if the name has been taken by also using the @finger command.)  Use a comma to separate the arguments.\n" +
             "If needed, you can specify an account name as a third parameter if the character should be restored to an account other than its original owner.  Again, use a comma between the arguments.")]
-        public static void HandleBornAgain(Session session, params string[] parameters)
+        public static void HandleBornAgain(ISession session, params string[] parameters)
         {
             // usage: @bornagain deletedCharID[, newCharName[, accountName]]
             // Given the ID of a deleted character, this command restores that character to its owner.  (You can find the ID of a deleted character using the @finger command.)
@@ -1854,7 +1854,7 @@ namespace ACE.Server.Command.Handlers
             "Copies an existing character into your character list.",
             "< Existing Character Name >, < New Character Name >\n" +
             "Given the name of an existing character \"character name\", this command makes a copy of that character with the name \"copy name\" and places it into your character list.")]
-        public static void HandleCopychar(Session session, params string[] parameters)
+        public static void HandleCopychar(ISession session, params string[] parameters)
         {
             // usage: @copychar < character name >, < copy name >
             // Given the name of an existing character "character name", this command makes a copy of that character with the name "copy name" and places it into your character list.
@@ -1890,7 +1890,7 @@ namespace ACE.Server.Command.Handlers
             DoCopyChar(session, existingCharName, existingPlayer.Guid.Full, false, newCharName);
         }
 
-        private static void DoCopyChar(Session session, string existingCharName, ulong existingCharId, bool isDeletedChar, string newCharacterName = null, uint newAccountId = 0)
+        private static void DoCopyChar(ISession session, string existingCharName, ulong existingCharId, bool isDeletedChar, string newCharacterName = null, uint newAccountId = 0)
         {
             DatabaseManager.Shard.GetCharacter(existingCharId, existingCharacter =>
             {
@@ -2194,7 +2194,7 @@ namespace ACE.Server.Command.Handlers
             "This will attempt to spawn the weenie you specify. If you include an amount to spawn, it will attempt to create that many of the object.\n" +
             "Stackable items will spawn in stacks of their max stack size. All spawns will be limited by the physics engine placement, which may prevent the number you specify from actually spawning." +
             "Be careful with large numbers, especially with ethereal weenies.")]
-        public static void HandleCreate(Session session, params string[] parameters)
+        public static void HandleCreate(ISession session, params string[] parameters)
         {
             if (ParseCreateParameters(session, parameters, false, out Weenie weenie, out int numToSpawn, out int? palette, out float? shade, out _))
             {
@@ -2212,7 +2212,7 @@ namespace ACE.Server.Command.Handlers
             "Stackable items will spawn in stacks of their max stack size. All spawns will be limited by the physics engine placement, which may prevent the number you specify from actually spawning.\n" +
             "Be careful with large numbers, especially with ethereal weenies.\n" +
             "If you include a lifespan, this value is in seconds, and defaults to 3600 (1 hour) if not specified.")]
-        public static void HandleCreateLiveOps(Session session, params string[] parameters)
+        public static void HandleCreateLiveOps(ISession session, params string[] parameters)
         {
             if (ParseCreateParameters(session, parameters, true, out Weenie weenie, out int numToSpawn, out int? palette, out float? shade, out int? lifespan))
             {
@@ -2224,7 +2224,7 @@ namespace ACE.Server.Command.Handlers
         /// Parses the command-line parameters for /create or /createliveops
         /// The only difference with /createliveops is that it includes a lifespan parameter in the middle
         /// </summary>
-        private static bool ParseCreateParameters(Session session, string[] parameters, bool hasLifespan, out Weenie weenie, out int numToSpawn, out int? palette, out float? shade, out int? lifespan)
+        private static bool ParseCreateParameters(ISession session, string[] parameters, bool hasLifespan, out Weenie weenie, out int numToSpawn, out int? palette, out float? shade, out int? lifespan)
         {
             weenie = GetWeenieForCreate(session, parameters[0]);
             numToSpawn = 1;
@@ -2295,7 +2295,7 @@ namespace ACE.Server.Command.Handlers
         /// Returns a weenie for a wcid or classname for /create, /createliveops, and /ci
         /// Performs some basic verifications for weenie types that are safe to spawn with these commands
         /// </summary>
-        private static Weenie GetWeenieForCreate(Session session, string weenieDesc, bool forInventory = false)
+        private static Weenie GetWeenieForCreate(ISession session, string weenieDesc, bool forInventory = false)
         {
             Weenie weenie = null;
 
@@ -2369,7 +2369,7 @@ namespace ACE.Server.Command.Handlers
         /// <summary>
         /// Attempts to spawn some # of weenies in the world for /create or /createliveops
         /// </summary>
-        private static void TryCreateObject(Session session, Weenie weenie, int numToSpawn, int? palette = null, float? shade = null, int? lifespan = null)
+        private static void TryCreateObject(ISession session, Weenie weenie, int numToSpawn, int? palette = null, float? shade = null, int? lifespan = null)
         {
             var obj = CreateObjectForCommand(session, weenie);
 
@@ -2439,7 +2439,7 @@ namespace ACE.Server.Command.Handlers
         /// <summary>
         /// Creates WorldObjects from Weenies for /create, /createliveops, and /ci
         /// </summary>
-        private static WorldObject CreateObjectForCommand(Session session, Weenie weenie)
+        private static WorldObject CreateObjectForCommand(ISession session, Weenie weenie)
         {
             var obj = WorldObjectFactory.CreateNewWorldObject(weenie, session.Player.RealmRuleset);
 
@@ -2465,7 +2465,7 @@ namespace ACE.Server.Command.Handlers
         /// </summary>
         [CommandHandler("createnamed", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 3,
             "Creates a named object in the world.", "<wcid or classname> <count> <name>")]
-        public static void HandleCreateNamed(Session session, params string[] parameters)
+        public static void HandleCreateNamed(ISession session, params string[] parameters)
         {
             var weenie = GetWeenieForCreate(session, parameters[0]);
 
@@ -2513,7 +2513,7 @@ namespace ACE.Server.Command.Handlers
         /// Creates an object in your inventory
         /// </summary>
         [CommandHandler("ci", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Creates an object in your inventory.", "wclassid (string or number), Amount to Spawn (optional [default:1]), Palette (optional), Shade (optional)\n")]
-        public static void HandleCI(Session session, params string[] parameters)
+        public static void HandleCI(ISession session, params string[] parameters)
         {
             var weenie = GetWeenieForCreate(session, parameters[0], true);
 
@@ -2582,7 +2582,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("crack", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0, "Cracks the most recently appraised locked target.", "[. open it too]")]
-        public static void HandleCrack(Session session, params string[] parameters)
+        public static void HandleCrack(ISession session, params string[] parameters)
         {
             bool openIt = (parameters?.Length > 0 && parameters[0] == ".");
             bool notOK = false;
@@ -2629,7 +2629,7 @@ namespace ACE.Server.Command.Handlers
         /// Displays how much experience the last appraised creature is worth when killed.
         /// </summary>
         [CommandHandler("deathxp", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0, "Displays how much experience the last appraised creature is worth when killed.")]
-        public static void HandleDeathxp(Session session, params string[] parameters)
+        public static void HandleDeathxp(ISession session, params string[] parameters)
         {
             var creature = CommandHandlerHelper.GetLastAppraisedObject(session);
             if (creature == null) return;
@@ -2639,7 +2639,7 @@ namespace ACE.Server.Command.Handlers
 
         // de_n name, text
         [CommandHandler("de_n", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 2, "Sends text to named player, formatted exactly as entered.", "<name>, <text>")]
-        public static void Handlede_n(Session session, params string[] parameters)
+        public static void Handlede_n(ISession session, params string[] parameters)
         {
             // usage: @de_n name, text
             // usage: @direct_emote_name name, text
@@ -2651,7 +2651,7 @@ namespace ACE.Server.Command.Handlers
 
         // direct_emote_name name, text
         [CommandHandler("direct_emote_name", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 2, "Sends text to named player, formatted exactly as entered.", "<name>, <text>")]
-        public static void Handledirect_emote_name(Session session, params string[] parameters)
+        public static void Handledirect_emote_name(ISession session, params string[] parameters)
         {
             // usage: @de_n name, text
             // usage: @direct_emote_name name, text
@@ -2679,7 +2679,7 @@ namespace ACE.Server.Command.Handlers
 
         // de_s text
         [CommandHandler("de_s", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Sends text to selected player, formatted exactly as entered, with no prefix of any kind.", "<text>")]
-        public static void Handlede_s(Session session, params string[] parameters)
+        public static void Handlede_s(ISession session, params string[] parameters)
         {
             // usage: @de_s text
             // usage: @direct_emote_select text
@@ -2691,7 +2691,7 @@ namespace ACE.Server.Command.Handlers
 
         // direct_emote_select text
         [CommandHandler("direct_emote_select", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Sends text to selected player, formatted exactly as entered, with no prefix of any kind.", "<text>")]
-        public static void Handledirect_emote_select(Session session, params string[] parameters)
+        public static void Handledirect_emote_select(ISession session, params string[] parameters)
         {
             // usage: @de_s text
             // usage: @direct_emote_select text
@@ -2733,7 +2733,7 @@ namespace ACE.Server.Command.Handlers
 
         // dispel
         [CommandHandler("dispel", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0, "Removes all enchantments from the player", "/dispel")]
-        public static void HandleDispel(Session session, params string[] parameters)
+        public static void HandleDispel(ISession session, params string[] parameters)
         {
             session.Player.EnchantmentManager.DispelAllEnchantments();
 
@@ -2748,7 +2748,7 @@ namespace ACE.Server.Command.Handlers
             "[ start | stop | disable | enable | clear | status ] (name)\n"
             + "@event clear < name > - clears event with name <name> or all events if you put in 'all' (All clears registered generators, <name> does not)\n"
             + "@event status <eventSubstring> - get the status of all registered events or get all of the registered events that have <eventSubstring> in the name.")]
-        public static void HandleEvent(Session session, params string[] parameters)
+        public static void HandleEvent(ISession session, params string[] parameters)
         {
             // usage: @event start| stop | disable | enable name
             // @event clear < name > -clears event with name <name> or all events if you put in 'all' (All clears registered generators, <name> does not).
@@ -2801,7 +2801,7 @@ namespace ACE.Server.Command.Handlers
 
         // fumble
         [CommandHandler("fumble", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleFumble(Session session, params string[] parameters)
+        public static void HandleFumble(ISession session, params string[] parameters)
         {
             // @fumble - Forces the selected target to drop everything they contain to the ground.
 
@@ -2900,14 +2900,14 @@ namespace ACE.Server.Command.Handlers
             "Sets attributes and skills to higher than max levels.\n"
             + "To return to a mortal state, use the /ungod command.\n"
             + "Use the /god command with caution. While unlikely, there is a possibility that the character that runs the command will not be able to return to normal or will end up in a state that is unrecoverable.")]
-        public static void HandleGod(Session session, params string[] parameters)
+        public static void HandleGod(ISession session, params string[] parameters)
         {
             // @god - Sets your own stats to a godly level.
             // need to save stats so that we can return with /ungod
             DatabaseManager.Shard.SaveBiota(session.Player.Biota, session.Player.BiotaDatabaseLock, result => DoGodMode(result, session));
         }
 
-        private static void DoGodMode(bool playerSaved, Session session, bool exceptionReturn = false)
+        private static void DoGodMode(bool playerSaved, ISession session, bool exceptionReturn = false)
         {
             if (!playerSaved)
             {
@@ -3064,7 +3064,7 @@ namespace ACE.Server.Command.Handlers
             "Sets attributes and skills back to the values they were when you became a god.\n"
             + "If the command fails to revert your state it will default to godmode.\n"
             + "In the event of failure, contact a server administrator to sort it out.")]
-        public static void HandleUngod(Session session, params string[] parameters)
+        public static void HandleUngod(ISession session, params string[] parameters)
         {
             // @ungod - Returns skills and attributues to pre-god levels.
             Player currentPlayer = session.Player;
@@ -3177,7 +3177,7 @@ namespace ACE.Server.Command.Handlers
 
         // magic god
         [CommandHandler("magic god", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleMagicGod(Session session, params string[] parameters)
+        public static void HandleMagicGod(ISession session, params string[] parameters)
         {
             // @magic god - Sets your magic stats to the specfied level.
 
@@ -3190,7 +3190,7 @@ namespace ACE.Server.Command.Handlers
 
 
         [CommandHandler("modifyvital", AccessLevel.Admin, CommandHandlerFlag.None, 2, "Adjusts the maximum vital attribute for the last appraised mob/player and restores full vitals", "<Health|Stamina|Mana> <delta>")]
-        public static void HandleModifyVital(Session session, params string[] parameters)
+        public static void HandleModifyVital(ISession session, params string[] parameters)
         {
             var lastAppraised = CommandHandlerHelper.GetLastAppraisedObject(session);
             if (lastAppraised == null || !(lastAppraised is Creature))
@@ -3260,7 +3260,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("modifyskill", AccessLevel.Admin, CommandHandlerFlag.None, 2, "Adjusts the skill for the last appraised mob/player", "<skillName> <delta>")]
-        public static void HandleModifySkill(Session session, params string[] parameters)
+        public static void HandleModifySkill(ISession session, params string[] parameters)
         {
             var lastAppraised = CommandHandlerHelper.GetLastAppraisedObject(session);
             if (lastAppraised == null || !(lastAppraised is Creature))
@@ -3303,7 +3303,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("modifyattr", AccessLevel.Admin, CommandHandlerFlag.None, 2, "Adjusts an attribute for the last appraised mob/NPC/player", "<attribute> <delta>")]
-        public static void HandleModifyAttribute(Session session, params string[] parameters)
+        public static void HandleModifyAttribute(ISession session, params string[] parameters)
         {
             var lastAppraised = CommandHandlerHelper.GetLastAppraisedObject(session);
             if (lastAppraised == null || !(lastAppraised is Creature))
@@ -3347,7 +3347,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("heal", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0,
             "Heals yourself (or the selected creature)",
             "\n" + "This command fully restores your(or the selected creature's) health, mana, and stamina")]
-        public static void HandleHeal(Session session, params string[] parameters)
+        public static void HandleHeal(ISession session, params string[] parameters)
         {
             // usage: @heal
             // This command fully restores your(or the selected creature's) health, mana, and stamina.
@@ -3383,7 +3383,7 @@ namespace ACE.Server.Command.Handlers
 
         // housekeep
         [CommandHandler("housekeep", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleHousekeep(Session session, params string[] parameters)
+        public static void HandleHousekeep(ISession session, params string[] parameters)
         {
             // @housekeep[never { off | on}] -With no parameters, this command displays the housekeeping info for the selected item.With the 'never' flag, it sets the item to never housekeep, or turns that state off.
             // @housekeep - Queries or sets the housekeeping status for the selected item.
@@ -3394,7 +3394,7 @@ namespace ACE.Server.Command.Handlers
         // idlist
         [CommandHandler("idlist", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0,
             "Shows the next ID that will be allocated from GuidManager.")]
-        public static void HandleIDlist(Session session, params string[] parameters)
+        public static void HandleIDlist(ISession session, params string[] parameters)
         {
             // @idlist - Shows the next ID that will be allocated from SQL.
 
@@ -3408,7 +3408,7 @@ namespace ACE.Server.Command.Handlers
             "<message>\n" +
             "Sends text to all players within chat range, formatted exactly as entered, with no prefix of any kind.\n" +
             "See Also: @gamecast, @gamecastemote, @gamecastlocal, @gamecastlocalemote.")]
-        public static void HandleGameCastLocalEmote(Session session, params string[] parameters)
+        public static void HandleGameCastLocalEmote(ISession session, params string[] parameters)
         {
             // usage: @gamecastlocalemote<message>
             // Sends text to all players within chat range, formatted exactly as entered, with no prefix of any kind.
@@ -3421,7 +3421,7 @@ namespace ACE.Server.Command.Handlers
 
         // location
         [CommandHandler("location", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleLocation(Session session, params string[] parameters)
+        public static void HandleLocation(ISession session, params string[] parameters)
         {
             // @location - Causes your current location to be continuously displayed on the screen.
 
@@ -3432,7 +3432,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("morph", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1,
             "Morphs your bodily form into that of the specified creature. Be careful with this one!",
             "<wcid or weenie class name> [character name]")]
-        public static void HandleMorph(Session session, params string[] parameters)
+        public static void HandleMorph(ISession session, params string[] parameters)
         {
             // @morph - Morphs your bodily form into that of the specified creature. Be careful with this one!
 
@@ -3564,7 +3564,7 @@ namespace ACE.Server.Command.Handlers
             + "qst bestow - Stamps the specific quest flag on the targeted player. If this fails, it's probably because you spelled the quest flag wrong.\n"
             + "qst stamp - Stamps the specific quest flag on the targeted player the specified number of times. If this fails, it's probably because you spelled the quest flag wrong.\n"
             + "qst erase - Erase the specific quest flag from the targeted player. If no quest flag is given, it erases the entire quest table for the targeted player.\n")]
-        public static void Handleqst(Session session, params string[] parameters)
+        public static void Handleqst(ISession session, params string[] parameters)
         {
             // fellow bestow  stamp erase
             // @qst list[filter]-List the quest flags for the targeted player, if a filter is provided, you will only get quest flags back that have the filter as a substring of the quest name. (Filter IS case sensitive!)
@@ -3995,7 +3995,7 @@ namespace ACE.Server.Command.Handlers
 
         // raise
         [CommandHandler("raise", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 2)]
-        public static void HandleRaise(Session session, params string[] parameters)
+        public static void HandleRaise(ISession session, params string[] parameters)
         {
             // @raise - Raises your experience (or the experience in a skill) by the given amount.
 
@@ -4006,7 +4006,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("rename", AccessLevel.Envoy, CommandHandlerFlag.None, 2,
             "Rename a character. (Do NOT include +'s for admin names)",
             "< Current Name >, < New Name >")]
-        public static void HandleRename(Session session, params string[] parameters)
+        public static void HandleRename(ISession session, params string[] parameters)
         {
             // @rename <Current Name>, <New Name> - Rename a character. (Do NOT include +'s for admin names)
 
@@ -4090,7 +4090,7 @@ namespace ACE.Server.Command.Handlers
 
         // setadvclass
         [CommandHandler("setadvclass", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 2)]
-        public static void Handlesetadvclass(Session session, params string[] parameters)
+        public static void Handlesetadvclass(ISession session, params string[] parameters)
         {
             // @setadvclass - Sets the advancement class of one of your own skills.
 
@@ -4099,7 +4099,7 @@ namespace ACE.Server.Command.Handlers
 
         // spendxp
         [CommandHandler("spendxp", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 2)]
-        public static void HandleSpendxp(Session session, params string[] parameters)
+        public static void HandleSpendxp(ISession session, params string[] parameters)
         {
             // @spendxp - Allows you to more quickly spend your available xp into the specified skill.
 
@@ -4108,7 +4108,7 @@ namespace ACE.Server.Command.Handlers
 
         // trainskill
         [CommandHandler("trainskill", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1)]
-        public static void Handletrainskill(Session session, params string[] parameters)
+        public static void Handletrainskill(ISession session, params string[] parameters)
         {
             // @trainskill - Attempts to train the specified skill by spending skill credits on it.
 
@@ -4117,7 +4117,7 @@ namespace ACE.Server.Command.Handlers
 
         // reloadsysmsg
         [CommandHandler("reloadsysmsg", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void Handlereloadsysmsg(Session session, params string[] parameters)
+        public static void Handlereloadsysmsg(ISession session, params string[] parameters)
         {
             // @reloadsysmsg - Causes all servers to reload system_messages.txt.
 
@@ -4130,7 +4130,7 @@ namespace ACE.Server.Command.Handlers
             "<message>\n" +
             "This command sends the specified text to every player on the current server.\n" +
             "See Also: @gamecast, @gamecastemote, @gamecastlocal, @gamecastlocalemote.")]
-        public static void HandleGameCastLocal(Session session, params string[] parameters)
+        public static void HandleGameCastLocal(ISession session, params string[] parameters)
         {
             // Local Server Broadcast from
             // usage: @gamecastlocal<message>
@@ -4146,7 +4146,7 @@ namespace ACE.Server.Command.Handlers
         /// Sets whether you lose items should you die.
         /// </summary>
         [CommandHandler("sticky", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, "Sets whether you lose items should you die.", "<off/on>")]
-        public static void HandleSticky(Session session, params string[] parameters)
+        public static void HandleSticky(ISession session, params string[] parameters)
         {
             bool sticky = !(parameters.Length > 0 && parameters[0] == "off");
 
@@ -4160,7 +4160,7 @@ namespace ACE.Server.Command.Handlers
 
         // userlimit { num }
         [CommandHandler("userlimit", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, 1)]
-        public static void Handleuserlimit(Session session, params string[] parameters)
+        public static void Handleuserlimit(ISession session, params string[] parameters)
         {
             // @userlimit - Sets how many clients are allowed to connect to this world.
 
@@ -4171,7 +4171,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("watchmen", AccessLevel.Admin, CommandHandlerFlag.None, 0,
             "Displays a list of accounts with the specified level of admin access.",
             "(accesslevel)")]
-        public static void Handlewatchmen(Session session, params string[] parameters)
+        public static void Handlewatchmen(ISession session, params string[] parameters)
         {
             // @watchmen - Displays a list of accounts with the specified level of admin access.
 
@@ -4210,7 +4210,7 @@ namespace ACE.Server.Command.Handlers
             "Sends text to all players, formatted exactly as entered.",
             "<message>\n" +
             "See Also: @gamecast, @gamecastemote, @gamecastlocal, @gamecastlocalemote.")]
-        public static void HandleGameCastEmote(Session session, params string[] parameters)
+        public static void HandleGameCastEmote(ISession session, params string[] parameters)
         {
             // usage: "@gamecastemote <message>" or "@we <message"
             // Sends text to all players, formatted exactly as entered, with no prefix of any kind.
@@ -4231,7 +4231,7 @@ namespace ACE.Server.Command.Handlers
             "Sends text to all players, formatted exactly as entered.",
             "<message>\n" +
             "See Also: @gamecast, @gamecastemote, @gamecastlocal, @gamecastlocalemote.")]
-        public static void HandleWe(Session session, params string[] parameters)
+        public static void HandleWe(ISession session, params string[] parameters)
         {
             // usage: "@gamecastemote <message>" or "@we <message"
             // Sends text to all players, formatted exactly as entered, with no prefix of any kind.
@@ -4243,7 +4243,7 @@ namespace ACE.Server.Command.Handlers
 
         // dumpattackers
         [CommandHandler("dumpattackers", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void Handledumpattackers(Session session, params string[] parameters)
+        public static void Handledumpattackers(ISession session, params string[] parameters)
         {
             // @dumpattackers - Displays the detection and enemy information for the selected creature.
 
@@ -4252,7 +4252,7 @@ namespace ACE.Server.Command.Handlers
 
         // knownobjs
         [CommandHandler("knownobjs", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void Handleknownobjs(Session session, params string[] parameters)
+        public static void Handleknownobjs(ISession session, params string[] parameters)
         {
             // @knownobjs - Display a list of objects that the client is aware of.
 
@@ -4261,7 +4261,7 @@ namespace ACE.Server.Command.Handlers
 
         // lbinterval
         [CommandHandler("lbinterval", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, 1)]
-        public static void Handlelbinterval(Session session, params string[] parameters)
+        public static void Handlelbinterval(ISession session, params string[] parameters)
         {
             // @lbinterval - Sets how often in seconds the server farm will rebalance the server farm load.
 
@@ -4270,7 +4270,7 @@ namespace ACE.Server.Command.Handlers
 
         // lbthresh
         [CommandHandler("lbthresh", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, 1)]
-        public static void Handlelbthresh(Session session, params string[] parameters)
+        public static void Handlelbthresh(ISession session, params string[] parameters)
         {
             // the @lbthresh command sets the maximum amount of load servers can trade at each balance. Large load transfers at once can cause poor server performance.  (Large would be about 400, small is about 20.)
             // @lbthresh - Set how much load can be transferred between two servers during a single load balance.
@@ -4280,7 +4280,7 @@ namespace ACE.Server.Command.Handlers
 
         // radar
         [CommandHandler("radar", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void Handleradar(Session session, params string[] parameters)
+        public static void Handleradar(ISession session, params string[] parameters)
         {
             // @radar - Toggles your radar on and off.
 
@@ -4289,7 +4289,7 @@ namespace ACE.Server.Command.Handlers
 
         // rares dump
         [CommandHandler("rares dump", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0)]
-        public static void HandleRaresDump(Session session, params string[] parameters)
+        public static void HandleRaresDump(ISession session, params string[] parameters)
         {
             // @rares dump - Lists all tiers of rare items.
 
@@ -4298,7 +4298,7 @@ namespace ACE.Server.Command.Handlers
 
         // stormnumstormed
         [CommandHandler("stormnumstormed", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, 1)]
-        public static void Handlestormnumstormed(Session session, params string[] parameters)
+        public static void Handlestormnumstormed(ISession session, params string[] parameters)
         {
             // @stormnumstormed - Sets how many characters are teleported away during a portal storm.
 
@@ -4307,7 +4307,7 @@ namespace ACE.Server.Command.Handlers
 
         // stormthresh
         [CommandHandler("stormthresh", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, 1)]
-        public static void Handlestormthresh(Session session, params string[] parameters)
+        public static void Handlestormthresh(ISession session, params string[] parameters)
         {
             // @stormthresh - Sets how many character can be in a landblock before we do a portal storm.
 
@@ -4315,13 +4315,13 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("showprops", AccessLevel.Admin, CommandHandlerFlag.None, 0, "Displays the name of all properties configurable via the modify commands")]
-        public static void HandleDisplayProps(Session session, params string[] parameters)
+        public static void HandleDisplayProps(ISession session, params string[] parameters)
         {
             CommandHandlerHelper.WriteOutputInfo(session, PropertyManager.ListProperties());
         }
 
         [CommandHandler("modifybool", AccessLevel.Admin, CommandHandlerFlag.None, 2, "Modifies a server property that is a bool", "modifybool (string) (bool)")]
-        public static void HandleModifyServerBoolProperty(Session session, params string[] parameters)
+        public static void HandleModifyServerBoolProperty(ISession session, params string[] parameters)
         {
             try
             {
@@ -4355,14 +4355,14 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("fetchbool", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Fetches a server property that is a bool", "fetchbool (string)")]
-        public static void HandleFetchServerBoolProperty(Session session, params string[] parameters)
+        public static void HandleFetchServerBoolProperty(ISession session, params string[] parameters)
         {
             var boolVal = PropertyManager.GetBool(parameters[0], cacheFallback: false);
             CommandHandlerHelper.WriteOutputInfo(session, $"{parameters[0]} - {boolVal.Description ?? "No Description"}: {boolVal.Item}");
         }
 
         [CommandHandler("modifylong", AccessLevel.Admin, CommandHandlerFlag.None, 2, "Modifies a server property that is a long", "modifylong (string) (long)")]
-        public static void HandleModifyServerLongProperty(Session session, params string[] paramters)
+        public static void HandleModifyServerLongProperty(ISession session, params string[] paramters)
         {
             try
             {
@@ -4382,14 +4382,14 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("fetchlong", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Fetches a server property that is a long", "fetchlong (string)")]
-        public static void HandleFetchServerLongProperty(Session session, params string[] parameters)
+        public static void HandleFetchServerLongProperty(ISession session, params string[] parameters)
         {
             var intVal = PropertyManager.GetLong(parameters[0], cacheFallback: false);
             CommandHandlerHelper.WriteOutputInfo(session, $"{parameters[0]} - {intVal.Description ?? "No Description"}: {intVal.Item}");
         }
 
         [CommandHandler("modifydouble", AccessLevel.Admin, CommandHandlerFlag.None, 2, "Modifies a server property that is a double", "modifyfloat (string) (double)")]
-        public static void HandleModifyServerFloatProperty(Session session, params string[] parameters)
+        public static void HandleModifyServerFloatProperty(ISession session, params string[] parameters)
         {
             try
             {
@@ -4409,14 +4409,14 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("fetchdouble", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Fetches a server property that is a double", "fetchdouble (string)")]
-        public static void HandleFetchServerFloatProperty(Session session, params string[] parameters)
+        public static void HandleFetchServerFloatProperty(ISession session, params string[] parameters)
         {
             var floatVal = PropertyManager.GetDouble(parameters[0], cacheFallback: false);
             CommandHandlerHelper.WriteOutputInfo(session, $"{parameters[0]} - {floatVal.Description ?? "No Description"}: {floatVal.Item}");
         }
 
         [CommandHandler("modifystring", AccessLevel.Admin, CommandHandlerFlag.None, 2, "Modifies a server property that is a string", "modifystring (string) (string)")]
-        public static void HandleModifyServerStringProperty(Session session, params string[] parameters)
+        public static void HandleModifyServerStringProperty(ISession session, params string[] parameters)
         {
             if (PropertyManager.ModifyString(parameters[0], parameters[1]))
             {
@@ -4428,14 +4428,14 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("fetchstring", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Fetches a server property that is a string", "fetchstring (string)")]
-        public static void HandleFetchServerStringProperty(Session session, params string[] parameters)
+        public static void HandleFetchServerStringProperty(ISession session, params string[] parameters)
         {
             var stringVal = PropertyManager.GetString(parameters[0], cacheFallback: false);
             CommandHandlerHelper.WriteOutputInfo(session, $"{parameters[0]} - {stringVal.Description ?? "No Description"}: {stringVal.Item}");
         }
 
         [CommandHandler("modifypropertydesc", AccessLevel.Admin, CommandHandlerFlag.None, 3, "Modifies a server property's description", "modifypropertydesc <STRING|BOOL|DOUBLE|LONG> (string) (string)")]
-        public static void HandleModifyPropertyDescription(Session session, params string[] parameters)
+        public static void HandleModifyPropertyDescription(ISession session, params string[] parameters)
         {
             var isSession = session != null;
             switch (parameters[0])
@@ -4461,13 +4461,13 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("resyncproperties", AccessLevel.Admin, CommandHandlerFlag.None, "Resync the properties database")]
-        public static void HandleResyncServerProperties(Session session, params string[] parameters)
+        public static void HandleResyncServerProperties(ISession session, params string[] parameters)
         {
             PropertyManager.ResyncVariables();
         }
 
         [CommandHandler("fix-allegiances", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Fixes the monarch data for allegiances")]
-        public static void HandleFixAllegiances(Session session, params string[] parameters)
+        public static void HandleFixAllegiances(ISession session, params string[] parameters)
         {
             var players = PlayerManager.GetAllPlayers();
 
@@ -4541,7 +4541,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("show-allegiances", AccessLevel.Admin, CommandHandlerFlag.None, "Shows all of the allegiance chains on the server.")]
-        public static void HandleShowAllegiances(Session session, params string[] parameters)
+        public static void HandleShowAllegiances(ISession session, params string[] parameters)
         {
             var players = PlayerManager.GetAllPlayers();
 
@@ -4557,7 +4557,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("getenchantments", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, "Shows the enchantments for the last appraised item")]
-        public static void HandleGetEnchantments(Session session, params string[] parameters)
+        public static void HandleGetEnchantments(ISession session, params string[] parameters)
         {
             var item = CommandHandlerHelper.GetLastAppraisedObject(session);
             if (item == null) return;
@@ -4574,14 +4574,14 @@ namespace ACE.Server.Command.Handlers
 
         // cm <material type> <quantity> <ave. workmanship>
         [CommandHandler("cm", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Create a salvage bag in your inventory", "<material_type>, optional: <structure> <workmanship> <num_items>")]
-        public static void HandleCM(Session session, params string[] parameters)
+        public static void HandleCM(ISession session, params string[] parameters)
         {
             // Format is: @cm <material type> <quantity> <ave. workmanship>
             HandleCISalvage(session, parameters);
         }
 
         [CommandHandler("cisalvage", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 1, "Create a salvage bag in your inventory", "<material_type>, optional: <structure> <workmanship> <num_items>")]
-        public static void HandleCISalvage(Session session, params string[] parameters)
+        public static void HandleCISalvage(ISession session, params string[] parameters)
         {
             if (!Enum.TryParse(parameters[0], true, out MaterialType materialType))
             {
@@ -4617,7 +4617,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("setlbenviron", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0,
             "Sets or clears your current landblock's environment option",
             "(name or id of EnvironChangeType)\nleave blank to reset to default.\nlist to get a complete list of options.")]
-        public static void HandleSetLBEnviron(Session session, params string[] parameters)
+        public static void HandleSetLBEnviron(ISession session, params string[] parameters)
         {
             EnvironChangeType environChange = EnvironChangeType.Clear;
 
@@ -4653,7 +4653,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("setglobalenviron", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0,
             "Sets or clears server's global environment option",
             "(name or id of EnvironChangeType)\nleave blank to reset to default.\nlist to get a complete list of options.")]
-        public static void HandleSetGlobalEnviron(Session session, params string[] parameters)
+        public static void HandleSetGlobalEnviron(ISession session, params string[] parameters)
         {
             EnvironChangeType environChange = EnvironChangeType.Clear;
 
@@ -4699,7 +4699,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("movetome", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, "Moves the last appraised object to the current player location.")]
-        public static void HandleMoveToMe(Session session, params string[] parameters)
+        public static void HandleMoveToMe(ISession session, params string[] parameters)
         {
             var obj = CommandHandlerHelper.GetLastAppraisedObject(session);
 
@@ -4744,7 +4744,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("reload-loot-tables", AccessLevel.Admin, CommandHandlerFlag.None, "reloads the latest data from the loot tables", "optional profile folder")]
-        public static void HandleReloadLootTables(Session session, params string[] parameters)
+        public static void HandleReloadLootTables(ISession session, params string[] parameters)
         {
             var sep = Path.DirectorySeparatorChar;
 

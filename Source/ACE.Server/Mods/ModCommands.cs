@@ -28,7 +28,7 @@ namespace ACE.Server.Command.Handlers
 
         [CommandHandler("mod", AccessLevel.Developer, CommandHandlerFlag.None, -1,
             "Lazy mod control")]
-        public static void HandleListMods(Session session, params string[] parameters)
+        public static void HandleListMods(ISession session, params string[] parameters)
         {
             if (parameters.Length < 1 || !Enum.TryParse<ModCommand>(parameters[0], true, out ModCommand verb))
             {
@@ -122,7 +122,7 @@ namespace ACE.Server.Command.Handlers
         /// <summary>
         /// Disable Mod and save choice in Metadata
         /// </summary>
-        private static void DisableMod(Session session, ModContainer match)
+        private static void DisableMod(ISession session, ModContainer match)
         {
             Log($"Disabling {match.Meta.Name}", session);
             match.Meta.Enabled = false;
@@ -133,7 +133,7 @@ namespace ACE.Server.Command.Handlers
         /// <summary>
         /// Enable Mod and save choice in Metadata
         /// </summary>
-        private static void EnableMod(Session session, ModContainer match)
+        private static void EnableMod(ISession session, ModContainer match)
         {
             Log($"Enabling {match.Meta.Name}", session);
             match.Meta.Enabled = true;
@@ -141,7 +141,7 @@ namespace ACE.Server.Command.Handlers
             match.Enable();
         }
 
-        private static void Log(string message, Session session)
+        private static void Log(string message, ISession session)
         {
             if (session?.Player is not null)
                 session.Player.SendMessage(message);

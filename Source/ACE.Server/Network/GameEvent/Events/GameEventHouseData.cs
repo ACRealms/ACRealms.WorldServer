@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameEvent.Events
     /// </summary>
     public class GameEventHouseData : GameEventMessage
     {
-        public GameEventHouseData(Session session, HouseData data)
+        public GameEventHouseData(ISession session, HouseData data)
             : base(GameEventType.HouseData, GameMessageGroup.UIQueue, session)
         {
             //Console.WriteLine("Sending 0x225 - GameEventHouseData");

@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionHouseRemoveAllStoragePermission
     {
         [GameAction(GameActionType.RemoveAllStoragePermission)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             //Console.WriteLine("Received 0x24C - House - RemoveAllStoragePermission");
             session.Player.HandleActionRemoveAllStorage();

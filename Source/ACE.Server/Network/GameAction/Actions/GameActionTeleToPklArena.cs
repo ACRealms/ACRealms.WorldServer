@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionTeleToPklArena
     {
         [GameAction(GameActionType.TeleToPklArena)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             session.Player.HandleActionTeleToPklArena();
         }

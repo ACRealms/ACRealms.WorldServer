@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameAction
     public static class GameActionPacket
     {
         [GameMessage(GameMessageOpcode.GameAction, SessionState.WorldConnected)]
-        public static void HandleGameAction(ClientMessage message, Session session)
+        public static void HandleGameAction(ClientMessage message, ISession session)
         {
             // TODO: verify sequence
             uint sequence = message.Payload.ReadUInt32();

@@ -10,7 +10,7 @@ namespace ACE.Server.Network
             public RealmBinaryReader(MemoryStream stream)
                 : base(stream) { }
 
-            public ObjectGuid ReadGuid(Session session)
+            public ObjectGuid ReadGuid(ISession session)
             {
                 return new ObjectGuid(base.ReadUInt32(), session.Player.Location.Instance);
             }

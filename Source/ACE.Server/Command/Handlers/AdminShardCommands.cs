@@ -26,7 +26,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("cancel-shutdown", AccessLevel.Admin, CommandHandlerFlag.None, 0,
             "Stops an active server shutdown.",
             "")]
-        public static void HandleCancelShutdown(Session session, params string[] parameters)
+        public static void HandleCancelShutdown(ISession session, params string[] parameters)
         {
             var adminName = (session == null) ? "CONSOLE" : session.Player.Name;
             var msg = $"{adminName} has requested the pending shut down @ {ServerManager.ShutdownTime.ToLocalTime()} ({ServerManager.ShutdownTime} UTC) be cancelled.";
@@ -42,7 +42,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("set-shutdown-interval", AccessLevel.Admin, CommandHandlerFlag.None, 1,
             "Changes the delay, in seconds, before the server will shutdown.",
             "< 0-99999 > in seconds")]
-        public static void HandleSetShutdownInterval(Session session, params string[] parameters)
+        public static void HandleSetShutdownInterval(ISession session, params string[] parameters)
         {
             if (parameters?.Length > 0)
             {
@@ -76,7 +76,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("stop-now", AccessLevel.Admin, CommandHandlerFlag.None, -1,
             "Shuts the server down, immediately!",
             "\nThis command will attempt to safely logoff all players, before shutting down the server.")]
-        public static void ShutdownServerNow(Session session, params string[] parameters)
+        public static void ShutdownServerNow(ISession session, params string[] parameters)
         {
             var adminName = (session == null) ? "CONSOLE" : session.Player.Name;
             var msg = $"{adminName} has initiated an immediate server shut down.";
@@ -95,7 +95,7 @@ namespace ACE.Server.Command.Handlers
             "< Optional Shutdown Message >\n" +
             "\tUse @cancel-shutdown to abort an active shutdown!\n" +
             "\tSet the shutdown delay in seconds with @set-shutdown-interval < 0-99999 >")]
-        public static void ShutdownServer(Session session, params string[] parameters)
+        public static void ShutdownServer(ISession session, params string[] parameters)
         {
             var adminText = "";
             if (parameters.Length > 0)
@@ -142,7 +142,7 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("world", AccessLevel.Admin, CommandHandlerFlag.None, 0,
             "Open or Close world to player access.",
             "[open | close] <boot>\nIf closing world, using @world close boot will force players to logoff immediately")]
-        public static void HandleHelp(Session session, params string[] parameters)
+        public static void HandleHelp(ISession session, params string[] parameters)
         {
             var open = false;
             var close = false;

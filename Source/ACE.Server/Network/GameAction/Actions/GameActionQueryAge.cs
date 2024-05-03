@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionQueryAge
     {
         [GameAction(GameActionType.QueryAge)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var target = message.Payload.ReadString16L();  // unused?
 

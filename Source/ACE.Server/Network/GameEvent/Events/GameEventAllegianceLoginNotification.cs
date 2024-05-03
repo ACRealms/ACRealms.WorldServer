@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     class GameEventAllegianceLoginNotification : GameEventMessage
     {
-        public GameEventAllegianceLoginNotification(Session session, uint playerGuid, bool isLoggedIn)
+        public GameEventAllegianceLoginNotification(ISession session, uint playerGuid, bool isLoggedIn)
             : base (GameEventType.AllegianceLoginNotification, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(playerGuid);

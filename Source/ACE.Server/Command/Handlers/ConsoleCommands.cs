@@ -11,20 +11,20 @@ namespace ACE.Server.Command.Handlers
     public static class ConsoleCommands
     {
         [CommandHandler("version", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 0, "Show server version information.", "")]
-        public static void ShowVersion(Session session, params string[] parameters)
+        public static void ShowVersion(ISession session, params string[] parameters)
         {
             var msg = ServerBuildInfo.GetVersionInfo();
             Console.WriteLine(msg);
         }
 
         [CommandHandler("exit", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 0, "Shut down server immediately.", "")]
-        public static void Exit(Session session, params string[] parameters)
+        public static void Exit(ISession session, params string[] parameters)
         {
             AdminShardCommands.ShutdownServerNow(session, parameters);
         }
 
         [CommandHandler("cell-export", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 1, "Export contents of CELL DAT file.", "<export-directory-without-spaces>")]
-        public static void ExportCellDatContents(Session session, params string[] parameters)
+        public static void ExportCellDatContents(ISession session, params string[] parameters)
         {
             if (parameters?.Length != 1)
                 Console.WriteLine("cell-export <export-directory-without-spaces>");
@@ -37,7 +37,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("portal-export", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 1, "Export contents of PORTAL DAT file.", "<export-directory-without-spaces>")]
-        public static void ExportPortalDatContents(Session session, params string[] parameters)
+        public static void ExportPortalDatContents(ISession session, params string[] parameters)
         {
             if (parameters?.Length != 1)
                 Console.WriteLine("portal-export <export-directory-without-spaces>");
@@ -50,7 +50,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("highres-export", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 1, "Export contents of client_highres.dat file.", "<export-directory-without-spaces>")]
-        public static void ExportHighresDatContents(Session session, params string[] parameters)
+        public static void ExportHighresDatContents(ISession session, params string[] parameters)
         {
             if (DatManager.HighResDat == null)
             {
@@ -68,7 +68,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("language-export", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 1, "Export contents of client_local_English.dat file.", "<export-directory-without-spaces>")]
-        public static void ExportLanguageDatContents(Session session, params string[] parameters)
+        public static void ExportLanguageDatContents(ISession session, params string[] parameters)
         {
             if (DatManager.LanguageDat == null)
             {
@@ -89,7 +89,7 @@ namespace ACE.Server.Command.Handlers
         /// Export all wav files to a specific directory.
         /// </summary>
         [CommandHandler("wave-export", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 0, "Export Wave Files")]
-        public static void ExportWaveFiles(Session session, params string[] parameters)
+        public static void ExportWaveFiles(ISession session, params string[] parameters)
         {
             if (parameters?.Length != 1)
             {
@@ -116,7 +116,7 @@ namespace ACE.Server.Command.Handlers
         /// Export all texture/image files to a specific directory.
         /// </summary>
         [CommandHandler("image-export", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 0, "Export Texture/Image Files")]
-        public static void ExportImageFile(Session session, params string[] parameters)
+        public static void ExportImageFile(ISession session, params string[] parameters)
         {
             string syntax = "image-export <export-directory-without-spaces> [id]";
             if (parameters?.Length < 1)

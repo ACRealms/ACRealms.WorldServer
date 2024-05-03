@@ -7,7 +7,7 @@ namespace ACE.Server.Command.Handlers.Processors
 {
     public partial class DeveloperContentCommands
     {
-        public static void ImportSQLWeenieWrapped(Session session, string param, string param2)
+        public static void ImportSQLWeenieWrapped(ISession session, string param, string param2)
         {
             DirectoryInfo di = VerifyContentFolder(session);
             if (!di.Exists) return;

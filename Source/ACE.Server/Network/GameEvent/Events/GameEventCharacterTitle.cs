@@ -4,7 +4,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventCharacterTitle : GameEventMessage
     {
-        public GameEventCharacterTitle(Session session)
+        public GameEventCharacterTitle(ISession session)
             : base(GameEventType.CharacterTitle, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(1u);

@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionChannelIndex
     {
         [GameAction(GameActionType.IndexChannels)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             // Probably need some IsAdvocate and IsSentinel type thing going on here as well. leaving for now
             if (!session.Player.IsAdmin && !session.Player.IsArch && !session.Player.IsPsr)

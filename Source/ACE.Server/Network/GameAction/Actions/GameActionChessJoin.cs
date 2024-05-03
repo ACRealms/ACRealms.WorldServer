@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionChessJoin
     {
         [GameAction(GameActionType.ChessJoin)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             var boardGuid = message.Payload.ReadGuid(session);   // chessboard guid
             var color = message.Payload.ReadInt32();        // expecting -1 here, unused?

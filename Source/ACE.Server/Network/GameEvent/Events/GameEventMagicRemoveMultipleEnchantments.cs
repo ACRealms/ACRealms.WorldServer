@@ -8,7 +8,7 @@ namespace ACE.Server.Network.GameEvent.Events
     /// </summary>
     public class GameEventMagicRemoveMultipleEnchantments : GameEventMessage
     {
-        public GameEventMagicRemoveMultipleEnchantments(Session session, List<LayeredSpell> spells)
+        public GameEventMagicRemoveMultipleEnchantments(ISession session, List<LayeredSpell> spells)
             : base(GameEventType.MagicRemoveMultipleEnchantments, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(spells);

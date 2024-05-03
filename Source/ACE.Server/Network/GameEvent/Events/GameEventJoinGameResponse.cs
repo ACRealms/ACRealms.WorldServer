@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventJoinGameResponse : GameEventMessage
     {
-        public GameEventJoinGameResponse(Session session, ObjectGuid boardGuid, ChessColor color)
+        public GameEventJoinGameResponse(ISession session, ObjectGuid boardGuid, ChessColor color)
             : base(GameEventType.JoinGameResponse, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(boardGuid.ClientGUID);

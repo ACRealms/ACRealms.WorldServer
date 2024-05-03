@@ -9,7 +9,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionAbandonContract
     {
         [GameAction(GameActionType.AbandonContract)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             // Read in the applicable data.
             uint contractId = message.Payload.ReadUInt32();

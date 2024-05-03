@@ -5,7 +5,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventSendClientContractTrackerTable : GameEventMessage
     {
-        public GameEventSendClientContractTrackerTable(Session session) : base(GameEventType.SendClientContractTrackerTable, GameMessageGroup.UIQueue, session)
+        public GameEventSendClientContractTrackerTable(ISession session) : base(GameEventType.SendClientContractTrackerTable, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(session.Player.ContractManager);
         }

@@ -157,7 +157,7 @@ namespace ACE.Server.Command
         /// <param name="parameters">the resolution details for every parameter</param>
         /// <param name="rawIncluded">whether or not the raw unparsed command line minus the command name was included as the first parameter</param>
         /// <returns>the parameters were successfully resolved or not</returns>
-        public static bool ResolveACEParameters(Session session, IEnumerable<string> aceParsedParameters, IEnumerable<ACECommandParameter> parameters, bool rawIncluded = false)
+        public static bool ResolveACEParameters(ISession session, IEnumerable<string> aceParsedParameters, IEnumerable<ACECommandParameter> parameters, bool rawIncluded = false)
         {
             string parameterBlob = "";
             if (rawIncluded)
@@ -558,7 +558,7 @@ namespace ACE.Server.Command
         /// <param name="position">the resultant ACE.Entity.Position</param>
         /// <param name="startingElement">the first zero based element index of the 2 contiguous elements in the parameter array</param>
         /// <returns>the parsing was successful or not</returns>
-        public static bool TryParsePosition(Session session, string[] parameters, out string errorMessage, out LocalPosition position, int startingElement = 0)
+        public static bool TryParsePosition(ISession session, string[] parameters, out string errorMessage, out LocalPosition position, int startingElement = 0)
         {
             errorMessage = string.Empty;
             position = null;

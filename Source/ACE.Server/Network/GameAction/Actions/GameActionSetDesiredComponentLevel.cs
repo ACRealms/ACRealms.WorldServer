@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameAction.Actions
     public static class GameActionSetDesiredComponentLevel
     {
         [GameAction(GameActionType.SetDesiredComponentLevel)]
-        public static void Handle(ClientMessage message, Session session)
+        public static void Handle(ClientMessage message, ISession session)
         {
             uint component_wcid = message.Payload.ReadUInt32();
             uint amount = message.Payload.ReadUInt32();

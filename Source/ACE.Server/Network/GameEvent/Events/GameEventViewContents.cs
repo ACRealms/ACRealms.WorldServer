@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventViewContents : GameEventMessage
     {
-        public GameEventViewContents(Session session, Container container)
+        public GameEventViewContents(ISession session, Container container)
             : base(GameEventType.ViewContents, GameMessageGroup.UIQueue, session)
         {
             Writer.Write(container.Guid.ClientGUID);

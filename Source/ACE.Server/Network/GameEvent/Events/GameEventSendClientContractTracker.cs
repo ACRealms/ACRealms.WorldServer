@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameEvent.Events
 {
     public class GameEventSendClientContractTracker : GameEventMessage
     {
-        public GameEventSendClientContractTracker(Session session, CharacterPropertiesContractRegistry contract) : base(GameEventType.SendClientContractTracker, GameMessageGroup.UIQueue, session)
+        public GameEventSendClientContractTracker(ISession session, CharacterPropertiesContractRegistry contract) : base(GameEventType.SendClientContractTracker, GameMessageGroup.UIQueue, session)
         {
             var contractTracker = new ContractTracker(session.Player, contract);
 
