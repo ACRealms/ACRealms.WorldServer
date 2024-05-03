@@ -54,7 +54,7 @@ namespace ACE.Server.Network.GameAction.Actions
                 for (int i = 0; i < numShortcuts; i++)
                 {
                     message.Payload.ReadInt32(); // index
-                    message.Payload.ReadUInt32(); // objectId (guid?)
+                    message.Payload.ReadGuid(session); // objectId (guid?)
                     message.Payload.ReadUInt32(); // spellId
                 }
             }

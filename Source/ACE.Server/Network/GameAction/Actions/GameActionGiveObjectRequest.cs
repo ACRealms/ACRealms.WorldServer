@@ -6,8 +6,8 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.GiveObjectRequest)]
         public static void Handle(ClientMessage message, Session session)
         {
-            uint targetGuid = message.Payload.ReadUInt32();
-            uint objectGuid = message.Payload.ReadUInt32();
+            var targetGuid = message.Payload.ReadGuid(session);
+            var objectGuid = message.Payload.ReadGuid(session);
             int amount = message.Payload.ReadInt32();
 
             session.Player.HandleActionGiveObjectRequest(targetGuid, objectGuid, amount);

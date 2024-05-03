@@ -46,7 +46,7 @@ namespace ACE.Server.Entity
             var player = Player;
             if (player == null) return;
 
-            var attributeTransferDevice = player.FindObject(AttributeTransferDevice.Full, Player.SearchLocations.MyInventory) as AttributeTransferDevice;
+            var attributeTransferDevice = player.FindObject(AttributeTransferDevice, Player.SearchLocations.MyInventory) as AttributeTransferDevice;
 
             if (attributeTransferDevice != null)
                 attributeTransferDevice.ActOnUse(player, true);
@@ -70,7 +70,7 @@ namespace ACE.Server.Entity
             var player = Player;
             if (player == null) return;
 
-            var skillAlterationDevice = player.FindObject(SkillAlterationDevice.Full, Player.SearchLocations.MyInventory) as SkillAlterationDevice;
+            var skillAlterationDevice = player.FindObject(SkillAlterationDevice, Player.SearchLocations.MyInventory) as SkillAlterationDevice;
 
             if (skillAlterationDevice != null)
                 skillAlterationDevice.ActOnUse(player, true);
@@ -94,7 +94,7 @@ namespace ACE.Server.Entity
             var player = Player;
             if (player == null) return;
 
-            var augmentation = player.FindObject(AugmentationGuid.Full, Player.SearchLocations.MyInventory) as AugmentationDevice;
+            var augmentation = player.FindObject(AugmentationGuid, Player.SearchLocations.MyInventory) as AugmentationDevice;
 
             if (augmentation != null)
                 augmentation.ActOnUse(player, true);
@@ -128,8 +128,8 @@ namespace ACE.Server.Entity
             }
 
             // inventory only?
-            var source = player.FindObject(SourceGuid.Full, Player.SearchLocations.LocationsICanMove);
-            var target = player.FindObject(TargetGuid.Full, Player.SearchLocations.LocationsICanMove);
+            var source = player.FindObject(SourceGuid, Player.SearchLocations.LocationsICanMove);
+            var target = player.FindObject(TargetGuid, Player.SearchLocations.LocationsICanMove);
 
             if (source == null || target == null) return;
 
@@ -213,7 +213,7 @@ namespace ACE.Server.Entity
             var player = Player;
             if (player == null) return;
 
-            var source = player.FindObject(SourceGuid.Full, Player.SearchLocations.Landblock);
+            var source = player.FindObject(SourceGuid, Player.SearchLocations.Landblock);
 
             if (source is Hook hook && hook.Item != null)
                 source = hook.Item;

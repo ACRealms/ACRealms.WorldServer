@@ -596,10 +596,10 @@ namespace ACE.Server.WorldObjects
             // ensure target is summoning essence? source.TargetType is Misc
 
             // ensure both source and target are in player's inventory
-            if (player.FindObject(source.Guid.Full, Player.SearchLocations.MyInventory) == null)
+            if (player.FindObject(source.Guid, Player.SearchLocations.MyInventory) == null)
                 return WeenieError.YouDoNotPassCraftingRequirements;
 
-            if (player.FindObject(target.Guid.Full, Player.SearchLocations.MyInventory) == null)
+            if (player.FindObject(target.Guid, Player.SearchLocations.MyInventory) == null)
                 return WeenieError.YouDoNotPassCraftingRequirements;
 
             return WeenieError.None;

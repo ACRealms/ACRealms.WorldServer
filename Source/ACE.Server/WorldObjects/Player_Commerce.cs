@@ -151,7 +151,7 @@ namespace ACE.Server.WorldObjects
 
             if (sellList.Count == 0)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid));
                 SendUseDoneEvent();
                 return;
             }
@@ -164,7 +164,7 @@ namespace ACE.Server.WorldObjects
                 log.Warn($"[VENDOR] {Name} (0x({Guid}) tried to sell something to {vendor.Name} (0x{vendor.Guid}) resulting in a payout of {payoutCoinAmount} pyreals.");
 
                 SendTransientError("Transaction failed.");
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid));
 
                 SendUseDoneEvent();
 
@@ -183,7 +183,7 @@ namespace ACE.Server.WorldObjects
                 else if (itemsToReceive.PlayerOutOfInventorySlots)
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You do not have enough free pack space to sell that!"));
 
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, Guid));
                 SendUseDoneEvent();     // WeenieError.FullInventoryLocation?
                 return;
             }

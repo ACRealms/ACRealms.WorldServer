@@ -9,7 +9,7 @@ namespace ACE.Server.Network.GameAction.Actions
         {
             var jumpPack = new JumpPack(message.Payload);
 
-            var objectGuid = message.Payload.ReadUInt32();
+            var objectGuid = message.Payload.ReadGuid(session);
             var spellId = message.Payload.ReadUInt32();
 
             session.Player.HandleActionJump(jumpPack);

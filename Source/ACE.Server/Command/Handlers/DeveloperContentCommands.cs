@@ -2677,11 +2677,12 @@ namespace ACE.Server.Command.Handlers.Processors
 
             if (parameters.Length == 3)
             {
-                if (!uint.TryParse(parameters[curParam++].TrimStart("0x"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var guid))
+                if (!uint.TryParse(parameters[curParam++].TrimStart("0x"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var clientGuid))
                 {
                     session.Network.EnqueueSend(new GameMessageSystemChat($"Invalid guid: {parameters[0]}", ChatMessageType.Broadcast));
                     return;
                 }
+                var guid = new ObjectGuid(clientGuid, session.Player.Location.Instance);
 
                 obj = session.Player.FindObject(guid, Player.SearchLocations.Landblock);
 
@@ -2887,12 +2888,12 @@ namespace ACE.Server.Command.Handlers.Processors
 
             if (parameters.Length == 2)
             {
-                if (!uint.TryParse(parameters[curParam++].TrimStart("0x"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var guid))
+                if (!uint.TryParse(parameters[curParam++].TrimStart("0x"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var clientGuid))
                 {
                     session.Network.EnqueueSend(new GameMessageSystemChat($"Invalid guid: {parameters[0]}", ChatMessageType.Broadcast));
                     return;
                 }
-
+                var guid = new ObjectGuid(clientGuid, session.Player.Location.Instance);
                 obj = session.Player.FindObject(guid, Player.SearchLocations.Landblock);
 
                 if (obj == null)
@@ -3019,11 +3020,12 @@ namespace ACE.Server.Command.Handlers.Processors
 
             if (parameters.Length == 2)
             {
-                if (!uint.TryParse(parameters[curParam++].TrimStart("0x"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var guid))
+                if (!uint.TryParse(parameters[curParam++].TrimStart("0x"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var clientGuid))
                 {
                     session.Network.EnqueueSend(new GameMessageSystemChat($"Invalid guid: {parameters[0]}", ChatMessageType.Broadcast));
                     return;
                 }
+                var guid = new ObjectGuid(clientGuid, session.Player.Location.Instance);
 
                 obj = session.Player.FindObject(guid, Player.SearchLocations.Landblock);
 

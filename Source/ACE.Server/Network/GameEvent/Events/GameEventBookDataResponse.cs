@@ -20,7 +20,7 @@ namespace ACE.Server.Network.GameEvent.Events
             Writer.Write(pageData.Count);
             for (int i = 0; i < pageData.Count; i++)
             {
-                Writer.Write(pageData[i].AuthorId);
+                Writer.WriteGuid(new ACE.Entity.ObjectGuid(pageData[i].AuthorId));
                 Writer.WriteString16L(pageData[i].AuthorName);
                 // Check if player is admin and hide AuthorAccount if not. Potential security hole if we are sending out account usernames.
                 if (session.Player.IsAdmin || session.Player.IsSentinel || session.Player.IsEnvoy || session.Player.IsArch || session.Player.IsPsr)

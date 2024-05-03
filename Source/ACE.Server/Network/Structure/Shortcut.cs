@@ -44,7 +44,7 @@ namespace ACE.Server.Network.Structure
         public static void Write(this BinaryWriter writer, Shortcut shortcut)
         {
             writer.Write(shortcut.Index);
-            writer.Write(shortcut.ObjectId);
+            writer.WriteGuid(new ACE.Entity.ObjectGuid(shortcut.ObjectId));
             writer.Write(shortcut.Spell);
         }
 

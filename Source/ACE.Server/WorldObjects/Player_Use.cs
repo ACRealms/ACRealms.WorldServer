@@ -47,7 +47,7 @@ namespace ACE.Server.WorldObjects
             }
 
             // Resolve the guid to an object that is either in our possession or on the Landblock
-            var target = FindObject(targetObjectGuid.Full, SearchLocations.MyInventory | SearchLocations.MyEquippedItems | SearchLocations.Landblock);
+            var target = FindObject(targetObjectGuid, SearchLocations.MyInventory | SearchLocations.MyEquippedItems | SearchLocations.Landblock);
 
             if (target == null)
             {
@@ -183,7 +183,7 @@ namespace ACE.Server.WorldObjects
 
             StopExistingMoveToChains();
 
-            var item = FindObject(itemGuid.Full, SearchLocations.MyInventory | SearchLocations.MyEquippedItems | SearchLocations.Landblock);
+            var item = FindObject(itemGuid, SearchLocations.MyInventory | SearchLocations.MyEquippedItems | SearchLocations.Landblock);
 
             if (IsTrading && item.IsBeingTradedOrContainsItemBeingTraded(ItemsInTradeWindow))
             {

@@ -13,6 +13,7 @@ using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects;
 using ACE.Server.Entity;
+using ACE.Entity;
 
 namespace ACE.Server.Managers
 {
@@ -530,7 +531,7 @@ namespace ACE.Server.Managers
 
             if (player == null) return;
 
-            var error = new GameEventInventoryServerSaveFailed(player.Session, wo.Guid.ClientGUID, WeenieError.ItemRequiresQuestToBePickedUp);
+            var error = new GameEventInventoryServerSaveFailed(player.Session, wo.Guid, WeenieError.ItemRequiresQuestToBePickedUp);
             player.Session.Network.EnqueueSend(error);
         }
 
@@ -562,13 +563,13 @@ namespace ACE.Server.Managers
 
             if (IsMaxSolves(questName))
             {
-                var error = new GameEventInventoryServerSaveFailed(player.Session, 0, WeenieError.YouHaveSolvedThisQuestTooManyTimes);
+                var error = new GameEventInventoryServerSaveFailed(player.Session, ObjectGuid.Invalid, WeenieError.YouHaveSolvedThisQuestTooManyTimes);
                 var text = new GameMessageSystemChat("You have solved this quest too many times!", ChatMessageType.Broadcast);
                 player.Session.Network.EnqueueSend(text, error);
             }
             else
             {
-                var error = new GameEventInventoryServerSaveFailed(player.Session, 0, WeenieError.YouHaveSolvedThisQuestTooRecently);
+                var error = new GameEventInventoryServerSaveFailed(player.Session, ObjectGuid.Invalid, WeenieError.YouHaveSolvedThisQuestTooRecently);
                 var text = new GameMessageSystemChat("You have solved this quest too recently!", ChatMessageType.Broadcast);
 
                 var remainStr = GetNextSolveTime(questName).GetFriendlyString();

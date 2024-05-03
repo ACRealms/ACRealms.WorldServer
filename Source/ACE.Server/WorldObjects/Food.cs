@@ -70,7 +70,7 @@ namespace ACE.Server.WorldObjects
             if (player.IsDead) return;
 
             // verify item is still valid
-            if (player.FindObject(Guid.Full, Player.SearchLocations.MyInventory) == null)
+            if (player.FindObject(Guid, Player.SearchLocations.MyInventory) == null)
             {
                 //player.SendWeenieError(WeenieError.ObjectGone);   // results in 'Unable to move object!' transient error
                 player.SendTransientError($"Cannot find the {Name}");   // custom message

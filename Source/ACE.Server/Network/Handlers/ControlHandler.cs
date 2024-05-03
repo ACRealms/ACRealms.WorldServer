@@ -8,7 +8,7 @@ namespace ACE.Server.Network.Handlers
         [GameMessage(GameMessageOpcode.ForceObjectDescSend, SessionState.WorldConnected)]
         public static void ControlResponse(ClientMessage message, Session session)
         {
-            var itemGuid = message.Payload.ReadUInt32();
+            var itemGuid = message.Payload.ReadGuid(session);
             session.Player.HandleActionForceObjDescSend(itemGuid);
         }
     }

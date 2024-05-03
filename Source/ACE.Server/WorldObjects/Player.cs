@@ -688,7 +688,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         ///  Sends object description if the client requests it
         /// </summary>
-        public void HandleActionForceObjDescSend(uint itemGuid)
+        public void HandleActionForceObjDescSend(ObjectGuid itemGuid)
         {
             var wo = FindObject(itemGuid, SearchLocations.Everywhere);
             if (wo == null)

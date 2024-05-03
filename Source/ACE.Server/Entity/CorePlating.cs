@@ -126,10 +126,10 @@ namespace ACE.Server.Entity
             }
 
             // ensure both source and target are in player's inventory
-            if (player.FindObject(source.Guid.Full, Player.SearchLocations.MyInventory) == null)
+            if (player.FindObject(source.Guid, Player.SearchLocations.MyInventory) == null)
                 return WeenieError.YouDoNotPassCraftingRequirements;
 
-            if (player.FindObject(target.Guid.Full, Player.SearchLocations.MyInventory) == null)
+            if (player.FindObject(target.Guid, Player.SearchLocations.MyInventory) == null)
                 return WeenieError.YouDoNotPassCraftingRequirements;
 
             if (source.WeenieClassId != CorePlatingIntegrator && source.WeenieClassId != CorePlatingDeintegrator)

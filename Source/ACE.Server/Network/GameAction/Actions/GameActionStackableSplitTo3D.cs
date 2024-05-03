@@ -12,8 +12,8 @@ namespace ACE.Server.Network.GameAction.Actions
         public static void Handle(ClientMessage message, Session session)
         {
             // Read in the applicable data.
-            uint stackId    = message.Payload.ReadUInt32();
-            int amount      = message.Payload.ReadInt32();
+            var stackId = message.Payload.ReadGuid(session);
+            int amount = message.Payload.ReadInt32();
 
             session.Player.HandleActionStackableSplitTo3D(stackId, amount);
         }

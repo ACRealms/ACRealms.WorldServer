@@ -118,7 +118,7 @@ namespace ACE.Server.WorldObjects
             if (player.IsDead) return;
 
             // verify item is still valid
-            if (player.FindObject(Guid.Full, Player.SearchLocations.MyInventory) == null)
+            if (player.FindObject(Guid, Player.SearchLocations.MyInventory) == null)
             {
                 //player.SendWeenieError(WeenieError.ObjectGone);   // results in 'Unable to move object!' transient error
                 player.SendTransientError($"Cannot find the {Name}");   // custom message
@@ -275,7 +275,7 @@ namespace ACE.Server.WorldObjects
         {
             if (ItemUseable == Usable.Contained && activator is Player player)
             {               
-                var containedItem = player.FindObject(Guid.Full, Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems);
+                var containedItem = player.FindObject(Guid, Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems);
                 if (containedItem != null) // item is contained by player
                 {
                     if (player.IsBusy || player.Teleporting || player.suicideInProgress)

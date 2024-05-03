@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameAction.Actions
 
         public static void Handle(ClientMessage message, Session session)
         {
-            var itemGuid = message.Payload.ReadUInt32();
+            var itemGuid = message.Payload.ReadGuid(session);
 
             session.Player.HandleActionDropItem(itemGuid);
         }

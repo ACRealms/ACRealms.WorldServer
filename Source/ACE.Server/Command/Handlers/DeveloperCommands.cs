@@ -338,11 +338,12 @@ namespace ACE.Server.Command.Handlers
 
             if (parameters.Length > 1)
             {
-                if (!uint.TryParse(parameters[1].TrimStart("0x"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var guid))
+                if (!uint.TryParse(parameters[1].TrimStart("0x"), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var clientGuid))
                 {
                     ChatPacket.SendServerMessage(session, $"Invalid guid: {parameters[1]}", ChatMessageType.Broadcast);
                     return;
                 }
+                var guid = new ObjectGuid(clientGuid, session.Player.Location.Instance);
                 obj = session.Player.FindObject(guid, Player.SearchLocations.Everywhere);
                 if (obj == null)
                 {
@@ -3491,12 +3492,12 @@ namespace ACE.Server.Command.Handlers
 
             if (parameters.Length > 1)
             {
-                if (!uint.TryParse(parameters[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var targetGuid))
+                if (!uint.TryParse(parameters[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var targetClientGuid))
                 {
                     CommandHandlerHelper.WriteOutputInfo(session, $"Invalid target guid: {parameters[1]}");
                     return;
                 }
-
+                var targetGuid = new ObjectGuid(targetClientGuid, session.Player.Location.Instance);
                 attackTarget = session.Player.FindObject(targetGuid, Player.SearchLocations.Landblock) as Creature;
 
                 if (attackTarget == null)
@@ -3537,11 +3538,13 @@ namespace ACE.Server.Command.Handlers
         [CommandHandler("trywield", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 2)]
         public static void HandleTryWield(Session session, params string[] parameters)
         {
-            if (!uint.TryParse(parameters[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var itemGuid))
+            if (!uint.TryParse(parameters[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var itemClientGuid))
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Invalid item guid {parameters[0]}", ChatMessageType.Broadcast);
                 return;
             }
+
+            var itemGuid = new ObjectGuid(itemClientGuid, session.Player.Location.Instance);
 
             var item = session.Player.FindObject(itemGuid, Player.SearchLocations.MyInventory);
 

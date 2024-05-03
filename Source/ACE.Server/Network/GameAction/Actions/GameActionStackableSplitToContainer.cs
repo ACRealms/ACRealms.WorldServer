@@ -13,7 +13,7 @@ namespace ACE.Server.Network.GameAction.Actions
         public static void Handle(ClientMessage message, Session session)
         {
             // Read in the applicable data.
-            uint stackId = message.Payload.ReadUInt32();
+            var stackId = message.Payload.ReadGuid(session);
             var containerId = message.Payload.ReadGuid(session);
             int place = message.Payload.ReadInt32();
             int amount = message.Payload.ReadInt32();

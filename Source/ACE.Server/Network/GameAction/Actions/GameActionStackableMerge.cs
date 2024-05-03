@@ -10,8 +10,8 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.StackableMerge)]
         public static void Handle(ClientMessage message, Session session)
         {
-            uint mergeFromGuid = message.Payload.ReadUInt32();
-            uint mergeToGuid = message.Payload.ReadUInt32();
+            var mergeFromGuid = message.Payload.ReadGuid(session);
+            var mergeToGuid = message.Payload.ReadGuid(session);
             int amount = message.Payload.ReadInt32();
 
             session.Player.HandleActionStackableMerge(mergeFromGuid, mergeToGuid, amount);

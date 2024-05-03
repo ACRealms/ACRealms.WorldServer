@@ -56,7 +56,7 @@ namespace ACE.Server.WorldObjects
             if (TransferFromAttribute == PropertyAttribute.Undef || TransferToAttribute == PropertyAttribute.Undef)
                 return;
 
-            var device = player.FindObject(Guid.Full, Player.SearchLocations.MyInventory);
+            var device = player.FindObject(Guid, Player.SearchLocations.MyInventory);
             if (device == null) return;
 
             var fromAttr = player.Attributes[TransferFromAttribute];

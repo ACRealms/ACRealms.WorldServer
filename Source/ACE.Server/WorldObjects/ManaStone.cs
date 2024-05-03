@@ -70,7 +70,7 @@ namespace ACE.Server.WorldObjects
 
             if (player != target)
             {
-                invTarget = player.FindObject(target.Guid.Full, Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems);
+                invTarget = player.FindObject(target.Guid, Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems);
                 if (invTarget == null)
                 {
                     // Haven't looked to see if an error was sent for this case; however, this one fits

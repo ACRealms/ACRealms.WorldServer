@@ -191,7 +191,7 @@ namespace ACE.Server.WorldObjects
                 TryConsumeFromInventoryWithNetworking(deed);
         }
 
-        public void HandleActionRentHouse(uint slumlord_id, List<uint> item_ids)
+        public void HandleActionRentHouse(ObjectGuid slumlord_id, List<uint> item_ids)
         {
             //Console.WriteLine($"{Name}.HandleActionRentHouse({slumlord_id:X8}, {string.Join(", ", item_ids.Select(i => i.ToString("X8")))})");
             log.Info($"[HOUSE] {Name}.HandleActionRentHouse({slumlord_id:X8}, {string.Join(", ", item_ids.Select(i => i.ToString("X8")))})");
@@ -309,9 +309,10 @@ namespace ACE.Server.WorldObjects
         {
             var inventoryItems = new List<WorldObject>();
 
+            var iid = Session.Player.Location.Instance;
             foreach (var item_id in item_ids)
             {
-                var item = FindObject(item_id, SearchLocations.MyInventory);
+                var item = FindObject(new ObjectGuid(item_id, iid), SearchLocations.MyInventory);
 
                 if (item != null)
                     inventoryItems.Add(item);
@@ -685,7 +686,7 @@ namespace ACE.Server.WorldObjects
         {
             foreach (var purchaseItem in purchaseItems)
             {
-                var item = FindObject(purchaseItem.Guid.Full, SearchLocations.MyInventory);
+                var item = FindObject(purchaseItem.Guid, SearchLocations.MyInventory);
 
                 if (item == null)
                 {

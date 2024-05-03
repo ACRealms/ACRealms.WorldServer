@@ -486,9 +486,9 @@ namespace ACE.Server.WorldObjects
             Everywhere          = 0xFF
         }
 
-        public WorldObject FindObject(ulong objectGuid, SearchLocations searchLocations)
+        public WorldObject FindObject(ObjectGuid objectGuid, SearchLocations searchLocations)
         {
-            return FindObject(new ObjectGuid(objectGuid), searchLocations, out _, out _, out _);
+            return FindObject(objectGuid, searchLocations, out _, out _, out _);
         }
 
         public WorldObject FindObject(ulong objectGuid, SearchLocations searchLocations, out Container foundInContainer, out Container rootOwner, out bool wasEquipped)
@@ -785,7 +785,7 @@ namespace ACE.Server.WorldObjects
             if (suicideInProgress)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YoureTooBusy));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 return false;
             }
 
@@ -794,7 +794,7 @@ namespace ACE.Server.WorldObjects
                 if (PickupState != PickupState.Return || NextPickup != null)
                 {
                     Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.YoureTooBusy));
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 }
                 else
                     NextPickup = () => { HandleActionPutItemInContainer(itemGuid, containerGuid, placement); };
@@ -810,7 +810,7 @@ namespace ACE.Server.WorldObjects
             if (item == null)
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "Source item not found!")); // Custom error message
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 return false;
             }
 
@@ -818,34 +818,34 @@ namespace ACE.Server.WorldObjects
             {
                 log.WarnFormat("Player 0x{0:X8}:{1} tried to move item 0x{2:X8}:{3}.", Guid.Full, Name, item.Guid.Full, item.Name);
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.Stuck));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 return false;
             }
 
             if (itemRootOwner != this && containerRootOwner == this && !HasEnoughBurdenToAddToInventory(item))
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You are too encumbered to carry that!"));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 return false;
             }
 
             if (container == null)
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "Target container not found!")); // Custom error message
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 return false;
             }
 
             if (container is Corpse)
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You cannot put {item.Name} in that.")); // Custom error message
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 return false;
             }
 
             if (IsTrading && item.IsBeingTradedOrContainsItemBeingTraded(ItemsInTradeWindow))
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID, WeenieError.TradeItemBeingTraded));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.TradeItemBeingTraded));
                 return false;
             }
 
@@ -853,20 +853,20 @@ namespace ACE.Server.WorldObjects
             {
                 if (itemRootOwner == this && item.IsAttunedOrContainsAttuned)
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID, WeenieError.AttunedItem));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.AttunedItem));
                     return false;
                 }
 
                 if (itemRootOwner == this && item is PetDevice petDevice && petDevice.Pet is not null)
                 {
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You must unsummon your pet before you can transfer this item!"));
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID, WeenieError.None));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.None));
                     return false;
                 }
 
                 if (containerRootOwner != null && !containerRootOwner.IsOpen)
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session,itemGuid.ClientGUID, WeenieError.TheContainerIsClosed));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session,itemGuid, WeenieError.TheContainerIsClosed));
                     return false;
                 }
             }
@@ -875,7 +875,7 @@ namespace ACE.Server.WorldObjects
             {
                 if (!corpse.IsMonster)
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID, WeenieError.Dead));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.Dead));
                     return false;
                 }
             }
@@ -886,7 +886,7 @@ namespace ACE.Server.WorldObjects
                 {
                     if (hook.House.HouseMaxHooksUsable != -1 && hook.House.HouseCurrentHooksUsable <= 0)
                     {
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID, WeenieError.YouHaveUsedAllTheHooks));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.YouHaveUsedAllTheHooks));
                         return false;
                     }
                 }
@@ -898,7 +898,7 @@ namespace ACE.Server.WorldObjects
                     var houseHookGroupCurrent = hook.House.GetHookGroupCurrentCount(itemHookGroup);
                     if (houseHookGroupMax != -1 && houseHookGroupCurrent >= houseHookGroupMax)
                     {
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                         Session.Player.SendWeenieErrorWithString(WeenieErrorWithString.MaxNumberOf_Hooked, itemHookGroup.ToSentence());
                         return false;
                     }
@@ -911,7 +911,7 @@ namespace ACE.Server.WorldObjects
                 if (container is not Player && container is not Storage)
                 {
                     //Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You cannot put {item.Name} in that.")); // Custom error message
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                     return false;
                 }
             }
@@ -938,7 +938,7 @@ namespace ACE.Server.WorldObjects
             {
                 if (!container.IsOpen || container.Viewer != Guid.Full)
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID, WeenieError.TheContainerIsClosed));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.TheContainerIsClosed));
                     return false;
                 }
             }
@@ -974,7 +974,7 @@ namespace ACE.Server.WorldObjects
                 if (itemRootOwner is Vendor)
                 {
                     Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.NotAllTheItemsAreAvailable));
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                     return;
                 }
 
@@ -994,20 +994,20 @@ namespace ACE.Server.WorldObjects
                 {
                     if (CurrentLandblock == null) // Maybe we were teleported as we were motioning to pick up the item
                     {
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID, WeenieError.ActionCancelled));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.ActionCancelled));
                         return;
                     }
 
                     if (!success)
                     {
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID, WeenieError.ActionCancelled));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.ActionCancelled));
                         return;
                     }
 
                     // Was this item picked up by someone else?
                     if (itemRootOwner == null && item.CurrentLandblock == null)
                     {
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID, WeenieError.ActionCancelled));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.ActionCancelled));
                         return;
                     }
 
@@ -1016,7 +1016,7 @@ namespace ACE.Server.WorldObjects
                         // moving from world container to player
                         if (item.IsUniqueOrContainsUnique && !CheckUniques(item))
                         {
-                            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                             return;
                         }
                     }
@@ -1031,7 +1031,7 @@ namespace ACE.Server.WorldObjects
                         // Was this item picked up by someone else?
                         if (itemRootOwner == null && item.CurrentLandblock == null)
                         {
-                            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID, WeenieError.ActionCancelled));
+                            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.ActionCancelled));
                             EnqueuePickupDone(pickupMotion);
                             return;
                         }
@@ -1136,7 +1136,7 @@ namespace ACE.Server.WorldObjects
                 {
                     // this *should* be a self-contained movement..
                     // duplicated check/message from client
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                     SendTransientError($"You must first pick up the {item.Name}");
                     return;
                 }
@@ -1178,7 +1178,7 @@ namespace ACE.Server.WorldObjects
                 {
                     // We're not who has it open. Can't pick up something someone else is viewing!
                     Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(Session, WeenieErrorWithString.The_IsCurrentlyInUse, item.Name));
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                     return false;
                 }
             }
@@ -1260,7 +1260,7 @@ namespace ACE.Server.WorldObjects
 
             var prevContainer = item.Container;
 
-            OnPutItemInContainer(item.Guid.Full, container.Guid.Full, placement);
+            OnPutItemInContainer(item.Guid, container.Guid, placement);
 
             if (item.CurrentLandblock != null) // Movement is an item pickup off the landblock
             {
@@ -1277,7 +1277,7 @@ namespace ACE.Server.WorldObjects
                 if (!TryDequipObjectWithNetworking(item.Guid, out _, dequipObjectAction))
                 {
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "TryDequipObjectWithNetworking failed!")); // Custom error message
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                     return false;
                 }
             }
@@ -1288,7 +1288,7 @@ namespace ACE.Server.WorldObjects
                 if (itemRootOwner != null && !itemRootOwner.TryRemoveFromInventory(item.Guid) && (itemRootCreature == null || !itemRootCreature.TryDequipObject(item.Guid, out _, out _)))
                 {
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "TryRemoveFromInventory failed!")); // Custom error message
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 }
 
                 if (itemRootOwner == this && containerRootOwner != this)
@@ -1306,7 +1306,7 @@ namespace ACE.Server.WorldObjects
             if (!container.TryAddToInventory(item, placement, true, burdenCheck))
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"Unable to put {item.Name} into container")); // Custom error message
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
 
                 if (prevLocation != null)
                 {
@@ -1354,7 +1354,7 @@ namespace ACE.Server.WorldObjects
         /// - drop an equipped item
         /// - drop an item from inventory
         /// </summary>
-        public void HandleActionDropItem(uint itemGuid)
+        public void HandleActionDropItem(ObjectGuid itemGuid)
         {
             if (IsBusy || Teleporting || suicideInProgress)
             {
@@ -1387,7 +1387,7 @@ namespace ACE.Server.WorldObjects
 
             if (IsTrading && item.IsBeingTradedOrContainsItemBeingTraded(ItemsInTradeWindow))
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.TradeItemBeingTraded));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.TradeItemBeingTraded));
                 return;
             }
 
@@ -1397,7 +1397,7 @@ namespace ACE.Server.WorldObjects
             {
                 if (CurrentLandblock == null) // Maybe we were teleported as we were motioning to drop the item
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.ActionCancelled));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.ActionCancelled));
                     return;
                 }
 
@@ -1406,7 +1406,7 @@ namespace ACE.Server.WorldObjects
                     if (!TryDequipObjectWithNetworking(item.Guid.Full, out _, DequipObjectAction.DropItem))
                     {
                         Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "Failed to dequip item!")); // Custom error message
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                         return;
                     }
                 }
@@ -1415,7 +1415,7 @@ namespace ACE.Server.WorldObjects
                     if (!TryRemoveFromInventoryWithNetworking(item.Guid.ClientGUID, out _, RemoveFromInventoryAction.DropItem))
                     {
                         Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "Failed to remove item from inventory!")); // Custom error message
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                         return;
                     }
                 }
@@ -1442,7 +1442,7 @@ namespace ACE.Server.WorldObjects
                         if (item.WeenieType == WeenieType.Coin || item.WeenieType == WeenieType.Container)
                             UpdateCoinValue();
 
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                     }
                     else
                         log.Warn($"0x{item.Guid}:{item.Name} for player {Name} lost from HandleActionDropItem failure.");
@@ -1494,7 +1494,7 @@ namespace ACE.Server.WorldObjects
         /// - try to wield an item on the landscape
         /// - try to transfer a wielded item to another wield location
         /// </summary>
-        public void HandleActionGetAndWieldItem(ulong itemGuid, EquipMask wieldedLocation)
+        public void HandleActionGetAndWieldItem(ObjectGuid itemGuid, EquipMask wieldedLocation)
         {
             //Console.WriteLine($"{Name}.HandleActionGetAndWieldItem({itemGuid:X8}, {wieldedLocation})");
 
@@ -1506,12 +1506,12 @@ namespace ACE.Server.WorldObjects
                 return;
             }*/
 
-            var item = FindObject(new ObjectGuid(itemGuid), SearchLocations.LocationsICanMove, out var fromContainer, out var rootOwner, out var wasEquipped);
+            var item = FindObject(itemGuid, SearchLocations.LocationsICanMove, out var fromContainer, out var rootOwner, out var wasEquipped);
 
             if (item == null)
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "Item not found!")); // Custom error message
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, new ObjectGuid(itemGuid).ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 return;
             }
 
@@ -1519,14 +1519,14 @@ namespace ACE.Server.WorldObjects
             {
                 log.WarnFormat("Player 0x{0:X8}:{1} tried to move item 0x{2:X8}:{3}.", Guid.Full, Name, item.Guid.Full, item.Name);
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.Stuck));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, new ObjectGuid(itemGuid).ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 return;
             }
 
             if (rootOwner != this && !HasEnoughBurdenToAddToInventory(item))
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You are too encumbered to carry that!"));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, new ObjectGuid(itemGuid).ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 return;
             }
 
@@ -1534,7 +1534,7 @@ namespace ACE.Server.WorldObjects
             {
                 log.WarnFormat("Player 0x{0:X8}:{1} tried to wield item 0x{2:X8}:{3} to {4} (0x{4:X}), not in item's validlocatiions {5} (0x{5:X}).", Guid.Full, Name, item.Guid.Full, item.Name, wieldedLocation, item.ValidLocations ?? 0);
                 Session.Network.EnqueueSend(new GameEventWeenieError(Session, WeenieError.InvalidInventoryLocation));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, new ObjectGuid(itemGuid).ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                 return;
             }
 
@@ -1543,7 +1543,7 @@ namespace ACE.Server.WorldObjects
                 if (CombatMode != CombatMode.NonCombat)
                 {
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "Cannot pick that up and wield it while not at peace!")); // Custom error message
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, new ObjectGuid(itemGuid).ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid));
                     return;
                 }
 
@@ -1551,20 +1551,20 @@ namespace ACE.Server.WorldObjects
                 {
                     if (CurrentLandblock == null) // Maybe we were teleported as we were motioning to pick up the item
                     {
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, new ObjectGuid(itemGuid).ClientGUID, WeenieError.ActionCancelled));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.ActionCancelled));
                         return;
                     }
 
                     if (!success)
                     {
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, new ObjectGuid(itemGuid).ClientGUID, WeenieError.ActionCancelled));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.ActionCancelled));
                         return;
                     }
 
                     // Was this item picked up by someone else?
                     if (rootOwner == null && item.CurrentLandblock == null)
                     {
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, new ObjectGuid(itemGuid).ClientGUID, WeenieError.ActionCancelled));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.ActionCancelled));
                         return;
                     }
 
@@ -1578,7 +1578,7 @@ namespace ACE.Server.WorldObjects
                         // Was this item picked up by someone else?
                         if (rootOwner == null && item.CurrentLandblock == null)
                         {
-                            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, new ObjectGuid(itemGuid).ClientGUID, WeenieError.ActionCancelled));
+                            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemGuid, WeenieError.ActionCancelled));
                             EnqueuePickupDone(pickupMotion);
                             return;
                         }
@@ -1630,7 +1630,7 @@ namespace ACE.Server.WorldObjects
             if (wieldError != WeenieError.None)
             {
                 // client doesnt show specific wieldError here, just '<item> can't be wielded'?
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, wieldError));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, wieldError));
                 return false;
             }
 
@@ -1639,7 +1639,7 @@ namespace ACE.Server.WorldObjects
             if (((item.CurrentWieldedLocation ?? 0) & EquipMask.SelectablePlusAmmo) == 0 && !CheckWeaponCollision(item, wieldedLocation))
             {
                 // Is this generic message good enough? -- '<item> can't be wielded'?
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, wieldError));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, wieldError));
                 return false;
             }
 
@@ -1661,7 +1661,7 @@ namespace ACE.Server.WorldObjects
                     // this wasn't a thing in retail, and can bug out the client during laggy conditions
 
                     // if main-hand slot is filled with anything other than a 1-handed melee weapon, send error
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.ConflictingInventoryLocation));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.ConflictingInventoryLocation));
                     return false;
 
                     /*if (CombatMode != CombatMode.NonCombat)
@@ -1695,7 +1695,7 @@ namespace ACE.Server.WorldObjects
                     // this wasn't a thing in retail, and can bug out the client during laggy conditions
 
                     // if wielding an off-hand weapon, send error
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.ConflictingInventoryLocation));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.ConflictingInventoryLocation));
                     return false;
 
                     /*if (CombatMode != CombatMode.NonCombat)
@@ -1725,7 +1725,7 @@ namespace ACE.Server.WorldObjects
                 else
                 {
                     log.Warn($"{Name} tried to wield {item.Name} ({item.Guid}) in slot {wieldedLocation}, which doesn't match valid slots {item.ValidLocations}");
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                     return false;
                 }
             }
@@ -1736,7 +1736,7 @@ namespace ACE.Server.WorldObjects
             // this client bug will still exist for melee weapons
             if (wieldedLocation == EquipMask.MeleeWeapon && ((item.ValidLocations ?? EquipMask.None) & wieldedLocation) == 0)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 return false;
             }
 
@@ -1747,7 +1747,7 @@ namespace ACE.Server.WorldObjects
                     wieldedLocation.HasFlag(EquipMask.SigilTwo)   && !AetheriaFlags.HasFlag(AetheriaBitfield.Yellow) ||
                     wieldedLocation.HasFlag(EquipMask.SigilThree) && !AetheriaFlags.HasFlag(AetheriaBitfield.Red))
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                     return false;
                 }
             }
@@ -1767,7 +1767,7 @@ namespace ACE.Server.WorldObjects
             // restricting this to two-handed for now, as without that clamp, it bugs out dual wielding and possibly other things
             if (item.WeaponSkill == Skill.TwoHandedCombat && (wieldedLocation & item.ValidLocations) == 0)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 return false;
             }
 
@@ -1778,7 +1778,7 @@ namespace ACE.Server.WorldObjects
                 var existing = GetEquippedItems(item, wieldedLocation).FirstOrDefault();
 
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, $"You must remove your {existing?.Name} to wield {item.Name}"));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 return false;
             }
 
@@ -1820,14 +1820,14 @@ namespace ACE.Server.WorldObjects
                 if (!fromSplit && !itemRootOwner.TryRemoveFromInventory(item.Guid))
                 {
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "TryRemoveFromInventory failed!")); // Custom error message
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 }
             }
 
             if (!TryEquipObjectWithNetworking(item, wieldedLocation))
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "TryEquipObjectWithNetworking failed!")); // Custom error message
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
 
                 // todo: So the item isn't lost, we should try to put the item in the players inventory, or if that's full, on the landblock.
                 log.WarnFormat("Item 0x{0:X8}:{1} for player {2} lost from DoHandleActionGetAndWieldItem failure.", item.Guid.Full, item.Name, Name);
@@ -2034,14 +2034,14 @@ namespace ACE.Server.WorldObjects
             if (!TryDequipObjectWithNetworking(mainWeapon.Guid, out var dequippedItem, DequipObjectAction.DequipToPack))
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "Failed to dequip existing weapon!")); // Custom error message
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 return false;
             }
 
             if (!TryCreateInInventoryWithNetworking(dequippedItem))
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "Failed to add dequip back into inventory!")); // Custom error message
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
 
                 // todo: if this happens, we should just put back the dequipped item to where it was
 
@@ -2213,7 +2213,7 @@ namespace ACE.Server.WorldObjects
         /// - try to split a stack off of the landblock into a container
         /// - try to split a stack into a different container that doesn't already have a stack that can support a merge
         /// </summary>
-        public void HandleActionStackableSplitToContainer(uint stackId, ObjectGuid containerId, int placementPosition, int amount)
+        public void HandleActionStackableSplitToContainer(ObjectGuid stackId, ObjectGuid containerId, int placementPosition, int amount)
         {
             //Console.WriteLine($"{Name}.HandleActionStackableSplitToContainer({stackId:X8}, {containerId:X8}, {placementPosition}, {amount})");
 
@@ -2225,7 +2225,7 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            var stack = FindObject(new ObjectGuid(stackId), SearchLocations.LocationsICanMove, out var stackFoundInContainer, out var stackRootOwner, out _);
+            var stack = FindObject(stackId, SearchLocations.LocationsICanMove, out var stackFoundInContainer, out var stackRootOwner, out _);
             var container = FindObject(containerId, SearchLocations.MyInventory | SearchLocations.Landblock | SearchLocations.LastUsedContainer, out _, out var containerRootOwner, out _) as Container;
 
             if (stack == null)
@@ -2418,7 +2418,7 @@ namespace ACE.Server.WorldObjects
             if (!container.TryAddToInventory(newStack, placementPosition, true))
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "TryAddToInventory failed!")); // Custom error message
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, stack.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, stack.Guid));
                 return false;
             }
 
@@ -2447,7 +2447,7 @@ namespace ACE.Server.WorldObjects
         /// This is raised when we:
         /// - try to split a stack onto the landblock
         /// </summary>
-        public void HandleActionStackableSplitTo3D(uint stackId, int amount)
+        public void HandleActionStackableSplitTo3D(ObjectGuid stackId, int amount)
         {
             if (amount <= 0)
             {
@@ -2457,7 +2457,7 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            var stack = FindObject(new ObjectGuid(stackId), SearchLocations.MyInventory | SearchLocations.MyEquippedItems, out var stackFoundInContainer, out var stackRootOwner, out _);
+            var stack = FindObject(stackId, SearchLocations.MyInventory | SearchLocations.MyEquippedItems, out var stackFoundInContainer, out var stackRootOwner, out _);
 
             if (stack == null)
             {
@@ -2566,7 +2566,7 @@ namespace ACE.Server.WorldObjects
             actionChain.EnqueueChain();
         }
 
-        public void HandleActionStackableSplitToWield(uint stackId, EquipMask wieldedLocation, int amount)
+        public void HandleActionStackableSplitToWield(ObjectGuid stackId, EquipMask wieldedLocation, int amount)
         {
             //Console.WriteLine($"{Name}.HandleActionStackableSplitToWield({stackId:X8}, {wieldedLocation}, {amount})");
 
@@ -2578,7 +2578,7 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            var stack = FindObject(new ObjectGuid(stackId), SearchLocations.LocationsICanMove, out var stackFoundInContainer, out var stackRootOwner, out _);
+            var stack = FindObject(stackId, SearchLocations.LocationsICanMove, out var stackFoundInContainer, out var stackRootOwner, out _);
 
             if (stack == null)
             {
@@ -2754,7 +2754,7 @@ namespace ACE.Server.WorldObjects
                                     Session.Network.EnqueueSend(new GameMessageSetStackSize(stack));
                             }
                             else
-                                log.WarnFormat("Partial stack 0x{0:X8}:{1} for player {2} lost from HandleActionStackableSplitToWield failure.", stack.Guid.Full, stack.Name, Name);
+                                log.WarnFormat("Partial stack 0x{0:X8}:{1} for player {2} lost from HandleActionStackableSplitToWield failure.", stack.Guid, stack.Name, Name);
 
                             newStack.Destroy();
                         }
@@ -2819,7 +2819,7 @@ namespace ACE.Server.WorldObjects
         /// - try to merge a stack from the landblock into a container
         /// - try to split a stack into a different container that has a stack that can support a merge
         /// </summary>
-        public void HandleActionStackableMerge(uint mergeFromGuid, uint mergeToGuid, int amount)
+        public void HandleActionStackableMerge(ObjectGuid mergeFromGuid, ObjectGuid mergeToGuid, int amount)
         {
             //Console.WriteLine($"HandleActionStackableMerge({mergeFromGuid:X8}, {mergeToGuid:X8}, {amount})");
 
@@ -2930,7 +2930,7 @@ namespace ACE.Server.WorldObjects
 
             if (targetStackRootOwner == this && !CanMergeToInventory(sourceStack, targetStack, amount))
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, sourceStack.Guid.ClientGUID, WeenieError.None));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, sourceStack.Guid, WeenieError.None));
                 return;
             }
 
@@ -2950,7 +2950,7 @@ namespace ACE.Server.WorldObjects
 
             if (sourceStack.IsAttunedOrContainsAttuned && sourceStackRootOwner == this && targetStackRootOwner != this)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, sourceStack.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, sourceStack.Guid));
                 return;
             }
 
@@ -2959,7 +2959,7 @@ namespace ACE.Server.WorldObjects
                 if (sourceStackRootOwner is Vendor)
                 {
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You cannot merge from vendor")); // Custom error message
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, sourceStack.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, sourceStack.Guid));
                     return;
                 }
 
@@ -3054,13 +3054,13 @@ namespace ACE.Server.WorldObjects
 
             if (sourceStack == null || targetStack == null)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid.ClientGUID, WeenieError.None));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid, WeenieError.None));
                 return false;
             }
 
             if (targetStack == null || targetStack.MaxStackSize < targetStack.StackSize + amount)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid));
                 return false;
             }
 
@@ -3079,7 +3079,7 @@ namespace ACE.Server.WorldObjects
                     }
                     else
                     {
-                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid.ClientGUID));
+                        Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid));
                         return false;
                     }
                 }
@@ -3104,19 +3104,19 @@ namespace ACE.Server.WorldObjects
 
                 if (sourceStack == null || sourceStack.StackSize < amount)
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid));
                     return false;
                 }
 
                 if (targetStack == null || targetStack.MaxStackSize < targetStack.StackSize + amount)
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid));
                     return false;
                 }
 
                 if (!AdjustStack(sourceStack, -amount, sourceStackFoundInContainer, sourceStackRootOwner))
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, previousSourceStackCheck.Guid));
                     return false;
                 }
 
@@ -3160,7 +3160,7 @@ namespace ACE.Server.WorldObjects
         /// - try to give an object to another player
         /// - try to give an object to an NPC
         /// </summary>
-        public void HandleActionGiveObjectRequest(uint targetGuid, uint itemGuid, int amount)
+        public void HandleActionGiveObjectRequest(ObjectGuid targetGuid, ObjectGuid itemGuid, int amount)
         {
             if (IsBusy || Teleporting || suicideInProgress)
             {
@@ -3204,7 +3204,7 @@ namespace ACE.Server.WorldObjects
 
             if (IsTrading && item.IsBeingTradedOrContainsItemBeingTraded(ItemsInTradeWindow))
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.TradeItemBeingTraded));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.TradeItemBeingTraded));
                 return;
             }
 
@@ -3234,34 +3234,34 @@ namespace ACE.Server.WorldObjects
         {
             if (item.IsAttunedOrContainsAttuned)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.AttunedItem));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.AttunedItem));
                 return;
             }
 
             if (item is PetDevice petDevice && petDevice.Pet is not null)
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You must unsummon your pet before you can transfer this item!"));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.AttunedItem));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.AttunedItem));
                 return;
             }
 
             if (IsTrading && item.IsBeingTradedOrContainsItemBeingTraded(ItemsInTradeWindow))
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.TradeItemBeingTraded));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.TradeItemBeingTraded));
                 return;
             }
 
             if (target.IsOlthoiPlayer || IsOlthoiPlayer)
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "Olthoi cannot trade items with other players!")); // Custom error message
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 return;
             }
 
             if ((target.Character.CharacterOptions1 & (int)CharacterOptions1.AllowGive) != (int)CharacterOptions1.AllowGive)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(Session, WeenieErrorWithString._IsNotAcceptingGiftsRightNow, target.Name));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 var msg = new GameMessageSystemChat($"{Name} tries to give you {(item.StackSize > 1 ? $"{item.StackSize} " : "")}{item.GetNameWithMaterial(item.StackSize)}.", ChatMessageType.Broadcast);
                 target.Session.Network.EnqueueSend(msg);
                 return;
@@ -3269,14 +3269,14 @@ namespace ACE.Server.WorldObjects
 
             if (target.IsLoggingOut)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.None));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.None));
                 return;
             }
 
             if (target.IsBusy)
             {
                 Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(Session, WeenieErrorWithString._IsTooBusyToAcceptGifts, target.Name));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 var msg = new GameMessageSystemChat($"{Name} tries to give you {(item.StackSize > 1 ? $"{item.StackSize} " : "")}{item.GetNameWithMaterial(item.StackSize)}.", ChatMessageType.Broadcast);
                 target.Session.Network.EnqueueSend(msg);
                 return;
@@ -3289,13 +3289,13 @@ namespace ACE.Server.WorldObjects
 
             if (!target.CanAddToInventory(item))
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.None));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.None));
                 return;
             }
 
             if (item.IsUniqueOrContainsUnique && !target.CheckUniques(item, this))
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.None));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.None));
                 return;
             }
 
@@ -3320,7 +3320,7 @@ namespace ACE.Server.WorldObjects
 
                     // todo: So the item isn't lost, we should try to put the item in the players inventory, or if that's full, on the landblock.
 
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemToGive.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, itemToGive.Guid));
 
                     if (!TryCreateInInventoryWithNetworking(itemToGive))
                         log.WarnFormat("Item 0x{0:X8}:{1} for player {2} lost from GiveObjecttoPlayer failure.", item.Guid.Full, item.Name, Name);
@@ -3363,27 +3363,27 @@ namespace ACE.Server.WorldObjects
             if (item is PetDevice petDevice && petDevice.Pet is not null)
             {
                 Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "You must unsummon your pet before you can transfer this item!"));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.AttunedItem));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.AttunedItem));
                 return;
             }
 
             if (IsOlthoiPlayer && target.CreatureType != ACE.Entity.Enum.CreatureType.Olthoi)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(Session, WeenieErrorWithString._CowersFromYou, target.Name));
                 return;
             }
 
             if (target.EmoteManager.IsBusy)
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                 Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(Session, WeenieErrorWithString.AiRefuseItemDuringEmote, target.Name));
                 return;
             }
 
             if (IsTrading && item.IsBeingTradedOrContainsItemBeingTraded(ItemsInTradeWindow))
             {
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.TradeItemBeingTraded));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.TradeItemBeingTraded));
                 return;
             }
 
@@ -3417,13 +3417,13 @@ namespace ACE.Server.WorldObjects
                 {
                     // Item rejected by npc
                     Session.Network.EnqueueSend(new GameMessageSystemChat($"You allow {target.Name} to examine your {item.NameWithMaterial}.", ChatMessageType.Broadcast));
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID, WeenieError.TradeAiRefuseEmote));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid, WeenieError.TradeAiRefuseEmote));
 
                     target.EmoteManager.ExecuteEmoteSet(emoteResult, this);
                 }
                 else
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                     Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(Session, WeenieErrorWithString._IsNotAcceptingGiftsRightNow, target.Name));
                     return;
                 }
@@ -3446,14 +3446,14 @@ namespace ACE.Server.WorldObjects
                 }
 
                 Session.Network.EnqueueSend(new GameEventWeenieErrorWithString(Session, (WeenieErrorWithString)WeenieError.TradeAiDoesntWant, target.Name));
-                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
             }
         }
 
         private void HandleIOUTurnIn(WorldObject target, WorldObject iouToTurnIn)
         {
             Session.Network.EnqueueSend(new GameMessageSystemChat($"You allow {target.Name} to examine your {iouToTurnIn.NameWithMaterial}.", ChatMessageType.Broadcast));
-            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, iouToTurnIn.Guid.ClientGUID, WeenieError.TradeAiRefuseEmote));
+            Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, iouToTurnIn.Guid, WeenieError.TradeAiRefuseEmote));
 
             if (!PropertyManager.GetBool("iou_trades").Item)
             {
@@ -3531,7 +3531,7 @@ namespace ACE.Server.WorldObjects
             {
                 if (!AdjustStack(item, -amount, itemFoundInContainer, itemRootOwner))
                 {
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                     itemToGive = null;
                     return false;
                 }
@@ -3544,7 +3544,7 @@ namespace ACE.Server.WorldObjects
                 {
                     // this should never happen under normal circumstances,
                     // but can happen if the player has an item in their inventory that is no longer in the world database
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                     itemToGive = null;
                     return false;
                 }
@@ -3567,7 +3567,7 @@ namespace ACE.Server.WorldObjects
                 if (!TryDequipObjectWithNetworking(item.Guid, out _, DequipObjectAction.GiveItem))
                 {
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "TryDequipObjectWithNetworking failed!")); // Custom error message
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                     itemToGive = null;
                     return false;
                 }
@@ -3577,7 +3577,7 @@ namespace ACE.Server.WorldObjects
                 if (!TryRemoveFromInventoryWithNetworking(item.Guid, out _, RemoveFromInventoryAction.GiveItem))
                 {
                     Session.Network.EnqueueSend(new GameEventCommunicationTransientString(Session, "TryRemoveFromInventoryWithNetworking failed!")); // Custom error message
-                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid.ClientGUID));
+                    Session.Network.EnqueueSend(new GameEventInventoryServerSaveFailed(Session, item.Guid));
                     itemToGive = null;
                     return false;
                 }
@@ -3687,7 +3687,7 @@ namespace ACE.Server.WorldObjects
             }
         }
 
-        private void OnPutItemInContainer(ulong itemGuid, ulong containerGuid, int placement)
+        private void OnPutItemInContainer(ObjectGuid itemGuid, ObjectGuid containerGuid, int placement)
         {
             Prev_PutItemInContainer[1] = Prev_PutItemInContainer[0];
             Prev_PutItemInContainer[0] = new PutItemInContainerEvent(itemGuid, containerGuid, placement);

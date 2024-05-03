@@ -12,7 +12,7 @@ namespace ACE.Server.Network.GameAction.Actions
         {
             //Console.WriteLine("Received 0x258 - House - QueryLord");
 
-            var lord = message.Payload.ReadUInt32();    // slumlord ID to request info for
+            var lord = message.Payload.ReadGuid(session);    // slumlord ID to request info for
         }
     }
 }

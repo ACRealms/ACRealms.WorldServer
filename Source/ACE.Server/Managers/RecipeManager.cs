@@ -479,7 +479,7 @@ namespace ACE.Server.Managers
             // only run this for items in the player's inventory
             // ie. skip for items on landblock, such as chorizite ore
 
-            var invObj = player.FindObject(obj.Guid.Full, Player.SearchLocations.MyInventory);
+            var invObj = player.FindObject(obj.Guid, Player.SearchLocations.MyInventory);
 
             if (invObj != null)
                 player.MoveItemToFirstContainerSlot(obj);
@@ -858,11 +858,11 @@ namespace ACE.Server.Managers
                 log.Warn($"{player.Name}.RecipeManager.VerifyUse({source.Name} ({source.Guid}), {target.Name} ({target.Guid})) - source not usable, falling back on defaults");
 
                 // re-verify
-                if (player.FindObject(source.Guid.Full, Player.SearchLocations.MyInventory) == null)
+                if (player.FindObject(source.Guid, Player.SearchLocations.MyInventory) == null)
                     return false;
 
                 // almost always MyInventory, but sometimes can be applied to equipped
-                if (player.FindObject(target.Guid.Full, Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems) == null)
+                if (player.FindObject(target.Guid, Player.SearchLocations.MyInventory | Player.SearchLocations.MyEquippedItems) == null)
                     return false;
 
                 return true;
@@ -886,7 +886,7 @@ namespace ACE.Server.Managers
             if (usable.HasFlag(Usable.Remote))
                 searchLocations |= Player.SearchLocations.LocationsICanMove;    // TODO: moveto for this type
 
-            return player.FindObject(obj.Guid.Full, searchLocations) != null;
+            return player.FindObject(obj.Guid, searchLocations) != null;
         }
 
         public static bool Debug = false;

@@ -28,7 +28,7 @@ namespace ACE.Server.Network.GameEvent.Events
             }
 
             Writer.WriteString16L(fellowship.FellowshipName);
-            Writer.Write(fellowship.FellowshipLeaderGuid);
+            Writer.WriteGuid(new ACE.Entity.ObjectGuid(fellowship.FellowshipLeaderGuid));
             Writer.Write(Convert.ToUInt32(fellowship.ShareXP));
             Writer.Write(Convert.ToUInt32(fellowship.EvenShare));
             Writer.Write(Convert.ToUInt32(fellowship.Open));

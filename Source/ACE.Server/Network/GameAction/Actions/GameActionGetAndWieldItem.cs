@@ -7,7 +7,7 @@ namespace ACE.Server.Network.GameAction.Actions
         [GameAction(GameActionType.GetAndWieldItem)]
         public static void Handle(ClientMessage message, Session session)
         {
-            uint itemGuid = message.Payload.ReadUInt32();
+            var itemGuid = message.Payload.ReadGuid(session);
             var location = (EquipMask)message.Payload.ReadInt32();
 
             session.Player.HandleActionGetAndWieldItem(itemGuid, location);
