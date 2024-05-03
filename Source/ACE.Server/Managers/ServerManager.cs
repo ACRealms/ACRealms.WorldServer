@@ -164,13 +164,13 @@ namespace ACE.Server.Managers
                 log.Debug("Disconnecting all sessions...");
 
                 // disconnect each session
-                NetworkManager.DisconnectAllSessionsForShutdown();
+                NetworkManager.Instance.DisconnectAllSessionsForShutdown();
             }));
 
             // Wait for all sessions to drop out
             logUpdateTS = DateTime.MinValue;
             int sessionCount;
-            while ((sessionCount = NetworkManager.GetAuthenticatedSessionCount()) > 0)
+            while ((sessionCount = NetworkManager.Instance.GetAuthenticatedSessionCount()) > 0)
             {
                 logUpdateTS = LogStatusUpdate(logUpdateTS, $"Waiting for {sessionCount} authenticated session{(sessionCount > 1 ? "s" : "")} to disconnect...");
                 Thread.Sleep(10);

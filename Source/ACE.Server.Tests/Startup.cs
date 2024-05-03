@@ -6,6 +6,7 @@ using ACE.Database.Models.World;
 using ACE.DatLoader;
 using ACE.Server;
 using ACE.Server.Managers;
+using ACE.Server.Network.Managers;
 using ACRealms.Tests.Fixtures;
 using ACRealms.Tests.Fixtures.Database;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,8 @@ namespace ACRealms.Tests
                 options.ServicesStopConcurrently = false;
             });
             TestDatabaseService.Initialize(hostApplicationBuilder.Services);
+
+            hostApplicationBuilder.Services.AddSingleton<INetworkManager, Fixtures.Network.FakeNetworkManager>();
 
             // If we don't use a scope, the DbContextFactory will be unusable as soon as tests finish,
             // immediately before ACRealmsTestService begins disposing, and will cause a crash

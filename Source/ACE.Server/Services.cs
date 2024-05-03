@@ -176,6 +176,8 @@ namespace ACE.Server
             var builder = Host.CreateDefaultBuilder();
             builder.ConfigureServices((context, services) =>
             {
+                services.AddSingleton<INetworkManager, NetworkManager>();
+
                 // Disable logging of db commands
                 var dbLogger = LoggerFactory.Create(builder => builder.AddFilter(_ => false));
 

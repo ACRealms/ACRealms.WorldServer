@@ -318,7 +318,7 @@ namespace ACE.Server.Network
             // Example: Applications that check uptime will stay in the AuthLoginRequest state.
             session.Network.TimeoutTick = (session.State == SessionState.AuthLoginRequest) ?
                 DateTime.UtcNow.AddSeconds(AuthenticationHandler.DefaultAuthTimeout).Ticks : // Default is 15s
-                DateTime.UtcNow.AddSeconds(NetworkManager.DefaultSessionTimeout).Ticks; // Default is 60s
+                DateTime.UtcNow.AddSeconds(NetworkManager.Instance.DefaultSessionTimeout).Ticks; // Default is 60s
 
             #endregion
 

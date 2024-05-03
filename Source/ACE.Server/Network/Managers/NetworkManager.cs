@@ -17,13 +17,28 @@ using ACE.Server.Network.Enum;
 
 namespace ACE.Server.Network.Managers
 {
-    public static class NetworkManager
+    public interface INetworkManager
     {
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private static readonly ILog packetLog = LogManager.GetLogger(System.Reflection.Assembly.GetEntryAssembly(), "Packets");
+        uint DefaultSessionTimeout { get; }
+        ActionQueue InboundMessageQueue { get; }
+        void DisconnectAllSessionsForShutdown();
+        int DoSessionWork();
+        ISession Find(string account);
+        ISession Find(uint accountId);
+        ISession FindOrCreateSession(ConnectionListener connectionListener, IPEndPoint endPoint);
+        int GetAuthenticatedSessionCount();
+        int GetSessionCount();
+        int GetSessionEndpointTotalByAddressCount(IPAddress address);
+        int GetUniqueSessionEndpointCount();
+        void ProcessPacket(ConnectionListener connectionListener, ClientPacket packet, IPEndPoint endPoint);
+        void RemoveSession(ISession session);
+        void SendLoginRequestReject(ISession session, CharacterError error);
+    }
 
-        // Hard coded server Id, this will need to change if we move to multi-process or multi-server model
-        public const ushort ServerId = 0xB;
+    public class NetworkManagerBase
+    {
+        protected readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        protected readonly ILog packetLog = LogManager.GetLogger(System.Reflection.Assembly.GetEntryAssembly(), "Packets");
 
         /// <summary>
         /// Seconds until a session will timeout. 
@@ -32,17 +47,105 @@ namespace ACE.Server.Network.Managers
         /// <remarks>
         /// If you're experiencing network dropouts or frequent disconnects, try increasing this value.
         /// </remarks>
-        public static uint DefaultSessionTimeout = ConfigManager.Config.Server.Network.DefaultSessionTimeout;
-
-        private static readonly ReaderWriterLockSlim sessionLock = new ReaderWriterLockSlim();
-        private static readonly ISession[] sessionMap = new ISession[ConfigManager.Config.Server.Network.MaximumAllowedSessions];
+        public uint DefaultSessionTimeout { get; } = ConfigManager.Config.Server.Network.DefaultSessionTimeout;
 
         /// <summary>
         /// Handles ClientMessages in InboundMessageManager
         /// </summary>
-        public static readonly ActionQueue InboundMessageQueue = new ActionQueue();
+        public ActionQueue InboundMessageQueue { get; } = new ActionQueue();
 
-        public static void ProcessPacket(ConnectionListener connectionListener, ClientPacket packet, IPEndPoint endPoint)
+        protected readonly ReaderWriterLockSlim sessionLock = new ReaderWriterLockSlim();
+        protected readonly ISession[] sessionMap = new ISession[ConfigManager.Config.Server.Network.MaximumAllowedSessions];
+
+        // Hard coded server Id, this will need to change if we move to multi-process or multi-server model
+        public ushort ServerId = 0xB;
+
+        public void SendLoginRequestReject(ISession session, CharacterError error)
+        {
+            // First we must send the connect request response
+            var connectRequest = new PacketOutboundConnectRequest(
+                Timers.PortalYearTicks,
+                session.Network.ConnectionData.ConnectionCookie,
+                session.Network.ClientId,
+                session.Network.ConnectionData.ServerSeed,
+                session.Network.ConnectionData.ClientSeed);
+            session.Network.ConnectionData.DiscardSeeds();
+            session.Network.EnqueueSend(connectRequest);
+
+            // Then we send the error
+            session.SendCharacterError(error);
+
+            session.Network.Update();
+        }
+
+        public int GetSessionCount()
+        {
+            sessionLock.EnterReadLock();
+            try
+            {
+                return sessionMap.Count(s => s != null);
+            }
+            finally
+            {
+                sessionLock.ExitReadLock();
+            }
+        }
+
+        public int GetAuthenticatedSessionCount()
+        {
+            sessionLock.EnterReadLock();
+            try
+            {
+                return sessionMap.Count(s => s != null && s.AccountId != 0);
+            }
+            finally
+            {
+                sessionLock.ExitReadLock();
+            }
+        }
+
+        public int GetUniqueSessionEndpointCount()
+        {
+            sessionLock.EnterReadLock();
+            try
+            {
+                var ipAddresses = new HashSet<IPAddress>();
+
+                foreach (var s in sessionMap)
+                {
+                    if (s != null)
+                        ipAddresses.Add(s.EndPointC2S.Address);
+                }
+
+                return ipAddresses.Count;
+            }
+            finally
+            {
+                sessionLock.ExitReadLock();
+            }
+        }
+        public int GetSessionEndpointTotalByAddressCount(IPAddress address)
+        {
+            sessionLock.EnterReadLock();
+            try
+            {
+                int result = 0;
+
+                foreach (var s in sessionMap)
+                {
+                    if (s != null && s.EndPointC2S.Address.Equals(address))
+                        result++;
+                }
+
+                return result;
+            }
+            finally
+            {
+                sessionLock.ExitReadLock();
+            }
+        }
+
+        public void ProcessPacket(ConnectionListener connectionListener, ClientPacket packet, IPEndPoint endPoint)
         {
             if (connectionListener.ListenerEndpoint.Port == ConfigManager.Config.Server.Network.Port + 1)
             {
@@ -167,100 +270,14 @@ namespace ACE.Server.Network.Managers
             }
         }
 
-        private static void SendLoginRequestReject(ConnectionListener connectionListener, IPEndPoint endPoint, CharacterError error)
+        private void SendLoginRequestReject(ConnectionListener connectionListener, IPEndPoint endPoint, CharacterError error)
         {
             var tempSession = new Session(connectionListener, endPoint, (ushort)(sessionMap.Length + 1), ServerId);
 
             SendLoginRequestReject(tempSession, error);
         }
 
-        public static void SendLoginRequestReject(ISession session, CharacterError error)
-        {
-            // First we must send the connect request response
-            var connectRequest = new PacketOutboundConnectRequest(
-                Timers.PortalYearTicks,
-                session.Network.ConnectionData.ConnectionCookie,
-                session.Network.ClientId,
-                session.Network.ConnectionData.ServerSeed,
-                session.Network.ConnectionData.ClientSeed);
-            session.Network.ConnectionData.DiscardSeeds();
-            session.Network.EnqueueSend(connectRequest);
-
-            // Then we send the error
-            session.SendCharacterError(error);
-
-            session.Network.Update();
-        }
-
-        public static int GetSessionCount()
-        {
-            sessionLock.EnterReadLock();
-            try
-            {
-                return sessionMap.Count(s => s != null);
-            }
-            finally
-            {
-                sessionLock.ExitReadLock();
-            }
-        }
-
-        public static int GetAuthenticatedSessionCount()
-        {
-            sessionLock.EnterReadLock();
-            try
-            {
-                return sessionMap.Count(s => s != null && s.AccountId != 0);
-            }
-            finally
-            {
-                sessionLock.ExitReadLock();
-            }
-        }
-
-        public static int GetUniqueSessionEndpointCount()
-        {
-            sessionLock.EnterReadLock();
-            try
-            {
-                var ipAddresses = new HashSet<IPAddress>();
-
-                foreach (var s in sessionMap)
-                {
-                    if (s != null)
-                        ipAddresses.Add(s.EndPointC2S.Address);
-                }
-
-                return ipAddresses.Count;
-            }
-            finally
-            {
-                sessionLock.ExitReadLock();
-            }
-        }
-
-        public static int GetSessionEndpointTotalByAddressCount(IPAddress address)
-        {
-            sessionLock.EnterReadLock();
-            try
-            {
-                int result = 0;
-
-                foreach (var s in sessionMap)
-                {
-                    if (s != null && s.EndPointC2S.Address.Equals(address))
-                        result++;
-                }
-
-                return result;
-            }
-            finally
-            {
-                sessionLock.ExitReadLock();
-            }
-        }
-
-        public static ISession FindOrCreateSession(ConnectionListener connectionListener, IPEndPoint endPoint)
+        public ISession FindOrCreateSession(ConnectionListener connectionListener, IPEndPoint endPoint)
         {
             ISession session;
 
@@ -298,7 +315,7 @@ namespace ACE.Server.Network.Managers
             return session;
         }
 
-        public static ISession Find(uint accountId)
+        public ISession Find(uint accountId)
         {
             sessionLock.EnterReadLock();
             try
@@ -311,7 +328,7 @@ namespace ACE.Server.Network.Managers
             }
         }
 
-        public static ISession Find(string account)
+        public ISession Find(string account)
         {
             sessionLock.EnterReadLock();
             try
@@ -327,7 +344,7 @@ namespace ACE.Server.Network.Managers
         /// <summary>
         /// Removes a session, network client and network endpoint from the various tracker objects.
         /// </summary>
-        public static void RemoveSession(ISession session)
+        public void RemoveSession(ISession session)
         {
             sessionLock.EnterWriteLock();
             try
@@ -347,7 +364,7 @@ namespace ACE.Server.Network.Managers
         /// Dispatches all outgoing messages.<para />
         /// Removes dead sessions.
         /// </summary>
-        public static int DoSessionWork()
+        public int DoSessionWork()
         {
             int sessionCount = 0;
 
@@ -380,12 +397,18 @@ namespace ACE.Server.Network.Managers
             return sessionCount;
         }
 
-        public static void DisconnectAllSessionsForShutdown()
+        public void DisconnectAllSessionsForShutdown()
         {
             foreach (var session in sessionMap)
             {
                 session?.Terminate(SessionTerminationReason.ServerShuttingDown, new GameMessages.Messages.GameMessageCharacterError(CharacterError.ServerCrash1));
             }
         }
+    }
+
+    public class NetworkManager : NetworkManagerBase, INetworkManager
+    {
+        public static INetworkManager Instance { get; } = new NetworkManager();
+ 
     }
 }

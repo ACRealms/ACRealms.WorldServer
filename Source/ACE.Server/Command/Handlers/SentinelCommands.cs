@@ -297,7 +297,7 @@ namespace ACE.Server.Command.Handlers
                     break;
                 case "account":
                     whatToBoot = "account";
-                    sessionToBoot = NetworkManager.Find(whomToBoot);
+                    sessionToBoot = NetworkManager.Instance.Find(whomToBoot);
                     break;
                 case "iid":
                     whatToBoot = "instance id";
@@ -408,7 +408,7 @@ namespace ACE.Server.Command.Handlers
             DatabaseManager.Authentication.UpdateAccount(account);
 
             // Boot the player
-            if (NetworkManager.Find(accountName) != null)
+            if (NetworkManager.Instance.Find(accountName) != null)
             {
                 var bootArgs = new List<string> { "account" };
                 if (!string.IsNullOrWhiteSpace(banReason))

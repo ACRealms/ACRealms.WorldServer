@@ -115,7 +115,7 @@ namespace ACE.Server.Network
                 var packet = new ClientPacket();
 
                 if (packet.Unpack(buffer, dataSize))
-                    NetworkManager.ProcessPacket(this, packet, ipEndpoint);
+                    NetworkManager.Instance.ProcessPacket(this, packet, ipEndpoint);
 
                 packet.ReleaseBuffer();
             }

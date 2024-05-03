@@ -458,7 +458,7 @@ namespace ACE.Server.Managers
                 ServerPerformanceMonitor.RegisterEventEnd(ServerPerformanceMonitor.MonitorType.PlayerManager_Tick);
 
                 ServerPerformanceMonitor.RestartEvent(ServerPerformanceMonitor.MonitorType.NetworkManager_InboundClientMessageQueueRun);
-                NetworkManager.InboundMessageQueue.RunActions();
+                NetworkManager.Instance.InboundMessageQueue.RunActions();
                 ServerPerformanceMonitor.RegisterEventEnd(ServerPerformanceMonitor.MonitorType.NetworkManager_InboundClientMessageQueueRun);
 
                 // This will consist of PlayerEnterWorld actions, as well as other game world actions that require thread safety
@@ -475,7 +475,7 @@ namespace ACE.Server.Managers
                 ServerPerformanceMonitor.RegisterEventEnd(ServerPerformanceMonitor.MonitorType.UpdateGameWorld);
 
                 ServerPerformanceMonitor.RestartEvent(ServerPerformanceMonitor.MonitorType.NetworkManager_DoSessionWork);
-                int sessionCount = NetworkManager.DoSessionWork();
+                int sessionCount = NetworkManager.Instance.DoSessionWork();
                 ServerPerformanceMonitor.RegisterEventEnd(ServerPerformanceMonitor.MonitorType.NetworkManager_DoSessionWork);
 
                 ServerPerformanceMonitor.Tick();

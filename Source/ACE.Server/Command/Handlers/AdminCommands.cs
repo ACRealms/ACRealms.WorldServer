@@ -2165,7 +2165,7 @@ namespace ACE.Server.Command.Handlers
                                     session.Characters.Add(newPlayer.Character);
                                 else
                                 {
-                                    var foundActiveSession = Network.Managers.NetworkManager.Find(newAccountId);
+                                    var foundActiveSession = Network.Managers.NetworkManager.Instance.Find(newAccountId);
 
                                     if (foundActiveSession != null)
                                         foundActiveSession.Characters.Add(newPlayer.Character);

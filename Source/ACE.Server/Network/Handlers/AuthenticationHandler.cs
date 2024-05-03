@@ -29,6 +29,8 @@ namespace ACE.Server.Network.Handlers
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly ILog packetLog = LogManager.GetLogger(System.Reflection.Assembly.GetEntryAssembly(), "Packets");
 
+        public static INetworkManager NetworkManager { get; } = Managers.NetworkManager.Instance;
+
         public static void HandleLoginRequest(ClientPacket packet, ISession session)
         {
             try
