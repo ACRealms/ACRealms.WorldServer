@@ -738,11 +738,17 @@ namespace ACE.Server.Command.Handlers
                         // Create a new position from the current player location
                         var playerPosition = new InstancedPosition(session.Player.Location);
 
+                        UsablePosition positionToSave = playerPosition;
+                        if (!InstancedProperties.PositionTypes.Contains(positionType))
+                            positionToSave = playerPosition.AsLocalPosition();
+
                         // Save the position
-                        session.Player.SetPosition(positionType, playerPosition);
+                        session.Player.SetPosition(positionType, positionToSave);
 
                         // Report changes to client
-                        var positionMessage = new GameMessageSystemChat($"Set: {positionType} to Loc: {playerPosition}", ChatMessageType.Broadcast);
+                        var positionMessage = new GameMessageSystemChat(
+                            $"Set: {positionType} to Loc: {positionToSave}{(positionToSave is LocalPosition ? " (LocalPosition)" : "")}",
+                            ChatMessageType.Broadcast);
                         session.Network.EnqueueSend(positionMessage);
                         return;
                     }
