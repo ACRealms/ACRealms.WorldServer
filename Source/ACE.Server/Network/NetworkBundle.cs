@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ACE.Server.Network
 {
 
-    internal class NetworkBundle
+    public class NetworkBundle
     {
         private bool propChanged;
 

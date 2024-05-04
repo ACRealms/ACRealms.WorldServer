@@ -1308,8 +1308,10 @@ namespace ACE.Server.Command.Handlers.Processors
         {
             var sqlCommands = File.ReadAllText(sqlFile);
 
-            using (var ctx = new ShardDbContext())
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
+            {
                 ctx.Database.ExecuteSqlRaw(sqlCommands);
+            }
         }
 
         public static LandblockInstanceWriter LandblockInstanceWriter;

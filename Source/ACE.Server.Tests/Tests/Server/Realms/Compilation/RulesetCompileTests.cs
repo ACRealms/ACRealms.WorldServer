@@ -3,6 +3,7 @@ using ACE.Entity.Enum.Properties;
 using ACE.Server.Managers;
 using ACE.Server.Network;
 using ACRealms.Tests.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,7 @@ using static ACRealms.Tests.Helpers.RealmFixtures;
 
 namespace ACRealms.Tests.Server.Realms.Compilation
 {
+    [Collection(nameof(WorldCollection))]
     public class RulesetCompileTests
     {
         [Fact]

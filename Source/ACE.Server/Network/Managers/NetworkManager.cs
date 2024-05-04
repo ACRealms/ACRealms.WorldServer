@@ -14,6 +14,7 @@ using ACE.Server.Managers;
 using ACE.Server.Network.Packets;
 using ACE.Server.Network.Handlers;
 using ACE.Server.Network.Enum;
+using ACE.Server.Network;
 
 namespace ACE.Server.Network.Managers
 {
@@ -35,7 +36,7 @@ namespace ACE.Server.Network.Managers
         void SendLoginRequestReject(ISession session, CharacterError error);
     }
 
-    public class NetworkManagerBase
+    public abstract class NetworkManagerBase
     {
         protected readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         protected readonly ILog packetLog = LogManager.GetLogger(System.Reflection.Assembly.GetEntryAssembly(), "Packets");
@@ -272,47 +273,9 @@ namespace ACE.Server.Network.Managers
 
         private void SendLoginRequestReject(ConnectionListener connectionListener, IPEndPoint endPoint, CharacterError error)
         {
-            var tempSession = new Session(connectionListener, endPoint, (ushort)(sessionMap.Length + 1), ServerId);
+            var tempSession = MakeSession(connectionListener, endPoint, (ushort)(sessionMap.Length + 1));
 
             SendLoginRequestReject(tempSession, error);
-        }
-
-        public ISession FindOrCreateSession(ConnectionListener connectionListener, IPEndPoint endPoint)
-        {
-            ISession session;
-
-            sessionLock.EnterUpgradeableReadLock();
-            try
-            {
-                session = sessionMap.SingleOrDefault(s => s != null && endPoint.Equals(s.EndPointC2S));
-                if (session == null)
-                {
-                    sessionLock.EnterWriteLock();
-                    try
-                    {
-                        for (ushort i = 0; i < sessionMap.Length; i++)
-                        {
-                            if (sessionMap[i] == null)
-                            {
-                                log.DebugFormat("Creating new session for {0} with id {1}", endPoint, i);
-                                session = new Session(connectionListener, endPoint, i, ServerId);
-                                sessionMap[i] = session;
-                                break;
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        sessionLock.ExitWriteLock();
-                    }
-                }
-            }
-            finally
-            {
-                sessionLock.ExitUpgradeableReadLock();
-            }
-
-            return session;
         }
 
         public ISession Find(uint accountId)
@@ -404,11 +367,66 @@ namespace ACE.Server.Network.Managers
                 session?.Terminate(SessionTerminationReason.ServerShuttingDown, new GameMessages.Messages.GameMessageCharacterError(CharacterError.ServerCrash1));
             }
         }
+
+        protected abstract ISession MakeSession(ConnectionListener connectionListener, IPEndPoint endPoint, ushort clientID);
+        public abstract ISession FindOrCreateSession(ConnectionListener connectionListener, IPEndPoint endPoint);
     }
 
     public class NetworkManager : NetworkManagerBase, INetworkManager
     {
-        public static INetworkManager Instance { get; } = new NetworkManager();
- 
+        public static INetworkManager Instance { get; private set; }
+        public static bool TestMode { get; set; } = false;
+
+        public static void Initialize(INetworkManager instance)
+        {
+            if (Instance != null)
+                throw new InvalidOperationException("NetworkManager may only be initialized once.");
+
+            TestMode = instance is not NetworkManager;
+            Instance = instance;
+        }
+
+        protected override ISession MakeSession(ConnectionListener connectionListener, IPEndPoint endPoint, ushort clientID)
+        {
+            return new Session(connectionListener, endPoint, clientID, ServerId);
+        }
+
+        public override ISession FindOrCreateSession(ConnectionListener connectionListener, IPEndPoint endPoint)
+        {
+            ISession session;
+
+            sessionLock.EnterUpgradeableReadLock();
+            try
+            {
+                session = sessionMap.SingleOrDefault(s => s != null && endPoint.Equals(s.EndPointC2S));
+                if (session == null)
+                {
+                    sessionLock.EnterWriteLock();
+                    try
+                    {
+                        for (ushort i = 0; i < sessionMap.Length; i++)
+                        {
+                            if (sessionMap[i] == null)
+                            {
+                                log.DebugFormat("Creating new session for {0} with id {1}", endPoint, i);
+                                session = MakeSession(connectionListener, endPoint, i);
+                                sessionMap[i] = session;
+                                break;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        sessionLock.ExitWriteLock();
+                    }
+                }
+            }
+            finally
+            {
+                sessionLock.ExitUpgradeableReadLock();
+            }
+
+            return session;
+        }
     }
 }

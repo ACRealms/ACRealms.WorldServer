@@ -9,11 +9,13 @@ using ACE.Server.Managers;
 using ACE.Server.Network.Managers;
 using ACRealms.Tests.Fixtures;
 using ACRealms.Tests.Fixtures.Database;
+using ACRealms.Tests.Fixtures.Network;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System;
 using System.Collections.Generic;
@@ -22,7 +24,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xunit;
 using Xunit.DependencyInjection;
+using static ACE.Server.Services;
+using Autofac.Extensions.DependencyInjection;
+using Autofac.Core;
+using ACRealms.Tests.Helpers;
 
 namespace ACRealms.Tests
 {
@@ -31,27 +38,32 @@ namespace ACRealms.Tests
         public void ConfigureHostApplicationBuilder(IHostApplicationBuilder hostApplicationBuilder)
         {
             ConfigManager.Initialize();
-            hostApplicationBuilder.Services.Configure<HostOptions>(options =>
-            {
-                options.ServicesStartConcurrently = false;
-                options.ServicesStopConcurrently = false;
-            });
             TestDatabaseService.Initialize(hostApplicationBuilder.Services);
-
-            hostApplicationBuilder.Services.AddSingleton<INetworkManager, Fixtures.Network.FakeNetworkManager>();
-
-            // If we don't use a scope, the DbContextFactory will be unusable as soon as tests finish,
-            // immediately before ACRealmsTestService begins disposing, and will cause a crash
-            hostApplicationBuilder.Services.AddKeyedScoped<Services.IACRealmsService, ACRealmsTestService>("ACRealmsFull");
         }
 
         public void Configure(IServiceProvider provider)
         {
-            provider.GetRequiredKeyedService<Services.IACRealmsService>("ACRealmsFull");
+            WorldFixture.Service = new ACRealmsTestService(provider);            
         }
     }
 
-    public class ACRealmsTestService : Services.IACRealmsService, IDisposable
+    [CollectionDefinition(nameof(WorldCollection))]
+    public class WorldCollection : ICollectionFixture<WorldFixture> { }
+
+    public class WorldFixture : IDisposable
+    {
+        public static ACRealmsTestService Service { get; set; }
+
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            Service.Dispose();
+            IsDisposed = true;
+        }
+    }
+
+    public class ACRealmsTestService : IACRealmsService, IDisposable
     {
         public ACRealmsTestService(IServiceProvider provider)
         {
@@ -66,22 +78,24 @@ namespace ACRealms.Tests
             PlayerManager.Initialize();
             HouseManager.Initialize();
             RealmManager.Initialize(false);
+            NetworkManager.Initialize(new FakeNetworkManager());
             WorldManager.Initialize();
+            RealmFixtures.LoadRealmFixture(RealmFixtures.FixtureName.simple);
         }
 
+        public bool IsDisposed { get; private set; }
         public void Dispose()
         {
             PropertyManager.StopUpdating();
-            DatabaseManager.Stop();
+
             WorldManager.StopWorld();
             while (WorldManager.WorldActive)
-            {
                 Thread.Sleep(10);
-            }
+
+            DatabaseManager.Stop();
             while (DatabaseManager.Shard.QueueCount > 0)
-            {
                 Thread.Sleep(10);
-            }
+            IsDisposed = true;
         }
     }
 }

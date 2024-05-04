@@ -30,7 +30,10 @@ namespace ACE.Server
 {
     public static partial class Services
     {
-        public interface IACRealmsService { }
+        public interface IACRealmsService
+        {
+            bool IsDisposed { get; }
+        }
 
         /// <summary>
         /// The timeBeginPeriod function sets the minimum timer resolution for an application or device driver. Used to manipulate the timer frequency.
@@ -176,8 +179,6 @@ namespace ACE.Server
             var builder = Host.CreateDefaultBuilder();
             builder.ConfigureServices((context, services) =>
             {
-                services.AddSingleton<INetworkManager, NetworkManager>();
-
                 // Disable logging of db commands
                 var dbLogger = LoggerFactory.Create(builder => builder.AddFilter(_ => false));
 
@@ -366,6 +367,7 @@ namespace ACE.Server
             InboundMessageManager.Initialize();
 
             log.Info("Initializing SocketManager...");
+            NetworkManager.Initialize(new NetworkManager());
             SocketManager.Initialize();
 
             log.Info("Initializing WorldManager...");

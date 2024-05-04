@@ -51,7 +51,7 @@ namespace ACE.Server.Factories
             0x00, 0x00, 0x00, 0x00
         };
 
-        private static CharacterCreateInfo CreateCharacterCreateInfo(string name, uint strength, uint endurance, uint coordination, uint quickness, uint focus, uint self, bool randomizeHeritageAndApperance = true)
+        public static CharacterCreateInfo CreateCharacterCreateInfo(string name, uint strength, uint endurance, uint coordination, uint quickness, uint focus, uint self, bool randomizeHeritageAndApperance = true)
         {
             var characterCreateInfo = new CharacterCreateInfo();
 

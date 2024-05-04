@@ -10,44 +10,26 @@ using System.Threading.Tasks;
 
 namespace ACRealms.Tests.Fixtures.Network
 {
-    internal class FakeNetworkSession : INetworkSession
+    public class FakeNetworkSession : NetworkSessionBase
     {
-        public ushort ClientId { get; }
+        public FakeSession FakeSession => (FakeSession)session;
 
-        public ushort ServerId { get; }
-
-        public long TimeoutTick { get; set; }
-        public bool sendResync { get; set; }
-
-        public SessionConnectionData ConnectionData => throw new NotImplementedException();
-
-        public FakeNetworkSession(ISession session, ConnectionListener connectionListener, ushort clientId, ushort serverId)
-        {
-            ClientId = clientId;
-            ServerId = serverId;
-
-            // New network auth session timeouts will always be low.
-            TimeoutTick = DateTime.UtcNow.AddSeconds(AuthenticationHandler.DefaultAuthTimeout).Ticks;
-        }
-
-        public void EnqueueSend(params GameMessage[] messages)
+        public FakeNetworkSession(ISession session, ushort clientId, ushort serverId)
+            : base(session, clientId, serverId)
         {
         }
 
-        public void EnqueueSend(params ServerPacket[] packets)
+        protected override void SendPacketRaw(ServerPacket packet)
         {
         }
 
-        public void ProcessPacket(ClientPacket packet)
+        public override void EnqueueSend(params GameMessage[] messages)
         {
-        }
+            if (isReleased) // Session has been removed
+                return;
 
-        public void ReleaseResources()
-        {
-        }
-
-        public void Update()
-        {
+            foreach (var message in messages)
+                FakeSession.LogMessageSent(message);
         }
     }
 }

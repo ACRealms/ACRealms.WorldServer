@@ -41,7 +41,7 @@ namespace ACRealms.Tests.Fixtures.Database
         public static string TestUserPassword { get; } = RandomPassword();
 
         // Can be temporarily false when trying to make specific tests pass (faster execution), but some tests need this to be true
-        const bool RESET_DB_EACH_RUN = true;
+        const bool RESET_DB_EACH_RUN = false;
 
         public static string AuthDbName { get; } = "acrealms_test_auth";
         public static string WorldDbName { get; } = "acrealms_test_world";
@@ -83,6 +83,7 @@ namespace ACRealms.Tests.Fixtures.Database
 
             var config = ConfigManager.Config.MySql.World;
             var connectionStringBase = $"server={config.Host};port={config.Port};user={TestUserName};password={TestUserPassword};{config.ConnectionOptions}";
+
             services.AddDbContextFactory<AuthDbContext>(options =>
             {
                 var connectionString = $"{connectionStringBase};database={AuthDbName}";
@@ -100,10 +101,33 @@ namespace ACRealms.Tests.Fixtures.Database
 
         public static void BuildDBs(IServiceProvider provider)
         {
-            if (!RESET_DB_EACH_RUN)
-#pragma warning disable CS0162 // Unreachable code detected
+            bool validDb = false;
+            try
+            {
+                using (var context = provider.GetRequiredService<IDbContextFactory<WorldDbContext>>().CreateDbContext())
+                {
+                    if (context.Weenie.First() != null)
+                        validDb = true;
+                }
+            }
+            catch (Exception) { }
+
+
+            if (validDb && !RESET_DB_EACH_RUN)
+            {
+                using (var context = provider.GetRequiredService<IDbContextFactory<AuthDbContext>>().CreateDbContext())
+                {
+                    context.Account.RemoveRange(context.Account);
+                    context.SaveChanges();
+                }
+                using (var context = provider.GetRequiredService<IDbContextFactory<ShardDbContext>>().CreateDbContext())
+                {
+                    context.Character.RemoveRange(context.Character);
+                    context.SaveChanges();
+                }
+
                 return;
-#pragma warning restore CS0162 // Unreachable code detected
+            }
 
             EnsureWorldDbDownloaded();
 

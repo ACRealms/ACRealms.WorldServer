@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Numerics;
 using ACE.Entity;
 using ACRealms.Tests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace ACRealms.Tests.Server.Realms
 {
-    [CollectionDefinition("Dependency Injection")]
+    [Collection(nameof(WorldCollection))]
     public class RealmTests
     {
         [Fact]

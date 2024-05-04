@@ -62,70 +62,12 @@ namespace ACE.Server.Network
         void WorldBroadcast(string broadcastMessage);
     }
 
-    //public interface ISession
-    //{
-    //    public IPEndPoint EndPointC2S { get; }
-
-    //    public IPEndPoint EndPointS2C { get; }
-
-    //    public NetworkSession Network { get; set; }
-
-    //    public uint GameEventSequence { get; set; }
-
-    //    public SessionState State { get; set; }
-
-
-    //    public uint AccountId { get; }
-
-    //    public string Account { get; }
-
-    //    public string LoggingIdentifier { get; }
-
-    //    public AccessLevel AccessLevel { get; }
-
-    //    public List<Character> Characters { get; }
-
-    //    public Player Player { get; }
-
-    //    public DateTime logOffRequestTime { get; set; }
-
-    //    public DateTime lastCharacterSelectPingReply { get; set; }
-
-    //    public SessionTerminationDetails PendingTermination { get; set; }
-
-    //    public string BootSessionReason { get; }
-
-    //    public bool DatWarnCell { get; set; }
-    //    public bool DatWarnPortal { get; set; }
-    //    public bool DatWarnLanguage { get; set; }
-
-    //    /// <summary>
-    //    /// This boolean is set to true if GameMessageDDDBeginDDD is sent to the client. Used to determine when response is needed for DDD_EndDDD
-    //    /// </summary>
-    //    public bool BeginDDDSent { get; set; }
-    //    /// <summary>
-    //    /// The time at which the BeginDDD message was sent to the client. Used to determine when to start processing dddDataQueue initially.
-    //    /// </summary>
-    //    public DateTime BeginDDDSentTime { get; set; }
-
-    //    public DateTime LastPassTime { get; set; }
-
-
-    //    public void ProcessPacket(ClientPacket packet);
-    //    public void TickOutbound();
-    //    public void SetAccount(uint accountId, string account, AccessLevel accountAccesslevel);
-    //    public void UpdateCharacters(IEnumerable<Character> characters);
-    //    public void CheckCharactersForDeletion();
-
-    //}
-
-    public class Session : ISession
+    public abstract class SessionBase : ISession
     {
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public IPEndPoint EndPointC2S { get; }
-
-        public IPEndPoint EndPointS2C { get; private set; }
+        public abstract IPEndPoint EndPointS2C { get; protected set; }
 
         public INetworkSession Network { get; set; }
 
@@ -176,17 +118,15 @@ namespace ACE.Server.Network
         /// </summary>
         private static readonly RateLimiter dddDataQueueRateLimiter = new RateLimiter(1000, TimeSpan.FromMinutes(1));
 
+        public SessionBase(IPEndPoint endPoint)
+        {
+            EndPointC2S = endPoint;
+        }
+
         /// <summary>
         /// Rate limiter for /passwd command
         /// </summary>
         public DateTime LastPassTime { get; set; }
-
-        public Session(ConnectionListener connectionListener, IPEndPoint endPoint, ushort clientId, ushort serverId)
-        {
-            EndPointC2S = endPoint;
-            Network = new NetworkSession(this, connectionListener, clientId, serverId);
-        }
-
 
         private bool CheckState(ClientPacket packet)
         {
@@ -264,7 +204,6 @@ namespace ACE.Server.Network
 
             ProcessDDDQueue();
         }
-
 
         public void SetAccount(uint accountId, string account, AccessLevel accountAccesslevel)
         {
@@ -483,6 +422,17 @@ namespace ACE.Server.Network
                 Network.EnqueueSend(new GameMessageDDDDataMessage(dataFile.DatFileId, dataFile.DatDatabaseType));
                 dddDataQueueRateLimiter.RegisterEvent();
             }
+        }
+    }
+
+    public class Session : SessionBase, ISession
+    {
+        public override IPEndPoint EndPointS2C { get; protected set; }
+
+        public Session(ConnectionListener connectionListener, IPEndPoint endPoint, ushort clientId, ushort serverId)
+            : base(endPoint)
+        {
+            Network = new NetworkSession(this, connectionListener, clientId, serverId);
         }
     }
 }

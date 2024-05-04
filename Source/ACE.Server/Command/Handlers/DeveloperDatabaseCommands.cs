@@ -61,7 +61,7 @@ namespace ACE.Server.Command.Handlers
             else
                 Console.WriteLine("Please use command fix-shortcut-bars execute");
 
-            using (var ctx = new ShardDbContext())
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
             {
                 var results = ctx.CharacterPropertiesShortcutBar
                     .FromSqlRaw("SELECT * FROM character_properties_shortcut_bar ORDER BY character_Id, shortcut_Bar_Index, id")
@@ -233,7 +233,7 @@ namespace ACE.Server.Command.Handlers
 
             log.Info($"Starting FixSpellBarsPR2918 process. This could take a while...");
 
-            using (var context = new ShardDbContext())
+            using (var context = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
             {
                 var characterSpellBarsNotFixed = context.CharacterPropertiesSpellBar.Where(c => c.SpellBarNumber == 0).ToList();
 

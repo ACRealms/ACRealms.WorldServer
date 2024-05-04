@@ -1,3 +1,4 @@
+using ACE.Server.Network.Managers;
 using log4net;
 using System.IO;
 
@@ -24,6 +25,7 @@ namespace ACE.Server.Network.GameMessages
         public GameMessageGroup Group { get; private set; }
 
         protected BinaryWriter Writer { get; private set; }
+        protected static bool TestMode => NetworkManager.TestMode;
 
         protected GameMessage(GameMessageOpcode opCode, GameMessageGroup group)
         {

@@ -386,7 +386,7 @@ namespace ACE.Server.Command.Handlers
             HashSet<ulong> ralireaSkillCredit = null;
             Dictionary<ulong, int> lumAugSkillCredits = null;
 
-            using (var ctx = new ShardDbContext())
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
             {
                 // 4 possible skill credits from quests
                 // - OswaldManualCompleted
@@ -896,7 +896,7 @@ namespace ACE.Server.Command.Handlers
 
             HashSet<ulong> lesserBenediction = null;
 
-            using (var ctx = new ShardDbContext())
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
             {
                 // Asheron's Lesser Benediction augmentation operates differently than all other augs
                 lesserBenediction = ctx.CharacterPropertiesQuestRegistry.Where(i => i.QuestName.Equals("LesserBenedictionAug")).Select(i => i.CharacterId).ToHashSet();
@@ -1111,7 +1111,7 @@ namespace ACE.Server.Command.Handlers
 
         public static Dictionary<ulong, int> GetResistMagic()
         {
-            using (var ctx = new ShardDbContext())
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
             {
                 var resistMagic = ctx.BiotaPropertiesInt.Where(i => i.Type == (int)PropertyInt.ResistMagic).ToDictionary(i => i.ObjectId, i => i.Value);
 
@@ -1121,7 +1121,7 @@ namespace ACE.Server.Command.Handlers
 
         public static Dictionary<ulong, string> GetTinkerLogs()
         {
-            using (var ctx = new ShardDbContext())
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
             {
                 var tinkerLogs = ctx.BiotaPropertiesString.Where(i => i.Type == (int)PropertyString.TinkerLog).ToDictionary(i => i.ObjectId, i => i.Value);
 
@@ -1131,7 +1131,7 @@ namespace ACE.Server.Command.Handlers
 
         public static Dictionary<ulong, int> GetNumTimesTinkered()
         {
-            using (var ctx = new ShardDbContext())
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
             {
                 var numTimesTinkered = ctx.BiotaPropertiesInt.Where(i => i.Type == (int)PropertyInt.NumTimesTinkered).ToDictionary(i => i.ObjectId, i => i.Value);
 
@@ -1141,7 +1141,7 @@ namespace ACE.Server.Command.Handlers
 
         public static Dictionary<ulong, int> GetImbuedEffect()
         {
-            using (var ctx = new ShardDbContext())
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
             {
                 var imbuedEffect = ctx.BiotaPropertiesInt.Where(i => i.Type == (int)PropertyInt.ImbuedEffect).ToDictionary(i => i.ObjectId, i => i.Value);
 

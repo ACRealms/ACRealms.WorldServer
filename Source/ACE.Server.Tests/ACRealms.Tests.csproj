@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="xunit" Version="2.7.1" />
     <PackageReference Include="Xunit.DependencyInjection" Version="9.1.0" />
@@ -55,14 +56,6 @@
         <Pack>True</Pack>
         <PackagePath></PackagePath>
       </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Tests\Server\Entity\" />
-      <Folder Include="Tests\Server\Factories\" />
-      <Folder Include="Tests\Server\Managers\" />
-      <Folder Include="Tests\Server\Network\" />
-      <Folder Include="Tests\Server\WorldObjects\" />
     </ItemGroup>
 
     <ItemGroup>
