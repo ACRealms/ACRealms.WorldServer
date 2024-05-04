@@ -117,20 +117,20 @@ namespace ACE.Database
             {
                 if (PlayerBiotaRetentionTime > TimeSpan.Zero)
                 {
-                    using (var context = ContextFactory.CreateDbContext())
-                    {
-                        var biota = GetBiota(context, id, doNotAddToCache); // This will add the result into the caches
-                        return biota;
-                    }
+                    var context = ContextFactory.CreateDbContext();
+
+                    var biota = GetBiota(context, id, doNotAddToCache); // This will add the result into the caches
+
+                    return biota;
                 }
             }
             else if (NonPlayerBiotaRetentionTime > TimeSpan.Zero)
             {
-                using (var context = ContextFactory.CreateDbContext())
-                { 
-                    var biota = GetBiota(context, id, doNotAddToCache); // This will add the result into the caches
-                    return biota;
-                }
+                var context = ContextFactory.CreateDbContext();
+
+                var biota = GetBiota(context, id, doNotAddToCache); // This will add the result into the caches
+
+                return biota;
             }
 
             return base.GetBiota(id, doNotAddToCache);
@@ -162,36 +162,36 @@ namespace ACE.Database
 
             // Biota does not exist in the cache
 
-            using (var context = ContextFactory.CreateDbContext())
+            var context = ContextFactory.CreateDbContext();
+
+            var existingBiota = base.GetBiota(context, biota.Id);
+
+            rwLock.EnterReadLock();
+            try
             {
-                var existingBiota = base.GetBiota(context, biota.Id);
-
-                rwLock.EnterReadLock();
-                try
+                if (existingBiota == null)
                 {
-                    if (existingBiota == null)
-                    {
-                        existingBiota = ACE.Database.Adapter.BiotaConverter.ConvertFromEntityBiota(biota);
+                    existingBiota = ACE.Database.Adapter.BiotaConverter.ConvertFromEntityBiota(biota);
 
-                        context.Biota.Add(existingBiota);
-                    }
-                    else
-                    {
-                        ACE.Database.Adapter.BiotaUpdater.UpdateDatabaseBiota(context, biota, existingBiota);
-                    }
+                    context.Biota.Add(existingBiota);
                 }
-                finally
+                else
                 {
-                    rwLock.ExitReadLock();
-                }
-
-                if (DoSaveBiota(context, existingBiota))
-                {
-                    TryAddToCache(context, existingBiota);
-
-                    return true;
+                    ACE.Database.Adapter.BiotaUpdater.UpdateDatabaseBiota(context, biota, existingBiota);
                 }
             }
+            finally
+            {
+                rwLock.ExitReadLock();
+            }
+
+            if (DoSaveBiota(context, existingBiota))
+            {
+                TryAddToCache(context, existingBiota);
+
+                return true;
+            }
+
             return false;
         }
 
