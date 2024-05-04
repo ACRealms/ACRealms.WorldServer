@@ -860,8 +860,8 @@ namespace ACE.Server.WorldObjects
             }
             else if (!newLocation.IsEphemeralRealm)
             {
-                SetPosition(PositionType.EphemeralRealmExitTo, null);
-                SetPosition(PositionType.EphemeralRealmLastEnteredDrop, null);
+                EphemeralRealmExitTo = null;
+                EphemeralRealmLastEnteredDrop = null;
             }
 
             var pk = false;

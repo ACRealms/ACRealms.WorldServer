@@ -541,31 +541,76 @@ namespace ACE.Server.WorldObjects
         private readonly Dictionary<PositionType, UsablePosition> positionCache = new Dictionary<PositionType, UsablePosition>();
 
         #region GetPosition, SetPosition, RemovePosition, GetAllPositions Functions
+
+        // As of ACRealmsv2, do not call this method! Use the wrapper methods in WorldObject_Positions.cs
         public UsablePosition GetPosition(PositionType positionType)
         {
+            UsablePosition unknownTypedPosition = null;
+
             if (ephemeralPositions.TryGetValue(positionType, out var ephemeralPosition))
-                return ephemeralPosition;
+                unknownTypedPosition = ephemeralPosition;
 
-            if (positionCache.TryGetValue(positionType, out var cachedPosition))
-                return cachedPosition;
-
-            var positionRaw = Biota.GetPosition(positionType, BiotaDatabaseLock);
-
-            if (positionRaw != null && !Position.IsRotationValid(positionRaw.Rotation))
+            if (unknownTypedPosition == null)
             {
-                positionRaw.AttemptToFixRotation();
+                if (positionCache.TryGetValue(positionType, out var cachedPosition))
+                    unknownTypedPosition = cachedPosition;
             }
-            if (positionRaw == null)
+
+            if (unknownTypedPosition == null)
             {
-                positionCache[positionType] = null;
-                return null;
+                var positionRaw = Biota.GetPosition(positionType, BiotaDatabaseLock);
+
+                if (positionRaw != null && !Position.IsRotationValid(positionRaw.Rotation))
+                {
+                    positionRaw.AttemptToFixRotation();
+                }
+                if (positionRaw == null)
+                {
+                    positionCache[positionType] = null;
+                    return null;
+                }
+                else
+                {
+                    if (InstancedProperties.PositionTypes.Contains(positionType))
+                        unknownTypedPosition = new InstancedPosition(positionRaw, positionRaw.Instance);
+                    else
+                        unknownTypedPosition = new LocalPosition(positionRaw);
+                }
             }
-            
+
             UsablePosition position;
             if (InstancedProperties.PositionTypes.Contains(positionType))
-                position = new InstancedPosition(positionRaw, positionRaw.Instance);
+            {
+                if (unknownTypedPosition is InstancedPosition)
+                {
+                    position = new InstancedPosition((InstancedPosition)unknownTypedPosition);
+                }
+                else if (unknownTypedPosition is LocalPosition)
+                {
+                    log.Warn($@"
+Warning: Previously saved position of type {positionType}
+should have been InstancedPosition, but was saved as LocalPosition for Guid {Guid}, Object Name: {Name}.
+Report this to the AC Realms developer.");
+                    position = ((LocalPosition)unknownTypedPosition).AsInstancedPosition(this, ACE.Entity.Enum.RealmProperties.WorldObjectInstanceSelectMode.Same);
+                }
+                else
+                    throw new InvalidOperationException($"Invalid position type {unknownTypedPosition.GetType().Name} (This should never happen)");
+            }
             else
-                position = new LocalPosition(positionRaw);
+            {
+                if (unknownTypedPosition is InstancedPosition)
+                {
+                    log.Warn($@"
+Warning: Previously saved position of type {positionType}
+should have been LocalPosition, but was saved as InstancedPosition for Guid {Guid}, Object Name: {Name}.
+Report this to the AC Realms developer.");
+                    position = ((InstancedPosition)unknownTypedPosition).AsLocalPosition();
+                }
+                else if (unknownTypedPosition is LocalPosition)
+                    position = new LocalPosition((LocalPosition)unknownTypedPosition);
+                else
+                    throw new InvalidOperationException($"Invalid position type {unknownTypedPosition.GetType().Name} (This should never happen)");
+            }
 
             positionCache[positionType] = position;
 
@@ -580,22 +625,58 @@ namespace ACE.Server.WorldObjects
         /// The proper way to would be: LandscapeItem.SetPosition(PositionType.Location, new Position(Player.Location))<para />
         /// Any time you want to set a position of a different PositionType, or, positions between WorldObjects, you should use the Position copy constructor.
         /// </summary>
-        public void SetPosition(PositionType positionType, UsablePosition position)
+        public void SetPosition(PositionType positionType, UsablePosition unknownPositionType)
         {
             //if (position != null && !position.Rotation.IsRotationValid())
-                //position.AttemptToFixRotation(this, positionType);
+            //position.AttemptToFixRotation(this, positionType);
+            UsablePosition positionToSave;
+            if (unknownPositionType != null)
+            {
+                if (InstancedProperties.PositionTypes.Contains(positionType))
+                {
+                    if (unknownPositionType is LocalPosition lPos)
+                    {
+                        log.Warn($@"
+Warning: Saving position of type {positionType}
+as InstancedPosition, but a LocalPosition was passed. Converting to InstancedPosition. Guid {Guid}, Object Name: {Name}.
+Report this to the AC Realms developer.");
+                        positionToSave = lPos.AsInstancedPosition(this, ACE.Entity.Enum.RealmProperties.WorldObjectInstanceSelectMode.Same);
+                    }
+                    else if (unknownPositionType is InstancedPosition iPos)
+                        positionToSave = new InstancedPosition(iPos);
+                    else
+                        throw new InvalidOperationException($"Invalid position type {unknownPositionType.GetType().Name} (This should never happen)");
+                }
+                else
+                {
+                    if (unknownPositionType is InstancedPosition iPos)
+                    {
+                        log.Warn($@"
+Warning: Saving position of type {positionType}
+as LocalPosition, but an InstancedPosition was passed. Converting to LocalPosition. Guid {Guid}, Object Name: {Name}.
+Report this to the AC Realms developer.");
+                        positionToSave = iPos.AsLocalPosition();
+                    }
+                    else if (unknownPositionType is LocalPosition lPos)
+                        positionToSave = new LocalPosition(lPos);
+                    else
+                        throw new InvalidOperationException($"Invalid position type {unknownPositionType.GetType().Name} (This should never happen)");
+                }
+            }
+            else
+                positionToSave = null;
 
             if (EphemeralProperties.PositionTypes.Contains(positionType))
-                ephemeralPositions[positionType] = position;
+                ephemeralPositions[positionType] = positionToSave;
             else
             {
-                if (position == null)
+                if (positionToSave == null)
                     RemovePosition(positionType);
                 else
                 {
-                    positionCache[positionType] = position;
+                    positionCache[positionType] = positionToSave;
 
-                    Biota.SetPosition(positionType, position.GetPosition(), BiotaDatabaseLock);
+                    Biota.SetPosition(positionType, positionToSave.GetPosition(), BiotaDatabaseLock);
                     ChangesDetected = true;
                 }
             }
@@ -622,7 +703,18 @@ namespace ACE.Server.WorldObjects
             try
             {
                 foreach (var kvp in Biota.PropertiesPosition)
-                    results[kvp.Key] = new InstancedPosition(kvp.Value.ObjCellId, kvp.Value.PositionX, kvp.Value.PositionY, kvp.Value.PositionZ, kvp.Value.RotationX, kvp.Value.RotationY, kvp.Value.RotationZ, kvp.Value.RotationW, kvp.Value.Instance ?? 0);
+                {
+                    var positionType = kvp.Key;
+                    if (InstancedProperties.PositionTypes.Contains(positionType))
+                    {
+                        var iid = kvp.Value.Instance ?? Location.Instance;
+                        results[kvp.Key] = new InstancedPosition(kvp.Value.ObjCellId, kvp.Value.PositionX, kvp.Value.PositionY, kvp.Value.PositionZ, kvp.Value.RotationX, kvp.Value.RotationY, kvp.Value.RotationZ, kvp.Value.RotationW, iid);
+                    }
+                    else
+                    {
+                        results[kvp.Key] = new LocalPosition(kvp.Value.ObjCellId, kvp.Value.PositionX, kvp.Value.PositionY, kvp.Value.PositionZ, kvp.Value.RotationX, kvp.Value.RotationY, kvp.Value.RotationZ, kvp.Value.RotationW);
+                    }
+                }
             }
             finally
             {
@@ -2210,45 +2302,6 @@ namespace ACE.Server.WorldObjects
         }
 
 
-        // ========================================
-        //= ======== Position Properties ==========
-        // ========================================
-        public InstancedPosition Location
-        {
-            get => (InstancedPosition)GetPosition(PositionType.Location);
-            set => SetPosition(PositionType.Location, value);
-        }
-
-        public LocalPosition Destination
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Destination); }
-            set { SetPosition(PositionType.Destination, value); }
-        }
-
-        public InstancedPosition Instantiation
-        {
-            get { return (InstancedPosition)GetPosition(PositionType.Instantiation); }
-            set { SetPosition(PositionType.Instantiation, value); }
-        }
-
-        public LocalPosition Sanctuary
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Sanctuary); }
-            set { SetPosition(PositionType.Sanctuary, value); }
-        }
-
-        public InstancedPosition Home
-        {
-            get { return (InstancedPosition)GetPosition(PositionType.Home); }
-            set { SetPosition(PositionType.Home, value); }
-        }
-
-        public LocalPosition LinkedPortalOne
-        {
-            get { return (LocalPosition)GetPosition(PositionType.LinkedPortalOne); }
-            set { SetPosition(PositionType.LinkedPortalOne, value); }
-        }
-
         public uint? LinkedPortalOneDID
         {
             get => GetProperty(PropertyDataId.LinkedPortalOne);
@@ -2261,130 +2314,10 @@ namespace ACE.Server.WorldObjects
             set { if (!value.HasValue) RemoveProperty(PropertyDataId.LinkedPortalTwo); else SetProperty(PropertyDataId.LinkedPortalTwo, value.Value); }
         }
 
-        public LocalPosition LastPortal
-        {
-            get { return (LocalPosition)GetPosition(PositionType.LastPortal); }
-            set { SetPosition(PositionType.LastPortal, value); }
-        }
-
         public uint? LastPortalDID
         {
             get => GetProperty(PropertyDataId.LastPortal);
             set { if (!value.HasValue) RemoveProperty(PropertyDataId.LastPortal); else SetProperty(PropertyDataId.LastPortal, value.Value); }
-        }
-
-        public LocalPosition PortalStorm
-        {
-            get { return (LocalPosition)GetPosition(PositionType.PortalStorm); }
-            set { SetPosition(PositionType.PortalStorm, value); }
-        }
-
-        public LocalPosition PortalSummonLoc
-        {
-            get { return (LocalPosition)GetPosition(PositionType.PortalSummonLoc); }
-            set { SetPosition(PositionType.PortalSummonLoc, value); }
-        }
-
-        public LocalPosition HouseBoot
-        {
-            get { return (LocalPosition)GetPosition(PositionType.HouseBoot); }
-            set { SetPosition(PositionType.HouseBoot, value); }
-        }
-
-        public LocalPosition LastOutsideDeath
-        {
-            get { return (LocalPosition)GetPosition(PositionType.LastOutsideDeath); }
-            set { SetPosition(PositionType.LastOutsideDeath, value); }
-        }
-
-        public LocalPosition LinkedLifestone
-        {
-            get { return (LocalPosition)GetPosition(PositionType.LinkedLifestone); }
-            set { SetPosition(PositionType.LinkedLifestone, value); }
-        }
-
-        public LocalPosition LinkedPortalTwo
-        {
-            get { return (LocalPosition)GetPosition(PositionType.LinkedPortalTwo); }
-            set { SetPosition(PositionType.LinkedPortalTwo, value); }
-        }
-
-        public LocalPosition Save1
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Save1); }
-            set { SetPosition(PositionType.Save1, value); }
-        }
-
-        public LocalPosition Save2
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Save2); }
-            set { SetPosition(PositionType.Save2, value); }
-        }
-
-        public LocalPosition Save3
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Save3); }
-            set { SetPosition(PositionType.Save3, value); }
-        }
-
-        public LocalPosition Save4
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Save4); }
-            set { SetPosition(PositionType.Save4, value); }
-        }
-
-        public LocalPosition Save5
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Save5); }
-            set { SetPosition(PositionType.Save5, value); }
-        }
-
-        public LocalPosition Save6
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Save6); }
-            set { SetPosition(PositionType.Save6, value); }
-        }
-
-        public LocalPosition Save7
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Save7); }
-            set { SetPosition(PositionType.Save7, value); }
-        }
-
-        public LocalPosition Save8
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Save8); }
-            set { SetPosition(PositionType.Save8, value); }
-        }
-
-        public LocalPosition Save9
-        {
-            get { return (LocalPosition)GetPosition(PositionType.Save9); }
-            set { SetPosition(PositionType.Save9, value); }
-        }
-
-        public InstancedPosition RelativeDestination
-        {
-            get { return (InstancedPosition)GetPosition(PositionType.RelativeDestination); }
-            set { SetPosition(PositionType.RelativeDestination, value); }
-        }
-
-        public InstancedPosition TeleportedCharacter
-        {
-            get { return (InstancedPosition)GetPosition(PositionType.TeleportedCharacter); }
-            set { SetPosition(PositionType.TeleportedCharacter, value); }
-        }
-
-        public InstancedPosition EphemeralRealmExitTo
-        {
-            get { return (InstancedPosition)GetPosition(PositionType.EphemeralRealmExitTo); }
-            set { SetPosition(PositionType.EphemeralRealmExitTo, value); }
-        }
-
-        public InstancedPosition EphemeralRealmLastEnteredDrop
-        {
-            get { return (InstancedPosition)GetPosition(PositionType.EphemeralRealmLastEnteredDrop); }
-            set { SetPosition(PositionType.EphemeralRealmLastEnteredDrop, value); }
         }
 
         public ulong? CurrentCombatTarget

@@ -585,7 +585,7 @@ namespace ACE.Server.WorldObjects
                     }
                     else if ((player.Location.Cell & 0xFFFF) < 0x100)
                     {
-                        player.SetPosition(PositionType.LastOutsideDeath, corpse.Location.AsLocalPosition());
+                        player.LastOutsideDeath = corpse.Location.AsLocalPosition();
                         player.Session.Network.EnqueueSend(new GameMessagePrivateUpdatePosition(player, PositionType.LastOutsideDeath, corpse.Location));
 
                         if (dropped.Count > 0)

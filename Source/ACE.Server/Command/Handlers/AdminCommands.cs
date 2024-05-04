@@ -653,10 +653,17 @@ namespace ACE.Server.Command.Handlers
                         }
                 }
 
+                var positionToSave = (UsablePosition)playerPosition;
+                if (!InstancedProperties.PositionTypes.Contains(positionType))
+                    positionToSave = playerPosition.AsLocalPosition();
+
                 // Save the position
-                session.Player.SetPosition(positionType, playerPosition);
+                session.Player.SetPosition(positionType, positionToSave);
                 // Report changes to client
-                var positionMessage = new GameMessageSystemChat($"Set: {positionType} to Loc: {playerPosition}", ChatMessageType.Broadcast);
+                var positionMessage = new GameMessageSystemChat(
+                    $"Set: {positionType} to Loc: {positionToSave}{(positionToSave is LocalPosition ? " (LocalPosition)" : "")}",
+                    ChatMessageType.Broadcast);
+
                 session.Network.EnqueueSend(positionMessage);
                 return;
             }
@@ -811,7 +818,7 @@ namespace ACE.Server.Command.Handlers
             }
             var currentPos = new InstancedPosition(player.Location);
             player.Teleport(session.Player.Location);
-            player.SetPosition(PositionType.TeleportedCharacter, currentPos);
+            player.TeleportedCharacter = currentPos;
             player.Session.Network.EnqueueSend(new GameMessageSystemChat($"{session.Player.Name} has teleported you.", ChatMessageType.Magic));
 
             PlayerManager.BroadcastToAuditChannel(session.Player, $"{session.Player.Name} has teleported {player.Name} to them.");
@@ -838,7 +845,7 @@ namespace ACE.Server.Command.Handlers
             }
 
             player.Teleport(new InstancedPosition(player.TeleportedCharacter));
-            player.SetPosition(PositionType.TeleportedCharacter, null);
+            player.TeleportedCharacter = null;
             player.Session.Network.EnqueueSend(new GameMessageSystemChat($"{session.Player.Name} has returned you to your previous location.", ChatMessageType.Magic));
 
             PlayerManager.BroadcastToAuditChannel(session.Player, $"{session.Player.Name} has returned {player.Name} to their previous location.");
@@ -861,7 +868,7 @@ namespace ACE.Server.Command.Handlers
                 if (player == destinationPlayer)
                     continue;
 
-                player.SetPosition(PositionType.TeleportedCharacter, new InstancedPosition(player.Location));
+                player.TeleportedCharacter = new InstancedPosition(player.Location);
 
                 player.Teleport(new InstancedPosition(destinationPlayer.Location));
             }
