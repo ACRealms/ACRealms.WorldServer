@@ -57,24 +57,5 @@ namespace ACE.Server.WorldObjects
             get => GetProperty(PropertyBool.AdvocateQuest);
             set { if (value == null) RemoveProperty(PropertyBool.AdvocateQuest); else SetProperty(PropertyBool.AdvocateQuest, value.Value); }
         }
-
-
-        public int? CrossRealmPortalRealmId
-        {
-            get => GetProperty(PropertyInt.CrossRealmPortalRealmID);
-            set { if (value == null) RemoveProperty(PropertyInt.CrossRealmPortalRealmID); else SetProperty(PropertyInt.CrossRealmPortalRealmID, value.Value); }
-        }
-
-        public bool IsEphemeralRealmPortal
-        {
-            get => GetProperty(PropertyBool.IsEphemeralRealmPortal) ?? false;
-            set { if (!value) RemoveProperty(PropertyBool.IsEphemeralRealmPortal); else SetProperty(PropertyBool.IsEphemeralRealmPortal, value); }
-        }
-
-        public uint? EphemeralRealmPortalInstanceID
-        {
-            get => (uint?)GetProperty(PropertyInstanceId.EphemeralRealmPortalInstanceID);
-            set { if (value == null) RemoveProperty(PropertyInstanceId.EphemeralRealmPortalInstanceID); else SetProperty(PropertyInstanceId.EphemeralRealmPortalInstanceID, value.Value); }
-        }
     }
 }
