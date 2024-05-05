@@ -47,6 +47,8 @@ namespace ACE.Server.Network.Handlers
         {
             var characterCreateInfo = new CharacterCreateInfo();
             characterCreateInfo.Unpack(message.Payload);
+            CharacterCreateEx(characterCreateInfo, session);
+
         }
 
         public static void CharacterCreateEx(CharacterCreateInfo characterCreateInfo, ISession session)
