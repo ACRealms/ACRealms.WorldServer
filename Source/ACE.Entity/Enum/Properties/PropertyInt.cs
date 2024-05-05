@@ -644,7 +644,11 @@ namespace ACE.Entity.Enum.Properties
         [ServerOnly]
         LastRebuffTimestamp                     = 42005,
 
-        CrossRealmPortalRealmID                 = 42006
+        CrossRealmPortalRealmID                 = 42006,
+
+        ItemGeneratedAtRealmID                  = 42007,
+        ItemLootedHomeRealmID                   = 42008,
+
     }
 
     public static class PropertyIntExtensions

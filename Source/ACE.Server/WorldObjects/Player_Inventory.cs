@@ -107,6 +107,12 @@ namespace ACE.Server.WorldObjects
                 new GameEventItemServerSaysContainId(Session, item, container),
                 new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.EncumbranceVal, EncumbranceVal ?? 0));
 
+            if (!item.ItemGeneratedAtRealmID.HasValue)
+                item.ItemGeneratedAtRealmID = Location.RealmID;
+
+            if (!item.ItemLootedHomeRealmID.HasValue && HomeRealm > 0)
+                item.ItemLootedHomeRealmID = HomeRealm;
+
             if (item.WeenieType == WeenieType.Coin || item.WeenieType == WeenieType.Container)
                 UpdateCoinValue();
 
