@@ -19,7 +19,12 @@ Focus areas:
 
 Contributions (time and development, **not money**) and feedback greatly appreciated. Contributors and server operators will have more of a say in development direction and priorities.
 
-The best way to start contributing is to join the discord (https://discord.gg/pN65pYqZeS) and make an introduction. 
+The best way to start contributing is to join the discord (https://discord.gg/pN65pYqZeS) and introduce yourself. Or alternatively, clone the repo and review the implementation and start experimenting!
+You'll likely find something that can be improved. There are still many features not implemented as a realm property. 
+
+For complex changes, it is recommended to get in touch via Discord before attempting them.
+
+If you don't use Discord and want to contribute, email me and let me know what mode of communication works best for you.
 
 
 ## Servers using AC Realms
