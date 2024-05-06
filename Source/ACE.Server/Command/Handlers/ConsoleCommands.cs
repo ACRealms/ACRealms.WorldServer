@@ -112,6 +112,7 @@ namespace ACE.Server.Command.Handlers
             Console.WriteLine($"Export to {exportDir} complete.");
         }
 
+        /* Disabled as it is not cross-platform
         /// <summary>
         /// Export all texture/image files to a specific directory.
         /// </summary>
@@ -188,6 +189,6 @@ namespace ACE.Server.Command.Handlers
                 int totalFiles = portalFiles + highresFiles;
                 Console.WriteLine($"Exported {totalFiles} total files to {exportDir}.");
             }
-        }
+        }*/
     }
 }

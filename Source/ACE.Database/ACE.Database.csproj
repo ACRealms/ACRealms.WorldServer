@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Platforms>AnyCPU</Platforms>
+    <Platforms>x64</Platforms>
     <Authors>ACEmulator Contributors</Authors>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/ACEmulator/ACE</RepositoryUrl>

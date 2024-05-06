@@ -4,7 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>disable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
-        <Platforms>AnyCPU</Platforms>
+        <Platforms>x64</Platforms>
         <Version>1.0.0</Version>
         <Authors>ACEmulator Contributors</Authors>
         <Company>ACEmulator</Company>
