@@ -1,13 +1,25 @@
 # ACRealms V2
 
-This is a fork of https://github.com/ACEmulator/ACE/. I'm considering recreating the repository as a fork. For now, if you want to see a full list of code changes (diff), you can git clone the project, and add the upstream ACE project as a second git remote, and use your preferred git client to do a diff between ACE tag `v1.58.4480` and `master`.
+This is a fork of https://github.com/ACEmulator/ACE/. The repo was not originally set up a fork and therefore could not be turned into one, but there is a mirror repo here for visibility https://github.com/ACRealms/ACRealmsForkMirror.
+
+It is recommended to fork from the mirror repo instead of this one. The mirror repo may eventually become the main one. 
+
+# Mission Statement
+
+**The mission of ACRealms is to be the recommended Asheron's Call server emulator for servers with heavy customization needs.**
 
 Focus areas:
  - Instanced Landblocks (multiple logical dungeons in same 'physical' landblock space)
  - Ruleset Composition (Realms are composed of ruleset definitions chained together recursively)
  - Ephemeral Realms (Temporary landblocks that may be assigned additional rulesets, including those defined by the player through crafting, inspired by the map device in Path of Exile)
+ - Automated testing - ACE traditionally lacked this capability. Due to the sheer amount and complexity of changes, and customizability of rulesets, automated tests are more important here.
+ 
 
- This is a work in progress, expect bugs and rough edges (but the project is rapidly improving as of v2). Contributions and feedback greatly appreciated.
+## Contributing
+
+Contributions (time and development, **not money**) and feedback greatly appreciated. Contributors and server operators will have more of a say in development direction and priorities.
+
+The best way to start contributing is to join the discord (https://discord.gg/pN65pYqZeS) and make an introduction. 
 
 
 ## Servers using AC Realms
@@ -26,6 +38,8 @@ The realm name must match the name specified in the realm file (not the filename
 If a realm file exists, it must have a corresponding entry in this file, and vice versa. It's not the most user-friendly process but there is room for improvement.
 
 #### Realm and Ruleset JSON
+
+(UPDATE MAY 2024: I am working on a way to support JSON validation and autocomplete functionality via json-schema to improve the developer experience for this, and may possibly support YAML in a future release as well)
 
 A realm file exists under `Content/json/realms/realm/xxx.jsonc`, and a ruleset file exists under `Content/json/realms/ruleset/xxx.jsonc`. They have the same basic structure.
 The key difference between a realm and a ruleset is that a realm may exist as a permanent home location for a player. A ruleset does not. Rulesets are intended to be composed on top of realms, to produce "ephemeral realms" (temporary rulesets).
@@ -96,14 +110,13 @@ These are shared by all realms, application-wide, and list the possible realm pr
 
 ## Known Issues
 
-- Housing is working, but not tested in full yet. Purchasing houses, abandoning houses, villa portals, villa storage have been tested. I haven't tried mansions, apartments, allegiance housing, booting, or permissions yet. I'm sure not everything works yet but it is just a matter of fixing minor things. The hard technical problems related to housing have already been solved, however.
 - Ruleset and realm files were originally intended to be updatable without a restart of the server, and a very early version of this project allowed it, but there were issues with caching. I still want to fix that because restarting the server is not convenient when experimenting with ideas for new rulesets.
-- The ruleset specification is complex and not covered by any unit tests. If you notice any unexpected behavior with rulesets, please report it!
-- landblock content files are global and cannot be defined on a realm by realm basis yet. This is something I've wanted to address for a very long time now but it hasn't been done yet because of priorities.
+- The ruleset specification is complex and not yet fully covered by unit tests, but progress is being made here. If you notice any unexpected behavior with rulesets, please report it!
+- landblock content files are global and cannot be defined on a realm by realm basis yet. This is something I've wanted to address for a very long time now but it hasn't been done yet because of priorities. (UPDATE: This is now scheduled for the v2.3 milestone)
 
 ## Developer notes
 
-Property IDs (ACE.Entity.Enum.Properties.PropertyXXX) from 42000-42999 are reserved by AC Realms Core. 
+Property IDs (ACE.Entity.Enum.Properties.PropertyXXX) and PositionTypes from 42000-42999 are reserved by AC Realms Core. 
 
 Realm Property IDs (ACE.Entity.Enum.Properties.RealmPropertyXXX) from 0-9999 are reserved by AC Realms Core in a similar manner.
 
