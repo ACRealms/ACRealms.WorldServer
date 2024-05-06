@@ -2248,6 +2248,8 @@ namespace ACE.Server.Command.Handlers
         public static void HandleForceGC(ISession session, params string[] parameters)
         {
             GC.Collect();
+
+            CommandHandlerHelper.WriteOutputInfo(session, ".NET Garbage Collection forced");
         }
 
         [CommandHandler("forcegc2", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Forces .NET Garbage Collection with LOH Compact")]
