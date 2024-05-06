@@ -6,7 +6,7 @@ namespace ACE.Server.Network.GameEvent.Events
     public class GameEventInventoryServerSaveFailed : GameEventMessage
     {
         public GameEventInventoryServerSaveFailed(ISession session, ObjectGuid itemGuid, WeenieError errorType = WeenieError.None)
-            : base(GameEventType.InventoryServerSaveFailed, GameMessageGroup.UIQueue, session)
+            : base(GameEventType.InventoryServerSaveFailed, GameMessageGroup.UIQueue, session, 12)
         {
             Writer.WriteGuid(itemGuid);
 

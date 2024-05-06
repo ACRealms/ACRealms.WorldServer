@@ -133,7 +133,7 @@ namespace ACE.Database.OfflineTools.Shard
         //        partialBiotas = context.Biota.Where(r => r.Id >= startingGuid).OrderByDescending(r => r.Id).ToList();
         //    }
 
-        //    var idConversions = new ConcurrentDictionary<ulong, ulong>();
+        //    var idConversions = new ConcurrentDictionary<uint, uint>();
 
         //    // Process ConsolidatableBasicWeenieTypes first
         //    Parallel.ForEach(partialBiotas, ConfigManager.Config.Server.Threading.DatabaseParallelOptions, partialBiota =>
@@ -152,7 +152,7 @@ namespace ACE.Database.OfflineTools.Shard
         //            if (fullBiota == null)
         //            {
         //                Interlocked.Increment(ref numOfErrors);
-        //                log.Warn($"Failed to get biota with id 0x{partialBiota.Id:X8} from the database. This shouldn't happen. It also shouldn't require a rollback.");
+        //                log.WarnFormat("Failed to get biota with id 0x{0:X8} from the database. This shouldn't happen. It also shouldn't require a rollback.", partialBiota.Id);
         //                return;
         //            }
 
@@ -187,7 +187,7 @@ namespace ACE.Database.OfflineTools.Shard
         //                return;
         //            }
 
-        //            idConversions[(uint)fullBiota.Id] = newId;
+        //            idConversions[fullBiota.Id] = newId;
 
         //            // Copy our original biota into a new biota and set the new id
         //            var converted = BiotaConverter.ConvertToEntityBiota(fullBiota);
@@ -197,15 +197,15 @@ namespace ACE.Database.OfflineTools.Shard
         //            if (!shardDatabase.SaveBiota(converted, new ReaderWriterLockSlim()))
         //            {
         //                Interlocked.Increment(ref numOfErrors);
-        //                log.Fatal($"Failed to save new biota with id 0x{fullBiota.Id:X8} to the database. Please rollback your shard.");
+        //                log.FatalFormat("Failed to save new biota with id 0x{0:X8} to the database. Please rollback your shard.", fullBiota.Id);
         //                return;
         //            }
 
         //            // Finally, remove the original biota
-        //            if (!shardDatabase.RemoveBiota((uint)fullBiota.Id))
+        //            if (!shardDatabase.RemoveBiota(fullBiota.Id))
         //            {
         //                Interlocked.Increment(ref numOfErrors);
-        //                log.Fatal($"Failed to remove original biota with id 0x{fullBiota.Id:X8} from database. Please rollback your shard.");
+        //                log.FatalFormat("Failed to remove original biota with id 0x{0:X8} from database. Please rollback your shard.", fullBiota.Id);
         //                return;
         //            }
 
@@ -240,7 +240,7 @@ namespace ACE.Database.OfflineTools.Shard
         //            if (fullBiota == null)
         //            {
         //                Interlocked.Increment(ref numOfErrors);
-        //                log.Warn($"Failed to get biota with id 0x{partialBiota.Id:X8} from the database. This shouldn't happen. It also shouldn't require a rollback.");
+        //                log.WarnFormat("Failed to get biota with id 0x{0:X8} from the database. This shouldn't happen. It also shouldn't require a rollback.", partialBiota.Id);
         //                break;
         //            }
 
@@ -275,7 +275,7 @@ namespace ACE.Database.OfflineTools.Shard
         //                break;
         //            }
 
-        //            idConversions[(uint)fullBiota.Id] = newId;
+        //            idConversions[fullBiota.Id] = newId;
 
         //            // Copy our original biota into a new biota and set the new id
         //            var converted = BiotaConverter.ConvertToEntityBiota(fullBiota);
@@ -285,7 +285,7 @@ namespace ACE.Database.OfflineTools.Shard
         //            if (!shardDatabase.SaveBiota(converted, new ReaderWriterLockSlim()))
         //            {
         //                Interlocked.Increment(ref numOfErrors);
-        //                log.Fatal($"Failed to save new biota with id 0x{fullBiota.Id:X8} to the database. Please rollback your shard.");
+        //                log.FatalFormat("Failed to save new biota with id 0x{0:X8} to the database. Please rollback your shard.", fullBiota.Id);
         //                break;
         //            }
 
@@ -309,7 +309,7 @@ namespace ACE.Database.OfflineTools.Shard
         //            if (!shardDatabase.RemoveBiota(fullBiota.Id))
         //            {
         //                Interlocked.Increment(ref numOfErrors);
-        //                log.Fatal($"Failed to remove original biota with id 0x{fullBiota.Id:X8} from database. Please rollback your shard.");
+        //                log.FatalFormat("Failed to remove original biota with id 0x{0:X8} from database. Please rollback your shard.", fullBiota.Id);
         //                break;
         //            }
 

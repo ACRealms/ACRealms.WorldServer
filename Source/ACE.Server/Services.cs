@@ -25,6 +25,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Runtime;
 
 namespace ACE.Server
 {
@@ -379,7 +380,13 @@ namespace ACE.Server
             // Free up memory before the server goes online. This can free up 6 GB+ on larger servers.
             log.Info("Forcing .net garbage collection...");
             for (int i = 0; i < 10; i++)
+            {
+                // https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/fundamentals
+                // https://learn.microsoft.com/en-us/dotnet/api/system.runtime.gcsettings.largeobjectheapcompactionmode
+                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+
                 GC.Collect();
+            }
 
             // This should be last
             log.Info("Initializing CommandManager...");

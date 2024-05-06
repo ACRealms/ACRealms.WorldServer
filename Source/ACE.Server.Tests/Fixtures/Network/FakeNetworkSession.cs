@@ -31,5 +31,14 @@ namespace ACRealms.Tests.Fixtures.Network
             foreach (var message in messages)
                 FakeSession.LogMessageSent(message);
         }
+
+        public override void EnqueueSend(IEnumerable<GameMessage> messages)
+        {
+            if (isReleased) // Session has been removed
+                return;
+
+            foreach (var message in messages)
+                FakeSession.LogMessageSent(message);
+        }
     }
 }

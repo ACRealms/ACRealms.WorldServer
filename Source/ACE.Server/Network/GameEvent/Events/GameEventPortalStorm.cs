@@ -9,7 +9,7 @@ namespace ACE.Server.Network.GameEvent.Events
     class GameEventPortalStorm : GameEventMessage
     {
         public GameEventPortalStorm(ISession session)
-            : base(GameEventType.MiscPortalStorm, GameMessageGroup.UIQueue, session)
+            : base(GameEventType.MiscPortalStorm, GameMessageGroup.UIQueue, session, 4)
         {
         }
     }

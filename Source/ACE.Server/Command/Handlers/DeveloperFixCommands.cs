@@ -19,6 +19,7 @@ using ACE.Server.Managers;
 using ACE.Server.Network;
 using ACE.Server.WorldObjects;
 using System.Text;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Command.Handlers
 {
@@ -1026,6 +1027,104 @@ namespace ACE.Server.Command.Handlers
         }
 
 
+        [CommandHandler("fix-biota-emote-delay", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, 0, "Fixes biota emotes with incorrect default delays")]
+        public static void HandleFixBiotaEmoteDelay(ISession session, params string[] parameters)
+        {
+            if (parameters.Length == 0)
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, "This command is intended to be run while the world is in offline mode, or there are 0 players connected.");
+                CommandHandlerHelper.WriteOutputInfo(session, "To run this fix, type fix-biota-emote-delay fix");
+                return;
+            }
+
+            var fix = parameters[0].Equals("fix", StringComparison.OrdinalIgnoreCase);
+
+            CommandHandlerHelper.WriteOutputInfo(session, "Building weenie emote cache");
+
+            var weenieEmoteCache = BuildWeenieEmoteCache();
+
+            CommandHandlerHelper.WriteOutputInfo(session, $"Found {weenieEmoteCache.Count:N0} weenie templates w/ emote actions with delay 0");
+
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Finding biotas for these wcids");
+
+                var biotas = ctx.Biota.Where(i => weenieEmoteCache.ContainsKey(i.WeenieClassId)).ToList();
+
+                var distinct = biotas.Select(i => i.WeenieClassId).Distinct();
+                var counts = new Dictionary<uint, uint>();
+                foreach (var biota in biotas)
+                {
+                    if (!counts.ContainsKey(biota.WeenieClassId))
+                        counts[biota.WeenieClassId] = 1;
+                    else
+                        counts[biota.WeenieClassId]++;
+                }
+
+                CommandHandlerHelper.WriteOutputInfo(session, $"Found {biotas.Count} biotas matching {distinct.Count()} distinct wcids");
+
+                foreach (var kvp in counts.OrderBy(i => i.Key))
+                    CommandHandlerHelper.WriteOutputInfo(session, $"{kvp.Key} - {(WeenieClassName)kvp.Key} ({kvp.Value})");
+
+                if (!fix)
+                {
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Dry run completed");
+                    return;
+                }
+
+                var totalUpdated = 0;
+
+                foreach (var biota in biotas)
+                {
+                    bool updated = false;
+
+                    var query = from emote in ctx.BiotaPropertiesEmote
+                                join action in ctx.BiotaPropertiesEmoteAction on emote.Id equals action.EmoteId
+                                where emote.ObjectId == biota.Id && action.Delay == 1.0f
+                                select new
+                                {
+                                    Emote = emote,
+                                    Action = action
+                                };
+
+                    var emoteActions = query.ToList();
+
+                    foreach (var emoteAction in emoteActions)
+                    {
+                        var emote = emoteAction.Emote;
+                        var action = emoteAction.Action;
+
+                        // ensure this delay 1 should be delay 0
+                        var hash = CalculateEmoteHash(emote);
+                        var weenieEmotes = weenieEmoteCache[biota.WeenieClassId];
+                        if (!weenieEmotes.TryGetValue(hash, out var list))
+                        {
+                            //CommandHandlerHelper.WriteOutputInfo(session, $"Skipping emote for {biota.WeenieClassId} not found in hash list");
+                            continue;
+                        }
+                        if (!list.Contains(action.Order))
+                        {
+                            //CommandHandlerHelper.WriteOutputInfo(session, $"Skipping emote for {biota.WeenieClassId} not found in action list");
+                            continue;
+                        }
+
+                        // confirmed match, update delay 1 -> 0
+                        action.Delay = 0.0f;
+                        updated = true;
+                    }
+
+                    if (updated)
+                    {
+                        CommandHandlerHelper.WriteOutputInfo(session, $"Fixed shard object {biota.Id:X16} of type {biota.WeenieClassId} - {(WeenieClassName)biota.WeenieClassId}");
+                        totalUpdated++;
+                    }
+                }
+                ctx.SaveChanges();
+
+                CommandHandlerHelper.WriteOutputInfo(session, $"Completed successfully, fixed {totalUpdated} shard items");
+            }
+        }
+
         private static Dictionary<uint, Dictionary<int, HashSet<uint>>> BuildWeenieEmoteCache()
         {
             /// wcid => emote hash => list of order ids with delay 0
@@ -1109,6 +1208,92 @@ namespace ACE.Server.Command.Handlers
             return hash;
         }
 
+        [CommandHandler("verify-armor-levels", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any existing armor levels above AL cap")]
+        public static void HandleFixArmorLevel(ISession session, params string[] parameters)
+        {
+            Console.WriteLine($"Fetching shard armors (this may take awhile on large servers) ...");
+
+            var resistMagic = GetResistMagic();
+            var tinkerLogs = GetTinkerLogs();
+            var numTimesTinkered = GetNumTimesTinkered();
+            var imbuedEffects = GetImbuedEffect();
+
+            var fix = parameters.Length > 0 && parameters[0].Equals("fix");
+            var fixStr = fix ? " -- fixed" : "";
+
+            // get all loot-generated items on server with armor level
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
+            {
+                ctx.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
+
+                var query = from armor in ctx.BiotaPropertiesInt
+                            join workmanship in ctx.BiotaPropertiesInt on armor.ObjectId equals workmanship.ObjectId
+                            join name in ctx.BiotaPropertiesString on armor.ObjectId equals name.ObjectId
+                            join validLocations in ctx.BiotaPropertiesInt on armor.ObjectId equals validLocations.ObjectId
+                            where armor.Type == (int)PropertyInt.ArmorLevel && workmanship.Type == (int)PropertyInt.ItemWorkmanship && name.Type == (int)PropertyString.Name && validLocations.Type == (int)PropertyInt.ValidLocations
+                            orderby armor.Value descending
+                            select new
+                            {
+                                Guid = armor.ObjectId,
+                                ArmorLevel = armor.Value,
+                                Name = name.Value,
+                                ValidLocs = validLocations.Value,
+                                Armor = armor
+                            };
+
+                var armorItems = query.ToList();
+
+                var adjusted = 0;
+
+                foreach (var armorItem in armorItems)
+                {
+                    // ignore unenchantable
+                    if (resistMagic.TryGetValue(armorItem.Guid, out var resist) && resist == 9999)
+                        continue;
+
+                    TinkerLog tinkerLog = null;
+                    if (tinkerLogs.TryGetValue(armorItem.Guid, out var _tinkerLog))
+                        tinkerLog = new TinkerLog(_tinkerLog);
+
+                    numTimesTinkered.TryGetValue(armorItem.Guid, out var numTinkers);
+                    imbuedEffects.TryGetValue(armorItem.Guid, out var imbuedEffect);
+
+                    var numArmorTinkers = tinkerLog != null ? tinkerLog.NumTinkers(MaterialType.Steel) : 0;
+
+                    var numArmorTinkerStr = numArmorTinkers > 0 ? $" ({numArmorTinkers})" : "";
+
+                    var equipMask = (EquipMask)armorItem.ValidLocs;
+
+                    var newArmorLevel = GetArmorLevel(armorItem.ArmorLevel, equipMask, tinkerLog, numTinkers, imbuedEffect);
+
+                    if (newArmorLevel != armorItem.ArmorLevel)
+                    {
+                        if (fix)
+                            armorItem.Armor.Value = newArmorLevel;
+
+                        Console.WriteLine($"{armorItem.Name}, {armorItem.ArmorLevel}{numArmorTinkerStr} => {newArmorLevel}{fixStr}");
+
+                        adjusted++;
+                    }
+                }
+                if (fix)
+                    ctx.SaveChanges();
+
+                var willBe = fix ? " " : " will be ";
+
+                if (adjusted > 0)
+                {
+                    Console.WriteLine($"Found {armorItems.Count:N0} armors, {adjusted:N0}{willBe}adjusted");
+
+                    if (!fix)
+                        Console.WriteLine($"Dry run completed. Type 'verify-armor-levels fix' to fix any issues.");
+                }
+                else
+                    Console.WriteLine($"Verified {armorItems.Count:N0} armors.");
+            }
+        }
+
+
         public static Dictionary<ulong, int> GetResistMagic()
         {
             using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
@@ -1182,6 +1367,1140 @@ namespace ACE.Server.Command.Handlers
                 }
             }
             return Math.Min(armorLevel, maxArmorLevel);
+        }
+
+        [CommandHandler("verify-clothing-wield-level", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any t7/t8 clothing that is missing a wield level requirement")]
+        public static void HandleVerifyClothingWieldLevel(ISession session, params string[] parameters)
+        {
+            var fix = parameters.Length > 0 && parameters[0].Equals("fix");
+            var fixStr = fix ? " -- fixed" : "";
+            var foundIssues = false;
+
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
+            {
+                ctx.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
+
+                // get all shard clothing
+                var _clothing = ctx.Biota.Where(i => i.WeenieType == (int)WeenieType.Clothing).ToList();
+
+                // get all shard armor levels
+                var armorLevels = ctx.BiotaPropertiesInt.Where(i => i.Type == (ushort)PropertyInt.ArmorLevel).ToDictionary(i => i.ObjectId, i => i.Value);
+
+                // filter clothing to actual clothing
+                var clothing = new Dictionary<ulong, Database.Models.Shard.Biota>();
+                foreach (var item in _clothing)
+                {
+                    if (!armorLevels.TryGetValue(item.Id, out var armorLevel) || armorLevel == 0)
+                    {
+                        clothing.Add(item.Id, item);
+                        //Console.WriteLine($"{item.Id:X16} - {(Factories.Enum.WeenieClassName)item.WeenieClassId}");
+                    }
+                }
+
+                // get shard spells
+                var _spells = ctx.BiotaPropertiesSpellBook.Where(i => clothing.ContainsKey(i.ObjectId)).ToList();
+
+                // filter clothing to those with epics/legendaries
+                var highTierClothing = new Dictionary<ulong, int>();
+
+                foreach (var s in _spells)
+                {
+                    var cantripLevel = 0;
+
+                    if (LootTables.EpicCantrips.Contains(s.Spell))
+                        cantripLevel = 3;
+                    else if (LootTables.LegendaryCantrips.Contains(s.Spell))
+                        cantripLevel = 4;
+
+                    if (cantripLevel == 0)
+                        continue;
+
+                    if (highTierClothing.ContainsKey(s.ObjectId))
+                        highTierClothing[s.ObjectId] = Math.Max(highTierClothing[s.ObjectId], cantripLevel);
+                    else
+                        highTierClothing[s.ObjectId] = cantripLevel;
+                }
+
+                // get wield level for these items
+                var wieldLevels = ctx.BiotaPropertiesInt.Where(i => i.Type == (ushort)PropertyInt.WieldDifficulty && highTierClothing.ContainsKey(i.ObjectId)).Select(i => i.ObjectId).ToHashSet();
+
+                foreach (var kvp in highTierClothing)
+                {
+                    var objectId = kvp.Key;
+                    var maxCantripLevel = kvp.Value;
+
+                    if (wieldLevels.Contains(objectId))
+                        continue;
+
+                    if (!foundIssues)
+                    {
+                        Console.WriteLine($"Missing wield difficulty:");
+                        foundIssues = true;
+                    }
+
+                    if (fix)
+                    {
+                        var wieldLevel = 150;
+
+                        if (maxCantripLevel > 3)
+                        {
+                            var rng = ThreadSafeRandom.Next(0.0f, 1.0f);
+                            if (rng < 0.9f)
+                                wieldLevel = 180;
+                        }
+
+                        ctx.Database.ExecuteSqlRaw($"insert into biota_properties_int set object_Id={objectId}, `type`={(ushort)PropertyInt.WieldRequirements}, value={(int)WieldRequirement.Level};");
+                        ctx.Database.ExecuteSqlRaw($"insert into biota_properties_int set object_Id={objectId}, `type`={(ushort)PropertyInt.WieldSkillType}, value=1;");
+                        ctx.Database.ExecuteSqlRaw($"insert into biota_properties_int set object_Id={objectId}, `type`={(ushort)PropertyInt.WieldDifficulty}, value={wieldLevel};");
+                    }
+
+                    var item = clothing[objectId];
+
+                    Console.WriteLine($"{item.Id:X16} - {(Factories.Enum.WeenieClassName)item.WeenieClassId} - {maxCantripLevel}{fixStr}");
+                }
+
+                if (!fix && foundIssues)
+                    Console.WriteLine($"Dry run completed. Type 'verify-clothing-wield-level fix' to fix any issues.");
+
+                if (!foundIssues)
+                    Console.WriteLine($"Verified wield levels for {highTierClothing.Count:N0} pieces of t7 / t8 clothing");
+            }
+        }
+
+        [CommandHandler("verify-legendary-wield-level", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any items with legendary cantrips that have less than 180 wield level requirement")]
+        public static void HandleVerifyLegendaryWieldLevel(ISession session, params string[] parameters)
+        {
+            var fix = parameters.Length > 0 && parameters[0].Equals("fix");
+            var fixStr = fix ? " -- fixed" : "";
+            var foundIssues = false;
+
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
+            {
+                ctx.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
+
+                // get all biota spellbooks
+                var spellbook = ctx.BiotaPropertiesSpellBook.Where(i => i.Probability == 2.0f).ToList();
+
+                var legendaryItems = new HashSet<ulong>();
+
+                foreach (var spell in spellbook)
+                {
+                    if (LootTables.LegendaryCantrips.Contains(spell.Spell))
+                        legendaryItems.Add(spell.ObjectId);
+                }
+
+                // get wield requirements for these items
+                var query = from wieldReq in ctx.BiotaPropertiesInt
+                            join wieldDiff in ctx.BiotaPropertiesInt on wieldReq.ObjectId equals wieldDiff.ObjectId
+                            where wieldReq.Type.Equals((int)PropertyInt.WieldRequirements) && wieldReq.Value.Equals((int)WieldRequirement.Level) && wieldDiff.Type.Equals((int)PropertyInt.WieldDifficulty) && legendaryItems.Contains(wieldReq.ObjectId)
+                            select new
+                            {
+                                WieldReq = wieldReq,
+                                WieldDiff = wieldDiff
+                            };
+
+                var wieldReq1 = query.ToList();
+
+                query = from wieldReq in ctx.BiotaPropertiesInt
+                            join wieldDiff in ctx.BiotaPropertiesInt on wieldReq.ObjectId equals wieldDiff.ObjectId
+                            where wieldReq.Type.Equals((int)PropertyInt.WieldRequirements2) && wieldReq.Value.Equals((int)WieldRequirement.Level) && wieldDiff.Type.Equals((int)PropertyInt.WieldDifficulty2) && legendaryItems.Contains(wieldReq.ObjectId)
+                            select new
+                            {
+                                WieldReq = wieldReq,
+                                WieldDiff = wieldDiff
+                            };
+
+                var wieldReq2 = query.ToList();
+
+                var verified = new HashSet<ulong>();
+                var updated = new HashSet<ulong>();
+
+                var hasLevelReq1 = new HashSet<ulong>();
+                var hasLevelReq2 = new HashSet<ulong>();
+
+                var updates = new List<string>();
+
+                foreach (var wieldReq in wieldReq1)
+                {
+                    hasLevelReq1.Add(wieldReq.WieldReq.ObjectId);
+
+                    if (wieldReq.WieldDiff.Value < 180)
+                    {
+                        foundIssues = true;
+                        updates.Add($"UPDATE biota_properties_int SET value=180 WHERE object_Id=0x{wieldReq.WieldDiff.ObjectId:X16} AND type={(int)PropertyInt.WieldDifficulty};");
+                    }
+                    else
+                        verified.Add(wieldReq.WieldDiff.ObjectId);
+                }
+
+                foreach (var wieldReq in wieldReq2)
+                {
+                    hasLevelReq2.Add(wieldReq.WieldReq.ObjectId);
+
+                    if (wieldReq.WieldDiff.Value < 180)
+                    {
+                        foundIssues = true;
+                        updates.Add($"UPDATE biota_properties_int SET value=180 WHERE object_Id=0x{wieldReq.WieldDiff.ObjectId:X16} AND type={(int)PropertyInt.WieldDifficulty2};");
+                    }
+                    else
+                        verified.Add(wieldReq.WieldDiff.ObjectId);
+                }
+
+                /*var hasLevelReq = hasLevelReq1.Union(hasLevelReq2).ToList();
+
+                if (hasLevelReq.Count != legendaryItems.Count)
+                {
+                    foundIssues = true;
+                    var noReqs = legendaryItems.Except(hasLevelReq).ToList();
+
+                    foreach (var noReq in noReqs)
+                    {
+                        if (!hasLevelReq1.Contains(noReq))
+                        {
+                            updates.Add($"INSERT INTO biota_properties_int SET object_Id=0x{noReq:X16}, `type`={(int)PropertyInt.WieldRequirements}, value={(int)WieldRequirement.Level};");
+                            updates.Add($"INSERT INTO biota_properties_int SET object_Id=0x{noReq:X16}, `type`={(int)PropertyInt.WieldSkillType}, value=1;");
+                            updates.Add($"INSERT INTO biota_properties_int SET object_Id=0x{noReq:X16}, `type`={(int)PropertyInt.WieldDifficulty}, value=180;");
+                        }
+                        else
+                        {
+                            updates.Add($"INSERT INTO biota_properties_int SET object_Id=0x{noReq:X16}, `type`={(int)PropertyInt.WieldRequirements2}, value={(int)WieldRequirement.Level};");
+                            updates.Add($"INSERT INTO biota_properties_int SET object_Id=0x{noReq:X16}, `type`={(int)PropertyInt.WieldSkillType2}, value=1;");
+                            updates.Add($"INSERT INTO biota_properties_int SET object_Id=0x{noReq:X16}, `type`={(int)PropertyInt.WieldDifficulty2}, value=180;");
+                        }
+                    }
+                }*/
+
+                var numIssues = legendaryItems.Count - verified.Count;
+
+                if (numIssues > 0)
+                    Console.WriteLine($"Found issues for {numIssues:N0} of {legendaryItems.Count:N0} legendary items");
+
+                if (!fix && foundIssues)
+                    Console.WriteLine($"Dry run completed. Type 'verify-legendary-wield-level fix' to fix any issues.");
+
+                if (fix)
+                {
+                    foreach (var update in updates)
+                    {
+                        Console.WriteLine(update);
+                        ctx.Database.ExecuteSqlRaw(update);
+                    }
+                }
+
+                if (!foundIssues)
+                    Console.WriteLine($"Verified wield levels for {legendaryItems.Count:N0} legendary items");
+            }
+        }
+
+        [CommandHandler("verify-shield-rating", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any lootgen shields with incorrectly assigned CD/CDR")]
+        public static void HandleRemoveShieldRatings(ISession session, params string[] parameters)
+        {
+            var fix = parameters.Length > 0 && parameters[0].Equals("fix");
+            var fixStr = fix ? " -- fixed" : "";
+            var foundIssues = false;
+
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
+            {
+                ctx.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
+
+                // get items with GearCritDamage
+                var critDamage = ctx.BiotaPropertiesInt.Where(i => i.Type == (ushort)PropertyInt.GearCritDamage).ToDictionary(i => i.ObjectId, i => i.Value);
+
+                // get items with GearCritDamageResist
+                var critDamageResist = ctx.BiotaPropertiesInt.Where(i => i.Type == (ushort)PropertyInt.GearCritDamageResist).ToDictionary(i => i.ObjectId, i => i.Value);
+
+                // get lootgen shields
+                var query = from biota in ctx.Biota
+                            join workmanship in ctx.BiotaPropertiesInt on biota.Id equals workmanship.ObjectId
+                            join combatUse in ctx.BiotaPropertiesInt on biota.Id equals combatUse.ObjectId
+                            join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                            where workmanship.Type == (ushort)PropertyInt.ItemWorkmanship && combatUse.Type == (ushort)PropertyInt.CombatUse && combatUse.Value == (int)CombatUse.Shield && name.Type == (ushort)PropertyString.Name
+                            select new
+                            {
+                                Biota = biota,
+                                Name = name
+                            };
+
+                var results = query.ToDictionary(i => i.Biota.Id, i => i);
+
+                // generate list of remove fields
+                var critDamageRemove = new Dictionary<ulong, int>();
+                var critDamageResistRemove = new Dictionary<ulong, int>();
+
+                foreach (var result in results.Keys)
+                {
+                    if (critDamage.TryGetValue(result, out var critDamageResult))
+                        critDamageRemove.Add(result, critDamageResult);
+
+                    if (critDamageResist.TryGetValue(result, out var critDamageResistResult))
+                        critDamageResistRemove.Add(result, critDamageResistResult);
+                }
+
+                var numIssues = critDamageRemove.Count + critDamageResistRemove.Count;
+
+                var sqlLines = new List<string>();
+
+                if (numIssues > 0)
+                {
+                    foundIssues = true;
+
+                    Console.WriteLine($"Found {numIssues:N0} bugged shields:");
+
+                    foreach (var critDamageValue in critDamageRemove)
+                    {
+                        var shield = results[critDamageValue.Key];
+
+                        Console.WriteLine($"{shield.Biota.Id:X16} - {shield.Name.Value} (CD: {critDamageValue.Value}){fixStr}");
+
+                        sqlLines.Add($"delete from biota_properties_int where object_Id=0x{shield.Biota.Id:X16} and `type`={(int)PropertyInt.GearCritDamage};");
+                    }
+
+                    foreach (var critDamageResistValue in critDamageResistRemove)
+                    {
+                        var shield = results[critDamageResistValue.Key];
+
+                        Console.WriteLine($"{shield.Biota.Id:X16} - {shield.Name.Value} (CDR: {critDamageResistValue.Value}){fixStr}");
+
+                        sqlLines.Add($"delete from biota_properties_int where object_Id=0x{shield.Biota.Id:X16} and `type`={(int)PropertyInt.GearCritDamageResist};");
+                    }
+                }
+
+                if (!fix && foundIssues)
+                    Console.WriteLine($"Dry run completed. Type 'verify-shield-rating fix' to fix any issues.");
+
+                if (fix)
+                {
+                    foreach (var sqlLine in sqlLines)
+                        ctx.Database.ExecuteSqlRaw(sqlLine);
+                }
+
+                if (!foundIssues)
+                    Console.WriteLine($"Verified {results.Count:N0} shields");
+            }
+        }
+
+        private static Dictionary<uint, uint> PreToPostMeleeRareConversions = new()
+        {
+            /* Ridgeback Dagger */          { 30310, 45444 },
+            /* Zharalim Crookblade */       { 30311, 45445 },
+            /* Baton of Tirethas */         { 30312, 45446 },
+            /* Dripping Death */            { 30313, 45447 },
+            /* Star of Tukal */             { 30314, 45448 },
+            /* Subjugator */                { 30315, 45449 },
+            /* Black Thistle */             { 30316, 45441 },
+            /* Moriharu's Kitchen Knife */  { 30317, 45442 },
+            /* Pitfighter's Edge */         { 30318, 45443 },
+            /* Champion's Demise */         { 30319, 45451 },
+            /* Pillar of Fearlessness */    { 30320, 45452 },
+            /* Squire's Glaive */           { 30321, 45453 },
+            /* Star of Gharu'n */           { 30322, 45454 },
+            /* Tri-Blade Spear */           { 30323, 45455 },
+            /* Staff of All Aspects */      { 30324, 45456 },
+            /* Death's Grip Staff */        { 30325, 45457 },
+            /* Staff of Fettered Souls */   { 30326, 45458 },
+            /* Spirit Shifting Staff */     { 30327, 45459 },
+            /* Staff of Tendrils */         { 30328, 45460 },
+            /* Brador's Frozen Eye */       { 30329, 45461 },
+            /* Defiler of Milantos */       { 30330, 45462 },
+            /* Desert Wyrm */               { 30331, 45463 },
+            /* Guardian of Pwyll */         { 30332, 45464 },
+            /* Morrigan's Vanity */         { 30333, 45465 },
+            /* Fist of Three Principles */  { 30334, 45466 },
+            /* Hevelio's Half-Moon */       { 30335, 45467 },
+            /* Malachite Slasher */         { 30336, 45468 },
+            /* Skullpuncher */              { 30337, 45469 },
+            /* Steel Butterfly */           { 30338, 45470 },
+            /* Thunderhead */               { 30339, 45450 },
+            /* Bearded Axe of Souia-Vey */  { 30340, 45436 },
+            /* Canfield Cleaver */          { 30341, 45437 },
+            /* Count Renari's Equalizer */  { 30342, 45438 },
+            /* Smite */                     { 30343, 45439 },
+            /* Tusked Axe of Ayan Baqur */  { 30344, 45440 },
+        };
+
+        [CommandHandler("verify-melee-rares", AccessLevel.Admin, CommandHandlerFlag.ConsoleInvoke, "Verifies and optionally fixes any melee rares to EoR wcids")]
+        public static void HandleFixMeleeRares(ISession session, params string[] parameters)
+        {
+            var fix = parameters.Length > 0 && parameters[0].Equals("fix");
+            var foundIssues = false;
+            var foundRaresPre = 0;
+            var foundRaresPost = 0;
+            var foundRareCoins = 0;
+            var deletedRareCoins = 0;
+            var newRaresFromCoins = 0;
+            var deletedPostRares = 0;
+            var replacedPostRares = 0;
+            var adjustedRaresPre = 0;
+            var adjustedRaresPost = 0;
+            var validPostRares = 0;
+            var validPostRaresV1 = 0;
+
+            using (var ctx = DatabaseManager.World.ContextFactory.CreateDbContext())
+            {
+                var minPatchVer = "v0.9.271";
+
+                var worldDbVersion = ctx.Version.FirstOrDefault();
+
+                if (worldDbVersion == null)
+                {
+                    Console.WriteLine($"Unable to determine World Database version. Your World Database must be {minPatchVer} or higher to run this command.");
+                    return;
+                }
+                else
+                {
+                    var currentPatchVer = worldDbVersion.PatchVersion;
+
+                    if (!currentPatchVer.StartsWith("v"))
+                    {
+                        Console.WriteLine($"Unexpected patch version format found. Your World Database must be {minPatchVer} or higher to run this command.");
+                        return;
+                    }
+                    else
+                    {
+                        var currentPatchVerSplit = currentPatchVer.TrimStart('v').Split('.');
+                        var minPatchVerSplit = minPatchVer.TrimStart('v').Split('.');
+
+                        _ = int.TryParse(minPatchVerSplit[0], out var minMajor);
+                        _ = int.TryParse(minPatchVerSplit[1], out var minMinor);
+                        _ = int.TryParse(minPatchVerSplit[2], out var minBuild);
+
+                        if (!int.TryParse(currentPatchVerSplit[0], out var curMajor) || curMajor < minMajor)
+                        {
+                            Console.WriteLine($"World Database must be {minPatchVer} or higher to run this command. Your current World Database patch version is: {currentPatchVer}");
+                            return;
+                        }
+                        else if (!int.TryParse(currentPatchVerSplit[1], out var curMinor) || curMinor < minMinor)
+                        {
+                            Console.WriteLine($"World Database must be {minPatchVer} or higher to run this command. Your current World Database patch version is: {currentPatchVer}");
+                            return;
+                        }
+                        else if (!int.TryParse(currentPatchVerSplit[2], out var curBuild) || curBuild < minBuild)
+                        {
+                            if (currentPatchVerSplit[2].Contains('-'))
+                            {
+                                var currentBuildSplit = currentPatchVerSplit[2].Split('-');
+
+                                if (!int.TryParse(currentBuildSplit[0], out curBuild) || curBuild < minBuild)
+                                {
+                                    Console.WriteLine($"World Database must be {minPatchVer} or higher to run this command. Your current World Database patch version is: {currentPatchVer}");
+                                    return;
+                                }
+                                else
+                                {
+                                    // all good here
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"World Database must be {minPatchVer} or higher to run this command. Your current World Database patch version is: {currentPatchVer}");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            // all good here
+                        }
+                    }
+                }
+            }
+
+            using (var ctx = DatabaseManager.Shard.BaseDatabase.ContextFactory.CreateDbContext())
+            {
+                ctx.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
+
+                // get preMoA rares
+                //var preRares = ctx.Biota.Where(i => i.WeenieClassId >= 30310 && i.WeenieClassId <= 30344).Select(i => i.Id).ToList();
+                var queryPreRares = from biota in ctx.Biota
+                                    join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                    where name.Type == (ushort)PropertyString.Name && biota.WeenieClassId >= 30310 && biota.WeenieClassId <= 30344
+                                    // from version in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.Version).DefaultIfEmpty()
+                                    from container in ctx.BiotaPropertiesIID.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInstanceId.Container).DefaultIfEmpty()
+                                    from placement in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.PlacementPosition).DefaultIfEmpty()
+                                    from wielder in ctx.BiotaPropertiesIID.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInstanceId.Wielder).DefaultIfEmpty()
+                                    from wieldedlocation in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.CurrentWieldedLocation).DefaultIfEmpty()
+                                    from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                    select new
+                                    {
+                                        Biota = biota,
+                                        Name = name,
+                                        // Version = version ?? null,
+                                        Container = container ?? null,
+                                        PlacementPosition = placement ?? null,
+                                        Wielder = wielder ?? null,
+                                        CurrentWieldedLocation = wieldedlocation ?? null,
+                                        Location = location ?? null,
+                                    };
+                var preRares = queryPreRares.ToDictionary(i => i.Biota.Id, i => i);
+                foundRaresPre = preRares.Count;
+
+                // get PostMoA rares 
+                //var postRares = ctx.Biota.Where(i => i.WeenieClassId >= 45436 && i.WeenieClassId <= 45470).Select(i => i.Id).ToList();
+                var queryPostMoA = from biota in ctx.Biota
+                                   join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                   where name.Type == (ushort)PropertyString.Name && biota.WeenieClassId >= 45436 && biota.WeenieClassId <= 45470
+                                   from version in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.Version).DefaultIfEmpty()
+                                   from container in ctx.BiotaPropertiesIID.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInstanceId.Container).DefaultIfEmpty()
+                                   from placement in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.PlacementPosition).DefaultIfEmpty()
+                                   from wielder in ctx.BiotaPropertiesIID.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInstanceId.Wielder).DefaultIfEmpty()
+                                   from wieldedlocation in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.CurrentWieldedLocation).DefaultIfEmpty()
+                                   from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                   from shortcut in ctx.CharacterPropertiesShortcutBar.Where(x => x.ShortcutObjectId == biota.Id).DefaultIfEmpty()
+                                   select new
+                                   {
+                                       Biota = biota,
+                                       Name = name,
+                                       Version = version ?? null,
+                                       Container = container ?? null,
+                                       PlacementPosition = placement ?? null,
+                                       Wielder = wielder ?? null,
+                                       CurrentWieldedLocation = wieldedlocation ?? null,
+                                       Location = location ?? null,
+                                       Shortcut = shortcut ?? null,
+                                   };
+                var postRares = queryPostMoA.ToDictionary(i => i.Biota.Id, i => i);
+                foundRaresPost = postRares.Count;
+
+                // get Rare Coins 
+                //var queryRareCoin = ctx.Biota.Where(i => i.WeenieClassId == 45493).Select(i => i.Id).ToList();
+                var queryRareCoin = from biota in ctx.Biota
+                                    join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                    where name.Type == (ushort)PropertyString.Name && biota.WeenieClassId == 45493
+                                    from container in ctx.BiotaPropertiesIID.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInstanceId.Container).DefaultIfEmpty()
+                                    from placement in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.PlacementPosition).DefaultIfEmpty()
+                                    from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                    from shortcut in ctx.CharacterPropertiesShortcutBar.Where(x => x.ShortcutObjectId == biota.Id).DefaultIfEmpty()
+                                    select new
+                                    {
+                                        Biota = biota,
+                                        Name = name,
+                                        Container = container ?? null,
+                                        PlacementPosition = placement ?? null,
+                                        Location = location ?? null,
+                                        Shortcut = shortcut ?? null,
+                                    };
+                var rareCoins = queryRareCoin.ToDictionary(i => i.Biota.Id, i => i);
+                foundRareCoins = rareCoins.Count;
+
+                foreach (var rare in postRares)
+                {
+                    if (rare.Value.Version is not null && rare.Value.Version.Value >= 2)
+                    {
+                        validPostRares++;
+                        continue;
+                    }
+
+                    if (rare.Value.Biota.WeenieClassId == 45461)
+                    {
+                        validPostRaresV1++;
+                    }
+
+                    foundIssues = true;
+
+                    var logline = $"0x{rare.Key:X16} {rare.Value.Name.Value} ({rare.Value.Biota.WeenieClassId}) is";
+
+                    if (rare.Value.Container is not null)
+                    {
+                        logline += " contained by: ";
+
+                        var queryContainer = from biota in ctx.Biota
+                                             join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                             where name.Type == (ushort)PropertyString.Name && biota.Id == rare.Value.Container.Value
+                                             from placement in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.PlacementPosition).DefaultIfEmpty()
+                                             from parentcontainer in ctx.BiotaPropertiesIID.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInstanceId.Container).DefaultIfEmpty()
+                                             select new
+                                             {
+                                                 Biota = biota,
+                                                 Name = name,
+                                                 PlacementPosition = placement ?? null,
+                                                 ParentContainer = parentcontainer ?? null,
+                                             };
+
+                        var container = queryContainer.FirstOrDefault();
+
+                        if (container is null)
+                        {
+                            logline += $"\n Unable to find 0x{rare.Value.Container.Value} in database. Orphaned object?";
+                        }
+                        else
+                        {
+                            if (container.Biota.WeenieType == (int)WeenieType.Container)
+                            {
+                                var queryParentContainer = from biota in ctx.Biota
+                                                           join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                           where name.Type == (ushort)PropertyString.Name && biota.Id == container.ParentContainer.Value
+                                                           select new
+                                                           {
+                                                               Biota = biota,
+                                                               Name = name,
+                                                           };
+
+                                var parentContainer = queryParentContainer.FirstOrDefault();
+
+                                logline += $"\n 0x{parentContainer.Biota.Id:X16} {parentContainer.Name.Value}{(parentContainer.Biota.WeenieType == (int)WeenieType.Storage ? "" : "'s")} Sub Pack 0x{container.Biota.Id:X16} {container.Name.Value} (Slot {container.PlacementPosition?.Value ?? 0}) at placement position {rare.Value.PlacementPosition?.Value ?? 0}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Hook)
+                            {
+                                var queryHook = from biota in ctx.Biota
+                                                join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                where name.Type == (ushort)PropertyString.Name && biota.Id == rare.Value.Container.Value
+                                                from hooktype in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.HookType).DefaultIfEmpty()
+                                                from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                                select new
+                                                {
+                                                    Biota = biota,
+                                                    Name = name,
+                                                    HookType = hooktype,
+                                                    Location = location ?? null,
+                                                };
+
+                                var hook = queryHook.FirstOrDefault();
+
+                                logline += $"\n 0x{container.Biota.Id:X16} {(HookType)hook.HookType.Value} Hook located at:\n 0x{hook.Location.ObjCellId:X16} [{hook.Location.OriginX:F6} {hook.Location.OriginY:F6} {hook.Location.OriginZ:F6}] {hook.Location.AnglesW:F6} {hook.Location.AnglesX:F6} {hook.Location.AnglesY:F6} {hook.Location.AnglesZ:F6}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Storage || container.Biota.WeenieType == (int)WeenieType.Chest || container.Biota.WeenieType == (int)WeenieType.SlumLord)
+                            {
+                                var queryStorage = from biota in ctx.Biota
+                                                   join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                   where name.Type == (ushort)PropertyString.Name && biota.Id == rare.Value.Container.Value
+                                                   from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                                   select new
+                                                   {
+                                                       Biota = biota,
+                                                       Name = name,
+                                                       Location = location ?? null,
+                                                   };
+
+                                var storage = queryStorage.FirstOrDefault();
+
+                                logline += $"\n 0x{container.Biota.Id:X16} {container.Name.Value} Main Pack at placement position {rare.Value.PlacementPosition?.Value ?? 0} and located at:\n 0x{storage.Location.ObjCellId:X8} [{storage.Location.OriginX:F6} {storage.Location.OriginY:F6} {storage.Location.OriginZ:F6}] {storage.Location.AnglesW:F6} {storage.Location.AnglesX:F6} {storage.Location.AnglesY:F6} {storage.Location.AnglesZ:F6} {storage.Location.Instance}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Corpse)
+                            {
+                                var queryCorpse = from biota in ctx.Biota
+                                                  join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                  where name.Type == (ushort)PropertyString.Name && biota.Id == rare.Value.Container.Value
+                                                  from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                                  select new
+                                                  {
+                                                      Biota = biota,
+                                                      Name = name,
+                                                      Location = location ?? null
+                                                  };
+
+                                var corpse = queryCorpse.FirstOrDefault();
+
+                                logline += $"\n 0x{corpse.Biota.Id:X16} {corpse.Name.Value}'s Main Pack 0x{container.Biota.Id:X16} at placement position {rare.Value.PlacementPosition?.Value ?? 0} and located at:\n 0x{corpse.Location.ObjCellId:X16} [{corpse.Location.OriginX:F6} {corpse.Location.OriginY:F6} {corpse.Location.OriginZ:F6}] {corpse.Location.AnglesW:F6} {corpse.Location.AnglesX:F6} {corpse.Location.AnglesY:F6} {corpse.Location.AnglesZ:F6} {corpse.Location.Instance}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Creature || container.Biota.WeenieType == (int)WeenieType.Admin || container.Biota.WeenieType == (int)WeenieType.Sentinel || container.Biota.WeenieType == (int)WeenieType.Cow || container.Biota.WeenieType == (int)WeenieType.Pet || container.Biota.WeenieType == (int)WeenieType.CombatPet || container.Biota.WeenieType == (int)WeenieType.Vendor)
+                            {
+                                logline += $"\n 0x{container.Biota.Id:X16} {container.Name.Value}'s Main Pack at placement position {rare.Value.PlacementPosition?.Value ?? 0}";
+                            }
+                            else
+                            {
+                                logline += $"\n Unexpected WeenieType '{container.Biota.WeenieType}' for container 0x{container.Biota.Id:X16} {container.Name.Value}. Invalid custom content?";
+                            }
+                        }
+                    }
+                    else if (rare.Value.Wielder is not null)
+                    {
+                        logline += " wielded by: ";
+
+                        var queryWielder = from biota in ctx.Biota
+                                           join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                           where name.Type == (ushort)PropertyString.Name && biota.Id == rare.Value.Wielder.Value
+                                           select new
+                                           {
+                                               Biota = biota,
+                                               Name = name,
+                                           };
+
+                        var wielder = queryWielder.FirstOrDefault();
+
+                        logline += $"\n 0x{wielder.Biota.Id:X16} {wielder.Name.Value} in the {(EquipMask)rare.Value.CurrentWieldedLocation.Value} slot";
+                    }
+                    else if (rare.Value.Location is not null)
+                    {
+                        logline += $" on a landblock and located at:\n 0x{rare.Value.Location.ObjCellId:X8} [{rare.Value.Location.OriginX:F6} {rare.Value.Location.OriginY:F6} {rare.Value.Location.OriginZ:F6}] {rare.Value.Location.AnglesW:F6} {rare.Value.Location.AnglesX:F6} {rare.Value.Location.AnglesY:F6} {rare.Value.Location.AnglesZ:F6} {rare.Value.Location.Instance}";
+                    }
+                    else
+                    {
+                        logline += $" found in database but does not have a Container, Wielder, or Location. Orphaned object?";
+                    }
+
+                    if (fix)
+                    {
+                        if (rare.Value.Biota.WeenieClassId == 45461)
+                        {
+                            // this rare requires no swap, it was always valid, so we'll update to version 2 and move on.
+
+                            var version = rare.Value.Biota.BiotaPropertiesInt.FirstOrDefault(x => x.Type == (int)PropertyInt.Version);
+
+                            if (version == null)
+                                rare.Value.Biota.BiotaPropertiesInt.Add(new BiotaPropertiesInt { ObjectId = rare.Value.Biota.Id, Type = (int)PropertyInt.Version, Value = 2 });
+                            else
+                                version.Value = 2;
+
+                            adjustedRaresPost++;
+
+                            logline += "\n\\----- Updated Version, no other changes required.";
+                        }
+                        else
+                        {
+                            // this rare was purchased from the Melee Rare Vendor. Generate a new v2 rare, copy over "link" data to effectively mutate in place "illegally" swapped rare for another randomly generated V2 rare that is also not the same as the one it started out as.
+
+                            var tierRares = PreToPostMeleeRareConversions.Values.ToList();
+
+                            tierRares.Remove(rare.Value.Biota.WeenieClassId);
+
+                            var rng = ThreadSafeRandom.Next(0, tierRares.Count - 1);
+
+                            var rareWCID = tierRares[rng];
+
+                            var wo = WorldObjectFactory.CreateNewWorldObject(rareWCID);
+
+                            if (wo != null)
+                            {
+                                if (rare.Value.Container != null)
+                                {
+                                    wo.ContainerId = rare.Value.Container.Value;
+                                }
+
+                                if (rare.Value.PlacementPosition != null)
+                                {
+                                    wo.PlacementPosition = rare.Value.PlacementPosition.Value;
+                                }
+
+                                if (rare.Value.Wielder != null)
+                                {
+                                    wo.WielderId = rare.Value.Wielder.Value;
+                                }
+
+                                if (rare.Value.CurrentWieldedLocation != null)
+                                {
+                                    wo.CurrentWieldedLocation = (EquipMask)rare.Value.CurrentWieldedLocation.Value;
+                                }
+
+                                if (rare.Value.Location != null)
+                                {
+                                    wo.Location = new InstancedPosition(rare.Value.Location.ObjCellId, rare.Value.Location.OriginX, rare.Value.Location.OriginY, rare.Value.Location.OriginZ, rare.Value.Location.AnglesX, rare.Value.Location.AnglesY, rare.Value.Location.AnglesZ, rare.Value.Location.AnglesW, rare.Value.Location.Instance ?? 0);
+                                }
+
+                                if (rare.Value.Shortcut != null)
+                                {
+                                    var shortcut = ctx.CharacterPropertiesShortcutBar.Where(x => x.ShortcutObjectId == rare.Value.Biota.Id).FirstOrDefault();
+
+                                    if (shortcut != null)
+                                        shortcut.ShortcutObjectId = wo.Biota.Id;
+                                }
+
+                                wo.SaveBiotaToDatabase();
+                                replacedPostRares++;
+
+                                ctx.Biota.Remove(rare.Value.Biota);
+                                deletedPostRares++;
+
+                                logline += $"\n\\----- Replaced with 0x{wo.Guid} {wo.Name} ({wo.WeenieClassId})";
+                            }
+                            else
+                            {
+                                logline += $"\n\\----- Unable to replace with ({rareWCID}). Rare not found in database.";
+                                return;
+                            }
+                        }
+
+                        ctx.SaveChanges();
+                    }
+                    else
+                    {
+                        if (rare.Value.Biota.WeenieClassId == 45461)
+                        {
+                            logline += "\n\\----- Version needs updating, no other changes required.";
+                        }
+                        else
+                        {
+                            logline += $"\n\\----- Rare obtained from Melee Rare Vendor, needs to be deleted and replaced with a random newly generated melee rare.";
+                        }
+                    }
+
+                    Console.WriteLine(logline);
+                }
+
+                foreach (var rare in preRares)
+                {
+                    foundIssues = true;
+
+                    var logline = $"0x{rare.Key:X16} {rare.Value.Name.Value} ({rare.Value.Biota.WeenieClassId}) is";
+
+                    if (rare.Value.Container is not null)
+                    {
+                        logline += " contained by: ";
+
+                        var queryContainer = from biota in ctx.Biota
+                                             join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                             where name.Type == (ushort)PropertyString.Name && biota.Id == rare.Value.Container.Value
+                                             from placement in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.PlacementPosition).DefaultIfEmpty()
+                                             from parentcontainer in ctx.BiotaPropertiesIID.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInstanceId.Container).DefaultIfEmpty()
+                                             select new
+                                             {
+                                                 Biota = biota,
+                                                 Name = name,
+                                                 PlacementPosition = placement ?? null,
+                                                 ParentContainer = parentcontainer ?? null,
+                                             };
+
+                        var container = queryContainer.FirstOrDefault();
+
+                        if (container is null)
+                        {
+                            logline += $"\n Unable to find 0x{rare.Value.Container.Value} in database. Orphaned object?";
+                        }
+                        else
+                        {
+                            if (container.Biota.WeenieType == (int)WeenieType.Container)
+                            {
+                                var queryParentContainer = from biota in ctx.Biota
+                                                           join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                           where name.Type == (ushort)PropertyString.Name && biota.Id == container.ParentContainer.Value
+                                                           select new
+                                                           {
+                                                               Biota = biota,
+                                                               Name = name,
+                                                           };
+
+                                var parentContainer = queryParentContainer.FirstOrDefault();
+
+                                logline += $"\n 0x{parentContainer.Biota.Id:X16} {parentContainer.Name.Value}{(parentContainer.Biota.WeenieType == (int)WeenieType.Storage ? "" : "'s")} Sub Pack 0x{container.Biota.Id:X8} {container.Name.Value} (Slot {container.PlacementPosition?.Value ?? 0}) at placement position {rare.Value.PlacementPosition?.Value ?? 0}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Hook)
+                            {
+                                var queryHook = from biota in ctx.Biota
+                                                join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                where name.Type == (ushort)PropertyString.Name && biota.Id == rare.Value.Container.Value
+                                                from hooktype in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.HookType).DefaultIfEmpty()
+                                                from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                                select new
+                                                {
+                                                    Biota = biota,
+                                                    Name = name,
+                                                    HookType = hooktype,
+                                                    Location = location ?? null,
+                                                };
+
+                                var hook = queryHook.FirstOrDefault();
+
+                                logline += $"\n 0x{container.Biota.Id:X16} {(HookType)hook.HookType.Value} Hook located at:\n 0x{hook.Location.ObjCellId:X8} [{hook.Location.OriginX:F6} {hook.Location.OriginY:F6} {hook.Location.OriginZ:F6}] {hook.Location.AnglesW:F6} {hook.Location.AnglesX:F6} {hook.Location.AnglesY:F6} {hook.Location.AnglesZ:F6} {hook.Location.Instance}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Storage || container.Biota.WeenieType == (int)WeenieType.Chest || container.Biota.WeenieType == (int)WeenieType.SlumLord)
+                            {
+                                var queryStorage = from biota in ctx.Biota
+                                                   join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                   where name.Type == (ushort)PropertyString.Name && biota.Id == rare.Value.Container.Value
+                                                   from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                                   select new
+                                                   {
+                                                       Biota = biota,
+                                                       Name = name,
+                                                       Location = location ?? null,
+                                                   };
+
+                                var storage = queryStorage.FirstOrDefault();
+
+                                logline += $"\n 0x{container.Biota.Id:X16} {container.Name.Value} Main Pack at placement position {rare.Value.PlacementPosition?.Value ?? 0} and located at:\n 0x{storage.Location.ObjCellId:X8} [{storage.Location.OriginX:F6} {storage.Location.OriginY:F6} {storage.Location.OriginZ:F6}] {storage.Location.AnglesW:F6} {storage.Location.AnglesX:F6} {storage.Location.AnglesY:F6} {storage.Location.AnglesZ:F6} {storage.Location.Instance}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Corpse)
+                            {
+                                var queryCorpse = from biota in ctx.Biota
+                                                  join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                  where name.Type == (ushort)PropertyString.Name && biota.Id == rare.Value.Container.Value
+                                                  from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                                  select new
+                                                  {
+                                                      Biota = biota,
+                                                      Name = name,
+                                                      Location = location ?? null
+                                                  };
+
+                                var corpse = queryCorpse.FirstOrDefault();
+
+                                logline += $"\n 0x{corpse.Biota.Id:X16} {corpse.Name.Value}'s Main Pack 0x{container.Biota.Id:X16} at placement position {rare.Value.PlacementPosition?.Value ?? 0} and located at:\n 0x{corpse.Location.ObjCellId:X8} [{corpse.Location.OriginX:F6} {corpse.Location.OriginY:F6} {corpse.Location.OriginZ:F6}] {corpse.Location.AnglesW:F6} {corpse.Location.AnglesX:F6} {corpse.Location.AnglesY:F6} {corpse.Location.AnglesZ:F6} {corpse.Location.Instance}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Creature || container.Biota.WeenieType == (int)WeenieType.Admin || container.Biota.WeenieType == (int)WeenieType.Sentinel || container.Biota.WeenieType == (int)WeenieType.Cow || container.Biota.WeenieType == (int)WeenieType.Pet || container.Biota.WeenieType == (int)WeenieType.CombatPet || container.Biota.WeenieType == (int)WeenieType.Vendor)
+                            {
+                                logline += $"\n 0x{container.Biota.Id:X16} {container.Name.Value}'s Main Pack at placement position {rare.Value.PlacementPosition?.Value ?? 0}";
+                            }
+                            else
+                            {
+                                logline += $"\n Unexpected WeenieType '{container.Biota.WeenieType}' for container 0x{container.Biota.Id:X8} {container.Name.Value}. Invalid custom content?";
+                            }
+                        }
+                    }
+                    else if (rare.Value.Wielder is not null)
+                    {
+                        logline += " wielded by: ";
+
+                        var queryWielder = from biota in ctx.Biota
+                                           join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                           where name.Type == (ushort)PropertyString.Name && biota.Id == rare.Value.Wielder.Value
+                                           select new
+                                           {
+                                               Biota = biota,
+                                               Name = name,
+                                           };
+
+                        var wielder = queryWielder.FirstOrDefault();
+
+                        logline += $"\n 0x{wielder.Biota.Id:X16} {wielder.Name.Value} in the {(EquipMask)rare.Value.CurrentWieldedLocation.Value} slot";
+                    }
+                    else if (rare.Value.Location is not null)
+                    {
+                        logline += $" on a landblock and located at:\n 0x{rare.Value.Location.ObjCellId:X8} [{rare.Value.Location.OriginX:F6} {rare.Value.Location.OriginY:F6} {rare.Value.Location.OriginZ:F6}] {rare.Value.Location.AnglesW:F6} {rare.Value.Location.AnglesX:F6} {rare.Value.Location.AnglesY:F6} {rare.Value.Location.AnglesZ:F6} {rare.Value.Location.Instance}";
+                    }
+                    else
+                    {
+                        logline += $" found in database but does not have a Container, Wielder, or Location. Orphaned object?";
+                    }
+
+                    if (fix)
+                    {
+                        // this is a preMoA rare and requires updating its WCID to a postMoA WCID, version 2 with no other changes.
+
+                        var newWCIDFound = PreToPostMeleeRareConversions.TryGetValue(rare.Value.Biota.WeenieClassId, out var newWCID);
+
+                        if (newWCIDFound)
+                        {
+                            var oldWCID = rare.Value.Biota.WeenieClassId;
+
+                            rare.Value.Biota.WeenieClassId = newWCID;
+
+                            var version = rare.Value.Biota.BiotaPropertiesInt.FirstOrDefault(x => x.Type == (int)PropertyInt.Version);
+
+                            if (version == null)
+                                rare.Value.Biota.BiotaPropertiesInt.Add(new BiotaPropertiesInt { ObjectId = rare.Value.Biota.Id, Type = (int)PropertyInt.Version, Value = 2 });
+                            else
+                                version.Value = 2;
+
+                            adjustedRaresPre++;
+
+                            logline += $"\n\\----- Updated WCID from {oldWCID} to {newWCID} and Updated Version, no other changes required.";
+
+                            ctx.SaveChanges();
+                        }
+                        else
+                        {
+                            logline += $"\n\\----- Unable to change WCID from {rare.Value.Biota.WeenieClassId} for 0x{rare.Key:X8}. Not a melee rare?";
+                        }    
+                    }
+                    else
+                    {
+                        var oldWCID = rare.Value.Biota.WeenieClassId;
+                        PreToPostMeleeRareConversions.TryGetValue(rare.Value.Biota.WeenieClassId, out var newWCID);
+                        logline += $"\n\\----- Rare needs to change WCID from {oldWCID} to {newWCID} and have its version updated.";
+                    }
+
+                    Console.WriteLine(logline);
+                }
+
+                foreach (var coin in rareCoins)
+                {
+                    foundIssues = true;
+
+                    var logline = $"0x{coin.Key:X8} {coin.Value.Name.Value} ({coin.Value.Biota.WeenieClassId}) is";
+
+                    if (coin.Value.Container is not null)
+                    {
+                        logline += " contained by: ";
+
+                        var queryContainer = from biota in ctx.Biota
+                                             join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                             where name.Type == (ushort)PropertyString.Name && biota.Id == coin.Value.Container.Value
+                                             from placement in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.PlacementPosition).DefaultIfEmpty()
+                                             from parentcontainer in ctx.BiotaPropertiesIID.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInstanceId.Container).DefaultIfEmpty()
+                                             select new
+                                             {
+                                                 Biota = biota,
+                                                 Name = name,
+                                                 PlacementPosition = placement ?? null,
+                                                 ParentContainer = parentcontainer ?? null,
+                                             };
+
+                        var container = queryContainer.FirstOrDefault();
+
+                        if (container is null)
+                        {
+                            logline += $"\n Unable to find 0x{coin.Value.Container.Value} in database. Orphaned object?";
+                        }
+                        else
+                        {
+                            if (container.Biota.WeenieType == (int)WeenieType.Container)
+                            {
+                                var queryParentContainer = from biota in ctx.Biota
+                                                           join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                           where name.Type == (ushort)PropertyString.Name && biota.Id == container.ParentContainer.Value
+                                                           select new
+                                                           {
+                                                               Biota = biota,
+                                                               Name = name,
+                                                           };
+
+                                var parentContainer = queryParentContainer.FirstOrDefault();
+
+                                logline += $"\n 0x{parentContainer.Biota.Id:X16} {parentContainer.Name.Value}{(parentContainer.Biota.WeenieType == (int)WeenieType.Storage ? "" : "'s")} Sub Pack 0x{container.Biota.Id:X8} {container.Name.Value} (Slot {container.PlacementPosition?.Value ?? 0}) at placement position {coin.Value.PlacementPosition?.Value ?? 0}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Hook)
+                            {
+                                var queryHook = from biota in ctx.Biota
+                                                join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                where name.Type == (ushort)PropertyString.Name && biota.Id == coin.Value.Container.Value
+                                                from hooktype in ctx.BiotaPropertiesInt.Where(x => x.ObjectId == biota.Id && x.Type == (ushort)PropertyInt.HookType).DefaultIfEmpty()
+                                                from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                                select new
+                                                {
+                                                    Biota = biota,
+                                                    Name = name,
+                                                    HookType = hooktype,
+                                                    Location = location ?? null,
+                                                };
+
+                                var hook = queryHook.FirstOrDefault();
+
+                                logline += $"\n 0x{container.Biota.Id:X16} {(HookType)hook.HookType.Value} Hook located at:\n 0x{hook.Location.ObjCellId:X8} [{hook.Location.OriginX:F6} {hook.Location.OriginY:F6} {hook.Location.OriginZ:F6}] {hook.Location.AnglesW:F6} {hook.Location.AnglesX:F6} {hook.Location.AnglesY:F6} {hook.Location.AnglesZ:F6} {hook.Location.Instance}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Storage || container.Biota.WeenieType == (int)WeenieType.Chest || container.Biota.WeenieType == (int)WeenieType.SlumLord)
+                            {
+                                var queryStorage = from biota in ctx.Biota
+                                                   join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                   where name.Type == (ushort)PropertyString.Name && biota.Id == coin.Value.Container.Value
+                                                   from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                                   select new
+                                                   {
+                                                       Biota = biota,
+                                                       Name = name,
+                                                       Location = location ?? null,
+                                                   };
+
+                                var storage = queryStorage.FirstOrDefault();
+
+                                logline += $"\n 0x{container.Biota.Id:X16} {container.Name.Value} Main Pack at placement position {coin.Value.PlacementPosition?.Value ?? 0} and located at:\n 0x{storage.Location.ObjCellId:X8} [{storage.Location.OriginX:F6} {storage.Location.OriginY:F6} {storage.Location.OriginZ:F6}] {storage.Location.AnglesW:F6} {storage.Location.AnglesX:F6} {storage.Location.AnglesY:F6} {storage.Location.AnglesZ:F6} {storage.Location.Instance}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Corpse)
+                            {
+                                var queryCorpse = from biota in ctx.Biota
+                                                  join name in ctx.BiotaPropertiesString on biota.Id equals name.ObjectId
+                                                  where name.Type == (ushort)PropertyString.Name && biota.Id == coin.Value.Container.Value
+                                                  from location in ctx.BiotaPropertiesPosition.Where(x => x.ObjectId == biota.Id && x.PositionType == (ushort)PositionType.Location).DefaultIfEmpty()
+                                                  select new
+                                                  {
+                                                      Biota = biota,
+                                                      Name = name,
+                                                      Location = location ?? null
+                                                  };
+
+                                var corpse = queryCorpse.FirstOrDefault();
+
+                                logline += $"\n 0x{corpse.Biota.Id:X16} {corpse.Name.Value}'s Main Pack 0x{container.Biota.Id:X16} at placement position {coin.Value.PlacementPosition?.Value ?? 0} and located at:\n 0x{corpse.Location.ObjCellId:X8} [{corpse.Location.OriginX:F6} {corpse.Location.OriginY:F6} {corpse.Location.OriginZ:F6}] {corpse.Location.AnglesW:F6} {corpse.Location.AnglesX:F6} {corpse.Location.AnglesY:F6} {corpse.Location.AnglesZ:F6} {corpse.Location.Instance}";
+                            }
+                            else if (container.Biota.WeenieType == (int)WeenieType.Creature || container.Biota.WeenieType == (int)WeenieType.Admin || container.Biota.WeenieType == (int)WeenieType.Sentinel || container.Biota.WeenieType == (int)WeenieType.Cow || container.Biota.WeenieType == (int)WeenieType.Pet || container.Biota.WeenieType == (int)WeenieType.CombatPet || container.Biota.WeenieType == (int)WeenieType.Vendor)
+                            {
+                                logline += $"\n 0x{container.Biota.Id:X16} {container.Name.Value}'s Main Pack at placement position {coin.Value.PlacementPosition?.Value ?? 0}";
+                            }
+                            else
+                            {
+                                logline += $"\n Unexpected WeenieType '{container.Biota.WeenieType}' for container 0x{container.Biota.Id:X16} {container.Name.Value}. Invalid custom content?";
+                            }
+                        }
+                    }
+                    else if (coin.Value.Location is not null)
+                    {
+                        logline += $" on a landblock and located at:\n 0x{coin.Value.Location.ObjCellId:X8} [{coin.Value.Location.OriginX:F6} {coin.Value.Location.OriginY:F6} {coin.Value.Location.OriginZ:F6}] {coin.Value.Location.AnglesW:F6} {coin.Value.Location.AnglesX:F6} {coin.Value.Location.AnglesY:F6} {coin.Value.Location.AnglesZ:F6} {coin.Value.Location.Instance}";
+                    }
+                    else
+                    {
+                        logline += $" found in database but does not have a Container, Wielder, or Location. Orphaned object?";
+                    }
+
+                    if (fix)
+                    {
+                        // this coin was distributed by Emissary of Asheron (45492) incorrectly to be used at the Melee Rare Vendor. Generate a new v2 rare, copy over "link" data to effectively mutate in place "illegally" swapped coin for another randomly generated V2 rare.
+
+                        var tierRares = PreToPostMeleeRareConversions.Values.ToList();
+
+                        //tierRares.Remove(coin.Value.Biota.WeenieClassId);
+
+                        var rng = ThreadSafeRandom.Next(0, tierRares.Count - 1);
+
+                        var rareWCID = tierRares[rng];
+
+                        var wo = WorldObjectFactory.CreateNewWorldObject(rareWCID);
+
+                        if (wo != null)
+                        {
+                            if (coin.Value.Container != null)
+                            {
+                                wo.ContainerId = coin.Value.Container.Value;
+                            }
+
+                            if (coin.Value.PlacementPosition != null)
+                            {
+                                wo.PlacementPosition = coin.Value.PlacementPosition.Value;
+                            }
+
+                            if (coin.Value.Location != null)
+                            {
+                                wo.Location = new InstancedPosition(coin.Value.Location.ObjCellId, coin.Value.Location.OriginX, coin.Value.Location.OriginY, coin.Value.Location.OriginZ, coin.Value.Location.AnglesX, coin.Value.Location.AnglesY, coin.Value.Location.AnglesZ, coin.Value.Location.AnglesW, coin.Value.Location.Instance ?? 0);
+                            }
+
+                            if (coin.Value.Shortcut != null)
+                            {
+                                var shortcut = ctx.CharacterPropertiesShortcutBar.Where(x => x.ShortcutObjectId == coin.Value.Biota.Id).FirstOrDefault();
+
+                                if (shortcut != null)
+                                    shortcut.ShortcutObjectId = wo.Biota.Id;
+                            }
+
+                            wo.SaveBiotaToDatabase();
+                            newRaresFromCoins++;
+
+                            ctx.Biota.Remove(coin.Value.Biota);
+                            deletedRareCoins++;
+
+                            logline += $"\n\\----- Replaced with 0x{wo.Guid} {wo.Name} ({wo.WeenieClassId})";
+                        }
+                        else
+                        {
+                            logline += $"\n\\----- Unable to replace with ({rareWCID}). Rare not found in database.";
+                            return;
+                        }
+
+                        ctx.SaveChanges();
+                    }
+                    else
+                    {
+                        logline += $"\n\\----- Rare Coin obtained from Emissary of Asheron (45492), needs to be deleted and replaced with a random newly generated melee rare.";
+                    }
+
+                    Console.WriteLine(logline);
+                }
+
+                if (!fix && foundIssues)
+                {
+                    Console.WriteLine($"Found {foundRaresPre:N0} Pre-MoA Rares. These need to be converted to Post-MoA WCIDs and their version updated to V2.");
+                    Console.WriteLine($"Found {foundRaresPost:N0} Post-MoA Rares. {foundRaresPost - validPostRares - validPostRaresV1:N0} are invalid and need to be regenerated due to incorrectly being distributed by Melee Rare Vendor. {validPostRaresV1:N0} need to have their version updated to V2.");
+                    Console.WriteLine($"Found {foundRareCoins:N0} Rare Coins. These need to be deleted and replaced with newly randomly generated rare.");
+                    Console.WriteLine($"Dry run completed. Type 'verify-melee-rares fix' to fix any issues.");
+                }
+
+                if (!foundIssues)
+                {
+                    Console.WriteLine($"Verified {foundRaresPre + foundRaresPost:N0} melee rares. No changes required.");
+                }
+
+                if (foundIssues && fix)
+                {
+                    Console.WriteLine($"Found {foundRaresPre:N0} Pre-MoA Rares. {adjustedRaresPre:N0} were converted to Post-MoA WCIDs and their version updated to V2.");
+                    Console.WriteLine($"Found {foundRaresPost:N0} Post-MoA Rares. {validPostRares:N0} valid, {deletedPostRares:N0} deleted, {replacedPostRares:N0} replaced, {adjustedRaresPost:N0} updated to V2.");
+                    Console.WriteLine($"Found {foundRareCoins:N0} Rare Coins. {deletedRareCoins:N0} deleted, {newRaresFromCoins:N0} replaced.");
+                }
+            }
         }
     }
 }
