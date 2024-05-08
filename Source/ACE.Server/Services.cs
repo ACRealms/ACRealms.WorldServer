@@ -56,7 +56,6 @@ namespace ACE.Server
         public static void ConfigureServicesForLiveEnvironment()
         {
             var consoleTitle = $"AC Realms - v{ServerBuildInfo.FullVersion}";
-
             Console.Title = consoleTitle;
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -164,8 +163,6 @@ namespace ACE.Server
                         File.Copy(configConfigContainer, configFile);
                 }
             }
-
-            consoleTitle = Console.Title;
 
             log.Info("Initializing ConfigManager...");
             ConfigManager.Initialize();
