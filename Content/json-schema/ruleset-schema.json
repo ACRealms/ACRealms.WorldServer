@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://realm.ac/schema/v1/ruleset-schema.json",
+  "type": "object",
+  "definitions": {
+    "apply_ruleset_random_schema": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "generated/ruleset-names.json"
+      },
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          {
+            "const": "auto"
+          }
+        ]
+      }
+    }
+  },
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "const": "Ruleset"
+    },
+    "parent": {
+      "anyOf": [
+        {
+          "$ref": "generated/ruleset-names.json"
+        },
+        {
+          "$ref": "generated/realm-names.json"
+        }
+      ]
+    },
+    "properties": {
+      "$ref": "generated/realm-properties.json"
+    },
+    "apply_rulesets": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "generated/ruleset-names.json"
+      }
+    },
+    "apply_rulesets_random": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "generated/ruleset-names.json"
+                },
+                {
+                  "$ref": "#/definitions/apply_ruleset_random_schema"
+                }
+              ]
+            }
+          },
+          {
+            "$ref": "#/definitions/apply_ruleset_random_schema"
+          }
+        ]
+      }
+    },
+    "properties_random_count": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "type"
+  ]
+}

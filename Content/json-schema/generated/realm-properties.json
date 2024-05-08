@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://realm.ac/schema/v1/generated/realm-properties.json",
+  "type": "object",
+  "minItems": 1,
+  "definitions": {
+    "reroll": {
+      "description": "landblock: Reroll once during landblock load; always: Reroll each time the property is accessed by game logic; Never: use the default value",
+      "enum": [
+        "landblock",
+        "always",
+        "never"
+      ]
+    },
+    "compose": {
+      "description": "add, multiply, or replace the previously composed ruleset property",
+      "enum": [
+        "add",
+        "multiply",
+        "replace"
+      ]
+    },
+    "locked": {
+      "type": "boolean",
+      "description": "If true, the value may not be further modified by other rulesets or sub-realms"
+    }
+  },
+  "properties": {
+    "Foo": {
+      "definitions": {
+        "val": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "oneOf": [
+        {
+          "$ref": "#/properties/Foo/definitions/val"
+        },
+        {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "$ref": "#/properties/Foo/definitions/val"
+                },
+                "compose": {
+                  "$ref": "#/definitions/compose"
+                },
+                "locked": {
+                  "$ref": "#/definitions/locked"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "low": {
+                  "$ref": "#/properties/Foo/definitions/val"
+                },
+                "high": {
+                  "$ref": "#/properties/Foo/definitions/val"
+                },
+                "reroll": {
+                  "$ref": "#/definitions/reroll"
+                },
+                "compose": {
+                  "$ref": "#/definitions/compose"
+                },
+                "locked": {
+                  "$ref": "#/definitions/locked"
+                }
+              },
+              "dependencies": {
+                "low": [
+                  "high"
+                ],
+                "high": [
+                  "low"
+                ]
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}
