@@ -84,6 +84,9 @@ namespace ACE.Entity
         public ObjectGuid(uint clientGUID, uint instance)
             : this(TranslateToServerGuid(clientGUID, instance)) { }
 
+        public ObjectGuid(ulong clientOrFullGuid, uint instance)
+            : this(TranslateToServerGuid((uint)(clientOrFullGuid & 0xFFFFFFFF), instance)) { }
+
         public bool IsPlayer()
         {
             return Type == GuidType.Player;
@@ -139,7 +142,7 @@ namespace ACE.Entity
 
         public override string ToString()
         {
-            if (Instance == 0)
+            if (Instance == 0 || Instance == null)
                 return Full.ToString("X8");
             else
                 return Full.ToString("X16");

@@ -2444,10 +2444,10 @@ Report this to the AC Realms developer.");
             set { if (!value.HasValue) RemoveProperty(PropertyInstanceId.Owner); else SetProperty(PropertyInstanceId.Owner, value.Value); }
         }
 
-        public ulong ActivationTarget
+        public ObjectGuid ActivationTarget
         {
-            get => GetProperty(PropertyInstanceId.ActivationTarget) ?? 0;
-            set { if (value == 0) RemoveProperty(PropertyInstanceId.ActivationTarget); else SetProperty(PropertyInstanceId.ActivationTarget, value); }
+            get => new ObjectGuid(GetProperty(PropertyInstanceId.ActivationTarget) ?? 0, Location?.Instance ?? 0);
+            set { if (value == ObjectGuid.Invalid) RemoveProperty(PropertyInstanceId.ActivationTarget); else SetProperty(PropertyInstanceId.ActivationTarget, value.Full); }
         }
 
         /// <summary>
