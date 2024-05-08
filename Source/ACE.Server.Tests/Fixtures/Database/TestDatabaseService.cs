@@ -37,7 +37,7 @@ namespace ACRealms.Tests.Fixtures.Database
     public class TestDatabaseService : IDisposable
     {
         public static string TestUserName { get; } = "acrealms_test_db_user";
-        private static string TestUserFull { get; } = $"'{TestUserName}'@'localhost'";
+        private static string TestUserFull { get; } = $"'{TestUserName}'@'%'";
         public static string TestUserPassword { get; } = RandomPassword();
 
         // Can be temporarily false when trying to make specific tests pass (faster execution), but some tests need this to be true

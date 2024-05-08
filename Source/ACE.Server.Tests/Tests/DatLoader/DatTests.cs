@@ -13,13 +13,13 @@ namespace ACRealms.Tests.DatLoader
     {
         static string DatFileDir { get; } = ConfigManager.Config.Server.DatFilesDirectory;
 
-        private static string cellDatLocation = $@"{DatFileDir}\client_cell_1.dat";
+        private static string cellDatLocation = $@"{DatFileDir}/client_cell_1.dat";
         private static int expectedCellDatFileCount = 805003;
 
-        private static string portalDatLocation = $@"{DatFileDir}\client_portal.dat";
+        private static string portalDatLocation = $@"{DatFileDir}/client_portal.dat";
         private static int expectedPortalDatFileCount = 79694;
 
-        private static string localEnglishDatLocation = $@"{DatFileDir}\client_local_English.dat";
+        private static string localEnglishDatLocation = $@"{DatFileDir}/client_local_English.dat";
         private static int expectedLocalEnglishDatFileCount = 118;
 
         const string skip = "Dat Tests Disabled";
