@@ -1131,7 +1131,7 @@ namespace ACE.Server.Entity
                 }
             }
 
-            if (guid.Instance == 0 && guid.IsStatic() && this.Instance != 0)
+            if (guid.Instance == null && guid.IsStatic() && this.Instance != 0)
             {
                 // ClientGUID 
                 var locatedObject = GetObject(new ObjectGuid(guid.ClientGUID, Instance));
