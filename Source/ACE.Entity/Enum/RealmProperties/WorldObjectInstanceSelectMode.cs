@@ -9,7 +9,11 @@ namespace ACE.Entity.Enum.RealmProperties
     public enum WorldObjectInstanceSelectMode : uint
     {
         Undefined = 0,
-        Same = 1,
-        RealmDefaultInstanceID = 2,
+        Same,
+        RealmDefaultInstanceID,
+
+
+        // Do not add entries below this item
+        reserved
     }
 }

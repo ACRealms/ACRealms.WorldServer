@@ -6,6 +6,8 @@ namespace ACE.Entity.Enum.Properties
     {
         [RealmPropertyString(defaultValue: "")]
         Undef                           = 0,
+
+        [Description("A description of the ruleset.")]
         [RealmPropertyString("No Description")]
         Description                     = 1
     }

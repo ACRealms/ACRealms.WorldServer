@@ -32,12 +32,15 @@ will be moved to the parent realm.")]
         [RealmPropertyBool(false)]
         IsTemporaryRealm = 3,
 
+        [Description("Set this to true to designate this realm as the dueling realm. Allows /rebuff command, all summoned portals lead to ephemeral instances, and no vitae.")]
         [RealmPropertyBool(false)]
         IsDuelingRealm = 4,
 
+        [Description("If true, realm will be listed as available from the realm selector (Blaine)")]
         [RealmPropertyBool(false)]
         CanBeHomeworld = 5,
 
+        [Description("Allows players to use the /hideout command to teleport to a personal instanced hideout")]
         [RealmPropertyBool(false)]
         HideoutEnabled = 6,
 
@@ -48,9 +51,11 @@ will be moved to the parent realm.")]
         [RealmPropertyBool(false)]
         CanInteractWithNeutralZone = 7,
 
+        [Description("Enables a double collision algorithm for projectile spells. In theory, this makes them harder to dodge.")]
         [RealmPropertyBool(true)]
         SpellCastingPKDoubleCollisionCheck = 8,
 
+        [Description("Enables the console commands for recalling to various locations (marketplace, house, etc)")]
         [RealmPropertyBool(true)]
         HasRecalls = 9
     }
