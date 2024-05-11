@@ -17,27 +17,27 @@ namespace ACE.Entity.Enum.Properties
 
 
         [Description("All creatures will have this value added to their strength attribute")]
-        [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
+        [RealmPropertyInt(0, -10000000, 10000000)]
         CreatureStrengthAdded = 2,
 
         [Description("All creatures will have this value added to their endurance attribute")]
-        [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
+        [RealmPropertyInt(0, -10000000, 10000000)]
         CreatureEnduranceAdded = 3,
 
         [Description("All creatures will have this value added to their coordination attribute")]
-        [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
+        [RealmPropertyInt(0, -10000000, 10000000)]
         CreatureCoordinationAdded = 4,
 
         [Description("All creatures will have this value added to their quickness attribute")]
-        [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
+        [RealmPropertyInt(0, -10000000, 10000000)]
         CreatureQuicknessAdded = 5,
 
         [Description("All creatures will have this value added to their focus attribute")]
-        [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
+        [RealmPropertyInt(0, -10000000, 10000000)]
         CreatureFocusAdded = 6,
 
         [Description("All creatures will have this value added to their self attribute")]
-        [RealmPropertyInt(0, int.MinValue, int.MaxValue)]
+        [RealmPropertyInt(0, -10000000, 10000000)]
         CreatureSelfAdded = 7,
 
         /*Below not implemented*/
