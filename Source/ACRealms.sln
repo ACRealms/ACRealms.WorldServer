@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACE.Server", "ACE.Server\ACE.Server.csproj", "{943276B8-1DCC-48C6-A98D-692D60F53E43}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E362FE4E-8F5F-4607-9B5E-6468D3ECB8AD} = {E362FE4E-8F5F-4607-9B5E-6468D3ECB8AD}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root items", "root items", "{1BA67CED-4F8D-433A-90E1-9871DD6A31EF}"
 	ProjectSection(SolutionItems) = preProject
@@ -60,6 +63,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{60DC64
 		..\Dockerfile.arm64 = ..\Dockerfile.arm64
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.JsonSchemaGenerator", "ACRealms.JsonSchemaGenerator\ACRealms.JsonSchemaGenerator.csproj", "{E362FE4E-8F5F-4607-9B5E-6468D3ECB8AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -94,6 +99,10 @@ Global
 		{3C925D75-B149-4898-8806-054D3E63A4BE}.Debug|x64.Build.0 = Debug|x64
 		{3C925D75-B149-4898-8806-054D3E63A4BE}.Release|x64.ActiveCfg = Release|x64
 		{3C925D75-B149-4898-8806-054D3E63A4BE}.Release|x64.Build.0 = Release|x64
+		{E362FE4E-8F5F-4607-9B5E-6468D3ECB8AD}.Debug|x64.ActiveCfg = Debug|x64
+		{E362FE4E-8F5F-4607-9B5E-6468D3ECB8AD}.Debug|x64.Build.0 = Debug|x64
+		{E362FE4E-8F5F-4607-9B5E-6468D3ECB8AD}.Release|x64.ActiveCfg = Release|x64
+		{E362FE4E-8F5F-4607-9B5E-6468D3ECB8AD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

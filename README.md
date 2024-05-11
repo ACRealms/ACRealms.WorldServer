@@ -44,7 +44,8 @@ If a realm file exists, it must have a corresponding entry in this file, and vic
 
 #### Realm and Ruleset JSON
 
-(UPDATE MAY 2024: I am working on a way to support JSON validation and autocomplete functionality via json-schema to improve the developer experience for this, and may possibly support YAML in a future release as well)
+It is recommended to use visual studio code to edit these files, using the "Content" folder as the root. A json-schema folder exists and realm properties will be populated in this schema after successful build of the ACE.Server project.  
+This allows for autocomplete and tooltip functionality to be integrated with the editor. 
 
 A realm file exists under `Content/json/realms/realm/xxx.jsonc`, and a ruleset file exists under `Content/json/realms/ruleset/xxx.jsonc`. They have the same basic structure.
 The key difference between a realm and a ruleset is that a realm may exist as a permanent home location for a player. A ruleset does not. Rulesets are intended to be composed on top of realms, to produce "ephemeral realms" (temporary rulesets).

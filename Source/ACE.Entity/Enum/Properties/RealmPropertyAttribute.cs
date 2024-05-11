@@ -1,7 +1,33 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ACE.Entity.Enum.Properties
 {
+    public static class RealmPropertyHelper
+    {
+        public static Dictionary<E, A> MakePropDict<E, A>()
+            where E : struct, System.Enum
+        {
+            return typeof(E).GetEnumNames().Select(n =>
+            {
+                var value = (E)System.Enum.Parse(typeof(E), n);
+                var attributes = typeof(E).GetMember(n)
+                    .FirstOrDefault(m => m.DeclaringType == typeof(E))
+                    .GetCustomAttributes(typeof(A), false);
+
+                if (attributes.Length == 0)
+                    throw new Exception($"Enum {typeof(E).Name}.{n} is missing a {typeof(A)} attribute.");
+                if (attributes.Length != 1)
+                    throw new Exception($"Enum {typeof(E).Name}.{n} must have no more than 1 {typeof(A)} attributes.");
+
+                var attribute = (A)attributes[0];
+                return (value, attribute);
+            }).ToDictionary((pair) => pair.value, (pair) => pair.attribute);
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
     public class RealmPropertyIntAttribute : Attribute
     {
         public string DefaultFromServerProperty { get; }

@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://realm.ac/schema/v1/common-schema.json",
+    "type": "object",
+    "definitions": {
+        "reroll": {
+            "enum": ["landblock", "always", "never"],
+            "uniqueItems": true
+        },
+        "compose": {
+            "enum": ["add", "multiply", "replace"]
+        },
+        "locked": {
+            "type": "boolean"
+        }
+    }
+}
