@@ -179,7 +179,12 @@ namespace ACE.Entity.Models
                 if ((double)(object)MinValue > (double)(object)MaxValue)
                     MaxValue = MinValue;
             }
-            else if (typeof(T) == typeof(int) || typeof(T) == typeof(long))
+            else if (typeof(T) == typeof(int))
+            {
+                if ((int)(object)MinValue > (int)(object)MaxValue)
+                    MaxValue = MinValue;
+            }
+            else if (typeof(T) == typeof(long))
             {
                 if ((long)(object)MinValue > (long)(object)MaxValue)
                     MaxValue = MinValue;
