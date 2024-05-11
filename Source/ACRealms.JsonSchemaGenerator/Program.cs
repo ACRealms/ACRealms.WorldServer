@@ -76,18 +76,22 @@ namespace ACRealms.JsonSchemaGenerator
                 {   "definitions", new Dictionary<string, object>() {
                     {   "reroll", new Dictionary<string, object>() {
                             { "description", "landblock: Reroll once during landblock load; always: Reroll each time the property is accessed by game logic; Never: use the default value" },
-                            { "enum", new List<string>() { "landblock", "always", "never" } }
-                        }
-                    },
+                            { "default", "landblock" },
+                            { "enum", new List<string>() { "landblock", "always", "never" } } } },
+                    {   "probability", new Dictionary<string, object>() {
+                            { "type", "number" },
+                            { "description", "The probability of this property taking effect or being composed" },
+                            { "default", 1 },
+                            { "minimum", 0 },
+                            { "maximum", 1 } } },
                     {   "compose", new Dictionary<string, object>() {
                             { "description", "add, multiply, or replace the previously composed ruleset property" },
-                            { "enum", new List<string>() { "add", "multiply", "replace" } } }
-                    },
+                            { "default", "replace" },
+                            { "enum", new List<string>() { "add", "multiply", "replace" } } } },
                     {   "locked", new Dictionary<string, object>() {
                             { "type", "boolean" },
-                            { "description", "If true, the value may not be further modified by other rulesets or sub-realms" } }
-                    } }
-                },
+                            { "description", "If true, the value may not be further modified by other rulesets or sub-realms" },
+                            { "default", false } } } } },
                 {   "properties", properties },
                 {   "additionalProperties", false }
             };
@@ -101,6 +105,11 @@ namespace ACRealms.JsonSchemaGenerator
             var propertyDefinitionsInt64 = RealmPropertyHelper.MakePropDict<RealmPropertyInt64, RealmPropertyInt64Attribute>().Where(x => x.Key != RealmPropertyInt64.Undef);
             var propertyDefinitionsString = RealmPropertyHelper.MakePropDict<RealmPropertyString, RealmPropertyStringAttribute>().Where(x => x.Key != RealmPropertyString.Undef);
             var propertyDefinitionsFloat = RealmPropertyHelper.MakePropDict<RealmPropertyFloat, RealmPropertyFloatAttribute>().Where(x => x.Key != RealmPropertyFloat.Undef);
+
+            var probabilitySchema = new Dictionary<string, object>()
+            {
+                { "$ref", "#/definitions/probability" }
+            };
 
             var composeSchema = new Dictionary<string, object>()
             {
@@ -126,14 +135,6 @@ namespace ACRealms.JsonSchemaGenerator
                 {
                     { "$ref", $"#/properties/{propInt.Key}/definitions/val" }
                 };
-                var lowSchema = new Dictionary<string, object>()
-                {
-                    { "low", directValueSchema }
-                };
-                var highSchema = new Dictionary<string, object>()
-                {
-                    { "high", directValueSchema }
-                };
 
                 var defSchema = new Dictionary<string, object>()
                 {
@@ -141,7 +142,8 @@ namespace ACRealms.JsonSchemaGenerator
                     {
                         { "type", "integer" },
                         { "minimum", att.MinValue },
-                        { "maximum", att.MaxValue }
+                        { "maximum", att.MaxValue },
+                        { "default", att.DefaultValue }
                     } }
                 };
 
@@ -156,6 +158,7 @@ namespace ACRealms.JsonSchemaGenerator
                     { "type", "object" },
                     { "properties", new Dictionary<string, object>() {
                         { "value", directValueSchema },
+                        { "probability", probabilitySchema },
                         { "compose", composeSchema },
                         { "locked", lockedSchema } } },
                     { "required", new List<string>() { "value" } },
@@ -166,8 +169,9 @@ namespace ACRealms.JsonSchemaGenerator
                 {
                     { "type", "object" },
                     { "properties", new Dictionary<string, object>() {
-                        { "low", lowSchema },
-                        { "high", highSchema},
+                        { "low", directValueSchema },
+                        { "high", directValueSchema},
+                        { "probability", probabilitySchema },
                         { "reroll", rerollSchema },
                         { "compose", composeSchema },
                         { "locked", lockedSchema } } },
@@ -199,14 +203,6 @@ namespace ACRealms.JsonSchemaGenerator
                 {
                     { "$ref", $"#/properties/{propLong.Key}/definitions/val" }
                 };
-                var lowSchema = new Dictionary<string, object>()
-                {
-                    { "low", directValueSchema }
-                };
-                var highSchema = new Dictionary<string, object>()
-                {
-                    { "high", directValueSchema }
-                };
 
                 var defSchema = new Dictionary<string, object>()
                 {
@@ -214,7 +210,8 @@ namespace ACRealms.JsonSchemaGenerator
                     {
                         { "type", "integer" },
                         { "minimum", att.MinValue },
-                        { "maximum", att.MaxValue }
+                        { "maximum", att.MaxValue },
+                        { "default", att.DefaultValue }
                     } }
                 };
 
@@ -229,6 +226,7 @@ namespace ACRealms.JsonSchemaGenerator
                     { "type", "object" },
                     { "properties", new Dictionary<string, object>() {
                         { "value", directValueSchema },
+                        { "probability", probabilitySchema },
                         { "compose", composeSchema },
                         { "locked", lockedSchema } } },
                     { "required", new List<string>() { "value" } },
@@ -239,8 +237,9 @@ namespace ACRealms.JsonSchemaGenerator
                 {
                     { "type", "object" },
                     { "properties", new Dictionary<string, object>() {
-                        { "low", lowSchema },
-                        { "high", highSchema},
+                        { "low", directValueSchema },
+                        { "high", directValueSchema},
+                        { "probability", probabilitySchema },
                         { "reroll", rerollSchema },
                         { "compose", composeSchema },
                         { "locked", lockedSchema } } },
@@ -273,14 +272,6 @@ namespace ACRealms.JsonSchemaGenerator
                 {
                     { "$ref", $"#/properties/{propFloat.Key}/definitions/val" }
                 };
-                var lowSchema = new Dictionary<string, object>()
-                {
-                    { "low", directValueSchema }
-                };
-                var highSchema = new Dictionary<string, object>()
-                {
-                    { "high", directValueSchema }
-                };
 
                 var defSchema = new Dictionary<string, object>()
                 {
@@ -288,7 +279,8 @@ namespace ACRealms.JsonSchemaGenerator
                     {
                         { "type", "number" },
                         { "minimum", Math.Round(att.MinValue, 6) },
-                        { "maximum", Math.Round(att.MaxValue, 6) }
+                        { "maximum", Math.Round(att.MaxValue, 6) },
+                        { "default", att.DefaultValue }
                     } }
                 };
 
@@ -303,6 +295,7 @@ namespace ACRealms.JsonSchemaGenerator
                     { "type", "object" },
                     { "properties", new Dictionary<string, object>() {
                         { "value", directValueSchema },
+                        { "probability", probabilitySchema },
                         { "compose", composeSchema },
                         { "locked", lockedSchema } } },
                     { "required", new List<string>() { "value" } },
@@ -313,8 +306,9 @@ namespace ACRealms.JsonSchemaGenerator
                 {
                     { "type", "object" },
                     { "properties", new Dictionary<string, object>() {
-                        { "low", lowSchema },
-                        { "high", highSchema},
+                        { "low", directValueSchema },
+                        { "high", directValueSchema},
+                        { "probability", probabilitySchema },
                         { "reroll", rerollSchema },
                         { "compose", composeSchema },
                         { "locked", lockedSchema } } },
@@ -339,7 +333,7 @@ namespace ACRealms.JsonSchemaGenerator
 
             foreach (var propString in propertyDefinitionsString)
             {
-                //var att = propString.Value;
+                var att = propString.Value;
                 var propertySchema = new Dictionary<string, object>();
 
                 var directValueSchema = new Dictionary<string, object>()
@@ -352,6 +346,7 @@ namespace ACRealms.JsonSchemaGenerator
                     { "val", new Dictionary<string, object>()
                     {
                         { "type", "string" },
+                        { "default", att.DefaultValue }
                     } }
                 };
 
@@ -366,6 +361,7 @@ namespace ACRealms.JsonSchemaGenerator
                     { "type", "object" },
                     { "properties", new Dictionary<string, object>() {
                         { "value", directValueSchema },
+                        { "probability", probabilitySchema },
                         { "locked", lockedSchema } } },
                     { "required", new List<string>() { "value" } },
                     { "additionalProperties", false }
@@ -382,7 +378,7 @@ namespace ACRealms.JsonSchemaGenerator
 
             foreach (var propBool in propertyDefinitionsBool)
             {
-                // var att = propString.Value;
+                var att = propBool.Value;
                 var propertySchema = new Dictionary<string, object>();
 
                 var directValueSchema = new Dictionary<string, object>()
@@ -395,6 +391,7 @@ namespace ACRealms.JsonSchemaGenerator
                     { "val", new Dictionary<string, object>()
                     {
                         { "type", "boolean" },
+                        { "default", att.DefaultValue }
                     } }
                 };
 
@@ -409,6 +406,7 @@ namespace ACRealms.JsonSchemaGenerator
                     { "type", "object" },
                     { "properties", new Dictionary<string, object>() {
                         { "value", directValueSchema },
+                        { "probability", probabilitySchema },
                         { "locked", lockedSchema } } },
                     { "required", new List<string>() { "value" } },
                     { "additionalProperties", false }
