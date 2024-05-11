@@ -525,7 +525,7 @@ namespace ACE.Server.Managers
             }
             catch (Exception ex)
             {
-                Command.Handlers.CommandHandlerHelper.WriteOutputInfo(session, $"Error importing json file {filename}. Exception: {ex.Message}.");
+                Command.Handlers.CommandHandlerHelper.WriteOutputError(session, $"Error importing json file {filename}. Exception: {ex.Message}.");
                 return null;
             }
         }

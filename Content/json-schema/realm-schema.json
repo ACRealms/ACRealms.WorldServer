@@ -2,31 +2,12 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "https://realm.ac/schema/v1/realm-schema.json",
   "type": "object",
-  "definitions": {
-    "apply_ruleset_random_schema": {
-      "type": "object",
-      "propertyNames": {
-        "$ref": "generated/ruleset-names.json"
-      },
-      "additionalProperties": {
-        "oneOf": [
-          {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1
-          },
-          {
-            "const": "auto"
-          }
-        ]
-      }
-    }
-  },
   "properties": {
     "name": {
       "type": "string"
     },
     "type": {
+      "description": "Represents a (semi)-permanent world",
       "const": "Realm"
     },
     "properties": {
@@ -37,6 +18,7 @@
     },
     "apply_rulesets": {
       "type": "array",
+      "description": "A list of rulesets to apply unconditionally",
       "uniqueItems": true,
       "items": {
         "$ref": "generated/ruleset-names.json"
@@ -44,6 +26,7 @@
     },
     "apply_rulesets_random": {
       "type": "array",
+      "description": "A list of rulesets to apply at random. The elements of the list may be either a ruleset name, another array (where instead of the ruleset being applied at that element location, it chooses one of those elements at random), or a hash. \nFor example, [[\"a\",\"b\",\"c\"],\"d\",\"e\"] will yield 11% chance for rulesets a, b, and c, and 33% chance for rulesets d and e",
       "items": {
         "oneOf": [
           {
@@ -54,19 +37,21 @@
                   "$ref": "generated/ruleset-names.json"
                 },
                 {
-                  "$ref": "#/definitions/apply_ruleset_random_schema"
+                  "$ref": "generated/apply-rulesets-random.json"
                 }
               ]
             }
           },
           {
-            "$ref": "#/definitions/apply_ruleset_random_schema"
+            "$ref": "generated/apply-rulesets-random.json"
           }
         ]
       }
     },
     "properties_random_count": {
-      "type": "integer"
+      "type": "integer",
+      "description": "An integer to specify that instead of all properties being applied, this many properties from the ruleset will be selected at random (excluding the description)",
+      "minimum": 0
     }
   },
   "additionalProperties": false,

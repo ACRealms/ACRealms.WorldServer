@@ -91,7 +91,7 @@ Property entry hash valid keys:
   - `multiply`: Multiply the result of the two rulesets together
   - `replace`: Discard the previous value and replace it with the result from this ruleset.
 - `locked`: Rulesets that inherit from this ruleset will ignore any properties that are locked here instead of composing them. If applying a ruleset with `apply_rulesets` or `apply_rulesets_random`, that value will become locked if specified.
-- `probability`: (Not implemented yet): A floating-point number between 0 and 1 representing the probability of this property taking effect.
+- `probability`: A floating-point number between 0 and 1 representing the probability of this property taking effect.
 
 #### RealmProperty Enums
 

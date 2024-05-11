@@ -38,7 +38,7 @@ namespace ACRealms.JsonSchemaGenerator
             var realmNames = realmFiles.Select(f =>
             {
                 var dobj = JsonConvert.DeserializeObject<dynamic>(File.ReadAllText(f.FullName));
-                return (string)dobj!.name.Value;
+                return (name: (string)dobj!.name.Value, description: (string?)dobj!.properties?.Description?.Value ?? "This realm is missing a 'Description' property. You can add one!");
             }).ToList();
 
             var rulesetDir = new DirectoryInfo($"{directory}/json/realms/ruleset");
@@ -46,25 +46,81 @@ namespace ACRealms.JsonSchemaGenerator
             var rulesetNames = rulesetFiles.Select(f =>
             {
                 var dobj = JsonConvert.DeserializeObject<dynamic>(File.ReadAllText(f.FullName));
-                return (string)dobj!.name.Value;
+                return (name: (string)dobj!.name.Value, description: (string?)dobj!.properties?.Description?.Value ?? "This ruleset is missing a 'Description' property. You can add one!");
             }).ToList();
 
             var generatedPath = $"{directory}/json-schema/generated";
             if (Directory.Exists(generatedPath))
                 Directory.CreateDirectory(generatedPath);
 
-            var realmNamesSchema = new Dictionary<string, dynamic>()
+            var realmNamesSchemaConsts = new List<object>();
+            foreach(var realmInfo in realmNames)
             {
-                { "enum", realmNames }
+                realmNamesSchemaConsts.Add(new Dictionary<string, object>()
+                {
+                    { "type", "string" },
+                    { "description", realmInfo.description },
+                    { "const", realmInfo.name }
+                });
+            }
+
+            var realmNamesSchema = new Dictionary<string, object>()
+            {
+                { "$schema", "http://json-schema.org/draft-07/schema" },
+                { "$id", "https://realm.ac/schema/v1/generated/realm-names.json" },
+                { "oneOf", realmNamesSchemaConsts }
             };
 
-            var rulesetNamesSchema = new Dictionary<string, dynamic>()
+            var rulesetNamesSchemaConsts = new List<object>();
+            foreach (var rulesetInfo in rulesetNames)
             {
-                { "enum", rulesetNames }
+                rulesetNamesSchemaConsts.Add(new Dictionary<string, object>()
+                {
+                    { "type", "string" },
+                    { "description", rulesetInfo.description },
+                    { "const", rulesetInfo.name }
+                });
+            }
+
+            var rulesetNamesSchema = new Dictionary<string, object>()
+            {
+                { "$schema", "http://json-schema.org/draft-07/schema" },
+                { "$id", "https://realm.ac/schema/v1/generated/ruleset-names.json" },
+                { "oneOf", rulesetNamesSchemaConsts }
             };
+
+            var applyRulesetsRandomSchemaProperties = new Dictionary<string, object>();
+            foreach(var rulesetInfo in rulesetNames)
+            {
+                applyRulesetsRandomSchemaProperties.Add(rulesetInfo.name, new Dictionary<string, object>()
+                {
+                    { "description", rulesetInfo.description },
+                    { "$ref", "#/definitions/probabilityValue" }
+                });
+            }
+
+            var applyRulesetsRandomSchema = new Dictionary<string, object>()
+            {
+                {   "$schema", "http://json-schema.org/draft-07/schema" },
+                {   "$id", "https://realm.ac/schema/v1/generated/apply-rulesets-random.json" },
+                {   "type", "object" },
+                {   "definitions", new Dictionary<string, object>() {
+                    {   "probabilityValue", new Dictionary<string, object>() {
+                        {   "default", "auto" },
+                        {   "oneOf", new List<object>() {
+                                new Dictionary<string, object>() {
+                                    { "type", "number" },
+                                    { "minimum", 0 },
+                                    { "maximum", 1 } },
+                                new Dictionary<string, object>() {
+                                    { "const", "auto" } } } } } } } },
+                {   "properties", applyRulesetsRandomSchemaProperties }
+            };
+
 
             File.WriteAllText($"{generatedPath}/realm-names.json", JsonConvert.SerializeObject(realmNamesSchema, Formatting.Indented));
             File.WriteAllText($"{generatedPath}/ruleset-names.json", JsonConvert.SerializeObject(rulesetNamesSchema, Formatting.Indented));
+            File.WriteAllText($"{generatedPath}/apply-rulesets-random.json", JsonConvert.SerializeObject(applyRulesetsRandomSchema, Formatting.Indented));
 
             var properties = MakePropertySchema();
             var realmPropertiesSchema = new Dictionary<string, object>()
@@ -148,8 +204,7 @@ namespace ACRealms.JsonSchemaGenerator
                 };
 
                 var descriptionAtt = propInt.Key.GetAttributeOfType<System.ComponentModel.DescriptionAttribute>();
-                if (descriptionAtt != null)
-                    propertySchema.Add("description", descriptionAtt.Description);
+                propertySchema.Add("description", descriptionAtt?.Description ?? "(no description)");
 
                 propertySchema.Add("definitions", defSchema);
 
@@ -216,8 +271,7 @@ namespace ACRealms.JsonSchemaGenerator
                 };
 
                 var descriptionAtt = propLong.Key.GetAttributeOfType<System.ComponentModel.DescriptionAttribute>();
-                if (descriptionAtt != null)
-                    propertySchema.Add("description", descriptionAtt.Description);
+                propertySchema.Add("description", descriptionAtt?.Description ?? "(no description)");
 
                 propertySchema.Add("definitions", defSchema);
 
@@ -285,8 +339,7 @@ namespace ACRealms.JsonSchemaGenerator
                 };
 
                 var descriptionAtt = propFloat.Key.GetAttributeOfType<System.ComponentModel.DescriptionAttribute>();
-                if (descriptionAtt != null)
-                    propertySchema.Add("description", descriptionAtt.Description);
+                propertySchema.Add("description", descriptionAtt?.Description ?? "(no description)");
 
                 propertySchema.Add("definitions", defSchema);
 
@@ -351,8 +404,7 @@ namespace ACRealms.JsonSchemaGenerator
                 };
 
                 var descriptionAtt = propString.Key.GetAttributeOfType<System.ComponentModel.DescriptionAttribute>();
-                if (descriptionAtt != null)
-                    propertySchema.Add("description", descriptionAtt.Description);
+                propertySchema.Add("description", descriptionAtt?.Description ?? "(no description)");
 
                 propertySchema.Add("definitions", defSchema);
 
@@ -396,8 +448,7 @@ namespace ACRealms.JsonSchemaGenerator
                 };
 
                 var descriptionAtt = propBool.Key.GetAttributeOfType<System.ComponentModel.DescriptionAttribute>();
-                if (descriptionAtt != null)
-                    propertySchema.Add("description", descriptionAtt.Description);
+                propertySchema.Add("description", descriptionAtt?.Description ?? "(no description)");
 
                 propertySchema.Add("definitions", defSchema);
 
