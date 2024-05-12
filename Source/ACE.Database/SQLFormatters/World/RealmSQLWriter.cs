@@ -32,16 +32,12 @@ namespace ACE.Database.SQLFormatters.World
 
         public void CreateSQLINSERTStatement(Realm input, StreamWriter writer)
         {
-            writer.WriteLine("INSERT INTO `realm` (`id`, `name`)");
+            writer.WriteLine("INSERT INTO `realm` (`id`, `name`, `parent_realm_id`, `property_count_randomized`)");
 
-            var output = "VALUES (" +
-                         $"{input.Id}, " +
-                         $"'{input.Name}'" +
-                         ");";
+            var lineGenerator = new Func<int, string>(_ => $"{input.Id}, '{input.Name}', {input.ParentRealmId}, {input.PropertyCountRandomized})" +
+                (input.ParentRealmId.HasValue ? $" /* Parent: {input.ParentRealmName} */" : ""));
 
-            output = FixNullFields(output);
-
-            writer.WriteLine(output);
+            ValuesWriter(1, lineGenerator, writer);
 
             if (input.RealmPropertiesBool != null && input.RealmPropertiesBool.Count > 0)
             {
@@ -68,6 +64,21 @@ namespace ACE.Database.SQLFormatters.World
                 writer.WriteLine();
                 CreateSQLINSERTStatement(input.Id, input.RealmPropertiesString.ToList(), writer);
             }
+            if (input.RealmRulesetLinksRealm != null && input.RealmRulesetLinksRealm.Count > 0)
+            {
+                writer.WriteLine();
+                CreateSQLINSERTStatement(input.Id, input.RealmRulesetLinksRealm.ToList(), writer);
+            }
+        }
+
+        private void CreateSQLINSERTStatement(ushort realmId, List<RealmRulesetLinks> input, StreamWriter writer)
+        {
+            writer.WriteLine("INSERT INTO `realm_ruleset_links;` (`realm_id`, `order`, `link_type`, `linked_realm_id`, `probability_group`, `probability`)");
+
+            var lineGenerator = new Func<int, string>(i => $"{realmId}, {input[i].Order}, {input[i].LinkType}, {input[i].LinkedRealmId}, {input[i].ProbabilityGroup}, {input[i].Probability})" +
+            $" /* {input[i].LinkedRealm.Name}, {Enum.GetName(typeof(RealmRulesetLinkType), input[i].LinkType)} */");
+
+            ValuesWriter(input.Count, lineGenerator, writer);
         }
 
         public void CreateSQLINSERTStatement(uint realmId, IList<RealmPropertiesInt> input, StreamWriter writer)
@@ -75,7 +86,7 @@ namespace ACE.Database.SQLFormatters.World
             writer.WriteLine("INSERT INTO `realm_properties_int` (`realm_id`, `type`, `value`)");
 
             var lineGenerator = new Func<int, string>(i => $"{realmId}, {input[i].Type}, {input[i].Value.ToString().PadLeft(3)})" +
-            $" /* {Enum.GetName(typeof(RealmPropertyBool), input[i].Type)} */");
+            $" /* {Enum.GetName(typeof(RealmPropertyInt), input[i].Type)} */");
 
             ValuesWriter(input.Count, lineGenerator, writer);
         }

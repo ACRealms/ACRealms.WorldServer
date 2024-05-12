@@ -82,6 +82,11 @@ namespace ACE.Server.Command.Handlers.Processors
             {
                 contentType = GetContentType(parameters, ref param);
 
+                if (contentType == FileType.Realm)
+                {
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Realms may not be imported individually. Use /import-realms instead to fully reload the ruleset and realm files.");
+                    return;
+                }
                 if (contentType == FileType.Undefined)
                 {
                     CommandHandlerHelper.WriteOutputInfo(session, $"Unknown content type '{parameters[1]}'");
@@ -105,10 +110,6 @@ namespace ACE.Server.Command.Handlers.Processors
                 case FileType.Weenie:
                     ImportJsonWeenie(session, param);
                     break;
-
-                case FileType.Realm:
-                    //ImportJsonRealm(session, param);
-                    return;
             }
         }
 
@@ -371,6 +372,11 @@ namespace ACE.Server.Command.Handlers.Processors
             {
                 contentType = GetContentType(parameters, ref param);
 
+                if (contentType == FileType.Realm)
+                {
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Realm SQL files are not importable (and it is not recommended to try to do this manually).");
+                    return;
+                }
                 if (contentType == FileType.Undefined)
                 {
                     CommandHandlerHelper.WriteOutputInfo(session, $"Unknown content type '{parameters[1]}'");
@@ -469,34 +475,6 @@ namespace ACE.Server.Command.Handlers.Processors
 
             foreach (var file in files)
                 ImportSQLRecipe(session, sql_folder, file.Name);
-        }
-
-        public static void ImportSQLRealm(ISession session, string realmId)
-        {
-            DirectoryInfo di = VerifyContentFolder(session);
-            if (!di.Exists) return;
-
-            var sep = Path.DirectorySeparatorChar;
-
-            var sql_folder = $"{di.FullName}{sep}sql{sep}realms{sep}";
-
-            var prefix = realmId + " ";
-
-            if (realmId.Equals("all", StringComparison.OrdinalIgnoreCase))
-                prefix = "";
-
-            di = new DirectoryInfo(sql_folder);
-
-            var files = di.Exists ? di.GetFiles($"{prefix}*.sql") : null;
-
-            if (files == null || files.Length == 0)
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find {sql_folder}{prefix}*.sql");
-                return;
-            }
-
-            foreach (var file in files)
-                ImportSQLRealm(session, sql_folder, file.Name);
         }
 
         public static void ImportSQLLandblock(ISession session, string landblockId)
@@ -775,7 +753,6 @@ namespace ACE.Server.Command.Handlers.Processors
         public static CookBookSQLWriter CookBookSQLWriter;
         public static RecipeSQLWriter RecipeSQLWriter;
         public static SpellSQLWriter SpellSQLWriter;
-        public static RealmSQLWriter RealmSQLWriter;
 
         public static string json2sql_recipe(ISession session, string folder, string json_filename)
         {
@@ -1072,28 +1049,6 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             sql2json_recipe(session, cookbooks, sql_folder, sql_file);
-        }
-
-        private static void ImportSQLRealm(ISession session, string sql_folder, string sql_file)
-        {
-            if (!uint.TryParse(Regex.Match(sql_file, @"\d+").Value, out var realmId))
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find realm id from {sql_file}");
-                return;
-            }
-
-            ImportSQL(sql_folder + sql_file);
-            CommandHandlerHelper.WriteOutputInfo(session, $"Imported {sql_file}");
-
-            RealmManager.ClearCache();
-
-            var realm = DatabaseManager.World.GetRealm(realmId);
-
-            if (realm == null)
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't load realm {realmId} from db");
-                return;
-            }
         }
 
         private static void ImportSQLLandblock(ISession session, string sql_folder, string sql_file)
@@ -1881,6 +1836,12 @@ namespace ACE.Server.Command.Handlers.Processors
             {
                 contentType = GetContentType(parameters, ref param);
 
+                if (contentType == FileType.Realm)
+                {
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Realms may not be exported to JSON. The raw data can be exported (but not re-imported) with /export-sql realm");
+                    return;
+                }
+
                 if (contentType == FileType.Undefined)
                 {
                     CommandHandlerHelper.WriteOutputInfo(session, $"Unknown content type '{parameters[1]}'");
@@ -2329,7 +2290,14 @@ namespace ACE.Server.Command.Handlers.Processors
 
             var sep = Path.DirectorySeparatorChar;
 
-            if (!uint.TryParse(param, out var realmId))
+            if (param == "all")
+            {
+                var realms = DatabaseManager.World.GetAllRealms(true);
+                foreach(var id in realms.Select(x => x.Id))
+                    ExportSQLRealm(session, id.ToString());
+                return;
+            }
+            if (!ushort.TryParse(param, out var realmId))
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"{param} not a valid realm id");
                 return;
@@ -2349,21 +2317,20 @@ namespace ACE.Server.Command.Handlers.Processors
             if (!di.Exists)
                 di.Create();
 
-            if (RealmSQLWriter == null)
-            {
-                RealmSQLWriter = new RealmSQLWriter();
-            }
+            var sqlWriter = new RealmSQLWriter();
 
-            var sql_filename = RealmSQLWriter.GetDefaultFileName(realm);
+            var sql_filename = sqlWriter.GetDefaultFileName(realm);
 
             try
             {
                 var sqlFile = new StreamWriter(sql_folder + sql_filename);
 
-                RealmSQLWriter.CreateSQLDELETEStatement(realm, sqlFile);
+                sqlFile.WriteLine("-- This export is intended for reference and troubleshooting purposes only.");
+                sqlFile.WriteLine("-- It is not recommended to run these statements on a live server.");
+                sqlWriter.CreateSQLDELETEStatement(realm, sqlFile);
                 sqlFile.WriteLine();
 
-                RealmSQLWriter.CreateSQLINSERTStatement(realm, sqlFile);
+                sqlWriter.CreateSQLINSERTStatement(realm, sqlFile);
                 sqlFile.WriteLine();
 
                 sqlFile.Close();

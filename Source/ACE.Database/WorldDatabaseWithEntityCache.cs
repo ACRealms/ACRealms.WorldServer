@@ -1114,9 +1114,9 @@ namespace ACE.Database
         // Realm
         // =====================================
 
-        private readonly Dictionary<uint, Realm> realmCache = new Dictionary<uint, Realm>();
+        private readonly Dictionary<ushort, Realm> realmCache = new Dictionary<ushort, Realm>();
 
-        public override Realm GetRealm(uint realmId)
+        public override Realm GetRealm(ushort realmId)
         {
             Realm realm;
 
@@ -1132,15 +1132,39 @@ namespace ACE.Database
             return realm;
         }
 
-        public override List<Realm> GetAllRealms()
+        public List<Realm> GetAllRealms(bool? cacheUsage = null)
         {
-            lock (realmCache)
+            // We may be able to get rid of the db realm cache, and possibly the tables entirely (take db out of the loop) for less complexity
+            // But it would be harder to backpedal on that decision
+
+            if (cacheUsage == true)
             {
-                ClearRealmCache();
-                var realms = base.GetAllRealms();
-                foreach(var realm in realms)
-                    realmCache[realm.Id] = realm;
-                return realms;
+                lock(realmCache)
+                {
+                    return realmCache.Values.ToList();
+                }
+            }
+            else if (cacheUsage == false)
+            {
+                return base.GetAllRealms();
+            }
+            else
+            {
+                lock (realmCache)
+                {
+                    var realms = base.GetAllRealms();
+                    HashSet<ushort> realmsAlreadyCached = realmCache.Keys.ToHashSet();
+
+                    foreach (var realm in realms)
+                    {
+                        realmCache[realm.Id] = realm;
+                        if (realmsAlreadyCached.Contains(realm.Id))
+                            realmsAlreadyCached.Remove(realm.Id);
+                    }
+                    foreach (var realmId in realmsAlreadyCached)
+                        realmCache.Remove(realmId);
+                    return realms;
+                }
             }
         }
         public void ClearRealmCache()

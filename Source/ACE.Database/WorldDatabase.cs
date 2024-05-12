@@ -614,13 +614,13 @@ namespace ACE.Database
             }
         }
 
-        public virtual Realm GetRealm(uint id)
+        public virtual Realm GetRealm(ushort id)
         {
             using (var context = ContextFactory.CreateDbContext())
                 return GetRealm(context, id);
         }
 
-        private Realm GetRealm(WorldDbContext context, uint id)
+        private Realm GetRealm(WorldDbContext context, ushort id)
         {
             var realm = context.Realm
                 .FirstOrDefault(r => r.Id == id);
