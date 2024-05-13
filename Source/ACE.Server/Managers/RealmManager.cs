@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using ACE.Entity.Enum;
 using ACE.Database.Models.World;
 using System.Threading.Tasks;
+using ACE.Server.Command.Handlers;
 
 namespace ACE.Server.Managers
 {
@@ -72,7 +73,7 @@ namespace ACE.Server.Managers
             //Import-realms
             if (liveEnvironment)
             {
-                DeveloperContentCommands.HandleImportRealms(null, null);
+                RealmDataCommands.HandleImportRealms(null, null);
                 if (!ImportComplete)
                     throw new Exception("Import of realms.jsonc did not complete successfully.");
             }

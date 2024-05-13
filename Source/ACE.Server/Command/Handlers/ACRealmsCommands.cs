@@ -12,12 +12,13 @@ using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace ACE.Server.Command.Handlers
 {
-    public static class CustomCommands
+    public static class ACRealmsCommands
     {
         [CommandHandler("telerealm", AccessLevel.Developer, CommandHandlerFlag.RequiresWorld, 0, "Teleports the current player to another realm.")]
         public static void HandleMoveRealm(ISession session, params string[] parameters)
@@ -52,7 +53,6 @@ namespace ACE.Server.Command.Handlers
         {
             session.Player.ExitInstance();
         }
-
 
         [CommandHandler("exiti", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, "Leaves the current instance, if the player is currently in one.")]
         public static void HandleExitI(ISession session, params string[] parameters)
@@ -92,6 +92,7 @@ namespace ACE.Server.Command.Handlers
             session.Player.HandleActionTeleToHideout();
         }
 
+        // Requires IsDuelingRealm and HomeRealm to be set
         [CommandHandler("rebuff", AccessLevel.Player, CommandHandlerFlag.RequiresWorld, 0,
             "Buffs you with all beneficial spells. Only usable in certain realms.")]
         public static void HandleRebuff(ISession session, params string[] parameters)
@@ -209,6 +210,5 @@ namespace ACE.Server.Command.Handlers
             lbResetChain.AddAction(WorldManager.ActionQueue, resetLandblockAction);
             lbResetChain.EnqueueChain();
         }
-
     }
 }

@@ -31,9 +31,9 @@ namespace ACRealms.Tests.Helpers
             if (!File.Exists(realmsJsoncPath))
                 throw new RealmFixtureNotFoundException($"Fixture {name} does not contain a realms.jsonc.");
 
-            var realms = ACE.Server.Command.Handlers.Processors.DeveloperContentCommands.ImportJsonRealmsFolder(null, fixturePath);
+            var realms = ACE.Server.Command.Handlers.RealmDataHelpers.ImportJsonRealmsFolder(null, fixturePath);
             if (realms != null)
-                ACE.Server.Command.Handlers.Processors.DeveloperContentCommands.ImportJsonRealmsIndex(null, realmsJsoncPath, realms);
+                ACE.Server.Command.Handlers.RealmDataHelpers.ImportJsonRealmsIndex(null, realmsJsoncPath, realms);
         }
     }
 }
