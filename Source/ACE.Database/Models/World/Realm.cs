@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ACE.Database.Models.World
@@ -7,13 +7,13 @@ namespace ACE.Database.Models.World
     {
         public Realm()
         {
-            RealmPropertiesBool = new HashSet<RealmPropertiesBool>();
-            RealmPropertiesFloat = new HashSet<RealmPropertiesFloat>();
-            RealmPropertiesInt = new HashSet<RealmPropertiesInt>();
-            RealmPropertiesInt64 = new HashSet<RealmPropertiesInt64>();
-            RealmPropertiesString = new HashSet<RealmPropertiesString>();
-            RealmRulesetLinksLinkedRealm = new HashSet<RealmRulesetLinks>();
-            RealmRulesetLinksRealm = new HashSet<RealmRulesetLinks>();
+            RealmPropertiesBool = new List<RealmPropertiesBool>();
+            RealmPropertiesFloat = new List<RealmPropertiesFloat>();
+            RealmPropertiesInt = new List<RealmPropertiesInt>();
+            RealmPropertiesInt64 = new List<RealmPropertiesInt64>();
+            RealmPropertiesString = new List<RealmPropertiesString>();
+            RealmRulesetLinksLinkedRealm = new List<RealmRulesetLinks>();
+            RealmRulesetLinksRealm = new List<RealmRulesetLinks>();
         }
 
         public ushort Id { get; set; }
@@ -22,12 +22,12 @@ namespace ACE.Database.Models.World
         public ushort? ParentRealmId { get; set; }
         public ushort? PropertyCountRandomized { get; set; }
 
-        public virtual ICollection<RealmPropertiesBool> RealmPropertiesBool { get; set; }
-        public virtual ICollection<RealmPropertiesFloat> RealmPropertiesFloat { get; set; }
-        public virtual ICollection<RealmPropertiesInt> RealmPropertiesInt { get; set; }
-        public virtual ICollection<RealmPropertiesInt64> RealmPropertiesInt64 { get; set; }
-        public virtual ICollection<RealmPropertiesString> RealmPropertiesString { get; set; }
-        public virtual ICollection<RealmRulesetLinks> RealmRulesetLinksLinkedRealm { get; set; }
-        public virtual ICollection<RealmRulesetLinks> RealmRulesetLinksRealm { get; set; }
+        public virtual IList<RealmPropertiesBool> RealmPropertiesBool { get; set; }
+        public virtual IList<RealmPropertiesFloat> RealmPropertiesFloat { get; set; }
+        public virtual IList<RealmPropertiesInt> RealmPropertiesInt { get; set; }
+        public virtual IList<RealmPropertiesInt64> RealmPropertiesInt64 { get; set; }
+        public virtual IList<RealmPropertiesString> RealmPropertiesString { get; set; }
+        public virtual IList<RealmRulesetLinks> RealmRulesetLinksLinkedRealm { get; set; }
+        public virtual IList<RealmRulesetLinks> RealmRulesetLinksRealm { get; set; }
     }
 }

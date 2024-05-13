@@ -49,6 +49,8 @@ namespace ACE.Server.Realms
         protected IDictionary<RealmPropertyString, AppliedRealmProperty<string>> PropertiesString { get; set; }
 
         protected static void ApplyRulesetDict<K, V>(IDictionary<K, AppliedRealmProperty<V>> parent, IDictionary<K, AppliedRealmProperty<V>> sub, bool invertRelationships = false)
+            where V : IComparable
+            where K : Enum
         {
             //If invertRelationships is true, we are prioritizing the sub dictionary for the purposes of lock, and prioritizing the parent for the purposes of replace.
             //Add and multiply operations can be applied independent of the ordering so they are not affected. 

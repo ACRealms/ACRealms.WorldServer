@@ -20,6 +20,8 @@ namespace ACE.Entity.Models
         public IDictionary<RealmPropertyInt, AppliedRealmProperty<int>> PropertiesInt { get; set; }
         public IDictionary<RealmPropertyInt64, AppliedRealmProperty<long>> PropertiesInt64 { get; set; }
         public IDictionary<RealmPropertyString, AppliedRealmProperty<string>> PropertiesString { get; set; }
+        public IDictionary<string, AppliedRealmProperty> AllProperties { get; set; }
+
         public bool NeedsRefresh { get; set; }
 
         public IReadOnlyList<RealmLinkJob> Jobs { get; }
@@ -71,14 +73,18 @@ namespace ACE.Entity.Models
     public abstract class AppliedRealmProperty
     {
         public ushort PropertyKey { get; protected set; }
+        public RealmPropertyOptions Options { get; init; }
+        public abstract Type ValueType { get; }
     }
-    public class AppliedRealmProperty<T> : AppliedRealmProperty
-    {
-        public RealmPropertyOptions<T> Options { get; }
-        public AppliedRealmProperty<T> Parent { get; }
 
-        private T _value;
-        public T Value
+    public sealed class AppliedRealmProperty<TVal> : AppliedRealmProperty
+        where TVal : IComparable
+    {
+        public new RealmPropertyOptions<TVal> Options { get => (RealmPropertyOptions<TVal>)base.Options; init => base.Options = value; }
+        public AppliedRealmProperty<TVal> Parent { get; }
+
+        private TVal _value;
+        public TVal Value
         {
             get
             {
@@ -89,23 +95,22 @@ namespace ACE.Entity.Models
             private set => _value = value;
         }
 
-        private AppliedRealmProperty() { }
+        protected AppliedRealmProperty() { }
 
         //Clone
-        public AppliedRealmProperty(AppliedRealmProperty<T> prop, AppliedRealmProperty<T> parent = null)
+        public AppliedRealmProperty(AppliedRealmProperty<TVal> prop, AppliedRealmProperty<TVal> parent = null)
+            : this(prop.PropertyKey, prop.Options)
         {
-            PropertyKey = prop.PropertyKey;
-            Options = prop.Options;
             if (Options.CompositionType != RealmPropertyCompositionType.replace)
             {
                 if (parent != null)
-                    Parent = new AppliedRealmProperty<T>(parent);
+                    Parent = new AppliedRealmProperty<TVal>(parent);
                 else if (prop.Parent != null)
-                    Parent = new AppliedRealmProperty<T>(prop.Parent);
+                    Parent = new AppliedRealmProperty<TVal>(prop.Parent);
             }
         }
 
-        public AppliedRealmProperty(ushort propertyKey, RealmPropertyOptions<T> options)
+        public AppliedRealmProperty(ushort propertyKey, RealmPropertyOptions<TVal> options)
         {
             PropertyKey = propertyKey;
             Options = options;
@@ -134,21 +139,33 @@ namespace ACE.Entity.Models
                     return $"{Value}";
             }
         }
+
+        public override Type ValueType => typeof(TVal);
     }
-    public class RealmPropertyOptions<T>
+
+    public abstract class RealmPropertyOptions(string name)
+    {
+        public object HardDefaultValue { get; protected set; }
+        public object DefaultValue { get; protected set; }
+        public object MinValue { get; protected set; }
+        public object MaxValue { get; protected set; }
+        public bool Locked { get; protected set; }
+        public double Probability { get; protected set; }
+        public RealmPropertyRerollType RandomType { get; protected set; }
+        public RealmPropertyCompositionType CompositionType { get; protected set; }
+        public string Name { get; init; } = name;
+    }
+
+    public sealed class RealmPropertyOptions<T> : RealmPropertyOptions
     {
         static Random Randomizer = new Random();
 
-        public T HardDefaultValue { get; private set; }
-        public T DefaultValue { get; private set; }
-        public RealmPropertyRerollType RandomType { get; private set; }
-        public RealmPropertyCompositionType CompositionType { get; set; }
-        public T MinValue { get; private set; }
-        public T MaxValue { get; private set; }
-        public bool Locked { get; private set; }
-        public double Probability { get; private set; }
+        public new T HardDefaultValue { get => (T)base.HardDefaultValue; private set => base.HardDefaultValue = value; }
+        public new T DefaultValue { get => (T)base.DefaultValue; private set => base.DefaultValue = value; }
+        public new T MinValue { get => (T)base.MinValue; private set => base.MinValue = value; }
+        public new T MaxValue { get => (T)base.MaxValue; private set => base.MaxValue = value; }
 
-        public RealmPropertyOptions() { }
+        public RealmPropertyOptions(string name) : base(name) { }
 
         public void SeedPropertiesStatic(T defaultValue, T hardDefaultValue, byte compositionType, bool locked, double? probability)
         {

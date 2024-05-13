@@ -97,10 +97,12 @@ namespace ACE.Server.Command.Handlers
                 RealmManager.FullUpdateRealmsRepository(realmsDict, realmsById);
                 Console.WriteLine($"Imported {realmsById.Count} realms.");
             }
-            catch
+            catch (Exception ex)
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Failed to update realms repository.");
-                log.Error($"Failed to update realms repository.");
+                log.Error(ex.ToString());
+                log.Error(ex.StackTrace);
+                log.Error($"Failed to update realms repository." );
                 return;
             }
         }
