@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 
@@ -70,20 +71,22 @@ namespace ACE.Entity.Models
         }
     }
 
-    public abstract class AppliedRealmProperty
+    public abstract class AppliedRealmProperty(List<string> traceLog = null)
     {
         public ushort PropertyKey { get; protected set; }
         public RealmPropertyOptions Options { get; init; }
         public abstract Type ValueType { get; }
+        public List<string> TraceLog { get; } = traceLog;
     }
 
-    public sealed class AppliedRealmProperty<TVal> : AppliedRealmProperty
+    public sealed class AppliedRealmProperty<TVal>(List<string> traceLog) : AppliedRealmProperty(traceLog)
         where TVal : IComparable
     {
         public new RealmPropertyOptions<TVal> Options { get => (RealmPropertyOptions<TVal>)base.Options; init => base.Options = value; }
         public AppliedRealmProperty<TVal> Parent { get; }
 
         private TVal _value;
+        private bool rolledOnce = false;
         public TVal Value
         {
             get
@@ -95,22 +98,49 @@ namespace ACE.Entity.Models
             private set => _value = value;
         }
 
-        protected AppliedRealmProperty() { }
+        private void LogTrace(Func<string> message)
+        {
+            if (TraceLog == null)
+                return;
+            TraceLog.Add($"   [P][{Options.Name}] {message()}");
+        }
 
         //Clone
-        public AppliedRealmProperty(AppliedRealmProperty<TVal> prop, AppliedRealmProperty<TVal> parent = null)
-            : this(prop.PropertyKey, prop.Options)
+        public AppliedRealmProperty(AppliedRealmProperty<TVal> prop, AppliedRealmProperty<TVal> parent = null, List<string> traceLog = null)
+            : this(prop.PropertyKey, prop.Options, traceLog)
         {
+            LogTrace(() => $"Cloning from template. CompositionType: {Options.CompositionType}");
+
             if (Options.CompositionType != RealmPropertyCompositionType.replace)
             {
                 if (parent != null)
-                    Parent = new AppliedRealmProperty<TVal>(parent);
+                {
+                    LogTrace(() => $"Setting parent (explicitly passed): {parent.Options.Name}");
+                    Parent = new AppliedRealmProperty<TVal>(parent, null, traceLog);
+                }
                 else if (prop.Parent != null)
-                    Parent = new AppliedRealmProperty<TVal>(prop.Parent);
+                {
+                    LogTrace(() => $"Setting parent (from template parent): {prop.Parent.Options.Name}");
+                    Parent = new AppliedRealmProperty<TVal>(prop.Parent, null, traceLog);
+                }
+            }
+            else
+            {
+                if (parent != null)
+                    LogTrace(() => $"Discarding parent: {prop.Parent.Options.Name}");
+                else if (prop.Parent != null)
+                    LogTrace(() => $"Discarding parent (from template parent): {prop.Parent.Options.Name}");
             }
         }
 
-        public AppliedRealmProperty(ushort propertyKey, RealmPropertyOptions<TVal> options)
+        /// <summary>
+        /// Constructor for realm property from database
+        /// </summary>
+        /// <param name="propertyKey"></param>
+        /// <param name="options"></param>
+        /// <param name="traceLog"></param>
+        public AppliedRealmProperty(ushort propertyKey, RealmPropertyOptions<TVal> options, List<string> traceLog)
+            : this(traceLog)
         {
             PropertyKey = propertyKey;
             Options = options;
@@ -118,25 +148,47 @@ namespace ACE.Entity.Models
 
         public void RollValue()
         {
+            TVal composedFromValue;
             if (Parent != null)
+            {
+                LogTrace(() => $"Rerolling parent property before composition");
                 Parent.RollValue();
-            Value = Options.Compose(Parent != null ? Parent.Value : Options.HardDefaultValue, Options.RollValue());
+                composedFromValue = Parent.Value;
+                LogTrace(() => $"Composing from parent property value: {composedFromValue}");
+            }
+            else
+            {
+                LogTrace(() => $"Composing from hard default value: {Options.HardDefaultValue}");
+                composedFromValue = Options.HardDefaultValue;
+            }
+
+            var val = Options.Compose(composedFromValue, Options.RollValue(TraceLog), TraceLog);
+            LogTrace(() => $"Rolled value {val}");
+            Value = val;
+            if (!rolledOnce)
+                rolledOnce = true;
         }
 
         public override string ToString()
         {
+            string val;
+            if (!rolledOnce)
+                val = "<Deferred Load>";
+            else
+                val = _value.ToString();
+
             switch(Options.RandomType)
             {
                 case RealmPropertyRerollType.always:
                     return $"Random ({Options.MinValue} to {Options.MaxValue})";
                 case RealmPropertyRerollType.landblock:
-                    return $"{Value} (Landblock reroll, random range {Options.MinValue} to {Options.MaxValue}";
+                    return $"{val} (Landblock reroll, random range {Options.MinValue} to {Options.MaxValue}";
                 case RealmPropertyRerollType.manual:
-                    return $"{Value} (Manual reroll, random range {Options.MinValue} to {Options.MaxValue}";
+                    return $"{val} (Manual reroll, random range {Options.MinValue} to {Options.MaxValue}";
                 case RealmPropertyRerollType.never:
-                    return $"{Value}";
+                    return val;
                 default:
-                    return $"{Value}";
+                    return val;
             }
         }
 
@@ -208,17 +260,29 @@ namespace ACE.Entity.Models
             }
         }
 
-        public T RollValue()
+        public T RollValue(List<string> traceLog)
         {
             if (RandomType == RealmPropertyRerollType.never)
+            {
+                Log(traceLog, () => $"No randomization, returning DefaultValue {DefaultValue}");
                 return DefaultValue;
+            }
 
             if (typeof(T) == typeof(double))
+            {
+                Log(traceLog, () => $"Rolling between {MinValue} and {MaxValue}");
                 return (T)(object)(Randomizer.NextDouble() * ((double)(object)MaxValue - (double)(object)MinValue) + (double)(object)MinValue);
+            }
             else if (typeof(T) == typeof(int))
+            {
+                Log(traceLog, () => $"Rolling between {MinValue} and {MaxValue}");
                 return (T)(object)Randomizer.Next((int)(object)MinValue, (int)(object)MaxValue);
+            }
             else if (typeof(T) == typeof(long))
+            {
+                Log(traceLog, () => $"Rolling between {MinValue} and {MaxValue}");
                 return (T)(object)NextLong((long)(object)MinValue, (long)(object)MaxValue);
+            }
             else
                 return DefaultValue;
         }
@@ -240,8 +304,9 @@ namespace ACE.Entity.Models
             return (long)(ulongRand % uRange) + min;
         }
 
-        internal Tvar Compose<Tvar>(Tvar parentValue, Tvar rolledValue)
+        internal Tvar Compose<Tvar>(Tvar parentValue, Tvar rolledValue, List<string> traceLog)
         {
+            Log(traceLog, () => $"Compose {CompositionType}({parentValue}, {rolledValue})");
             switch (CompositionType)
             {
                 case RealmPropertyCompositionType.replace:
@@ -277,6 +342,13 @@ namespace ACE.Entity.Models
                 return (Tvar)(object)((long)(object)oldvalue * (long)(object)newvalue);
             else
                 return newvalue;
+        }
+
+        private void Log(List<string> traceLog, Func<string> message)
+        {
+            if (traceLog == null)
+                return;
+            traceLog.Add($"   [T][{Name}] {message()}");
         }
 
         public override string ToString()

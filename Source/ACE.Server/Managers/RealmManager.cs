@@ -112,12 +112,20 @@ namespace ACE.Server.Managers
             }
         }
 
-        private static RulesetTemplate BuildRuleset(ACE.Entity.Models.Realm realm)
+        internal static RulesetTemplate BuildRuleset(ACE.Entity.Models.Realm realm, bool trace)
         {
             if (realm.ParentRealmID == null)
-                return RulesetTemplate.MakeTopLevelRuleset(realm);
-            var parent = GetRealm(realm.ParentRealmID.Value);
-            return RulesetTemplate.MakeRuleset(parent.RulesetTemplate, realm);
+                return RulesetTemplate.MakeTopLevelRuleset(realm, trace);
+            
+            var worldRealmParent = GetRealm(realm.ParentRealmID.Value);
+
+            RulesetTemplate templateParent;
+            if (trace)
+                templateParent = BuildRuleset(worldRealmParent.Realm, trace);
+            else
+                templateParent = worldRealmParent.RulesetTemplate;
+
+            return RulesetTemplate.MakeRuleset(templateParent, realm, trace);
         }
 
         internal static void ClearCache()
@@ -199,7 +207,7 @@ namespace ACE.Server.Managers
             foreach(var realmid in RealmIDsByTopologicalSort)
             {
                 var erealm = RealmConverter.ConvertToEntityRealm(realms[realmid], true);
-                var ruleset = BuildRuleset(erealm);
+                var ruleset = BuildRuleset(erealm, false);
                 var wrealm = new WorldRealm(erealm, ruleset);
                 RealmsByID[erealm.Id] = wrealm;
                 RealmsByName[erealm.Name] = wrealm;
@@ -398,7 +406,10 @@ namespace ACE.Server.Managers
 
         internal static void CacheEphemeralRealmTemplate(string key, RulesetTemplate template)
         {
-            EphemeralRealmCache[key] = template;
+            lock (realmsLock)
+            {
+                EphemeralRealmCache[key] = template;
+            }
         }
 
         internal static RealmToImport DeserializeRealmJson(Network.ISession session, string filename, string fileContent)

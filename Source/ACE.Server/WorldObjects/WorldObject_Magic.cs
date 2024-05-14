@@ -1318,7 +1318,7 @@ namespace ACE.Server.WorldObjects
                     var maxPortalTime = Math.Min(portalLifetime, TimeSpan.FromMinutes(0.5 + landblock.RealmRuleset.GetProperty(RealmPropertyInt.LandblockUnloadInterval)).TotalSeconds);
                     if (portalLifetime > maxPortalTime)
                     {
-                        summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"The portal duration has been reduced from #{portalLifetime} to #{maxPortalTime} seconds due to the ruleset's limit on inactive landblock lifespans!", ChatMessageType.Magic));
+                        summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"The portal duration has been reduced from {portalLifetime} to {maxPortalTime} seconds due to the ruleset's limit on inactive landblock lifespans!", ChatMessageType.Magic));
                         portalLifetime = maxPortalTime;
                     }
                 }

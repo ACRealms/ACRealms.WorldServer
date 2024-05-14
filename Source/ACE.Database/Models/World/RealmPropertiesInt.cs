@@ -23,7 +23,7 @@ namespace ACE.Database.Models.World
                 prop.SeedPropertiesStatic(Value.Value, att.DefaultValue, CompositionType, Locked, Probability);
             else
                 prop.SeedPropertiesRandomized(att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability);
-            return new AppliedRealmProperty<int>(Type, prop);
+            return new AppliedRealmProperty<int>(Type, prop, null);
         }
     }
 }

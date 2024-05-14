@@ -16,7 +16,7 @@ namespace ACE.Database.Models.World
             var prop = new RealmPropertyOptions<string>(@enum.ToString());
             var att = RealmConverter.PropertyDefinitionsString[@enum];
             prop.SeedPropertiesStatic(Value, att.DefaultValue, (byte)RealmPropertyCompositionType.replace, Locked, Probability);
-            return new AppliedRealmProperty<string>(Type, prop);
+            return new AppliedRealmProperty<string>(Type, prop, null);
         }
     }
 }

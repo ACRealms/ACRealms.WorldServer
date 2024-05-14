@@ -10,8 +10,10 @@ using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Common;
 using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -209,6 +211,51 @@ namespace ACE.Server.Command.Handlers
             });
             lbResetChain.AddAction(WorldManager.ActionQueue, resetLandblockAction);
             lbResetChain.EnqueueChain();
+        }
+
+        [CommandHandler("compile-ruleset", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, 1, "Gives a diagnostic trace of a ruleset compilation for the current landblock",
+            "{ full | landblock | ephemeral-new | ephemeral-cached } ")]
+        public static void HandleCompileRuleset(ISession session, params string[] parameters)
+        {
+            string type = parameters[0];
+
+            Ruleset ruleset = null;
+            switch (type)
+            {
+                case "landblock":
+                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.RealmRuleset.Template, trace: true);
+                    break;
+                case "ephemeral-new":
+                    if (!session.Player.CurrentLandblock.IsEphemeral)
+                    {
+                        session.Network.EnqueueSend(new GameMessageSystemChat($"The current landblock is not ephemeral.", ChatMessageType.Broadcast));
+                        return;
+                    }
+                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace(), true);
+                    break;
+                case "ephemeral-cached":
+                    if (!session.Player.CurrentLandblock.IsEphemeral)
+                    {
+                        session.Network.EnqueueSend(new GameMessageSystemChat($"The current landblock is not ephemeral.", ChatMessageType.Broadcast));
+                        return;
+                    }
+                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.RealmRuleset.Template, trace: true);
+                    break;
+                case "full":
+                    RulesetTemplate template;
+                    if (!session.Player.CurrentLandblock.IsEphemeral)
+                        template = RealmManager.BuildRuleset(session.Player.RealmRuleset.Realm, trace: true);
+                    else
+                        template = session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace();
+                    ruleset = AppliedRuleset.MakeRerolledRuleset(template, true);
+                    break;
+                default:
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"Unknown compilation type.", ChatMessageType.Broadcast));
+                    return;
+            }
+
+            File.WriteAllLines("compile-ruleset-output.txt", ruleset.TraceLog);
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Logged compilation output to compile-ruleset-output.txt", ChatMessageType.Broadcast));
         }
     }
 }
