@@ -1,17 +1,14 @@
 using ACE.Database.Adapter;
 using ACE.Entity.Enum.Properties;
+using ACE.Server.Command.Handlers;
 using ACE.Server.Managers;
-using ACE.Server.Network;
+using ACE.Server.Network.GameMessages.Messages;
+using ACRealms.Tests.Factories;
+using ACRealms.Tests.Fixtures.Network;
 using ACRealms.Tests.Helpers;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
-using Xunit.Sdk;
 using static ACRealms.Tests.Helpers.RealmFixtures;
 
 namespace ACRealms.Tests.Server.Realms.Compilation
@@ -52,6 +49,29 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             Assert.Equal(2, lb.RealmRuleset.GetProperty(RealmPropertyFloat.Spellcasting_Max_Angle));
 
             PropertyManager.ModifyDouble(att.DefaultFromServerProperty, serverPropOrig);
+        }
+
+        [Fact]
+        public void TestRulesetCompileCommand()
+        {
+            LoadRealmFixture(FixtureName.simple);
+
+            var player = new OnlinePlayerFactory()
+            {
+                Character = new CharacterFactory { CharacterName = "TestRulesetCompileCommand" }
+            }.Create();
+
+            ACRealmsCommands.HandleCompileRuleset(player.Session, "all");
+            var prefix = "Logged compilation output to ";
+            
+            foreach (var i in Enumerable.Range(0, 1))
+            {
+                var message = ((FakeSession)player.Session).WaitForMessage<GameMessageSystemChat>(m => m.Message.StartsWith(prefix));
+                var filename = message.Message.Substring(prefix.Length);
+                Assert.True(File.Exists(filename));
+                File.Copy(filename, $"TestRulesetCompileCommand-output-{i}.txt");
+                File.Delete(filename);
+            }
         }
     }
 }

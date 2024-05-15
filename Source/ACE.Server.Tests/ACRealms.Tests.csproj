@@ -67,4 +67,9 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Helpers\realm-fixtures\coverage\ruleset\" />
+      <Folder Include="Helpers\realm-fixtures\coverage\realm\" />
+    </ItemGroup>
+
 </Project>

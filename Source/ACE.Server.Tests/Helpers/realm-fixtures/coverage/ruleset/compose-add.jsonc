@@ -1,0 +1,34 @@
+{
+  "name": "Compose Added",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "All Properties Added",
+    "CreatureStrengthAdded": {
+      "low": 10,
+      "high": 20,
+      "compose": "add"
+    },
+    "CreatureEnduranceAdded": {
+      "value": 10,
+      "compose": "add"
+    },
+    "CreatureCoordinationAdded": {
+      "value": 10,
+      "compose": "add"
+    },
+    "CreatureQuicknessAdded": {
+      "compose": "add",
+      "value": 10
+    },
+    "CreatureFocusAdded": {
+      "value": 10,
+      "probability": 0,
+      "compose": "add"
+    },
+    "CreatureSelfAdded": {
+      "value": 10,
+      "locked": true,
+      "compose": "add"
+    }
+  }
+}

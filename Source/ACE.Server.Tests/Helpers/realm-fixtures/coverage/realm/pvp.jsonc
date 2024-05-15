@@ -1,0 +1,10 @@
+{
+  "name": "PvP Realm",
+  "type": "Realm",
+  "parent": "Root Realm",
+  "properties": {
+    "Description": "PvP Realm.",
+    "CanInteractWithNeutralZone": false,
+    "HideoutEnabled": true
+  }
+}

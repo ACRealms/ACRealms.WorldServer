@@ -1,0 +1,10 @@
+{
+  "name": "Root Realm",
+  "type": "Realm",
+  "properties": {
+    "Description": "Root Realm.",
+    "CanBeHomeworld": true,
+    "CanInteractWithNeutralZone": false,
+    "HideoutEnabled": true
+  }
+}

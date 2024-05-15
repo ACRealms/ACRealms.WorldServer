@@ -1,0 +1,31 @@
+{
+  "name": "Compose Root",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "Root composition ruleset",
+    "CreatureStrengthAdded": {
+      "low": 10,
+      "high": 20
+    },
+    "CreatureEnduranceAdded": {
+      "value": 10
+    },
+    "CreatureCoordinationAdded": {
+      "compose": "add",
+      "value": 10
+    },
+    "CreatureQuicknessAdded": {
+      "compose": "multiply",
+      "value": 10
+    },
+    "CreatureFocusAdded": {
+      "value": 10,
+      "probability": 0,
+      "locked": true
+    },
+    "CreatureSelfAdded": {
+      "value": 10,
+      "locked": true
+    }
+  }
+}
