@@ -55,7 +55,8 @@ namespace ACE.Server.Realms
         protected static void ApplyRulesetDict<K, V>(
             IDictionary<K, AppliedRealmProperty<V>> parent,
             IDictionary<K, AppliedRealmProperty<V>> sub,
-            bool invertRelationships = false,
+            bool invertRelationships,
+            Realm parentRealm,
             List<string> traceLog = null)
             where V : IComparable
             where K : Enum
@@ -106,15 +107,27 @@ namespace ACE.Server.Realms
 
                 //Apply composition rules
                 if (!invertRelationships)
+                {
                     sub[pair.Key] = new AppliedRealmProperty<V>(sub[pair.Key], parentprop, traceLog);
+                }
                 else
+                {
+                    LogTrace(traceLog, () => $"Inverted Relationships: Property parent pointing to {parentRealm.Name}", pair.Value);
                     sub[pair.Key] = new AppliedRealmProperty<V>(parentprop, sub[pair.Key], traceLog); //ensure parent chain is kept
+                }
 
                 LogTrace(traceLog, () => "End single property compilation", pair.Value);
             }
         }
-        private static void LogTrace<V>(List<string> traceLog, Func<string> message, AppliedRealmProperty<V> property)
-            where V : IComparable
+
+        private static void LogTrace(List<string> traceLog, Func<string> message)
+        {
+            if (traceLog == null)
+                return;
+            traceLog.Add($"[C] {message()}");
+        }
+            
+        private static void LogTrace(List<string> traceLog, Func<string> message, AppliedRealmProperty property)
         {
             if (traceLog == null)
                 return;
@@ -126,11 +139,22 @@ namespace ACE.Server.Realms
         {
             if (template.PropertiesForRandomization?.Count == 0)
                 return null;
+            var selectedProp = template.PropertiesForRandomization[random.Next(template.PropertiesForRandomization.Count - 1)];
+
             return template.PropertiesForRandomization[random.Next(template.PropertiesForRandomization.Count - 1)];
+        }
+
+        private void DictAdd<TKey, TVal>(IDictionary<TKey, AppliedRealmProperty<TVal>> dict, TKey key, AppliedRealmProperty<TVal> prop)
+            where TKey : Enum
+            where TVal : IComparable
+        {
+            dict.Add(key, prop);
+            AllProperties.Add(prop.Options.Name, prop);
         }
 
         protected void CopyDicts(RulesetTemplate copyFrom)
         {
+            LogTrace(() => "Begin deep clone of properties from template");
             if (copyFrom.Realm.PropertyCountRandomized.HasValue)
             {
                 var count = copyFrom.Realm.PropertyCountRandomized.Value;
@@ -138,34 +162,36 @@ namespace ACE.Server.Realms
                 foreach (var prop in props)
                 {
                     if (prop is AppliedRealmProperty<bool> a)
-                        PropertiesBool.Add((RealmPropertyBool)a.PropertyKey, new AppliedRealmProperty<bool>(a, null, TraceLog));
+                        DictAdd(PropertiesBool, (RealmPropertyBool)a.PropertyKey, new AppliedRealmProperty<bool>(a, null, TraceLog));
                     else if (prop is AppliedRealmProperty<int> b)
-                        PropertiesInt.Add((RealmPropertyInt)b.PropertyKey, new AppliedRealmProperty<int>(b, null, TraceLog));
+                        DictAdd(PropertiesInt, (RealmPropertyInt)b.PropertyKey, new AppliedRealmProperty<int>(b, null, TraceLog));
                     else if (prop is AppliedRealmProperty<double> c)
-                        PropertiesFloat.Add((RealmPropertyFloat)c.PropertyKey, new AppliedRealmProperty<double>(c, null, TraceLog));
+                        DictAdd(PropertiesFloat, (RealmPropertyFloat)c.PropertyKey, new AppliedRealmProperty<double>(c, null, TraceLog));
                     else if (prop is AppliedRealmProperty<long> d)
-                        PropertiesInt64.Add((RealmPropertyInt64)d.PropertyKey, new AppliedRealmProperty<long>(d, null, TraceLog));
+                        DictAdd(PropertiesInt64, (RealmPropertyInt64)d.PropertyKey, new AppliedRealmProperty<long>(d, null, TraceLog));
                     else if (prop is AppliedRealmProperty<string> e)
-                        PropertiesString.Add((RealmPropertyString)e.PropertyKey, new AppliedRealmProperty<string>(e, null, TraceLog));
+                        DictAdd(PropertiesString, (RealmPropertyString)e.PropertyKey, new AppliedRealmProperty<string>(e, null, TraceLog));
                 }
             }
             else
             {
                 foreach (var item in copyFrom.PropertiesBool)
-                    PropertiesBool.Add(item.Key, new AppliedRealmProperty<bool>(item.Value, null, TraceLog));
+                    DictAdd(PropertiesBool, item.Key, new AppliedRealmProperty<bool>(item.Value, null, TraceLog));
                 foreach (var item in copyFrom.PropertiesFloat)
-                    PropertiesFloat.Add(item.Key, new AppliedRealmProperty<double>(item.Value, null, TraceLog));
+                    DictAdd(PropertiesFloat, item.Key, new AppliedRealmProperty<double>(item.Value, null, TraceLog));
                 foreach (var item in copyFrom.PropertiesInt)
-                    PropertiesInt.Add(item.Key, new AppliedRealmProperty<int>(item.Value, null, TraceLog));
+                    DictAdd(PropertiesInt, item.Key, new AppliedRealmProperty<int>(item.Value, null, TraceLog));
                 foreach (var item in copyFrom.PropertiesInt64)
-                    PropertiesInt64.Add(item.Key, new AppliedRealmProperty<long>(item.Value, null, TraceLog));
+                    DictAdd(PropertiesInt64, item.Key, new AppliedRealmProperty<long>(item.Value, null, TraceLog));
                 foreach (var item in copyFrom.PropertiesString)
-                    PropertiesString.Add(item.Key, new AppliedRealmProperty<string>(item.Value, null, TraceLog));
+                    DictAdd(PropertiesString, item.Key, new AppliedRealmProperty<string>(item.Value, null, TraceLog));
             }
+            LogTrace(() => "End deep clone of properties from template");
         }
 
         private IEnumerable<AppliedRealmProperty> TakeRandomProperties(ushort amount, RulesetTemplate template)
         {
+            LogTrace(() => $"Taking {amount} properties at random");
             if (PropertiesString.TryGetValue(RealmPropertyString.Description, out var desc))
                 amount++;
 
@@ -179,25 +205,42 @@ namespace ACE.Server.Realms
                 var set = new HashSet<AppliedRealmProperty>();
                 if (desc != null)
                     set.Add(desc);
-                while(set.Count < amount)
-                    set.Add(GetRandomProperty(template));
+                while (set.Count < amount)
+                {
+                    var selectedProp = GetRandomProperty(template);
+                    LogTrace(TraceLog, () => $"Cherry-picking {selectedProp.Options.Name} from randomization list");
+                    set.Add(selectedProp);
+                }
                 return set;
             }
             else
             {
+                LogTrace(() => $"{amount} is at least 50% of the randomization properties count, using subtraction algorithm");
                 var all = new List<AppliedRealmProperty>(template.PropertiesForRandomization);
                 if (amount >= all.Count)
+                {
+                    LogTrace(() => $"{amount} exceeds the randomization properties count of {all.Count}, skipping set reduction.");
                     return all;
+                }
                 var set = new HashSet<AppliedRealmProperty>(all);
                 while (set.Count > amount)
                 {
                     var next = GetRandomProperty(template);
                     if (next is AppliedRealmProperty<string> s && s.PropertyKey == (ushort)RealmPropertyString.Description)
                         continue;
+                    LogTrace(TraceLog, () => $"Subtracting {next.Options.Name} from randomization selection");
                     set.Remove(next);
                 }
                 return set;
             }
+        }
+
+        protected virtual void LogTrace(IEnumerable<string> messages)
+        {
+            if (!Trace)
+                return;
+            foreach(var message in messages)
+                TraceLog.Add($"{(this is RulesetTemplate ? "[T]" : "[R]")}[{RealmManager.GetRealm(RulesetID).Realm.Name}] {message}");
         }
 
         protected virtual void LogTrace(Func<string> message)
@@ -293,6 +336,9 @@ namespace ACE.Server.Realms
             Jobs = entity.Jobs;
             if (trace)
             {
+                var rulesetNames = RealmManager.RealmsAndRulesets.ToDictionary(x => x.Realm.Id, x => x.Realm.Name);
+                foreach(var job in Jobs)
+                    LogTrace(job.GetLogTraceMessages(rulesetNames));
                 foreach(var kv in AllProperties)
                     LogTrace(() => $"Loaded uncomposed property {kv.Key} as {kv.Value}");
             }
@@ -322,6 +368,7 @@ namespace ACE.Server.Realms
                 list.AddRange(PropertiesFloat.Values);
                 list.AddRange(PropertiesString.Where(x => x.Key != RealmPropertyString.Description).Select(x => x.Value));
                 PropertiesForRandomization = list.AsReadOnly();
+                LogTrace(() => $"Will select {Realm.PropertyCountRandomized.Value} properties at random.");
             }
         }
 
@@ -422,11 +469,11 @@ namespace ACE.Server.Realms
             var parent = MakeRerolledRuleset(parentTemplate);
             LogTrace(() => $"ContinueCompose (parent: {parentTemplate.Realm.Name}, invertRules: {invertRules})");
 
-            ApplyRulesetDict(parent.PropertiesBool, PropertiesBool, invertRules, TraceLog);
-            ApplyRulesetDict(parent.PropertiesFloat, PropertiesFloat, invertRules, TraceLog);
-            ApplyRulesetDict(parent.PropertiesInt, PropertiesInt, invertRules, TraceLog);
-            ApplyRulesetDict(parent.PropertiesInt64, PropertiesInt64, invertRules, TraceLog);
-            ApplyRulesetDict(parent.PropertiesString, PropertiesString, invertRules, TraceLog);
+            ApplyRulesetDict(parent.PropertiesBool, PropertiesBool, invertRules, parentTemplate.Realm, TraceLog);
+            ApplyRulesetDict(parent.PropertiesFloat, PropertiesFloat, invertRules, parentTemplate.Realm, TraceLog);
+            ApplyRulesetDict(parent.PropertiesInt, PropertiesInt, invertRules, parentTemplate.Realm, TraceLog);
+            ApplyRulesetDict(parent.PropertiesInt64, PropertiesInt64, invertRules, parentTemplate.Realm, TraceLog);
+            ApplyRulesetDict(parent.PropertiesString, PropertiesString, invertRules, parentTemplate.Realm, TraceLog);
             LogTrace(() => $"FinishCompose (parent: {parentTemplate.Realm.Name}, invertRules: {invertRules})");
         }
 

@@ -1,0 +1,34 @@
+{
+  "name": "Compose Multiply",
+  "type": "Ruleset",
+  "properties": {
+    "Description": "All Properties Multiplied",
+    "CreatureStrengthAdded": {
+      "low": 10,
+      "high": 20,
+      "compose": "multiply"
+    },
+    "CreatureEnduranceAdded": {
+      "value": 10,
+      "compose": "multiply"
+    },
+    "CreatureCoordinationAdded": {
+      "value": 10,
+      "compose": "multiply"
+    },
+    "CreatureQuicknessAdded": {
+      "compose": "multiply",
+      "value": 10
+    },
+    "CreatureFocusAdded": {
+      "value": 10,
+      "probability": 0,
+      "compose": "multiply"
+    },
+    "CreatureSelfAdded": {
+      "value": 10,
+      "locked": true,
+      "compose": "multiply"
+    }
+  }
+}

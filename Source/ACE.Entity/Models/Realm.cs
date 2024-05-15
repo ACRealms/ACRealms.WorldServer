@@ -52,6 +52,14 @@ namespace ACE.Entity.Models
         {
             return $"{Links.Count} Links";
         }
+
+        public List<string> GetLogTraceMessages(Dictionary<ushort, string> rulesetNames)
+        {
+            var list = new List<string>();
+            list.Add($"Job of type {Type}, {Links.Count} links");
+            list.AddRange(Links.Select(x => x.GetLogTrace(rulesetNames[x.RulesetIDToApply])));
+            return list;
+        }
     }
 
     public class AppliedRealmLink
@@ -69,6 +77,8 @@ namespace ACE.Entity.Models
         {
             return $"{Probability} - Realm {RulesetIDToApply}";
         }
+
+        internal string GetLogTrace(string realmName) => $"<- ({Probability.ToString("P2")}) [{realmName}]";
     }
 
     public abstract class AppliedRealmProperty(List<string> traceLog = null)

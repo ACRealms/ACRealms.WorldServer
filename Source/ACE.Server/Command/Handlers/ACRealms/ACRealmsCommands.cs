@@ -214,7 +214,7 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("compile-ruleset", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, 1, "Gives a diagnostic trace of a ruleset compilation for the current landblock",
-            "{ full | landblock | ephemeral-new | ephemeral-cached } ")]
+            "{ full | landblock | ephemeral-new | ephemeral-cached | all } ")]
         public static void HandleCompileRuleset(ISession session, params string[] parameters)
         {
             string type = parameters[0];
@@ -249,13 +249,23 @@ namespace ACE.Server.Command.Handlers
                         template = session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace();
                     ruleset = AppliedRuleset.MakeRerolledRuleset(template, true);
                     break;
+                case "all":
+                    HandleCompileRuleset(session, "landblock");
+                    if (session.Player.CurrentLandblock.IsEphemeral)
+                    {
+                        HandleCompileRuleset(session, "ephemeral-cached");
+                        HandleCompileRuleset(session, "ephemeral-new");
+                    }
+                    HandleCompileRuleset(session, "full");
+                    return;
                 default:
                     session.Network.EnqueueSend(new GameMessageSystemChat($"Unknown compilation type.", ChatMessageType.Broadcast));
                     return;
             }
 
-            File.WriteAllLines("compile-ruleset-output.txt", ruleset.TraceLog);
-            session.Network.EnqueueSend(new GameMessageSystemChat($"Logged compilation output to compile-ruleset-output.txt", ChatMessageType.Broadcast));
+            var filename = $"compile-ruleset-output-{session.Player.Name}-{type}.txt";
+            File.WriteAllLines(filename, ruleset.TraceLog);
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Logged compilation output to {filename}", ChatMessageType.Broadcast));
         }
     }
 }
