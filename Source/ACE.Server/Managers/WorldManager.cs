@@ -28,6 +28,7 @@ using ACE.Server.Realms;
 using ACE.Entity.Enum.RealmProperties;
 using ACE.Server.Network.Enum;
 using System.Linq;
+using ACRealms.Server.Network.TraceMessages.Messages;
 
 namespace ACE.Server.Managers
 {
@@ -372,7 +373,9 @@ namespace ACE.Server.Managers
             if (olthoiPlayerReturnedToLifestone)
                 session.Network.EnqueueSend(new GameMessageSystemChat("You have returned to the Olthoi Queen to serve the hive.", ChatMessageType.Broadcast));
             else if (playerLoggedInOnNoLogLandblock) // see http://acpedia.org/wiki/Mount_Elyrii_Hive
-                session.Network.EnqueueSend(new GameMessageSystemChat("The currents of portal space cannot return you from whence you came. Your previous location forbids login.", ChatMessageType.Broadcast));            
+                session.Network.EnqueueSend(new GameMessageSystemChat("The currents of portal space cannot return you from whence you came. Your previous location forbids login.", ChatMessageType.Broadcast));
+
+            session.Network.EnqueueSend(new TraceMessageEnterWorldComplete());
         }
 
         private static string AppendLines(params string[] lines)

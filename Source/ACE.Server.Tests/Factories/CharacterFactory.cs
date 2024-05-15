@@ -27,18 +27,18 @@ namespace ACRealms.Tests.Factories
         public override string ToString() => $"The character was not created successfully: ${Response}";
     }
 
-    internal class CharacterFactory : Factory<Character, CharacterFactory>
+    internal record CharacterFactory : Factory<Character, CharacterFactory>
     {
-        public Account Account { get; init; }
-        public FakeSession Session { get; init; }
-        CharacterCreateInfo CharacterCreateInfo { get; init; }
-        public string CharacterName { get; init; }
+        public AccountFactory Account { get; init; } = new AccountFactory();
+        Func<CharacterFactory, CharacterCreateInfo> CharacterCreateInfo { get; init; } = (fac) => PlayerFactoryEx.CreateCharacterCreateInfo(fac.CharacterName, 40, 70, 100, 100, 10, 10, true);
+        public string CharacterName { get; init; } = $"Generated {CurrentIndex}";
 
-        public override Func<Character> Builder() => () =>
+        protected override Func<Character> Builder() => () =>
         {
-            var session = Session ?? FakeSessionFactory.Make();
-            var characterName = CharacterName ?? $"Generated {CurrentIndex}";
-            var characterCreateInfo = CharacterCreateInfo ?? PlayerFactoryEx.CreateCharacterCreateInfo(characterName, 40, 70, 100, 100, 10, 10, true);
+            var account = Account.Create();
+            var sessionFactory = new FakeSessionFactory() { Account = AccountFactory.Identity(account) };
+            var session = sessionFactory.Create();
+            var characterCreateInfo = CharacterCreateInfo(this);
             CharacterHandler.CharacterCreateEx(characterCreateInfo, session);
             var response = session.WaitForMessage<GameMessageCharacterCreateResponse>();
             if (response.Response != ACE.Server.Network.Enum.CharacterGenerationVerificationResponse.Ok)

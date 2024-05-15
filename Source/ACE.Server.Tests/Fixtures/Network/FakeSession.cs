@@ -50,24 +50,30 @@ namespace ACRealms.Tests.Fixtures.Network
             queue.Enqueue(message);
         }
 
-        public TMessage WaitForMessage<TMessage>(double timeoutInSeconds = 1.0)
+        private static bool DefaultSelector<TMessage>(TMessage message)
+            where TMessage : GameMessage => true;
+        
+        public TMessage WaitForMessage<TMessage>(Func<TMessage, bool> selector = null, double timeoutInSeconds = 1.0)
             where TMessage : GameMessage
         {
+            selector ??= DefaultSelector;
+
             Exception ex = null;
             var task = Task.Run(() =>
             {
                 var type = typeof(TMessage);
-                while (!MessagesSent.ContainsKey(type) || MessagesSent[type].IsEmpty)
-                {
+                while (!MessagesSent.ContainsKey(type))
                     Thread.Sleep(10);
-                }
-                MessagesSent[type].TryDequeue(out var message);
-                if (message == null)
+                do
                 {
-                    ex = new InvalidOperationException("Another thread dequeued this session's message log. Ensure only one test thread is running for a given session.");
-                    return null;
-                }
-                return message;
+                    while(!MessagesSent[type].IsEmpty)
+                    {
+                        MessagesSent[type].TryDequeue(out var message);
+                        if (selector((TMessage)message))
+                            return (TMessage)message;
+                    }
+                    Thread.Sleep(10);
+                } while (true);
             });
             task.Wait((int)(timeoutInSeconds * 1000));
 
@@ -77,7 +83,7 @@ namespace ACRealms.Tests.Fixtures.Network
             if (ex != null)
                 throw ex;
 
-            return (TMessage)task.Result;
+            return task.Result;
         }
     }
 }

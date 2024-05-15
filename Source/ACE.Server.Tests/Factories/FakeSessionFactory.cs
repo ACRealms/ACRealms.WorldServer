@@ -1,27 +1,22 @@
 using ACE.Database.Models.Auth;
 using ACE.Entity.Enum;
-using ACE.Server.Network;
 using ACRealms.Tests.Fixtures.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace ACRealms.Tests.Factories
 {
-    internal class FakeSessionFactory : Factory<FakeSession, FakeSessionFactory>
+    internal record FakeSessionFactory : Factory<FakeSession, FakeSessionFactory>
     {
-        internal static uint? SessionRequestingForAccount { get; private set; }
+        internal static ThreadLocal<uint?> SessionRequestingForAccount { get; private set; } = new ThreadLocal<uint?>();
 
-        public Account Account { get; init; }
+        public AccountFactory Account { get; init; } = new AccountFactory();
 
-        public override Func<FakeSession> Builder() => () =>
+        protected override Func<FakeSession> Builder() => () =>
         {
-            var account = Account ?? AccountFactory.Make();
+            var account = Account.Create();
 
             return MakeTestSession(account);
         };
@@ -30,14 +25,14 @@ namespace ACRealms.Tests.Factories
         {
             try
             {
-                SessionRequestingForAccount = account.AccountId;
+                SessionRequestingForAccount.Value = account.AccountId;
                 var session = (FakeSession)FakeNetworkManager.Instance.FindOrCreateSession(null, null);
                 session.SetAccount(account.AccountId, account.AccountName, (AccessLevel)account.AccessLevel);
                 return session;
             }
             finally
             {
-                SessionRequestingForAccount = null;
+                SessionRequestingForAccount.Value = null;
             }
         }
     }

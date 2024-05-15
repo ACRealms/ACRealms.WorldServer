@@ -17,7 +17,7 @@ using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Network.Handlers;
 using ACE.Server.Network.Managers;
 using ACE.Server.Network.Packets;
-
+using ACRealms.Server.Network.TraceMessages;
 using log4net;
 
 namespace ACE.Server.Network
@@ -917,6 +917,8 @@ namespace ACE.Server.Network
 
             foreach (var message in messages)
             {
+                if (message is TraceMessage)
+                    continue;
                 var grp = message.Group;
                 var currentBundleLock = currentBundleLocks[(int)grp];
                 lock (currentBundleLock)
@@ -941,6 +943,8 @@ namespace ACE.Server.Network
 
             foreach (var message in messages)
             {
+                if (message is TraceMessage)
+                    continue;
                 var grp = message.Group;
                 var currentBundleLock = currentBundleLocks[(int)grp];
                 lock (currentBundleLock)

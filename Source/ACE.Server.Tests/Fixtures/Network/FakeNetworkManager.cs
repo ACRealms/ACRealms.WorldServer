@@ -26,9 +26,9 @@ namespace ACRealms.Tests.Fixtures.Network
 
         public override ISession FindOrCreateSession(ConnectionListener connectionListener, IPEndPoint endPoint)
         {
-            if (FakeSessionFactory.SessionRequestingForAccount == null)
+            if (FakeSessionFactory.SessionRequestingForAccount.Value == null)
                 throw new InvalidOperationException("Must be called from FakeSessionFactory");
-            var aid = FakeSessionFactory.SessionRequestingForAccount;
+            var aid = FakeSessionFactory.SessionRequestingForAccount.Value;
 
             ISession session;
 

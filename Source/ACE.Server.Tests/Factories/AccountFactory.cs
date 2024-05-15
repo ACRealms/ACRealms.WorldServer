@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ACRealms.Tests.Factories
 {
-    internal class AccountFactory : Factory<Account, AccountFactory>
+    internal record AccountFactory : Factory<Account, AccountFactory>
     {
         public string AccountName { get; init; }
         public string AccountPassword { get; init; }
@@ -18,7 +18,7 @@ namespace ACRealms.Tests.Factories
 
         public AccountFactory() { }
 
-        public override Func<Account> Builder() => () =>
+        protected override Func<Account> Builder() => () =>
         {
             return DatabaseManager.Authentication.CreateAccount(AccountName ?? $"factoryaccount{CurrentIndex}",
                 AccountPassword ?? $"password",
