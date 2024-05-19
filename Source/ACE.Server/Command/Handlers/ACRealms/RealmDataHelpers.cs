@@ -46,7 +46,8 @@ namespace ACE.Server.Command.Handlers
 
             bool changesDetected = false;
 
-            foreach(var dbRealmName in dbRealms.Keys)
+            
+            foreach (var dbRealmName in dbRealms.Keys)
             {
                 var dbRealmId = dbRealms[dbRealmName];
 
@@ -149,7 +150,7 @@ namespace ACE.Server.Command.Handlers
             {
                 log.Error(ex);
                 CommandHandlerHelper.WriteOutputError(session, $"Couldn't create realms dictionary. Is there a problem with a realm name?");
-                return;
+                throw;
             }
 
             Dictionary<string, ushort> realmsIndex = null;
@@ -168,7 +169,7 @@ namespace ACE.Server.Command.Handlers
                 {
                     log.Error(ex);
                     CommandHandlerHelper.WriteOutputError(session, $"Failed to interpret contents of {realmsIndexJsonFile}.");
-                    return;
+                    throw;
                 }
             }
 
@@ -218,7 +219,7 @@ namespace ACE.Server.Command.Handlers
             {
                 log.Error($"Couldn't import {realmsIndexJsonFile}", ex);
                 CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't import {realmsIndexJsonFile}");
-                return;
+                throw;
             }
 
             try
@@ -232,7 +233,7 @@ namespace ACE.Server.Command.Handlers
                 log.Error(ex.ToString());
                 log.Error(ex.StackTrace);
                 log.Error($"Failed to update realms repository." );
-                return;
+                throw;
             }
         }
 
@@ -254,7 +255,7 @@ namespace ACE.Server.Command.Handlers
                 var jsondata = File.ReadAllText(file.FullName);
                 var realmToImport = RealmManager.DeserializeRealmJson(session, file.FullName, jsondata);
                 if (realmToImport == null)
-                    return null;
+                    throw new InvalidDataException($"Unable to deserialize realmfile {file.FullName}");
                 list.Add(realmToImport);
             }
             return list;
