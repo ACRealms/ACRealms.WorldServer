@@ -392,6 +392,8 @@ namespace ACE.Server.Managers
             if (dobj.parent != null)
                 realm.ParentRealmName = dobj.parent.Value;
 
+            if (dobj.properties != null)
+            {
                 foreach (var prop in ((Newtonsoft.Json.Linq.JObject)dobj.properties).Properties())
                 {
                     if (prop.Value.Type == Newtonsoft.Json.Linq.JTokenType.Object)
@@ -404,6 +406,7 @@ namespace ACE.Server.Managers
                         realm.SetPropertyByName(prop.Name, prop.Value);
                     }
                 }
+            }
 
             var links = new List<RealmRulesetLinks>();
             ushort order = 0;
