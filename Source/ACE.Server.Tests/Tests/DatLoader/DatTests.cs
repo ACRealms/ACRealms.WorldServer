@@ -229,6 +229,7 @@ namespace ACRealms.Tests.DatLoader
         }
 
         // Change Skip to null if you want to run this
+        // I do not recommend running this because it will generate a huge number of files and cause major slowdowns with future test runs. It took 1 hour to delete the files
         [Fact(Skip = "Skipping slow test")]
         public void ExtractCellDatByLandblock()
         {
@@ -238,6 +239,7 @@ namespace ACRealms.Tests.DatLoader
         }
 
         // Change Skip to null if you want to run this
+        // I do not recommend running this because it will generate a huge number of files and cause major slowdowns with future test runs. It took 1 hour to delete the files
         [Fact(Skip = "Skipping slow test")]
         public void ExportPortalDatsWithTypeInfo()
         {
