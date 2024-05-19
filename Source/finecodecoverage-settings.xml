@@ -1,0 +1,7 @@
+<FineCodeCoverage>
+  <Enabled>True</Enabled>
+  <RunMsCodeCoverage>IfInRunSettings</RunMsCodeCoverage>
+  <RunInParallel>False</RunInParallel>
+  <IncludeTestAssembly>False</IncludeTestAssembly>
+  <IncludeReferencedProjects>True</IncludeReferencedProjects>
+</FineCodeCoverage>
