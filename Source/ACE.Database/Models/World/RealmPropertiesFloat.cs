@@ -18,11 +18,11 @@ namespace ACE.Database.Models.World
         {
             var @enum = (RealmPropertyFloat)Type;
             var att = RealmConverter.PropertyDefinitionsFloat[@enum];
-            var prop = new RealmPropertyOptions<double>(@enum.ToString());
+            RealmPropertyOptions<double> prop;
             if (Value.HasValue)
-                prop.SeedPropertiesStatic(Value.Value, att.DefaultValue, CompositionType, Locked, Probability);
+                prop = new RealmPropertyOptions<double>(@enum.ToString(), Value.Value, att.DefaultValue, Locked, Probability);
             else
-                prop.SeedPropertiesRandomized(att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability);
+                prop = new RollableRealmPropertyOptions<double>(@enum.ToString(), att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability);
             return new AppliedRealmProperty<double>(Type, prop, null);
         }
     }

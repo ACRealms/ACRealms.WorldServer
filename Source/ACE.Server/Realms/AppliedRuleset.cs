@@ -58,7 +58,7 @@ namespace ACE.Server.Realms
             bool invertRelationships,
             Realm parentRealm,
             List<string> traceLog = null)
-            where V : IComparable
+            where V : IEquatable<V>
             where K : Enum
         {
             //If invertRelationships is true, we are prioritizing the sub dictionary for the purposes of lock, and prioritizing the parent for the purposes of replace.
@@ -146,7 +146,7 @@ namespace ACE.Server.Realms
 
         private void DictAdd<TKey, TVal>(IDictionary<TKey, AppliedRealmProperty<TVal>> dict, TKey key, AppliedRealmProperty<TVal> prop)
             where TKey : Enum
-            where TVal : IComparable
+            where TVal : IEquatable<TVal>
         {
             dict.Add(key, prop);
             AllProperties.Add(prop.Options.Name, prop);

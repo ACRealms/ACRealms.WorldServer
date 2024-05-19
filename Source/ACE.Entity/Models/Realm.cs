@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Sockets;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
@@ -90,7 +92,7 @@ namespace ACE.Entity.Models
     }
 
     public sealed class AppliedRealmProperty<TVal>(List<string> traceLog) : AppliedRealmProperty(traceLog)
-        where TVal : IComparable
+        where TVal : IEquatable<TVal>
     {
         public new RealmPropertyOptions<TVal> Options { get => (RealmPropertyOptions<TVal>)base.Options; init => base.Options = value; }
         public AppliedRealmProperty<TVal> Parent { get; }
@@ -187,19 +189,23 @@ namespace ACE.Entity.Models
             else
                 val = _value.ToString();
 
-            switch(Options.RandomType)
+            if (Options.RandomType == RealmPropertyRerollType.never)
+                return val;
+            switch (Options.RandomType)
             {
+                case RealmPropertyRerollType.never:
+                    return val;
+                    /*
                 case RealmPropertyRerollType.always:
                     return $"Random ({Options.MinValue} to {Options.MaxValue})";
                 case RealmPropertyRerollType.landblock:
                     return $"{val} (Landblock reroll, random range {Options.MinValue} to {Options.MaxValue}";
                 case RealmPropertyRerollType.manual:
                     return $"{val} (Manual reroll, random range {Options.MinValue} to {Options.MaxValue}";
-                case RealmPropertyRerollType.never:
-                    return val;
-                default:
-                    return val;
+                    */
+
             }
+            throw new NotImplementedException();
         }
 
         public override Type ValueType => typeof(TVal);
@@ -207,95 +213,90 @@ namespace ACE.Entity.Models
 
     public abstract record RealmPropertyOptions(string name)
     {
-        public object HardDefaultValue { get; protected init; }
-        public object DefaultValue { get; protected init; }
-        public object MinValue { get; protected init; }
-        public object MaxValue { get; protected init; }
+        public string Name { get; init; } = name;
         public bool Locked { get; init; }
         public double Probability { get; init; }
-        public RealmPropertyRerollType RandomType { get; init; }
-        public RealmPropertyCompositionType CompositionType { get; init; }
-        public string Name { get; init; } = name;
+        public virtual RealmPropertyRerollType RandomType { get => RealmPropertyRerollType.never; protected init { } }
+        public virtual RealmPropertyCompositionType CompositionType { get => RealmPropertyCompositionType.replace; protected init { } }
+
+        protected void Log(List<string> traceLog, Func<string> message)
+        {
+            if (traceLog == null)
+                return;
+            traceLog.Add($"   [T][{Name}] {message()}");
+        }
     }
 
-    public sealed record RealmPropertyOptions<T> : RealmPropertyOptions
+    public record RealmPropertyOptions<T> : RealmPropertyOptions
+        where T : IEquatable<T>
     {
-        static Random Randomizer = new Random();
-
-        public new T HardDefaultValue { get => (T)base.HardDefaultValue; private set => base.HardDefaultValue = value; }
-        public new T DefaultValue { get => (T)base.DefaultValue; private set => base.DefaultValue = value; }
-        public new T MinValue { get => (T)base.MinValue; private set => base.MinValue = value; }
-        public new T MaxValue { get => (T)base.MaxValue; private set => base.MaxValue = value; }
-
+        public T HardDefaultValue { get; init; }
+        public T DefaultValue { get; init; }
         public RealmPropertyOptions(string name) : base(name) { }
 
-        public RealmPropertyOptions(string name, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability) : base(name)
+        public RealmPropertyOptions(string name, T hardDefaultValue, T defaultValue, bool locked, double? probability) : base(name)
         {
-            RandomType = RealmPropertyRerollType.never;
-            CompositionType = (RealmPropertyCompositionType)compositionType;
             Locked = locked;
             Probability = probability ?? 1.0;
             DefaultValue = defaultValue;
             HardDefaultValue = hardDefaultValue;
         }
 
-        public RealmPropertyOptions(string name, T hardDefaultValue, byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability) : base(name)
+        public virtual T RollValue(List<string> traceLog)
+        {
+            Log(traceLog, () =>
+            {
+                if (DefaultValue.Equals(HardDefaultValue))
+                    return $"No randomization, value equals HardDefaultValue {HardDefaultValue}";
+                return $"No randomization, returning DefaultValue {HardDefaultValue}";
+            });
+            return DefaultValue;
+        }
+
+        public virtual T Compose(T parentValue, T rolledValue, List<string> traceLog)
+        {
+            Log(traceLog, () => $"Compose: Replacing parent {parentValue} with {rolledValue}");
+            return DefaultValue;
+        }
+    }
+
+    public record RollableRealmPropertyOptions<T> : RealmPropertyOptions<T>
+        where T : IMinMaxValue<T>, IEquatable<T>, IComparable<T>
+    {
+        IPropertyOperators<T> Operators { get; init; }
+        public T MinValue { get; init; }
+        public T MaxValue { get; init; }
+        public override RealmPropertyRerollType RandomType { get; protected init; }
+        public override RealmPropertyCompositionType CompositionType { get; protected init; }
+
+        public RollableRealmPropertyOptions(string name, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability)
+            : base(name, hardDefaultValue, defaultValue, locked, probability)
         {
             RandomType = RealmPropertyRerollType.never;
             CompositionType = (RealmPropertyCompositionType)compositionType;
-            Locked = locked;
-            Probability = probability ?? 1.0;
-            DefaultValue = defaultValue;
-            HardDefaultValue = hardDefaultValue;
         }
 
-        public void SeedPropertiesStatic(T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability)
+        public RollableRealmPropertyOptions(string name, T hardDefaultValue, byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
+            : base(name, hardDefaultValue, hardDefaultValue, locked, probability)
         {
-            HardDefaultValue = hardDefaultValue;
-            Locked = locked;
-            Probability = probability ?? 1.0;
             RandomType = (RealmPropertyRerollType)randomType;
-            CompositionType = (RealmPropertyCompositionType)compositionType;
-            MinValue = randomLowRange;
-            MaxValue = randomHighRange;
-            ClampMinMax();
-        }
-
-        public void SeedPropertiesRandomized(T hardDefaultValue, byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
-        {
-            HardDefaultValue = hardDefaultValue;
-            Locked = locked;
-            Probability = probability ?? 1.0;
-            RandomType = (RealmPropertyRerollType)randomType;
-            CompositionType = (RealmPropertyCompositionType)compositionType;
-            MinValue = randomLowRange;
-            MaxValue = randomHighRange;
-            if (hardDefaultValue is IComparable)
-                MinGreaterThanMax<T>();
-        }
-
-        private ClampMinMax<TVal>()
-            where TVal : IComparable
-        {
-            return false;
             if (typeof(T) == typeof(double))
-            {
-                if ((double)(object)MinValue > (double)(object)MaxValue)
-                    MaxValue = MinValue;
-            }
-            else if (typeof(T) == typeof(int))
-            {
-                if ((int)(object)MinValue > (int)(object)MaxValue)
-                    MaxValue = MinValue;
-            }
+                Operators = (IPropertyOperators<T>)PropertyOperatorsDouble.Instance;
             else if (typeof(T) == typeof(long))
-            {
-                if ((long)(object)MinValue > (long)(object)MaxValue)
-                    MaxValue = MinValue;
-            }
+                Operators = (IPropertyOperators<T>)PropertyOperatorsInt64.Instance;
+            else if (typeof(T) == typeof(int))
+                Operators = (IPropertyOperators<T>)PropertyOperatorsInt.Instance;
+            else
+                throw new NotImplementedException();
+
+            CompositionType = (RealmPropertyCompositionType)compositionType;
+            MinValue = randomLowRange;
+            MaxValue = randomHighRange;
+            if (MinValue.CompareTo(MaxValue) > 0)
+                MaxValue = MinValue;
         }
 
-        public T RollValue(List<string> traceLog)
+        public override T RollValue(List<string> traceLog)
         {
             if (RandomType == RealmPropertyRerollType.never)
             {
@@ -303,43 +304,11 @@ namespace ACE.Entity.Models
                 return DefaultValue;
             }
 
-            if (typeof(T) == typeof(double))
-            {
-                Log(traceLog, () => $"Rolling between {MinValue} and {MaxValue}");
-                return (T)(object)(Randomizer.NextDouble() * ((double)(object)MaxValue - (double)(object)MinValue) + (double)(object)MinValue);
-            }
-            else if (typeof(T) == typeof(int))
-            {
-                Log(traceLog, () => $"Rolling between {MinValue} and {MaxValue}");
-                return (T)(object)Randomizer.Next((int)(object)MinValue, (int)(object)MaxValue);
-            }
-            else if (typeof(T) == typeof(long))
-            {
-                Log(traceLog, () => $"Rolling between {MinValue} and {MaxValue}");
-                return (T)(object)NextLong((long)(object)MinValue, (long)(object)MaxValue);
-            }
-            else
-                return DefaultValue;
+            Log(traceLog, () => $"Rolling between {MinValue} and {MaxValue}");
+            return Operators.RollValue(MinValue, MaxValue);
         }
 
-        private long NextLong(long min, long max)
-        {
-            if (max <= min)
-                throw new ArgumentOutOfRangeException("max", "max must be > min!");
-
-            ulong uRange = (ulong)(max - min);
-            ulong ulongRand;
-            do
-            {
-                byte[] buf = new byte[8];
-                Randomizer.NextBytes(buf);
-                ulongRand = (ulong)BitConverter.ToInt64(buf, 0);
-            } while (ulongRand > ulong.MaxValue - ((ulong.MaxValue % uRange) + 1) % uRange);
-
-            return (long)(ulongRand % uRange) + min;
-        }
-
-        internal Tvar Compose<Tvar>(Tvar parentValue, Tvar rolledValue, List<string> traceLog)
+        public override T Compose(T parentValue, T rolledValue, List<string> traceLog)
         {
             Log(traceLog, () => $"Compose {CompositionType}({parentValue}, {rolledValue})");
             switch (CompositionType)
@@ -347,48 +316,55 @@ namespace ACE.Entity.Models
                 case RealmPropertyCompositionType.replace:
                     return rolledValue;
                 case RealmPropertyCompositionType.add:
-                    return Add(parentValue, rolledValue);
+                    return Operators.AddValue(parentValue, rolledValue);
                 case RealmPropertyCompositionType.multiply:
-                    return Multiply(parentValue, rolledValue);
+                    return Operators.MultiplyValue(parentValue, rolledValue);
                 default:
-                    return rolledValue;
+                    throw new NotImplementedException();
             }
-        }
-
-        Tvar Add<Tvar>(Tvar oldvalue, Tvar newvalue)
-        {
-            if (typeof(Tvar) == typeof(double))
-                return (Tvar)(object)((double)(object)oldvalue + (double)(object)newvalue);
-            else if (typeof(Tvar) == typeof(int))
-                return (Tvar)(object)((int)(object)oldvalue + (int)(object)newvalue);
-            else if (typeof(Tvar) == typeof(long))
-                return (Tvar)(object)((long)(object)oldvalue + (long)(object)newvalue);
-            else
-                return newvalue;
-        }
-
-        Tvar Multiply<Tvar>(Tvar oldvalue, Tvar newvalue)
-        {
-            if (typeof(Tvar) == typeof(double))
-                return (Tvar)(object)((double)(object)oldvalue * (double)(object)newvalue);
-            else if (typeof(Tvar) == typeof(int))
-                return (Tvar)(object)((int)(object)oldvalue * (int)(object)newvalue);
-            else if (typeof(T) == typeof(long))
-                return (Tvar)(object)((long)(object)oldvalue * (long)(object)newvalue);
-            else
-                return newvalue;
-        }
-
-        private void Log(List<string> traceLog, Func<string> message)
-        {
-            if (traceLog == null)
-                return;
-            traceLog.Add($"   [T][{Name}] {message()}");
         }
 
         public override string ToString()
         {
             return $"Default: {DefaultValue}, Min: {MinValue}, Max: {MaxValue}, Locked: {Locked}, Probability: {Probability}";
         }
+    }
+
+
+    public interface IPropertyOperators<T>
+        where T : IMinMaxValue<T>, IEquatable<T>, IComparable<T>
+    {
+        public abstract T RollValue(T min, T max);
+        public abstract T AddValue(T val1, T val2);
+        public abstract T MultiplyValue(T val1, T val2);
+    }
+
+    public abstract class PropertyOperatorsBase
+    {
+        protected static Random Randomizer { get; } = new Random();
+    }
+
+    public class PropertyOperatorsDouble : PropertyOperatorsBase, IPropertyOperators<double>
+    {
+        public static PropertyOperatorsDouble Instance { get; } = new PropertyOperatorsDouble();
+        public double RollValue(double min, double max) => Randomizer.NextDouble() * (max - min) + min;
+        public double AddValue(double val1, double val2) => val1 + val2;
+        public double MultiplyValue(double val1, double val2) => val1 * val2;
+    }
+
+    public class PropertyOperatorsInt : PropertyOperatorsBase, IPropertyOperators<int>
+    {
+        public static PropertyOperatorsInt Instance { get; } = new PropertyOperatorsInt();
+        public int RollValue(int min, int max) => Randomizer.Next(min, max);
+        public int AddValue(int val1, int val2) => val1 + val2;
+        public int MultiplyValue(int val1, int val2) => val1 * val2;
+    }
+
+    public class PropertyOperatorsInt64 : PropertyOperatorsBase, IPropertyOperators<long>
+    {
+        public static PropertyOperatorsInt64 Instance { get; } = new PropertyOperatorsInt64();
+        public long RollValue(long min, long max) => Randomizer.NextInt64(min, max);
+        public long AddValue(long val1, long val2) => val1 + val2;
+        public long MultiplyValue(long val1, long val2) => val1 * val2;
     }
 }
