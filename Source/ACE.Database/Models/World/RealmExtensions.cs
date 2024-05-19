@@ -85,7 +85,7 @@ namespace ACE.Database.Models.World
             }
             this.Locked = model.locked ?? false;
             this.Probability = model.probability;
-            this.RandomType = (byte)model.reroll;
+            this.RandomType = (byte)(model.reroll ?? RealmPropertyRerollType.never);
             this.CompositionType = (byte)model.compose;
         }
     }
@@ -107,7 +107,7 @@ namespace ACE.Database.Models.World
             }
             this.Locked = model.locked ?? false;
             this.Probability = model.probability;
-            this.RandomType = (byte)model.reroll;
+            this.RandomType = (byte)(model.reroll ?? RealmPropertyRerollType.never);
             this.CompositionType = (byte)model.compose;
         }
     }
