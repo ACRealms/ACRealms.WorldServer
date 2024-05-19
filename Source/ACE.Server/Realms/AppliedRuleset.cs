@@ -36,14 +36,14 @@ namespace ACE.Server.Realms
         }
     }
 
-    public abstract class Ruleset(ushort rulesetID, bool trace = false)
+    public abstract class Ruleset(ushort rulesetID, bool trace = false, List<string> traceLog = null)
     {
         protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         protected static Random random = new Random();
         public Ruleset ParentRuleset { get; protected set; }
         public ushort RulesetID { get; } = rulesetID;
-        protected bool Trace { get; init; } = trace;
-        public virtual List<string> TraceLog { get; } = trace ? new List<string>() : null;
+        protected bool Trace { get; init; } = traceLog != null || trace;
+        public virtual List<string> TraceLog { get; } = traceLog ?? (trace ? new List<string>() : null);
 
         protected IDictionary<RealmPropertyBool, AppliedRealmProperty<bool>> PropertiesBool { get; } = new Dictionary<RealmPropertyBool, AppliedRealmProperty<bool>>();
         protected IDictionary<RealmPropertyFloat, AppliedRealmProperty<double>> PropertiesFloat { get; } = new Dictionary<RealmPropertyFloat, AppliedRealmProperty<double>>();
@@ -124,14 +124,14 @@ namespace ACE.Server.Realms
         {
             if (traceLog == null)
                 return;
-            traceLog.Add($"[C] {message()}");
+            traceLog.Add($"   [C] {message()}");
         }
             
         private static void LogTrace(List<string> traceLog, Func<string> message, AppliedRealmProperty property)
         {
             if (traceLog == null)
                 return;
-            traceLog.Add($"[C] [{property.Options.Name}] {message()}");
+            traceLog.Add($"   [C][{property.Options.Name}] {message()}");
         }
 
 
@@ -384,7 +384,7 @@ namespace ACE.Server.Realms
     }
 
     //Properties may be changed freely
-    public partial class AppliedRuleset(RulesetTemplate template, bool trace = false) : Ruleset(template.RulesetID, trace)
+    public partial class AppliedRuleset(RulesetTemplate template, bool trace = false, List<string> traceLog = null) : Ruleset(template.RulesetID, trace, traceLog)
     {
         public Landblock Landblock { get; set; }
         public override List<string> TraceLog => Trace ? (Template.TraceLog ?? base.TraceLog) : null;
@@ -420,9 +420,9 @@ namespace ACE.Server.Realms
         /// </summary>
         /// <param name="template"></param>
         /// <returns></returns>
-        internal static AppliedRuleset MakeRerolledRuleset(RulesetTemplate template, bool trace = false)
+        internal static AppliedRuleset MakeRerolledRuleset(RulesetTemplate template, bool trace = false, List<string> traceLog = null)
         {
-            var result = new AppliedRuleset(template, trace);
+            var result = new AppliedRuleset(template, trace, traceLog);
             result.CopyDicts(template);
             if (template.ParentRuleset != null)
                 result.ComposeFrom(template.ParentRuleset);
@@ -466,7 +466,7 @@ namespace ACE.Server.Realms
             if (parentTemplate == null)
                 return;
             LogTrace(() => $"BeginCompose (parent: {parentTemplate.Realm.Name}, invertRules: {invertRules})");
-            var parent = MakeRerolledRuleset(parentTemplate);
+            var parent = MakeRerolledRuleset(parentTemplate, traceLog: TraceLog);
             LogTrace(() => $"ContinueCompose (parent: {parentTemplate.Realm.Name}, invertRules: {invertRules})");
 
             ApplyRulesetDict(parent.PropertiesBool, PropertiesBool, invertRules, parentTemplate.Realm, TraceLog);

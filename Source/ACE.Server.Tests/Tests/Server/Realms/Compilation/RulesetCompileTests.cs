@@ -89,7 +89,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             ACRealmsCommands.HandleCompileRuleset(player.Session, "all");
             var prefix = "Logged compilation output to ";
 
-            foreach (var i in Enumerable.Range(0, 1))
+            foreach (var i in Enumerable.Range(0, 2))
             {
                 var message = ((FakeSession)player.Session).WaitForMessage<GameMessageSystemChat>(m => m.Message.StartsWith(prefix));
                 var filename = message.Message.Substring(prefix.Length);
