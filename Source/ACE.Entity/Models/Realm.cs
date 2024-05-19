@@ -205,20 +205,20 @@ namespace ACE.Entity.Models
         public override Type ValueType => typeof(TVal);
     }
 
-    public abstract class RealmPropertyOptions(string name)
+    public abstract record RealmPropertyOptions(string name)
     {
-        public object HardDefaultValue { get; protected set; }
-        public object DefaultValue { get; protected set; }
-        public object MinValue { get; protected set; }
-        public object MaxValue { get; protected set; }
-        public bool Locked { get; protected set; }
-        public double Probability { get; protected set; }
-        public RealmPropertyRerollType RandomType { get; protected set; }
-        public RealmPropertyCompositionType CompositionType { get; protected set; }
+        public object HardDefaultValue { get; protected init; }
+        public object DefaultValue { get; protected init; }
+        public object MinValue { get; protected init; }
+        public object MaxValue { get; protected init; }
+        public bool Locked { get; init; }
+        public double Probability { get; init; }
+        public RealmPropertyRerollType RandomType { get; init; }
+        public RealmPropertyCompositionType CompositionType { get; init; }
         public string Name { get; init; } = name;
     }
 
-    public sealed class RealmPropertyOptions<T> : RealmPropertyOptions
+    public sealed record RealmPropertyOptions<T> : RealmPropertyOptions
     {
         static Random Randomizer = new Random();
 
@@ -229,7 +229,7 @@ namespace ACE.Entity.Models
 
         public RealmPropertyOptions(string name) : base(name) { }
 
-        public void SeedPropertiesStatic(T defaultValue, T hardDefaultValue, byte compositionType, bool locked, double? probability)
+        public RealmPropertyOptions(string name, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability) : base(name)
         {
             RandomType = RealmPropertyRerollType.never;
             CompositionType = (RealmPropertyCompositionType)compositionType;
@@ -239,7 +239,17 @@ namespace ACE.Entity.Models
             HardDefaultValue = hardDefaultValue;
         }
 
-        public void SeedPropertiesRandomized(T hardDefaultValue, byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
+        public RealmPropertyOptions(string name, T hardDefaultValue, byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability) : base(name)
+        {
+            RandomType = RealmPropertyRerollType.never;
+            CompositionType = (RealmPropertyCompositionType)compositionType;
+            Locked = locked;
+            Probability = probability ?? 1.0;
+            DefaultValue = defaultValue;
+            HardDefaultValue = hardDefaultValue;
+        }
+
+        public void SeedPropertiesStatic(T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability)
         {
             HardDefaultValue = hardDefaultValue;
             Locked = locked;
@@ -251,8 +261,23 @@ namespace ACE.Entity.Models
             ClampMinMax();
         }
 
-        private void ClampMinMax()
+        public void SeedPropertiesRandomized(T hardDefaultValue, byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
         {
+            HardDefaultValue = hardDefaultValue;
+            Locked = locked;
+            Probability = probability ?? 1.0;
+            RandomType = (RealmPropertyRerollType)randomType;
+            CompositionType = (RealmPropertyCompositionType)compositionType;
+            MinValue = randomLowRange;
+            MaxValue = randomHighRange;
+            if (hardDefaultValue is IComparable)
+                MinGreaterThanMax<T>();
+        }
+
+        private ClampMinMax<TVal>()
+            where TVal : IComparable
+        {
+            return false;
             if (typeof(T) == typeof(double))
             {
                 if ((double)(object)MinValue > (double)(object)MaxValue)
