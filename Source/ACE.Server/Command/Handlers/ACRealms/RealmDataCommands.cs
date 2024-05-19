@@ -11,12 +11,14 @@ using ACE.Database.Adapter;
 using ACE.Server.Managers;
 using log4net;
 using ACE.Server.Command.Handlers.Processors;
+using System.Runtime.CompilerServices;
 
 namespace ACE.Server.Command.Handlers
 {
     public static class RealmDataCommands
     {
         [CommandHandler("import-realms", AccessLevel.Developer, CommandHandlerFlag.None, 0, "Imports all json realms from the Content folder")]
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void HandleImportRealms(ISession session, params string[] parameters)
         {
             DateTime now = DateTime.Now;
@@ -28,11 +30,20 @@ namespace ACE.Server.Command.Handlers
             var realms_index = $"{di.FullName}{sep}json{sep}realms.jsonc";
             var json_folder = $"{di.FullName}{sep}json{sep}realms{sep}";
 
-            var realms = RealmDataHelpers.ImportJsonRealmsFolder(session, json_folder);
-            if (realms != null)
-                RealmDataHelpers.ImportJsonRealmsIndex(session, realms_index, realms);
-
-            session?.Network.EnqueueSend(new GameMessageSystemChat($"Synced {realms.Count} realms in {(DateTime.Now - now).TotalSeconds} seconds.", ChatMessageType.Broadcast));
+            try
+            {
+                var realms = RealmDataHelpers.ImportJsonRealmsFolder(session, json_folder);
+                if (realms != null)
+                    RealmDataHelpers.ImportJsonRealmsIndex(session, realms_index, realms);
+                else
+                    throw new InvalidDataException("Could not load realms files");
+                session?.Network.EnqueueSend(new GameMessageSystemChat($"Synced {realms.Count} realms in {(DateTime.Now - now).TotalSeconds} seconds.", ChatMessageType.Broadcast));
+            }
+            catch (Exception ex)
+            {
+                CommandHandlerHelper.WriteOutputError(session, $"Error: {ex.Message}", ChatMessageType.Broadcast);
+                throw;
+            }
         }
     }
 }

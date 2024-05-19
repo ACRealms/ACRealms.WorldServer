@@ -62,9 +62,9 @@ namespace ACE.Server.Realms
                         return AsInstancedPosition(player, backupMode);
                     break;
                 case PlayerInstanceSelectMode.RealmDefaultInstanceID:
-                    instanceId = player.RealmRuleset.GetDefaultInstanceID(); break;
+                    instanceId = player.RealmRuleset.GetFullInstanceID(player.DefaultShortInstanceID); break;
                 case PlayerInstanceSelectMode.HomeRealm:
-                    instanceId = Position.InstanceIDFromVars(player.HomeRealm, 0, false); break;
+                    instanceId = Position.InstanceIDFromVars(player.HomeRealm, player.DefaultShortInstanceID, false); break;
                 case PlayerInstanceSelectMode.PersonalRealm:
                     var realm = RealmManager.GetReservedRealm(ReservedRealm.hideout);
                     instanceId = Position.InstanceIDFromVars(realm.Realm.Id, (ushort)(player.Account.AccountId), false); break;

@@ -1,6 +1,7 @@
 {
-  "name": "Compose Add",
+  "name": "Compose Add With Inherit",
   "type": "Ruleset",
+  "parent": "Compose Root",
   "properties": {
     "Description": "All Properties Added",
     "CreatureStrengthAdded": {

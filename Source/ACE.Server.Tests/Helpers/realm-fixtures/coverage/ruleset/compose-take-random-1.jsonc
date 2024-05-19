@@ -1,34 +1,35 @@
 {
-  "name": "Compose Add",
+  "name": "Compose Take Random 1",
   "type": "Ruleset",
+  "properties_random_count": 1,
   "properties": {
-    "Description": "All Properties Added",
+    "Description": "Take random 1",
     "CreatureStrengthAdded": {
       "low": 10,
       "high": 20,
-      "compose": "add"
+      "compose": "multiply"
     },
     "CreatureEnduranceAdded": {
       "value": 10,
-      "compose": "add"
+      "compose": "multiply"
     },
     "CreatureCoordinationAdded": {
       "value": 10,
-      "compose": "add"
+      "compose": "multiply"
     },
     "CreatureQuicknessAdded": {
-      "compose": "add",
+      "compose": "multiply",
       "value": 10
     },
     "CreatureFocusAdded": {
       "value": 10,
       "probability": 0,
-      "compose": "add"
+      "compose": "multiply"
     },
     "CreatureSelfAdded": {
       "value": 10,
       "locked": true,
-      "compose": "add"
+      "compose": "multiply"
     }
   }
 }

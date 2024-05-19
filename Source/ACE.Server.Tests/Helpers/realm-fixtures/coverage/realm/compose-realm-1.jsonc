@@ -1,0 +1,11 @@
+{
+  "name": "Compose Realm 1",
+  "type": "Realm",
+  "parent": "PvP Realm",
+  "apply_rulesets": [
+    "Compose Take Random 1",
+    "Compose Take Random 1 With Inherit",
+    "Compose Add",
+    "Compose Add With Inherit"
+  ]
+}

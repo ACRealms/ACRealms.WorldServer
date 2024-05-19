@@ -18,13 +18,10 @@ namespace ACRealms.Tests.Factories
 {
     internal class CharacterNotCreatedException : Exception
     {
-        ACE.Server.Network.Enum.CharacterGenerationVerificationResponse Response { get; init; }
         public CharacterNotCreatedException(ACE.Server.Network.Enum.CharacterGenerationVerificationResponse response)
+            : base($"The character was not created successfully: {response}")
         {
-            Response = response;
         }
-
-        public override string ToString() => $"The character was not created successfully: ${Response}";
     }
 
     internal record CharacterFactory : Factory<Character, CharacterFactory>

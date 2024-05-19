@@ -308,3 +308,4 @@ Source/ACE.GenerateSQLEnums/solutionpath.txt
 # ACRealms specific files
 Content/json-schema/generated/
 
+**/realm-fixtures/**/realms.jsonc

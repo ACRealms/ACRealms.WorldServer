@@ -575,11 +575,13 @@ namespace ACE.Server.Realms
             return att.DefaultValue;
         }
 
-        public uint GetDefaultInstanceID()
+        public uint GetFullInstanceID(ushort shortInstanceID)
         {
-            return ACE.Entity.Position.InstanceIDFromVars(this.Template.Realm.Id, 0, this.Template.Realm.Type == ACE.Entity.Enum.RealmType.Ruleset);
+            return ACE.Entity.Position.InstanceIDFromVars(Template.Realm.Id, shortInstanceID, Template.Realm.Type == ACE.Entity.Enum.RealmType.Ruleset);
         }
 
+        public uint GetDefaultInstanceID() => GetFullInstanceID(0);
+        
         public override string ToString()
         {
             return $"Applied Ruleset {Realm.Name}";

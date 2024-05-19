@@ -213,6 +213,11 @@ namespace ACE.Entity.Enum.Properties
         /// True if ephemeral realm portal. If the instance ID is missing (such as after a server restart), this portal will not be usable
         /// </summary>
         IsEphemeralRealmPortal = 42003,
+
+        /// <summary>
+        /// Player will always be placed in a different instance ID according to their character ID. Mainly intended for testing 
+        /// </summary>
+        AttemptUniqueInstanceID = 42004
     }
 
     public static class PropertyBoolExtensions

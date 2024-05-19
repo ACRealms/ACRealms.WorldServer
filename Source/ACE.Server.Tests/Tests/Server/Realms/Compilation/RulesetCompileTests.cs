@@ -58,6 +58,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
 
             var player = new OnlinePlayerFactory()
             {
+                HomeRealm = "Modern Realm",
                 Character = new CharacterFactory { CharacterName = "TestRulesetCompileCommand" }
             }.Create();
 
@@ -69,7 +70,31 @@ namespace ACRealms.Tests.Server.Realms.Compilation
                 var message = ((FakeSession)player.Session).WaitForMessage<GameMessageSystemChat>(m => m.Message.StartsWith(prefix));
                 var filename = message.Message.Substring(prefix.Length);
                 Assert.True(File.Exists(filename));
-                File.Copy(filename, $"TestRulesetCompileCommand-output-{i}.txt");
+                File.Copy(filename, $"TestRulesetCompileCommand-Simple-output-{i}.txt", true);
+                File.Delete(filename);
+            }
+        }
+
+        [Fact]
+        public void TestRulesetCompileCommand_Coverage()
+        {
+            LoadRealmFixture(FixtureName.coverage);
+
+            var player = new OnlinePlayerFactory()
+            {
+                HomeRealm = "Compose Realm 1",
+                Character = new CharacterFactory { CharacterName = "TestRulesetCompileCommand Coverage" }
+            }.Create();
+
+            ACRealmsCommands.HandleCompileRuleset(player.Session, "all");
+            var prefix = "Logged compilation output to ";
+
+            foreach (var i in Enumerable.Range(0, 1))
+            {
+                var message = ((FakeSession)player.Session).WaitForMessage<GameMessageSystemChat>(m => m.Message.StartsWith(prefix));
+                var filename = message.Message.Substring(prefix.Length);
+                Assert.True(File.Exists(filename));
+                File.Copy(filename, $"TestRulesetCompileCommand-Coverage-output-{i}.txt", true);
                 File.Delete(filename);
             }
         }

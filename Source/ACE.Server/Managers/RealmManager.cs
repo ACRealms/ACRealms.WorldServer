@@ -17,6 +17,7 @@ using ACE.Entity.Enum;
 using ACE.Database.Models.World;
 using System.Threading.Tasks;
 using ACE.Server.Command.Handlers;
+using System.IO;
 
 namespace ACE.Server.Managers
 {
@@ -107,6 +108,16 @@ namespace ACE.Server.Managers
             lock (realmsLock)
             {
                 if (RealmsByID.TryGetValue(realmId, out var realm))
+                    return realm;
+                return null;
+            }
+        }
+
+        public static WorldRealm GetRealmByName(string name)
+        {
+            lock (realmsLock)
+            {
+                if (RealmsByName.TryGetValue(name, out var realm))
                     return realm;
                 return null;
             }

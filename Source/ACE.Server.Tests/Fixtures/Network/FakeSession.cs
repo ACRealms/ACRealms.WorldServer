@@ -85,5 +85,41 @@ namespace ACRealms.Tests.Fixtures.Network
 
             return task.Result;
         }
+
+        public void WaitForPlayerState(Func<Player, bool> selector, double timeoutInSeconds = 1.0, uint checkIntervalMs = 10)
+        {
+            if (Player == null)
+                throw new InvalidOperationException("Player not found on session");
+
+            Exception ex = new InvalidOperationException("The task did not complete successfully");
+            var task = Task.Run(() =>
+            {
+                try
+                {
+                    do
+                    {
+                        if (Player == null)
+                            throw new InvalidOperationException("Player not found on session");
+
+                        if (selector(Player))
+                        {
+                            ex = null;
+                            return;
+                        }
+                        Thread.Sleep((int)checkIntervalMs);
+                    }
+                    while (true);
+                }
+                catch (Exception e)
+                {
+                    ex = e;
+                    return;
+                }
+            });
+            task.Wait((int)(timeoutInSeconds * 1000));
+
+            if (ex != null)
+                throw ex;
+        }
     }
 }

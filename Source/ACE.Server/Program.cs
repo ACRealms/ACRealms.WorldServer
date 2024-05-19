@@ -16,6 +16,10 @@ using ACE.Server.Managers;
 using ACE.Server.Mods;
 using ACE.Server.Network.Managers;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("ACRealms.Tests")]
+
 
 namespace ACE.Server
 {
