@@ -34,7 +34,8 @@ namespace ACRealms.Tests.Factories
                 player.HomeRealm = RealmManager.GetRealmByName(HomeRealm).Realm.Id;
 
             session.WaitForMessage<TraceMessageEnterWorldComplete>();
-            session.WaitForPlayerState(p => p.CurrentLandblock?.WorldRealmID == player.HomeRealm && p.CurrentLandblock.RealmRuleset.Realm.Name == HomeRealm, timeoutInSeconds: 60, checkIntervalMs: 50);
+            if (HomeRealm != null)
+                session.WaitForPlayerState(p => p.CurrentLandblock?.WorldRealmID == player.HomeRealm && p.CurrentLandblock.RealmRuleset.Realm.Name == HomeRealm, timeoutInSeconds: 60, checkIntervalMs: 50);
 
             return player;
         };
