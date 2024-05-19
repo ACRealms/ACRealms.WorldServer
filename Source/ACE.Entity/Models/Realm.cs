@@ -189,35 +189,28 @@ namespace ACE.Entity.Models
             else
                 val = _value.ToString();
 
-            if (Options.RandomType == RealmPropertyRerollType.never)
-                return val;
-            switch (Options.RandomType)
-            {
-                case RealmPropertyRerollType.never:
-                    return val;
-                    /*
-                case RealmPropertyRerollType.always:
-                    return $"Random ({Options.MinValue} to {Options.MaxValue})";
-                case RealmPropertyRerollType.landblock:
-                    return $"{val} (Landblock reroll, random range {Options.MinValue} to {Options.MaxValue}";
-                case RealmPropertyRerollType.manual:
-                    return $"{val} (Manual reroll, random range {Options.MinValue} to {Options.MaxValue}";
-                    */
-
-            }
-            throw new NotImplementedException();
+            return Options.AppliedInfo(val);
         }
 
         public override Type ValueType => typeof(TVal);
     }
 
-    public abstract record RealmPropertyOptions(string name)
+    public abstract record RealmPropertyOptions
     {
-        public string Name { get; init; } = name;
+        public string RulesetName { get; init; }
+        public string Name { get; init; }
         public bool Locked { get; init; }
         public double Probability { get; init; }
         public virtual RealmPropertyRerollType RandomType { get => RealmPropertyRerollType.never; protected init { } }
         public virtual RealmPropertyCompositionType CompositionType { get => RealmPropertyCompositionType.replace; protected init { } }
+
+        private Lazy<string> TemplateDisplayString { get; init; } 
+        protected RealmPropertyOptions(string name, string rulesetName)
+        {
+            Name = name;
+            RulesetName = rulesetName;
+            TemplateDisplayString = new Lazy<string>(TemplateInfo, System.Threading.LazyThreadSafetyMode.PublicationOnly);
+        }
 
         protected void Log(List<string> traceLog, Func<string> message)
         {
@@ -225,6 +218,10 @@ namespace ACE.Entity.Models
                 return;
             traceLog.Add($"   [T][{Name}] {message()}");
         }
+
+        public sealed override string ToString() => TemplateDisplayString.Value;
+        protected abstract string TemplateInfo();
+        public abstract string AppliedInfo(string val);
     }
 
     public record RealmPropertyOptions<T> : RealmPropertyOptions
@@ -232,9 +229,8 @@ namespace ACE.Entity.Models
     {
         public T HardDefaultValue { get; init; }
         public T DefaultValue { get; init; }
-        public RealmPropertyOptions(string name) : base(name) { }
 
-        public RealmPropertyOptions(string name, T hardDefaultValue, T defaultValue, bool locked, double? probability) : base(name)
+        public RealmPropertyOptions(string name, string rulesetName, T hardDefaultValue, T defaultValue, bool locked, double? probability) : base(name, rulesetName)
         {
             Locked = locked;
             Probability = probability ?? 1.0;
@@ -244,12 +240,7 @@ namespace ACE.Entity.Models
 
         public virtual T RollValue(List<string> traceLog)
         {
-            Log(traceLog, () =>
-            {
-                if (DefaultValue.Equals(HardDefaultValue))
-                    return $"No randomization, value equals HardDefaultValue {HardDefaultValue}";
-                return $"No randomization, returning DefaultValue {HardDefaultValue}";
-            });
+            Log(traceLog, () => $"Value: {DefaultValue}");
             return DefaultValue;
         }
 
@@ -258,6 +249,9 @@ namespace ACE.Entity.Models
             Log(traceLog, () => $"Compose: Replacing parent {parentValue} with {rolledValue}");
             return DefaultValue;
         }
+
+        protected override string TemplateInfo() => $"Default: {DefaultValue}, Locked: {Locked}, Probability: {Probability}";
+        public override string AppliedInfo(string val) => $"Value: {val}";
     }
 
     public record RollableRealmPropertyOptions<T> : RealmPropertyOptions<T>
@@ -269,15 +263,15 @@ namespace ACE.Entity.Models
         public override RealmPropertyRerollType RandomType { get; protected init; }
         public override RealmPropertyCompositionType CompositionType { get; protected init; }
 
-        public RollableRealmPropertyOptions(string name, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability)
-            : base(name, hardDefaultValue, defaultValue, locked, probability)
+        public RollableRealmPropertyOptions(string name, string rulesetName, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability)
+            : base(name, rulesetName, hardDefaultValue, defaultValue, locked, probability)
         {
             RandomType = RealmPropertyRerollType.never;
             CompositionType = (RealmPropertyCompositionType)compositionType;
         }
 
-        public RollableRealmPropertyOptions(string name, T hardDefaultValue, byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
-            : base(name, hardDefaultValue, hardDefaultValue, locked, probability)
+        public RollableRealmPropertyOptions(string name, string rulesetName, T hardDefaultValue, byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
+            : base(name, rulesetName, hardDefaultValue, hardDefaultValue, locked, probability)
         {
             RandomType = (RealmPropertyRerollType)randomType;
             if (typeof(T) == typeof(double))
@@ -324,10 +318,22 @@ namespace ACE.Entity.Models
             }
         }
 
-        public override string ToString()
+        public override string AppliedInfo(string val)
         {
-            return $"Default: {DefaultValue}, Min: {MinValue}, Max: {MaxValue}, Locked: {Locked}, Probability: {Probability}";
+            switch(RandomType)
+            {
+                case RealmPropertyRerollType.always:
+                    return $"Random ({MinValue} to {MaxValue})";
+                case RealmPropertyRerollType.landblock:
+                    return $"{val} (Landblock reroll, random range {MinValue} to {MaxValue}";
+                case RealmPropertyRerollType.manual:
+                    return $"{val} (Manual reroll, random range {MinValue} to {MaxValue}";
+                default:
+                    return base.AppliedInfo(val);
+            }
         }
+
+        protected override string TemplateInfo() => $"Min: {MinValue}, Max: {MaxValue}, Locked: {Locked}, Probability: {Probability}";
     }
 
 

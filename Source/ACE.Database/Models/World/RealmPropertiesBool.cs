@@ -15,7 +15,7 @@ namespace ACE.Database.Models.World
             var @enum = (RealmPropertyBool)Type;
             
             var att = RealmConverter.PropertyDefinitionsBool[@enum];
-            var prop = new RealmPropertyOptions<bool>(@enum.ToString(), Value, att.DefaultValue, Locked, Probability);
+            var prop = new RealmPropertyOptions<bool>(@enum.ToString(), Realm.Name, Value, att.DefaultValue, Locked, Probability);
             return new AppliedRealmProperty<bool>(Type, prop, null);
         }
     }

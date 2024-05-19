@@ -20,9 +20,9 @@ namespace ACE.Database.Models.World
             var att = RealmConverter.PropertyDefinitionsFloat[@enum];
             RealmPropertyOptions<double> prop;
             if (Value.HasValue)
-                prop = new RealmPropertyOptions<double>(@enum.ToString(), Value.Value, att.DefaultValue, Locked, Probability);
+                prop = new RealmPropertyOptions<double>(@enum.ToString(), Realm.Name, Value.Value, att.DefaultValue, Locked, Probability);
             else
-                prop = new RollableRealmPropertyOptions<double>(@enum.ToString(), att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability);
+                prop = new RollableRealmPropertyOptions<double>(@enum.ToString(), Realm.Name, att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability);
             return new AppliedRealmProperty<double>(Type, prop, null);
         }
     }
