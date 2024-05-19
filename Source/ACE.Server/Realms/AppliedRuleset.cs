@@ -195,11 +195,7 @@ namespace ACE.Server.Realms
             if (PropertiesString.TryGetValue(RealmPropertyString.Description, out var desc))
                 amount++;
 
-            var total = PropertiesBool.Count +
-                PropertiesInt.Count +
-                PropertiesInt64.Count +
-                PropertiesFloat.Count +
-                PropertiesString.Count;
+            var total = template.PropertiesForRandomization.Count;
             if (amount <= total / 2)
             {
                 var set = new HashSet<AppliedRealmProperty>();
@@ -215,7 +211,9 @@ namespace ACE.Server.Realms
             }
             else
             {
-                LogTrace(() => $"{amount} is at least 50% of the randomization properties count, using subtraction algorithm");
+                // As an extreme example of why this is needed, imagine if there were 1000 properties, and 999 of them are taken at random.
+                // The last few rolls will have as little as 0.1% chance of finding an unused property.
+                LogTrace(() => $"{amount} is at least 50% of the randomization properties count of {total}, using subtraction algorithm");
                 var all = new List<AppliedRealmProperty>(template.PropertiesForRandomization);
                 if (amount >= all.Count)
                 {
