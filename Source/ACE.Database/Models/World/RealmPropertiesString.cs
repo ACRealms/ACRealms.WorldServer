@@ -13,9 +13,8 @@ namespace ACE.Database.Models.World
         public override AppliedRealmProperty<string> ConvertRealmProperty()
         {
             var @enum = (RealmPropertyString)Type;
-            var prop = new RealmPropertyOptions<string>(@enum.ToString());
             var att = RealmConverter.PropertyDefinitionsString[@enum];
-            prop.SeedPropertiesStatic(Value, att.DefaultValue, (byte)RealmPropertyCompositionType.replace, Locked, Probability);
+            var prop = new RealmPropertyOptions<string>(@enum.ToString(), Realm.Name, Value, att.DefaultValue, Locked, Probability);
             return new AppliedRealmProperty<string>(Type, prop, null);
         }
     }

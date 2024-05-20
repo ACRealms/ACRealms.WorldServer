@@ -80,7 +80,7 @@ namespace ACE.Database.Adapter
 
         private static IDictionary<TProp, AppliedRealmProperty<TVal>> MakePropertyDict<TProp, TVal>(IEnumerable<RealmPropertiesBase> dbValues, ACE.Entity.Models.Realm realmEntity)
             where TProp : Enum
-            where TVal : IComparable
+            where TVal : IEquatable<TVal>
         {
             var result = new Dictionary<TProp, AppliedRealmProperty<TVal>>(dbValues.Count());
             foreach (var value in dbValues)
