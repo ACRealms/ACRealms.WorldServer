@@ -71,7 +71,7 @@ namespace ACE.Server.Realms
                 var parentprop = pair.Value;
                 if (!sub.ContainsKey(pair.Key))
                 {
-                    LogTrace(traceLog, () => "Property not defined, pointing directly to parent property", pair.Value);
+                    LogTrace(traceLog, () => $"No property def, using parent '{parentprop.Options.RulesetName}'", pair.Value);
                     //Just add the parent's reference, as we already previously imprinted the parent from its template for this purpose
                     sub[pair.Key] = parentprop;
                     continue;
@@ -79,7 +79,7 @@ namespace ACE.Server.Realms
 
                 if (!invertRelationships && parentprop.Options.Locked)
                 {
-                    LogTrace(traceLog, () => "Parent property locked, pointing directly to parent property", pair.Value);
+                    LogTrace(traceLog, () => $"No property def, using parent '{parentprop.Options.RulesetName}'", pair.Value);
 
                     //Use parent's property as it is locked
                     sub[pair.Key] = parentprop;
@@ -87,20 +87,20 @@ namespace ACE.Server.Realms
                 }
                 else if (invertRelationships && sub[pair.Key].Options.Locked)
                 {
-                    LogTrace(traceLog, () => "Property locked, discarding parent", pair.Value);
+                    LogTrace(traceLog, () => $"Locked: Discarding parent '{parentprop.Options.RulesetName}'", pair.Value);
                     continue;
                 }
 
                 //Replace
                 if (!invertRelationships && sub[pair.Key].Options.CompositionType == RealmPropertyCompositionType.replace)
                 {
-                    LogTrace(traceLog, () => "CompositionType is replace, discarding parent", pair.Value);
+                    LogTrace(traceLog, () => $"Replace: Discarding parent '{parentprop.Options.RulesetName}'", pair.Value);
                     //No need to do anything here since we are replacing the parent
                     continue;
                 }
                 else if (invertRelationships && parentprop.Options.CompositionType == RealmPropertyCompositionType.replace)
                 {
-                    LogTrace(traceLog, () => $"CompositionType is replace, pointing directly to parent property with invertRelationships", pair.Value);
+                    LogTrace(traceLog, () => $"Replace: using parent from invertRelationships: '{parentprop.Options.RulesetName}'", pair.Value);
                     sub[pair.Key] = parentprop;
                     continue;
                 }
@@ -112,7 +112,7 @@ namespace ACE.Server.Realms
                 }
                 else
                 {
-                    LogTrace(traceLog, () => $"Inverted Relationships: Property parent pointing to {parentRealm.Name}", pair.Value);
+                    LogTrace(traceLog, () => $"InvertedRel: using '{parentprop.Options.RulesetName}' with parent '{sub[pair.Key].Options.RulesetName}'", pair.Value);
                     sub[pair.Key] = new AppliedRealmProperty<V>(parentprop, sub[pair.Key], traceLog); //ensure parent chain is kept
                 }
 
@@ -131,7 +131,7 @@ namespace ACE.Server.Realms
         {
             if (traceLog == null)
                 return;
-            traceLog.Add($"   [C][{property.Options.Name}] {message()}");
+            traceLog.Add($"   [C][{property.Options.Name}] (Def:{property.Options.RulesetName}) {message()}");
         }
 
 
@@ -250,7 +250,7 @@ namespace ACE.Server.Realms
     }
 
     //Properties should not be changed after initial composition
-    public class RulesetTemplate(ushort rulesetID, bool trace = false) : Ruleset(rulesetID, trace)
+    public class RulesetTemplate(ushort rulesetID, bool trace = false, List<string> traceLog = null) : Ruleset(rulesetID, trace, traceLog)
     {
         public Realm Realm { get; protected set; }
         public new RulesetTemplate ParentRuleset
@@ -268,12 +268,12 @@ namespace ACE.Server.Realms
         /// <param name="cloneFrom"></param>
         /// <param name="rulesetID"></param>
         /// <param name="trace"></param>
-        public RulesetTemplate(RulesetTemplate cloneFrom, ushort rulesetID, bool trace)
-            : this(rulesetID, trace)
+        public RulesetTemplate(RulesetTemplate cloneFrom, ushort rulesetID, bool trace, List<string> traceLog)
+            : this(rulesetID, trace, traceLog)
         {
             if (cloneFrom.ParentRuleset != null)
-                ParentRuleset = new RulesetTemplate(cloneFrom.ParentRuleset, cloneFrom.ParentRuleset.RulesetID, trace);
-            LogTrace(() => $"New template (parent: {ParentRuleset.Realm.Name}");
+                ParentRuleset = new RulesetTemplate(cloneFrom.ParentRuleset, cloneFrom.ParentRuleset.RulesetID, trace, traceLog);
+            LogTrace(() => $"New template (parent: {ParentRuleset.Realm.Name})");
             var realm = RealmManager.GetRealm(rulesetID).Realm;
             LoadPropertiesFrom(realm);
             LogTrace(() => $"Completed template initialization");
@@ -348,8 +348,8 @@ namespace ACE.Server.Realms
         {
             if (baseset.Realm.Type == ACE.Entity.Enum.RealmType.Ruleset && subset.Type == ACE.Entity.Enum.RealmType.Realm)
                 throw new Exception("Realms may not inherit from rulesets.");
-            var ruleset = new RulesetTemplate(subset.Id, baseset.Trace || trace);
-            ruleset.LogTrace(() => $"New (parent: {baseset.Realm.Name}");
+            var ruleset = new RulesetTemplate(subset.Id, baseset.Trace || trace, baseset.TraceLog);
+            ruleset.LogTrace(() => $"New (parent: {baseset.Realm.Name})");
             ruleset.ParentRuleset = baseset;
             ruleset.LoadPropertiesFrom(subset);
             return ruleset;
@@ -377,7 +377,7 @@ namespace ACE.Server.Realms
 
         internal RulesetTemplate RebuildTemplateWithTrace()
         {
-            return new RulesetTemplate(this, RulesetID, true);
+            return new RulesetTemplate(this, RulesetID, true, TraceLog);
         }
     }
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Text;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 
@@ -114,7 +115,7 @@ namespace ACE.Entity.Models
         {
             if (TraceLog == null)
                 return;
-            TraceLog.Add($"   [P][{Options.Name}] {message()}");
+            TraceLog.Add($"   [P][{Options.Name}] (Def:{Options.RulesetName}) {message()}");
         }
 
         //Clone
@@ -127,21 +128,21 @@ namespace ACE.Entity.Models
             {
                 if (parent != null)
                 {
-                    LogTrace(() => $"Setting parent (explicitly passed): {parent.Options.Name}");
+                    LogTrace(() => $"Setting parent (explicitly passed): {parent.Options.RulesetName}");
                     Parent = new AppliedRealmProperty<TVal>(parent, null, traceLog);
                 }
                 else if (prop.Parent != null)
                 {
-                    LogTrace(() => $"Setting parent (from template parent): {prop.Parent.Options.Name}");
+                    LogTrace(() => $"Setting parent (from template parent): {prop.Parent.Options.RulesetName}");
                     Parent = new AppliedRealmProperty<TVal>(prop.Parent, null, traceLog);
                 }
             }
             else
             {
                 if (parent != null)
-                    LogTrace(() => $"Discarding parent: {prop.Parent.Options.Name}");
+                    LogTrace(() => $"Discarding parent: {parent.Options.RulesetName}");
                 else if (prop.Parent != null)
-                    LogTrace(() => $"Discarding parent (from template parent): {prop.Parent.Options.Name}");
+                    LogTrace(() => $"Discarding parent (from template parent): {prop.Parent.Options.RulesetName}");
             }
         }
 
@@ -158,19 +159,33 @@ namespace ACE.Entity.Models
             Options = options;
         }
 
-        public void RollValue()
+        private string GetAppliedParentChain(StringBuilder sb = null)
+        {
+            bool direct = sb == null;
+            sb ??= new StringBuilder();
+            if (!direct) sb.AppendFormat("<-{0}", Options.RulesetName);
+            if (Parent != null) Parent.GetAppliedParentChain(sb);
+            return direct ? sb.ToString() : null;
+        }
+
+        public void RollValue(bool direct = true)
         {
             TVal composedFromValue;
             if (Parent != null)
             {
-                LogTrace(() => $"Rerolling parent property before composition");
-                Parent.RollValue();
+                if (direct)
+                    LogTrace(() => GetAppliedParentChain());
+
+                //LogTrace(() => $"Rerolling parent property before composition");
+                Parent.RollValue(false);
                 composedFromValue = Parent.Value;
-                LogTrace(() => $"Composing from parent property value: {composedFromValue}");
+                //LogTrace(() => $"Composing from parent property value: {composedFromValue}");
             }
             else
             {
-                LogTrace(() => $"Composing from hard default value: {Options.HardDefaultValue}");
+                if (direct)
+                    LogTrace(() => "<-[DEFAULT]");
+                //LogTrace(() => $"Composing from hard default value: {Options.HardDefaultValue}");
                 composedFromValue = Options.HardDefaultValue;
             }
 
@@ -216,7 +231,7 @@ namespace ACE.Entity.Models
         {
             if (traceLog == null)
                 return;
-            traceLog.Add($"   [T][{Name}] {message()}");
+            traceLog.Add($"   [T][{Name}] (Def: {RulesetName}) {message()}");
         }
 
         public sealed override string ToString() => TemplateDisplayString.Value;

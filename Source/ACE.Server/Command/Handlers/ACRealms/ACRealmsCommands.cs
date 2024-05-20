@@ -247,7 +247,7 @@ namespace ACE.Server.Command.Handlers
                         template = RealmManager.BuildRuleset(session.Player.RealmRuleset.Realm, trace: true);
                     else
                         template = session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace();
-                    ruleset = AppliedRuleset.MakeRerolledRuleset(template, true);
+                    ruleset = AppliedRuleset.MakeRerolledRuleset(template, true, template.TraceLog);
                     break;
                 case "all":
                     HandleCompileRuleset(session, "landblock");
