@@ -18,6 +18,7 @@ using ACE.Database.Models.World;
 using System.Threading.Tasks;
 using ACE.Server.Command.Handlers;
 using System.IO;
+using ACE.Entity.ACRealms;
 
 namespace ACE.Server.Managers
 {
@@ -123,20 +124,22 @@ namespace ACE.Server.Managers
             }
         }
 
-        internal static RulesetTemplate BuildRuleset(ACE.Entity.Models.Realm realm, bool trace)
+        internal static RulesetTemplate BuildRuleset(ACE.Entity.Models.Realm realm, RulesetCompilationContext ctx = null)
         {
+            ctx ??= Ruleset.MakeDefaultContext();
+
             if (realm.ParentRealmID == null)
-                return RulesetTemplate.MakeTopLevelRuleset(realm, trace);
+                return RulesetTemplate.MakeTopLevelRuleset(realm, ctx);
             
             var worldRealmParent = GetRealm(realm.ParentRealmID.Value);
 
             RulesetTemplate templateParent;
-            if (trace)
-                templateParent = BuildRuleset(worldRealmParent.Realm, trace);
+            if (ctx.Trace)
+                templateParent = BuildRuleset(worldRealmParent.Realm, ctx);
             else
                 templateParent = worldRealmParent.RulesetTemplate;
 
-            return RulesetTemplate.MakeRuleset(templateParent, realm, trace);
+            return RulesetTemplate.MakeRuleset(templateParent, realm, ctx);
         }
 
         internal static void ClearCache()
@@ -218,7 +221,7 @@ namespace ACE.Server.Managers
             foreach(var realmid in RealmIDsByTopologicalSort)
             {
                 var erealm = RealmConverter.ConvertToEntityRealm(realms[realmid], true);
-                var ruleset = BuildRuleset(erealm, false);
+                var ruleset = BuildRuleset(erealm);
                 var wrealm = new WorldRealm(erealm, ruleset);
                 RealmsByID[erealm.Id] = wrealm;
                 RealmsByName[erealm.Name] = wrealm;

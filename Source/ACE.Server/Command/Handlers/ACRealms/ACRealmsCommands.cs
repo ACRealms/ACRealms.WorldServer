@@ -1,5 +1,6 @@
 using ACE.Common;
 using ACE.Entity;
+using ACE.Entity.ACRealms;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity.Actions;
@@ -214,16 +215,35 @@ namespace ACE.Server.Command.Handlers
         }
 
         [CommandHandler("compile-ruleset", AccessLevel.Admin, CommandHandlerFlag.RequiresWorld, 1, "Gives a diagnostic trace of a ruleset compilation for the current landblock",
-            "{ full | landblock | ephemeral-new | ephemeral-cached | all } ")]
+            "(required) { full | landblock | ephemeral-new | ephemeral-cached | all }\n" +
+            "(optional) random seed")]
         public static void HandleCompileRuleset(ISession session, params string[] parameters)
         {
-            string type = parameters[0];
+            if (!PropertyManager.GetBool("acr_enable_ruleset_seeds").Item)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"The server property 'acr_enable_ruleset_seeds' must be enabled to use this command.", ChatMessageType.Broadcast));
+                return;
+            }
 
-            Ruleset ruleset = null;
+            string type = parameters[0];
+            int seed;
+            if (parameters.Length > 1)
+            {
+                if (!int.TryParse(parameters[1], out seed))
+                {
+                    session.Network.EnqueueSend(new GameMessageSystemChat($"Invalid random seed, must pass an integer", ChatMessageType.Broadcast));
+                    return;
+                }
+            }
+            else
+                seed = Random.Shared.Next();
+
+            Ruleset ruleset;
+            var ctx = Ruleset.MakeDefaultContext().WithTrace(deriveNewSeedEachPhase: false).WithNewSeed();
             switch (type)
             {
                 case "landblock":
-                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.RealmRuleset.Template, trace: true);
+                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.RealmRuleset.Template, ctx);
                     break;
                 case "ephemeral-new":
                     if (!session.Player.CurrentLandblock.IsEphemeral)
@@ -231,7 +251,7 @@ namespace ACE.Server.Command.Handlers
                         session.Network.EnqueueSend(new GameMessageSystemChat($"The current landblock is not ephemeral.", ChatMessageType.Broadcast));
                         return;
                     }
-                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace(), true);
+                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace(), ctx);
                     break;
                 case "ephemeral-cached":
                     if (!session.Player.CurrentLandblock.IsEphemeral)
@@ -239,15 +259,15 @@ namespace ACE.Server.Command.Handlers
                         session.Network.EnqueueSend(new GameMessageSystemChat($"The current landblock is not ephemeral.", ChatMessageType.Broadcast));
                         return;
                     }
-                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.RealmRuleset.Template, trace: true);
+                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.RealmRuleset.Template, ctx);
                     break;
                 case "full":
                     RulesetTemplate template;
                     if (!session.Player.CurrentLandblock.IsEphemeral)
-                        template = RealmManager.BuildRuleset(session.Player.RealmRuleset.Realm, trace: true);
+                        template = RealmManager.BuildRuleset(session.Player.RealmRuleset.Realm, ctx);
                     else
                         template = session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace();
-                    ruleset = AppliedRuleset.MakeRerolledRuleset(template, true, template.TraceLog);
+                    ruleset = AppliedRuleset.MakeRerolledRuleset(template, ctx);
                     break;
                 case "all":
                     HandleCompileRuleset(session, "landblock");
@@ -264,7 +284,7 @@ namespace ACE.Server.Command.Handlers
             }
 
             var filename = $"compile-ruleset-output-{session.Player.Name}-{type}.txt";
-            File.WriteAllLines(filename, ruleset.TraceLog);
+            ruleset.Context.FlushLogToFile(filename);
             session.Network.EnqueueSend(new GameMessageSystemChat($"Logged compilation output to {filename}", ChatMessageType.Broadcast));
         }
     }

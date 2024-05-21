@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using ACE.Entity.ACRealms;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 
@@ -82,15 +83,15 @@ namespace ACE.Entity.Models
         internal string GetLogTrace(string realmName) => $"<- ({Probability.ToString("P2")}) [{realmName}]";
     }
 
-    public abstract class AppliedRealmProperty(List<string> traceLog = null)
+    public abstract class AppliedRealmProperty(RulesetCompilationContext ctx)
     {
         public ushort PropertyKey { get; protected set; }
         public RealmPropertyOptions Options { get; init; }
         public abstract Type ValueType { get; }
-        public List<string> TraceLog { get; } = traceLog;
+        protected RulesetCompilationContext Context { get; } = ctx;
     }
 
-    public sealed class AppliedRealmProperty<TVal>(List<string> traceLog) : AppliedRealmProperty(traceLog)
+    public sealed class AppliedRealmProperty<TVal>(RulesetCompilationContext ctx) : AppliedRealmProperty(ctx)
         where TVal : IEquatable<TVal>
     {
         public new RealmPropertyOptions<TVal> Options { get => (RealmPropertyOptions<TVal>)base.Options; init => base.Options = value; }
@@ -111,14 +112,14 @@ namespace ACE.Entity.Models
 
         private void LogTrace(Func<string> message)
         {
-            if (TraceLog == null)
+            if (!Context.Trace)
                 return;
-            TraceLog.Add($"   [P][{Options.Name}] (Def:{Options.RulesetName}) {message()}");
+            Context.LogDirect($"   [P][{Options.Name}] (Def:{Options.RulesetName}) {message()}");
         }
 
         //Clone
-        public AppliedRealmProperty(AppliedRealmProperty<TVal> prop, AppliedRealmProperty<TVal> parent = null, List<string> traceLog = null)
-            : this(prop.PropertyKey, prop.Options, traceLog)
+        public AppliedRealmProperty(RulesetCompilationContext ctx, AppliedRealmProperty<TVal> prop, AppliedRealmProperty<TVal> parent = null)
+            : this(ctx, prop.PropertyKey, prop.Options)
         {
             LogTrace(() => $"Cloning from template. CompositionType: {Options.CompositionType}");
 
@@ -127,12 +128,12 @@ namespace ACE.Entity.Models
                 if (parent != null)
                 {
                     LogTrace(() => $"Setting parent (explicitly passed): {parent.Options.RulesetName}");
-                    Parent = new AppliedRealmProperty<TVal>(parent, null, traceLog);
+                    Parent = new AppliedRealmProperty<TVal>(ctx, parent, null);
                 }
                 else if (prop.Parent != null)
                 {
                     LogTrace(() => $"Setting parent (from template parent): {prop.Parent.Options.RulesetName}");
-                    Parent = new AppliedRealmProperty<TVal>(prop.Parent, null, traceLog);
+                    Parent = new AppliedRealmProperty<TVal>(ctx, prop.Parent, null);
                 }
             }
             else
@@ -150,8 +151,8 @@ namespace ACE.Entity.Models
         /// <param name="propertyKey"></param>
         /// <param name="options"></param>
         /// <param name="traceLog"></param>
-        public AppliedRealmProperty(ushort propertyKey, RealmPropertyOptions<TVal> options, List<string> traceLog)
-            : this(traceLog)
+        public AppliedRealmProperty(RulesetCompilationContext ctx, ushort propertyKey, RealmPropertyOptions<TVal> options)
+            : this(ctx)
         {
             PropertyKey = propertyKey;
             Options = options;
@@ -184,7 +185,7 @@ namespace ACE.Entity.Models
                 composedFromValue = Options.HardDefaultValue;
             }
 
-            var val = Options.Compose(composedFromValue, Options.RollValue(TraceLog), TraceLog);
+            var val = Options.Compose(composedFromValue, Options.RollValue(Context), Context);
             LogTrace(() => $"Rolled value {val}");
             Value = val;
             if (!rolledOnce)
@@ -226,11 +227,11 @@ namespace ACE.Entity.Models
             TemplateDisplayString = new Lazy<string>(TemplateInfo, System.Threading.LazyThreadSafetyMode.PublicationOnly);
         }
 
-        protected void Log(List<string> traceLog, Func<string> message)
+        protected void Log(RulesetCompilationContext ctx, Func<string> message)
         {
-            if (traceLog == null)
+            if (!ctx.Trace)
                 return;
-            traceLog.Add($"   [T][{Name}] (Def: {RulesetName}) {message()}");
+            ctx.LogDirect($"   [T][{Name}] (Def: {RulesetName}) {message()}");
         }
 
         public sealed override string ToString() => TemplateDisplayString.Value;
@@ -252,15 +253,15 @@ namespace ACE.Entity.Models
             HardDefaultValue = hardDefaultValue;
         }
 
-        public virtual T RollValue(List<string> traceLog)
+        public virtual T RollValue(RulesetCompilationContext ctx)
         {
-            Log(traceLog, () => $"Value: {DefaultValue}");
+            Log(ctx, () => $"Value: {DefaultValue}");
             return DefaultValue;
         }
 
-        public virtual T Compose(T parentValue, T rolledValue, List<string> traceLog)
+        public virtual T Compose(T parentValue, T rolledValue, RulesetCompilationContext ctx)
         {
-            Log(traceLog, () => $"Compose: Replacing parent {parentValue} with {rolledValue}");
+            Log(ctx, () => $"Compose: Replacing parent {parentValue} with {rolledValue}");
             return DefaultValue;
         }
 
@@ -304,21 +305,21 @@ namespace ACE.Entity.Models
                 MaxValue = MinValue;
         }
 
-        public override T RollValue(List<string> traceLog)
+        public override T RollValue(RulesetCompilationContext ctx)
         {
             if (RandomType == RealmPropertyRerollType.never)
             {
-                Log(traceLog, () => $"No randomization, returning DefaultValue {DefaultValue}");
+                Log(ctx, () => $"No randomization, returning DefaultValue {DefaultValue}");
                 return DefaultValue;
             }
 
-            Log(traceLog, () => $"Rolling between {MinValue} and {MaxValue}");
+            Log(ctx, () => $"Rolling between {MinValue} and {MaxValue}");
             return Operators.RollValue(MinValue, MaxValue);
         }
 
-        public override T Compose(T parentValue, T rolledValue, List<string> traceLog)
+        public override T Compose(T parentValue, T rolledValue, RulesetCompilationContext ctx)
         {
-            Log(traceLog, () => $"Compose {CompositionType}({parentValue}, {rolledValue})");
+            Log(ctx, () => $"Compose {CompositionType}({parentValue}, {rolledValue})");
             switch (CompositionType)
             {
                 case RealmPropertyCompositionType.replace:

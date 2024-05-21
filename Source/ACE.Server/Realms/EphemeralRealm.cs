@@ -52,7 +52,7 @@ namespace ACE.Server.Realms
                 }
                 if (template == null)
                 {
-                    template = RulesetTemplate.MakeRuleset(prevTemplate, appliedRealm, full_trace);
+                    template = RulesetTemplate.MakeRuleset(prevTemplate, appliedRealm, prevTemplate.Context);
                     if (useCache)
                         RealmManager.CacheEphemeralRealmTemplate(key, template);
                 }

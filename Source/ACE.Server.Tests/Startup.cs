@@ -73,7 +73,8 @@ namespace ACRealms.Tests
             DatabaseManager.Start();
             DatManager.Initialize(ConfigManager.Config.Server.DatFilesDirectory, true);
             ACE.Server.Physics.Common.LandDefs.LandHeightTable = DatManager.PortalDat.RegionDesc.LandDefs.LandHeightTable;
-            PropertyManager.Initialize();
+            
+            InitializePropertyManager();
             GuidManager.Initialize();
             PlayerManager.Initialize();
             HouseManager.Initialize();
@@ -81,6 +82,12 @@ namespace ACRealms.Tests
             NetworkManager.Initialize(new FakeNetworkManager());
             WorldManager.Initialize();
             RealmFixtures.LoadRealmFixture(RealmFixtures.FixtureName.simple);
+        }
+
+        private void InitializePropertyManager()
+        {
+            PropertyManager.Initialize();
+            PropertyManager.ModifyBool("acr_enable_ruleset_seeds", true);
         }
 
         public bool IsDisposed { get; private set; }

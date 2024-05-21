@@ -1,4 +1,5 @@
 using ACE.Database.Adapter;
+using ACE.Entity.ACRealms;
 using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
 using System;
@@ -23,7 +24,7 @@ namespace ACE.Database.Models.World
                 prop = new RealmPropertyOptions<int>(@enum.ToString(), Realm.Name, Value.Value, att.DefaultValue, Locked, Probability);
             else
                 prop = new MinMaxRangedRealmPropertyOptions<int>(@enum.ToString(), Realm.Name, att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability);
-            return new AppliedRealmProperty<int>(Type, prop, null);
+            return new AppliedRealmProperty<int>(RulesetCompilationContext.DefaultShared, Type, prop);
         }
     }
 }

@@ -1,4 +1,5 @@
 using ACE.Database.Adapter;
+using ACE.Entity.ACRealms;
 using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
 using System;
@@ -16,7 +17,7 @@ namespace ACE.Database.Models.World
             
             var att = RealmConverter.PropertyDefinitionsBool[@enum];
             var prop = new RealmPropertyOptions<bool>(@enum.ToString(), Realm.Name, Value, att.DefaultValue, Locked, Probability);
-            return new AppliedRealmProperty<bool>(Type, prop, null);
+            return new AppliedRealmProperty<bool>(RulesetCompilationContext.DefaultShared, Type, prop);
         }
     }
 }
