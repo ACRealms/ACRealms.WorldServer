@@ -37,6 +37,10 @@ This project has been used in three servers that I am aware of.
 ## Content Structure (differences from ACE)
 
 #### Realms.jsonc
+UPDATE May 2024: This file is now auto generated and doesn't need to be edited manually.  
+
+Previously:
+
 realms.jsonc contains a list of realm and ruleset names mapped to realm ids. These ids can be changed to anything between 1 and 0x7FFE (32766), and may not be changed to new values after the first run of the server.  
 New realms can still be added to the list as long as they are not changed after the next time the server is started.
 The realm name must match the name specified in the realm file (not the filename).
