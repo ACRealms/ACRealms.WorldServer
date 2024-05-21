@@ -62,7 +62,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
                 Character = new CharacterFactory { CharacterName = "TestRulesetCompileCommand" }
             }.Create();
 
-            ACRealmsCommands.HandleCompileRuleset(player.Session, "all");
+            ACRealmsCommands.HandleCompileRuleset(player.Session, "all", "19191919");
             var prefix = "Logged compilation output to ";
             
             foreach (var i in Enumerable.Range(0, 1))
@@ -86,7 +86,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
                 Character = new CharacterFactory { CharacterName = "TestRulesetCompileCommand Coverage" }
             }.Create();
 
-            ACRealmsCommands.HandleCompileRuleset(player.Session, "all");
+            ACRealmsCommands.HandleCompileRuleset(player.Session, "all", "19191919");
             var prefix = "Logged compilation output to ";
 
             foreach (var i in Enumerable.Range(0, 2))
@@ -97,6 +97,24 @@ namespace ACRealms.Tests.Server.Realms.Compilation
                 File.Copy(filename, $"TestRulesetCompileCommand-Coverage-output-{i}.txt", true);
                 File.Delete(filename);
             }
+        }
+
+        [Fact]
+        public void TestRulesetCompile_DeterministicRandomization()
+        {
+            LoadRealmFixture(FixtureName.coverage);
+
+            var player = new OnlinePlayerFactory()
+            {
+                HomeRealm = "Compose Realm 1",
+                Character = new CharacterFactory { CharacterName = "TestRulesetCompile Deterministic" }
+            }.Create();
+            var seed = System.Random.Shared.Next();
+
+            var result = ACRealmsCommands.CompileRulesetRaw(player.Session, seed, "full");
+            var result2 = ACRealmsCommands.CompileRulesetRaw(player.Session, seed, "full");
+            Assert.NotEmpty(result);
+            Assert.Equal(result, result2);
         }
     }
 }

@@ -13,35 +13,10 @@ using Lifestoned.DataModel.Content;
 
 namespace ACE.Server.Realms
 {
-    public static class RandomHelpers
-    {
-        static Random rnd = new Random();
-        public static Dictionary<int, T> ToIndexedDictionary<T>(this IEnumerable<T> lst)
-        {
-            return lst.ToIndexedDictionary(t => t);
-        }
-
-        public static Dictionary<int, T> ToIndexedDictionary<S, T>(this IEnumerable<S> lst, Func<S, T> valueSelector)
-        {
-            int index = -1;
-            return lst.ToDictionary(t => ++index, valueSelector);
-        }
-
-        public static int GetRandomIndex<T>(this ICollection<T> source)
-        {
-            return rnd.Next(source.Count);
-        }
-
-        public static T GetRandom<T>(this IList<T> source)
-        {
-            return source[source.GetRandomIndex()];
-        }
-    }
-
     public abstract class Ruleset(ushort rulesetID, RulesetCompilationContext ctx)
     {
         protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        protected static Random random = new Random();
+        protected Random Random => Context.Randomizer;
         public Ruleset ParentRuleset { get; protected set; }
         public ushort RulesetID { get; } = rulesetID;
         public RulesetCompilationContext Context { get; init; } = ctx;
@@ -136,13 +111,13 @@ namespace ACE.Server.Realms
         }
 
 
-        private static AppliedRealmProperty GetRandomProperty(RulesetTemplate template)
+        private static AppliedRealmProperty GetRandomProperty(RulesetTemplate template, RulesetCompilationContext ctx)
         {
             if (template.PropertiesForRandomization?.Count == 0)
                 return null;
-            var selectedProp = template.PropertiesForRandomization[random.Next(template.PropertiesForRandomization.Count - 1)];
+            var selectedProp = template.PropertiesForRandomization[ctx.Randomizer.Next(template.PropertiesForRandomization.Count - 1)];
 
-            return template.PropertiesForRandomization[random.Next(template.PropertiesForRandomization.Count - 1)];
+            return selectedProp;
         }
 
         private void DictAdd<TKey, TVal>(IDictionary<TKey, AppliedRealmProperty<TVal>> dict, TKey key, AppliedRealmProperty<TVal> prop)
@@ -204,7 +179,7 @@ namespace ACE.Server.Realms
                     set.Add(desc);
                 while (set.Count < amount)
                 {
-                    var selectedProp = GetRandomProperty(template);
+                    var selectedProp = GetRandomProperty(template, Context);
                     LogTrace(Context, () => $"Cherry-picking {selectedProp.Options.Name} from randomization list");
                     set.Add(selectedProp);
                 }
@@ -224,7 +199,7 @@ namespace ACE.Server.Realms
                 var set = new HashSet<AppliedRealmProperty>(all);
                 while (set.Count > amount)
                 {
-                    var next = GetRandomProperty(template);
+                    var next = GetRandomProperty(template, Context);
                     if (next is AppliedRealmProperty<string> s && s.PropertyKey == (ushort)RealmPropertyString.Description)
                         continue;
                     LogTrace(Context, () => $"Subtracting {next.Options.Name} from randomization selection");
@@ -455,7 +430,7 @@ namespace ACE.Server.Realms
             }
             foreach (var link in job.Links)
             {
-                var roll = random.NextDouble();
+                var roll = Random.NextDouble();
                 if (roll < link.Probability)
                 {
                     LogTrace(() => $"Rolled {roll}, is < {link.Probability}, applying ruleset, skipping further rolls for this job");

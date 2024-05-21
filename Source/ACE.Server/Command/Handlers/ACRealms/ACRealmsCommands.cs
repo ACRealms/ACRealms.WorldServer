@@ -238,8 +238,33 @@ namespace ACE.Server.Command.Handlers
             else
                 seed = Random.Shared.Next();
 
+            string result;
+            switch (type)
+            {
+                case "all":
+                    HandleCompileRuleset(session, "landblock", seed.ToString());
+                    if (session.Player.CurrentLandblock.IsEphemeral)
+                    {
+                        HandleCompileRuleset(session, "ephemeral-cached", seed.ToString());
+                        HandleCompileRuleset(session, "ephemeral-new", seed.ToString());
+                    }
+                    HandleCompileRuleset(session, "full", seed.ToString());
+                    return;
+                default:
+                    result = CompileRulesetRaw(session, seed, type);
+                    break;
+            }
+
+            var filename = $"compile-ruleset-output-{session.Player.Name}-{type}.txt";
+            File.WriteAllText(filename, result);
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Logged compilation output to {filename}", ChatMessageType.Broadcast));
+        }
+
+        public class InvalidCommandException() : Exception { }
+        public static string CompileRulesetRaw(ISession session, int seed, string type)
+        {
             Ruleset ruleset;
-            var ctx = Ruleset.MakeDefaultContext().WithTrace(deriveNewSeedEachPhase: false).WithNewSeed();
+            var ctx = Ruleset.MakeDefaultContext().WithTrace(deriveNewSeedEachPhase: false).WithNewSeed(seed);
             switch (type)
             {
                 case "landblock":
@@ -249,7 +274,7 @@ namespace ACE.Server.Command.Handlers
                     if (!session.Player.CurrentLandblock.IsEphemeral)
                     {
                         session.Network.EnqueueSend(new GameMessageSystemChat($"The current landblock is not ephemeral.", ChatMessageType.Broadcast));
-                        return;
+                        throw new InvalidCommandException();
                     }
                     ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace(), ctx);
                     break;
@@ -257,7 +282,7 @@ namespace ACE.Server.Command.Handlers
                     if (!session.Player.CurrentLandblock.IsEphemeral)
                     {
                         session.Network.EnqueueSend(new GameMessageSystemChat($"The current landblock is not ephemeral.", ChatMessageType.Broadcast));
-                        return;
+                        throw new InvalidCommandException();
                     }
                     ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.RealmRuleset.Template, ctx);
                     break;
@@ -269,23 +294,11 @@ namespace ACE.Server.Command.Handlers
                         template = session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace();
                     ruleset = AppliedRuleset.MakeRerolledRuleset(template, ctx);
                     break;
-                case "all":
-                    HandleCompileRuleset(session, "landblock");
-                    if (session.Player.CurrentLandblock.IsEphemeral)
-                    {
-                        HandleCompileRuleset(session, "ephemeral-cached");
-                        HandleCompileRuleset(session, "ephemeral-new");
-                    }
-                    HandleCompileRuleset(session, "full");
-                    return;
                 default:
                     session.Network.EnqueueSend(new GameMessageSystemChat($"Unknown compilation type.", ChatMessageType.Broadcast));
-                    return;
+                    throw new InvalidCommandException();
             }
-
-            var filename = $"compile-ruleset-output-{session.Player.Name}-{type}.txt";
-            ruleset.Context.FlushLogToFile(filename);
-            session.Network.EnqueueSend(new GameMessageSystemChat($"Logged compilation output to {filename}", ChatMessageType.Broadcast));
+            return ruleset.Context.FlushLog();
         }
     }
 }

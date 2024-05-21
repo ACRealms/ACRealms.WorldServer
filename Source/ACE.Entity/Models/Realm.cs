@@ -7,6 +7,7 @@ using System.Text;
 using ACE.Entity.ACRealms;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using static ACE.Entity.ACRealms.RulesetCompilationContext;
 
 namespace ACE.Entity.Models
 {
@@ -272,7 +273,7 @@ namespace ACE.Entity.Models
     public record MinMaxRangedRealmPropertyOptions<T> : RealmPropertyOptions<T>
         where T : IMinMaxValue<T>, IEquatable<T>, IComparable<T>
     {
-        IPropertyOperatorsMinMax<T> Operators { get; init; }
+        private Func<RulesetCompilationContext, RulesetCompilationContext.IPropertyOperatorsMinMax<T>> Operator { get; init; }
         public T MinValue { get; init; }
         public T MaxValue { get; init; }
         public override RealmPropertyRerollType RandomType { get; protected init; }
@@ -290,11 +291,11 @@ namespace ACE.Entity.Models
         {
             RandomType = (RealmPropertyRerollType)randomType;
             if (typeof(T) == typeof(double))
-                Operators = (IPropertyOperatorsMinMax<T>)PropertyOperatorsDouble.Instance;
+                Operator = new Func<RulesetCompilationContext, IPropertyOperatorsMinMax<T>>((ctx) => (IPropertyOperatorsMinMax<T>)ctx.Operators.Float);
             else if (typeof(T) == typeof(long))
-                Operators = (IPropertyOperatorsMinMax<T>)PropertyOperatorsInt64.Instance;
+                Operator = new Func<RulesetCompilationContext, IPropertyOperatorsMinMax<T>>((ctx) => (IPropertyOperatorsMinMax<T>)ctx.Operators.Int64);
             else if (typeof(T) == typeof(int))
-                Operators = (IPropertyOperatorsMinMax<T>)PropertyOperatorsInt.Instance;
+                Operator = new Func<RulesetCompilationContext, IPropertyOperatorsMinMax<T>>((ctx) => (IPropertyOperatorsMinMax<T>)ctx.Operators.Int);
             else
                 throw new NotImplementedException();
 
@@ -314,7 +315,7 @@ namespace ACE.Entity.Models
             }
 
             Log(ctx, () => $"Rolling between {MinValue} and {MaxValue}");
-            return Operators.RollValue(MinValue, MaxValue);
+            return Operator(ctx).RollValue(MinValue, MaxValue);
         }
 
         public override T Compose(T parentValue, T rolledValue, RulesetCompilationContext ctx)
@@ -325,9 +326,9 @@ namespace ACE.Entity.Models
                 case RealmPropertyCompositionType.replace:
                     return rolledValue;
                 case RealmPropertyCompositionType.add:
-                    return Operators.AddValue(parentValue, rolledValue);
+                    return Operator(ctx).AddValue(parentValue, rolledValue);
                 case RealmPropertyCompositionType.multiply:
-                    return Operators.MultiplyValue(parentValue, rolledValue);
+                    return Operator(ctx).MultiplyValue(parentValue, rolledValue);
                 default:
                     throw new NotImplementedException();
             }
@@ -349,50 +350,5 @@ namespace ACE.Entity.Models
         }
 
         protected override string TemplateInfo() => $"Min: {MinValue}, Max: {MaxValue}, Locked: {Locked}, Probability: {Probability}";
-    }
-
-    public interface IPropertyOperators { }
-    public interface IPropertyOperators<T> : IPropertyOperators { }
-
-    public interface IPropertyOperatorsRollable<T> : IPropertyOperators<T>
-        where T : IEquatable<T>
-    {
-        public abstract T RollValue(T min, T max);
-    }
-
-    public interface IPropertyOperatorsMinMax<T> : IPropertyOperatorsRollable<T>
-        where T : IMinMaxValue<T>, IEquatable<T>, IComparable<T>
-    {
-        public abstract T AddValue(T val1, T val2);
-        public abstract T MultiplyValue(T val1, T val2);
-    }
-
-    public abstract class PropertyOperatorsBase : IPropertyOperators
-    {
-        protected static Random Randomizer { get; } = new Random();
-    }
-
-    public class PropertyOperatorsDouble : PropertyOperatorsBase, IPropertyOperatorsMinMax<double>
-    {
-        public static PropertyOperatorsDouble Instance { get; } = new PropertyOperatorsDouble();
-        public double RollValue(double min, double max) => Randomizer.NextDouble() * (max - min) + min;
-        public double AddValue(double val1, double val2) => val1 + val2;
-        public double MultiplyValue(double val1, double val2) => val1 * val2;
-    }
-
-    public class PropertyOperatorsInt : PropertyOperatorsBase, IPropertyOperatorsMinMax<int>
-    {
-        public static PropertyOperatorsInt Instance { get; } = new PropertyOperatorsInt();
-        public int RollValue(int min, int max) => Randomizer.Next(min, max);
-        public int AddValue(int val1, int val2) => val1 + val2;
-        public int MultiplyValue(int val1, int val2) => val1 * val2;
-    }
-
-    public class PropertyOperatorsInt64 : PropertyOperatorsBase, IPropertyOperatorsMinMax<long>
-    {
-        public static PropertyOperatorsInt64 Instance { get; } = new PropertyOperatorsInt64();
-        public long RollValue(long min, long max) => Randomizer.NextInt64(min, max);
-        public long AddValue(long val1, long val2) => val1 + val2;
-        public long MultiplyValue(long val1, long val2) => val1 * val2;
     }
 }
