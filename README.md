@@ -1,8 +1,15 @@
-# ACRealms V2
+# ACRealms V2.1
 
 This is a fork of https://github.com/ACEmulator/ACE/. The repo was not originally set up a fork and therefore could not be turned into one, but there is a mirror repo here for visibility https://github.com/ACRealms/ACRealmsForkMirror.
 
 It is recommended to fork from the mirror repo instead of this one. The mirror repo may eventually become the main one. 
+
+# Looking to get started?
+
+Before you do anything, note that the master branch in this project is a development branch and is not considered to be stable. Please use the latest even-numbered versioned branch for the most stability.
+
+Currently, that branch is `v2.0`  
+
 
 # Mission Statement
 
