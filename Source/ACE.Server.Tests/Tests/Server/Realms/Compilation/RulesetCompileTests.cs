@@ -6,6 +6,7 @@ using ACE.Server.Network.GameMessages.Messages;
 using ACRealms.Tests.Factories;
 using ACRealms.Tests.Fixtures.Network;
 using ACRealms.Tests.Helpers;
+using System;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -111,10 +112,18 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             }.Create();
             var seed = System.Random.Shared.Next();
 
-            var result = ACRealmsCommands.CompileRulesetRaw(player.Session, seed, "full");
-            var result2 = ACRealmsCommands.CompileRulesetRaw(player.Session, seed, "full");
+            DateTime timeContext = DateTime.Parse("2020-09-22T03:55:40Z").ToUniversalTime();
+            var result = ACRealmsCommands.CompileRulesetRaw(player.Session, seed, "full", timeContext: timeContext);
+            var result2 = ACRealmsCommands.CompileRulesetRaw(player.Session, seed, "full", timeContext: timeContext);
+
             Assert.NotEmpty(result);
             Assert.Equal(result, result2);
+
+            int seed2;
+            do { seed2 = System.Random.Shared.Next(); } while (seed2 == seed);
+            result2 = ACRealmsCommands.CompileRulesetRaw(player.Session, seed2, "full", timeContext: timeContext);
+
+            Assert.NotEqual(result, result2);
         }
     }
 }

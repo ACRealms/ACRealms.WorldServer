@@ -17,7 +17,7 @@ namespace ACE.Entity.ACRealms
         private static bool DefaultSharedWasResetOnce = false;
         public static RulesetCompilationContext DefaultShared { get; private set; } = new();
 
-        
+        private DateTime? TimeContext { get; init; }
         public Random Randomizer { get; private init; } = Random.Shared; //RandomSeed.HasValue ? new Random(RandomSeed.Value) : Random.Shared;
         public PropertyOperators Operators { get; private init; } = new PropertyOperators(Random.Shared);
         public bool Trace { get; private init; } = false;
@@ -25,8 +25,9 @@ namespace ACE.Entity.ACRealms
         public int? RandomSeed { get; private init; } = null;
         public string GitHash { get; init; } = null;
         private IList<string> LogOutput { get; init; } = null;
-        
 
+
+        public RulesetCompilationContext WithTimeContext(DateTime time) => this with { TimeContext = time };
         public RulesetCompilationContext WithDerivedNewSeed() => (DeriveNewSeedEachPhase && RandomSeed.HasValue) ? WithDerivedNewSeed(Randomizer.Next()) : this;
         public RulesetCompilationContext WithNewSeed(int seed) => WithDerivedNewSeed(seed);
         private RulesetCompilationContext WithDerivedNewSeed(int seed) => (this with { RandomSeed = seed, Randomizer = new Random(seed) }).AfterSeedUpdated();
@@ -89,7 +90,7 @@ namespace ACE.Entity.ACRealms
         {
             StringBuilder sb = new StringBuilder();
             sb.Append($@"ACRealms Ruleset Compilation Log
-Generated at: {DateTime.UtcNow} UTC
+Generated at: {TimeContext ?? DateTime.UtcNow} UTC
 {(GitHash != null ? $"Commit Hash: {GitHash}" : "Commit hash unavailable")}
 
 Context Configuration:

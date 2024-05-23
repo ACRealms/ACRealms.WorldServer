@@ -261,10 +261,13 @@ namespace ACE.Server.Command.Handlers
         }
 
         public class InvalidCommandException() : Exception { }
-        public static string CompileRulesetRaw(ISession session, int seed, string type)
+        public static string CompileRulesetRaw(ISession session, int seed, string type, DateTime? timeContext = null)
         {
             Ruleset ruleset;
             var ctx = Ruleset.MakeDefaultContext().WithTrace(deriveNewSeedEachPhase: false).WithNewSeed(seed);
+            if (timeContext.HasValue)
+                ctx = ctx.WithTimeContext(timeContext.Value);
+
             switch (type)
             {
                 case "landblock":
