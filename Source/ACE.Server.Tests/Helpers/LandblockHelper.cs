@@ -16,19 +16,16 @@ namespace ACRealms.Tests.Helpers
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static ACE.Server.Entity.Landblock LoadLandblock(ACE.Server.Realms.WorldRealm realm, ushort landblockId)
         {
-            lock (LandblockManager.landblockMutex)
+            var lbid = new ACE.Entity.LandblockId(landblockId);
+            uint iid;
+            do
             {
-                var lbid = new ACE.Entity.LandblockId(landblockId);
-                uint iid;
-                do
-                {
-                    ushort shortiid = (ushort)ACE.Common.ThreadSafeRandom.Next(1, ushort.MaxValue);
-                    iid = ACE.Entity.Position.InstanceIDFromVars(realm.Realm.Id, shortiid, isTemporaryRuleset: false);
-                }
-                while (LandblockManager.IsLoaded(lbid, iid));
-
-                return LandblockManager.GetLandblock(new ACE.Entity.LandblockId(landblockId), iid, null, false, wait: true);
+                ushort shortiid = (ushort)ACE.Common.ThreadSafeRandom.Next(1, ushort.MaxValue);
+                iid = ACE.Entity.Position.InstanceIDFromVars(realm.Realm.Id, shortiid, isTemporaryRuleset: false);
             }
+            while (LandblockManager.IsLoaded(lbid, iid));
+
+            return LandblockManager.GetLandblock(new ACE.Entity.LandblockId(landblockId), iid, null, false, wait: true);
         }
     }
 }
