@@ -18,7 +18,8 @@ namespace ACRealms.Tests.Helpers
         public enum FixtureName
         {
             simple,
-            coverage
+            coverage,
+            simple_random
         }
 
         public class RealmFixtureNotFoundException : Exception

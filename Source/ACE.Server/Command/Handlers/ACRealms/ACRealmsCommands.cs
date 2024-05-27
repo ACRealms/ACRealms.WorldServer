@@ -279,7 +279,7 @@ namespace ACE.Server.Command.Handlers
                         session.Network.EnqueueSend(new GameMessageSystemChat($"The current landblock is not ephemeral.", ChatMessageType.Broadcast));
                         throw new InvalidCommandException();
                     }
-                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace(), ctx);
+                    ruleset = AppliedRuleset.MakeRerolledRuleset(session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithContext(ctx), ctx);
                     break;
                 case "ephemeral-cached":
                     if (!session.Player.CurrentLandblock.IsEphemeral)
@@ -294,7 +294,7 @@ namespace ACE.Server.Command.Handlers
                     if (!session.Player.CurrentLandblock.IsEphemeral)
                         template = RealmManager.BuildRuleset(session.Player.RealmRuleset.Realm, ctx);
                     else
-                        template = session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithTrace();
+                        template = session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithContext(ctx);
                     ruleset = AppliedRuleset.MakeRerolledRuleset(template, ctx);
                     break;
                 default:
@@ -302,6 +302,18 @@ namespace ACE.Server.Command.Handlers
                     throw new InvalidCommandException();
             }
             return ruleset.Context.FlushLog();
+        }
+
+        [CommandHandler("ruleset-seed", AccessLevel.Envoy, CommandHandlerFlag.RequiresWorld, 0, "Shows the randomization seed for the current landblock's ruleset")]
+        public static void HandleRulesetSeed(ISession session, params string[] parameters)
+        {
+            if (!PropertyManager.GetBool("acr_enable_ruleset_seeds").Item)
+            {
+                session.Network.EnqueueSend(new GameMessageSystemChat($"The server property 'acr_enable_ruleset_seeds' must be enabled to use this command.", ChatMessageType.Broadcast));
+                return;
+            }
+
+            session.Network.EnqueueSend(new GameMessageSystemChat($"Ruleset seed: {session.Player.RealmRuleset.Context.RandomSeed}", ChatMessageType.Broadcast));
         }
     }
 }

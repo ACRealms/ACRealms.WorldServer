@@ -4,6 +4,7 @@ using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ACE.Database.Models.World
 {
@@ -11,12 +12,14 @@ namespace ACE.Database.Models.World
     {
         public bool Value { get; set; }
 
+        static Type EnumType = typeof(RealmPropertyBool);
+
         public override AppliedRealmProperty<bool> ConvertRealmProperty()
         {
             var @enum = (RealmPropertyBool)Type;
             
             var att = RealmConverter.PropertyDefinitionsBool[@enum];
-            var prop = new RealmPropertyOptions<bool>(@enum.ToString(), Realm.Name, Value, att.DefaultValue, Locked, Probability);
+            var prop = new RealmPropertyOptions<bool>(@enum.ToString(), Realm.Name, Value, att.DefaultValue, Locked, Probability, EnumType, Type);
             return new AppliedRealmProperty<bool>(RulesetCompilationContext.DefaultShared, Type, prop);
         }
     }

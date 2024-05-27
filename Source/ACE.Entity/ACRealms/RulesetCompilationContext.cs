@@ -28,12 +28,11 @@ namespace ACE.Entity.ACRealms
 
 
         public RulesetCompilationContext WithTimeContext(DateTime time) => this with { TimeContext = time };
-        public RulesetCompilationContext WithDerivedNewSeed() => (DeriveNewSeedEachPhase && RandomSeed.HasValue) ? WithDerivedNewSeed(Randomizer.Next()) : this;
-        public RulesetCompilationContext WithNewSeed(int seed) => WithDerivedNewSeed(seed);
-        private RulesetCompilationContext WithDerivedNewSeed(int seed) => (this with { RandomSeed = seed, Randomizer = new Random(seed) }).AfterSeedUpdated();
+        public RulesetCompilationContext WithDerivedNewSeed() => (DeriveNewSeedEachPhase && RandomSeed.HasValue) ? WithNewSeed(Randomizer.Next()) : this;
+        public RulesetCompilationContext WithNewSeed(int seed) => (this with { RandomSeed = seed, Randomizer = new Random(seed) }).AfterSeedUpdated();
         private RulesetCompilationContext AfterSeedUpdated() => this with { Operators = new PropertyOperators(Randomizer) };
-        public RulesetCompilationContext WithTrace(bool deriveNewSeedEachPhase, bool alwaysReset = false) =>
-            (Trace || alwaysReset)
+        public RulesetCompilationContext WithTrace(bool deriveNewSeedEachPhase, bool withNewTraceLog = false) =>
+            (Trace && !withNewTraceLog)
             ? this
             : this with {
                 Trace = true,
@@ -56,12 +55,10 @@ namespace ACE.Entity.ACRealms
         ) 
         {
             if (enableSeedTracking || randomSeed.HasValue)
-                return new()
-                {
-                    RandomSeed = randomSeed.HasValue ? randomSeed : GetNewRootSeed(),
-                    DeriveNewSeedEachPhase = true,
-                    GitHash = gitHash
-                };
+            {
+                var ctx = new RulesetCompilationContext { GitHash = gitHash, DeriveNewSeedEachPhase = true };
+                return ctx.WithNewSeed(randomSeed ?? GetNewRootSeed());
+            }
             else return DefaultShared;
         }
 
@@ -102,9 +99,12 @@ Context Configuration:
             foreach (var line in LogOutput)
                 sb.AppendLine(line);
             var s = sb.ToString();
-            LogOutput.Clear();
+            ClearLog();
             return s;
         }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void ClearLog() => LogOutput.Clear();
 
 
         public interface IPropertyOperators { }

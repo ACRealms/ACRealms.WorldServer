@@ -15,15 +15,16 @@ namespace ACE.Database.Models.World
         public byte RandomType { get; set; }
         public byte CompositionType { get; set; }
 
+        static Type EnumType = typeof(RealmPropertyInt);
         public override AppliedRealmProperty<int> ConvertRealmProperty()
         {
             var @enum = (RealmPropertyInt)Type;
             var att = RealmConverter.PropertyDefinitionsInt[@enum];
             RealmPropertyOptions<int> prop;
             if (Value.HasValue)
-                prop = new RealmPropertyOptions<int>(@enum.ToString(), Realm.Name, Value.Value, att.DefaultValue, Locked, Probability);
+                prop = new RealmPropertyOptions<int>(@enum.ToString(), Realm.Name, Value.Value, att.DefaultValue, Locked, Probability, EnumType, Type);
             else
-                prop = new MinMaxRangedRealmPropertyOptions<int>(@enum.ToString(), Realm.Name, att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability);
+                prop = new MinMaxRangedRealmPropertyOptions<int>(@enum.ToString(), Realm.Name, att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability, EnumType, Type);
             return new AppliedRealmProperty<int>(RulesetCompilationContext.DefaultShared, Type, prop);
         }
     }

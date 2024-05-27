@@ -88,7 +88,7 @@ namespace ACE.Entity.Models
     {
         public ushort PropertyKey { get; protected set; }
         public RealmPropertyOptions Options { get; init; }
-        public abstract Type ValueType { get; }
+        public Type ValueType => Options.ValueType;
         protected RulesetCompilationContext Context { get; } = ctx;
     }
 
@@ -203,8 +203,6 @@ namespace ACE.Entity.Models
 
             return Options.AppliedInfo(val);
         }
-
-        public override Type ValueType => typeof(TVal);
     }
 
     /// <summary>
@@ -213,18 +211,23 @@ namespace ACE.Entity.Models
     /// </summary>
     public abstract record RealmPropertyOptions
     {
-        public string RulesetName { get; init; }
+        public Type ValueType { get; init; }
+        public Type EnumType { get; init; }
+        public ushort EnumValueRaw { get; init; }
         public string Name { get; init; }
+        public string RulesetName { get; init; }
         public bool Locked { get; init; }
         public double Probability { get; init; }
         public virtual RealmPropertyRerollType RandomType { get => RealmPropertyRerollType.never; protected init { } }
         public virtual RealmPropertyCompositionType CompositionType { get => RealmPropertyCompositionType.replace; protected init { } }
-
         private Lazy<string> TemplateDisplayString { get; init; } 
-        protected RealmPropertyOptions(string name, string rulesetName)
+        protected RealmPropertyOptions(string name, string rulesetName, Type type, Type enumType, ushort enumValue)
         {
+            ValueType = type;
+            EnumType = enumType;
             Name = name;
             RulesetName = rulesetName;
+            EnumValueRaw = enumValue;
             TemplateDisplayString = new Lazy<string>(TemplateInfo, System.Threading.LazyThreadSafetyMode.PublicationOnly);
         }
 
@@ -246,7 +249,7 @@ namespace ACE.Entity.Models
         public T HardDefaultValue { get; init; }
         public T DefaultValue { get; init; }
 
-        public RealmPropertyOptions(string name, string rulesetName, T hardDefaultValue, T defaultValue, bool locked, double? probability) : base(name, rulesetName)
+        internal RealmPropertyOptions(string name, string rulesetName, T hardDefaultValue, T defaultValue, bool locked, double? probability, Type enumType, ushort enumValue) : base(name, rulesetName, typeof(T), enumType, enumValue)
         {
             Locked = locked;
             Probability = probability ?? 1.0;
@@ -279,15 +282,17 @@ namespace ACE.Entity.Models
         public override RealmPropertyRerollType RandomType { get; protected init; }
         public override RealmPropertyCompositionType CompositionType { get; protected init; }
 
-        public MinMaxRangedRealmPropertyOptions(string name, string rulesetName, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability)
-            : base(name, rulesetName, hardDefaultValue, defaultValue, locked, probability)
+        internal MinMaxRangedRealmPropertyOptions(string name, string rulesetName, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability, Type enumType, ushort enumValue)
+            : base(name, rulesetName, hardDefaultValue, defaultValue, locked, probability, enumType, enumValue)
         {
             RandomType = RealmPropertyRerollType.never;
             CompositionType = (RealmPropertyCompositionType)compositionType;
         }
 
-        public MinMaxRangedRealmPropertyOptions(string name, string rulesetName, T hardDefaultValue, byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked, double? probability)
-            : base(name, rulesetName, hardDefaultValue, hardDefaultValue, locked, probability)
+        internal MinMaxRangedRealmPropertyOptions(string name, string rulesetName, T hardDefaultValue,
+            byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked,
+            double? probability, Type enumType, ushort enumValue)
+            : base(name, rulesetName, hardDefaultValue, hardDefaultValue, locked, probability, enumType, enumValue)
         {
             RandomType = (RealmPropertyRerollType)randomType;
             if (typeof(T) == typeof(double))

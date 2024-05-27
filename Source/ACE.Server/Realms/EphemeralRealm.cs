@@ -40,7 +40,7 @@ namespace ACE.Server.Realms
             if (full_trace)
             {
                 useCache = false;
-                prevTemplate = prevTemplate.RebuildTemplateWithTrace();
+                prevTemplate = prevTemplate.RebuildTemplateWithContext(prevTemplate.Context.WithTrace(deriveNewSeedEachPhase: false));
             }
             for(int i = 0; i < appliedRealms.Count; i++)
             {

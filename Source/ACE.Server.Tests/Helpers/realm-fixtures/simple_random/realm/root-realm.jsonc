@@ -1,0 +1,10 @@
+{
+  "name": "Root",
+  "type": "Realm",
+  "properties": {
+    "CanBeHomeworld": true
+  },
+  "apply_rulesets": [
+    "Take Random 3"
+  ]
+}

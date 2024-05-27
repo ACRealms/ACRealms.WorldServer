@@ -1,0 +1,39 @@
+{
+  "name": "Take Random 3",
+  "type": "Ruleset",
+  "properties_random_count": 3,
+  "properties": {
+    "CreatureStrengthAdded": {
+      "low": 10,
+      "high": 20,
+      "compose": "add"
+    },
+    "CreatureEnduranceAdded": {
+      "low": 10,
+      "high": 20,
+      "compose": "add"
+    },
+    "CreatureCoordinationAdded": {
+      "low": 10,
+      "high": 20,
+      "compose": "add"
+    },
+    "CreatureQuicknessAdded": {
+      "low": 10,
+      "high": 20,
+      "compose": "add"
+    },
+    "CreatureFocusAdded": {
+      "low": 10,
+      "high": 20,
+      "probability": 0.5,
+      "compose": "add"
+    },
+    "CreatureSelfAdded": {
+      "low": 10,
+      "high": 20,
+      "locked": true,
+      "compose": "add"
+    }
+  }
+}

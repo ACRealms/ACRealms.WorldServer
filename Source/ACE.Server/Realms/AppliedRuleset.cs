@@ -10,6 +10,7 @@ using ACE.Server.Entity;
 using ACE.Database.Adapter;
 using ACE.Entity.ACRealms;
 using Lifestoned.DataModel.Content;
+using System.Diagnostics;
 
 namespace ACE.Server.Realms
 {
@@ -21,18 +22,17 @@ namespace ACE.Server.Realms
         public ushort RulesetID { get; } = rulesetID;
         public RulesetCompilationContext Context { get; init; } = ctx;
 
-        protected IDictionary<RealmPropertyBool, AppliedRealmProperty<bool>> PropertiesBool { get; } = new Dictionary<RealmPropertyBool, AppliedRealmProperty<bool>>();
-        protected IDictionary<RealmPropertyFloat, AppliedRealmProperty<double>> PropertiesFloat { get; } = new Dictionary<RealmPropertyFloat, AppliedRealmProperty<double>>();
-        protected IDictionary<RealmPropertyInt, AppliedRealmProperty<int>> PropertiesInt { get; } = new Dictionary<RealmPropertyInt, AppliedRealmProperty<int>>();
-        protected IDictionary<RealmPropertyInt64, AppliedRealmProperty<long>> PropertiesInt64 { get; } = new Dictionary<RealmPropertyInt64, AppliedRealmProperty<long>>();
-        protected IDictionary<RealmPropertyString, AppliedRealmProperty<string>> PropertiesString { get; } = new Dictionary<RealmPropertyString, AppliedRealmProperty<string>>();
-        protected IDictionary<string, AppliedRealmProperty> AllProperties { get; } = new Dictionary<string, AppliedRealmProperty>();
+        internal IDictionary<RealmPropertyBool, AppliedRealmProperty<bool>> PropertiesBool { get; } = new Dictionary<RealmPropertyBool, AppliedRealmProperty<bool>>();
+        internal IDictionary<RealmPropertyFloat, AppliedRealmProperty<double>> PropertiesFloat { get; } = new Dictionary<RealmPropertyFloat, AppliedRealmProperty<double>>();
+        internal IDictionary<RealmPropertyInt, AppliedRealmProperty<int>> PropertiesInt { get; } = new Dictionary<RealmPropertyInt, AppliedRealmProperty<int>>();
+        internal IDictionary<RealmPropertyInt64, AppliedRealmProperty<long>> PropertiesInt64 { get; } = new Dictionary<RealmPropertyInt64, AppliedRealmProperty<long>>();
+        internal IDictionary<RealmPropertyString, AppliedRealmProperty<string>> PropertiesString { get; } = new Dictionary<RealmPropertyString, AppliedRealmProperty<string>>();
+        internal IDictionary<string, AppliedRealmProperty> AllProperties { get; } = new Dictionary<string, AppliedRealmProperty>();
 
-        protected static void ApplyRulesetDict<K, V>(
+        protected void ApplyRulesetDict<K, V>(
             IDictionary<K, AppliedRealmProperty<V>> parent,
-            IDictionary<K, AppliedRealmProperty<V>> sub,
+            IDictionary<K, AppliedRealmProperty<V>> self,
             bool invertRelationships,
-            Realm parentRealm,
             RulesetCompilationContext ctx)
             where V : IEquatable<V>
             where K : Enum
@@ -43,13 +43,16 @@ namespace ACE.Server.Realms
             //Add all parent items to sub. But if it is already in sub, then calculate using the special composition rules
             foreach (var pair in parent)
             {
+                var propName = pair.Value.Options.Name;
+
                 LogTrace(ctx, () => "Begin single property compilation", pair.Value);
                 var parentprop = pair.Value;
-                if (!sub.ContainsKey(pair.Key))
+                if (!self.ContainsKey(pair.Key))
                 {
                     LogTrace(ctx, () => $"No property def, using parent '{parentprop.Options.RulesetName}'", pair.Value);
                     //Just add the parent's reference, as we already previously imprinted the parent from its template for this purpose
-                    sub[pair.Key] = parentprop;
+                    self[pair.Key] = parentprop;
+                    AllProperties[propName] = parentprop;
                     continue;
                 }
 
@@ -58,17 +61,18 @@ namespace ACE.Server.Realms
                     LogTrace(ctx, () => $"No property def, using parent '{parentprop.Options.RulesetName}'", pair.Value);
 
                     //Use parent's property as it is locked
-                    sub[pair.Key] = parentprop;
+                    self[pair.Key] = parentprop;
+                    AllProperties[propName] = parentprop;
                     continue;
                 }
-                else if (invertRelationships && sub[pair.Key].Options.Locked)
+                else if (invertRelationships && self[pair.Key].Options.Locked)
                 {
                     LogTrace(ctx, () => $"Locked: Discarding parent '{parentprop.Options.RulesetName}'", pair.Value);
                     continue;
                 }
 
                 //Replace
-                if (!invertRelationships && sub[pair.Key].Options.CompositionType == RealmPropertyCompositionType.replace)
+                if (!invertRelationships && self[pair.Key].Options.CompositionType == RealmPropertyCompositionType.replace)
                 {
                     LogTrace(ctx, () => $"Replace: Discarding parent '{parentprop.Options.RulesetName}'", pair.Value);
                     //No need to do anything here since we are replacing the parent
@@ -77,19 +81,25 @@ namespace ACE.Server.Realms
                 else if (invertRelationships && parentprop.Options.CompositionType == RealmPropertyCompositionType.replace)
                 {
                     LogTrace(ctx, () => $"Replace: using parent from invertRelationships: '{parentprop.Options.RulesetName}'", pair.Value);
-                    sub[pair.Key] = parentprop;
+                    self[pair.Key] = parentprop;
+                    AllProperties[propName] = parentprop;
                     continue;
                 }
 
                 //Apply composition rules
                 if (!invertRelationships)
                 {
-                    sub[pair.Key] = new AppliedRealmProperty<V>(ctx, sub[pair.Key], parentprop);
+                    LogTrace(ctx, () => $"Cloning new composed property with parent {parentprop.Options.RulesetName}", pair.Value);
+                    var newAllocatedProp = new AppliedRealmProperty<V>(ctx, self[pair.Key], parentprop);
+                    self[pair.Key] = newAllocatedProp;
+                    AllProperties[propName] = newAllocatedProp;
                 }
                 else
                 {
-                    LogTrace(ctx, () => $"InvertedRel: using '{parentprop.Options.RulesetName}' with parent '{sub[pair.Key].Options.RulesetName}'", pair.Value);
-                    sub[pair.Key] = new AppliedRealmProperty<V>(ctx, parentprop, sub[pair.Key]); //ensure parent chain is kept
+                    LogTrace(ctx, () => $"InvertedRel: cloning new property from '{parentprop.Options.RulesetName}' with parent '{self[pair.Key].Options.RulesetName}'", pair.Value);
+                    var newAllocatedProp = new AppliedRealmProperty<V>(ctx, parentprop, self[pair.Key]);
+                    self[pair.Key] = newAllocatedProp; //ensure parent chain is kept
+                    AllProperties[propName] = newAllocatedProp;
                 }
 
                 LogTrace(ctx, () => "End single property compilation", pair.Value);
@@ -255,7 +265,7 @@ namespace ACE.Server.Realms
         {
             if (cloneFrom.ParentRuleset != null)
                 ParentRuleset = new RulesetTemplate(cloneFrom.ParentRuleset, cloneFrom.ParentRuleset.RulesetID, ctx);
-            LogTrace(() => $"New template (parent: {ParentRuleset.Realm.Name})");
+            LogTrace(() => $"New template (parent: {ParentRuleset?.Realm?.Name ?? "<NONE>"})");
             var realm = RealmManager.GetRealm(rulesetID).Realm;
             LoadPropertiesFrom(realm);
             LogTrace(() => $"Completed template initialization");
@@ -277,40 +287,36 @@ namespace ACE.Server.Realms
             Realm = entity;
             foreach (var kv in entity.PropertiesBool)
             {
-                PropertiesBool.Add(kv.Key, !trace ? kv.Value : new AppliedRealmProperty<bool>(Context, kv.Value, null));
-                // This is arguably slower and consumes more memory so doing the check for trace mode here
-                if (trace)
-                    AllProperties.Add(kv.Key.ToString(), PropertiesBool[kv.Key]);
+                var prop = !trace ? kv.Value : new AppliedRealmProperty<bool>(Context, kv.Value, null);
+                PropertiesBool.Add(kv.Key, prop);
+                AllProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesFloat)
             {
-                PropertiesFloat.Add(kv.Key, !trace ? kv.Value : new AppliedRealmProperty<double>(Context, kv.Value, null));
-                if (trace)
-                    AllProperties.Add(kv.Key.ToString(), PropertiesFloat[kv.Key]);
+                var prop = !trace ? kv.Value : new AppliedRealmProperty<double>(Context, kv.Value, null);
+                PropertiesFloat.Add(kv.Key, prop);
+                AllProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesInt)
             {
-                PropertiesInt.Add(kv.Key, !trace ? kv.Value : new AppliedRealmProperty<int>(Context, kv.Value, null));
-                if (trace)
-                    AllProperties.Add(kv.Key.ToString(), PropertiesInt[kv.Key]);
+                var prop = !trace ? kv.Value : new AppliedRealmProperty<int>(Context, kv.Value, null);
+                PropertiesInt.Add(kv.Key, prop);
+                AllProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesInt64)
             {
-                PropertiesInt64.Add(kv.Key, !trace ? kv.Value : new AppliedRealmProperty<long>(Context, kv.Value, null));
-                if (trace)
-                    AllProperties.Add(kv.Key.ToString(), PropertiesInt64[kv.Key]);
+                var prop = !trace ? kv.Value : new AppliedRealmProperty<long>(Context, kv.Value, null);
+                PropertiesInt64.Add(kv.Key, prop);
+                AllProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesString)
             {
-                PropertiesString.Add(kv.Key, !trace ? kv.Value : new AppliedRealmProperty<string>(Context, kv.Value, null));
-                if (trace)
-                    AllProperties.Add(kv.Key.ToString(), PropertiesString[kv.Key]);
+                var prop = !trace ? kv.Value : new AppliedRealmProperty<string>(Context, kv.Value, null);
+                PropertiesString.Add(kv.Key, prop);
+                AllProperties.Add(prop.Options.Name, prop);
             }
-            if (!trace)
-            {
-                foreach (var kv in entity.AllProperties)
-                    AllProperties.Add(kv.Key, kv.Value);
-            }
+
+            Debug.Assert(entity.AllProperties.Count == AllProperties.Count);
 
             Jobs = entity.Jobs;
             if (trace)
@@ -356,12 +362,14 @@ namespace ACE.Server.Realms
             return $"Template {Realm.Name}";
         }
 
-        internal RulesetTemplate RebuildTemplateWithTrace()
+        internal AppliedRuleset RecompileWithSeed(int seed, RulesetCompilationContext ctx = null)
         {
-            if (Context.Trace)
-                throw new InvalidOperationException("Trace is already enabled");
-            return new RulesetTemplate(this, RulesetID, Context.WithTrace(deriveNewSeedEachPhase: false));
+            ctx ??= MakeDefaultContext();
+            ctx = ctx.WithNewSeed(seed);
+            return AppliedRuleset.MakeRerolledRuleset(RebuildTemplateWithContext(ctx), ctx);
         }
+
+        internal RulesetTemplate RebuildTemplateWithContext(RulesetCompilationContext ctx) => new(this, RulesetID, ctx);
     }
 
     //Properties may be changed freely
@@ -451,11 +459,11 @@ namespace ACE.Server.Realms
             var parent = MakeRerolledRuleset(parentTemplate, Context);
             LogTrace(() => $"ContinueCompose (parent: {parentTemplate.Realm.Name}, invertRules: {invertRules})");
 
-            ApplyRulesetDict(parent.PropertiesBool, PropertiesBool, invertRules, parentTemplate.Realm, Context);
-            ApplyRulesetDict(parent.PropertiesFloat, PropertiesFloat, invertRules, parentTemplate.Realm, Context);
-            ApplyRulesetDict(parent.PropertiesInt, PropertiesInt, invertRules, parentTemplate.Realm, Context);
-            ApplyRulesetDict(parent.PropertiesInt64, PropertiesInt64, invertRules, parentTemplate.Realm, Context);
-            ApplyRulesetDict(parent.PropertiesString, PropertiesString, invertRules, parentTemplate.Realm, Context);
+            ApplyRulesetDict(parent.PropertiesBool, PropertiesBool, invertRules, Context);
+            ApplyRulesetDict(parent.PropertiesFloat, PropertiesFloat, invertRules, Context);
+            ApplyRulesetDict(parent.PropertiesInt, PropertiesInt, invertRules, Context);
+            ApplyRulesetDict(parent.PropertiesInt64, PropertiesInt64, invertRules, Context);
+            ApplyRulesetDict(parent.PropertiesString, PropertiesString, invertRules, Context);
             LogTrace(() => $"FinishCompose (parent: {parentTemplate.Realm.Name}, invertRules: {invertRules})");
         }
 

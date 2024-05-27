@@ -1,12 +1,15 @@
 using ACE.Database.Adapter;
 using ACE.Entity.Enum.Properties;
+using ACE.Entity.Models;
 using ACE.Server.Command.Handlers;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Realms;
 using ACRealms.Tests.Factories;
 using ACRealms.Tests.Fixtures.Network;
 using ACRealms.Tests.Helpers;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -124,6 +127,86 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             result2 = ACRealmsCommands.CompileRulesetRaw(player.Session, seed2, "full", timeContext: timeContext);
 
             Assert.NotEqual(result, result2);
+        }
+
+        [Fact]
+        public void TestRulesetCompile_ReversibleRulesetSeed()
+        {
+            LoadRealmFixture(FixtureName.simple_random);
+
+            var player = new OnlinePlayerFactory()
+            {
+                HomeRealm = "Root",
+                Character = new CharacterFactory { CharacterName = "TestRulesetCompile ReversibleRulesetSeed" }
+            }.Create();
+
+            var session = player.Session as FakeSession;
+            ACRealmsCommands.HandleRulesetSeed(session);
+            var msg = session.WaitForMessage<GameMessageSystemChat>((m) => m.Message.StartsWith("Ruleset seed: ")).Message;
+            var seed = int.Parse(msg.Split(":")[1]);
+            Assert.Equal(player.RealmRuleset.Context.RandomSeed, seed);
+
+            Func<AppliedRuleset, List<AppliedRealmProperty<int>>> filter = (ruleset) =>
+                ruleset.PropertiesInt.Keys.Intersect([
+                    RealmPropertyInt.CreatureStrengthAdded,
+                    RealmPropertyInt.CreatureEnduranceAdded,
+                    RealmPropertyInt.CreatureCoordinationAdded,
+                    RealmPropertyInt.CreatureQuicknessAdded,
+                    RealmPropertyInt.CreatureFocusAdded,
+                    RealmPropertyInt.CreatureSelfAdded])
+                .Select(k => ruleset.PropertiesInt[k]).ToList();
+            Func<AppliedRuleset, List<string>> mapPropNames = (ruleset) => filter(ruleset).Select(x => x.Options.Name).OrderBy(x => x).ToList();
+
+            var ruleset = player.RealmRuleset;
+            var propNamesOriginal = mapPropNames(ruleset);
+
+            // Equal calls to recompile with seed should result in equal rulesets
+            for (var i = 0; i < 5; i++)
+            {
+                var rulesetRecompiled1 = ruleset.Template.RecompileWithSeed(seed);
+                var rulesetRecompiled2 = ruleset.Template.RecompileWithSeed(seed);
+                Assert.Equal(seed, rulesetRecompiled1.Context.RandomSeed);
+                Assert.Equal(seed, rulesetRecompiled2.Context.RandomSeed);
+                Assert.Equal(mapPropNames(rulesetRecompiled1), mapPropNames(rulesetRecompiled2));
+            }
+
+            // And here, we make sure that with a trace enabled, re-compilation is still equal
+            var rulesetRecompiledTraced = ruleset.Template.RecompileWithSeed(seed, Ruleset.MakeDefaultContext().WithTrace(true));
+            rulesetRecompiledTraced.Context.ClearLog();
+            Assert.Equal(propNamesOriginal, mapPropNames(rulesetRecompiledTraced));
+            Assert.Equal(seed, rulesetRecompiledTraced.Context.RandomSeed);
+
+            // Here, we make sure the seed displayed to the user can be accurately re-used
+            for (var i = 0; i < 5; i++)
+            {
+                var rulesetRecompiled = ruleset.Template.RecompileWithSeed(seed);
+                Assert.Equal(seed, rulesetRecompiled.Context.RandomSeed);
+
+                var propNamesRecompiled = mapPropNames(rulesetRecompiled);
+                Assert.Equal(propNamesOriginal, propNamesRecompiled);
+            }
+
+            // And here, we make sure that with a trace enabled, re-compilation is still equal
+            rulesetRecompiledTraced = ruleset.Template.RecompileWithSeed(seed, Ruleset.MakeDefaultContext().WithTrace(true));
+            rulesetRecompiledTraced.Context.ClearLog();
+            Assert.Equal(seed, rulesetRecompiledTraced.Context.RandomSeed);
+
+            var propNamesRecompiledTraced = mapPropNames(rulesetRecompiledTraced);
+            Assert.Equal(propNamesOriginal, propNamesRecompiledTraced);
+        }
+
+        [Fact]
+        public void TestRulesetCompile_CanBeHomeworld()
+        {
+            LoadRealmFixture(FixtureName.simple_random);
+
+            var player = new OnlinePlayerFactory()
+            {
+                HomeRealm = "Root",
+                Character = new CharacterFactory { CharacterName = "TestRulesetCompile CanBeHomeworld" }
+            }.Create();
+
+            Assert.True(player.RealmRuleset.GetProperty(RealmPropertyBool.CanBeHomeworld));
         }
     }
 }
