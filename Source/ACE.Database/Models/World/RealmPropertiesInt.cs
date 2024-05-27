@@ -22,7 +22,7 @@ namespace ACE.Database.Models.World
             var att = RealmConverter.PropertyDefinitionsInt[@enum];
             RealmPropertyOptions<int> prop;
             if (Value.HasValue)
-                prop = new RealmPropertyOptions<int>(@enum.ToString(), Realm.Name, Value.Value, att.DefaultValue, Locked, Probability, EnumType, Type);
+                prop = new RealmPropertyOptions<int>(@enum.ToString(), Realm.Name, att.DefaultValue, Value.Value, Locked, Probability, EnumType, Type);
             else
                 prop = new MinMaxRangedRealmPropertyOptions<int>(@enum.ToString(), Realm.Name, att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability, EnumType, Type);
             return new AppliedRealmProperty<int>(RulesetCompilationContext.DefaultShared, Type, prop);

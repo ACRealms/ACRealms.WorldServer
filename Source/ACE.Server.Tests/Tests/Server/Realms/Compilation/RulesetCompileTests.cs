@@ -206,6 +206,18 @@ namespace ACRealms.Tests.Server.Realms.Compilation
                 Character = new CharacterFactory { CharacterName = "TestRulesetCompile CanBeHomeworld" }
             }.Create();
 
+            //ACRealmsCommands.HandleCompileRuleset(player.Session, "all");
+            //var prefix = "Logged compilation output to ";
+
+            //foreach (var i in Enumerable.Range(0, 2))
+            //{
+            //    var message = ((FakeSession)player.Session).WaitForMessage<GameMessageSystemChat>(m => m.Message.StartsWith(prefix));
+            //    var filename = message.Message.Substring(prefix.Length);
+            //    Assert.True(File.Exists(filename));
+            //    File.Copy(filename, $"TestRulesetCompileCommand-CanBeHomeworld-output-{i}.txt", true);
+            //    File.Delete(filename);
+            //}
+
             Assert.True(player.RealmRuleset.GetProperty(RealmPropertyBool.CanBeHomeworld));
         }
     }
