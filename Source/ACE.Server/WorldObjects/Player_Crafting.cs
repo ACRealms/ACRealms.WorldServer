@@ -121,7 +121,7 @@ namespace ACE.Server.WorldObjects
             Skill.MagicItemTinkering
         };
 
-        private bool ToolIsValidUst(uint tool)
+        private bool ToolIsValidUst(ACE.Entity.ObjectGuid tool)
         {
             var toolObject = FindObject(tool, SearchLocations.Everywhere, out _, out var rootOwner, out _);
 
@@ -139,7 +139,7 @@ namespace ACE.Server.WorldObjects
                 return true;
         }
 
-        public void HandleSalvaging(uint tool, List<uint> salvageItems)
+        public void HandleSalvaging(ACE.Entity.ObjectGuid tool, List<uint> salvageItems)
         {
             if (!ToolIsValidUst(tool))
                 return;
