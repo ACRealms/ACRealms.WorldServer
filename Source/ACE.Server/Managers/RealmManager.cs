@@ -553,12 +553,11 @@ namespace ACE.Server.Managers
             player.Sanctuary = loc.AsLocalPosition();
             WorldManager.ThreadSafeTeleport(player, loc, false, new Entity.Actions.ActionEventDelegate(() =>
             {
-                //if (realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
-                //{
+                if (realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                {
                     DuelRealmHelpers.SetupNewCharacter(player);
-                //}
+                }
             }));
-            player.GrantXP((long)player.GetXPToNextLevel(10), XpType.Emote, ShareType.None);
         }
     }
 }
