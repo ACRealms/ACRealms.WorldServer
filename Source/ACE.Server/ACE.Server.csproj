@@ -132,6 +132,8 @@
     <None Remove="Entity\Mutations\Recipes\3800004E - Sandstone.txt" />
     <None Remove="Entity\Mutations\Recipes\39000000 - Paragon Weapons.txt" />
     <None Remove="Entity\Mutations\Recipes\39000001 - Lucky White Rabbit%27s Foot.txt" />
+    <None Remove="Realms\reserved_realms\NULL.jsonc" />
+    <None Remove="Realms\reserved_realms\RealmSelector.jsonc" />
     <None Include="..\..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -237,6 +239,8 @@
     <EmbeddedResource Include="Entity\Mutations\Recipes\3800004E - Sandstone.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\39000000 - Paragon Weapons.txt" />
     <EmbeddedResource Include="Entity\Mutations\Recipes\39000001 - Lucky White Rabbit's Foot.txt" />
+    <EmbeddedResource Include="Realms\reserved_realms\RealmSelector.jsonc" />
+    <EmbeddedResource Include="Realms\reserved_realms\NULL.jsonc" />
   </ItemGroup>
 
   <ItemGroup>
@@ -269,6 +273,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Config.realms.js.docker">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Config.realms.js.example">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Config.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

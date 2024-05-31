@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Runtime;
+using ACE.Common.ACRealms;
 
 namespace ACE.Server
 {
@@ -166,6 +167,8 @@ namespace ACE.Server
 
             log.Info("Initializing ConfigManager...");
             ConfigManager.Initialize();
+            log.Info("Initializing ACRealmsConfigManager...");
+            ACRealmsConfigManager.Initialize();
 
             log.Info("Initializing ModManager...");
             ModManager.Initialize();

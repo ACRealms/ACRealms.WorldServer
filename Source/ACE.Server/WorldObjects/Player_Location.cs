@@ -961,8 +961,8 @@ namespace ACE.Server.WorldObjects
             {
                 switch (reservedRealm)
                 {
-                    case ReservedRealm.@default:
-                        if (homerealm.Realm.Id != (ushort)ReservedRealm.@default)
+                    case ReservedRealm.NULL:
+                        if (homerealm.Realm.Id != (ushort)ReservedRealm.NULL)
                             return false;
                         return shortInstanceId == Account.AccountId;
                     case ReservedRealm.hideout:

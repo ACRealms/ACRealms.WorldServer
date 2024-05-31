@@ -296,7 +296,7 @@ namespace ACE.Server.Managers
             {
                 var homerealm = RealmManager.GetRealm(session.Player.HomeRealm);
                 if (homerealm == null)
-                    homerealm = RealmManager.GetRealm((ushort)ReservedRealm.@default);
+                    homerealm = RealmManager.GetRealm((ushort)ReservedRealm.NULL);
                 if (session.Player.GetPosition(PositionType.EphemeralRealmExitTo) != null)
                 {
                     session.Network.EnqueueSend(new GameMessageSystemChat($"The instance you were in has expired and you have been transported outside!", ChatMessageType.System));

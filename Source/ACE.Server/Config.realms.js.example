@@ -1,0 +1,23 @@
+// Copy this file and rename it to Config.realms.js
+// The defaults from this file will automatically be used instead when not located in acrealms.config
+// More configuration options may be added in the future
+// Config file provided with server version: 2.1.0
+
+{
+    // If true, the server is opting out of instancing or realms. This feature is experimental and not fully implemented yet.
+    // If this is enabled, it may be difficult to disable until this is better supported, so I recommend leaving it 'false' for now
+    "OptOutOfRealms": false,
+
+    // This is the default realm that new characters will be assigned to, if UseRealmSelector is false.
+    // By default, this is the realm named "default", which is system-defined and has realm ID 0x7FFE (32766)
+    // This value must be changed to a user-defined realm name unless OptOutOfRealms is true
+    // See the README.md file for instructions on how to configure a realm file
+    "DefaultRealm": "default",
+
+    "CharacterCreationOptions": {
+        // If true, players will start in a room with an npc offering the choice of starting realm
+        // Realms with "CanBeHomeworld": true will be offered in this list
+        // This room will use a separate instance ID per player account.
+        "UseRealmSelector": false
+    }
+}

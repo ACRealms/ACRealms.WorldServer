@@ -27,7 +27,7 @@ namespace ACE.Server.Factories
         public static WorldObject CreateWorldObject(Weenie weenie, ObjectGuid guid, AppliedRuleset ruleset = null)
         {
             if (ruleset == null)
-                ruleset = RealmManager.DefaultRuleset;
+                ruleset = RealmManager.DefaultRulesetFallback;
 
             if (weenie == null)
                 return null;

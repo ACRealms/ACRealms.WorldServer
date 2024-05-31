@@ -11,6 +11,7 @@ using ACE.Database.Adapter;
 using ACE.Entity.ACRealms;
 using Lifestoned.DataModel.Content;
 using System.Diagnostics;
+using ACE.Server.WorldObjects;
 
 namespace ACE.Server.Realms
 {
@@ -563,6 +564,17 @@ namespace ACE.Server.Realms
             if (att.DefaultFromServerProperty != null)
                 return PropertyManager.GetString(att.DefaultFromServerProperty, att.DefaultValue).Item;
             return att.DefaultValue;
+        }
+
+        public uint GetDefaultInstanceID(Player player, LocalPosition position)
+        {
+            RealmManager.TryParseReservedRealm(Realm.Id, out var r);
+            return r switch
+            {
+                // RealmSelector and Hideout uses separate instance ID for each account
+                ReservedRealm.RealmSelector or ReservedRealm.hideout => ACE.Entity.Position.InstanceIDFromVars(Realm.Id, (ushort)player.Account.AccountId, false),
+                _ => GetFullInstanceID(player.DefaultShortInstanceID)
+            };
         }
 
         public uint GetFullInstanceID(ushort shortInstanceID)

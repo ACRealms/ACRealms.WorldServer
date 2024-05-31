@@ -26,19 +26,6 @@ namespace ACE.Server.Realms
             StandardRules = AppliedRuleset.MakeRerolledRuleset(RulesetTemplate);
         }
 
-        internal uint GetDefaultInstanceID(Player player)
-        {
-            if (RealmManager.TryParseReservedRealm(Realm.Id, out var r))
-            {
-                switch(r)
-                {
-                    default:
-                        return ACE.Entity.Position.InstanceIDFromVars(Realm.Id, (ushort)player.Account.AccountId, false);
-                }
-            }
-            return StandardRules.GetDefaultInstanceID();
-        }
-
         internal InstancedPosition DefaultStartingLocation(Player player)
         {
 

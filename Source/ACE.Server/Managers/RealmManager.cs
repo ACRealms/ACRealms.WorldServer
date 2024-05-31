@@ -19,6 +19,8 @@ using System.Threading.Tasks;
 using ACE.Server.Command.Handlers;
 using System.IO;
 using ACE.Entity.ACRealms;
+using ACE.Common.ACRealms;
+using System.Configuration;
 
 namespace ACE.Server.Managers
 {
@@ -44,17 +46,32 @@ namespace ACE.Server.Managers
         private static bool FirstImportCompleted;
 
         private static WorldRealm _defaultRealm;
-        public static WorldRealm DefaultRealm
+        public static WorldRealm DefaultRealmFallback
         {
             get { return _defaultRealm; }
             private set
             {
                 _defaultRealm = value;
-                DefaultRuleset = AppliedRuleset.MakeRerolledRuleset(value.RulesetTemplate);
+                DefaultRulesetFallback = AppliedRuleset.MakeRerolledRuleset(value.RulesetTemplate);
             }
         }
-        public static AppliedRuleset DefaultRuleset { get; private set; }
+        public static AppliedRuleset DefaultRulesetFallback { get; private set; }
 
+
+        private static WorldRealm _defaultRealmConfigured;
+        public static WorldRealm DefaultRealmConfigured
+        {
+            get { return _defaultRealmConfigured; }
+            private set
+            {
+                _defaultRealmConfigured = value;
+                DefaultRulesetConfigured = AppliedRuleset.MakeRerolledRuleset(value.RulesetTemplate);
+            }
+        }
+        public static AppliedRuleset DefaultRulesetConfigured { get; private set; }
+
+
+        public static AppliedRuleset DefaultRulesetForCharacterCreation { get; private set; }
 
         public static void Initialize(bool liveEnvironment = true)
         {
@@ -85,6 +102,9 @@ namespace ACE.Server.Managers
         {
             foreach (var id in Enum.GetValues(typeof(ReservedRealm)).Cast<ReservedRealm>())
             {
+                if (id.ToString().StartsWith("Reserved"))
+                    continue;
+
                 string jsonc = null;
                 using (var resource = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream($"ACE.Server.Realms.reserved_realms.{id}.jsonc"))
                     using (var sr = new System.IO.StreamReader(resource))
@@ -223,16 +243,16 @@ namespace ACE.Server.Managers
                 var erealm = RealmConverter.ConvertToEntityRealm(realms[realmid], true);
                 var ruleset = BuildRuleset(erealm);
                 var wrealm = new WorldRealm(erealm, ruleset);
-                RealmsByID[erealm.Id] = wrealm;
-                RealmsByName[erealm.Name] = wrealm;
+                RealmsByID.Add(erealm.Id, wrealm);
+                RealmsByName.Add(erealm.Name, wrealm);
                 if (Enum.IsDefined(typeof(ReservedRealm), erealm.Id))
                 {
-                    ReservedRealms[(ReservedRealm)erealm.Id] = wrealm;
+                    ReservedRealms.Add((ReservedRealm)erealm.Id, wrealm);
                     if (erealm.Id == (ushort)ReservedRealm.@default)
-                        DefaultRealm = wrealm;
+                        DefaultRealmFallback = wrealm;
                 }
 
-                //Stupid hack, leaks complexity
+                // Needs improvement: Only one realm can be set to the dueling realm and it uses a static property, which seems wrong to me
                 if (wrealm.Realm.Type == RealmType.Realm && wrealm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
                     DuelRealm = wrealm;
             };
@@ -240,6 +260,13 @@ namespace ACE.Server.Managers
             Realms = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Realm).ToList().AsReadOnly();
             Rulesets = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Ruleset).ToList().AsReadOnly();
             RealmsAndRulesets = RealmsByID.Values.ToList().AsReadOnly();
+
+            var configDefaultRealmName = ACRealmsConfigManager.Config.DefaultRealm;
+            if (Enum.TryParse(configDefaultRealmName, true, out ReservedRealm reserved))
+                throw new ConfigurationErrorsException($"Config.realms.js must choose a user-defined realm, not the reserved realm {reserved}");
+            if (!RealmsByName.ContainsKey(configDefaultRealmName))
+                throw new ConfigurationErrorsException($"Config.realms.js specified default realm {configDefaultRealmName}, but no json file was defined for that realm. See the README doc for instructions.");
+            DefaultRealmConfigured = RealmsByName[configDefaultRealmName];
         }
 
         private static bool PrepareRealmUpdates(Dictionary<string, RealmToImport> newRealmsByName,
@@ -522,14 +549,14 @@ namespace ACE.Server.Managers
             //return null;
         }
 
-        public static bool TryParseReservedRealm(ushort realmId, out ReservedRealm reservedRealm)
+        public static bool TryParseReservedRealm(ushort realmId, out ReservedRealm? reservedRealm)
         {
             if (Enum.IsDefined(typeof(ReservedRealm), realmId))
             {
                 reservedRealm = (ReservedRealm)realmId;
                 return true;
             }
-            reservedRealm = ReservedRealm.@default;
+            reservedRealm = null;
             return false;
         }
 
