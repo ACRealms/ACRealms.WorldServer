@@ -362,25 +362,31 @@ namespace ACE.Server.Factories
             // Index used to determine the starting location
             if (!ACRealmsConfigManager.Config.CharacterCreationOptions.UseRealmSelector)
             {
-                var realmName = ACRealmsConfigManager.Config.DefaultRealm;
-                if (ReservedRealm.)
-                return CreateResult.InvalidSkillRequested;
+                WorldRealm defaultRealm;
+                if (ACRealmsConfigManager.Config.OptOutOfRealms)
+                    defaultRealm = RealmManager.GetReservedRealm(ReservedRealm.@default);
+                else
+                    defaultRealm = RealmManager.GetRealmByName(ACRealmsConfigManager.Config.DefaultRealm);
 
                 var startArea = characterCreateInfo.StartArea;
-
                 var starterArea = DatManager.PortalDat.CharGen.StarterAreas[(int)startArea];
-
-                player.Location = new Position(starterArea.Locations[0].ObjCellID,
+                var startLoc = new LocalPosition(starterArea.Locations[0].ObjCellID,
                     starterArea.Locations[0].Frame.Origin.X, starterArea.Locations[0].Frame.Origin.Y, starterArea.Locations[0].Frame.Origin.Z,
                     starterArea.Locations[0].Frame.Orientation.X, starterArea.Locations[0].Frame.Orientation.Y, starterArea.Locations[0].Frame.Orientation.Z, starterArea.Locations[0].Frame.Orientation.W);
+                var iid = defaultRealm.StandardRules.GetDefaultInstanceID(player, startLoc);
 
-                var instantiation = new Position(0xA9B40019, 84, 7.1f, 94, 0, 0, -0.0784591f, 0.996917f); // ultimate fallback.
+                RealmManager.SetHomeRealm(player, defaultRealm.Realm.Id, teleportToDefaultLoc: false); // Will crash if teleportToDefaultLoc is true
+                player.Location = new InstancedPosition(startLoc, iid);
+                
+
+                var instantiation = new InstancedPosition(new LocalPosition(0xA9B40019, 84, 7.1f, 94, 0, 0, -0.0784591f, 0.996917f), iid); // ultimate fallback.
+                
                 var spellFreeRide = new Database.Models.World.Spell();
                 switch (starterArea.Name)
                 {
                     case "OlthoiLair": //todo: check this when olthoi play is allowed in ace
                         spellFreeRide = null; // no training area for olthoi, so they start and fall back to same place.
-                        instantiation = new Position(player.Location);
+                        instantiation = new InstancedPosition(player.Location);
                         break;
                     case "Shoushi":
                         spellFreeRide = DatabaseManager.World.GetCachedSpell(3813); // Free Ride to Shoushi
@@ -397,7 +403,10 @@ namespace ACE.Server.Factories
                         break;
                 }
                 if (spellFreeRide != null && spellFreeRide.Name != "")
-                    instantiation = new Position(spellFreeRide.PositionObjCellId.Value, spellFreeRide.PositionOriginX.Value, spellFreeRide.PositionOriginY.Value, spellFreeRide.PositionOriginZ.Value, spellFreeRide.PositionAnglesX.Value, spellFreeRide.PositionAnglesY.Value, spellFreeRide.PositionAnglesZ.Value, spellFreeRide.PositionAnglesW.Value);
+                    instantiation =
+                        new InstancedPosition(new LocalPosition(
+                            spellFreeRide.PositionObjCellId.Value, spellFreeRide.PositionOriginX.Value, spellFreeRide.PositionOriginY.Value, spellFreeRide.PositionOriginZ.Value,
+                            spellFreeRide.PositionAnglesX.Value, spellFreeRide.PositionAnglesY.Value, spellFreeRide.PositionAnglesZ.Value, spellFreeRide.PositionAnglesW.Value), iid);
             }
             else
             {
@@ -406,6 +415,7 @@ namespace ACE.Server.Factories
 
                 var iid = realmSelector.StandardRules.GetDefaultInstanceID(player, blaineRoom);
                 var startPos = blaineRoom.AsInstancedPosition(iid);
+                RealmManager.SetHomeRealm(player, realmSelector.Realm.Id, false);
                 player.Location = startPos;
                 player.Instantiation = new InstancedPosition(player.Location);
                 player.Sanctuary = player.Location.AsLocalPosition();

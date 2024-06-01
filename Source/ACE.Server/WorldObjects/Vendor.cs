@@ -729,7 +729,7 @@ namespace ACE.Server.WorldObjects
             if (item.GetProperty(PropertyInt.HomeRealm).HasValue)
             {
                 var realmId = item.GetProperty(PropertyInt.HomeRealm).Value;
-                RealmManager.SetHomeRealm(target, realmId);
+                RealmManager.SetHomeRealm(target, (ushort)realmId);
                 NumServicesSold++;
                 return;
             }

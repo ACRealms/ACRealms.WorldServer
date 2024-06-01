@@ -150,6 +150,14 @@ namespace ACE.Server.Managers
                 return;
             }
 
+            var homeRealm = offlinePlayer.GetProperty(PropertyInt.HomeRealm);
+            if (!homeRealm.HasValue)
+            {
+                //TODO: Fix
+                session.SendCharacterError(CharacterError.EnterGameCouldntPlaceCharacter);
+                return;
+            }
+
             session.InitSessionForWorldLogin();
 
             session.State = SessionState.WorldConnected;

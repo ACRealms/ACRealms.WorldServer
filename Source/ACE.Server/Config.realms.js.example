@@ -4,10 +4,6 @@
 // Config file provided with server version: 2.1.0
 
 {
-    // If true, the server is opting out of instancing or realms. This feature is experimental and not fully implemented yet.
-    // If this is enabled, it may be difficult to disable until this is better supported, so I recommend leaving it 'false' for now
-    "OptOutOfRealms": false,
-
     // This is the default realm that new characters will be assigned to, if UseRealmSelector is false.
     // By default, this is the realm named "default", which is system-defined and has realm ID 0x7FFE (32766)
     // This value must be changed to a user-defined realm name unless OptOutOfRealms is true
@@ -19,5 +15,22 @@
         // Realms with "CanBeHomeworld": true will be offered in this list
         // This room will use a separate instance ID per player account.
         "UseRealmSelector": false
+    },
+
+    // Options for porting characters that existed before ACRealms v2.1, or existed in ACE (not ACRealms) servers before migrating to ACRealms
+    "CharacterMigrationOptions": {
+        /*
+           If home realm is missing, characters will not be permitted to log in unless these options are set to valid values
+           This action is not reversible for characters auto-assigned in this manner, which is why it is off by default
+
+           For servers previously on ACE:
+             AutoAssignHomeRealm: true, AutoAssignToRealm: "(name of realm you wish to assign existing characters to)"
+
+           For servers previously on ACRealms versions 1.0 to 2.1:
+             AutoAssignHomeRealm: true, AutoAssignToRealm: "RealmSelector"
+         */
+        "AutoAssignHomeRealm": false,
+
+        "AutoAssignToRealm": "NULL"
     }
 }

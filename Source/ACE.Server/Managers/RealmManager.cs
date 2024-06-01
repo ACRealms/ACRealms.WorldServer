@@ -263,9 +263,9 @@ namespace ACE.Server.Managers
 
             var configDefaultRealmName = ACRealmsConfigManager.Config.DefaultRealm;
             if (Enum.TryParse(configDefaultRealmName, true, out ReservedRealm reserved))
-                throw new ConfigurationErrorsException($"Config.realms.js must choose a user-defined realm, not the reserved realm {reserved}");
+                throw new ConfigurationErrorsException($"Config.realms.js must choose a user-defined realm, not the reserved realm '{reserved}'");
             if (!RealmsByName.ContainsKey(configDefaultRealmName))
-                throw new ConfigurationErrorsException($"Config.realms.js specified default realm {configDefaultRealmName}, but no json file was defined for that realm. See the README doc for instructions.");
+                throw new ConfigurationErrorsException($"Config.realms.js specified default realm '{configDefaultRealmName}', but no json file was defined for that realm. See the README doc for instructions.");
             DefaultRealmConfigured = RealmsByName[configDefaultRealmName];
         }
 
@@ -560,31 +560,26 @@ namespace ACE.Server.Managers
             return false;
         }
 
-        public static void SetHomeRealm(Player player, int realmId)
+        public static void SetHomeRealm(Player player, ushort realmId, bool teleportToDefaultLoc = true)
         {
-            if (realmId < 1 || realmId > 0x7FFF)
-            {
-                log.Error($"SetHomeRealm must have a value between 1 and {0x7FFF}!" + Environment.NewLine + Environment.StackTrace);
-                return;
-            }
-            var realm = RealmManager.GetRealm((ushort)realmId);
+            var realm = GetRealm(realmId);
             if (realm == null)
-            {
-                log.Error($"SetHomeRealm from object references a missing realm with id {realmId}!" + Environment.NewLine + Environment.StackTrace);
-                return;
-            }
+                throw new InvalidOperationException($"Attempted to use SetHomeRealm with a realm id {realmId}, which was not found.");
+
             log.Info($"Setting HomeRealm for character {player.Name} to {realm.Realm.Id}.");
-            player.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
-            player.SetProperty(PropertyBool.RecallsDisabled, false);
-            var loc = realm.DefaultStartingLocation(player);
-            player.Sanctuary = loc.AsLocalPosition();
-            WorldManager.ThreadSafeTeleport(player, loc, false, new Entity.Actions.ActionEventDelegate(() =>
+            player.HomeRealm = realm.Realm.Id;
+            
+            if (teleportToDefaultLoc)
             {
-                if (realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                player.SetProperty(PropertyBool.RecallsDisabled, false);
+                var loc = realm.DefaultStartingLocation(player);
+                player.Sanctuary = loc.AsLocalPosition();
+                WorldManager.ThreadSafeTeleport(player, loc, false, new Entity.Actions.ActionEventDelegate(() =>
                 {
-                    DuelRealmHelpers.SetupNewCharacter(player);
-                }
-            }));
+                    if (realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                        DuelRealmHelpers.SetupNewCharacter(player);
+                }));
+            }
         }
     }
 }
