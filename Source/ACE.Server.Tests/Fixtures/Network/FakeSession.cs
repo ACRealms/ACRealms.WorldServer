@@ -58,6 +58,8 @@ namespace ACRealms.Tests.Fixtures.Network
         {
             selector ??= DefaultSelector;
 
+            int timeout = System.Diagnostics.Debugger.IsAttached ? int.MaxValue : (int)(timeoutInSeconds * 1000);
+
             Exception ex = null;
             var task = Task.Run(() =>
             {
@@ -75,7 +77,7 @@ namespace ACRealms.Tests.Fixtures.Network
                     Thread.Sleep(10);
                 } while (true);
             });
-            task.Wait((int)(timeoutInSeconds * 1000));
+            task.Wait(timeout);
 
             if (!task.IsCompletedSuccessfully)
                 throw new GameMessageNotSentException();
@@ -90,6 +92,7 @@ namespace ACRealms.Tests.Fixtures.Network
         {
             if (Player == null)
                 throw new InvalidOperationException("Player not found on session");
+            int timeout = System.Diagnostics.Debugger.IsAttached ? int.MaxValue : (int)(timeoutInSeconds * 1000);
 
             Exception ex = new InvalidOperationException("The task did not complete successfully");
             var task = Task.Run(() =>
@@ -116,7 +119,7 @@ namespace ACRealms.Tests.Fixtures.Network
                     return;
                 }
             });
-            task.Wait((int)(timeoutInSeconds * 1000));
+            task.Wait(timeout);
 
             if (ex != null)
                 throw ex;
