@@ -182,6 +182,31 @@ namespace ACE.Server.Managers
 
                     RealmManager.SetHomeRealm(offlinePlayer, realm);
                 }
+                else
+                {
+                    log.Error($"Missing Config.realms.js configuration for AssignHomeRealm and HomeRealm is null for '{offlinePlayer.Name}'. Rejecting login!");
+                    session.SendCharacterError(CharacterError.EnterGameCouldntPlaceCharacter);
+                    return;
+                }
+            }
+
+            // Verify that home realm has a valid range
+            homeRealm = offlinePlayer.GetProperty(PropertyInt.HomeRealm).Value;
+            if (homeRealm < 0 || homeRealm > 0x7FFF)
+            {
+                log.Error($"HomeRealm ID {homeRealm} out of range for '{offlinePlayer.Name}'. Rejecting login!");
+                session.SendCharacterError(CharacterError.EnterGameCouldntPlaceCharacter);
+                return;
+            }
+
+            // Verify that home realm actually exists
+            var scopedHomeRealmId = (ushort)homeRealm;
+            var worldRealm = RealmManager.GetRealm(scopedHomeRealmId, includeRulesets: false);
+            if (worldRealm == null)
+            {
+                log.Error($"HomeRealm ID {scopedHomeRealmId} for player '{offlinePlayer.Name}' does not reference a valid realm. Rejecting login!");
+                session.SendCharacterError(CharacterError.EnterGameCouldntPlaceCharacter);
+                return;
             }
 
             session.InitSessionForWorldLogin();
