@@ -523,7 +523,7 @@ namespace ACE.Entity
 
         public string ToLOCString()
         {
-            return $"0x{LandblockId.Raw:X8} [{PositionX:F6} {PositionY:F6} {PositionZ:F6}] {RotationW:F6} {RotationX:F6} {RotationY:F6} {RotationZ:F6} {Instance}";
+            return $"0x{LandblockId.Raw:X8} [{PositionX:F6} {PositionY:F6} {PositionZ:F6}] {RotationW:F6} {RotationX:F6} {RotationY:F6} {RotationZ:F6} {Instance:X8}";
         }
 
         public static readonly int BlockLength = 192;
