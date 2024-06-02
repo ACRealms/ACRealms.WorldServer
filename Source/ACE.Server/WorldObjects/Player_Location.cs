@@ -884,7 +884,7 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(new GameMessageSystemChat($"Leaving instance and returning to realm {newRealm.Realm.Name}.", ChatMessageType.System));
             else
             {
-                if (prevrealm.Realm.Id != HomeRealm)
+                if (prevrealm.Realm.Id == HomeRealm)
                     Session.Network.EnqueueSend(new GameMessageSystemChat($"You are temporarily leaving your home realm. Some actions may be restricted and your corpse will appear at your hideout if you die.", ChatMessageType.System));
                 else if (newRealm.Realm.Id == HomeRealm)
                     Session.Network.EnqueueSend(new GameMessageSystemChat($"Returning to home realm.", ChatMessageType.System));
