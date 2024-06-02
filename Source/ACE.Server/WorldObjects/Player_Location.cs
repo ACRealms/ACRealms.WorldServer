@@ -775,7 +775,7 @@ namespace ACE.Server.WorldObjects
             }
             if (!ValidatePlayerRealmPosition(newPosition))
             {
-                if (IsAdmin)
+                if (IsAdmin && !PropertyManager.GetBool("acr_validate_realm_position_for_admins").Item)
                 {
                     Session.Network.EnqueueSend(new GameMessageSystemChat($"Admin bypassing realm restriction.", ChatMessageType.System));
                 }
@@ -924,7 +924,7 @@ namespace ACE.Server.WorldObjects
 
         public void ValidateCurrentRealm()
         {
-            if (IsAdmin)
+            if (IsAdmin && !PropertyManager.GetBool("acr_validate_realm_position_for_admins").Item)
                 return;
             if (!ValidatePlayerRealmPosition(Location))
                 TeleportToHomeRealm();

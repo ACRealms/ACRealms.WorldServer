@@ -502,7 +502,7 @@ namespace ACE.Server.Managers
         public static readonly ReadOnlyDictionary<string, Property<bool>> DefaultBooleanProperties =
             DictOf(
                 ("acr_enable_ruleset_seeds", new Property<bool>(false, "If enabled, ruleset randomization seeds will be visible to sessions with the role envoy or higher. This does carry some slight side effects with the ruleset randomization engine, and is fine to disable if you don't need it. It will be necessary to have this enabled to troubleshoot some complex ruleset compilation issues.")),
-
+                ("acr_validate_realm_position_for_admins", new Property<bool>(false, "If enabled, admins will be booted out of realms where they are not permitted to travel to.")),
 
                 ("account_login_boots_in_use", new Property<bool>(true, "if FALSE, oldest connection to account is not booted when new connection occurs")),
                 ("advanced_combat_pets", new Property<bool>(false, "(non-retail function) If enabled, Combat Pets can cast spells")),
