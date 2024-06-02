@@ -29,6 +29,7 @@ using ACE.Entity.Enum.RealmProperties;
 using ACE.Server.Network.Enum;
 using System.Linq;
 using ACRealms.Server.Network.TraceMessages.Messages;
+using ACE.Common.ACRealms;
 
 namespace ACE.Server.Managers
 {
@@ -151,11 +152,36 @@ namespace ACE.Server.Managers
             }
 
             var homeRealm = offlinePlayer.GetProperty(PropertyInt.HomeRealm);
-            if (!homeRealm.HasValue)
+            if (!homeRealm.HasValue || homeRealm.Value == (ushort)ReservedRealm.NULL)
             {
-                //TODO: Fix
-                session.SendCharacterError(CharacterError.EnterGameCouldntPlaceCharacter);
-                return;
+                var migrationOpts = ACRealmsConfigManager.Config.CharacterMigrationOptions;
+
+                bool ASSIGNING_HOME_REALM = migrationOpts.AutoAssignHomeRealm && migrationOpts.AutoAssignToRealm != "NULL";
+                if (ASSIGNING_HOME_REALM)
+                {
+                    var realmNameToAssign = migrationOpts.AutoAssignToRealm;
+                    WorldRealm realm;
+                    if (Enum.TryParse(realmNameToAssign, true, out ReservedRealm reservedRealm))
+                    {
+                        realm = reservedRealm switch
+                        {
+                            ReservedRealm.hideout => null,
+                            ReservedRealm.@default => ACRealmsConfigManager.Config.OptOutOfRealms ? RealmManager.GetReservedRealm(ReservedRealm.@default) : null,
+                            _ => RealmManager.GetRealmByName(reservedRealm.ToString(), includeRulesets: false)
+                        };
+                    }
+                    else
+                        realm = RealmManager.GetRealmByName(realmNameToAssign, includeRulesets: false);
+
+                    if (realm == null)
+                    {
+                        log.Error($"Couldn't place homeless character '{offlinePlayer.Name}' in realm '{realmNameToAssign}'. Realm name is not valid. Make sure Config.realms.js is valid. Rejecting login!");
+                        session.SendCharacterError(CharacterError.EnterGameCouldntPlaceCharacter);
+                        return;
+                    }
+
+                    RealmManager.SetHomeRealm(offlinePlayer, realm);
+                }
             }
 
             session.InitSessionForWorldLogin();
