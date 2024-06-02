@@ -680,6 +680,50 @@ namespace ACE.Server.WorldObjects
             actionChain.EnqueueChain();
         }
 
+        public void ChangeOwnedHouse(House oldHouse, House newHouse)
+        {
+            var slumlord = newHouse.SlumLord;
+
+            log.Info($"[HOUSE] Setting {Name} (0x{Guid}) as owner of {newHouse.Name} (0x{newHouse.Guid:X16})");
+
+            HouseManager.HandleEviction(oldHouse, Guid.Full, notifyPlayer: false);
+            HouseManager.RemoveRentQueue(oldHouse.Guid.Full);
+
+            // set player properties
+            HouseId = newHouse.HouseId;
+            HouseInstance = newHouse.Guid.Full;
+
+            // set house properties
+            newHouse.HouseOwner = Guid.Full;
+            newHouse.HouseOwnerName = Name;
+            newHouse.OpenToEveryone = oldHouse.OpenToEveryone;
+            newHouse.SaveBiotaToDatabase();
+
+            // relink
+            newHouse.UpdateLinks();
+
+            if (newHouse.HasDungeon)
+            {
+                var dungeonHouse = newHouse.GetDungeonHouse();
+                if (dungeonHouse != null)
+                    dungeonHouse.UpdateLinks();
+            }
+
+            slumlord.On();
+            slumlord.SetAndBroadcastName(Name);
+            slumlord.ClearInventory();
+            slumlord.SaveBiotaToDatabase();
+
+            HouseList.RemoveFromAvailable(slumlord, newHouse);
+            SaveBiotaToDatabase();
+            newHouse.UpdateRestrictionDB();
+
+            newHouse.BootAll(this, false);
+
+            HouseManager.AddRentQueue(this, newHouse.Guid.Full);
+            log.Info($"Transferred house owner for '{Name}' from {oldHouse.Guid} to {newHouse.Guid}.");
+        }
+
         /// <summary>
         /// Removes verified items from inventory for house purchase
         /// </summary>

@@ -133,24 +133,24 @@ namespace ACE.Server.Managers
             var owner = PlayerManager.FindByGuid(biotaOwner.Value);
             if (owner == null)
             {
-                log.Error($"[HOUSE] HouseManager.AddRentQueue(): couldn't find owner {biotaOwner.Value:X8}");
+                log.Error($"[HOUSE] HouseManager.AddRentQueue(): couldn't find owner {biotaOwner.Value:X16}");
                 return;
             }
             var houseId = slumlord.BiotaPropertiesDID.FirstOrDefault(i => i.Type == (ushort)PropertyDataId.HouseId);
             if (houseId == null)
             {
-                log.Error($"[HOUSE] HouseManager.AddRentQueue(): couldn't find house id for {slumlord.Id:X8}");
+                log.Error($"[HOUSE] HouseManager.AddRentQueue(): couldn't find house id for {slumlord.Id:X16}");
                 return;
             }
             if (!HouseIdToGuid.TryGetValue(houseId.Value, out var houseGuids))
             {
-                log.Error($"[HOUSE] HouseManager.AddRentQueue(): couldn't find house instance for {slumlord.Id:X8}");
+                log.Error($"[HOUSE] HouseManager.AddRentQueue(): couldn't find house instance for {slumlord.Id:X16}");
                 return;
             }
             var houseInstance = GetHouseGuid(slumlord.Id, houseGuids);
             if (houseInstance == 0)
             {
-                log.Error($"[HOUSE] HouseManager.AddRentQueue(): couldn't find house guid for {slumlord.Id:X8}");
+                log.Error($"[HOUSE] HouseManager.AddRentQueue(): couldn't find house guid for {slumlord.Id:X16}");
                 return;
             }
             if (RentQueueContainsHouse(houseInstance))
@@ -225,7 +225,7 @@ namespace ACE.Server.Managers
                 if (biotaOwner == null)
                 {
                     // this is fine. this is just a house that was purchased, and then later abandoned
-                    //Console.WriteLine($"HouseManager.QueryMultiHouse(): couldn't find owner for house {slumlord.Id:X8}");
+                    //Console.WriteLine($"HouseManager.QueryMultiHouse(): couldn't find owner for house {slumlord.Id:X16}");
                     continue;
                 }
                 var owner = PlayerManager.FindByGuid(biotaOwner.Value);
@@ -436,7 +436,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Handles the eviction process for a player house
         /// </summary>
-        public static void HandleEviction(House house, ulong playerGuid, bool multihouse = false, bool force = false)
+        public static void HandleEviction(House house, ulong playerGuid, bool multihouse = false, bool force = false, bool notifyPlayer = true)
         {
             // clear out slumlord inventory
             var slumlord = house.SlumLord;
@@ -531,7 +531,8 @@ namespace ACE.Server.Managers
             onlinePlayer.House = null;
 
             // send text message
-            onlinePlayer.Session.Network.EnqueueSend(new GameMessageSystemChat("Your house has reverted due to non-payment of the maintenance costs.  All items stored in the house have been lost.", ChatMessageType.Broadcast));
+            if (notifyPlayer)
+                onlinePlayer.Session.Network.EnqueueSend(new GameMessageSystemChat("Your house has reverted due to non-payment of the maintenance costs.  All items stored in the house have been lost.", ChatMessageType.Broadcast));
             onlinePlayer.RemoveDeed();
 
             onlinePlayer.SaveBiotaToDatabase();
@@ -667,9 +668,14 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Returns all of the houses in the rent queue for a house id
         /// </summary>
-        public static List<House> GetHouseById(ulong houseId)
+        public static List<House> GetHouseById(uint houseId)
         {
             return RentQueue.Where(i => i.House.HouseId == houseId).Select(i => i.House).ToList();
+        }
+
+        public static House GetPurchasedHouseByInstancedId(ObjectGuid guid)
+        {
+            return RentQueue.Where(i => i.House.Guid == guid).Select(i => i.House).FirstOrDefault();
         }
 
         /// <summary>
@@ -702,9 +708,9 @@ namespace ACE.Server.Managers
         /// <summary>
         /// If the landblock is loaded, return a reference to the current House object
         /// else return a copy of the House biota from the latest info in the db
-        ///
+        /// Returns the house biota immediately, and a boolean to indicate if the inventory was loaded 
         /// <param name="callback">called when the slumlord inventory is fully loaded</param>
-        public static void GetHouse(ObjectGuid houseGuid, Action<House> callback)
+        public static Tuple<House, bool> GetHouse(ObjectGuid houseGuid, Action<House> callback)
         {
             var landblockId = new LandblockId(houseGuid.StaticObjectLandblock.Value);
             var isLoaded = LandblockManager.IsLoaded(landblockId, houseGuid.Instance.Value);
@@ -715,9 +721,10 @@ namespace ACE.Server.Managers
                 // return a copy of the House biota from the latest info in the db
                 var houseBiota = House.Load(houseGuid);
 
+                var inventoryLoaded = houseBiota.SlumLord.InventoryLoaded;
                 RegisterCallback(houseBiota, callback);
 
-                return;
+                return new Tuple<House, bool>(houseBiota, inventoryLoaded);
             }
 
             // landblock is loaded, return a reference to the current House object
@@ -727,18 +734,30 @@ namespace ACE.Server.Managers
             if (house != null && house.SlumLord != null)
             {
                 if (!house.SlumLord.InventoryLoaded)
+                {
                     RegisterCallback(house, callback);
+                    return new Tuple<House, bool>(house, false);
+                }
                 else
+                {
                     callback(house);
+                    return new Tuple<House, bool>(house, true);
+                }
+
             }
             else if (!loaded.CreateWorldObjectsCompleted)
             {
                 var houseBiota = House.Load(houseGuid);
 
+                var inventoryLoaded = house.SlumLord.InventoryLoaded;
                 RegisterCallback(houseBiota, callback);
+                return new Tuple<House, bool>(houseBiota, inventoryLoaded);
             }
             else
+            {
                 log.ErrorFormat("[HOUSE] HouseManager.GetHouse({0:X16}): couldn't find house on loaded landblock", houseGuid);
+                return new Tuple<House, bool>(null, false);
+            }
         }
 
         /// <summary>

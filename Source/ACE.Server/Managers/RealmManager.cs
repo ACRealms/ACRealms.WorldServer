@@ -610,7 +610,7 @@ namespace ACE.Server.Managers
         }
 
         // This will be used for auto home realm migration from older servers, but may also be used from an admin command.
-        public static void SetHomeRealm(OfflinePlayer offlinePlayer, WorldRealm realm)
+        public static bool SetHomeRealm(OfflinePlayer offlinePlayer, WorldRealm realm)
         {
             log.Info($"Setting HomeRealm for offline character '{offlinePlayer.Name}' to '{realm.Realm.Name}' (ID {realm.Realm.Id}).");
             int oldHomeRealmInt = offlinePlayer.GetProperty(PropertyInt.HomeRealm) ?? 0;
@@ -645,8 +645,18 @@ namespace ACE.Server.Managers
                 offlinePlayer.SetPositionUnsafe(type, destPosition);
             }
 
-            //TODO: Housing
             offlinePlayer.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
+            return TryMoveHousesToNewRealm(offlinePlayer, realm);
+        }
+
+        private static bool TryMoveHousesToNewRealm(IPlayer player, WorldRealm destinationRealm)
+        {
+            var houses = HouseManager.GetCharacterHouses(player.Guid.Full);
+            bool failed = false;
+
+            foreach(var house in houses)
+                failed |= !house.TryMoveHouseToNewRealmInstance(destinationRealm.StandardRules.GetDefaultInstanceID(player, house.Location.AsLocalPosition()));
+            return !failed;
         }
 
         public static void SetHomeRealm(Player player, ushort realmId, bool settingFromRealmSelector, bool saveImmediately = true)
@@ -674,7 +684,9 @@ namespace ACE.Server.Managers
                 player.ValidateCurrentRealm();
             if (saveImmediately)
                 player.SavePlayerToDatabase();
-            
+
+            if (!TryMoveHousesToNewRealm(player, realm))
+                player.Session.Network.EnqueueSend(new Network.GameMessages.Messages.GameMessageSystemChat("Your house was unable to be transferred to the new realm.", ChatMessageType.Broadcast));
         }
     }
 }

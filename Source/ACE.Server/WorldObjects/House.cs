@@ -16,6 +16,10 @@ using ACE.Server.Managers;
 using ACE.Server.Network.Structure;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Realms;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.Diagnostics.Eventing.Reader;
 
 namespace ACE.Server.WorldObjects
 {
@@ -141,23 +145,23 @@ namespace ACE.Server.WorldObjects
             }
 
             var iid = houseGuid.Instance ?? 0;
-            if (iid == 0)
-                throw new InvalidOperationException("Uninstanced Housing Data detected");
 
             Position.ParseInstanceID(iid, out bool isEphemeral, out ushort realmId, out ushort _);
 
-            // Should never happen, but if this is a problem, uncomment the line until it can be fixed
-            if (isEphemeral)
-                throw new InvalidOperationException("Housing data found in ephemeral instance!");
-
             var realm = RealmManager.GetRealm(realmId, includeRulesets: false);
-            if (realm == null)
-                throw new InvalidOperationException($"Housing data found in instance ID {iid}, for which a realm could not be located.");
+            AppliedRuleset ruleset;
+            if (realm != null)
+                ruleset = realm.StandardRules;
+            else
+                ruleset = RealmManager.DefaultRealmConfigured.StandardRules;
+
+            if (ruleset == null)
+                throw new InvalidOperationException("Could not find a default realm to fall back to for orphaned housing data.");
 
             var linkedHouses = WorldObjectFactory.CreateNewWorldObjects(
                 instances,
                 new List<ACE.Database.Models.Shard.Biota> { biota },
-                biota.WeenieClassId, iid, realm.StandardRules, landblock);
+                biota.WeenieClassId, iid, ruleset, landblock);
 
             foreach (var linkedHouse in linkedHouses)
                 linkedHouse.ActivateLinks(instances, new List<ACE.Database.Models.Shard.Biota> { biota }, linkedHouses[0]);
@@ -613,11 +617,12 @@ namespace ACE.Server.WorldObjects
             return false;
         }
 
-        public int BootAll(Player booter, bool guests = true, bool allegianceHouse = false)
+        public int BootAll(IPlayer booter, bool guests = true, bool allegianceHouse = false)
         {
             var players = PlayerManager.GetAllOnline();
 
             var booted = 0;
+
             foreach (var player in players)
             {
                 // exclude booter
@@ -629,7 +634,10 @@ namespace ACE.Server.WorldObjects
                 if (!guests && HasPermission(player, false))
                     continue;
 
-                booter.HandleActionBoot(player.Name, allegianceHouse);
+                if (booter is Player booterOnline)
+                    booterOnline.HandleActionBoot(player.Name, allegianceHouse);
+                else
+                    player.Teleport(BootSpot.Location);
                 booted++;
             }
             return booted;
@@ -747,5 +755,105 @@ namespace ACE.Server.WorldObjects
         public int GetHookGroupCurrentCount(HookGroupType hookGroupType) => Hooks.Count(h => h.HasItem && (h.Item?.HookGroup ?? HookGroupType.Undef) == hookGroupType);
 
         public int GetHookGroupMaxCount(HookGroupType hookGroupType) => HookGroupLimits[HouseType][hookGroupType];
+
+        public bool TryMoveHouseToNewRealmInstance(uint instanceId)
+        {
+            if (HouseOwner == null)
+            {
+                log.Error($"Couldn't move house to new instance, as the house has no owner");
+                return false;
+            }
+
+            // Check if a conflict exists
+            var targetGuid = new ObjectGuid(Guid.ClientGUID, instanceId);
+            var existingTargetHouse = HouseManager.GetPurchasedHouseByInstancedId(targetGuid);
+            if (existingTargetHouse != null)
+            {
+                log.Error($"Couldn't move house for player {HouseOwnerName} to new instance, as that house is owned by {existingTargetHouse.HouseOwnerName}");
+                return false;
+            }
+
+            House destHouse = null;
+            Task<bool> job = new Task<bool>(() =>
+            {
+                var player = PlayerManager.FindByGuid(new ObjectGuid(HouseOwner.Value));
+
+                player.ChangeOwnedHouse(this, destHouse);
+
+                List<Container> srcContainers = new List<Container>();
+                srcContainers.AddRange(Storage);
+                srcContainers.AddRange(Hooks);
+
+                List<Container> destContainers = new List<Container>();
+                destContainers.AddRange(destHouse.Storage);
+                destContainers.AddRange(destHouse.Hooks);
+
+                foreach (var srcContainer in srcContainers)
+                {
+                    string type = srcContainer.GetType().Name;
+                    if (!srcContainer.InventoryLoaded)
+                    {
+                        log.Error($"Couldn't move house for player {HouseOwnerName} to new instance, {type} inventory not loaded.");
+                        return false;
+                    }
+
+                    var destContainer = destContainers.Where(s => s.Guid.ClientGUID == srcContainer.Guid.ClientGUID).FirstOrDefault();
+                    if (destContainer == null)
+                    {
+                        log.Error($"Couldn't move house for player {HouseOwnerName} to new instance, destination {type} not found.");
+                        return false;
+                    }
+
+                    destContainer.ClearInventory(true);
+                    foreach(var item in srcContainer.Inventory.Values)
+                    {
+                        if (destContainer.TryAddToInventory(item, item.PlacementPosition ?? 0, false, false))
+                            item.SaveBiotaToDatabase();
+                        else
+                            log.Error($"Couldn't move inventory item {item.Guid} for player {HouseOwnerName} to new {type}.");
+                    }
+                }
+
+                return true;
+            });
+
+            bool callbackCancelled = false;
+            bool callbackRunning = false;
+            var returnInfo = HouseManager.GetHouse(targetGuid, (house) =>
+            {
+                callbackRunning = true;
+                if (!callbackCancelled)
+                {
+                    destHouse = house;
+                    job.Start();
+                }
+            });
+
+            if (returnInfo.Item1 == null)
+            {
+                log.Error($"Failed to transfer house owned by player {HouseOwnerName} to new instance.");
+                return false;
+            }
+            else if (returnInfo.Item2)
+            {
+                if (!callbackRunning)
+                {
+                    callbackCancelled = true;
+                    destHouse = returnInfo.Item1;
+                    job.RunSynchronously();
+                    return job.Result;
+                }
+            }
+            else
+            {
+                if (!job.Wait(5000))
+                {
+                    log.Error($"Failed to transfer house owned by player {HouseOwnerName} to new instance. InventoryLoadCallback failed to run within 5 second timeout.");
+                    return false;
+                }
+            }
+            
+            return job.Result;
+        }
     }
 }
