@@ -572,7 +572,7 @@ namespace ACE.Server.Realms
             return r switch
             {
                 // RealmSelector and Hideout uses separate instance ID for each account
-                ReservedRealm.RealmSelector or ReservedRealm.hideout => ACE.Entity.Position.InstanceIDFromVars(Realm.Id, (ushort)player.Account.AccountId, false),
+                ReservedRealm.RealmSelector or ReservedRealm.hideout or ReservedRealm.NULL => ACE.Entity.Position.InstanceIDFromVars(Realm.Id, (ushort)player.Account.AccountId, false),
                 _ => GetFullInstanceID(player.GetDefaultShortInstanceID())
             };
         }
