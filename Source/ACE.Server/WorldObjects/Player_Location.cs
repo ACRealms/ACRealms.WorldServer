@@ -959,6 +959,8 @@ namespace ACE.Server.WorldObjects
                 return false;
             if (RealmManager.TryParseReservedRealm(destrealm.Realm.Id, out var reservedRealm))
             {
+                if (homerealm == destrealm)
+                    return true;
                 switch (reservedRealm)
                 {
                     case ReservedRealm.NULL:
