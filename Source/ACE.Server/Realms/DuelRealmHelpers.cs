@@ -96,14 +96,14 @@ namespace ACE.Server.Realms
             actionChain.EnqueueChain();
         }
 
-        public static InstancedPosition GetDuelingAreaDrop()
+        public static InstancedPosition GetDuelingAreaDrop(IPlayer player)
         {
-            return GetDuelingAreaDrop(RealmManager.DuelRealm);
+            return GetDuelingAreaDrop(RealmManager.DuelRealm, player);
         }
 
-        public static InstancedPosition GetDuelingAreaDrop(WorldRealm realm)
+        public static InstancedPosition GetDuelingAreaDrop(WorldRealm realm, IPlayer player)
         {
-            return new InstancedPosition(RealmConstants.DuelStagingAreaDrop, realm.StandardRules.GetDefaultInstanceID());
+            return new InstancedPosition(RealmConstants.DuelStagingAreaDrop, realm.StandardRules.GetDefaultInstanceID(player, RealmConstants.DuelStagingAreaDrop));
         }
     }
 }

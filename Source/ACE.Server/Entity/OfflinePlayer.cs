@@ -6,7 +6,9 @@ using ACE.Database.Models.Auth;
 using ACE.Entity;
 using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
+using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
+using Newtonsoft.Json.Linq;
 
 namespace ACE.Server.Entity
 {
@@ -178,6 +180,26 @@ namespace ACE.Server.Entity
         }
         #endregion
 
+        #region Position Functions
+
+        public InstancedPosition GetPositionUnsafe(PositionType property)
+        {
+            var rawPos = Biota.GetPosition(property, BiotaDatabaseLock);
+            if (rawPos == null)
+                return null;
+            return new InstancedPosition(rawPos, rawPos.Instance);
+        }
+
+        public InstancedPosition SetPositionUnsafe(PositionType property, InstancedPosition pos)
+        {
+            Biota.SetPosition(property, pos.GetPosition(), BiotaDatabaseLock);
+            ChangesDetected = true;
+
+            var rawPos = Biota.GetPosition(property, BiotaDatabaseLock);
+            return new InstancedPosition(rawPos, rawPos.Instance);
+        }
+
+        #endregion
 
         public string Name => GetProperty(PropertyString.Name);
 

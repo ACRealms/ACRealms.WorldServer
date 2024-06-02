@@ -267,7 +267,7 @@ namespace ACE.Server.Entity
         {
             var objects = DatabaseManager.World.GetCachedInstancesByLandblock(Id.Landblock);
             var shardObjects = DatabaseManager.Shard.BaseDatabase.GetStaticObjectsByLandblock(Id.Landblock, Instance);
-            var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects, null, Instance, RealmRuleset);
+            var factoryObjects = WorldObjectFactory.CreateNewWorldObjects(objects, shardObjects, null, Instance, RealmRuleset, Id.Landblock);
 
             var action = () =>
             {

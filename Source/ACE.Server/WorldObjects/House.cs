@@ -140,7 +140,24 @@ namespace ACE.Server.WorldObjects
                 }
             }
 
-            var linkedHouses = WorldObjectFactory.CreateNewWorldObjects(instances, new List<ACE.Database.Models.Shard.Biota> { biota }, biota.WeenieClassId, houseGuid.Instance.Value, RealmManager.DefaultRulesetFallback);
+            var iid = houseGuid.Instance ?? 0;
+            if (iid == 0)
+                throw new InvalidOperationException("Uninstanced Housing Data detected");
+
+            Position.ParseInstanceID(iid, out bool isEphemeral, out ushort realmId, out ushort _);
+
+            // Should never happen, but if this is a problem, uncomment the line until it can be fixed
+            if (isEphemeral)
+                throw new InvalidOperationException("Housing data found in ephemeral instance!");
+
+            var realm = RealmManager.GetRealm(realmId, includeRulesets: false);
+            if (realm == null)
+                throw new InvalidOperationException($"Housing data found in instance ID {iid}, for which a realm could not be located.");
+
+            var linkedHouses = WorldObjectFactory.CreateNewWorldObjects(
+                instances,
+                new List<ACE.Database.Models.Shard.Biota> { biota },
+                biota.WeenieClassId, iid, realm.StandardRules, landblock);
 
             foreach (var linkedHouse in linkedHouses)
                 linkedHouse.ActivateLinks(instances, new List<ACE.Database.Models.Shard.Biota> { biota }, linkedHouses[0]);

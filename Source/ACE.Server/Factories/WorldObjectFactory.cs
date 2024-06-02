@@ -27,7 +27,7 @@ namespace ACE.Server.Factories
         public static WorldObject CreateWorldObject(Weenie weenie, ObjectGuid guid, AppliedRuleset ruleset = null)
         {
             if (ruleset == null)
-                ruleset = RealmManager.DefaultRulesetFallback;
+                ruleset = RealmManager.DefaultRealmConfigured.StandardRules;
 
             if (weenie == null)
                 return null;
@@ -275,7 +275,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// This will create a list of WorldObjects, all with new GUIDs and for every position provided.
         /// </summary>
-        public static List<WorldObject> CreateNewWorldObjects(List<LandblockInstance> sourceObjects, List<Biota> biotas, uint? restrict_wcid, uint iid, AppliedRuleset ruleset)
+        public static List<WorldObject> CreateNewWorldObjects(List<LandblockInstance> sourceObjects, List<Biota> biotas, uint? restrict_wcid, uint iid, AppliedRuleset ruleset, ushort landblockId)
         {
             var results = new List<WorldObject>();
 

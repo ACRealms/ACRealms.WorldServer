@@ -125,7 +125,7 @@ namespace ACE.Server.Command.Handlers
             if (RealmManager.DuelRealm == null)
                 return;
             var player = session.Player;
-            if (!player.ValidatePlayerRealmPosition(DuelRealmHelpers.GetDuelingAreaDrop()))
+            if (!player.ValidatePlayerRealmPosition(DuelRealmHelpers.GetDuelingAreaDrop(player)))
                 return;
 
             if (player.PKTimerActive)
@@ -178,7 +178,7 @@ namespace ACE.Server.Command.Handlers
                     return;
                 }
 
-                player.Teleport(DuelRealmHelpers.GetDuelingAreaDrop());
+                player.Teleport(DuelRealmHelpers.GetDuelingAreaDrop(player));
             });
 
             // Set the chain to run

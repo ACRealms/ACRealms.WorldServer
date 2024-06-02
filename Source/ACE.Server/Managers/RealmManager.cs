@@ -45,33 +45,11 @@ namespace ACE.Server.Managers
 
         private static bool FirstImportCompleted;
 
-        private static WorldRealm _defaultRealm;
-        public static WorldRealm DefaultRealmFallback
-        {
-            get { return _defaultRealm; }
-            private set
-            {
-                _defaultRealm = value;
-                DefaultRulesetFallback = AppliedRuleset.MakeRerolledRuleset(value.RulesetTemplate);
-            }
-        }
-        public static AppliedRuleset DefaultRulesetFallback { get; private set; }
+        public static WorldRealm DefaultRealmFallback { get; private set; }
+        public static WorldRealm DefaultRealmConfigured { get; internal set; }
 
+        public static LocalPosition UltimateDefaultLocation = Player.MarketplaceDrop;
 
-        private static WorldRealm _defaultRealmConfigured;
-        public static WorldRealm DefaultRealmConfigured
-        {
-            get { return _defaultRealmConfigured; }
-            private set
-            {
-                _defaultRealmConfigured = value;
-                DefaultRulesetConfigured = AppliedRuleset.MakeRerolledRuleset(value.RulesetTemplate);
-            }
-        }
-        public static AppliedRuleset DefaultRulesetConfigured { get; private set; }
-
-
-        public static AppliedRuleset DefaultRulesetForCharacterCreation { get; private set; }
 
         public static void Initialize(bool liveEnvironment = true)
         {
@@ -305,12 +283,29 @@ namespace ACE.Server.Managers
             Rulesets = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Ruleset).ToList().AsReadOnly();
             RealmsAndRulesets = RealmsByID.Values.ToList().AsReadOnly();
 
-            var configDefaultRealmName = ACRealmsConfigManager.Config.DefaultRealm;
-            if (Enum.TryParse(configDefaultRealmName, true, out ReservedRealm reserved))
-                throw new ConfigurationErrorsException($"Config.realms.js must choose a user-defined realm, not the reserved realm '{reserved}'");
-            if (!RealmsByName.ContainsKey(configDefaultRealmName))
-                throw new ConfigurationErrorsException($"Config.realms.js specified default realm '{configDefaultRealmName}', but no json file was defined for that realm. See the README doc for instructions.");
-            DefaultRealmConfigured = RealmsByName[configDefaultRealmName];
+            ValidateConfiguredRealmName(ACRealmsConfigManager.Config.DefaultRealm, "DefaultRealm", allowDefault: ACRealmsConfigManager.Config.AllowUndefinedDefaultRealm);
+            ValidateConfiguredRealmName(ACRealmsConfigManager.Config.CharacterMigrationOptions.AutoAssignToRealm, "CharacterMigrationOptions.AutoAssignToRealm",
+                allowDefault: ACRealmsConfigManager.Config.AllowUndefinedDefaultRealm,
+                allowNull: true);
+
+            DefaultRealmConfigured = RealmsByName[ACRealmsConfigManager.Config.DefaultRealm];
+        }
+
+        private static void ValidateConfiguredRealmName(string realmName, string configLabel, bool allowDefault = false, bool allowNull = false)
+        {
+            if (Enum.TryParse(realmName, true, out ReservedRealm reserved))
+            {
+                bool valid = false;
+                valid |= allowDefault && reserved == ReservedRealm.@default;
+                valid |= allowNull && reserved == ReservedRealm.NULL;
+
+                if (!valid)
+                    throw new ConfigurationErrorsException($"{configLabel} in Config.realms.js must choose a user-defined realm, not the reserved realm '{reserved}'");
+            }
+            if (!RealmsByName.ContainsKey(realmName))
+                throw new ConfigurationErrorsException($"Config.realms.js specified {configLabel} '{realmName}', but no json file was defined for that realm. See the README doc for instructions.");
+            else if (RealmsByName[realmName].Realm.Type != RealmType.Realm)
+                throw new ConfigurationErrorsException($"Config.realms.js specified {configLabel} '{realmName}', but this must be a realm, not a ruleset.");
         }
 
         private static bool PrepareRealmUpdates(Dictionary<string, RealmToImport> newRealmsByName,

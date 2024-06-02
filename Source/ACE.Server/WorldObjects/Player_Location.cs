@@ -23,7 +23,7 @@ namespace ACE.Server.WorldObjects
 {
     partial class Player
     {
-        private static readonly LocalPosition MarketplaceDrop = new LocalPosition(DatabaseManager.World.GetCachedWeenie("portalmarketplace")?.GetPosition(PositionType.Destination)) ?? new LocalPosition(0x016C01BC, 49.206f, -31.935f, 0.005f, 0, 0, -0.707107f, 0.707107f);
+        public static readonly LocalPosition MarketplaceDrop = new LocalPosition(DatabaseManager.World.GetCachedWeenie("portalmarketplace")?.GetPosition(PositionType.Destination)) ?? new LocalPosition(0x016C01BC, 49.206f, -31.935f, 0.005f, 0, 0, -0.707107f, 0.707107f);
 
         private uint HideoutInstanceId
         {

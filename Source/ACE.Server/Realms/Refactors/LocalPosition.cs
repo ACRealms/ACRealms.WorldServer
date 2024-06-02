@@ -88,7 +88,7 @@ namespace ACE.Server.Realms
                 case WorldObjectInstanceSelectMode.Same:
                     instanceId = obj.Location.Instance; break;
                 case WorldObjectInstanceSelectMode.RealmDefaultInstanceID:
-                    instanceId = obj.RealmRuleset.GetDefaultInstanceID(); break;
+                    instanceId = obj.RealmRuleset.GetDefaultInstanceID(obj.Location?.AsLocalPosition()); break;
                 default: throw new NotImplementedException();
             }
             

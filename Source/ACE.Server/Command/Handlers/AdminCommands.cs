@@ -3473,7 +3473,7 @@ namespace ACE.Server.Command.Handlers
 
             var guid = GuidManager.NewPlayerGuid();
 
-            var player = new Player(weenie, guid, session.AccountId, RealmManager.DefaultRulesetFallback);
+            var player = new Player(weenie, guid, session.AccountId, RealmManager.DefaultRealmConfigured.StandardRules);
 
             player.Biota.WeenieType = session.Player.WeenieType;
 

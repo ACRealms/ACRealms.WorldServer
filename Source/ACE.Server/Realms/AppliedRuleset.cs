@@ -566,14 +566,14 @@ namespace ACE.Server.Realms
             return att.DefaultValue;
         }
 
-        public uint GetDefaultInstanceID(Player player, LocalPosition position)
+        public uint GetDefaultInstanceID(IPlayer player, LocalPosition position)
         {
             RealmManager.TryParseReservedRealm(Realm.Id, out var r);
             return r switch
             {
                 // RealmSelector and Hideout uses separate instance ID for each account
                 ReservedRealm.RealmSelector or ReservedRealm.hideout => ACE.Entity.Position.InstanceIDFromVars(Realm.Id, (ushort)player.Account.AccountId, false),
-                _ => GetFullInstanceID(player.DefaultShortInstanceID)
+                _ => GetFullInstanceID(player.GetDefaultShortInstanceID())
             };
         }
 
@@ -582,7 +582,7 @@ namespace ACE.Server.Realms
             return ACE.Entity.Position.InstanceIDFromVars(Template.Realm.Id, shortInstanceID, Template.Realm.Type == ACE.Entity.Enum.RealmType.Ruleset);
         }
 
-        public uint GetDefaultInstanceID() => GetFullInstanceID(0);
+        public uint GetDefaultInstanceID(LocalPosition position) => GetFullInstanceID(0);
         
         public override string ToString()
         {
