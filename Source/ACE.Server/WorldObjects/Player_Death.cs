@@ -211,7 +211,7 @@ namespace ACE.Server.WorldObjects
 
             // update vitae
             // players who died in a PKLite fight do not accrue vitae
-            var duelRealm = RealmManager.GetRealm(HomeRealm)?.StandardRules?.GetProperty(RealmPropertyBool.IsDuelingRealm) == true ||
+            var duelRealm = RealmManager.GetRealm(HomeRealm, includeRulesets: false)?.StandardRules?.GetProperty(RealmPropertyBool.IsDuelingRealm) == true ||
                 RealmRuleset?.GetProperty(RealmPropertyBool.IsDuelingRealm) == true;
             if (!duelRealm && !IsPKLiteDeath(topDamager))
                 InflictVitaePenalty();

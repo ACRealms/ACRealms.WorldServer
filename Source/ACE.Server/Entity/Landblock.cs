@@ -250,7 +250,7 @@ namespace ACE.Server.Entity
                 return AppliedRuleset.MakeRerolledRuleset(ephemeralRealm.RulesetTemplate);
 
             Position.ParseInstanceID(this.Instance, out bool _istemp, out var realmid, out var _shortinstid);
-            var realm = RealmManager.GetRealm(realmid);
+            var realm = RealmManager.GetRealm(realmid, includeRulesets: true);
             if (realm == null)
             {
                 //Shouldn't happen
@@ -1485,7 +1485,7 @@ Please report this to the ACRealms developer.");
             }
         }
 
-        public WorldRealm WorldRealm => WorldRealmID.HasValue ? RealmManager.GetRealm(WorldRealmID) : null;
+        public WorldRealm WorldRealm => WorldRealmID.HasValue ? RealmManager.GetRealm(WorldRealmID, includeRulesets: true) : null;
         public bool IsPrimaryForWorldRealm => ShortInstanceID == 0;
         public bool IsHomeInstanceForPlayer(Player player) => IsPrimaryForWorldRealm && player.HomeRealm == WorldRealmID;
 

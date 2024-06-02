@@ -768,7 +768,7 @@ namespace ACE.Server.WorldObjects
                     return;
             }
 
-            if (RealmManager.GetRealm(newPosition.RealmID) == null)
+            if (RealmManager.GetRealm(newPosition.RealmID, includeRulesets: isTemporaryRuleset) == null)
             {
                 Session.Network.EnqueueSend(new GameMessageSystemChat($"Error: Realm at destination location does not exist.", ChatMessageType.System));
                 return;
@@ -848,8 +848,8 @@ namespace ACE.Server.WorldObjects
         // Assumes instance is loaded! Do not call directly
         private bool OnTransitionToNewRealm(ushort prevRealmId, ushort newRealmId, InstancedPosition newLocation)
         {
-            var prevrealm = RealmManager.GetRealm(prevRealmId);
-            var newRealm = RealmManager.GetRealm(newRealmId);
+            var prevrealm = RealmManager.GetRealm(prevRealmId, includeRulesets: true);
+            var newRealm = RealmManager.GetRealm(newRealmId, includeRulesets: true);
 
             if (newLocation.IsEphemeralRealm && !Location.IsEphemeralRealm)
             {
@@ -953,8 +953,8 @@ namespace ACE.Server.WorldObjects
         public bool ValidatePlayerRealmPosition(InstancedPosition newPosition)
         {
             Position.ParseInstanceID(newPosition.Instance, out var isTemporaryRuleset, out ushort newRealmId, out ushort shortInstanceId);
-            var homerealm = RealmManager.GetRealm(HomeRealm);
-            var destrealm = RealmManager.GetRealm(newPosition.RealmID);
+            var homerealm = RealmManager.GetRealm(HomeRealm, includeRulesets: false);
+            var destrealm = RealmManager.GetRealm(newPosition.RealmID, includeRulesets: isTemporaryRuleset);
             if (destrealm == null)
                 return false;
             if (RealmManager.TryParseReservedRealm(destrealm.Realm.Id, out var reservedRealm))

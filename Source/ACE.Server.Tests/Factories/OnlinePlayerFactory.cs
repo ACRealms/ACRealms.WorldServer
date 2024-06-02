@@ -31,7 +31,7 @@ namespace ACRealms.Tests.Factories
             if (UseUniqueInstanceID)
                 player.SetProperty(ACE.Entity.Enum.Properties.PropertyBool.AttemptUniqueInstanceID, true);
             if (HomeRealm != null)
-                player.HomeRealm = RealmManager.GetRealmByName(HomeRealm).Realm.Id;
+                player.HomeRealm = RealmManager.GetRealmByName(HomeRealm, includeRulesets: false).Realm.Id;
 
             session.WaitForMessage<TraceMessageEnterWorldComplete>();
             if (HomeRealm != null)

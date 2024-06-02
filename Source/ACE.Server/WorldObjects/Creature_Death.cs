@@ -497,7 +497,7 @@ namespace ACE.Server.WorldObjects
             bool atHideout = false;
             if (player?.HomeRealm != null &&
                 player.Location.RealmID != player.HomeRealm &&
-                RealmManager.GetRealm(player.HomeRealm).StandardRules.GetProperty(RealmPropertyBool.HideoutEnabled))
+                RealmManager.GetRealm(player.HomeRealm, includeRulesets: false).StandardRules.GetProperty(RealmPropertyBool.HideoutEnabled))
             {
                 atHideout = true;
                 var loc = player.HideoutLocation;

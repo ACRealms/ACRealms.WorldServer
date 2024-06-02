@@ -225,14 +225,14 @@ namespace ACE.Server.Realms
             if (!Context.Trace)
                 return;
             foreach(var message in messages)
-                Context.LogDirect($"{(this is RulesetTemplate ? "[T]" : "[R]")}[{RealmManager.GetRealm(RulesetID).Realm.Name}] {message}");
+                Context.LogDirect($"{(this is RulesetTemplate ? "[T]" : "[R]")}[{RealmManager.GetRealm(RulesetID, includeRulesets: true).Realm.Name}] {message}");
         }
 
         protected virtual void LogTrace(Func<string> message)
         {
             if (!Context.Trace)
                 return;
-            Context.LogDirect($"{(this is RulesetTemplate ? "[T]" : "[R]")}[{RealmManager.GetRealm(RulesetID).Realm.Name}] {message()}");
+            Context.LogDirect($"{(this is RulesetTemplate ? "[T]" : "[R]")}[{RealmManager.GetRealm(RulesetID, includeRulesets: true).Realm.Name}] {message()}");
         }
 
         public static RulesetCompilationContext MakeDefaultContext() =>
@@ -267,7 +267,7 @@ namespace ACE.Server.Realms
             if (cloneFrom.ParentRuleset != null)
                 ParentRuleset = new RulesetTemplate(cloneFrom.ParentRuleset, cloneFrom.ParentRuleset.RulesetID, ctx);
             LogTrace(() => $"New template (parent: {ParentRuleset?.Realm?.Name ?? "<NONE>"})");
-            var realm = RealmManager.GetRealm(rulesetID).Realm;
+            var realm = RealmManager.GetRealm(rulesetID, includeRulesets: true).Realm;
             LoadPropertiesFrom(realm);
             LogTrace(() => $"Completed template initialization");
         }
@@ -443,7 +443,7 @@ namespace ACE.Server.Realms
                 if (roll < link.Probability)
                 {
                     LogTrace(() => $"Rolled {roll}, is < {link.Probability}, applying ruleset, skipping further rolls for this job");
-                    var template = RealmManager.GetRealm(link.RulesetIDToApply).RulesetTemplate;
+                    var template = RealmManager.GetRealm(link.RulesetIDToApply, includeRulesets: true).RulesetTemplate;
                     ComposeFrom(template, true);
                     return;
                 }

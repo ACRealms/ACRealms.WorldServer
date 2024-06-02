@@ -24,7 +24,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
         public void CanLoadBasicRealmFixture()
         {
             LoadRealmFixture(FixtureName.simple);
-            var realm = RealmManager.GetRealm(1);
+            var realm = RealmManager.GetRealm(1, includeRulesets: false);
             Assert.NotNull(realm);
             var lb = LandblockHelper.LoadLandblock(realm, 0x7308);
             Assert.NotNull(lb);
@@ -44,7 +44,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             Assert.NotEqual(serverProp, att.DefaultValue);
 
             LoadRealmFixture(FixtureName.simple);
-            var realm = RealmManager.GetRealm(1);
+            var realm = RealmManager.GetRealm(1, includeRulesets: false);
             var lb = LandblockHelper.LoadLandblock(realm, 0x8903);
 
             Assert.Equal(1, lb.RealmRuleset.GetProperty(RealmPropertyFloat.Spellcasting_Max_Angle));

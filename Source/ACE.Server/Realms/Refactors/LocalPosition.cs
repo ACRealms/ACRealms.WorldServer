@@ -65,7 +65,7 @@ namespace ACE.Server.Realms
                     // Warning! May have unintended results if using from an ephemeral realm
                     instanceId = player.RealmRuleset.GetDefaultInstanceID(player, this); break;
                 case PlayerInstanceSelectMode.HomeRealm:
-                    var realm = RealmManager.GetRealm(player.HomeRealm);
+                    var realm = RealmManager.GetRealm(player.HomeRealm, includeRulesets: false);
                     instanceId = realm.StandardRules.GetDefaultInstanceID(player, this);
                     break;
                 case PlayerInstanceSelectMode.PersonalRealm:

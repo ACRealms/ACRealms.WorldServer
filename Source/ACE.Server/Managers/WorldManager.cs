@@ -285,7 +285,7 @@ namespace ACE.Server.Managers
                 if (session.Player.Instantiation != null)
                     session.Player.Location = session.Player.Instantiation;
                 else
-                    session.Player.Location = RealmManager.GetRealm(session.Player.HomeRealm).DefaultStartingLocation(session.Player);  // realm fallback
+                    session.Player.Location = RealmManager.GetRealm(session.Player.HomeRealm, includeRulesets: false).DefaultStartingLocation(session.Player);  // realm fallback
             }
 
             //var realm = RealmManager.GetRealm(session.Player.Location.RealmID);
@@ -302,9 +302,9 @@ namespace ACE.Server.Managers
             //}
             if (!session.Player.ValidatePlayerRealmPosition(session.Player.Location))
             {
-                var homerealm = RealmManager.GetRealm(session.Player.HomeRealm);
+                var homerealm = RealmManager.GetRealm(session.Player.HomeRealm, includeRulesets: false);
                 if (homerealm == null)
-                    homerealm = RealmManager.GetRealm((ushort)ReservedRealm.NULL);
+                    homerealm = RealmManager.GetRealm((ushort)ReservedRealm.NULL, includeRulesets: false);
                 if (session.Player.GetPosition(PositionType.EphemeralRealmExitTo) != null)
                 {
                     session.Network.EnqueueSend(new GameMessageSystemChat($"The instance you were in has expired and you have been transported outside!", ChatMessageType.System));
@@ -329,7 +329,7 @@ namespace ACE.Server.Managers
             if (!success)
             {
                 // send to lifestone, or fallback location
-                var fixLoc = (session.Player.Sanctuary ?? RealmManager.GetRealm(session.Player.HomeRealm).DefaultStartingLocation(session.Player).AsLocalPosition())
+                var fixLoc = (session.Player.Sanctuary ?? RealmManager.GetRealm(session.Player.HomeRealm, includeRulesets: false).DefaultStartingLocation(session.Player).AsLocalPosition())
                     .AsInstancedPosition(session.Player, PlayerInstanceSelectMode.HomeRealm);
 
                 log.Error($"WorldManager.DoPlayerEnterWorld: failed to spawn {session.Player.Name}, relocating to {fixLoc.ToLOCString()}");

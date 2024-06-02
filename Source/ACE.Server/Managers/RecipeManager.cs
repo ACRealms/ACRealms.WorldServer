@@ -166,7 +166,7 @@ namespace ACE.Server.Managers
             var realmId = _realmId.Value;
             if (realmId < 0 || realmId > 0xFFFF)
                 return false;
-            var realm = RealmManager.GetRealm((ushort)realmId);
+            var realm = RealmManager.GetRealm((ushort)realmId, includeRulesets: true);
             if (realm == null)
             {
                 log.Error($"Player ${player.Name} attempted to apply stamp for missing realm {realmId} to a portal gem.");

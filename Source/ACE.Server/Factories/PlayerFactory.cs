@@ -366,7 +366,7 @@ namespace ACE.Server.Factories
                 if (ACRealmsConfigManager.Config.OptOutOfRealms)
                     defaultRealm = RealmManager.GetReservedRealm(ReservedRealm.@default);
                 else
-                    defaultRealm = RealmManager.GetRealmByName(ACRealmsConfigManager.Config.DefaultRealm);
+                    defaultRealm = RealmManager.GetRealmByName(ACRealmsConfigManager.Config.DefaultRealm, includeRulesets: false);
 
                 var startArea = characterCreateInfo.StartArea;
                 var starterArea = DatManager.PortalDat.CharGen.StarterAreas[(int)startArea];
