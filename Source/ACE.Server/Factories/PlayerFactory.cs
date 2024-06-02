@@ -375,7 +375,7 @@ namespace ACE.Server.Factories
                     starterArea.Locations[0].Frame.Orientation.X, starterArea.Locations[0].Frame.Orientation.Y, starterArea.Locations[0].Frame.Orientation.Z, starterArea.Locations[0].Frame.Orientation.W);
                 var iid = defaultRealm.StandardRules.GetDefaultInstanceID(player, startLoc);
 
-                RealmManager.SetHomeRealm(player, defaultRealm.Realm.Id, teleportToDefaultLoc: false); // Will crash if teleportToDefaultLoc is true
+                RealmManager.SetHomeRealm(player, defaultRealm.Realm.Id, settingFromRealmSelector: false, saveImmediately: false); // Will crash if teleportToDefaultLoc is true
                 player.Location = new InstancedPosition(startLoc, iid);
                 
 
@@ -415,7 +415,7 @@ namespace ACE.Server.Factories
 
                 var iid = realmSelector.StandardRules.GetDefaultInstanceID(player, blaineRoom);
                 var startPos = blaineRoom.AsInstancedPosition(iid);
-                RealmManager.SetHomeRealm(player, realmSelector.Realm.Id, false);
+                RealmManager.SetHomeRealm(player, realmSelector.Realm.Id, false, saveImmediately: false);
                 player.Location = startPos;
                 player.Instantiation = new InstancedPosition(player.Location);
                 player.Sanctuary = player.Location.AsLocalPosition();

@@ -614,16 +614,56 @@ namespace ACE.Server.Managers
             return false;
         }
 
-        public static void SetHomeRealm(Player player, ushort realmId, bool teleportToDefaultLoc = true)
+        // This will be used for auto home realm migration from older servers, but may also be used from an admin command.
+        public static void SetHomeRealm(OfflinePlayer offlinePlayer, WorldRealm realm)
         {
-            var realm = GetRealm(realmId);
+            log.Info($"Setting HomeRealm for offline character '{offlinePlayer.Name}' to '{realm.Realm.Name}' (ID {realm.Realm.Id}).");
+            int oldHomeRealmInt = offlinePlayer.GetProperty(PropertyInt.HomeRealm) ?? 0;
+            ushort oldHomeRealmId;
+            if (oldHomeRealmInt < 0 || oldHomeRealmInt > 0x7FFF)
+                oldHomeRealmId = 0;
+            else
+                oldHomeRealmId = (ushort)oldHomeRealmInt;
+
+            // var oldHomeRealm = GetRealm(oldHomeRealmId);
+
+            foreach(var type in Enum.GetValues<PositionType>())
+            {
+                var previousPosition = offlinePlayer.GetPositionUnsafe(type);
+                if (previousPosition == null)
+                    continue;
+                var destPositionAsLocal = previousPosition.AsLocalPosition();
+
+                if (previousPosition.IsEphemeralRealm)
+                    destPositionAsLocal = UltimateDefaultLocation;
+                else if (previousPosition.RealmID == realm.Realm.Id)
+                    continue;
+                else if (previousPosition.RealmID != oldHomeRealmId)
+                    continue;
+
+                if (DuelRealm == realm)
+                    destPositionAsLocal = DuelRealmHelpers.GetDuelingAreaDrop(offlinePlayer).AsLocalPosition();
+
+                var iid = realm.StandardRules.GetDefaultInstanceID(offlinePlayer, destPositionAsLocal);
+
+                var destPosition = destPositionAsLocal.AsInstancedPosition(iid);
+                offlinePlayer.SetPositionUnsafe(type, destPosition);
+            }
+
+            //TODO: Housing
+            offlinePlayer.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
+        }
+
+        public static void SetHomeRealm(Player player, ushort realmId, bool settingFromRealmSelector, bool saveImmediately = true)
+        {
+            var realm = GetRealm(realmId, includeRulesets: false);
             if (realm == null)
                 throw new InvalidOperationException($"Attempted to use SetHomeRealm with a realm id {realmId}, which was not found.");
 
-            log.Info($"Setting HomeRealm for character {player.Name} to {realm.Realm.Id}.");
+            log.Info($"Setting HomeRealm for character '{player.Name}' to '{realm.Realm.Name}' (ID {realm.Realm.Id}).");
             player.HomeRealm = realm.Realm.Id;
             
-            if (teleportToDefaultLoc)
+            if (settingFromRealmSelector)
             {
                 player.SetProperty(PropertyBool.RecallsDisabled, false);
                 var loc = realm.DefaultStartingLocation(player);
@@ -634,6 +674,12 @@ namespace ACE.Server.Managers
                         DuelRealmHelpers.SetupNewCharacter(player);
                 }));
             }
+            bool validate = saveImmediately;
+            if (validate)
+                player.ValidateCurrentRealm();
+            if (saveImmediately)
+                player.SavePlayerToDatabase();
+            
         }
     }
 }
