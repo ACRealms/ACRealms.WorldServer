@@ -30,6 +30,7 @@ using static ACE.Server.Services;
 using Autofac.Extensions.DependencyInjection;
 using Autofac.Core;
 using ACRealms.Tests.Helpers;
+using ACE.Common.ACRealms;
 
 namespace ACRealms.Tests
 {
@@ -38,6 +39,7 @@ namespace ACRealms.Tests
         public void ConfigureHostApplicationBuilder(IHostApplicationBuilder hostApplicationBuilder)
         {
             ConfigManager.Initialize();
+            ACRealmsConfigManager.Initialize();
             TestDatabaseService.Initialize(hostApplicationBuilder.Services);
         }
 
