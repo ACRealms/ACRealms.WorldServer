@@ -411,15 +411,19 @@ namespace ACE.Server.Factories
             else
             {
                 var realmSelector = RealmManager.GetReservedRealm(ReservedRealm.RealmSelector);
-                var blaineRoom = new LocalPosition(0x8903012E, 87.738312f, -47.704556f, .005f, 0.0f, 0.0f, -0.926821f, 0.375504f);
-
+                var blaineRoom = new LocalPosition(0xB96F0100, 83.7821f, 107.123f, 10.005f, 0f, 0f, -0.068597f, -0.997645f);
                 var iid = realmSelector.StandardRules.GetDefaultInstanceID(player, blaineRoom);
                 var startPos = blaineRoom.AsInstancedPosition(iid);
                 RealmManager.SetHomeRealm(player, realmSelector.Realm.Id, false, saveImmediately: false);
                 player.Location = startPos;
-                player.Instantiation = new InstancedPosition(player.Location);
+                player.Instantiation = startPos;
                 player.Sanctuary = player.Location.AsLocalPosition();
                 player.SetProperty(PropertyBool.RecallsDisabled, true);
+
+                var token = WorldObjectFactory.CreateNewWorldObject((uint)WeenieClassName.W_TOKENTRAININGEXIT_CLASS, realmSelector.StandardRules);
+                if (token == null)
+                    throw new InvalidOperationException("Academy Exit Token Weenie not found.");
+                player.TryAddToInventory(token);
             }
 
                 /*

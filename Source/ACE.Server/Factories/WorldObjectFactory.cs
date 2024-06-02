@@ -14,6 +14,8 @@ using ACE.Server.WorldObjects;
 using Biota = ACE.Database.Models.Shard.Biota;
 using LandblockInstance = ACE.Database.Models.World.LandblockInstance;
 using ACE.Server.Realms;
+using ACE.Common.ACRealms;
+using ACE.Entity.Enum.Properties;
 
 namespace ACE.Server.Factories
 {
@@ -293,43 +295,81 @@ namespace ACE.Server.Factories
                 if (restrict_wcid != null && restrict_wcid.Value != instance.WeenieClassId)
                     continue;
 
-                var guid = new ObjectGuid(instance.Guid, iid);
+                var pos = new InstancedPosition(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW, iid);
+                var obj = CreateStaticObject(biotas, weenie, instance.Guid, iid, pos, ruleset, instance.LandblockInstanceLink, sourceObjects);
+                if (obj != null)
+                    results.Add(obj);
+            }
 
-                WorldObject worldObject;
-
-                var biota = biotas.FirstOrDefault(b => b.Id == guid.Full);
-                if (biota == null)
+            // Hack to create realm selector so as to not require overwriting of existing landblock data
+            if (ACRealmsConfigManager.Config.CharacterCreationOptions.UseRealmSelector && landblockId == 0xB96F)
+            {
+                Position.ParseInstanceID(iid, out bool _, out ushort realmId, out ushort _);
+                if (realmId == (ushort)ReservedRealm.RealmSelector)
                 {
-                    worldObject = CreateWorldObject(weenie, guid, ruleset);
+                    uint staticGuid;
+                    if (results.Count > 0)
+                        staticGuid = results.Last().Guid.ClientGUID + 1;
+                    else
+                        staticGuid = 0x70000000 | (uint)landblockId << 12;
 
-                    worldObject.Location = new InstancedPosition(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW, iid);
-                }
-                else
-                {
-                    worldObject = CreateWorldObject(biota);
-
-                    if (worldObject.Location == null)
+                    var weenie = DatabaseManager.World.GetCachedWeenie("realmselector");
+                    if (weenie == null)
+                        log.Warn($"CreateNewWorldObjects: Couldn't find realmselector weenie");
+                    else
                     {
-                        log.Warn($"CreateNewWorldObjects: {worldObject.Name} (0x{worldObject.Guid}) Location was null. CreationTimestamp = {worldObject.CreationTimestamp} ({Common.Time.GetDateTimeFromTimestamp(worldObject.CreationTimestamp ?? 0).ToLocalTime()}) | Location restored from world db instance.");
-                        worldObject.Location = new InstancedPosition(instance.ObjCellId, instance.OriginX, instance.OriginY, instance.OriginZ, instance.AnglesX, instance.AnglesY, instance.AnglesZ, instance.AnglesW, iid);
+                        var pos = new InstancedPosition(0xB96F0101, 83.39159f, 111.2694f, 10.005f, 0f, 0f, -0.998641f, -0.052122f, iid);
+                        var obj = CreateStaticObject(biotas, weenie, staticGuid, iid, pos, ruleset, null, null);
+                        if (obj == null)
+                            log.Warn($"CreateNewWorldObjects: Couldn't spawn Blaine!");
+                        else
+                            results.Add(obj);
                     }
-                }
-
-                if (worldObject != null)
-                {
-                    // queue linked child objects
-                    foreach (var link in instance.LandblockInstanceLink)
-                    {
-                        var linkInstance = sourceObjects.FirstOrDefault(x => x.Guid == link.ChildGuid);
-
-                        if (linkInstance != null)
-                            worldObject.LinkedInstances.Add(linkInstance);
-                    }
-
-                    results.Add(worldObject);
                 }
             }
+
             return results;
+        }
+
+        private static WorldObject CreateStaticObject(List<Biota> biotas, Weenie weenie, uint staticGuid, uint iid, InstancedPosition position,
+            AppliedRuleset ruleset, ICollection<Database.Models.World.LandblockInstanceLink> landblockInstanceLinks, List<LandblockInstance> sourceObjects)
+        {
+            var guid = new ObjectGuid(staticGuid, iid);
+
+            WorldObject worldObject;
+
+            var biota = biotas.FirstOrDefault(b => b.Id == guid.Full);
+            if (biota == null)
+            {
+                worldObject = CreateWorldObject(weenie, guid, ruleset);
+                worldObject.Location = position;
+            }
+            else
+            {
+                worldObject = CreateWorldObject(biota);
+
+                if (worldObject.Location == null)
+                {
+                    log.Warn($"CreateNewWorldObjects: {worldObject.Name} (0x{worldObject.Guid}) Location was null. CreationTimestamp = {worldObject.CreationTimestamp} ({Common.Time.GetDateTimeFromTimestamp(worldObject.CreationTimestamp ?? 0).ToLocalTime()}) | Location restored from world db instance.");
+                    worldObject.Location = position;
+                }
+            }
+
+            if (landblockInstanceLinks == null)
+                return worldObject;
+
+            if (worldObject != null)
+            {
+                // queue linked child objects
+                foreach (var link in landblockInstanceLinks)
+                {
+                    var linkInstance = sourceObjects.FirstOrDefault(x => x.Guid == link.ChildGuid);
+
+                    if (linkInstance != null)
+                        worldObject.LinkedInstances.Add(linkInstance);
+                }
+            }
+            return worldObject;
         }
 
         /// <summary>
