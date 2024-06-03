@@ -204,10 +204,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Called when a player abandons a house
         /// </summary>
-        public static void RemoveRentQueue(ulong houseGuid)
-        {
-            RentQueue.RemoveWhere(i => i.House.Guid.Full == houseGuid);
-        }
+        public static bool RemoveRentQueue(ulong houseGuid) => RentQueue.RemoveWhere(i => i.House.Guid.Full == houseGuid) > 0;
 
         /// <summary>
         /// Queries the status of multi-house owners on the server
