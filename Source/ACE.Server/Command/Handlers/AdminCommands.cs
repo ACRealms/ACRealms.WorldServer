@@ -1592,17 +1592,20 @@ namespace ACE.Server.Command.Handlers
                 CommandHandlerHelper.WriteOutputInfo(session, msg, ChatMessageType.System);
 
                 var houseProfile = slumLord.GetHouseProfile();
+                msg = "";
                 if (full)
                 {
-                    msg = "";
                     msg += $"===HouseProfile================================\n";
 
                     msg += $"Type: {houseProfile.Type} | Bitmask: {houseProfile.Bitmask}\n";
 
                     msg += $"MinLevel: {houseProfile.MinLevel} | MaxLevel: {houseProfile.MaxLevel}\n";
                     msg += $"MinAllegRank: {houseProfile.MinAllegRank} | MaxAllegRank: {houseProfile.MaxAllegRank}\n";
+                }
 
-                    msg += $"OwnerID: 0x{houseProfile.OwnerID} | OwnerName: {(string.IsNullOrEmpty(houseProfile.OwnerName) ? "N/A" : $"{houseProfile.OwnerName}")}\n";
+                msg += $"OwnerID: 0x{houseProfile.OwnerID} | OwnerName: {(string.IsNullOrEmpty(houseProfile.OwnerName) ? "N/A" : $"{houseProfile.OwnerName}")}\n";
+                if (full)
+                { 
                     msg += $"MaintenanceFree: {houseProfile.MaintenanceFree}\n";
                     msg += "--== Buy Cost==--\n";
                     foreach (var cost in houseProfile.Buy)
@@ -1610,8 +1613,8 @@ namespace ACE.Server.Command.Handlers
                     msg += "--==Rent Cost==--\n";
                     foreach (var cost in houseProfile.Rent)
                         msg += $"{cost.Num:N0} {(cost.Num > 1 ? $"{cost.PluralName}" : $"{cost.Name}")} (WCID: {cost.WeenieID}) | Paid: {cost.Paid:N0}\n";
-                    CommandHandlerHelper.WriteOutputInfo(session, msg, ChatMessageType.System);
                 }
+                CommandHandlerHelper.WriteOutputInfo(session, msg, ChatMessageType.System);
 
                 var houseData = house.GetHouseData(PlayerManager.FindByGuid(houseProfile.OwnerID));
                 msg = "";
