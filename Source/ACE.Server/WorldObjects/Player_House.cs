@@ -171,7 +171,10 @@ namespace ACE.Server.WorldObjects
                     log.ErrorFormat("{0}.GiveDeed() - couldn't find location {1}", Name, slumLord.Location.ToLOCString());
             }
 
-            deed.LongDesc = $"Bought by {Name}{titleStr} on {date} at {time}\n\nPurchased at {location}";
+            var realmName = slumLord.Location.WorldRealm?.Realm?.Name;
+            var realmInfo = realmName != null ? $"in the realm of {realmName}." : "in a mysterious realm.";
+
+            deed.LongDesc = $"Bought by {Name}{titleStr} on {date} at {time}\n\nPurchased at {location}, {realmInfo}";
 
             TryCreateInInventoryWithNetworking(deed);
         }
