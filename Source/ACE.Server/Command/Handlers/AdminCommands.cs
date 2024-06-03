@@ -1252,13 +1252,23 @@ namespace ACE.Server.Command.Handlers
                         return;
                     }
 
-                    if (!uint.TryParse(parameters[2], out var houseId))
+                    if (!ulong.TryParse(parameters[2], out var houseId))
                     {
-                        CommandHandlerHelper.WriteOutputInfo(session, $"{parameters[2]} is not a valid house id.");
-                        return;
+                        if (parameters[2].StartsWith("0x") || parameters[2].StartsWith("0X"))
+                            parameters[2] = parameters[2].Substring(2);
+
+                        if (!ulong.TryParse(parameters[2], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out houseId))
+                        {
+                            CommandHandlerHelper.WriteOutputInfo(session, $"{parameters[2]} is not a valid house id.");
+                            return;
+                        }
                     }
 
-                    var houses = HouseManager.GetHouseById(houseId);
+                    List<House> houses;
+                    if (houseId <= uint.MaxValue)
+                        houses = HouseManager.GetHouseById((uint)houseId);
+                    else
+                        houses = new List<House> { HouseManager.GetPurchasedHouseByInstancedId(new ObjectGuid(houseId)) };
 
                     if (houses.Count == 0)
                     {
