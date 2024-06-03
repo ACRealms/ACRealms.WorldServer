@@ -396,7 +396,7 @@ namespace ACE.Server.Command.Handlers.ACRealms
             foreach(var p in players)
             {
                 var playerHomeRealmId = p.GetProperty(PropertyInt.HomeRealm) ?? 0;
-                if (playerHomeRealmId == oldRealmId)
+                if (playerHomeRealmId != oldRealmId)
                     continue;
                 HandleSetHomeRealm(session, $"{p.Name}, {newRealm.Realm.Id}".Split(' ', StringSplitOptions.RemoveEmptyEntries));
             }
