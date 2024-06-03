@@ -1,5 +1,6 @@
 using ACE.DatLoader;
 using ACE.Entity;
+using ACE.Server.Managers;
 using ACE.Server.Network.GameAction.Actions;
 using ACE.Server.Physics.Common;
 using ACE.Server.Physics.Extensions;
@@ -81,6 +82,20 @@ namespace ACE.Server.Realms
             ushort left = (ushort)(instanceId >> 16);
             isTemporaryRuleset = (left & 0x8000) == 0x8000;
             realmId = (ushort)(left & 0x7FFF);
+        }
+
+        /// <summary>
+        /// Returns null if it is not a permanent realm
+        /// </summary>
+        public WorldRealm WorldRealm
+        {
+            get
+            {
+                ParseInstanceID(Instance, out var ephemeral, out var realmId, out _);
+                if (IsEphemeralRealm)
+                    return null;
+                return RealmManager.GetRealm(realmId, false);
+            }
         }
 
         public ushort RealmID
