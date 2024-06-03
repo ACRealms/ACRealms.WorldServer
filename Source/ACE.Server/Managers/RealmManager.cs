@@ -654,8 +654,11 @@ namespace ACE.Server.Managers
             var houses = HouseManager.GetCharacterHouses(player.Guid.Full);
             bool failed = false;
 
-            foreach(var house in houses)
-                failed |= !house.TryMoveHouseToNewRealmInstance(destinationRealm.StandardRules.GetDefaultInstanceID(player, house.Location.AsLocalPosition()));
+            foreach (var house in houses)
+            {
+                var actualHouse = HouseManager.GetHouseSynchronously(house.Guid, true);
+                failed |= !actualHouse.TryMoveHouseToNewRealmInstance(destinationRealm.StandardRules.GetDefaultInstanceID(player, house.Location.AsLocalPosition()));
+            }
             return !failed;
         }
 

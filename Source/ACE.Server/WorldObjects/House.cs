@@ -773,87 +773,16 @@ namespace ACE.Server.WorldObjects
                 return false;
             }
 
-            House destHouse = null;
-            Task<bool> job = new Task<bool>(() =>
+            House destHouse = HouseManager.GetHouseSynchronously(targetGuid, true);
+
+            var player = PlayerManager.FindByGuid(new ObjectGuid(HouseOwner.Value));
+
+            if (!HouseManager.ChangeOwnedHouse(player, this, destHouse))
             {
-                var player = PlayerManager.FindByGuid(new ObjectGuid(HouseOwner.Value));
-
-                player.ChangeOwnedHouse(this, destHouse);
-
-                List<Container> srcContainers = new List<Container>();
-                srcContainers.AddRange(Storage);
-                srcContainers.AddRange(Hooks);
-
-                List<Container> destContainers = new List<Container>();
-                destContainers.AddRange(destHouse.Storage);
-                destContainers.AddRange(destHouse.Hooks);
-
-                foreach (var srcContainer in srcContainers)
-                {
-                    string type = srcContainer.GetType().Name;
-                    if (!srcContainer.InventoryLoaded)
-                    {
-                        log.Error($"Couldn't move house for player {HouseOwnerName} to new instance, {type} inventory not loaded.");
-                        return false;
-                    }
-
-                    var destContainer = destContainers.Where(s => s.Guid.ClientGUID == srcContainer.Guid.ClientGUID).FirstOrDefault();
-                    if (destContainer == null)
-                    {
-                        log.Error($"Couldn't move house for player {HouseOwnerName} to new instance, destination {type} not found.");
-                        return false;
-                    }
-
-                    destContainer.ClearInventory(true);
-                    foreach(var item in srcContainer.Inventory.Values)
-                    {
-                        if (destContainer.TryAddToInventory(item, item.PlacementPosition ?? 0, false, false))
-                            item.SaveBiotaToDatabase();
-                        else
-                            log.Error($"Couldn't move inventory item {item.Guid} for player {HouseOwnerName} to new {type}.");
-                    }
-                }
-
-                return true;
-            });
-
-            bool callbackCancelled = false;
-            bool callbackRunning = false;
-            var returnInfo = HouseManager.GetHouse(targetGuid, (house) =>
-            {
-                callbackRunning = true;
-                if (!callbackCancelled)
-                {
-                    destHouse = house;
-                    job.Start();
-                }
-            });
-
-            if (returnInfo.Item1 == null)
-            {
-                log.Error($"Failed to transfer house owned by player {HouseOwnerName} to new instance.");
+                log.Error($"[HOUSE] TryMoveHouseToNewRealmInstance: Error in HouseManager.ChangeOwnedHouse");
                 return false;
             }
-            else if (returnInfo.Item2)
-            {
-                if (!callbackRunning)
-                {
-                    callbackCancelled = true;
-                    destHouse = returnInfo.Item1;
-                    job.RunSynchronously();
-                    return job.Result;
-                }
-            }
-            else
-            {
-                if (!job.Wait(5000))
-                {
-                    log.Error($"Failed to transfer house owned by player {HouseOwnerName} to new instance. InventoryLoadCallback failed to run within 5 second timeout.");
-                    return false;
-                }
-            }
-            
-            return job.Result;
+            return true;
         }
     }
 }

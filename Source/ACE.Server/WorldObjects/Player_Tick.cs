@@ -32,7 +32,7 @@ namespace ACE.Server.WorldObjects
         private const double ageUpdateInterval = 7;
         private double nextAgeUpdateTime;
 
-        private double houseRentWarnTimestamp;
+        internal double houseRentWarnTimestamp;
         private const double houseRentWarnInterval = 3600;
 
         public void Player_Tick(double currentUnixTime)

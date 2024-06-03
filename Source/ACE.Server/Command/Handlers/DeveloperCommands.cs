@@ -2876,7 +2876,7 @@ namespace ACE.Server.Command.Handlers
                 session.Network.EnqueueSend(new GameMessageSystemChat("Couldn't find slumlord", ChatMessageType.Broadcast));
                 return;
             }
-            session.Player.SetHouseOwner(slumlord);
+            HouseManager.SetHouseOwner(session.Player, slumlord, slumlord.House, runSynchronously: false);
             session.Player.GiveDeed(slumlord);
         }
 

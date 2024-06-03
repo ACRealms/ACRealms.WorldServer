@@ -310,51 +310,5 @@ namespace ACE.Server.Entity
             else
                 RemoveProperty(prop);
         }
-
-        /// <summary>
-        /// Sets the offline player as the owner of a new house, given a previously owned house
-        /// Does not transfer items
-        /// </summary>
-        public void ChangeOwnedHouse(House oldHouse, House newHouse)
-        {
-            log.Info($"[HOUSE] Setting {Name} (0x{Guid}) as owner of {newHouse.Name} (0x{newHouse.Guid:X16})");
-
-            var slumlord = newHouse.SlumLord;
-            Managers.HouseManager.HandleEviction(oldHouse, Guid.Full, notifyPlayer: false);
-            Managers.HouseManager.RemoveRentQueue(oldHouse.Guid.Full);
-
-            // set player properties
-            HouseId = newHouse.HouseId;
-            HouseInstance = newHouse.Guid.Full;
-
-            // set house properties
-            newHouse.HouseOwner = Guid.Full;
-            newHouse.HouseOwnerName = Name;
-            newHouse.OpenToEveryone = oldHouse.OpenToEveryone;
-            newHouse.SaveBiotaToDatabase();
-
-            // relink
-            newHouse.UpdateLinks();
-
-            if (newHouse.HasDungeon)
-            {
-                var dungeonHouse = newHouse.GetDungeonHouse();
-                if (dungeonHouse != null)
-                    dungeonHouse.UpdateLinks();
-            }
-
-            slumlord.On();
-            slumlord.SetAndBroadcastName(Name);
-            slumlord.ClearInventory();
-            slumlord.SaveBiotaToDatabase();
-
-            HouseList.RemoveFromAvailable(slumlord, newHouse);
-            SaveBiotaToDatabase();
-            newHouse.UpdateRestrictionDB();
-
-            newHouse.BootAll(this, false);
-            Managers.HouseManager.AddRentQueue(this, newHouse.Guid.Full);
-            log.Info($"Transferred house owner for '{Name}' from {oldHouse.Guid} to {newHouse.Guid}.");
-        }
     }
 }

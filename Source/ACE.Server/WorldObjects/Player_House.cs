@@ -149,7 +149,7 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            SetHouseOwner(slumlord);
+            HouseManager.SetHouseOwner(this, slumlord, slumlord.House, runSynchronously: false);
 
             GiveDeed(slumlord);
         }
@@ -607,124 +607,6 @@ namespace ACE.Server.WorldObjects
             RemoveDeed();
 
             RemoveProperty(PropertyBool.HouseEvicted);
-        }
-
-        /// <summary>
-        /// Sets this player as the owner of a house
-        /// </summary>
-        public void SetHouseOwner(SlumLord slumlord)
-        {
-            var house = slumlord.House;
-
-            //Console.WriteLine($"Setting {Name} as owner of {house.Name}");
-            log.Info($"[HOUSE] Setting {Name} (0x{Guid}) as owner of {house.Name} (0x{house.Guid:X8})");
-
-            // set player properties
-            HouseId = house.HouseId;
-            HouseInstance = house.Guid.Full;
-
-            var housePurchaseTimestamp = Time.GetUnixTime();
-            if (house.HouseType != HouseType.Apartment)
-                HousePurchaseTimestamp = (int)housePurchaseTimestamp;
-            HouseRentTimestamp = (int)house.GetRentDue((uint)housePurchaseTimestamp);
-            houseRentWarnTimestamp = 0;
-
-            // set house properties
-            house.HouseOwner = Guid.Full;
-            house.HouseOwnerName = Name;
-            house.OpenToEveryone = false;
-            house.SaveBiotaToDatabase();
-            
-            // relink
-            house.UpdateLinks();
-
-            if (house.HasDungeon)
-            {
-                var dungeonHouse = house.GetDungeonHouse();
-                if (dungeonHouse != null)
-                    dungeonHouse.UpdateLinks();
-            }
-
-            // notify client w/ HouseID
-            Session.Network.EnqueueSend(new GameMessageSystemChat("Congratulations!  You now own this dwelling.", ChatMessageType.Broadcast));
-
-            // player slumlord 'on' animation
-            slumlord.On();
-
-            // set house name
-            slumlord.SetAndBroadcastName(Name);
-
-            slumlord.ClearInventory();
-
-            slumlord.SaveBiotaToDatabase();
-
-            HouseList.RemoveFromAvailable(slumlord, house);
-
-            SaveBiotaToDatabase();
-
-            if (house.HouseType != HouseType.Apartment)
-                Session.Network.EnqueueSend(new GameMessagePrivateUpdatePropertyInt(this, PropertyInt.HousePurchaseTimestamp, HousePurchaseTimestamp ?? 0));
-
-            // set house data
-            // why has this changed? use callback?
-            var actionChain = new ActionChain();
-            actionChain.AddDelaySeconds(3.0f);
-            actionChain.AddAction(this, () =>
-            {
-                HandleActionQueryHouse();
-                house.UpdateRestrictionDB();
-
-                // boot anyone who may have been wandering around inside...
-                HandleActionBootAll(false);
-
-                HouseManager.AddRentQueue(this, house.Guid.Full);
-                slumlord.ActOnUse(this);
-            });
-            actionChain.EnqueueChain();
-        }
-
-        public void ChangeOwnedHouse(House oldHouse, House newHouse)
-        {
-            var slumlord = newHouse.SlumLord;
-
-            log.Info($"[HOUSE] Setting {Name} (0x{Guid}) as owner of {newHouse.Name} (0x{newHouse.Guid:X16})");
-
-            HouseManager.HandleEviction(oldHouse, Guid.Full, notifyPlayer: false);
-            HouseManager.RemoveRentQueue(oldHouse.Guid.Full);
-
-            // set player properties
-            HouseId = newHouse.HouseId;
-            HouseInstance = newHouse.Guid.Full;
-
-            // set house properties
-            newHouse.HouseOwner = Guid.Full;
-            newHouse.HouseOwnerName = Name;
-            newHouse.OpenToEveryone = oldHouse.OpenToEveryone;
-            newHouse.SaveBiotaToDatabase();
-
-            // relink
-            newHouse.UpdateLinks();
-
-            if (newHouse.HasDungeon)
-            {
-                var dungeonHouse = newHouse.GetDungeonHouse();
-                if (dungeonHouse != null)
-                    dungeonHouse.UpdateLinks();
-            }
-
-            slumlord.On();
-            slumlord.SetAndBroadcastName(Name);
-            slumlord.ClearInventory();
-            slumlord.SaveBiotaToDatabase();
-
-            HouseList.RemoveFromAvailable(slumlord, newHouse);
-            SaveBiotaToDatabase();
-            newHouse.UpdateRestrictionDB();
-
-            newHouse.BootAll(this, false);
-
-            HouseManager.AddRentQueue(this, newHouse.Guid.Full);
-            log.Info($"Transferred house owner for '{Name}' from {oldHouse.Guid} to {newHouse.Guid}.");
         }
 
         /// <summary>

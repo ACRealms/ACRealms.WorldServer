@@ -1274,7 +1274,7 @@ namespace ACE.Server.Command.Handlers
 
                     if (houses.Count == 0)
                     {
-                        CommandHandlerHelper.WriteOutputInfo(session, $"HouseId {houseId} is not currently owned.");
+                        CommandHandlerHelper.WriteOutputInfo(session, $"HouseId {new ObjectGuid(houseId)} is not currently owned.");
                         return;
                     }
 
@@ -1283,7 +1283,8 @@ namespace ACE.Server.Command.Handlers
                 }
                 else
                 {
-                    session.Player.SendMessage("You must specify either \"name\", \"account\" or \"hid\".");
+                    CommandHandlerHelper.WriteOutputInfo(session, "You must specify either \"name\", \"account\" or \"hid\".");
+                    return;
                 }
             }
             else if (parameters.Length >= 1 && parameters[0] == "dump_all")

@@ -95,7 +95,5 @@ namespace ACE.Server.Entity
         void SaveBiotaToDatabase(bool enqueueSave = true);
 
         void UpdateProperty(PropertyInstanceId prop, ulong? value, bool broadcast = false);
-
-        void ChangeOwnedHouse(House oldHouse, House newHouse);
     }
 }

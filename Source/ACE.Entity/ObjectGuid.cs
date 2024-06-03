@@ -53,7 +53,47 @@ namespace ACE.Entity
                 return instance;
             }
         }
-        
+
+        public ushort? StaticRealmID
+        {
+            get
+            {
+                if (Type != GuidType.Static)
+                    return null;
+                var iid = Instance ?? 0;
+                Position.ParseInstanceID(iid, out bool ephemeral, out ushort realmId, out _);
+                if (ephemeral)
+                    return null;
+                return realmId;
+            }
+        }
+
+        public ushort? StaticShortInstanceId
+        {
+            get
+            {
+                if (Type != GuidType.Static)
+                    return null;
+                var iid = Instance ?? 0;
+                Position.ParseInstanceID(iid, out bool ephemeral, out ushort realmId, out ushort shortInstanceId);
+                if (ephemeral)
+                    return null;
+                return shortInstanceId;
+            }
+        }
+
+        public bool IsStaticEphemeralInstanceGuid
+        {
+            get
+            {
+                if (Type != GuidType.Static)
+                    return false;
+                var iid = Instance ?? 0;
+                Position.ParseInstanceID(iid, out bool ephemeral, out _, out _);
+                return ephemeral;
+            }
+        }
+
         public GuidType Type { get; }
 
         public static uint TranslateToClientGuid(ulong fullGuid) => (uint)(fullGuid & 0xFFFFFFFF);
