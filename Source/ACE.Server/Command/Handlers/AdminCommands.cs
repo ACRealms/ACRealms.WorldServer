@@ -1270,7 +1270,7 @@ namespace ACE.Server.Command.Handlers
                     if (houseId <= uint.MaxValue)
                         houses = HouseManager.GetHouseById((uint)houseId);
                     else
-                        houses = new List<House> { HouseManager.GetPurchasedHouseByInstancedId(new ObjectGuid(houseId)) };
+                        houses = new List<House> { HouseManager.GetPurchasedHouseByInstancedId(new ObjectGuid(houseId)) }.Where(x => x != null).ToList();
 
                     if (houses.Count == 0)
                     {
