@@ -96,7 +96,7 @@ namespace ACE.Server.Command.Handlers.ACRealms
                 try
                 {
                     var actualHouse = HouseManager.GetHouseSynchronously(house.Guid);
-                    HouseManager.HandleEviction(actualHouse, player.Guid.Full, false, true, true);
+                    HouseManager.HandleEviction(actualHouse, player.Guid.Full, false, true, movingHouse: false);
                     CommandHandlerHelper.WriteOutputInfo(session, $"Evicted '{player.Name}' from house {house.Guid}", ChatMessageType.Broadcast);
                 }
                 catch (Exception)

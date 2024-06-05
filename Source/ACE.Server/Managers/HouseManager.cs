@@ -438,7 +438,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Handles the eviction process for a player house
         /// </summary>
-        public static void HandleEviction(House house, ulong playerGuid, bool multihouse = false, bool force = false, bool notifyPlayer = true)
+        public static void HandleEviction(House house, ulong playerGuid, bool multihouse = false, bool force = false, bool movingHouse = false)
         {
             // clear out slumlord inventory
             var slumlord = house.SlumLord;
@@ -514,7 +514,7 @@ namespace ACE.Server.Managers
                 return;
             }
 
-            if (!isOnline)
+            if (!isOnline && !movingHouse)
             {
                 // inform player of eviction when they log in
                 var offlinePlayer = PlayerManager.GetOfflinePlayer(playerGuid);
@@ -533,7 +533,7 @@ namespace ACE.Server.Managers
             onlinePlayer.House = null;
 
             // send text message
-            if (notifyPlayer)
+            if (!movingHouse)
                 onlinePlayer.Session.Network.EnqueueSend(new GameMessageSystemChat("Your house has reverted due to non-payment of the maintenance costs.  All items stored in the house have been lost.", ChatMessageType.Broadcast));
             onlinePlayer.RemoveDeed();
 
@@ -1063,7 +1063,7 @@ namespace ACE.Server.Managers
             log.Info($"[HOUSE] Setting {player.Name} (0x{player.Guid}) as owner of {newHouse.Name} (0x{newHouse.Guid:X16})");
 
             // var houseRentTimestamp = player.HouseRentTimestamp;
-            HandleEviction(oldHouse, player.Guid.Full, notifyPlayer: false);
+            HandleEviction(oldHouse, player.Guid.Full, movingHouse: true);
             RemoveRentQueue(oldHouse.Guid.Full);
 
             var slumlord = newHouse.SlumLord;
