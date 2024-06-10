@@ -11,6 +11,7 @@ namespace ACE.Entity.Enum.Properties
         [RealmPropertyInt(defaultValue: 0, minValue: 0, maxValue: 0)]
         Undef                                    = 0,
 
+        [Obsolete("This will be changed to a string")]
         [Description("Vendor weenies with a matching PropertyInt.RulesetStampVendorType will include this ruleset as a stamp for sale, to allow players to craft these rulesets for ephemeral instances")]
         [RealmPropertyInt(0, 0, 0xFFFF)]
         RulesetStampVendorCategory = 1,
