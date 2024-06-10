@@ -244,7 +244,7 @@ namespace ACE.Server.Command.Handlers
             try
             {
                 RealmManager.FullUpdateRealmsRepository(realmsDict, realmsById);
-                Console.WriteLine($"Imported {realmsById.Count} realms.");
+                Console.WriteLine($"Imported {realmsById.Count} realms (includes system-reserved realms).");
             }
             catch (Exception ex)
             {
