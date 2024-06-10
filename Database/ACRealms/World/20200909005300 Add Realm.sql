@@ -1,13 +1,3 @@
-use realms_world;
-
-DROP TABLE IF EXISTS `realm_properties_string`;
-DROP TABLE IF EXISTS `realm_properties_bool`;
-DROP TABLE IF EXISTS `realm_properties_float`;
-DROP TABLE IF EXISTS `realm_properties_int`;
-DROP TABLE IF EXISTS `realm_properties_int64`;
-DROP TABLE IF EXISTS `realm_ruleset_links`;
-DROP TABLE IF EXISTS `realm`;
-
 CREATE TABLE `realm` (
   `id` smallint unsigned NOT NULL DEFAULT 0 COMMENT 'Unique Realm Id within the Shard',
   `type` smallint unsigned NOT NULL,
@@ -15,7 +5,7 @@ CREATE TABLE `realm` (
   `parent_realm_id` smallint unsigned NULL,
   `property_count_randomized` smallint unsigned NULL COMMENT 'Maximum number of properties that will be picked from the ruleset at random.',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Dynamic Realm of a Shard/World';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Dynamic Realm of a Shard/World';
 
 CREATE TABLE `realm_ruleset_links` (
   `realm_id` smallint unsigned NOT NULL,
@@ -27,7 +17,7 @@ CREATE TABLE `realm_ruleset_links` (
   PRIMARY KEY (`realm_id`, `order`),
   CONSTRAINT `realm_link_parent` FOREIGN KEY (`realm_Id`) REFERENCES `realm` (`id`) ON DELETE CASCADE,
   CONSTRAINT `realm_link_child` FOREIGN KEY (`linked_realm_id`) REFERENCES `realm` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `realm_properties_string` (
   `realm_Id` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'Id of the object this property belongs to',
@@ -38,7 +28,7 @@ CREATE TABLE `realm_properties_string` (
   PRIMARY KEY (`realm_Id`,`type`),
   KEY `idx_type` (`type`),
   CONSTRAINT `realm_string` FOREIGN KEY (`realm_Id`) REFERENCES `realm` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='String Properties of Realms';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='String Properties of Realms';
 
 CREATE TABLE `realm_properties_int64` (
   `realm_Id` smallint unsigned NOT NULL DEFAULT '0' COMMENT 'Id of the object this property belongs to',
@@ -53,7 +43,7 @@ CREATE TABLE `realm_properties_int64` (
   PRIMARY KEY (`realm_Id`,`type`),
   CONSTRAINT `realm_int64` FOREIGN KEY (`realm_Id`) REFERENCES `realm` (`id`) ON DELETE CASCADE
   
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Int64 Properties of Realms';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Int64 Properties of Realms';
 
 
 CREATE TABLE `realm_properties_int` (
@@ -69,7 +59,7 @@ CREATE TABLE `realm_properties_int` (
   PRIMARY KEY (`realm_Id`,`type`),
   KEY `idx_type` (`type`),
   CONSTRAINT `realm_int` FOREIGN KEY (`realm_Id`) REFERENCES `realm` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Int Properties of Realms';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Int Properties of Realms';
 
 
 CREATE TABLE `realm_properties_float` (
@@ -85,7 +75,7 @@ CREATE TABLE `realm_properties_float` (
   PRIMARY KEY (`realm_Id`,`type`),
   KEY `idx_type` (`type`),
   CONSTRAINT `realm_float` FOREIGN KEY (`realm_Id`) REFERENCES `realm` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Float Properties of Realms';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Float Properties of Realms';
 
 
 CREATE TABLE `realm_properties_bool` (
@@ -97,4 +87,4 @@ CREATE TABLE `realm_properties_bool` (
   PRIMARY KEY (`realm_Id`,`type`),
   KEY `idx_type` (`type`),
   CONSTRAINT `realm_bool` FOREIGN KEY (`realm_Id`) REFERENCES `realm` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bool Properties of Realms';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Bool Properties of Realms';

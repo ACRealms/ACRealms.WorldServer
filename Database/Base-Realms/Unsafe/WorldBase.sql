@@ -14,6 +14,61 @@
 
 -- Begin ACE Schema
 
+DROP TABLE IF EXISTS `cook_book`;
+DROP TABLE IF EXISTS `encounter`;
+DROP TABLE IF EXISTS `event`;
+DROP TABLE IF EXISTS `house_portal`;
+DROP TABLE IF EXISTS `landblock_instance`;
+DROP TABLE IF EXISTS `landblock_instance_link`;
+DROP TABLE IF EXISTS `points_of_interest`;
+DROP TABLE IF EXISTS `quest`;
+DROP TABLE IF EXISTS `recipe`;
+DROP TABLE IF EXISTS `recipe_mod`;
+DROP TABLE IF EXISTS `recipe_mods_bool`;
+DROP TABLE IF EXISTS `recipe_mods_d_i_d`;
+DROP TABLE IF EXISTS `recipe_mods_float`;
+DROP TABLE IF EXISTS `recipe_mods_i_i_d`;
+DROP TABLE IF EXISTS `recipe_mods_int`;
+DROP TABLE IF EXISTS `recipe_mods_string`;
+DROP TABLE IF EXISTS `recipe_requirements_bool`;
+DROP TABLE IF EXISTS `recipe_requirements_d_i_d`;
+DROP TABLE IF EXISTS `recipe_requirements_float`;
+DROP TABLE IF EXISTS `recipe_requirements_i_i_d`;
+DROP TABLE IF EXISTS `recipe_requirements_int`;
+DROP TABLE IF EXISTS `recipe_requirements_string`;
+DROP TABLE IF EXISTS `spell`;
+DROP TABLE IF EXISTS `treasure_death`;
+DROP TABLE IF EXISTS `treasure_gem_count`;
+DROP TABLE IF EXISTS `treasure_material_base`;
+DROP TABLE IF EXISTS `treasure_material_color`;
+DROP TABLE IF EXISTS `treasure_material_groups`;
+DROP TABLE IF EXISTS `treasure_wielded`;
+DROP TABLE IF EXISTS `version`;
+DROP TABLE IF EXISTS `weenie`;
+DROP TABLE IF EXISTS `weenie_properties_anim_part`;
+DROP TABLE IF EXISTS `weenie_properties_attribute`;
+DROP TABLE IF EXISTS `weenie_properties_attribute_2nd`;
+DROP TABLE IF EXISTS `weenie_properties_body_part`;
+DROP TABLE IF EXISTS `weenie_properties_book`;
+DROP TABLE IF EXISTS `weenie_properties_book_page_data`;
+DROP TABLE IF EXISTS `weenie_properties_bool`;
+DROP TABLE IF EXISTS `weenie_properties_create_list`;
+DROP TABLE IF EXISTS `weenie_properties_d_i_d`;
+DROP TABLE IF EXISTS `weenie_properties_emote`;
+DROP TABLE IF EXISTS `weenie_properties_emote_action`;
+DROP TABLE IF EXISTS `weenie_properties_event_filter`;
+DROP TABLE IF EXISTS `weenie_properties_float`;
+DROP TABLE IF EXISTS `weenie_properties_generator`;
+DROP TABLE IF EXISTS `weenie_properties_i_i_d`;
+DROP TABLE IF EXISTS `weenie_properties_int`;
+DROP TABLE IF EXISTS `weenie_properties_int64`;
+DROP TABLE IF EXISTS `weenie_properties_palette`;
+DROP TABLE IF EXISTS `weenie_properties_position`;
+DROP TABLE IF EXISTS `weenie_properties_skill`;
+DROP TABLE IF EXISTS `weenie_properties_spell_book`;
+DROP TABLE IF EXISTS `weenie_properties_string`;
+DROP TABLE IF EXISTS `weenie_properties_texture_map`;
+
 CREATE TABLE `cook_book` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Id of this cook book instance',
   `recipe_Id` int unsigned NOT NULL COMMENT 'Unique Id of Recipe',
@@ -834,6 +889,14 @@ CREATE TABLE `weenie_properties_texture_map` (
 -- End ACE Schema
 
 -- Begin ACRealms Schema
+
+DROP TABLE IF EXISTS `realm_properties_string`;
+DROP TABLE IF EXISTS `realm_properties_bool`;
+DROP TABLE IF EXISTS `realm_properties_float`;
+DROP TABLE IF EXISTS `realm_properties_int`;
+DROP TABLE IF EXISTS `realm_properties_int64`;
+DROP TABLE IF EXISTS `realm_ruleset_links`;
+DROP TABLE IF EXISTS `realm`;
 
 CREATE TABLE `realm` (
   `id` smallint unsigned NOT NULL DEFAULT 0 COMMENT 'Unique Realm Id within the Shard',

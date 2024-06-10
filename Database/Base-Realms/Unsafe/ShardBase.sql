@@ -14,6 +14,47 @@
 
 -- Begin ACE Schema
 
+DROP TABLE IF EXISTS `biota`;
+DROP TABLE IF EXISTS `biota_properties_allegiance`;
+DROP TABLE IF EXISTS `biota_properties_anim_part`;
+DROP TABLE IF EXISTS `biota_properties_attribute`;
+DROP TABLE IF EXISTS `biota_properties_attribute_2nd`;
+DROP TABLE IF EXISTS `biota_properties_body_part`;
+DROP TABLE IF EXISTS `biota_properties_book`;
+DROP TABLE IF EXISTS `biota_properties_book_page_data`;
+DROP TABLE IF EXISTS `biota_properties_bool`;
+DROP TABLE IF EXISTS `biota_properties_create_list`;
+DROP TABLE IF EXISTS `biota_properties_d_i_d`;
+DROP TABLE IF EXISTS `biota_properties_emote`;
+DROP TABLE IF EXISTS `biota_properties_emote_action`;
+DROP TABLE IF EXISTS `biota_properties_enchantment_registry`;
+DROP TABLE IF EXISTS `biota_properties_event_filter`;
+DROP TABLE IF EXISTS `biota_properties_float`;
+DROP TABLE IF EXISTS `biota_properties_generator`;
+DROP TABLE IF EXISTS `biota_properties_i_i_d`;
+DROP TABLE IF EXISTS `biota_properties_int`;
+DROP TABLE IF EXISTS `biota_properties_int64`;
+DROP TABLE IF EXISTS `biota_properties_palette`;
+DROP TABLE IF EXISTS `biota_properties_position`;
+DROP TABLE IF EXISTS `biota_properties_skill`;
+DROP TABLE IF EXISTS `biota_properties_spell_book`;
+DROP TABLE IF EXISTS `biota_properties_string`;
+DROP TABLE IF EXISTS `biota_properties_texture_map`;
+DROP TABLE IF EXISTS `character`;
+DROP TABLE IF EXISTS `character_properties_contract_registry`;
+DROP TABLE IF EXISTS `character_properties_fill_comp_book`;
+DROP TABLE IF EXISTS `character_properties_friend_list`;
+DROP TABLE IF EXISTS `character_properties_quest_registry`;
+DROP TABLE IF EXISTS `character_properties_shortcut_bar`;
+DROP TABLE IF EXISTS `character_properties_spell_bar`;
+DROP TABLE IF EXISTS `character_properties_squelch`;
+DROP TABLE IF EXISTS `character_properties_title_book`;
+DROP TABLE IF EXISTS `config_properties_boolean`;
+DROP TABLE IF EXISTS `config_properties_double`;
+DROP TABLE IF EXISTS `config_properties_long`;
+DROP TABLE IF EXISTS `config_properties_string`;
+DROP TABLE IF EXISTS `house_permission`;
+
 CREATE TABLE `biota` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Object Id within the Shard',
   `weenie_Class_Id` int unsigned NOT NULL COMMENT 'Weenie Class Id of the Weenie this Biota was created from',

@@ -14,6 +14,9 @@
 
 -- Begin ACE Schema
 
+DROP TABLE IF EXISTS `accesslevel`;
+DROP TABLE IF EXISTS `account`;
+
 CREATE TABLE `accesslevel` (
   `level` int unsigned NOT NULL DEFAULT '0',
   `name` varchar(45) NOT NULL,
