@@ -229,16 +229,17 @@ namespace ACE.Server
             content_folders.ForEach(path =>
             {
                 var contentDI = new DirectoryInfo(path);
+                contentDI = new DirectoryInfo(Path.Combine(contentDI.FullName, "sql")); // Require explicit sql folder for this
                 if (contentDI.Exists)
                 {
                     Console.WriteLine($"Searching for SQL files within {path} .... ");
-
                     var sqlConnect = new MySqlConnector.MySqlConnection($"server={ConfigManager.Config.MySql.World.Host};port={ConfigManager.Config.MySql.World.Port};user={ConfigManager.Config.MySql.World.Username};password={ConfigManager.Config.MySql.World.Password};database={ConfigManager.Config.MySql.World.Database};{ConfigManager.Config.MySql.World.ConnectionOptions}");
                     foreach (var file in contentDI.GetFiles("*.sql", content_folders_search_option).OrderBy(f => f.FullName))
                     {
                         Console.Write($"Found {file.FullName} .... ");
                         var sqlDBFile = File.ReadAllText(file.FullName);
                         sqlDBFile = sqlDBFile.Replace("realms_world", ConfigManager.Config.MySql.World.Database);
+                        sqlDBFile = sqlDBFile.Replace("ace_world", ConfigManager.Config.MySql.World.Database);
                         var script = new MySqlConnector.MySqlCommand(sqlDBFile, sqlConnect);
 
                         Console.Write($"Importing into World database on SQL server at {ConfigManager.Config.MySql.World.Host}:{ConfigManager.Config.MySql.World.Port} .... ");
@@ -255,6 +256,10 @@ namespace ACE.Server
                         }
                     }
                     CleanupConnection(sqlConnect);
+                }
+                else
+                {
+                    log.Error($"Could not find content path {contentDI.FullName}");
                 }
             });
 
