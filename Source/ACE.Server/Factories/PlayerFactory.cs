@@ -411,7 +411,7 @@ namespace ACE.Server.Factories
             else
             {
                 var realmSelector = RealmManager.GetReservedRealm(ReservedRealm.RealmSelector);
-                var blaineRoom = new LocalPosition(0xB96F0100, 83.7821f, 107.123f, 10.005f, 0f, 0f, -0.068597f, -0.997645f);
+                var blaineRoom = new LocalPosition(0x8903012E, 87.738312f, -47.704556f, .005f, 0f, 0f, -0.926821f, 0.375504f);
                 var iid = realmSelector.StandardRules.GetDefaultInstanceID(player, blaineRoom);
                 var startPos = blaineRoom.AsInstancedPosition(iid);
                 RealmManager.SetHomeRealm(player, realmSelector.Realm.Id, false, saveImmediately: false);

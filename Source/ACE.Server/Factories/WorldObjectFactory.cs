@@ -302,7 +302,7 @@ namespace ACE.Server.Factories
             }
 
             // Hack to create realm selector so as to not require overwriting of existing landblock data
-            if (ACRealmsConfigManager.Config.CharacterCreationOptions.UseRealmSelector && landblockId == 0xB96F)
+            if (ACRealmsConfigManager.Config.CharacterCreationOptions.UseRealmSelector && landblockId == 0x8903)
             {
                 Position.ParseInstanceID(iid, out bool _, out ushort realmId, out ushort _);
                 if (realmId == (ushort)ReservedRealm.RealmSelector)
@@ -313,12 +313,25 @@ namespace ACE.Server.Factories
                     else
                         staticGuid = 0x70000000 | (uint)landblockId << 12;
 
+                    var pos = new InstancedPosition(0x8903012E, 90.2252f, -50.3203f, 0.005f, 0f, 0f, -0.359971f, -0.932963f, iid);
+
                     var weenie = DatabaseManager.World.GetCachedWeenie("realmselector");
                     if (weenie == null)
-                        log.Warn($"CreateNewWorldObjects: Couldn't find realmselector weenie");
+                    {
+                        log.Error($"[Realm Selector]: Couldn't find realmselector content! Make sure the content is included (check the readme.txt in the repo's Content/extensions folder).");
+                        weenie = DatabaseManager.World.GetCachedWeenie("signpost");
+                        var obj = CreateStaticObject(biotas, weenie, staticGuid, iid, pos, ruleset, null, null) as Book;
+                        if (obj == null)
+                            log.Warn($"CreateNewWorldObjects: Couldn't spawn Realm Selector MIA Signpost!");
+                        else
+                        {
+                            obj.GetPage(0).PageText = "Blaine, The Master of Realms, has not received his tithe and will be unable to bring you into the world at this time. \n\n (The admin forgot to include the content file for this character)";
+                            obj.Location = obj.Location.Rotate(new System.Numerics.Vector3(0.3f, -0.3f, 0f));
+                            results.Add(obj);
+                        }
+                    }
                     else
                     {
-                        var pos = new InstancedPosition(0xB96F0101, 83.39159f, 111.2694f, 10.005f, 0f, 0f, -0.998641f, -0.052122f, iid);
                         var obj = CreateStaticObject(biotas, weenie, staticGuid, iid, pos, ruleset, null, null);
                         if (obj == null)
                             log.Warn($"CreateNewWorldObjects: Couldn't spawn Blaine!");
