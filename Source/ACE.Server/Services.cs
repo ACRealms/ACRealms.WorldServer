@@ -262,7 +262,7 @@ namespace ACE.Server
 
             if (ConfigManager.Config.Offline.AutoUpdateWorldDatabase)
             {
-                CheckForWorldDatabaseUpdate();
+                CheckForWorldDatabaseUpdate(services);
 
                 if (ConfigManager.Config.Offline.AutoApplyWorldCustomizations)
                     AutoApplyWorldCustomizations();
