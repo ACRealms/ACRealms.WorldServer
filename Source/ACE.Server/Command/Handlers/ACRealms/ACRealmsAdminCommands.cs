@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 #nullable enable
 namespace ACE.Server.Command.Handlers.ACRealms
 {
-    public class ACRealmsAdminCommands
+    public static class ACRealmsAdminCommands
     {
         [CommandHandler("get-home-realm", AccessLevel.Admin, CommandHandlerFlag.None, 1,
             "Get a home realm for a character.",
@@ -352,7 +352,7 @@ namespace ACE.Server.Command.Handlers.ACRealms
 
             if (!string.Join(" ", parameters).Contains(','))
             {
-                CommandHandlerHelper.WriteOutputInfo(session, "You must include the realm name or ID followed by a comma and then the other realm name or ID.\n Example: @set-home-realm Modern Realm, Classic", ChatMessageType.Broadcast);
+                CommandHandlerHelper.WriteOutputInfo(session, "You must include the realm name or ID followed by a comma and then the other realm name or ID.\n Example: @mass-transfer-home-realm Modern Realm, Classic", ChatMessageType.Broadcast);
                 return;
             }
 
@@ -393,14 +393,22 @@ namespace ACE.Server.Command.Handlers.ACRealms
             }
 
             var players = PlayerManager.GetAllPlayers();
+            int countDeleted = 0;
             foreach(var p in players)
             {
+                if (p.IsDeleted || p.IsPendingDeletion)
+                {
+                    countDeleted++;
+                    continue;
+                }
                 var playerHomeRealmId = p.GetProperty(PropertyInt.HomeRealm) ?? 0;
                 if (playerHomeRealmId != oldRealmId)
                     continue;
                 HandleSetHomeRealm(session, $"{p.Name}, {newRealm.Realm.Id}".Split(' ', StringSplitOptions.RemoveEmptyEntries));
             }
             CommandHandlerHelper.WriteOutputInfo(session, $"Completed transfer of characters from realm {oldRealmId} to {newRealm.Realm.Name}.", ChatMessageType.Broadcast);
+            if (countDeleted > 0)
+                CommandHandlerHelper.WriteOutputInfo(session, $"Warning! {countDeleted} deleted or pending-deleted characters were not transferred. Undeleting these characters may not be possible.", ChatMessageType.Broadcast);
         }
 
         [CommandHandler("force-all-characters-to-new-home-realm", AccessLevel.Admin, CommandHandlerFlag.None, 1,
@@ -436,9 +444,19 @@ namespace ACE.Server.Command.Handlers.ACRealms
             }
 
             var players = PlayerManager.GetAllPlayers();
+            int countDeleted = 0;
             foreach (var p in players)
+            {
+                if (p.IsDeleted || p.IsPendingDeletion)
+                {
+                    countDeleted++;
+                    continue;
+                }
                 HandleSetHomeRealm(session, $"{p.Name}, {newRealm.Realm.Id}".Split(' ', StringSplitOptions.RemoveEmptyEntries));
+            }
             CommandHandlerHelper.WriteOutputInfo(session, $"Completed transfer of characters to {newRealm.Realm.Name}.", ChatMessageType.Broadcast);
+            if (countDeleted > 0)
+                CommandHandlerHelper.WriteOutputInfo(session, $"Warning! {countDeleted} deleted or pending-deleted characters were not transferred. Undeleting these characters may not be possible.", ChatMessageType.Broadcast);
         }
     }
 }

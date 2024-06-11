@@ -21,7 +21,7 @@ namespace ACE.Server.Realms
         public InstancedPosition(Position pos, uint instance)
             : base(pos, instance)
         {
-            if (instance == 0)
+            if (instance == 0 && !ACE.Entity.ACRealms.RealmsFromACESetupHelper.UnsafeInstanceIDTemporarilyAllowed)
                 throw new ArgumentException("Instance ID may not be 0");
             Instance = instance;
         }

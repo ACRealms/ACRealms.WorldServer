@@ -27,6 +27,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Runtime;
 using ACE.Common.ACRealms;
+using ACE.Server.Managers.ACRealms;
 
 namespace ACE.Server
 {
@@ -364,8 +365,12 @@ namespace ACE.Server
             log.Info("Initializing PlayerManager...");
             PlayerManager.Initialize();
 
+            RealmsFromACESetup.QueryStage1();
+
             log.Info("Initializing HouseManager...");
             HouseManager.Initialize();
+
+            RealmsFromACESetup.RunStage1IfRequired();
 
             log.Info("Initializing InboundMessageManager...");
             InboundMessageManager.Initialize();

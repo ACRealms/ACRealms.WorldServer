@@ -51,11 +51,15 @@ namespace ACE.Server.Managers
         /// </summary>
         private static readonly RateLimiter updateHouseManagerRateLimiter = new RateLimiter(1, TimeSpan.FromMinutes(1));
 
+        public static bool Initialized { get; private set; }
+
         public static void Initialize()
         {
             BuildHouseIdToGuid();
 
             BuildRentQueue();
+
+            Initialized = true;
         }
 
         /// <summary>

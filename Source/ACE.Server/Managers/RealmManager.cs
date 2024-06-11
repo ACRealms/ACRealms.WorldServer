@@ -646,7 +646,9 @@ namespace ACE.Server.Managers
             }
 
             offlinePlayer.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
-            return TryMoveHousesToNewRealm(offlinePlayer, realm);
+            var result = TryMoveHousesToNewRealm(offlinePlayer, realm);
+            offlinePlayer.SaveBiotaToDatabase();
+            return result;
         }
 
         private static bool TryMoveHousesToNewRealm(IPlayer player, WorldRealm destinationRealm)

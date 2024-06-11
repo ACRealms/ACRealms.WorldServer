@@ -30,6 +30,7 @@ using ACE.Server.Network.Enum;
 using System.Linq;
 using ACRealms.Server.Network.TraceMessages.Messages;
 using ACE.Common.ACRealms;
+using ACE.Server.Managers.ACRealms;
 
 namespace ACE.Server.Managers
 {
@@ -79,6 +80,7 @@ namespace ACE.Server.Managers
 
         internal static void Open(Player player)
         {
+            ACE.Entity.ACRealms.RealmsFromACESetupHelper.UnsafeInstanceIDTemporarilyAllowed = false;
             WorldStatus = WorldStatusState.Open;
             PlayerManager.BroadcastToAuditChannel(player, "World is now open");
         }
@@ -98,6 +100,20 @@ namespace ACE.Server.Managers
 
         public static void PlayerInitForWorld(ISession session, uint guid, string clientString)
         {
+            if (!RealmsFromACESetup.StatusQueriedDuringStartup)
+            {
+                log.Error($"FATAL: RealmsFromACESetup was not allowed to query migration status during startup (bad git merge or manually disabled). Rejecting login to prevent player data corruption.");
+                session.SendCharacterError(CharacterError.EnterGameCouldntPlaceCharacter);
+                return;
+            }
+
+            if (ACE.Entity.ACRealms.RealmsFromACESetupHelper.UnsafeInstanceIDTemporarilyAllowed)
+            {
+                log.Error($"FATAL: RealmsFromACESetupHelper.UnsafeInstanceIDTemporarilyAllowed was erroneously set to true, or migration from ACE did not complete successfully. Rejecting login to prevent player data corruption.");
+                session.SendCharacterError(CharacterError.EnterGameCouldntPlaceCharacter);
+                return;
+            }
+
             if (ServerManager.ShutdownInProgress)
             {
                 session.SendCharacterError(CharacterError.LogonServerFull);
