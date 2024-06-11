@@ -21,6 +21,7 @@ using System.IO;
 using ACE.Entity.ACRealms;
 using ACE.Common.ACRealms;
 using System.Configuration;
+using ACE.Entity;
 
 namespace ACE.Server.Managers
 {
@@ -609,6 +610,15 @@ namespace ACE.Server.Managers
             return false;
         }
 
+
+        internal static bool SetHomeRealm(ObjectGuid playerGuidOfflinePlayer, WorldRealm realm)
+        {
+            var player = PlayerManager.GetOfflinePlayer(playerGuidOfflinePlayer);
+            if (player == null)
+                log.Error($"SetHomeRealm: Could not find offline player with guid {playerGuidOfflinePlayer}");
+            return SetHomeRealm(player, realm);
+        }
+
         // This will be used for auto home realm migration from older servers, but may also be used from an admin command.
         public static bool SetHomeRealm(OfflinePlayer offlinePlayer, WorldRealm realm)
         {
@@ -646,7 +656,19 @@ namespace ACE.Server.Managers
             }
 
             offlinePlayer.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
-            return TryMoveHousesToNewRealm(offlinePlayer, realm);
+            var result = TryMoveHousesToNewRealm(offlinePlayer, realm);
+            offlinePlayer.SaveBiotaToDatabase();
+            return result;
+        }
+
+        public static bool SetHomeRealm(IPlayer player, WorldRealm realm)
+        {
+            return player switch
+            {
+                OfflinePlayer offline => SetHomeRealm(offline, realm),
+                Player online => SetHomeRealm(online, realm.Realm.Id, false),
+                _ => throw new NotImplementedException()
+            };
         }
 
         private static bool TryMoveHousesToNewRealm(IPlayer player, WorldRealm destinationRealm)
@@ -656,13 +678,13 @@ namespace ACE.Server.Managers
 
             foreach (var house in houses)
             {
-                var actualHouse = HouseManager.GetHouseSynchronously(house.Guid, true);
-                failed |= !actualHouse.TryMoveHouseToNewRealmInstance(destinationRealm.StandardRules.GetDefaultInstanceID(player, house.Location.AsLocalPosition()));
+                var srcHouse = HouseManager.GetHouseSynchronously(house.Guid, true, isRealmMigration: true);
+                failed |= !srcHouse.TryMoveHouseToNewRealmInstance(destinationRealm.StandardRules.GetDefaultInstanceID(player, house.Location.AsLocalPosition()));
             }
             return !failed;
         }
 
-        public static void SetHomeRealm(Player player, ushort realmId, bool settingFromRealmSelector, bool saveImmediately = true)
+        public static bool SetHomeRealm(Player player, ushort realmId, bool settingFromRealmSelector, bool saveImmediately = true)
         {
             var realm = GetRealm(realmId, includeRulesets: false);
             if (realm == null)
@@ -689,7 +711,11 @@ namespace ACE.Server.Managers
                 player.SavePlayerToDatabase();
 
             if (!TryMoveHousesToNewRealm(player, realm))
+            {
                 player.Session.Network.EnqueueSend(new Network.GameMessages.Messages.GameMessageSystemChat("Your house was unable to be transferred to the new realm.", ChatMessageType.Broadcast));
+                return false;
+            }
+            return true;
         }
     }
 }

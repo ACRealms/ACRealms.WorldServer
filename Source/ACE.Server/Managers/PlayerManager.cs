@@ -206,17 +206,38 @@ namespace ACE.Server.Managers
             playersLock.EnterReadLock();
             try
             {
-                var offlinePlayer = offlinePlayers.Values.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase) || p.Name.Equals(admin, StringComparison.OrdinalIgnoreCase));
+                var offlinePlayerList = offlinePlayers.Values.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase) || p.Name.Equals(admin, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (offlinePlayerList.Count == 0)
+                    return null;
 
-                if (offlinePlayer != null)
-                    return offlinePlayer;
+                if (offlinePlayerList.Count == 1)
+                    return offlinePlayerList[0];
+
+                var not_deleted = offlinePlayerList.FirstOrDefault(x => x.IsDeleted || x.IsPendingDeletion);
+                if (not_deleted != null)
+                    return not_deleted;
+
+                return offlinePlayerList[0];
             }
             finally
             {
                 playersLock.ExitReadLock();
             }
+        }
 
-            return null;
+        public static List<OfflinePlayer> GetOfflinePlayersWithName(string name)
+        {
+            var admin = "+" + name;
+
+            playersLock.EnterReadLock();
+            try
+            {
+                return offlinePlayers.Values.Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase) || p.Name.Equals(admin, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            finally
+            {
+                playersLock.ExitReadLock();
+            }
         }
 
         public static List<IPlayer> GetAllPlayers()

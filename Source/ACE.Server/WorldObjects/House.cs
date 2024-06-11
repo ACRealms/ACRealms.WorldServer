@@ -20,6 +20,7 @@ using ACE.Server.Realms;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.Diagnostics.Eventing.Reader;
+using ACE.Server.Managers.ACRealms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -773,7 +774,7 @@ namespace ACE.Server.WorldObjects
                 return false;
             }
 
-            House destHouse = HouseManager.GetHouseSynchronously(targetGuid, true);
+            House destHouse = HouseManager.GetHouseSynchronously(targetGuid, true, isRealmMigration: true);
 
             var player = PlayerManager.FindByGuid(new ObjectGuid(HouseOwner.Value));
 

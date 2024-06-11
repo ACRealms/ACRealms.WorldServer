@@ -1,3 +1,6 @@
+using ACE.Common.ACRealms;
+using ACE.Entity.ACRealms;
+
 namespace ACE.Entity
 {
     public enum GuidType
@@ -48,7 +51,7 @@ namespace ACE.Entity
                 if (Type != GuidType.Static)
                     return null;
                 var instance = (uint)(Full >> 32);
-                if (instance == 0)
+                if (instance == 0 && !RealmsFromACESetupHelper.UnsafeInstanceIDTemporarilyAllowed)
                     return null;
                 return instance;
             }
@@ -182,7 +185,7 @@ namespace ACE.Entity
 
         public override string ToString()
         {
-            if (Instance == 0 || Instance == null)
+            if (!Instance.HasValue)
                 return Full.ToString("X8");
             else
                 return Full.ToString("X16");
