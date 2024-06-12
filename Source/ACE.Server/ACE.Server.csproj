@@ -311,6 +311,7 @@
     <None Include="..\..\Database\ACRealms\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\ACRealms\" />
     <None Include="..\..\Database\Archive\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Archive\" />
     <None Include="..\..\Database\Base\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Base\" />
+    <None Include="..\..\Database\Base-Realms\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Base-Realms\" />
     <None Include="..\..\Database\Updates\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Updates\" />
     <None Include="..\..\Database\Optional\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Optional\" />
       <None Include="..\..\Database\Custom\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Custom\" />

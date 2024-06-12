@@ -8,7 +8,7 @@ VALUES (4200006,   1,       2048) /* ItemType - Gem */
      , (4200006,   3,         82) /* PaletteTemplate - PinkPurple */
      , (4200006,   5,         10) /* EncumbranceVal */
      , (4200006,   8,         10) /* Mass */
-     , (4200006,  11,         1) /* MaxStackSize */
+     , (4200006,  11,          1) /* MaxStackSize */
      , (4200006,  12,          1) /* StackSize */
      , (4200006,  13,         10) /* StackUnitEncumbrance */
      , (4200006,  14,         10) /* StackUnitMass */
@@ -26,8 +26,7 @@ VALUES (4200006,   1,       2048) /* ItemType - Gem */
      , (4200006, 110,          0) /* ItemAllegianceRankLimit */
      , (4200006, 150,        103) /* HookPlacement - Hook */
      , (4200006, 151,          2) /* HookType - Wall */
-     , (4200006, 280,       1000) /* SharedCooldown */
-     , (4200006, 42001,          3) /* SummonTargetRealm */;
+     , (4200006, 280,       1000) /* SharedCooldown */;
 
 INSERT INTO `weenie_properties_bool` (`object_Id`, `type`, `value`)
 VALUES (4200006,  11, True ) /* IgnoreCollisions */
@@ -54,6 +53,5 @@ VALUES (4200006,   1,   33556769) /* Setup */
      , (4200006,   8,  100674869) /* Icon */
      , (4200006,  22,  872415275) /* PhysicsEffectTable */
      , (4200006,  28,        157) /* Spell - Summon Primary Portal I */
-     , (4200006,  31,       7291) /* LinkedPortalOne - Halls of Metos */
      , (4200006,  36,  234881046) /* MutateFilter */
      , (4200006,  50,  0x06006C20) /* IconOverlay */;

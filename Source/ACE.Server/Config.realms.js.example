@@ -18,7 +18,9 @@
     "CharacterCreationOptions": {
       /* If true, players will start in a room with an npc offering the choice of starting realm
          Realms with "CanBeHomeworld": true will be offered in this list
-         This room will use a separate instance ID per player account. */
+         This room will use a separate instance ID per player account.
+
+         *important*: You must copy the contents of "Content/extensions/Realm Selector" to your root content folder for this to work */
         "UseRealmSelector": false
     },
 

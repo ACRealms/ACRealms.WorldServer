@@ -198,7 +198,7 @@ namespace ACE.Server.Entity
 
         public void Init(EphemeralRealm ephemeralRealm, bool reload = false, bool wait = false)
         {
-            if (Instance == 0)
+            if (Instance == 0 && !ACE.Entity.ACRealms.RealmsFromACESetupHelper.UnsafeInstanceIDTemporarilyAllowed)
                 log.Error("Error: Loading Landblock with Instance ID = 0");
 
             RealmRuleset = GetOrApplyRuleset(ephemeralRealm);

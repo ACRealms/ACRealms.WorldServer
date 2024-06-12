@@ -574,26 +574,23 @@ namespace ACE.Database
         /// <summary>
         /// Get the version information stored in database
         /// </summary>
-        public ACE.Database.Models.World.Version GetVersion(WorldDbContext context)
+        public static ACE.Database.Models.World.Version GetVersion(IDbContextFactory<WorldDbContext> contextFactory)
         {
-            var version = context.Version
-                .FirstOrDefault(r => r.Id == 1);
+            using (var context = contextFactory.CreateDbContext())
+            {
+                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-            return version;
+                var version = context.Version.FirstOrDefault(r => r.Id == 1);
+
+                return version;
+            }
+
         }
 
         /// <summary>
         /// Get the version information stored in database
         /// </summary>
-        public ACE.Database.Models.World.Version GetVersion()
-        {
-            using (var context = ContextFactory.CreateDbContext())
-            {
-                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-
-                return GetVersion(context);
-            }
-        }
+        public ACE.Database.Models.World.Version GetVersion() => GetVersion(ContextFactory);
 
         // =====================================
         // IsWorldDatabaseGuidRangeValid

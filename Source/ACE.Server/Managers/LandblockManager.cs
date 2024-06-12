@@ -16,6 +16,7 @@ using ACE.Server.WorldObjects;
 using System.Diagnostics;
 using ACE.Server.Realms;
 using ACE.Server.Network.GameAction.Actions;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace ACE.Server.Managers
 {
@@ -735,11 +736,25 @@ namespace ACE.Server.Managers
 
         private static readonly System.Diagnostics.Stopwatch swTrySplitEach = new System.Diagnostics.Stopwatch();
 
+        internal static bool UnloadingAfterACEMigration { get; set; }
+
         /// <summary>
         /// Processes the destruction queue in a thread-safe manner
         /// </summary>
         private static void UnloadLandblocks()
         {
+            bool aceMigrationUnload = false;
+            if (UnloadingAfterACEMigration)
+            {
+                aceMigrationUnload = true;
+                var lbs = GetLoadedLandblocks();
+                foreach(var lb in lbs)
+                {
+                    if (!destructionQueue.Contains(lb))
+                        destructionQueue.Add(lb);
+                }
+            }
+
             while (!destructionQueue.IsEmpty)
             {
                 if (destructionQueue.TryTake(out Landblock landblock))
@@ -808,6 +823,9 @@ namespace ACE.Server.Managers
                         log.Error($"LandblockManager: failed to unload {landblock.Id.Raw:X8}");
                 }
             }
+
+            if (aceMigrationUnload)
+                UnloadingAfterACEMigration = false;
         }
 
         /// <summary>

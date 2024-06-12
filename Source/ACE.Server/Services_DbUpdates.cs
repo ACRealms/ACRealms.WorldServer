@@ -3,29 +3,31 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 
 using ACE.Common;
 using ACE.Database;
+using ACE.Database.Models.World;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ACE.Server
 {
     partial class Services
     {
-        private static void CheckForWorldDatabaseUpdate()
+        private static void CheckForWorldDatabaseUpdate(IServiceProvider services)
         {
-            log.Info($"Automatic World Database Update not available for AC Realms.");
-            return;
-
-#pragma warning disable CS0162 // Unreachable code detected
             log.Info($"Automatic World Database Update started...");
 
             try
             {
-                var worldDb = DatabaseManager.World;
-                var currentVersion = worldDb.GetVersion();
-                log.Info($"Current World Database version: Base - {currentVersion.BaseVersion} | Patch - {currentVersion.PatchVersion}");
+                var ctxFactory = services.GetRequiredService<IDbContextFactory<WorldDbContext>>();
+
+                var currentVersion = WorldDatabase.GetVersion(ctxFactory);
+
+                log.Info($"Current World Database version: Base - {currentVersion?.BaseVersion ?? "No Version"} | Patch - {currentVersion?.PatchVersion ?? "No Version"}");
 
                 var url = "https://api.github.com/repos/ACEmulator/ACE-World-16PY-Patches/releases/latest";
 
@@ -36,15 +38,22 @@ namespace ACE.Server
                 string dbURL = json.GetProperty("assets")[0].GetProperty("browser_download_url").GetString();
                 string dbFileName = json.GetProperty("assets")[0].GetProperty("name").GetString();
 
-                if (currentVersion.PatchVersion != tag)
+                if (currentVersion == null || currentVersion.PatchVersion != tag)
                 {
-                    var patchVersionSplit = currentVersion.PatchVersion.Split(".");
                     var tagSplit = tag.Split(".");
+                    int patchMajor, patchMinor, patchBuild;
 
-                    int.TryParse(patchVersionSplit[0], out var patchMajor);
-                    int.TryParse(patchVersionSplit[1], out var patchMinor);
-                    int.TryParse(patchVersionSplit[2], out var patchBuild);
-
+                    if (currentVersion != null)
+                    {
+                        var patchVersionSplit = currentVersion.PatchVersion.Split(".");
+                        int.TryParse(patchVersionSplit[0], out patchMajor);
+                        int.TryParse(patchVersionSplit[1], out patchMinor);
+                        int.TryParse(patchVersionSplit[2], out patchBuild);
+                    }
+                    else
+                    {
+                        patchMajor = 0; patchMinor = 0; patchBuild = 0;
+                    }
                     int.TryParse(tagSplit[0], out var tagMajor);
                     int.TryParse(tagSplit[1], out var tagMinor);
                     int.TryParse(tagSplit[2], out var tagBuild);
@@ -53,7 +62,9 @@ namespace ACE.Server
                     {
                         log.Info($"Latest patch version is {tag} -- Update Required!");
                         UpdateToLatestWorldDatabase(dbURL, dbFileName);
-                        var newVersion = worldDb.GetVersion();
+
+                        var newVersion = WorldDatabase.GetVersion(ctxFactory);
+
                         log.Info($"Updated World Database version: Base - {newVersion.BaseVersion} | Patch - {newVersion.PatchVersion}");
                     }
                     else
@@ -71,81 +82,104 @@ namespace ACE.Server
                 log.Info($"Unable to continue with Automatic World Database Update due to the following error: {ex}");
             }
             log.Info($"Automatic World Database Update complete.");
-#pragma warning restore CS0162 // Unreachable code detected
         }
 
         private static void UpdateToLatestWorldDatabase(string dbURL, string dbFileName)
         {
-            //Console.WriteLine();
+            // For security, validate the filename returned from the server, because we're deleting the previous file with that name.
+            foreach (var badChar in Path.GetInvalidFileNameChars())
+            {
+                if (dbFileName.Contains(badChar))
+                    throw new InvalidDataException($"The filename {dbFileName} contains illegal characters.");
+            }
 
-            //if (IsRunningInContainer)
-            //{
-            //    Console.WriteLine(" ");
-            //    Console.WriteLine("This process will take a while, depending on many factors, and may look stuck while reading and importing the world database, please be patient! ");
-            //    Console.WriteLine(" ");
-            //}
+            Console.WriteLine();
 
-            //Console.Write($"Downloading {dbFileName} .... ");
-            //using var client = new WebClient();
-            //try
-            //{
-            //    var dlTask = client.DownloadFile(dbURL, dbFileName);
-            //    dlTask.Wait();
-            //}
-            //catch
-            //{
-            //    Console.Write($"Download for {dbFileName} failed!");
-            //    return;
-            //}
-            //Console.WriteLine("download complete!");
+            if (Program.IsRunningInContainer)
+            {
+                Console.WriteLine(" ");
+                Console.WriteLine("This process will take a while, depending on many factors, and may look stuck while reading and importing the world database, please be patient! ");
+                Console.WriteLine(" ");
+            }
 
-            //Console.Write($"Extracting {dbFileName} .... ");
-            //ZipFile.ExtractToDirectory(dbFileName, ".", true);
-            //Console.WriteLine("extraction complete!");
-            //Console.Write($"Deleting {dbFileName} .... ");
-            //File.Delete(dbFileName);
-            //Console.WriteLine("Deleted!");
+            Console.Write($"Downloading {dbFileName} .... ");
+            using var client = new WebClient();
+            try
+            {
+                var dlTask = client.DownloadFile(dbURL, dbFileName);
+                dlTask.Wait();
+            }
+            catch
+            {
+                Console.Write($"Download for {dbFileName} failed!");
+                return;
+            }
+            Console.WriteLine("download complete!");
 
-            //var sqlFile = dbFileName.Substring(0, dbFileName.Length - 4);
-            //Console.Write($"Importing {sqlFile} into SQL server at {ConfigManager.Config.MySql.World.Host}:{ConfigManager.Config.MySql.World.Port} (This will take a while, please be patient) .... ");
-            //using (var sr = File.OpenText(sqlFile))
-            //{
-            //    var sqlConnect = new MySqlConnector.MySqlConnection($"server={ConfigManager.Config.MySql.World.Host};port={ConfigManager.Config.MySql.World.Port};user={ConfigManager.Config.MySql.World.Username};password={ConfigManager.Config.MySql.World.Password};{ConfigManager.Config.MySql.World.ConnectionOptions}");
+            Console.Write($"Extracting {dbFileName} .... ");
+            ZipFile.ExtractToDirectory(dbFileName, ".", true);
+            Console.WriteLine("extraction complete!");
+            Console.Write($"Deleting {dbFileName} .... ");
+            File.Delete(dbFileName);
+            Console.WriteLine("Deleted!");
 
-            //    var line = string.Empty;
-            //    var completeSQLline = string.Empty;
+            var sqlFile = dbFileName.Substring(0, dbFileName.Length - 4);
+            Console.Write($"Importing {sqlFile} into SQL server at {ConfigManager.Config.MySql.World.Host}:{ConfigManager.Config.MySql.World.Port} (This will take a while, please be patient) .... ");
+            using (var sr = File.OpenText(sqlFile))
+            {
+                var sqlConnect = new MySqlConnector.MySqlConnection($"server={ConfigManager.Config.MySql.World.Host};port={ConfigManager.Config.MySql.World.Port};user={ConfigManager.Config.MySql.World.Username};password={ConfigManager.Config.MySql.World.Password};{ConfigManager.Config.MySql.World.ConnectionOptions};database={ConfigManager.Config.MySql.World.Database}");
 
-            //    var dbname = ConfigManager.Config.MySql.World.Database;
+                StringBuilder completeSQLline = new StringBuilder();
+                bool create_table_encountered = false;
+                var line = string.Empty;
 
-            //    while ((line = sr.ReadLine()) != null)
-            //    {
-            //        line = line.Replace("realms_world", dbname);
-            //        //do minimal amount of work here
-            //        if (line.EndsWith(";"))
-            //        {
-            //            completeSQLline += line + Environment.NewLine;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    if (line.Length == 0)
+                        continue;
+                    if (line.Contains("CREATE TABLE"))
+                        create_table_encountered = true;
 
-            //            var script = new MySqlConnector.MySqlCommand(completeSQLline, sqlConnect);
-            //            try
-            //            {
-            //                ExecuteScript(script);
-            //            }
-            //            catch (MySqlConnector.MySqlException)
-            //            {
+                    // AC Realms World DB Updates do not drop and re-create the world db, as there may be separate tables that we want to keep
+                    if (!create_table_encountered)
+                    {
+                        if (line.Contains("DROP DATABASE"))
+                            continue;
+                        if (line.Contains("CREATE DATABASE"))
+                            continue;
+                        if (line.Contains("USE `ace_world`;"))
+                            continue;
+                    }
 
-            //            }
-            //            completeSQLline = string.Empty;
-            //        }
-            //        else
-            //            completeSQLline += line + Environment.NewLine;
-            //    }
-            //    CleanupConnection(sqlConnect);
-            //}
-            //Console.WriteLine(" complete!");
+                    //do minimal amount of work here
+                    if (line.EndsWith(";"))
+                    {
+                        string work;
+                        if (completeSQLline.Length != 0)
+                        {
+                            completeSQLline.AppendLine(line);
+                            work = completeSQLline.ToString();
+                            completeSQLline.Clear();
+                        }
+                        else
+                            work = line;
 
-            //Console.Write($"Deleting {sqlFile} .... ");
-            //File.Delete(sqlFile);
-            //Console.WriteLine("Deleted!");
+                        try
+                        {
+                            ExecuteScript(new MySqlConnector.MySqlCommand(work, sqlConnect));
+                        }
+                        catch (MySqlConnector.MySqlException) { }
+                    }
+                    else
+                        completeSQLline.AppendLine(line);
+                }
+                CleanupConnection(sqlConnect);
+            }
+            Console.WriteLine(" complete!");
+
+            Console.Write($"Deleting {sqlFile} .... ");
+            File.Delete(sqlFile);
+            Console.WriteLine("Deleted!");
         }
 
         private static string GetContentFolder()
@@ -195,16 +229,17 @@ namespace ACE.Server
             content_folders.ForEach(path =>
             {
                 var contentDI = new DirectoryInfo(path);
+                contentDI = new DirectoryInfo(Path.Combine(contentDI.FullName, "sql")); // Require explicit sql folder for this
                 if (contentDI.Exists)
                 {
                     Console.WriteLine($"Searching for SQL files within {path} .... ");
-
                     var sqlConnect = new MySqlConnector.MySqlConnection($"server={ConfigManager.Config.MySql.World.Host};port={ConfigManager.Config.MySql.World.Port};user={ConfigManager.Config.MySql.World.Username};password={ConfigManager.Config.MySql.World.Password};database={ConfigManager.Config.MySql.World.Database};{ConfigManager.Config.MySql.World.ConnectionOptions}");
                     foreach (var file in contentDI.GetFiles("*.sql", content_folders_search_option).OrderBy(f => f.FullName))
                     {
                         Console.Write($"Found {file.FullName} .... ");
                         var sqlDBFile = File.ReadAllText(file.FullName);
                         sqlDBFile = sqlDBFile.Replace("realms_world", ConfigManager.Config.MySql.World.Database);
+                        sqlDBFile = sqlDBFile.Replace("ace_world", ConfigManager.Config.MySql.World.Database);
                         var script = new MySqlConnector.MySqlCommand(sqlDBFile, sqlConnect);
 
                         Console.Write($"Importing into World database on SQL server at {ConfigManager.Config.MySql.World.Host}:{ConfigManager.Config.MySql.World.Port} .... ");
@@ -221,6 +256,10 @@ namespace ACE.Server
                         }
                     }
                     CleanupConnection(sqlConnect);
+                }
+                else
+                {
+                    log.Error($"Could not find content path {contentDI.FullName}");
                 }
             });
 

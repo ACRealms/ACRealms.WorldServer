@@ -24,6 +24,8 @@ namespace ACE.Server.Managers
 
         private static Timer _workerThread;
 
+        public static bool Initialized { get; private set; }
+
         /// <summary>
         /// Initializes the PropertyManager.
         /// Run this only once per server instance.
@@ -45,6 +47,8 @@ namespace ACE.Server.Managers
             _workerThread.Elapsed += DoWork;
             _workerThread.AutoReset = true;
             _workerThread.Start();
+
+            Initialized = true;
         }
 
 
@@ -504,6 +508,10 @@ namespace ACE.Server.Managers
                 ("acr_enable_ruleset_seeds", new Property<bool>(false, "If enabled, ruleset randomization seeds will be visible to sessions with the role envoy or higher. This does carry some slight side effects with the ruleset randomization engine, and is fine to disable if you don't need it. It will be necessary to have this enabled to troubleshoot some complex ruleset compilation issues.")),
                 ("acr_validate_realm_position_for_admins", new Property<bool>(false, "If enabled, admins will be booted out of realms where they are not permitted to travel to.")),
 
+                // Leave acrsystem settings alone unless asked to change it by the AC Realms developer
+                ("acrsystem_enable_ace_migration_mode_at_next_startup", new Property<bool>(true, "If enabled, ACE Migration mode will be enabled at next startup. Do not change this setting unless asked to by the developer. It will disable itself after the next successful check.")),
+
+                // ACE settings
                 ("account_login_boots_in_use", new Property<bool>(true, "if FALSE, oldest connection to account is not booted when new connection occurs")),
                 ("advanced_combat_pets", new Property<bool>(false, "(non-retail function) If enabled, Combat Pets can cast spells")),
                 ("advocate_fane_auto_bestow", new Property<bool>(false, "If enabled, Advocate Fane will automatically bestow new advocates to advocate_fane_auto_bestow_level")),

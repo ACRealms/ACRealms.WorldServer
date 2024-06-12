@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using ACE.Entity;
 using ACE.Entity.Enum.Properties;
 using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace ACE.Database.Models.World
 {
@@ -299,7 +300,7 @@ namespace ACE.Database.Models.World
             else if (Enum.TryParse<RealmPropertyInt64>(propertyName, out var longprop))
                 SetProperty_Complex(realm, longprop, pobj);
             else
-                throw new Exception("Realm property not found: " + propertyName);
+                throw new InvalidDataException("Realm property not found: " + propertyName);
         }
         
         

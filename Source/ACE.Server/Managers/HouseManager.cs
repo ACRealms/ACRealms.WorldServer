@@ -22,6 +22,7 @@ using ACE.Server.Realms;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using ACE.Common;
+using ACE.Server.Managers.ACRealms;
 
 
 namespace ACE.Server.Managers
@@ -51,11 +52,15 @@ namespace ACE.Server.Managers
         /// </summary>
         private static readonly RateLimiter updateHouseManagerRateLimiter = new RateLimiter(1, TimeSpan.FromMinutes(1));
 
+        public static bool Initialized { get; private set; }
+
         public static void Initialize()
         {
             BuildHouseIdToGuid();
 
             BuildRentQueue();
+
+            Initialized = true;
         }
 
         /// <summary>
@@ -317,11 +322,31 @@ namespace ACE.Server.Managers
             return coords;
         }
 
+        internal static bool PausedDuringACEMigrationFinalization { get; private set; }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        internal static void PauseForACEMigrationFinalization()
+        {
+            PausedDuringACEMigrationFinalization = true;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        internal static void ResetAfterACEMigrationFinalization()
+        {
+            if (!PausedDuringACEMigrationFinalization || !RealmsFromACESetup.ACEMigrationInProgress)
+                throw new InvalidOperationException("This may only be run by RealmsFromACESetup");
+
+            Initialize();
+        }
+
         /// <summary>
         /// Runs every ~1 minute
         /// </summary>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void Tick()
         {
+            if (PausedDuringACEMigrationFinalization)
+                return;
             if (updateHouseManagerRateLimiter.GetSecondsToWaitBeforeNextEvent() > 0)
                 return;
 
@@ -707,24 +732,42 @@ namespace ACE.Server.Managers
             return new ObjectGuid(house_guids.FirstOrDefault(i => slumlord_prefix == (i >> 12)), instance).Full;
         }
 
-        public static House GetHouseSynchronously(ObjectGuid houseGuid, bool waitForInventoryLoad = false)
+        public static House GetHouseSynchronously(ObjectGuid houseGuid, bool waitForInventoryLoad = false, bool isRealmMigration = false)
         {
-            if (waitForInventoryLoad)
-                return GetHouse(houseGuid, (_) => { }).Item1;
-
-            Task job = new Task(() => { });
-
-            var (house, isLoaded) = GetHouse(houseGuid, (_) => job.Start());
+            var (house, isLoaded) = GetHouse(houseGuid, (_) => { });
             if (!waitForInventoryLoad || isLoaded || house == null)
                 return house;
 
-            if (!job.Wait(5000))
+            if (house.SlumLord.CurrentLandblock == null)
             {
-                log.Error($"GetHouseSynchronously failed for {house.HouseOwnerName}'s house {houseGuid}.");
-                return null;
+                if (!LandblockManager.IsLoaded(house.Location.LandblockId, house.Location.Instance))
+                {
+                    var lb = LandblockManager.GetLandblock(house.Location.LandblockId, house.Location.Instance, null, loadAdjacents: false, wait: isRealmMigration);
+                    lb.SetActive(isAdjacent: false);
+                }
             }
+            (house, isLoaded) = GetHouse(houseGuid, (_) => { });
+            if (isLoaded)
+                return house;
 
-            return house;
+            bool cancelled = false;
+            var waitjob = new Task(() => {
+                while (!cancelled)
+                {
+                    Thread.Sleep(100);
+                    if (house.SlumLord.InventoryLoaded)
+                        return;
+                }
+            });
+            waitjob.Start();
+            var completed = waitjob.Wait(isRealmMigration ? 30000 : 5000);
+            cancelled = true;
+
+            if (completed)
+                return house;
+
+            log.Error($"GetHouseSynchronously failed for {house.HouseOwnerName}'s house {houseGuid}.");
+            return null;
         }
              
         /// <summary>
@@ -1051,7 +1094,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        // This is still buggy for hooks and storage
+        // This is still buggy for hooks and storage use outside of RealmsFromACSetupHelper
         public static bool ChangeOwnedHouse(IPlayer player, House oldHouse, House newHouse)
         {
             if (newHouse.OwnerId.HasValue)
@@ -1060,9 +1103,6 @@ namespace ACE.Server.Managers
                 return false;
             }
 
-            log.Info($"[HOUSE] Setting {player.Name} (0x{player.Guid}) as owner of {newHouse.Name} (0x{newHouse.Guid:X16})");
-
-            // var houseRentTimestamp = player.HouseRentTimestamp;
             HandleEviction(oldHouse, player.Guid.Full, movingHouse: true);
             RemoveRentQueue(oldHouse.Guid.Full);
 
@@ -1109,8 +1149,6 @@ namespace ACE.Server.Managers
                     }
 
                     srcContainer.UpdateLinks();
-                    // How correctly remove item from previous container?
-                    // How to correctly update clients?
                 }
             }
             finally

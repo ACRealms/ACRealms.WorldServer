@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 #nullable disable
@@ -10,7 +10,6 @@ namespace ACE.Database.Models.World
         public uint Id { get; set; }
         public uint ObjectId { get; set; }
         public ushort PositionType { get; set; }
-        public uint? Instance { get; set; }
         public uint ObjCellId { get; set; }
         public float OriginX { get; set; }
         public float OriginY { get; set; }
