@@ -775,6 +775,7 @@ namespace ACE.Server.Managers
         /// else return a copy of the House biota from the latest info in the db
         /// Returns the house biota immediately, and a boolean to indicate if the inventory was loaded 
         /// <param name="callback">called when the slumlord inventory is fully loaded</param>
+        /// </summary>
         public static Tuple<House, bool> GetHouse(ObjectGuid houseGuid, Action<House> callback)
         {
             var landblockId = new LandblockId(houseGuid.StaticObjectLandblock.Value);
@@ -814,7 +815,7 @@ namespace ACE.Server.Managers
             {
                 var houseBiota = House.Load(houseGuid);
 
-                var inventoryLoaded = house.SlumLord.InventoryLoaded;
+                var inventoryLoaded = houseBiota.SlumLord.InventoryLoaded;
                 RegisterCallback(houseBiota, callback);
                 return new Tuple<House, bool>(houseBiota, inventoryLoaded);
             }
