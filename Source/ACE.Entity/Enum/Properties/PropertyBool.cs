@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 
 namespace ACE.Entity.Enum.Properties
@@ -215,9 +216,14 @@ namespace ACE.Entity.Enum.Properties
         IsEphemeralRealmPortal = 42003,
 
         /// <summary>
-        /// Player will always be placed in a different instance ID according to their character ID. Mainly intended for testing 
+        /// Player will always be placed in a different instance ID according to their character ID. Mainly intended for testing.
+        /// Do not use this as it will likely be changed or removed
         /// </summary>
-        AttemptUniqueInstanceID = 42004
+        [ServerOnly]
+        AttemptUniqueInstanceID = 42004,
+
+        [ServerOnly]
+        ClassicalInstancesActive = 42005
     }
 
     public static class PropertyBoolExtensions

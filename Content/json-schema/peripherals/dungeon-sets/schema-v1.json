@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://realm.ac/schema/v1/peripherals/dungeon-sets/schema-v1.json",
+  "type": "object",
+  "definitions": {
+    "lb_maps": {
+      "anyOf": [
+        {
+          "const": "00C8",
+          "description": "Egg Orchard (West) - Example 1 - List to be completed later"
+        },
+        {
+          "const": "00C9",
+          "description": "Chamber of Scrolls - Example 2 - List to be completed later"
+        }
+      ]
+    },
+    "landblock_entry": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/raw_landblock"
+        }
+      ]
+    },
+    "raw_landblock": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 4,
+      "pattern": "^[0-9A-F]+$"
+    },
+    "dungeon_set": {
+      "description": "A named dungeon set, composing a list of indoor landblock ids",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the dungeon set, can be referenced by a realm string property with the same value"
+        },
+        "landblocks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/landblock_entry"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "landblocks"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "$schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "dungeon_sets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/dungeon_set"
+      }
+    }
+  },
+  "required": [
+    "$schema_version",
+    "dungeon_sets"
+  ],
+  "additionalProperties": false
+}

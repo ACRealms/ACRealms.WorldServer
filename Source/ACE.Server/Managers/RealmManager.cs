@@ -22,6 +22,7 @@ using ACE.Entity.ACRealms;
 using ACE.Common.ACRealms;
 using System.Configuration;
 using ACE.Entity;
+using ACE.Server.Realms.Peripherals;
 
 namespace ACE.Server.Managers
 {
@@ -29,6 +30,7 @@ namespace ACE.Server.Managers
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        internal static Peripherals Peripherals { get; private set; }
         public static IReadOnlyCollection<WorldRealm> Realms { get; private set; }
         public static IReadOnlyCollection<WorldRealm> Rulesets { get; private set; }
         public static IReadOnlyCollection<WorldRealm> RealmsAndRulesets { get; private set; }
@@ -75,6 +77,14 @@ namespace ACE.Server.Managers
                 if (!FirstImportCompleted)
                     throw new Exception("Import of realms.jsonc did not complete successfully.");
             }
+
+            ReloadPeripherals();
+        }
+
+        public static void ReloadPeripherals()
+        {
+            Peripherals = Peripherals.Load();
+            log.Info("Loaded Peripheral Configuration");
         }
 
         private static void SetupReservedRealms()
