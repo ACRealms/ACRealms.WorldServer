@@ -263,7 +263,7 @@ namespace ACE.Server.Factories
             if (roll.ItemType == TreasureItemType_Orig.ArtObject)
                 return null;
 
-            var numCantrips = CantripChance.RollNumCantrips(profile);
+            var numCantrips = CantripChance.RollNumCantrips(profile, Ruleset);
 
             if (numCantrips == 0)
                 return null;
@@ -286,7 +286,7 @@ namespace ACE.Server.Factories
 
             foreach (var cantrip in cantrips)
             {
-                var cantripLevel = CantripChance.RollCantripLevel(profile);
+                var cantripLevel = CantripChance.RollCantripLevel(profile, Ruleset);
 
                 var cantripLevels = SpellLevelProgression.GetSpellLevels(cantrip);
 

@@ -240,13 +240,13 @@ namespace ACE.Server.Managers
                 switch (key)
                 {
                     case "cantrip_drop_rate":
-                        Factories.Tables.CantripChance.ApplyNumCantripsMod();
+                        Factories.Tables.CantripChance.UpdateGlobalNumCantripsMod();
                         break;
                     case "minor_cantrip_drop_rate":
                     case "major_cantrip_drop_rate":
                     case "epic_cantrip_drop_rate":
                     case "legendary_cantrip_drop_rate":
-                        Factories.Tables.CantripChance.ApplyCantripLevelsMod();
+                        Factories.Tables.CantripChance.UpdateGlobalNumCantripsMod();
                         break;
                 }
             }

@@ -7,6 +7,7 @@ using log4net;
 using ACE.Database.Models.World;
 using ACE.Server.Factories.Entity;
 using ACE.Server.Managers;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Factories.Tables
 {
@@ -80,9 +81,9 @@ namespace ACE.Server.Factories.Tables
             T7_T8_NumCantrips,
         };
 
-        public static int RollNumCantrips(TreasureDeath profile)
+        public static int RollNumCantrips(TreasureDeath profile, AppliedRuleset ruleset)
         {
-            return numCantrips[profile.Tier - 1].Roll(profile.LootQualityMod);
+            return ruleset.ChanceTableNumCantrips[profile.Tier - 1].Roll(profile.LootQualityMod);
         }
 
 
@@ -142,40 +143,46 @@ namespace ACE.Server.Factories.Tables
             T8_CantripLevel,
         };
 
-        public static int RollCantripLevel(TreasureDeath profile)
+        public static int RollCantripLevel(TreasureDeath profile, AppliedRuleset ruleset)
         {
-            return cantripLevels[profile.Tier - 1].Roll(profile.LootQualityMod);
+            return ruleset.ChanceTableCantripLevels[profile.Tier - 1].Roll(profile.LootQualityMod);
         }
 
 
-        private static List<ChanceTable<int>> numCantrips = _numCantrips;
+        internal static List<ChanceTable<int>> numCantrips { get; private set; } = _numCantrips;
 
-        public static void ApplyNumCantripsMod(bool showResults = true)
+        public static void UpdateGlobalNumCantripsMod()
+        {
+            numCantrips = ApplyNumCantripsMod(PropertyManager.GetDouble("cantrip_drop_rate").Item, false);
+        }
+
+        public static List<ChanceTable<int>> ApplyNumCantripsMod(double cantripDropRateMaybeOutOfRange, bool showResults = true)
         {
             // scales NumCantrips, no chance vs. chance, relative to each other
-            var cantrip_drop_rate = (float)Math.Max(0.0f, PropertyManager.GetDouble("cantrip_drop_rate").Item);
+            var cantrip_drop_rate = (float)Math.Max(0.0f, cantripDropRateMaybeOutOfRange);
 
+            List<ChanceTable<int>> newTable;
             if (cantrip_drop_rate != 1.0f)
             {
-                var newTable = new List<ChanceTable<int>>();
+                newTable = new List<ChanceTable<int>>();
 
                 foreach (var entry in _numCantrips)
                 {
                     var newEntry = ScaleNumCantrips(entry, cantrip_drop_rate);
                     newTable.Add(newEntry);
                 }
-                numCantrips = newTable;
             }
             else
-                numCantrips = _numCantrips;
+                newTable = _numCantrips;
 
             if (showResults)
             {
                 log.Info($"ApplyNumCantripsMod({cantrip_drop_rate})");
                 log.Info("");
 
-                ShowTables(numCantrips);
+                ShowTables(newTable);
             }
+            return newTable;
         }
 
         public static ChanceTable<int> ScaleNumCantrips(ChanceTable<int> numCantrips, float cantrip_drop_rate)
@@ -203,37 +210,49 @@ namespace ACE.Server.Factories.Tables
             return finalTable;
         }
 
-        private static List<ChanceTable<int>> cantripLevels = _cantripLevels;
+        internal static List<ChanceTable<int>> cantripLevels { get; private set; } = _cantripLevels;
 
-        public static void ApplyCantripLevelsMod(bool showResults = true)
+        public static void UpdateGlobalCantripLevelsMod()
+        {
+            var minor_cantrip_drop_rate = PropertyManager.GetDouble("minor_cantrip_drop_rate").Item;
+            var major_cantrip_drop_rate = PropertyManager.GetDouble("major_cantrip_drop_rate").Item;
+            var epic_cantrip_drop_rate =  PropertyManager.GetDouble("epic_cantrip_drop_rate").Item;
+            var legendary_cantrip_drop_rate = PropertyManager.GetDouble("legendary_cantrip_drop_rate").Item;
+
+            cantripLevels = ApplyCantripLevelsMod(minor_cantrip_drop_rate, major_cantrip_drop_rate, epic_cantrip_drop_rate, legendary_cantrip_drop_rate, false);
+        }
+
+        public static List<ChanceTable<int>> ApplyCantripLevelsMod(double minor_cantrip_drop_rate_raw, double major_cantrip_drop_rate_raw, double epic_cantrip_drop_rate_raw, double legendary_cantrip_drop_rate_raw, bool showResults = true)
         {
             // scales CantripLevels, relative to each other
-            var minor_cantrip_drop_rate = (float)Math.Max(0.0f, PropertyManager.GetDouble("minor_cantrip_drop_rate").Item);
-            var major_cantrip_drop_rate = (float)Math.Max(0.0f, PropertyManager.GetDouble("major_cantrip_drop_rate").Item);
-            var epic_cantrip_drop_rate = (float)Math.Max(0.0f, PropertyManager.GetDouble("epic_cantrip_drop_rate").Item);
-            var legendary_cantrip_drop_rate = (float)Math.Max(0.0f, PropertyManager.GetDouble("legendary_cantrip_drop_rate").Item);
+            var minor_cantrip_drop_rate = (float)Math.Max(0.0f, minor_cantrip_drop_rate_raw);
+            var major_cantrip_drop_rate = (float)Math.Max(0.0f, major_cantrip_drop_rate_raw);
+            var epic_cantrip_drop_rate = (float)Math.Max(0.0f, epic_cantrip_drop_rate_raw);
+            var legendary_cantrip_drop_rate = (float)Math.Max(0.0f, legendary_cantrip_drop_rate_raw);
+
+            List<ChanceTable<int>> newTable;
 
             if (minor_cantrip_drop_rate != 1.0f || major_cantrip_drop_rate != 1.0f || epic_cantrip_drop_rate != 1.0f || legendary_cantrip_drop_rate != 1.0f)
             {
-                var newTable = new List<ChanceTable<int>>();
+                newTable = new List<ChanceTable<int>>();
 
                 foreach (var entry in _cantripLevels)
                 {
                     var newEntry = ScaleCantripLevels(entry, minor_cantrip_drop_rate, major_cantrip_drop_rate, epic_cantrip_drop_rate, legendary_cantrip_drop_rate);
                     newTable.Add(newEntry);
                 }
-                cantripLevels = newTable;
             }
             else
-                cantripLevels = _cantripLevels;
+                newTable = _cantripLevels;
 
             if (showResults)
             {
                 log.Info($"ApplyCantripLevelsMod({minor_cantrip_drop_rate}, {major_cantrip_drop_rate}, {epic_cantrip_drop_rate}, {legendary_cantrip_drop_rate})");
                 log.Info("");
 
-                ShowTables(cantripLevels);
+                ShowTables(newTable);
             }
+            return newTable;
         }
 
         public static ChanceTable<int> ScaleCantripLevels(ChanceTable<int> cantripLevel, float minor_cantrip_drop_rate, float major_cantrip_drop_rate, float epic_cantrip_drop_rate, float legendary_cantrip_drop_rate)
@@ -285,8 +304,8 @@ namespace ACE.Server.Factories.Tables
 
         static CantripChance()
         {
-            ApplyNumCantripsMod(false);
-            ApplyCantripLevelsMod(false);
+            UpdateGlobalNumCantripsMod();
+            UpdateGlobalCantripLevelsMod();
         }
 
         private static void ShowTables(List<ChanceTable<int>> tables)

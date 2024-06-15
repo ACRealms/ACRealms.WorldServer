@@ -14,6 +14,10 @@ using System.Diagnostics;
 using ACE.Server.WorldObjects;
 using ACE.Server.Factories;
 using ACE.Entity.Enum.RealmProperties;
+using System.Drawing.Text;
+using System.Collections.Immutable;
+using ACE.Server.Factories.Entity;
+using ACE.Server.Factories.Tables;
 
 namespace ACE.Server.Realms
 {
@@ -429,6 +433,8 @@ namespace ACE.Server.Realms
             // properties with a composition rule can be applied in sequence
             result.RerollAllRules();
 
+            result.BuildChanceTablesIfNecessary();
+
             // Set the loot generation factory here so that it can reference the ruleset
             result.LootGenerationFactory = new LootGenerationFactory(result);
 
@@ -489,7 +495,46 @@ namespace ACE.Server.Realms
                 v.RollValue();
             foreach (var v in PropertiesString.Values)
                 v.RollValue();
+
             LogTrace(() => $"RerollAllRules End");
+        }
+
+
+        private List<ChanceTable<int>> _chanceTableNumCantrips = null;
+
+        public List<ChanceTable<int>> ChanceTableNumCantrips => _chanceTableNumCantrips ?? CantripChance.numCantrips;
+        
+        private List<ChanceTable<int>> _chanceTableCantripLevels = null;
+        public List<ChanceTable<int>> ChanceTableCantripLevels => _chanceTableCantripLevels ?? CantripChance.cantripLevels;
+
+        private void BuildChanceTablesIfNecessary()
+        {
+            if (PropertiesFloat.ContainsKey(RealmPropertyFloat.CantripDropRate) || GetProperty(RealmPropertyFloat.CantripDropRate) != PropertyManager.GetDouble("cantrip_drop_rate").Item)
+            {
+                LogTrace(() => $"CantripDropRate property is present or differs from server property, building custom NumCantrips ChanceTables");
+                _chanceTableNumCantrips = CantripChance.ApplyNumCantripsMod(GetProperty(RealmPropertyFloat.CantripDropRate), false);
+            }
+
+            var keys = new (string server_prop, RealmPropertyFloat realm_prop)[] { ("minor_cantrip_drop_rate", RealmPropertyFloat.MinorCantripDropRate), ("major_cantrip_drop_rate", RealmPropertyFloat.MajorCantripDropRate), ("epic_cantrip_drop_rate", RealmPropertyFloat.EpicCantripDropRate),
+                ("legendary_cantrip_drop_rate", RealmPropertyFloat.LegendaryCantripDropRate) };
+            var appliedLevels = keys.Select(keypair => (
+                name: keypair.server_prop,
+                server_prop: PropertyManager.GetDouble(keypair.server_prop).Item,
+                realm_prop: PropertiesFloat.ContainsKey(keypair.realm_prop) ? (double?)GetProperty(keypair.realm_prop) : null,
+                realm_prop_with_fallback: GetProperty(keypair.realm_prop)
+            )).ToArray();
+            var mapping = appliedLevels.ToDictionary(x => x.name, x => x.realm_prop_with_fallback);
+            var needsLevelsTable = appliedLevels.Any(levels => levels.realm_prop.HasValue || levels.realm_prop_with_fallback != levels.server_prop);
+            if (needsLevelsTable)
+            {
+                LogTrace(() => $"Major, Minor, Epic, or Legendary CantripDropRate property is present or differs from server property, building custom CantripLevels ChanceTables");
+                _chanceTableCantripLevels = CantripChance.ApplyCantripLevelsMod(
+                    mapping["minor_cantrip_drop_rate"],
+                    mapping["major_cantrip_drop_rate"],
+                    mapping["epic_cantrip_drop_rate"],
+                    mapping["legendary_cantrip_drop_rate"],
+                    false);
+            }
         }
 
         public bool GetProperty(RealmPropertyBool property)

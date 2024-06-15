@@ -146,7 +146,27 @@ namespace ACE.Entity.Enum.Properties
         [Description("Scales the chance for cantrips to drop in each tier. Defaults to 1.0, as per end of retail")]
         [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
         [RealmPropertyFloat("cantrip_drop_rate", 1f, 0f, 100000.0)]
-        CantripDropRate = 33
+        CantripDropRate = 33,
+
+        [Description("Scales the chance for minor cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail")]
+        [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
+        [RealmPropertyFloat("minor_cantrip_drop_rate", 1f, 0f, 100000.0)]
+        MinorCantripDropRate = 34,
+
+        [Description("Scales the chance for major cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail")]
+        [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
+        [RealmPropertyFloat("major_cantrip_drop_rate", 1f, 0f, 100000.0)]
+        MajorCantripDropRate = 35,
+
+        [Description("Scales the chance for epic cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail")]
+        [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
+        [RealmPropertyFloat("epic_cantrip_drop_rate", 1f, 0f, 100000.0)]
+        EpicCantripDropRate = 36,
+
+        [Description("Scales the chance for legendary cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail")]
+        [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
+        [RealmPropertyFloat("legendary_cantrip_drop_rate", 1f, 0f, 100000.0)]
+        LegendaryCantripDropRate = 37
     }
 
     public static class RealmPropertyFloatExtensions
