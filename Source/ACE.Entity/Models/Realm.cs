@@ -7,6 +7,7 @@ using System.Text;
 using ACE.Entity.ACRealms;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Entity.Enum.RealmProperties;
 using static ACE.Entity.ACRealms.RulesetCompilationContext;
 
 namespace ACE.Entity.Models
@@ -211,6 +212,7 @@ namespace ACE.Entity.Models
     /// </summary>
     public abstract record RealmPropertyOptions
     {
+        public virtual RealmPropertyPrototypeBase PrototypeBase { get; init; }
         public Type ValueType { get; init; }
         public Type EnumType { get; init; }
         public ushort EnumValueRaw { get; init; }
@@ -221,8 +223,9 @@ namespace ACE.Entity.Models
         public virtual RealmPropertyRerollType RandomType { get => RealmPropertyRerollType.never; protected init { } }
         public virtual RealmPropertyCompositionType CompositionType { get => RealmPropertyCompositionType.replace; protected init { } }
         private Lazy<string> TemplateDisplayString { get; init; } 
-        protected RealmPropertyOptions(string name, string rulesetName, Type type, Type enumType, ushort enumValue)
+        protected RealmPropertyOptions(RealmPropertyPrototypeBase prototype, string name, string rulesetName, Type type, Type enumType, ushort enumValue)
         {
+            PrototypeBase = prototype;
             ValueType = type;
             EnumType = enumType;
             Name = name;
@@ -243,27 +246,30 @@ namespace ACE.Entity.Models
         public abstract string AppliedInfo(string val);
     }
 
-    public record RealmPropertyOptions<T> : RealmPropertyOptions
-        where T : IEquatable<T>
+    public record RealmPropertyOptions<TPrimitive> : RealmPropertyOptions
+        where TPrimitive : IEquatable<TPrimitive>
     {
-        public T HardDefaultValue { get; init; }
-        public T DefaultValue { get; init; }
+        public RealmPropertyPrototype<TPrimitive> Prototype { get; private init; }
+        public TPrimitive HardDefaultValue { get; private init; }
+        public TPrimitive DefaultValue { get; private init; }
 
-        internal RealmPropertyOptions(string name, string rulesetName, T hardDefaultValue, T defaultValue, bool locked, double? probability, Type enumType, ushort enumValue) : base(name, rulesetName, typeof(T), enumType, enumValue)
+        internal RealmPropertyOptions(RealmPropertyPrototype<TPrimitive> prototype, string name, string rulesetName, TPrimitive hardDefaultValue, TPrimitive defaultValue, bool locked, double? probability, Type enumType, ushort enumValue)
+            : base(prototype, name, rulesetName, typeof(TPrimitive), enumType, enumValue)
         {
+            Prototype = prototype;
             Locked = locked;
             Probability = probability ?? 1.0;
             DefaultValue = defaultValue;
             HardDefaultValue = hardDefaultValue;
         }
 
-        public virtual T RollValue(RulesetCompilationContext ctx)
+        public virtual TPrimitive RollValue(RulesetCompilationContext ctx)
         {
             Log(ctx, () => $"Value: {DefaultValue}");
             return DefaultValue;
         }
 
-        public virtual T Compose(T parentValue, T rolledValue, RulesetCompilationContext ctx)
+        public virtual TPrimitive Compose(TPrimitive parentValue, TPrimitive rolledValue, RulesetCompilationContext ctx)
         {
             Log(ctx, () => $"Compose: Replacing parent {parentValue} with {rolledValue}");
             return DefaultValue;
@@ -282,17 +288,17 @@ namespace ACE.Entity.Models
         public override RealmPropertyRerollType RandomType { get; protected init; }
         public override RealmPropertyCompositionType CompositionType { get; protected init; }
 
-        internal MinMaxRangedRealmPropertyOptions(string name, string rulesetName, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability, Type enumType, ushort enumValue)
-            : base(name, rulesetName, hardDefaultValue, defaultValue, locked, probability, enumType, enumValue)
+        internal MinMaxRangedRealmPropertyOptions(RealmPropertyPrototype<T> prototype, string name, string rulesetName, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability, Type enumType, ushort enumValue)
+            : base(prototype, name, rulesetName, hardDefaultValue, defaultValue, locked, probability, enumType, enumValue)
         {
             RandomType = RealmPropertyRerollType.never;
             CompositionType = (RealmPropertyCompositionType)compositionType;
         }
 
-        internal MinMaxRangedRealmPropertyOptions(string name, string rulesetName, T hardDefaultValue,
+        internal MinMaxRangedRealmPropertyOptions(RealmPropertyPrototype<T> prototype, string name, string rulesetName, T hardDefaultValue,
             byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked,
             double? probability, Type enumType, ushort enumValue)
-            : base(name, rulesetName, hardDefaultValue, hardDefaultValue, locked, probability, enumType, enumValue)
+            : base(prototype, name, rulesetName, hardDefaultValue, hardDefaultValue, locked, probability, enumType, enumValue)
         {
             RandomType = (RealmPropertyRerollType)randomType;
             if (typeof(T) == typeof(double))

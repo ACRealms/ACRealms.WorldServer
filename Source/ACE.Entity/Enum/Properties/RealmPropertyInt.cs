@@ -3,9 +3,13 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using RealmPropertyIntAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrimaryMinMaxAttribute<int>;
 
 namespace ACE.Entity.Enum.Properties
 {
+    #pragma warning disable IDE0001
+    [RequiresPrimaryAttribute<RealmPropertyPrimaryMinMaxAttribute<int>, int>]
+    #pragma warning restore IDE0001
     public enum RealmPropertyInt : ushort
     {
         [RealmPropertyInt(defaultValue: 0, minValue: 0, maxValue: 0)]

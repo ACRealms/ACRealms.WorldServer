@@ -1,5 +1,6 @@
 using ACE.Database.Adapter;
 using ACE.Entity.Enum.Properties;
+using ACE.Entity.Enum.RealmProperties;
 using ACE.Entity.Models;
 using ACE.Server.Command.Handlers;
 using ACE.Server.Managers;
@@ -35,7 +36,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
         [Fact]
         public void TestServerPropertyFallback()
         {
-            var att = RealmConverter.PropertyDefinitionsFloat[RealmPropertyFloat.Spellcasting_Max_Angle];
+            var att = RealmPropertyPrototypes.Float[RealmPropertyFloat.Spellcasting_Max_Angle].PrimaryAttribute;
             Assert.NotNull(att.DefaultFromServerProperty);
             var serverPropOrig = PropertyManager.GetDouble(att.DefaultFromServerProperty).Item;
 

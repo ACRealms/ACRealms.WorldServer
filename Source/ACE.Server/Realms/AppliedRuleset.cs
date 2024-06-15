@@ -13,6 +13,7 @@ using Lifestoned.DataModel.Content;
 using System.Diagnostics;
 using ACE.Server.WorldObjects;
 using ACE.Server.Factories;
+using ACE.Entity.Enum.RealmProperties;
 
 namespace ACE.Server.Realms
 {
@@ -493,7 +494,7 @@ namespace ACE.Server.Realms
 
         public bool GetProperty(RealmPropertyBool property)
         {
-            var att = RealmConverter.PropertyDefinitionsBool[property];
+            var att = RealmPropertyPrototypes.Bool[property].PrimaryAttribute;
             if (PropertiesBool.TryGetValue(property, out var value))
                 return value.Value;
             if (att.DefaultFromServerProperty != null)
@@ -503,7 +504,7 @@ namespace ACE.Server.Realms
 
         public double GetProperty(RealmPropertyFloat property)
         {
-            var att = RealmConverter.PropertyDefinitionsFloat[property];
+            var att = RealmPropertyPrototypes.Float[property].PrimaryAttribute;
             if (PropertiesFloat.TryGetValue(property, out var result))
             {
                 var val = result.Value;
@@ -521,7 +522,7 @@ namespace ACE.Server.Realms
 
         public int GetProperty(RealmPropertyInt property)
         {
-            var att = RealmConverter.PropertyDefinitionsInt[property];
+            var att = RealmPropertyPrototypes.Int[property].PrimaryAttribute;
             if (PropertiesInt.TryGetValue(property, out var result))
             {
                 var val = result.Value;
@@ -547,7 +548,7 @@ namespace ACE.Server.Realms
 
         public long GetProperty(RealmPropertyInt64 property)
         {
-            var att = RealmConverter.PropertyDefinitionsInt64[property];
+            var att = RealmPropertyPrototypes.Int64[property].PrimaryAttribute;
             if (PropertiesInt64.TryGetValue(property, out var result))
             {
                 var val = result.Value;
@@ -565,7 +566,7 @@ namespace ACE.Server.Realms
 
         public string GetProperty(RealmPropertyString property)
         {
-            var att = RealmConverter.PropertyDefinitionsString[property];
+            var att = RealmPropertyPrototypes.String[property].PrimaryAttribute;
             if (PropertiesString.TryGetValue(property, out var result))
                 return result.Value;
             if (att.DefaultFromServerProperty != null)

@@ -1,6 +1,7 @@
 using ACE.Database.Adapter;
 using ACE.Entity.ACRealms;
 using ACE.Entity.Enum.Properties;
+using ACE.Entity.Enum.RealmProperties;
 using ACE.Entity.Models;
 using System;
 using System.Collections.Generic;
@@ -19,12 +20,13 @@ namespace ACE.Database.Models.World
         public override AppliedRealmProperty<double> ConvertRealmProperty()
         {
             var @enum = (RealmPropertyFloat)Type;
-            var att = RealmConverter.PropertyDefinitionsFloat[@enum];
+            var proto = RealmPropertyPrototypes.Float[@enum];
+            var att = proto.PrimaryAttribute;
             RealmPropertyOptions<double> prop;
             if (Value.HasValue)
-                prop = new RealmPropertyOptions<double>(@enum.ToString(), Realm.Name, att.DefaultValue, Value.Value, Locked, Probability, EnumType, Type);
+                prop = new RealmPropertyOptions<double>(proto, @enum.ToString(), Realm.Name, att.DefaultValue, Value.Value, Locked, Probability, EnumType, Type);
             else
-                prop = new MinMaxRangedRealmPropertyOptions<double>(@enum.ToString(), Realm.Name, att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability, EnumType, Type);
+                prop = new MinMaxRangedRealmPropertyOptions<double>(proto, @enum.ToString(), Realm.Name, att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability, EnumType, Type);
             return new AppliedRealmProperty<double>(RulesetCompilationContext.DefaultShared, Type, prop);
         }
     }

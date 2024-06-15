@@ -2,6 +2,7 @@ using ACE.Entity.Enum.Properties;
 using System.CommandLine;
 using Newtonsoft.Json;
 using ACE.Entity.Enum;
+using ACE.Entity.Enum.RealmProperties;
 
 namespace ACRealms.JsonSchemaGenerator
 {
@@ -172,11 +173,11 @@ namespace ACRealms.JsonSchemaGenerator
 
         private static object MakePropertySchema()
         {
-            var propertyDefinitionsBool = RealmPropertyHelper.MakePropDict<RealmPropertyBool, RealmPropertyBoolAttribute>().Where(x => x.Key != RealmPropertyBool.Undef);
-            var propertyDefinitionsInt = RealmPropertyHelper.MakePropDict<RealmPropertyInt, RealmPropertyIntAttribute>().Where(x => x.Key != RealmPropertyInt.Undef);
-            var propertyDefinitionsInt64 = RealmPropertyHelper.MakePropDict<RealmPropertyInt64, RealmPropertyInt64Attribute>().Where(x => x.Key != RealmPropertyInt64.Undef);
-            var propertyDefinitionsString = RealmPropertyHelper.MakePropDict<RealmPropertyString, RealmPropertyStringAttribute>().Where(x => x.Key != RealmPropertyString.Undef);
-            var propertyDefinitionsFloat = RealmPropertyHelper.MakePropDict<RealmPropertyFloat, RealmPropertyFloatAttribute>().Where(x => x.Key != RealmPropertyFloat.Undef);
+            var propertyDefinitionsBool = RealmPropertyPrototypes.Bool;
+            var propertyDefinitionsInt = RealmPropertyPrototypes.Int;
+            var propertyDefinitionsInt64 = RealmPropertyPrototypes.Int64;
+            var propertyDefinitionsString = RealmPropertyPrototypes.String;
+            var propertyDefinitionsFloat = RealmPropertyPrototypes.Float;
 
             var probabilitySchema = new Dictionary<string, object>()
             {
@@ -200,7 +201,7 @@ namespace ACRealms.JsonSchemaGenerator
 
             foreach (var propInt in propertyDefinitionsInt)
             {
-                var att = propInt.Value;
+                var att = propInt.Value.PrimaryAttribute;
                 var propertySchema = new Dictionary<string, object>();
 
                 var directValueSchema = new Dictionary<string, object>()
@@ -267,7 +268,7 @@ namespace ACRealms.JsonSchemaGenerator
 
             foreach (var propLong in propertyDefinitionsInt64)
             {
-                var att = propLong.Value;
+                var att = propLong.Value.PrimaryAttribute;
                 var propertySchema = new Dictionary<string, object>();
 
                 var directValueSchema = new Dictionary<string, object>()
@@ -335,7 +336,7 @@ namespace ACRealms.JsonSchemaGenerator
 
             foreach (var propFloat in propertyDefinitionsFloat)
             {
-                var att = propFloat.Value;
+                var att = propFloat.Value.PrimaryAttribute;
                 var propertySchema = new Dictionary<string, object>();
 
                 var directValueSchema = new Dictionary<string, object>()
@@ -402,7 +403,7 @@ namespace ACRealms.JsonSchemaGenerator
 
             foreach (var propString in propertyDefinitionsString)
             {
-                var att = propString.Value;
+                var att = propString.Value.PrimaryAttribute;
                 var propertySchema = new Dictionary<string, object>();
 
                 var directValueSchema = new Dictionary<string, object>()
@@ -446,7 +447,7 @@ namespace ACRealms.JsonSchemaGenerator
 
             foreach (var propBool in propertyDefinitionsBool)
             {
-                var att = propBool.Value;
+                var att = propBool.Value.PrimaryAttribute;
                 var propertySchema = new Dictionary<string, object>();
 
                 var directValueSchema = new Dictionary<string, object>()

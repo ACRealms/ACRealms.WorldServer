@@ -1,7 +1,12 @@
 using System.ComponentModel;
+using RealmPropertyInt64Attribute = ACE.Entity.Enum.Properties.RealmPropertyPrimaryMinMaxAttribute<long>;
 
 namespace ACE.Entity.Enum.Properties
 {
+
+    #pragma warning disable IDE0001
+    [RequiresPrimaryAttribute<RealmPropertyPrimaryAttribute<long>, long>]
+    #pragma warning restore IDE0001
     public enum RealmPropertyInt64 : ushort
     {
         [RealmPropertyInt64(defaultValue: 0, minValue: 0, maxValue: 0)]

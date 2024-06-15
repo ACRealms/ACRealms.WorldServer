@@ -1,7 +1,12 @@
 using System.ComponentModel;
+using RealmPropertyStringAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrimaryAttribute<string>;
 
 namespace ACE.Entity.Enum.Properties
 {
+
+    #pragma warning disable IDE0001
+    [RequiresPrimaryAttribute<RealmPropertyPrimaryAttribute<string>, string>]
+    #pragma warning restore IDE0001
     public enum RealmPropertyString : ushort
     {
         [RealmPropertyString(defaultValue: "")]

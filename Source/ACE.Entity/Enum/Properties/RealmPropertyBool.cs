@@ -1,7 +1,13 @@
 using System.ComponentModel;
 
+using RealmPropertyBoolAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrimaryAttribute<bool>;
+
 namespace ACE.Entity.Enum.Properties
 {
+
+    #pragma warning disable IDE0001
+    [RequiresPrimaryAttribute<RealmPropertyPrimaryAttribute<bool>, bool>]
+    #pragma warning restore IDE0001
     public enum RealmPropertyBool : ushort
     {
         [RealmPropertyBool(defaultValue: false)]

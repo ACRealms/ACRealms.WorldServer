@@ -58,8 +58,6 @@ namespace ACE.Server.Managers
 
         public static void Initialize(bool liveEnvironment = true)
         {
-            RealmConverter.Initialize();
-
             SetupReservedRealms();
 
             /* var results = DatabaseManager.World.GetAllRealms();

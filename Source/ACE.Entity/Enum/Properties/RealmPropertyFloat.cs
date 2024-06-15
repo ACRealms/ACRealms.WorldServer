@@ -2,8 +2,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+using RealmPropertyFloatAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrimaryMinMaxAttribute<double>;
+
 namespace ACE.Entity.Enum.Properties
 {
+    #pragma warning disable IDE0001
+    [RequiresPrimaryAttribute<RealmPropertyPrimaryMinMaxAttribute<double>, double>]
+    #pragma warning restore IDE0001
     public enum RealmPropertyFloat : ushort
     {
         [RealmPropertyFloat(defaultValue: 0f, minValue: 0f, maxValue: 0f)]
@@ -137,6 +142,11 @@ namespace ACE.Entity.Enum.Properties
         [Description("NOT IMPLEMENTED")]
         [RealmPropertyFloat(33f, -10f, 100f)]
         TinkeringBaseImbueChanceCap = 32,
+
+        [Description("Scales the chance for cantrips to drop in each tier. Defaults to 1.0, as per end of retail")]
+        [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
+        [RealmPropertyFloat("cantrip_drop_rate", 1f, 0f, 100000.0)]
+        CantripDropRate = 33
     }
 
     public static class RealmPropertyFloatExtensions

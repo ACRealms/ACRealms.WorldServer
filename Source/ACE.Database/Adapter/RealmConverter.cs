@@ -6,26 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using ACE.Entity.Enum.RealmProperties;
+using System.Collections.Frozen;
 
 namespace ACE.Database.Adapter
 {
     public static class RealmConverter
     {
-        public static Dictionary<RealmPropertyBool, RealmPropertyBoolAttribute> PropertyDefinitionsBool;
-        public static Dictionary<RealmPropertyInt, RealmPropertyIntAttribute> PropertyDefinitionsInt;
-        public static Dictionary<RealmPropertyInt64, RealmPropertyInt64Attribute> PropertyDefinitionsInt64;
-        public static Dictionary<RealmPropertyFloat, RealmPropertyFloatAttribute> PropertyDefinitionsFloat;
-        public static Dictionary<RealmPropertyString, RealmPropertyStringAttribute> PropertyDefinitionsString;
-
-        public static void Initialize()
-        {
-            PropertyDefinitionsBool = RealmPropertyHelper.MakePropDict<RealmPropertyBool, RealmPropertyBoolAttribute>();
-            PropertyDefinitionsInt = RealmPropertyHelper.MakePropDict<RealmPropertyInt, RealmPropertyIntAttribute>();
-            PropertyDefinitionsInt64 = RealmPropertyHelper.MakePropDict<RealmPropertyInt64, RealmPropertyInt64Attribute>();
-            PropertyDefinitionsString = RealmPropertyHelper.MakePropDict<RealmPropertyString, RealmPropertyStringAttribute>();
-            PropertyDefinitionsFloat = RealmPropertyHelper.MakePropDict<RealmPropertyFloat, RealmPropertyFloatAttribute>();
-        }
-
         public static ACE.Entity.Models.Realm ConvertToEntityRealm(ACE.Database.Models.World.Realm realm, bool instantiateEmptyCollections = false)
         {
             var jobs = new List<RealmLinkJob>();
