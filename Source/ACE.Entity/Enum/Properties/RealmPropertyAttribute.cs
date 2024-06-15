@@ -258,6 +258,7 @@ namespace ACE.Entity.Enum.Properties
             return dict;
         })().ToFrozenDictionary();
 
+        public RealmPropertyRerollType ConstrainRerollType(RealmPropertyRerollType source) => IsAllowedRerollType(source, RerollRestriction) ? source : RerollRestriction;
         public static FrozenSet<RealmPropertyRerollType> GetAllowedRerollTypes(RealmPropertyRerollType? restrictionType) => RestrictionMap[restrictionType];
         public bool IsAllowedRerollType(RealmPropertyRerollType? restrictionType, RealmPropertyRerollType rerollType) => RestrictionMap[restrictionType].Contains(rerollType);
     }
