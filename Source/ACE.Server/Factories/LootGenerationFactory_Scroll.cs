@@ -10,7 +10,7 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static WorldObject CreateRandomScroll(TreasureDeath profile, TreasureRoll roll = null)
+        private WorldObject CreateRandomScroll(TreasureDeath profile, TreasureRoll roll = null)
         {
             // level 8 spell components shouldn't be in here,
             // they should be associated with TreasureItemType.SpellComponent (peas)
@@ -50,7 +50,7 @@ namespace ACE.Server.Factories
             return WorldObjectFactory.CreateNewWorldObject(weenie.WeenieClassId);
         }
 
-        private static int RollLevel8SpellComp()
+        private int RollLevel8SpellComp()
         {
             var rng = ThreadSafeRandom.Next(0, LootTables.Level8SpellComps.Length - 1);
 

@@ -329,12 +329,12 @@ namespace ACE.Server.WorldObjects
                     killerPlayer.RaresLoginTimestamp = timestamp;
             }
 
-            var wo = LootGenerationFactory.TryCreateRare(luck);
+            var wo = RealmRuleset.LootGenerationFactory.TryCreateRare(luck);
 
             if (secondChanceGranted && wo == null)
             {
                 luck = 2490;
-                wo = LootGenerationFactory.TryCreateRare(luck);
+                wo = RealmRuleset.LootGenerationFactory.TryCreateRare(luck);
             }
 
             if (wo == null)
@@ -343,7 +343,7 @@ namespace ACE.Server.WorldObjects
             if (!wo.IconUnderlayId.HasValue || wo.IconUnderlayId.Value != 0x6005B0C) // ensure icon underlay exists for rare (loot profiles use this)
                 wo.IconUnderlayId = 0x6005B0C;
 
-            var tier = LootGenerationFactory.GetRareTier(wo.WeenieClassId);
+            var tier = RealmRuleset.LootGenerationFactory.GetRareTier(wo.WeenieClassId);
             LootGenerationFactory.RareChances.TryGetValue(tier, out var chance);
 
             if (log.IsDebugEnabled)

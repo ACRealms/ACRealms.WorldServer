@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using System.Collections.Immutable;
 using ACE.Common;
 using ACE.Database.Models.World;
 using ACE.Server.Entity;
@@ -11,7 +11,7 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static WorldObject CreateAetheria(int tier, bool mutate = true)
+        private WorldObject CreateAetheria(int tier, bool mutate = true)
         {
             int chance;
             uint aetheriaType;
@@ -50,16 +50,16 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        public static readonly List<uint> IconOverlay_ItemMaxLevel = new List<uint>()
+        public static readonly ImmutableList<uint> IconOverlay_ItemMaxLevel = new List<uint>()
         {
             0x6006C34,  // 1
             0x6006C35,  // 2
             0x6006C36,  // 3
             0x6006C37,  // 4
             0x6006C38,  // 5
-        };
+        }.ToImmutableList();
 
-        private static void MutateAetheria(WorldObject wo, int tier)
+        private void MutateAetheria(WorldObject wo, int tier)
         {
             // Initial roll for an Aetheria level 1 through 3
             wo.ItemMaxLevel = 1;
@@ -89,7 +89,7 @@ namespace ACE.Server.Factories
             wo.IconOverlayId = IconOverlay_ItemMaxLevel[wo.ItemMaxLevel.Value - 1];
         }
 
-        private static WorldObject CreateCoalescedMana(TreasureDeath profile)
+        private WorldObject CreateCoalescedMana(TreasureDeath profile)
         {
             var wcid = CoalescedManaWcids.Roll(profile);
 
@@ -97,7 +97,7 @@ namespace ACE.Server.Factories
         }
 
 
-        private static WorldObject CreateAetheria_New(TreasureDeath profile, bool mutate = true)
+        private WorldObject CreateAetheria_New(TreasureDeath profile, bool mutate = true)
         {
             var wcid = AetheriaWcids.Roll(profile.Tier);
 
@@ -109,14 +109,14 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static void MutateAetheria_New(WorldObject wo, TreasureDeath profile)
+        private void MutateAetheria_New(WorldObject wo, TreasureDeath profile)
         {
             wo.ItemMaxLevel = AetheriaChance.Roll_ItemMaxLevel(profile);
 
             wo.IconOverlayId = IconOverlay_ItemMaxLevel[wo.ItemMaxLevel.Value - 1];
         }
 
-        private static bool GetMutateAetheriaData(uint wcid)
+        private bool GetMutateAetheriaData(uint wcid)
         {
             return LootTables.AetheriaWcids.Contains(wcid);
         }

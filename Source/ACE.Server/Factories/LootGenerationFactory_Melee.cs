@@ -17,7 +17,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Creates and optionally mutates a new MeleeWeapon
         /// </summary>
-        public static WorldObject CreateMeleeWeapon(TreasureDeath profile, bool isMagical, MeleeWeaponSkill weaponSkill = MeleeWeaponSkill.Undef, bool mutate = true)
+        public WorldObject CreateMeleeWeapon(TreasureDeath profile, bool isMagical, MeleeWeaponSkill weaponSkill = MeleeWeaponSkill.Undef, bool mutate = true)
         {
             var wcid = 0;
             var weaponType = 0;
@@ -67,7 +67,7 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static bool MutateMeleeWeapon(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
+        private bool MutateMeleeWeapon(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
         {
             if (!(wo is MeleeWeapon))
                 return false;
@@ -158,7 +158,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static bool MutateStats_OldMethod(WorldObject wo, TreasureDeath profile, int wieldDifficulty)
+        private bool MutateStats_OldMethod(WorldObject wo, TreasureDeath profile, int wieldDifficulty)
         {
             var success = false;
 
@@ -206,12 +206,12 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static string GetDamageScript(MeleeWeaponSkill weaponSkill, TreasureWeaponType weaponType)
+        private string GetDamageScript(MeleeWeaponSkill weaponSkill, TreasureWeaponType weaponType)
         {
             return "MeleeWeapons.Damage_WieldDifficulty_DamageVariance." + weaponSkill.GetScriptName_Combined() + "_" + weaponType.GetScriptName() + ".txt";
         }
 
-        private static string GetOffenseDefenseScript(MeleeWeaponSkill weaponSkill, TreasureWeaponType weaponType)
+        private string GetOffenseDefenseScript(MeleeWeaponSkill weaponSkill, TreasureWeaponType weaponType)
         {
             return "MeleeWeapons.WeaponOffense_WeaponDefense." + weaponType.GetScriptShortName() + "_offense_defense.txt";
         }
@@ -233,7 +233,7 @@ namespace ACE.Server.Factories
             Spears      = 1,
         }
 
-        private static bool MutateHeavyWeapon(WorldObject wo, TreasureDeath profile, int wieldDifficulty)
+        private bool MutateHeavyWeapon(WorldObject wo, TreasureDeath profile, int wieldDifficulty)
         {
             switch (wo.W_WeaponType)
             {
@@ -330,7 +330,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static bool MutateLightWeapon(WorldObject wo, TreasureDeath profile, int wieldDifficulty)
+        private bool MutateLightWeapon(WorldObject wo, TreasureDeath profile, int wieldDifficulty)
         {
             switch (wo.W_WeaponType)
             {
@@ -428,7 +428,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static bool MutateFinesseWeapon(WorldObject wo, TreasureDeath profile, int wieldDifficulty)
+        private bool MutateFinesseWeapon(WorldObject wo, TreasureDeath profile, int wieldDifficulty)
         {
             switch (wo.W_WeaponType)
             {
@@ -536,7 +536,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static bool MutateTwoHandedWeapon(WorldObject wo, TreasureDeath profile, int wieldDifficulty)
+        private bool MutateTwoHandedWeapon(WorldObject wo, TreasureDeath profile, int wieldDifficulty)
         {
             if (wo.IsCleaving)
             {
@@ -563,7 +563,7 @@ namespace ACE.Server.Factories
         /// </summary>
         /// <param name="category"></param><param name="type"></param>
         /// <returns>Returns Melee Weapon Variance</returns>
-        private static double GetVariance(Skill category, LootWeaponType type)
+        private double GetVariance(Skill category, LootWeaponType type)
         {
             double variance = 0;
             int chance = ThreadSafeRandom.Next(0, 99);
@@ -844,7 +844,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Gets Melee Weapon Index
         /// </summary>
-        private static int GetMeleeWieldToIndex(int wieldDiff)
+        private int GetMeleeWieldToIndex(int wieldDiff)
         {
             int index = 0;
 
@@ -887,7 +887,7 @@ namespace ACE.Server.Factories
         /// </summary>
         /// <param name="weaponType"></param><param name="wieldDiff"></param><param name="baseWeapon"></param>
         /// <returns>Melee Weapon Max Damage</returns>
-        private static int GetMeleeMaxDamage(Skill weaponType, int wieldDiff, LootWeaponType baseWeapon)
+        private int GetMeleeMaxDamage(Skill weaponType, int wieldDiff, LootWeaponType baseWeapon)
         {
             int damageTable = 0;
 
@@ -913,7 +913,7 @@ namespace ACE.Server.Factories
             return damageTable + maxDamageVariance;
         }
 
-        private static bool GetMutateMeleeWeaponData(uint wcid)
+        private bool GetMutateMeleeWeaponData(uint wcid)
         {
             // linear search = slow... but this is only called for /lootgen
             // if this ever needs to be fast, create a lookup table

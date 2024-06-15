@@ -1103,7 +1103,7 @@ namespace ACE.Server.Command.Handlers
                 }
             }
 
-            var items = LootGenerationFactory.CreateRandomObjectsOfType(weenieType, numItems);
+            var items = session.Player.RealmRuleset.LootGenerationFactory.CreateRandomObjectsOfType(weenieType, numItems);
 
             var stuck = new List<WorldObject>();
 
@@ -2359,7 +2359,7 @@ namespace ACE.Server.Command.Handlers
                 LootQualityMod = 0
             };
 
-            var success = LootGenerationFactory.MutateItem(wo, profile, true);
+            var success = session.Player.RealmRuleset.LootGenerationFactory.MutateItem(wo, profile, true);
 
             session.Player.TryCreateInInventoryWithNetworking(wo);
         }
@@ -2386,7 +2386,7 @@ namespace ACE.Server.Command.Handlers
             for (var i = 0; i < numItems; i++)
             {
                 //var wo = LootGenerationFactory.CreateRandomLootObjects(profile, true);
-                var wo = LootGenerationFactory.CreateRandomLootObjects_New(profile, TreasureItemCategory.MagicItem);
+                var wo = session.Player.RealmRuleset.LootGenerationFactory.CreateRandomLootObjects_New(profile, TreasureItemCategory.MagicItem);
                 if (wo != null)
                     session.Player.TryCreateInInventoryWithNetworking(wo);
                 else

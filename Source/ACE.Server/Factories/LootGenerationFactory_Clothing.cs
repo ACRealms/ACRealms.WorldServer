@@ -17,7 +17,7 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static WorldObject CreateArmor(TreasureDeath profile, bool isMagical, bool isArmor, LootBias lootBias = LootBias.UnBiased, bool mutate = true)
+        private WorldObject CreateArmor(TreasureDeath profile, bool isMagical, bool isArmor, LootBias lootBias = LootBias.UnBiased, bool mutate = true)
         {
             var minType = LootTables.ArmorType.Helms;
             LootTables.ArmorType maxType;
@@ -68,7 +68,7 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static void MutateArmor(WorldObject wo, TreasureDeath profile, bool isMagical, LootTables.ArmorType armorType, TreasureRoll roll = null)
+        private void MutateArmor(WorldObject wo, TreasureDeath profile, bool isMagical, LootTables.ArmorType armorType, TreasureRoll roll = null)
         {
             // material type
             var materialType = GetMaterialType(wo, profile.Tier);
@@ -162,7 +162,7 @@ namespace ACE.Server.Factories
             wo.LongDesc = GetLongDesc(wo);
         }
 
-        private static bool AssignArmorLevel_New(WorldObject wo, TreasureDeath profile, TreasureRoll roll, LootTables.ArmorType armorType)
+        private bool AssignArmorLevel_New(WorldObject wo, TreasureDeath profile, TreasureRoll roll, LootTables.ArmorType armorType)
         {
             // retail was only divied up into a few different mutation scripts here
             // anything with ArmorLevel ran these mutation scripts
@@ -204,7 +204,7 @@ namespace ACE.Server.Factories
             return success;
         }
 
-        private static string GetMutationScript_ArmorLevel(WorldObject wo, TreasureRoll roll)
+        private string GetMutationScript_ArmorLevel(WorldObject wo, TreasureRoll roll)
         {
             switch (roll.ArmorType)
             {
@@ -241,7 +241,7 @@ namespace ACE.Server.Factories
         /// Used values given at https://asheron.fandom.com/wiki/Loot#Armor_Levels for setting the AL mod values
         /// so as to not exceed the values listed in that table
         /// </summary>
-        private static void AssignArmorLevel(WorldObject wo, int tier, LootTables.ArmorType armorType)
+        private void AssignArmorLevel(WorldObject wo, int tier, LootTables.ArmorType armorType)
         {
             if (wo.ArmorType == null)
             {
@@ -402,7 +402,7 @@ namespace ACE.Server.Factories
                 log.Warn($"[LOOT] Standard armor item exceeding upper AL threshold {wo.WeenieClassId} - {wo.Name}");
         }
 
-        private static void AssignArmorLevelCompat(WorldObject wo, int tier, LootTables.ArmorType armorType)
+        private void AssignArmorLevelCompat(WorldObject wo, int tier, LootTables.ArmorType armorType)
         {
             log.DebugFormat("[LOOT] Using AL Assignment Compatibility layer for item {0} - {1}.", wo.WeenieClassId, wo.Name);
 
@@ -562,7 +562,7 @@ namespace ACE.Server.Factories
             }
         }
 
-        private static int GetCovenantWieldReq(int tier, Skill skill)
+        private int GetCovenantWieldReq(int tier, Skill skill)
         {
             var index = tier switch
             {
@@ -613,7 +613,7 @@ namespace ACE.Server.Factories
             return wield;
         }
 
-        private static bool TryRollEquipmentSet(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private bool TryRollEquipmentSet(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             if (roll == null)
             {
@@ -658,7 +658,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static WorldObject CreateSocietyArmor(TreasureDeath profile, bool mutate = true)
+        private WorldObject CreateSocietyArmor(TreasureDeath profile, bool mutate = true)
         {
             int society = 0;
             int armortype = 0;
@@ -730,7 +730,7 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static void MutateSocietyArmor(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
+        private void MutateSocietyArmor(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
         {
             // why is this a separate method??
 
@@ -771,7 +771,7 @@ namespace ACE.Server.Factories
                 MutateBurden(wo, profile, false);
         }
 
-        private static WorldObject CreateCloak(TreasureDeath profile, bool mutate = true)
+        private WorldObject CreateCloak(TreasureDeath profile, bool mutate = true)
         {
             // even chance between 11 different types of cloaks
             var cloakType = ThreadSafeRandom.Next(0, LootTables.Cloaks.Length - 1);
@@ -786,7 +786,7 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static void MutateCloak(WorldObject wo, TreasureDeath profile, TreasureRoll roll = null)
+        private void MutateCloak(WorldObject wo, TreasureDeath profile, TreasureRoll roll = null)
         {
             wo.ItemMaxLevel = CloakChance.Roll_ItemMaxLevel(profile);
 
@@ -850,7 +850,7 @@ namespace ACE.Server.Factories
                 MutateValue(wo, profile.Tier, roll);
         }
 
-        private static int RollCloak_ItemMaxLevel(TreasureDeath profile)
+        private int RollCloak_ItemMaxLevel(TreasureDeath profile)
         {
             //  These Values are just for starting off.  I haven't gotten the numbers yet to confirm these.
             int cloakLevel = 1;
@@ -912,12 +912,12 @@ namespace ACE.Server.Factories
             return cloakLevel;
         }
 
-        private static bool GetMutateCloakData(uint wcid)
+        private bool GetMutateCloakData(uint wcid)
         {
             return LootTables.Cloaks.Contains((int)wcid);
         }
 
-        private static void MutateValue_Armor(WorldObject wo)
+        private void MutateValue_Armor(WorldObject wo)
         {
             var bulkMod = wo.BulkMod ?? 1.0f;
             var sizeMod = wo.SizeMod ?? 1.0f;
@@ -937,7 +937,7 @@ namespace ACE.Server.Factories
             wo.Value += (int)(armorLevel * armorLevel / 10.0f * rng);
         }
 
-        private static void MutateArmorModVsType(WorldObject wo, TreasureDeath profile)
+        private void MutateArmorModVsType(WorldObject wo, TreasureDeath profile)
         {
             // for the PropertyInt.MutateFilters found in py16 data,
             // items either had all of these, or none of these
@@ -949,7 +949,7 @@ namespace ACE.Server.Factories
             TryMutateArmorModVsType(wo, profile, PropertyFloat.ArmorModVsElectric);
         }
 
-        private static bool TryMutateArmorModVsType(WorldObject wo, TreasureDeath profile, PropertyFloat prop)
+        private bool TryMutateArmorModVsType(WorldObject wo, TreasureDeath profile, PropertyFloat prop)
         {
             var armorModVsType = wo.GetProperty(prop);
 
@@ -983,7 +983,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static bool TryMutateGearRating(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private bool TryMutateGearRating(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             if (profile.Tier != 8)
                 return false;
@@ -1035,7 +1035,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static void SetWieldLevelReq(WorldObject wo, int level)
+        private void SetWieldLevelReq(WorldObject wo, int level)
         {
             if (wo.WieldRequirements == WieldRequirement.Invalid)
             {
@@ -1064,7 +1064,7 @@ namespace ACE.Server.Factories
             }
         }
 
-        private static bool GetMutateArmorData(uint wcid, out LootTables.ArmorType? armorType)
+        private bool GetMutateArmorData(uint wcid, out LootTables.ArmorType? armorType)
         {
             foreach (var kvp in LootTables.armorTypeMap)
             {

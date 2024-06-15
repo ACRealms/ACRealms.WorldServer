@@ -69,7 +69,7 @@ namespace ACE.Server.WorldObjects
         /// Should only be adjusted by Landblock -- default is null
         /// </summary>
         public Landblock CurrentLandblock { get; internal set; }
-        public AppliedRuleset RealmRuleset => CurrentLandblock?.RealmRuleset;
+        public AppliedRuleset RealmRuleset => CurrentLandblock?.RealmRuleset ?? RealmManager.ServerDefaultRuleset;
 
         public bool IsBusy { get; set; }
         public bool IsShield { get => CombatUse != null && CombatUse == ACE.Entity.Enum.CombatUse.Shield; }

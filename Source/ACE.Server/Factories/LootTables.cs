@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
-
+using System.Collections.Immutable;
+using System.Linq;
 using ACE.Entity.Enum;
 using ACE.Server.Factories.Tables;
 using ACE.Server.WorldObjects;
@@ -12,7 +14,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// A mapping of MaterialTypes to value modifiers
         /// </summary>
-        private static Dictionary<int, double> materialModifier = new Dictionary<int, double>()
+        private static FrozenDictionary<int, double> materialModifier = new Dictionary<int, double>()
         {
             { 1,  1.0 }, // Ceramic
             { 2,  1.5 }, // Porcelain
@@ -90,7 +92,7 @@ namespace ACE.Server.Factories
             { 75, 1.4 }, // Oak
             { 76, 1.0 }, // Pine
             { 77, 1.2 }, // Teak
-        };
+        }.ToFrozenDictionary();
 
         public static double getMaterialValueModifier(WorldObject wo)
         {
@@ -105,7 +107,7 @@ namespace ACE.Server.Factories
             return getMaterialValueModifier(wo);
         }
 
-        public static Dictionary<int, int> gemValues = new Dictionary<int, int>()
+        public static FrozenDictionary<int, int> gemValues = new Dictionary<int, int>()
         {
             { 10, 100 },    // Agate
             { 11, 500 },    // Amber
@@ -149,9 +151,9 @@ namespace ACE.Server.Factories
             { 49, 2500 },   // Yellow Topaz
             { 50, 1000 },   // Zircon
             { 51, 100 }     // Ivory
-        };
+        }.ToFrozenDictionary();
 
-        public static readonly int[][] SummoningEssencesMatrix =
+        public static readonly ImmutableArray<ImmutableArray<int>> SummoningEssencesMatrix = new int[][]
         {
             new int[] { 48942, 48944, 48945, 48946, 48947, 48948, 48956 },
             new int[] { 49213, 49214, 49215, 49216, 49217, 49218, 49219 },
@@ -189,9 +191,9 @@ namespace ACE.Server.Factories
             new int[] { 49531, 49532, 49533, 49534, 49535, 49536, 49537 },
             new int[] { 49538, 49539, 49540, 49541, 49542, 49543, 49544 },
             new int[] { 49545, 49546, 49547, 49548, 49549, 49550, 49551 }
-        };
+        }.Select(row => row.ToImmutableArray()).ToImmutableArray();
 
-        public static readonly int[][] HeavyWeaponsMatrix =
+        public static readonly ImmutableArray<ImmutableArray<int>> HeavyWeaponsMatrix = new int[][]
         {
             new int[] { 301, 3750, 3751, 3752, 3753 },       //  0 - Battle Axe
             new int[] { 344, 3865, 3866, 3867, 3868 },       //  1 - Silifi
@@ -217,9 +219,9 @@ namespace ACE.Server.Factories
             new int[] { 45108, 45109, 45110, 45111, 45112 }, // 21 - Schlager (MS)
             new int[] { 4190, 4191, 4192, 4193, 4194 },      // 22 - Cestus
             new int[] { 4195, 4196, 4197, 4198, 4199 },      // 23 - Nekode
-        };
+        }.Select(row => row.ToImmutableArray()).ToImmutableArray();
 
-        public static readonly int[][] LightWeaponsMatrix =
+        public static readonly ImmutableArray<ImmutableArray<int>> LightWeaponsMatrix = new int[][]
         {
             new int[] { 30561, 30562, 30563, 30564, 30565 }, //  0 - Dolabra
             new int[] { 303, 3754, 3755, 3756, 3757 },       //  1 - Hand Axe
@@ -241,9 +243,9 @@ namespace ACE.Server.Factories
             new int[] { 340, 3853, 3854, 3855, 3856 },       // 17 - Shamshir
             new int[] { 30611, 30612, 30613, 30614, 30615 }, // 18 - Knuckles
             new int[] { 326, 3818, 3819, 3820, 3821 }        // 19 - Katar
-        };
+        }.Select(row => row.ToImmutableArray()).ToImmutableArray();
 
-        public static readonly int[][] FinesseWeaponsMatrix =
+        public static readonly ImmutableArray<ImmutableArray<int>> FinesseWeaponsMatrix = new int[][]
         {
             new int[] { 45113, 45114, 45115, 45116, 45117 }, //  0 - Hammer
             new int[] { 30556, 30557, 30558, 30559, 30560 }, //  1 - Hatchet
@@ -268,9 +270,9 @@ namespace ACE.Server.Factories
             new int[] { 361, 3909, 3910, 3911, 3912 },       // 20 - Yaoji
             new int[] { 31784, 31785, 31786, 31787, 31783 }, // 21 - Claw
             new int[] { 45118, 45119, 45120, 45121, 45122 }  // 22 - Hand Wraps
-        };
+        }.Select(row => row.ToImmutableArray()).ToImmutableArray();
 
-        public static readonly int[][] TwoHandedWeaponsMatrix =
+        public static readonly ImmutableArray<ImmutableArray<int>> TwoHandedWeaponsMatrix = new int[][]
         {
             new int[] { 40760, 40761, 40762, 40763, 40764 }, //  0 - Nodachi
             new int[] { 41067, 41068, 41069, 41070, 41071 }, //  1 - Shashqa
@@ -284,22 +286,22 @@ namespace ACE.Server.Factories
             new int[] { 41046, 41047, 41048, 41049, 41050 }, //  9 - Pike
             new int[] { 40818, 40819, 40820, 40821, 40822 }, // 10 - Corsesca
             new int[] { 41041, 41042, 41043, 41044, 41045 }  // 11 - Magari Yari
-        };
+        }.Select(row => row.ToImmutableArray()).ToImmutableArray();
 
-        public static readonly List<int[][]> MeleeWeaponsMatrices = new List<int[][]>()
+        public static readonly ImmutableList<ImmutableArray<ImmutableArray<int>>> MeleeWeaponsMatrices = new List<ImmutableArray<ImmutableArray<int>>>()
         {
             HeavyWeaponsMatrix,
             LightWeaponsMatrix,
             FinesseWeaponsMatrix,
             TwoHandedWeaponsMatrix
-        };
+        }.ToImmutableList();
 
-        public static readonly HashSet<uint> AetheriaWcids = new HashSet<uint>()
+        public static readonly FrozenSet<uint> AetheriaWcids = new HashSet<uint>()
         {
             Server.Entity.Aetheria.AetheriaBlue,
             Server.Entity.Aetheria.AetheriaYellow,
             Server.Entity.Aetheria.AetheriaRed,
-        };
+        }.ToFrozenSet();
 
         public static readonly int[,] HeavyWeaponDamageTable =
         {      //  0|250|300|325|350|370|400|420|430
@@ -313,7 +315,7 @@ namespace ACE.Server.Factories
                 { 23, 30, 36, 43, 50, 56, 63, 66, 70 }, // Staff
                 { 20, 26, 31, 37, 43, 48, 54, 56, 59 }  // UA
         };
-
+        
         public static readonly int[,] LightWeaponDamageTable =
         {      //  0|250|300|325|350|370|400|420|430
                 { 22, 28, 33, 39, 44, 50, 55, 58, 61 }, // Axe

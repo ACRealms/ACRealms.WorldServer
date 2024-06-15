@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 using ACE.Common;
@@ -15,7 +16,7 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static void AssignMagic(WorldObject wo, TreasureDeath profile, TreasureRoll roll, bool isArmor = false)
+        private void AssignMagic(WorldObject wo, TreasureDeath profile, TreasureRoll roll, bool isArmor = false)
         {
             int numSpells = 0;
             int numEpics = 0;
@@ -71,7 +72,7 @@ namespace ACE.Server.Factories
             }
         }
 
-        private static bool AssignMagic_Spells(WorldObject wo, TreasureDeath profile, bool isArmor, out int numSpells, out int epicCantrips, out int legendaryCantrips)
+        private bool AssignMagic_Spells(WorldObject wo, TreasureDeath profile, bool isArmor, out int numSpells, out int epicCantrips, out int legendaryCantrips)
         {
             SpellId[][] spells;
             SpellId[][] cantrips;
@@ -202,7 +203,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static int GetSpellDistribution(TreasureDeath profile, out int numMinors, out int numMajors, out int numEpics, out int numLegendaries)
+        private int GetSpellDistribution(TreasureDeath profile, out int numMinors, out int numMajors, out int numEpics, out int numLegendaries)
         {
             int numNonCantrips = 0;
 
@@ -246,7 +247,7 @@ namespace ACE.Server.Factories
             return numNonCantrips + numMinors + numMajors + numEpics + numLegendaries;
         }
 
-        private static int GetNumMinorCantrips(TreasureDeath profile)
+        private int GetNumMinorCantrips(TreasureDeath profile)
         {
             int numMinors = 0;
 
@@ -299,7 +300,7 @@ namespace ACE.Server.Factories
             return numMinors;
         }
 
-        private static int GetNumMajorCantrips(TreasureDeath profile)
+        private int GetNumMajorCantrips(TreasureDeath profile)
         {
             int numMajors = 0;
 
@@ -350,7 +351,7 @@ namespace ACE.Server.Factories
             return numMajors;
         }
 
-        private static int GetNumEpicCantrips(TreasureDeath profile)
+        private int GetNumEpicCantrips(TreasureDeath profile)
         {
             int numEpics = 0;
 
@@ -385,7 +386,7 @@ namespace ACE.Server.Factories
             return numEpics;
         }
 
-        private static int GetNumLegendaryCantrips(TreasureDeath profile)
+        private int GetNumLegendaryCantrips(TreasureDeath profile)
         {
             int numLegendaries = 0;
 
@@ -411,7 +412,7 @@ namespace ACE.Server.Factories
             return numLegendaries;
         }
 
-        private static int GetLowSpellTier(int tier)
+        private int GetLowSpellTier(int tier)
         {
             int lowSpellTier;
             switch (tier)
@@ -440,7 +441,7 @@ namespace ACE.Server.Factories
             return lowSpellTier;
         }
 
-        private static int GetHighSpellTier(int tier)
+        private int GetHighSpellTier(int tier)
         {
             int highSpellTier;
             switch (tier)
@@ -467,7 +468,7 @@ namespace ACE.Server.Factories
             return highSpellTier;
         }
 
-        private static void Shuffle(int[] array)
+        private void Shuffle(int[] array)
         {
             // verified even distribution
             for (var i = 0; i < array.Length; i++)
@@ -483,7 +484,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Returns the maximum BaseMana from the spells in item's spellbook
         /// </summary>
-        public static int GetMaxBaseMana(WorldObject wo)
+        public int GetMaxBaseMana(WorldObject wo)
         {
             var maxBaseMana = 0;
 
@@ -502,7 +503,7 @@ namespace ACE.Server.Factories
 
         // old table / method
 
-        private static readonly List<(int min, int max)> itemMaxMana_RandomRange = new List<(int min, int max)>()
+        private static readonly ImmutableList<(int min, int max)> itemMaxMana_RandomRange = new List<(int min, int max)>()
         {
             (200,  400),    // T1
             (400,  600),    // T2
@@ -512,9 +513,9 @@ namespace ACE.Server.Factories
             (1200, 1400),   // T6
             (1400, 1600),   // T7
             (1600, 1800),   // T8
-        };
+        }.ToImmutableList();
 
-        private static int RollItemMaxMana(int tier, int numSpells)
+        private int RollItemMaxMana(int tier, int numSpells)
         {
             var range = itemMaxMana_RandomRange[tier - 1];
 
@@ -526,7 +527,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Rolls the ItemMaxMana for an object
         /// </summary>
-        private static int RollItemMaxMana_New(WorldObject wo, TreasureRoll roll, int maxSpellMana)
+        private int RollItemMaxMana_New(WorldObject wo, TreasureRoll roll, int maxSpellMana)
         {
             // verified matches up with magloot eor logs
 
@@ -564,7 +565,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Calculates the ManaRate for an item
         /// </summary>
-        public static float CalculateManaRate(int maxBaseMana)
+        public float CalculateManaRate(int maxBaseMana)
         {
             if (maxBaseMana <= 0)
                 maxBaseMana = 1;
@@ -575,7 +576,7 @@ namespace ACE.Server.Factories
 
         // old method / based on item type
 
-        private static int RollSpellcraft(WorldObject wo)
+        private int RollSpellcraft(WorldObject wo)
         {
             var maxSpellPower = GetMaxSpellPower(wo);
 
@@ -607,7 +608,7 @@ namespace ACE.Server.Factories
 
         // new method / based on treasure roll
 
-        private static int RollSpellcraft(WorldObject wo, TreasureRoll roll)
+        private int RollSpellcraft(WorldObject wo, TreasureRoll roll)
         {
             var maxSpellPower = GetMaxSpellPower(wo);
 
@@ -636,7 +637,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Returns the maximum power from the spells in item's SpellDID / spellbook
         /// </summary>
-        public static int GetMaxSpellPower(WorldObject wo)
+        public int GetMaxSpellPower(WorldObject wo)
         {
             var maxSpellPower = 0;
 
@@ -661,7 +662,7 @@ namespace ACE.Server.Factories
             return maxSpellPower;
         }
 
-        private static void AddActivationRequirements(WorldObject wo, TreasureRoll roll)
+        private void AddActivationRequirements(WorldObject wo, TreasureRoll roll)
         {
             // ItemSkill/LevelLimit
             TryMutate_ItemSkillLimit(wo, roll);
@@ -670,7 +671,7 @@ namespace ACE.Server.Factories
             wo.ItemDifficulty = CalculateArcaneLore(wo, roll);
         }
 
-        private static bool TryMutate_ItemSkillLimit(WorldObject wo, TreasureRoll roll)
+        private bool TryMutate_ItemSkillLimit(WorldObject wo, TreasureRoll roll)
         {
             if (!RollItemSkillLimit(roll))
                 return false;
@@ -707,7 +708,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static bool RollItemSkillLimit(TreasureRoll roll)
+        private bool RollItemSkillLimit(TreasureRoll roll)
         {
             if (roll.IsMeleeWeapon || roll.IsMissileWeapon)
             {
@@ -725,7 +726,7 @@ namespace ACE.Server.Factories
         // previous method - replaces itemSkillLevelLimit w/ WieldDifficulty,
         // and does not use treasure roll
 
-        private static int RollItemDifficulty(WorldObject wo, int numEpics, int numLegendaries)
+        private int RollItemDifficulty(WorldObject wo, int numEpics, int numLegendaries)
         {
             // - # of spells on item
             var num_spells = wo.Biota.PropertiesSpellBook.Count();
@@ -754,7 +755,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Calculates the Arcane Lore requirement / ItemDifficulty
         /// </summary>
-        private static int CalculateArcaneLore(WorldObject wo, TreasureRoll roll)
+        private int CalculateArcaneLore(WorldObject wo, TreasureRoll roll)
         {
             // spellcraft - (itemSkillLevelLimit / 2.0f) + creatureLifeEnchantments + cantrips
 

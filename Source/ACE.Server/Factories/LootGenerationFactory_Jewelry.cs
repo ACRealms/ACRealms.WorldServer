@@ -12,7 +12,7 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static WorldObject CreateJewelry(TreasureDeath profile, bool isMagical, bool mutate = true)
+        private WorldObject CreateJewelry(TreasureDeath profile, bool isMagical, bool mutate = true)
         {
             // 31% chance ring, 31% chance bracelet, 30% chance necklace 8% chance Trinket
 
@@ -37,7 +37,7 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static void MutateJewelry(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
+        private void MutateJewelry(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
         {
             // material type
             var materialType = GetMaterialType(wo, profile.Tier);
@@ -86,7 +86,7 @@ namespace ACE.Server.Factories
             wo.LongDesc = GetLongDesc(wo);
         }
 
-        private static bool GetMutateJewelryData(uint wcid)
+        private bool GetMutateJewelryData(uint wcid)
         {
             foreach (var jewelryTable in LootTables.jewelryTables)
             {

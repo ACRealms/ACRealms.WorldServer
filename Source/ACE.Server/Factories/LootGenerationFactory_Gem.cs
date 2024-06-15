@@ -13,7 +13,7 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static WorldObject CreateGem(TreasureDeath profile, bool isMagical, bool mutate = true)
+        private WorldObject CreateGem(TreasureDeath profile, bool isMagical, bool mutate = true)
         {
             var idx = profile.Tier - 1;
 
@@ -31,7 +31,7 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static void MutateGem(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
+        private void MutateGem(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
         {
             // workmanship
             wo.ItemWorkmanship = WorkmanshipChance.Roll(profile.Tier);
@@ -71,7 +71,7 @@ namespace ACE.Server.Factories
             wo.LongDesc = GetLongDesc(wo);
         }
 
-        private static void AssignMagic_Gem(WorldObject wo, TreasureDeath profile)
+        private void AssignMagic_Gem(WorldObject wo, TreasureDeath profile)
         {
             var spellLevelIdx = ThreadSafeRandom.Next(0, 1);
             var spellLevel = LootTables.GemSpellIndexMatrix[profile.Tier - 1][spellLevelIdx];
@@ -96,7 +96,7 @@ namespace ACE.Server.Factories
             wo.ItemManaCost = baseMana;
         }
 
-        private static bool AssignMagic_Gem_New(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private bool AssignMagic_Gem_New(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             // TODO: move to standard AssignMagic() pipeline
 
@@ -132,7 +132,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static bool GetMutateGemData(uint wcid)
+        private bool GetMutateGemData(uint wcid)
         {
             for (var gemLootMatrixIndex = 0; gemLootMatrixIndex < LootTables.GemsWCIDsMatrix.Length; gemLootMatrixIndex++)
             {
@@ -142,7 +142,7 @@ namespace ACE.Server.Factories
             return false;
         }
 
-        private static void MutateValue_Gem(WorldObject wo)
+        private void MutateValue_Gem(WorldObject wo)
         {
             var materialMod = MaterialTable.GetValueMod(wo.MaterialType);
 

@@ -15,7 +15,7 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static WorldObject CreateDinnerware(TreasureDeath profile, bool isMagical, bool mutate = true)
+        private WorldObject CreateDinnerware(TreasureDeath profile, bool isMagical, bool mutate = true)
         {
             var rng = ThreadSafeRandom.Next(0, LootTables.DinnerwareLootMatrix.Length - 1);
 
@@ -29,7 +29,7 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static void MutateDinnerware(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
+        private void MutateDinnerware(WorldObject wo, TreasureDeath profile, bool isMagical, TreasureRoll roll = null)
         {
             // dinnerware did not have its Damage / DamageVariance / WeaponSpeed mutated
 
@@ -62,7 +62,7 @@ namespace ACE.Server.Factories
             wo.LongDesc = GetLongDesc(wo);
         }
 
-        private static void MutateDinnerware_ItemValue(WorldObject wo)
+        private void MutateDinnerware_ItemValue(WorldObject wo)
         {
             var materialMod = LootTables.getMaterialValueModifier(wo);
             var gemMaterialMod = LootTables.getGemMaterialValueModifier(wo);
@@ -74,7 +74,7 @@ namespace ACE.Server.Factories
             wo.Value = (int)(baseValue * gemMaterialMod * materialMod * workmanship);
         }
 
-        private static bool GetMutateDinnerwareData(uint wcid)
+        private bool GetMutateDinnerwareData(uint wcid)
         {
             return LootTables.DinnerwareLootMatrix.Contains((int)wcid);
         }

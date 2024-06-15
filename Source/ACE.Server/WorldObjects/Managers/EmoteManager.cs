@@ -45,6 +45,8 @@ namespace ACE.Server.WorldObjects.Managers
 
         public bool Debug = false;
 
+        public AppliedRuleset Ruleset => WorldObject?.RealmRuleset ?? RealmManager.ServerDefaultRuleset;
+
         public EmoteManager(WorldObject worldObject)
         {
             _worldObject = worldObject;
@@ -277,7 +279,7 @@ namespace ACE.Server.WorldObjects.Managers
                             UnknownChances = 21
                         };
 
-                        var treasure = LootGenerationFactory.CreateRandomLootObjects_New(profile, treasureType, treasureClass);
+                        var treasure = Ruleset.LootGenerationFactory.CreateRandomLootObjects_New(profile, treasureType, treasureClass);
                         if (treasure != null)
                         {
                             player.TryCreateForGive(WorldObject, treasure);

@@ -1073,7 +1073,7 @@ namespace ACE.Server.WorldObjects
         {
             if (killerIsOlthoiPlayer)
             {
-                var slag = LootGenerationFactory.RollSlag(this, hadVitae);
+                var slag = RealmRuleset.LootGenerationFactory.RollSlag(this, hadVitae);
 
                 if (slag == null)
                     return new();

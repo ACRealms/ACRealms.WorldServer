@@ -10,7 +10,7 @@ namespace ACE.Server.Factories
 
         // used by multiple item types
 
-        private static int RollWieldDifficulty(int tier, TreasureWeaponType weaponType)
+        private int RollWieldDifficulty(int tier, TreasureWeaponType weaponType)
         {
             int wield = 0;
             int chance = ThreadSafeRandom.Next(1, 100);
@@ -204,7 +204,7 @@ namespace ACE.Server.Factories
             return wield;
         }
 
-        private static double GetMaxDamageMod(int tier, int maxDamageMod)
+        private double GetMaxDamageMod(int tier, int maxDamageMod)
         {
             double damageMod = 0;
 
@@ -641,7 +641,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Rolls for a WeaponDefense for a weapon
         /// </summary>
-        private static double RollWeaponDefense(int wield, TreasureDeath profile)
+        private double RollWeaponDefense(int wield, TreasureDeath profile)
         {
             double meleeMod = 0;
 
@@ -852,7 +852,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Returns Values for Magic & Missile Defense Bonus. Updated HarliQ 11/17/19
         /// </summary>
-        private static double RollWeapon_MissileMagicDefense(int tier)
+        private double RollWeapon_MissileMagicDefense(int tier)
         {
             double magicMissileDefenseMod = 0;
             // For seeing if weapon even gets a chance at a modifier

@@ -6,13 +6,13 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static WorldObject CreateFood()
+        private WorldObject CreateFood()
         {
             uint foodType = (uint)LootTables.food[ThreadSafeRandom.Next(0, LootTables.food.Length - 1)];
             return WorldObjectFactory.CreateNewWorldObject(foodType);
         }
 
-        private static WorldObject CreateGenericObjects(TreasureDeath profile)
+        private WorldObject CreateGenericObjects(TreasureDeath profile)
         {
             int chance;
             WorldObject wo;

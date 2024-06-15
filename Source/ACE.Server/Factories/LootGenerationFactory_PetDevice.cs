@@ -6,7 +6,7 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static WorldObject CreateSummoningEssence(int tier, bool mutate = true)
+        private WorldObject CreateSummoningEssence(int tier, bool mutate = true)
         {
             // Adding a spread of Pet Device levels for each tier - Level 200 pets should only be dropping in T8 Loot - HQ 2/29/2020
             // The spread is from Optim's Data
@@ -47,7 +47,7 @@ namespace ACE.Server.Factories
             return petDevice;
         }
 
-        private static void MutatePetDevice(WorldObject petDevice, int tier)
+        private void MutatePetDevice(WorldObject petDevice, int tier)
         {
             if (!(petDevice is PetDevice)) return;
 
@@ -71,7 +71,7 @@ namespace ACE.Server.Factories
             petDevice.ItemWorkmanship = WorkmanshipChance.Roll(tier);
         }
 
-        public static int GeneratePetDeviceRating(int tier)
+        public int GeneratePetDeviceRating(int tier)
         {
             // thanks to morosity for this formula!
             var baseRating = ThreadSafeRandom.Next(1, 10);

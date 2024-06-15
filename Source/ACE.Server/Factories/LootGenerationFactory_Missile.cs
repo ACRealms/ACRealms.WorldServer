@@ -17,7 +17,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Creates and optionally mutates a new MissileWeapon
         /// </summary>
-        public static WorldObject CreateMissileWeapon(TreasureDeath profile, bool isMagical, bool mutate = true)
+        public WorldObject CreateMissileWeapon(TreasureDeath profile, bool isMagical, bool mutate = true)
         {
             int weaponWeenie;
 
@@ -37,7 +37,7 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static void MutateMissileWeapon(WorldObject wo, TreasureDeath profile, bool isMagical, int? wieldDifficulty = null, TreasureRoll roll = null)
+        private void MutateMissileWeapon(WorldObject wo, TreasureDeath profile, bool isMagical, int? wieldDifficulty = null, TreasureRoll roll = null)
         {
             if (roll == null)
             {
@@ -145,14 +145,14 @@ namespace ACE.Server.Factories
             wo.LongDesc = GetLongDesc(wo);
         }
 
-        private static string GetMissileScript(TreasureWeaponType weaponType, bool isElemental = false)
+        private string GetMissileScript(TreasureWeaponType weaponType, bool isElemental = false)
         {
             var elementalStr = isElemental ? "elemental" : "non_elemental";
 
             return "MissileWeapons." + weaponType.GetScriptName() + "_" + elementalStr + ".txt";
         }
 
-        private static bool GetMutateMissileWeaponData(uint wcid, int tier)
+        private bool GetMutateMissileWeaponData(uint wcid, int tier)
         {
             for (var isElemental = 0; isElemental < LootTables.MissileWeaponsMatrices.Count; isElemental++)
             {
@@ -169,7 +169,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Get Missile Wield Index.
         /// </summary>
-        private static int GetMissileWieldToIndex(int wieldDiff)
+        private int GetMissileWieldToIndex(int wieldDiff)
         {
             int index = 0;
 
@@ -191,7 +191,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Rolls for a DamageMod for missile weapons
         /// </summary>
-        private static float GetMissileDamageMod(int wieldDiff, WeaponType weaponType)
+        private float GetMissileDamageMod(int wieldDiff, WeaponType weaponType)
         {
             // should this be setting defaults?
             if (weaponType == WeaponType.Undef)
@@ -234,7 +234,7 @@ namespace ACE.Server.Factories
         /// </summary>
         /// <param name="wield"></param>
         /// <returns>Missile Weapon Wield Requirement</returns>
-        private static int GetElementalDamageBonus(int wield)
+        private int GetElementalDamageBonus(int wield)
         {
             int chance = 0;
             int eleMod = 0;
@@ -331,7 +331,7 @@ namespace ACE.Server.Factories
         /// Determines Type of Missile Weapon, and the element.
         /// </summary>
         /// <returns>Missile Type, Element</returns>
-        private static int GetElementalMissileWeapon()
+        private int GetElementalMissileWeapon()
         {
             // Determine missile weapon type: 0 - Bow, 1 - Crossbows, 2 - Atlatl, 3 - Slingshot, 4 - Compound Bow, 5 - Compound Crossbow
             int missileType = ThreadSafeRandom.Next(0, 5);
@@ -346,7 +346,7 @@ namespace ACE.Server.Factories
         /// Determines Non Elemental type of missile weapon (No Wields).
         /// </summary>
         /// <returns>Missile Weapon Type and SubType</returns>      
-        private static int GetNonElementalMissileWeapon()
+        private int GetNonElementalMissileWeapon()
         {
             // Determine missile weapon type: 0 - Bow, 1 - Crossbows, 2 - Atlatl
             int missileType = ThreadSafeRandom.Next(0, 2);

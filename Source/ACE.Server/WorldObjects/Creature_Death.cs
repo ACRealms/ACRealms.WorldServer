@@ -747,7 +747,7 @@ namespace ACE.Server.WorldObjects
         {
             if (DeathTreasure == null) return;
 
-            var slag = LootGenerationFactory.RollSlag(DeathTreasure);
+            var slag = RealmRuleset.LootGenerationFactory.RollSlag(DeathTreasure);
 
             if (slag == null) return;
 

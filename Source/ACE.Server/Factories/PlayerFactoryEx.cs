@@ -488,7 +488,7 @@ namespace ACE.Server.Factories
 
             for (int i = 0; i < 12; i++)
             {
-                var item = LootGenerationFactory.CreateMeleeWeapon(profile, true, MeleeWeaponSkill.HeavyWeapons);
+                var item = RealmManager.ServerDefaultRuleset.LootGenerationFactory.CreateMeleeWeapon(profile, true, MeleeWeaponSkill.HeavyWeapons);
                 AddRend(item);
                 player.TryAddToInventory(item);
             }
@@ -539,7 +539,7 @@ namespace ACE.Server.Factories
 
             for (int i = 0; i < 12; i++)
             {
-                var item = LootGenerationFactory.CreateMissileWeapon(profile, true);
+                var item = RealmManager.ServerDefaultRuleset.LootGenerationFactory.CreateMissileWeapon(profile, true);
                 AddRend(item);
                 player.TryAddToInventory(item);
             }
@@ -591,7 +591,7 @@ namespace ACE.Server.Factories
 
             for (int i = 0; i < 12; i++)
             {
-                var item = LootGenerationFactory.CreateCaster(profile, true, 1, true);
+                var item = RealmManager.ServerDefaultRuleset.LootGenerationFactory.CreateCaster(profile, true, 1, true);
                 AddRend(item);
                 player.TryAddToInventory(item);
             }

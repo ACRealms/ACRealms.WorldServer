@@ -249,7 +249,7 @@ namespace ACE.Server.Entity
             target.SoundTableId = source.SoundTableId;
 
             target.Name = source.Name;
-            target.LongDesc = LootGenerationFactory.GetLongDesc(target);
+            target.LongDesc = target.RealmRuleset.LootGenerationFactory.GetLongDesc(target);
 
             target.IgnoreCloIcons = source.IgnoreCloIcons;
             target.IconId = source.IconId;

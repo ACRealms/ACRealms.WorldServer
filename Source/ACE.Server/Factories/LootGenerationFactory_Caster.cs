@@ -14,7 +14,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Creates Caster (Wand, Staff, Orb)
         /// </summary>
-        public static WorldObject CreateCaster(TreasureDeath profile, bool isMagical, int wield = -1, bool forceWar = false, bool mutate = true)
+        public WorldObject CreateCaster(TreasureDeath profile, bool isMagical, int wield = -1, bool forceWar = false, bool mutate = true)
         {
             // Refactored 11/20/19  - HarliQ
             int casterWeenie = 0;
@@ -49,7 +49,7 @@ namespace ACE.Server.Factories
             return wo;
         }
 
-        private static void MutateCaster(WorldObject wo, TreasureDeath profile, bool isMagical, int? wieldDifficulty = null, TreasureRoll roll = null)
+        private void MutateCaster(WorldObject wo, TreasureDeath profile, bool isMagical, int? wieldDifficulty = null, TreasureRoll roll = null)
         {
             if (wieldDifficulty != null)
             {
@@ -189,7 +189,7 @@ namespace ACE.Server.Factories
             wo.LongDesc = GetLongDesc(wo);
         }
 
-        private static void MutateCaster_SpellDID(WorldObject wo, TreasureDeath profile)
+        private void MutateCaster_SpellDID(WorldObject wo, TreasureDeath profile)
         {
             var firstSpell = CasterSlotSpells.Roll(wo);
 
@@ -220,14 +220,14 @@ namespace ACE.Server.Factories
             wo.ItemUseable = Usable.SourceWieldedTargetRemoteNeverWalk;
         }
 
-        private static string GetCasterScript(bool isElemental = false)
+        private string GetCasterScript(bool isElemental = false)
         {
             var elementalStr = isElemental ? "elemental" : "non_elemental";
 
             return $"Casters.caster_{elementalStr}.txt";
         }
 
-        private static bool GetMutateCasterData(uint wcid)
+        private bool GetMutateCasterData(uint wcid)
         {
             for (var i = 0; i < LootTables.CasterWeaponsMatrix.Length; i++)
             {
@@ -245,7 +245,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Rolls for the ManaConversionMod for casters
         /// </summary>
-        private static double RollManaConversionMod(int tier)
+        private double RollManaConversionMod(int tier)
         {
             int magicMod = 0;
 
@@ -354,7 +354,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Rolls for ElementalDamageMod for caster weapons
         /// </summary>
-        private static double RollElementalDamageMod(int wield)
+        private double RollElementalDamageMod(int wield)
         {
             double elementBonus = 0;
 

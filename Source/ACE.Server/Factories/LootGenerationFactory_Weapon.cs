@@ -7,7 +7,7 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static WorldObject CreateWeapon(TreasureDeath profile, bool isMagical)
+        private WorldObject CreateWeapon(TreasureDeath profile, bool isMagical)
         {
             int chance = ThreadSafeRandom.Next(1, 100);
 
@@ -24,7 +24,7 @@ namespace ACE.Server.Factories
             };
         }
 
-        private static float RollWeaponSpeedMod(TreasureDeath treasureDeath)
+        private float RollWeaponSpeedMod(TreasureDeath treasureDeath)
         {
             var qualityLevel = QualityChance.Roll(treasureDeath);
 

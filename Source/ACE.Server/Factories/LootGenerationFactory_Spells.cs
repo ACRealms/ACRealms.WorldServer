@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 using ACE.Common;
@@ -15,7 +16,7 @@ namespace ACE.Server.Factories
 {
     public partial class LootGenerationFactory
     {
-        private static bool AssignMagic_New(WorldObject wo, TreasureDeath profile, TreasureRoll roll, out int numSpells)
+        private bool AssignMagic_New(WorldObject wo, TreasureDeath profile, TreasureRoll roll, out int numSpells)
         {
             var spells = RollSpells(wo, profile, roll);
 
@@ -27,7 +28,7 @@ namespace ACE.Server.Factories
             return true;
         }
 
-        private static List<SpellId> RollSpells(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private List<SpellId> RollSpells(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             var spells = new List<SpellId>();
 
@@ -63,7 +64,7 @@ namespace ACE.Server.Factories
             return spells;
         }
 
-        private static List<SpellId> RollItemSpells(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private List<SpellId> RollItemSpells(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             List<SpellId> spells = null;
 
@@ -93,7 +94,7 @@ namespace ACE.Server.Factories
             return RollSpellLevels(wo, profile, spells);
         }
 
-        private static List<SpellId> RollSpellLevels(WorldObject wo, TreasureDeath profile, IEnumerable<SpellId> spells)
+        private List<SpellId> RollSpellLevels(WorldObject wo, TreasureDeath profile, IEnumerable<SpellId> spells)
         {
             var finalSpells = new List<SpellId>();
 
@@ -115,7 +116,7 @@ namespace ACE.Server.Factories
             return finalSpells;
         }
 
-        private static List<SpellId> RollEnchantments(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private List<SpellId> RollEnchantments(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             /*if (wo.SpellSelectionCode == null)
             {
@@ -151,7 +152,7 @@ namespace ACE.Server.Factories
             return RollSpellLevels(wo, profile, spells);
         }
 
-        private static int RollNumEnchantments(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private int RollNumEnchantments(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             if (roll.IsArmor || roll.IsWeapon)
             {
@@ -171,7 +172,7 @@ namespace ACE.Server.Factories
             }
         }
 
-        private static readonly List<float> EnchantmentChances_Armor_MeleeMissileWeapon = new List<float>()
+        private static readonly ImmutableList<float> EnchantmentChances_Armor_MeleeMissileWeapon = new List<float>()
         {
             0.00f,  // T1
             0.05f,  // T2
@@ -181,9 +182,9 @@ namespace ACE.Server.Factories
             0.60f,  // T6
             0.60f,  // T7
             0.60f,  // T8
-        };
+        }.ToImmutableList();
 
-        private static readonly List<float> EnchantmentChances_Caster = new List<float>()
+        private static readonly ImmutableList<float> EnchantmentChances_Caster = new List<float>()
         {
             0.60f,  // T1
             0.60f,  // T2
@@ -193,9 +194,9 @@ namespace ACE.Server.Factories
             0.75f,  // T6
             0.75f,  // T7
             0.75f,  // T8
-        };
+        }.ToImmutableList();
 
-        private static int RollNumEnchantments_Armor_Weapon(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private int RollNumEnchantments_Armor_Weapon(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             var tierChances = roll.IsCaster ? EnchantmentChances_Caster : EnchantmentChances_Armor_MeleeMissileWeapon;
 
@@ -209,7 +210,7 @@ namespace ACE.Server.Factories
                 return 0;
         }
 
-        private static int RollNumEnchantments_Clothing_Jewelry_Dinnerware(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private int RollNumEnchantments_Clothing_Jewelry_Dinnerware(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             var chance = 0.1f;
 
@@ -229,7 +230,7 @@ namespace ACE.Server.Factories
                 return 3;
         }
 
-        private static float RollEnchantmentDifficulty(List<SpellId> spellIds)
+        private float RollEnchantmentDifficulty(List<SpellId> spellIds)
         {
             var spells = new List<Server.Entity.Spell>();
 
@@ -256,7 +257,7 @@ namespace ACE.Server.Factories
             return itemDifficulty;
         }
 
-        private static List<SpellId> RollCantrips(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private List<SpellId> RollCantrips(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             // no cantrips on dinnerware?
             if (roll.ItemType == TreasureItemType_Orig.ArtObject)
@@ -317,7 +318,7 @@ namespace ACE.Server.Factories
             return finalCantrips;
         }
 
-        private static SpellId RollCantrip(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
+        private SpellId RollCantrip(WorldObject wo, TreasureDeath profile, TreasureRoll roll)
         {
             if (roll.HasArmorLevel(wo) || roll.IsClothing)
             {
@@ -363,7 +364,7 @@ namespace ACE.Server.Factories
             }
         }
 
-        private static float RollCantripDifficulty(List<SpellId> cantripIds)
+        private float RollCantripDifficulty(List<SpellId> cantripIds)
         {
             var itemDifficulty = 0.0f;
 
@@ -387,7 +388,7 @@ namespace ACE.Server.Factories
             return itemDifficulty;
         }
 
-        private static SpellId AdjustForWeaponMastery(WorldObject wo)
+        private SpellId AdjustForWeaponMastery(WorldObject wo)
         {
             // handle two-handed weapons
             if (wo.WeaponSkill == Skill.TwoHandedCombat)
@@ -412,7 +413,7 @@ namespace ACE.Server.Factories
             return SpellId.Undef;
         }
 
-        private static SpellId AdjustForDamageType(WorldObject wo, SpellId spell)
+        private SpellId AdjustForDamageType(WorldObject wo, SpellId spell)
         {
             if (wo.W_DamageType == DamageType.Nether)
                 return SpellId.CantripVoidMagicAptitude1;
@@ -432,7 +433,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// An alternate method to using the SpellSelectionCode from PropertyInt.TSysMutationdata
         /// </summary>
-        private static int GetSpellSelectionCode_Dynamic(WorldObject wo, TreasureRoll roll)
+        private int GetSpellSelectionCode_Dynamic(WorldObject wo, TreasureRoll roll)
         {
             if (wo is Gem)
             {
@@ -486,13 +487,13 @@ namespace ACE.Server.Factories
             return 0;
         }
 
-        private static readonly CoverageMask upperArmor = CoverageMask.OuterwearChest | CoverageMask.OuterwearUpperArms | CoverageMask.OuterwearLowerArms | CoverageMask.OuterwearAbdomen;
-        private static readonly CoverageMask lowerArmor = CoverageMask.OuterwearUpperLegs | CoverageMask.OuterwearLowerLegs;     // check abdomen
+        private const CoverageMask upperArmor = CoverageMask.OuterwearChest | CoverageMask.OuterwearUpperArms | CoverageMask.OuterwearLowerArms | CoverageMask.OuterwearAbdomen;
+        private const CoverageMask lowerArmor = CoverageMask.OuterwearUpperLegs | CoverageMask.OuterwearLowerLegs;     // check abdomen
 
-        private static readonly CoverageMask clothing = CoverageMask.UnderwearChest | CoverageMask.UnderwearUpperArms | CoverageMask.UnderwearLowerArms |
+        private const CoverageMask clothing = CoverageMask.UnderwearChest | CoverageMask.UnderwearUpperArms | CoverageMask.UnderwearLowerArms |
                 CoverageMask.UnderwearAbdomen | CoverageMask.UnderwearUpperLegs | CoverageMask.UnderwearLowerLegs;
 
-        private static int GetSpellCode_Dynamic_ClothingArmor(WorldObject wo, TreasureRoll roll)
+        private int GetSpellCode_Dynamic_ClothingArmor(WorldObject wo, TreasureRoll roll)
         {
             // special cases
             switch (roll.Wcid)
