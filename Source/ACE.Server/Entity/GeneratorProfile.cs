@@ -20,7 +20,7 @@ namespace ACE.Server.Entity
     /// <summary>
     /// A generator profile for a Generator
     /// </summary>
-    public class GeneratorProfile
+    public class GeneratorProfile(AppliedRuleset ruleset)
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -30,6 +30,8 @@ namespace ACE.Server.Entity
         public ulong Id;
 
         public string LinkId => Id > 0x70000000 ? $"0x{Id:16}" : $"{Id}";
+
+        public AppliedRuleset Ruleset { get; private init; } = ruleset;
 
         /// <summary>
         /// The biota with all the generator profile info
@@ -141,7 +143,8 @@ namespace ACE.Server.Entity
         /// Constructs a new active generator profile
         /// from a biota generator
         /// </summary>
-        public GeneratorProfile(WorldObject generator, PropertiesGenerator biota, uint profileId)
+        public GeneratorProfile(WorldObject generator, PropertiesGenerator biota, uint profileId, AppliedRuleset ruleset)
+            : this(ruleset)
         {
             Generator = generator;
             Biota = biota;
@@ -472,7 +475,7 @@ namespace ACE.Server.Entity
             {
                 // TODO: get randomly generated death treasure from LootGenerationFactory
                 //log.DebugFormat("{0}.TreasureGenerator(): found death treasure {1}", _generator.Name, Biota.WeenieClassId);
-                return LootGenerationFactory.CreateRandomLootObjects(deathTreasure);
+                return Ruleset.LootGenerationFactory.CreateRandomLootObjects(deathTreasure);
             }
             else
             {

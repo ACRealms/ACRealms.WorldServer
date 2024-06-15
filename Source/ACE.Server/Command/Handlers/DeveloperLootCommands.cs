@@ -1,6 +1,7 @@
 using System;
 using ACE.Entity.Enum;
 using ACE.Server.Factories;
+using ACE.Server.Managers;
 using ACE.Server.Network;
 
 namespace ACE.Server.Command.Handlers
@@ -81,7 +82,7 @@ namespace ACE.Server.Command.Handlers
                 }
             }
 
-            var results = LootGenerationFactory_Test.TestLootGen(numItems, tier, logStats, displayTable);
+            var results = new LootGenerationFactory_Test(RealmManager.ServerDefaultRuleset).TestLootGen(numItems, tier, logStats, displayTable);
 
             Console.WriteLine(results);
         }
@@ -159,7 +160,7 @@ namespace ACE.Server.Command.Handlers
                     return;
                 }
             }
-            var results = LootGenerationFactory_Test.TestLootGenMonster(monsterDID, numItems, logStats, displayTable);
+            var results = new LootGenerationFactory_Test(RealmManager.ServerDefaultRuleset).TestLootGenMonster(monsterDID, numItems, logStats, displayTable);
 
             Console.WriteLine(results);
         }

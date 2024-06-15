@@ -12,7 +12,7 @@ using ACE.Server.WorldObjects;
 
 namespace ACE.Server.Factories
 {
-    public static partial class LootGenerationFactory
+    public partial class LootGenerationFactory
     {
         /// <summary>
         /// Creates and optionally mutates a new MissileWeapon

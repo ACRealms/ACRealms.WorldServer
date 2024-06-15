@@ -19,23 +19,20 @@ using ACE.Server.Managers;
 using ACE.Server.WorldObjects;
 
 using WeenieClassName = ACE.Server.Factories.Enum.WeenieClassName;
+using System.Collections.Immutable;
+using ACE.Server.Realms;
 
 namespace ACE.Server.Factories
 {
-    public static partial class LootGenerationFactory
+    public partial class LootGenerationFactory(AppliedRuleset Ruleset)
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         // Used for cumulative ServerPerformanceMonitor event recording
-        private static readonly ThreadLocal<Stopwatch> stopwatch = new ThreadLocal<Stopwatch>(() => new Stopwatch());
+        private readonly ThreadLocal<Stopwatch> stopwatch = new ThreadLocal<Stopwatch>(() => new Stopwatch());
 
-        static LootGenerationFactory()
-        {
-            InitRares();
-            InitClothingColors();
-        }
 
-        public static List<WorldObject> CreateRandomLootObjects(TreasureDeath profile)
+        public List<WorldObject> CreateRandomLootObjects(TreasureDeath profile)
         {
             if (!PropertyManager.GetBool("legacy_loot_system").Item)
                 return CreateRandomLootObjects_New(profile);
@@ -161,7 +158,7 @@ namespace ACE.Server.Factories
             }
         }
 
-        public static List<WorldObject> CreateRandomLootObjects_New(TreasureDeath profile)
+        public List<WorldObject> CreateRandomLootObjects_New(TreasureDeath profile)
         {
             stopwatch.Value.Restart();
 
@@ -230,7 +227,7 @@ namespace ACE.Server.Factories
             }
         }
 
-        private static WorldObject TryRollMundaneAddon(TreasureDeath profile)
+        private WorldObject TryRollMundaneAddon(TreasureDeath profile)
         {
             // coalesced mana only dropped in tiers 1-4
             if (profile.Tier <= 4)
@@ -602,11 +599,9 @@ namespace ACE.Server.Factories
             }
             return wo;
         }
-
-        public static readonly List<TreasureMaterialColor> clothingColors = new List<TreasureMaterialColor>();
-
-        public static void InitClothingColors()
-        {
+        
+        public static ImmutableList<TreasureMaterialColor> clothingColors { get; } = new Func<List<TreasureMaterialColor>>(() => {
+            var list = new List<TreasureMaterialColor>();
             for (uint i = 1; i < 19; i++)
             {
                 TreasureMaterialColor tmc = new TreasureMaterialColor
@@ -614,9 +609,11 @@ namespace ACE.Server.Factories
                     PaletteTemplate = i,
                     Probability = 1
                 };
-                clothingColors.Add(tmc);
+                list.Add(tmc);
             }
-        }
+            return list;
+        })().ToImmutableList();
+
 
         /// <summary>
         /// Assign a random color (Int.PaletteTemplate and Float.Shade) to a World Object based on the material assigned to it.
@@ -645,7 +642,7 @@ namespace ACE.Server.Factories
                         // (gems have ColorCode of 0, but also no MaterialCode as they are defined by the weenie)
 
                         // this can be removed after all servers have upgraded to latest db
-                        colors = clothingColors;
+                        colors = clothingColors.ToList();
                     }
                     else
                         return;

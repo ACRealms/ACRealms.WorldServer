@@ -788,7 +788,7 @@ namespace ACE.Server.WorldObjects
             var treasure = new List<WorldObject>();
             if (treasureDeath != null)
             {
-                treasure = LootGenerationFactory.CreateRandomLootObjects(treasureDeath);
+                treasure = RealmRuleset.LootGenerationFactory.CreateRandomLootObjects(treasureDeath);
             }
             else if (treasureWielded != null)
             {

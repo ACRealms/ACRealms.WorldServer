@@ -9,7 +9,7 @@ using ACE.Server.WorldObjects;
 
 namespace ACE.Server.Factories
 {
-    public static partial class LootGenerationFactory
+    public partial class LootGenerationFactory
     {
         public static readonly WeenieClassName slagWcid = WeenieClassName.coinolthoi;
 
@@ -179,7 +179,7 @@ namespace ACE.Server.Factories
         /// <summary>
         /// Rolls to generate a gland for a player that killed an OlthoiPlayer
         /// </summary>
-        public static WorldObject RollGland(Player player, bool hadVitae)
+        public WorldObject RollGland(Player player, bool hadVitae)
         {
             // http://acpedia.org/wiki/Mutated_Olthoi_Gland
 
@@ -196,7 +196,7 @@ namespace ACE.Server.Factories
             if (rng <= 50)
                 return null;
 
-            var gland = WorldObjectFactory.CreateNewWorldObject((uint)glandWcid);
+            var gland = WorldObjectFactory.CreateNewWorldObject((uint)glandWcid, Ruleset);
 
             return gland;
         }

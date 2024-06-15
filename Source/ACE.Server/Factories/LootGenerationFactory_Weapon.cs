@@ -5,7 +5,7 @@ using ACE.Server.WorldObjects;
 
 namespace ACE.Server.Factories
 {
-    public static partial class LootGenerationFactory
+    public partial class LootGenerationFactory
     {
         private static WorldObject CreateWeapon(TreasureDeath profile, bool isMagical)
         {

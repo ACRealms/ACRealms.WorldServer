@@ -13,7 +13,7 @@ using WeenieClassName = ACE.Server.Factories.Enum.WeenieClassName;
 
 namespace ACE.Server.Factories
 {
-    public static partial class LootGenerationFactory
+    public partial class LootGenerationFactory
     {
         private static WorldObject CreateDinnerware(TreasureDeath profile, bool isMagical, bool mutate = true)
         {

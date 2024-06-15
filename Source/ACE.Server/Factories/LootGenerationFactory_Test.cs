@@ -4,13 +4,17 @@ using System.IO;
 
 using ACE.Database;
 using ACE.Database.Models.World;
+using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
 
 namespace ACE.Server.Factories
 {
-    public static class LootGenerationFactory_Test
+    public class LootGenerationFactory_Test(AppliedRuleset ruleset)
     {
-        public static string TestLootGen(int numItems, int tier, bool logStats, string displayTable)
+        public AppliedRuleset Ruleset { get; } = ruleset;
+        private LootGenerationFactory Factory => Ruleset.LootGenerationFactory;
+
+        public string TestLootGen(int numItems, int tier, bool logStats, string displayTable)
         {
             string displayHeader = $"\n LootFactory Simulator - Items\n ---------------------\n";
 
@@ -48,7 +52,7 @@ namespace ACE.Server.Factories
             return displayHeader;
         }
 
-        public static string TestLootGenMonster(uint deathTreasureDID, int numCorpses, bool logStats, string displayTable)
+        public string TestLootGenMonster(uint deathTreasureDID, int numCorpses, bool logStats, string displayTable)
         {
             string displayHeader = $"\n LootFactory Simulator - Corpses\n ---------------------\n";
 
@@ -72,7 +76,7 @@ namespace ACE.Server.Factories
             {
                 if (deathTreasure != null)
                 {
-                    corpseContainer = LootGenerationFactory.CreateRandomLootObjects(deathTreasure);
+                    corpseContainer = Factory.CreateRandomLootObjects(deathTreasure);
 
                     if (corpseContainer.Count < ls.MinItemsCreated)
                         ls.MinItemsCreated = corpseContainer.Count;

@@ -4,7 +4,7 @@ using ACE.Server.Factories.Enum;
 
 namespace ACE.Server.Factories
 {
-    public static partial class LootGenerationFactory
+    public partial class LootGenerationFactory
     {
         // legacy chance tables
 

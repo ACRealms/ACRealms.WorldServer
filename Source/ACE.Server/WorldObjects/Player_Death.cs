@@ -1088,9 +1088,9 @@ namespace ACE.Server.WorldObjects
                 if (hadVitae)
                     return new();
 
-                var items = LootGenerationFactory.CreateRandomLootObjects(OlthoiDeathTreasureType);
+                var items = RealmRuleset.LootGenerationFactory.CreateRandomLootObjects(OlthoiDeathTreasureType);
 
-                var gland = LootGenerationFactory.RollGland(this, hadVitae);
+                var gland = RealmRuleset.LootGenerationFactory.RollGland(this, hadVitae);
 
                 if (gland != null)
                 {

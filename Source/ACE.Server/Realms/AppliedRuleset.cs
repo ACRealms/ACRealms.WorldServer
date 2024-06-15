@@ -12,6 +12,7 @@ using ACE.Entity.ACRealms;
 using Lifestoned.DataModel.Content;
 using System.Diagnostics;
 using ACE.Server.WorldObjects;
+using ACE.Server.Factories;
 
 namespace ACE.Server.Realms
 {
@@ -384,6 +385,8 @@ namespace ACE.Server.Realms
             get { return (AppliedRuleset)base.ParentRuleset; }
             set { base.ParentRuleset = value; }
         }
+        public LootGenerationFactory LootGenerationFactory { get; private set; }
+
         internal string DebugOutputString()
         {
             var sb = new StringBuilder();
@@ -424,6 +427,10 @@ namespace ACE.Server.Realms
             // so that random properties that depend on other random
             // properties with a composition rule can be applied in sequence
             result.RerollAllRules();
+
+            // Set the loot generation factory here so that it can reference the ruleset
+            result.LootGenerationFactory = new LootGenerationFactory(result);
+
             return result;
         }
 

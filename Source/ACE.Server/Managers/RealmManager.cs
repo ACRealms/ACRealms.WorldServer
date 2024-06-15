@@ -53,6 +53,8 @@ namespace ACE.Server.Managers
 
         public static LocalPosition UltimateDefaultLocation = Player.MarketplaceDrop;
 
+        public static WorldRealm ServerDefaultRealm => DefaultRealmConfigured ?? DefaultRealmFallback;
+        public static AppliedRuleset ServerDefaultRuleset => ServerDefaultRealm.StandardRules;
 
         public static void Initialize(bool liveEnvironment = true)
         {

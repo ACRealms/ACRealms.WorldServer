@@ -9,7 +9,7 @@ using ACE.Server.WorldObjects;
 
 namespace ACE.Server.Factories
 {
-    public static partial class LootGenerationFactory
+    public partial class LootGenerationFactory
     {
         /// <summary>
         /// Creates Caster (Wand, Staff, Orb)

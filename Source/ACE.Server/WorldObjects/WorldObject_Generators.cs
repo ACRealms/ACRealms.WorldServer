@@ -46,7 +46,7 @@ namespace ACE.Server.WorldObjects
             if (Biota.PropertiesGenerator != null)
             {
                 foreach (var generator in Biota.PropertiesGenerator)
-                    GeneratorProfiles.Add(new GeneratorProfile(this, generator, i++));
+                    GeneratorProfiles.Add(new GeneratorProfile(this, generator, i++, RealmRuleset));
             }
         }
 
@@ -615,7 +615,7 @@ namespace ACE.Server.WorldObjects
                 profile.WhenCreate = profileTemplate.Biota.WhenCreate;
                 profile.WhereCreate = profileTemplate.Biota.WhereCreate;
 
-                GeneratorProfiles.Add(new GeneratorProfile(this, profile, link.Guid));
+                GeneratorProfiles.Add(new GeneratorProfile(this, profile, link.Guid, RealmRuleset));
                 if (profile.Probability == -1)
                 {
                     InitCreate += profile.InitCreate;
