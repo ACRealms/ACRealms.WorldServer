@@ -34,20 +34,34 @@ namespace ACRealms.JsonSchemaGenerator
         public static void Run(DirectoryInfo directory)
         {
             var realmDir = new DirectoryInfo($"{directory}/json/realms/realm");
-            var realmFiles = realmDir.GetFiles() ?? throw new ArgumentException("Could not find files");
+            var realmFiles = realmDir.GetFiles()?.Where(f => f.Name.EndsWith(".jsonc"))?.ToList() ?? throw new ArgumentException("Could not find realm files");
             var realmNames = realmFiles.Select(f =>
             {
-                var dobj = JsonConvert.DeserializeObject<dynamic>(File.ReadAllText(f.FullName));
-                return (name: (string)dobj!.name.Value, description: (string?)dobj!.properties?.Description?.Value ?? "This realm is missing a 'Description' property. You can add one!");
-            }).ToList();
+                try
+                {
+                    var dobj = JsonConvert.DeserializeObject<dynamic>(File.ReadAllText(f.FullName));
+                    return (name: (string?)dobj!.name.Value, description: (string?)(dobj!.properties?.Description?.Value ?? "This realm is missing a 'Description' property. You can add one!"));
+                }
+                catch (Exception)
+                {
+                    return (name: null, description: null);
+                }
+            }).Where(data => data.name != null).Select(d => (name: d.name!, description: d.description!)).ToList();
 
             var rulesetDir = new DirectoryInfo($"{directory}/json/realms/ruleset");
-            var rulesetFiles = rulesetDir.GetFiles();
+            var rulesetFiles = rulesetDir.GetFiles().Where(f => f.Name.EndsWith(".jsonc"))?.ToList() ?? new List<FileInfo>();
             var rulesetNames = rulesetFiles.Select(f =>
             {
-                var dobj = JsonConvert.DeserializeObject<dynamic>(File.ReadAllText(f.FullName));
-                return (name: (string)dobj!.name.Value, description: (string?)dobj!.properties?.Description?.Value ?? "This ruleset is missing a 'Description' property. You can add one!");
-            }).ToList();
+                try
+                {
+                    var dobj = JsonConvert.DeserializeObject<dynamic>(File.ReadAllText(f.FullName));
+                    return (name: (string?)dobj!.name.Value, description: (string?)(dobj!.properties?.Description?.Value ?? "This ruleset is missing a 'Description' property. You can add one!"));
+                }
+                catch (Exception)
+                {
+                    return (name: null, description: null);
+                }
+            }).Where(data => data.name != null).Select(d => (name: d.name!, description: d.description!)).ToList();
 
             var generatedPath = $"{directory}/json-schema/generated";
             if (Directory.Exists(generatedPath))
@@ -117,6 +131,8 @@ namespace ACRealms.JsonSchemaGenerator
                 {   "properties", applyRulesetsRandomSchemaProperties }
             };
 
+            if (!Directory.Exists(generatedPath))
+                Directory.CreateDirectory(generatedPath);
 
             File.WriteAllText($"{generatedPath}/realm-names.json", JsonConvert.SerializeObject(realmNamesSchema, Formatting.Indented));
             File.WriteAllText($"{generatedPath}/ruleset-names.json", JsonConvert.SerializeObject(rulesetNamesSchema, Formatting.Indented));

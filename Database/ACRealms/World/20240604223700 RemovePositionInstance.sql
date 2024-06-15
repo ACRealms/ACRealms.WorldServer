@@ -1,1 +1,1 @@
-ALTER TABLE weenie_properties_position MODIFY COLUMN instance int UNSIGNED;
+ALTER TABLE weenie_properties_position DROP COLUMN instance;

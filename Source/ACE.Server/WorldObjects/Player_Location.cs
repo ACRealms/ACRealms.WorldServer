@@ -791,7 +791,7 @@ namespace ACE.Server.WorldObjects
 
             if (newPosition.Instance != Location.Instance)
             {
-                if (!OnTransitionToNewRealm(Location.RealmID, newPosition.RealmID, newPosition))
+                if (!OnTransitionToNewInstance(Location.RealmID, newPosition.RealmID, newPosition))
                     return;
             }
 
@@ -846,7 +846,7 @@ namespace ACE.Server.WorldObjects
         }
 
         // Assumes instance is loaded! Do not call directly
-        private bool OnTransitionToNewRealm(ushort prevRealmId, ushort newRealmId, InstancedPosition newLocation)
+        private bool OnTransitionToNewInstance(ushort prevRealmId, ushort newRealmId, InstancedPosition newLocation)
         {
             var prevrealm = RealmManager.GetRealm(prevRealmId, includeRulesets: true);
             var newRealm = RealmManager.GetRealm(newRealmId, includeRulesets: true);
@@ -884,12 +884,15 @@ namespace ACE.Server.WorldObjects
                 Session.Network.EnqueueSend(new GameMessageSystemChat($"Leaving instance and returning to realm {newRealm.Realm.Name}.", ChatMessageType.System));
             else
             {
-                if (prevrealm.Realm.Id == HomeRealm)
-                    Session.Network.EnqueueSend(new GameMessageSystemChat($"You are temporarily leaving your home realm. Some actions may be restricted and your corpse will appear at your hideout if you die.", ChatMessageType.System));
-                else if (newRealm.Realm.Id == HomeRealm)
-                    Session.Network.EnqueueSend(new GameMessageSystemChat($"Returning to home realm.", ChatMessageType.System));
-                else
-                    Session.Network.EnqueueSend(new GameMessageSystemChat($"Switching from realm {prevrealm.Realm.Name} to {newRealm.Realm.Name}.", ChatMessageType.System));
+                if (prevrealm.Realm.Id != newRealm.Realm.Id)
+                {
+                    if (prevrealm.Realm.Id != HomeRealm)
+                        Session.Network.EnqueueSend(new GameMessageSystemChat($"You are temporarily leaving your home realm. Some actions may be restricted.", ChatMessageType.System));
+                    else if (newRealm.Realm.Id == HomeRealm)
+                        Session.Network.EnqueueSend(new GameMessageSystemChat($"Returning to home realm.", ChatMessageType.System));
+                    else
+                        Session.Network.EnqueueSend(new GameMessageSystemChat($"Switching from realm {prevrealm.Realm.Name} to {newRealm.Realm.Name}.", ChatMessageType.System));
+                }
             }
             return true;
         }

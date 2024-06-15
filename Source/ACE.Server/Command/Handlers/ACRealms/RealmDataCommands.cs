@@ -45,5 +45,20 @@ namespace ACE.Server.Command.Handlers
                 throw;
             }
         }
+
+        [CommandHandler("reload-peripherals", AccessLevel.Admin, CommandHandlerFlag.None, 0, "Reloads peripheral configurations")]
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static void HandleReloadPeripheralConfig(ISession session, params string[] parameters)
+        {
+            try
+            {
+                RealmManager.ReloadPeripherals();
+            }
+            catch (Exception ex)
+            {
+                CommandHandlerHelper.WriteOutputError(session, $"Error: {ex.Message}", ChatMessageType.Broadcast);
+                throw;
+            }
+        }
     }
 }

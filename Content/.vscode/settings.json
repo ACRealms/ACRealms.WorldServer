@@ -12,6 +12,12 @@
       ],
       "url": "./json-schema/ruleset-schema.json"
     },
+    {
+      "fileMatch": [
+        "json/peripherals/dungeon-sets/dungeon-sets.jsonc"
+      ],
+      "url": "./json-schema/peripherals/dungeon-sets/schema-v1.json"
+    }
   ],
   "editor.formatOnSave": true,
   "files.autoSaveWorkspaceFilesOnly": true,

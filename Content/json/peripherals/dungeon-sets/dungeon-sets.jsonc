@@ -1,0 +1,12 @@
+{
+  "$schema_version": 1,
+  "dungeon_sets": [ /*
+    {
+    // If a name other than "default" is used, the ruleset can use that set instead by setting ClassicalInstanceDungeonSet realm property
+      "name": "default", 
+      "landblocks": [
+        "019E"
+      ]
+    }
+*/]
+}

@@ -573,9 +573,65 @@ namespace ACE.Server.Realms
             {
                 // RealmSelector and Hideout uses separate instance ID for each account
                 ReservedRealm.RealmSelector or ReservedRealm.hideout or ReservedRealm.NULL => ACE.Entity.Position.InstanceIDFromVars(Realm.Id, (ushort)player.Account.AccountId, false),
-                _ => GetFullInstanceID(player.GetDefaultShortInstanceID())
+                _ => GetFullInstanceID(GetDefaultShortInstanceID(player, position))
             };
         }
+
+        internal bool ClassicalInstancesActivated(IPlayer player, LocalPosition position)
+        {
+            if (!GetProperty(RealmPropertyBool.UseClassicalInstances))
+                return false;
+
+            if (player.GetProperty(PropertyBool.ClassicalInstancesActive) != true)
+            {
+                if (!GetProperty(RealmPropertyBool.ClassicalInstances_IgnoreCharacterProp))
+                    return false;
+            }
+
+            if (GetProperty(RealmPropertyBool.ClassicalInstances_EnableForAllLandblocks_Dangerous))
+                return true;
+
+            var set = GetProperty(RealmPropertyString.ClassicalInstanceDungeonSet);
+            return RealmManager.Peripherals.DungeonSets.IncludedInSet(position, set);
+        }
+
+        private ushort GetDefaultShortInstanceID(IPlayer player, LocalPosition position)
+        {
+            if (player.GetProperty(PropertyBool.AttemptUniqueInstanceID) == true) // TODO: Merge this with Classical Instances
+                return ShortInstanceIDForClassicalNonEphemeralInstances_PerCharacter(player);
+
+            if (ClassicalInstancesActivated(player, position))
+                return GetClassicalShortInstanceID(player);
+            else
+                return 0;
+        }
+
+        private ushort GetClassicalShortInstanceID(IPlayer player, bool isFellowLeader = false)
+        {
+            if (!isFellowLeader && player is Player p && p.Fellowship != null)
+            {
+                if (p.Fellowship.FellowshipLeaderGuid != player.Guid.Full)
+                {
+                    var members = p.Fellowship.GetFellowshipMembers();
+                    if (members.TryGetValue(p.Fellowship.FellowshipLeaderGuid, out var leader))
+                    {
+                        return GetClassicalShortInstanceID(leader, isFellowLeader: true);
+                    }
+                    else
+                    {
+                        log.Warn($"GetClassicalShortInstanceID: Unable to get fellowship leader for {player.Name} (previously known leader guid {p.Fellowship.FellowshipLeaderGuid}). Using player's own ClassicalShortInstanceID");
+                    }
+                }
+            }
+
+            if (GetProperty(RealmPropertyBool.ClassicalInstances_ShareWithPlayerAccount))
+                return ShortInstanceIDForClassicalNonEphemeralInstances_PerAccount(player);
+            else
+                return ShortInstanceIDForClassicalNonEphemeralInstances_PerCharacter(player);
+        }
+
+        private static ushort ShortInstanceIDForClassicalNonEphemeralInstances_PerCharacter(IPlayer player) => (ushort)((player.Guid.Full % 0xFFFE) + 1);
+        public static ushort ShortInstanceIDForClassicalNonEphemeralInstances_PerAccount(IPlayer player) => (ushort)((player.Account.AccountId % 0xFFFE) + 1);
 
         public uint GetFullInstanceID(ushort shortInstanceID)
         {

@@ -11,16 +11,9 @@ namespace ACE.Server.WorldObjects
 {
     public static class IPlayerACRealmsLocationExtensions
     {
-        public static ushort GetDefaultShortInstanceID(this IPlayer player)
-        {
-            if (player.GetProperty(PropertyBool.AttemptUniqueInstanceID) == true)
-                return (ushort)((player.Guid.Full % 0xFFFE) + 1);
-            return 0;
-        }
     }
 
     partial class Player
     {
-        public ushort DefaultShortInstanceID => IPlayerACRealmsLocationExtensions.GetDefaultShortInstanceID(this);
     }
 }
