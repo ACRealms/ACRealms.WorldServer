@@ -301,6 +301,11 @@ namespace ACE.Entity.Models
             : base(prototype, name, rulesetName, hardDefaultValue, hardDefaultValue, locked, probability, enumType, enumValue)
         {
             RandomType = (RealmPropertyRerollType)randomType;
+            if (prototype.TryGetSecondaryValue<RerollRestrictedToAttribute, RealmPropertyRerollType>((att) => att.IsAllowedRerollType(att.RerollRestriction, RandomType) ? RandomType : att.RerollRestriction, out RealmPropertyRerollType modifiedRerollType))
+            {
+                RandomType = modifiedRerollType;
+            }
+
             if (typeof(T) == typeof(double))
                 Operator = new Func<RulesetCompilationContext, IPropertyOperatorsMinMax<T>>((ctx) => (IPropertyOperatorsMinMax<T>)ctx.Operators.Float);
             else if (typeof(T) == typeof(long))

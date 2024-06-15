@@ -2,6 +2,7 @@ using ACE.Entity.Enum.Properties;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -32,6 +33,26 @@ namespace ACE.Entity.Enum.RealmProperties
             RawIdentifier = rawIdentifier;
             SecondaryAttributes = secondaryAttributes;
             SerializedHardDefaultValue = serializedHardDefaultValue;
+        }
+
+        public bool TryGetSecondaryValue<TSecondary, TResult>(Func<TSecondary, TResult> selector, out TResult? result)
+            where TSecondary : RealmPropertySecondaryAttributeBase
+        {
+            if (SecondaryAttributes == null)
+            {
+                result = default;
+                return false;
+            }
+            var t = typeof(TSecondary);
+            if (!SecondaryAttributes!.ContainsKey(t))
+            {
+                result = default;
+                return false;
+            }
+
+            var att = (TSecondary)SecondaryAttributes[t];
+            result = selector(att);
+            return true;
         }
     }
 

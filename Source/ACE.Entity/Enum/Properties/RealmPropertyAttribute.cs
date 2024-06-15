@@ -228,7 +228,7 @@ namespace ACE.Entity.Enum.Properties
 
     public class RerollRestrictedToAttribute : RealmPropertySecondaryAttributeBase
     {
-        RealmPropertyRerollType RerollRestriction { get; }
+        public RealmPropertyRerollType RerollRestriction { get; }
         public RerollRestrictedToAttribute(RealmPropertyRerollType restrictedTo)
         {
             RerollRestriction = restrictedTo;
@@ -259,6 +259,6 @@ namespace ACE.Entity.Enum.Properties
         })().ToFrozenDictionary();
 
         public static FrozenSet<RealmPropertyRerollType> GetAllowedRerollTypes(RealmPropertyRerollType? restrictionType) => RestrictionMap[restrictionType];
-        public static bool IsAllowedRerollType(RealmPropertyRerollType? restrictionType, RealmPropertyRerollType rerollType) => RestrictionMap[restrictionType].Contains(rerollType);
+        public bool IsAllowedRerollType(RealmPropertyRerollType? restrictionType, RealmPropertyRerollType rerollType) => RestrictionMap[restrictionType].Contains(rerollType);
     }
 }
