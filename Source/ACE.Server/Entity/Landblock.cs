@@ -29,6 +29,7 @@ using ACE.Server.WorldObjects;
 using Position = ACE.Entity.Position;
 using ACE.Server.Realms;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Entity.ACRealms;
 
 namespace ACE.Server.Entity
 {
@@ -253,8 +254,10 @@ namespace ACE.Server.Entity
             var realm = RealmManager.GetRealm(realmid, includeRulesets: true);
             if (realm == null)
             {
-                //Shouldn't happen
-                throw new Exception($"Error: Realm {realmid} is null when creating landblock.");
+                if (RealmsFromACESetupHelper.UnsafeInstanceIDTemporarilyAllowed)
+                    return RealmManager.DefaultRealmFallback.StandardRules;
+                else
+                    throw new Exception($"Error: Realm {realmid} is null when creating landblock.");
             }
             return AppliedRuleset.MakeRerolledRuleset(realm.RulesetTemplate);
         }
