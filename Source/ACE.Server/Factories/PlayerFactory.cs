@@ -377,7 +377,11 @@ namespace ACE.Server.Factories
 
                 RealmManager.SetHomeRealm(player, defaultRealm.Realm.Id, settingFromRealmSelector: false, saveImmediately: false); // Will crash if teleportToDefaultLoc is true
                 player.Location = new InstancedPosition(startLoc, iid);
-                
+                if (!player.IsOlthoiPlayer)
+                {
+                    player.Sanctuary = new InstancedPosition(player.Location).AsLocalPosition();
+                    player.SetProperty(PropertyBool.RecallsDisabled, true);
+                }
 
                 var instantiation = new InstancedPosition(new LocalPosition(0xA9B40019, 84, 7.1f, 94, 0, 0, -0.0784591f, 0.996917f), iid); // ultimate fallback.
                 
@@ -407,6 +411,8 @@ namespace ACE.Server.Factories
                         new InstancedPosition(new LocalPosition(
                             spellFreeRide.PositionObjCellId.Value, spellFreeRide.PositionOriginX.Value, spellFreeRide.PositionOriginY.Value, spellFreeRide.PositionOriginZ.Value,
                             spellFreeRide.PositionAnglesX.Value, spellFreeRide.PositionAnglesY.Value, spellFreeRide.PositionAnglesZ.Value, spellFreeRide.PositionAnglesW.Value), iid);
+
+                player.Instantiation = new InstancedPosition(instantiation);
             }
             else
             {
