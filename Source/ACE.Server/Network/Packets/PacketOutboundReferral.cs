@@ -8,7 +8,7 @@ namespace ACE.Server.Network.Packets
 
             InitializeDataWriter();
 
-            DataWriter.Write(worldConnectionKey);
+            DataWriter.WriteNonGuidULong(worldConnectionKey);
             DataWriter.Write((ushort)2);
             DataWriter.WriteUInt16BE(port);
 
@@ -20,7 +20,7 @@ namespace ACE.Server.Network.Packets
             else
                 DataWriter.Write(host);
 
-            DataWriter.Write(0ul);
+            DataWriter.WriteNonGuidULong(0ul);
             DataWriter.Write((ushort)0x18); // This value is currently the hard coded Server ID. It can be something different...
             DataWriter.Write((ushort)0);
             DataWriter.Write(0u);

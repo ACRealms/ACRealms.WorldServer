@@ -9,7 +9,7 @@ namespace ACE.Server.Network.Packets
             InitializeDataWriter();
 
             DataWriter.Write(serverTime); // CConnectHeader.ServerTime
-            DataWriter.Write(cookie); // CConnectHeader.Cookie
+            DataWriter.WriteNonGuidULong(cookie); // CConnectHeader.Cookie
             DataWriter.Write(clientId); // CConnectHeader.NetID
             DataWriter.Write(isaacServerSeed); // CConnectHeader.OutgoingSeed
             DataWriter.Write(isaacClientSeed); // CConnectHeader.IncomingSeed
