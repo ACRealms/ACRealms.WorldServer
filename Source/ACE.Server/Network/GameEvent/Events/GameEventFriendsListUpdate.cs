@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using ACE.Database.Models.Shard;
 using ACE.Server.Managers;
+using ACE.Entity;
 
 namespace ACE.Server.Network.GameEvent.Events
 {
@@ -79,7 +80,7 @@ namespace ACE.Server.Network.GameEvent.Events
                         isOnline = false;
                 }
 
-                Writer.Write(f.FriendId);           // Friend's ID
+                Writer.WriteGuid(new ObjectGuid(f.FriendId));           // Friend's ID
                 Writer.Write(isOnline ? 1u : 0u);   // Whether this friend is online
                 Writer.Write(0u);                   // Whether the friend should appear to be offline
                 Writer.WriteString16L(friendName);  // Name of the friend
