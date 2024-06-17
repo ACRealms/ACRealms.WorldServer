@@ -256,7 +256,7 @@ namespace ACE.Server.WorldObjects
         public void ThreadSafeTeleportOnDeath()
         {
             // teleport to sanctuary or best location
-            var newPosition = Sanctuary.AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm) ?? Instantiation ?? Location;
+            var newPosition = Sanctuary?.AsInstancedPosition(this, PlayerInstanceSelectMode.HomeRealm) ?? Instantiation ?? Location;
 
             WorldManager.ThreadSafeTeleport(this, newPosition, true, new ActionEventDelegate(() =>
             {
