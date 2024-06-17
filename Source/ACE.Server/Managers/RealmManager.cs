@@ -644,17 +644,29 @@ namespace ACE.Server.Managers
 
             foreach(var type in Enum.GetValues<PositionType>())
             {
-                var previousPosition = offlinePlayer.GetPositionUnsafe(type);
+                UsablePosition previousPosition;
+                try
+                {
+                    previousPosition = offlinePlayer.GetPositionUnsafe(type);
+                }
+                catch (NullRealmException)
+                {
+                    previousPosition = offlinePlayer.GetLocalPositionUnsafe(type);
+                }
+
                 if (previousPosition == null)
                     continue;
-                var destPositionAsLocal = previousPosition.AsLocalPosition();
+                var destPositionAsLocal = previousPosition as LocalPosition ?? ((InstancedPosition)previousPosition).AsLocalPosition();
 
-                if (previousPosition.IsEphemeralRealm)
-                    destPositionAsLocal = UltimateDefaultLocation;
-                else if (previousPosition.RealmID == realm.Realm.Id)
-                    continue;
-                else if (previousPosition.RealmID != oldHomeRealmId)
-                    continue;
+                if (previousPosition is InstancedPosition ip)
+                {
+                    if (ip.IsEphemeralRealm)
+                        destPositionAsLocal = UltimateDefaultLocation;
+                    else if (ip.RealmID == realm.Realm.Id)
+                        continue;
+                    else if (ip.RealmID != oldHomeRealmId)
+                        continue;
+                }
 
                 if (DuelRealm == realm)
                     destPositionAsLocal = DuelRealmHelpers.GetDuelingAreaDrop(offlinePlayer).AsLocalPosition();
