@@ -1,4 +1,4 @@
-// Config file provided with server version: 2.1.1
+// Config file provided with server version: 2.1.2
 {
     "DefaultRealm": "default",
     "AllowUndefinedDefaultRealm": true,
