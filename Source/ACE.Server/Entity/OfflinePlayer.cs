@@ -204,6 +204,14 @@ namespace ACE.Server.Entity
             return new InstancedPosition(rawPos, rawPos.Instance);
         }
 
+        public LocalPosition GetLocalPositionUnsafe(PositionType property)
+        {
+            var rawPos = Biota.GetPosition(property, BiotaDatabaseLock);
+            if (rawPos == null)
+                return null;
+            return new LocalPosition(rawPos);
+        }
+
         #endregion
 
         public string Name => GetProperty(PropertyString.Name);
