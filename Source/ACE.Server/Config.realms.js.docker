@@ -1,7 +1,7 @@
 /* Copy this file and rename it to Config.realms.js
    The defaults from this file will automatically be used instead when not located in acrealms.config
    More configuration options may be added in the future
-   Config file provided with server version: 2.1.2 */
+   Config file provided with server version: 2.1.3 */
 
 {
   /* This is the default realm that new characters will be assigned to, if UseRealmSelector is false.
