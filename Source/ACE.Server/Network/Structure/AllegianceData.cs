@@ -112,7 +112,7 @@ namespace ACE.Server.Network.Structure
                 writer.Write(allegianceAge);
             }
             else
-                writer.Write(uTimeOnline);
+                writer.WriteNonGuidULong(uTimeOnline);
 
             writer.WriteString16L(name);
         }

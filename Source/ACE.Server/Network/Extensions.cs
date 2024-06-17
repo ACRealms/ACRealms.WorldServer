@@ -115,7 +115,5 @@ namespace ACE.Server.Network
             writer.Write(value);
             writer.BaseStream.Position = originalPosition;
         }
-
-        public static void WriteGuid(this BinaryWriter writer, ObjectGuid guid) { writer.Write(guid.ClientGUID); }
     }
 }

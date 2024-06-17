@@ -15,7 +15,7 @@ namespace ACE.Server.Network.GameEvent.Events
             Writer.Write(damage);
             Writer.Write((uint)damageLocation);
             Writer.Write(Convert.ToUInt32(criticalHit));
-            Writer.Write((ulong)attackConditions);
+            Writer.WriteNonGuidULong((ulong)attackConditions);
             Writer.Align();
         }
     }
