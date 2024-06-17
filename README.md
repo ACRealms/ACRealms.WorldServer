@@ -1,15 +1,22 @@
 # ACRealms V2.1
 
-This is a fork of https://github.com/ACEmulator/ACE/. The repo was not originally set up a fork and therefore could not be turned into one, but there is a mirror repo here for visibility https://github.com/ACRealms/ACRealmsForkMirror.
+This is a fork of https://github.com/ACEmulator/ACE/. The repo was not originally set up a fork and therefore could not be turned into one, but there is a mirror repo here for visibility https://github.com/ACRealms/ACRealmsForkMirror.  
 
-It is recommended to fork from the mirror repo instead of this one. The mirror repo may eventually become the main one. 
+It is recommended to fork from the mirror repo instead of this one. The mirror repo may eventually become the main one.  
 
 # Looking to get started?
 
-Before you do anything, note that the master branch in this project is a development branch and is not considered to be stable. Please use the latest even-numbered versioned branch for the most stability.
+Before you do anything, note that the master branch in this project is a development branch and is not considered to be stable.  
 
-Currently, that branch is `v2.0`  
+For the absolute most stability, use the latest even-numbered versioned branch. Currently, that branch is `v2.0`  
 
+For the best balance between feature updates and stability, use the latest beta branch. Currently, that branch is `v2.1`.  
+
+For the latest development updates, use `master`.  
+
+As this project doesn't have a lot of development resources, use at your own risk, and back your databases up frequently, especially before updating to a new version.  
+
+Please see [this page](https://github.com/ACRealms/ACRealms.WorldServer/blob/master/Docs/setup-tips.md) for setup tips, including some notes on database backups.  
 
 # Mission Statement
 
