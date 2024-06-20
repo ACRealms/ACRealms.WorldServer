@@ -1150,6 +1150,10 @@ namespace ACE.Server.Managers
                     }
 
                     srcContainer.UpdateLinks();
+                    destContainer.UpdateLinks();
+
+                    srcContainer.SaveBiotaToDatabase();
+                    destContainer.SaveBiotaToDatabase();
                 }
             }
             finally
@@ -1164,6 +1168,7 @@ namespace ACE.Server.Managers
                         var dungeonHouse = house.GetDungeonHouse();
                         if (dungeonHouse != null)
                             dungeonHouse.UpdateLinks();
+                        dungeonHouse.SaveBiotaToDatabase();
                     }
 
                     house.SaveBiotaToDatabase();
