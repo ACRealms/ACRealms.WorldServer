@@ -63,6 +63,17 @@ namespace ACE.Server.Managers.ACRealms
             success = RunStage2IfRequired();
             if (!success) return false;
 
+            // wait for flush to database
+            int shardQueueCount;
+            int lastQueueCount = 0;
+            while ((shardQueueCount = DatabaseManager.Shard.QueueCount) > 0)
+            {
+                if (shardQueueCount < lastQueueCount) // some progress made
+                   Console.Write(".");
+                lastQueueCount = shardQueueCount;
+                System.Threading.Thread.Sleep(10);
+            }
+
             if (IsMigrationComplete)
             {
                 SignalMigrationComplete();
