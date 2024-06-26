@@ -22,6 +22,7 @@ using ACE.Server.Factories.Tables;
 namespace ACE.Server.Realms
 {
     public abstract class Ruleset(ushort rulesetID, RulesetCompilationContext ctx)
+        : RulesetBase
     {
         protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         protected Random Random => Context.Randomizer;
@@ -241,11 +242,15 @@ namespace ACE.Server.Realms
             Context.LogDirect($"{(this is RulesetTemplate ? "[T]" : "[R]")}[{RealmManager.GetRealm(RulesetID, includeRulesets: true).Realm.Name}] {message()}");
         }
 
-        public static RulesetCompilationContext MakeDefaultContext() =>
-            RulesetCompilationContext.CreateContext(
+        public static RulesetCompilationContext MakeDefaultContext(IDictionary<ushort, WorldRealmBase> dependencies = null)
+        {
+            dependencies ??= RealmManager.CompilationContextDependencyHandles;
+            return RulesetCompilationContext.CreateContext(
                 enableSeedTracking: PropertyManager.GetBool("acr_enable_ruleset_seeds", false).Item,
-                gitHash: AssemblyInfo.GitHash
+                gitHash: AssemblyInfo.GitHash,
+                dependencies: dependencies
             );
+        }
     }
 
     //Properties should not be changed after initial composition
@@ -328,9 +333,8 @@ namespace ACE.Server.Realms
             Jobs = entity.Jobs;
             if (trace)
             {
-                var rulesetNames = RealmManager.RealmsAndRulesets.ToDictionary(x => x.Realm.Id, x => x.Realm.Name);
                 foreach(var job in Jobs)
-                    LogTrace(job.GetLogTraceMessages(rulesetNames));
+                    LogTrace(job.GetLogTraceMessages(Context.Dependencies));
                 foreach(var kv in AllProperties)
                     LogTrace(() => $"Loaded uncomposed property {kv.Key} as {kv.Value}");
             }
@@ -457,7 +461,7 @@ namespace ACE.Server.Realms
                 if (roll < link.Probability)
                 {
                     LogTrace(() => $"Rolled {roll}, is < {link.Probability}, applying ruleset, skipping further rolls for this job");
-                    var template = RealmManager.GetRealm(link.RulesetIDToApply, includeRulesets: true).RulesetTemplate;
+                    var template = ((WorldRealm)Context.Dependencies[link.RulesetIDToApply]).RulesetTemplate;
                     ComposeFrom(template, true);
                     return;
                 }

@@ -101,7 +101,7 @@ namespace ACE.Server.Managers.ACRealms
 
             if (!HouseManager.Initialized)
                 throw new InvalidOperationException("RealmsFromACESetup.RunStage1IfRequired must start after the HouseManager is initialized.");
-            if (RealmManager.Realms == null || RealmManager.Realms.Count == 0)
+            if (RealmManager.Realms.Count == 0)
                 throw new InvalidOperationException("RealmsFromACESetup.RunStage1IfRequired must start after RealmManager is initialized.");
 
             return DoSetupStage1();

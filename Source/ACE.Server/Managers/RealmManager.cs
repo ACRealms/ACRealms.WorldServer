@@ -23,6 +23,7 @@ using ACE.Common.ACRealms;
 using System.Configuration;
 using ACE.Entity;
 using ACE.Server.Realms.Peripherals;
+using System.Collections.Frozen;
 
 namespace ACE.Server.Managers
 {
@@ -31,15 +32,18 @@ namespace ACE.Server.Managers
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         internal static Peripherals Peripherals { get; private set; }
-        public static IReadOnlyCollection<WorldRealm> Realms { get; private set; }
-        public static IReadOnlyCollection<WorldRealm> Rulesets { get; private set; }
-        public static IReadOnlyCollection<WorldRealm> RealmsAndRulesets { get; private set; }
-        private static readonly ReaderWriterLockSlim realmsLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-        private static readonly Dictionary<ushort, WorldRealm> RealmsByID = new Dictionary<ushort, WorldRealm>();
-        private static readonly Dictionary<string, WorldRealm> RealmsByName = new Dictionary<string, WorldRealm>(StringComparer.OrdinalIgnoreCase);
-        private static readonly Dictionary<ReservedRealm, RealmToImport> ReservedRealmsToImport = new Dictionary<ReservedRealm, RealmToImport>();
-        private static readonly Dictionary<ReservedRealm, WorldRealm> ReservedRealms = new Dictionary<ReservedRealm, WorldRealm>();
-        private static readonly Dictionary<string, RulesetTemplate> EphemeralRealmCache = new Dictionary<string, RulesetTemplate>(StringComparer.OrdinalIgnoreCase);
+        public static FrozenSet<WorldRealm> Realms { get; private set; } = FrozenSet<WorldRealm>.Empty;
+        public static FrozenSet<WorldRealm> Rulesets { get; private set; } = FrozenSet<WorldRealm>.Empty;
+        public static FrozenSet<WorldRealm> RealmsAndRulesets { get; private set; } = FrozenSet<WorldRealm>.Empty;
+        private static FrozenDictionary<ushort, WorldRealm> RealmsByID = FrozenDictionary<ushort, WorldRealm>.Empty;
+        private static FrozenDictionary<string, WorldRealm> RealmsByName = FrozenDictionary<string, WorldRealm>.Empty;
+        private static FrozenDictionary<ReservedRealm, RealmToImport> ReservedRealmsToImport = FrozenDictionary<ReservedRealm, RealmToImport>.Empty;
+        private static FrozenDictionary<ReservedRealm, WorldRealm> ReservedRealms = FrozenDictionary<ReservedRealm, WorldRealm>.Empty;
+        private static Dictionary<string, RulesetTemplate> EphemeralRealmCache = new Dictionary<string, RulesetTemplate>(StringComparer.OrdinalIgnoreCase);
+
+        // We have to use WorldRealmBase (for now) because casting is the lesser evil than polluting the template with more state
+        // While doing a full realm reload, this dictionary will NOT be passed to the context.
+        internal static FrozenDictionary<ushort, WorldRealmBase> CompilationContextDependencyHandles { get; private set; } = FrozenDictionary<ushort, WorldRealmBase>.Empty;
 
         //Todo: refactor
         public static WorldRealm DuelRealm;
@@ -60,16 +64,6 @@ namespace ACE.Server.Managers
         {
             SetupReservedRealms();
 
-            /* var results = DatabaseManager.World.GetAllRealms();
-
-             foreach(var realm in results)
-             {
-                 lock (realmsLock)
-                 {
-                     realms[realm.Id] = realm;
-                 }
-             }*/
-
             //Import-realms
             if (liveEnvironment)
             {
@@ -89,6 +83,7 @@ namespace ACE.Server.Managers
 
         private static void SetupReservedRealms()
         {
+            var reservedRealmsToImport = new Dictionary<ReservedRealm, RealmToImport>();
             foreach (var id in Enum.GetValues(typeof(ReservedRealm)).Cast<ReservedRealm>())
             {
                 if (id.ToString().StartsWith("Reserved"))
@@ -101,23 +96,28 @@ namespace ACE.Server.Managers
                 var realm = DeserializeRealmJson(null, $"SYSTEM FILE - {id}.jsonc", jsonc);
                 if (realm.Realm.Name != id.ToString())
                     throw new Exception($"Error importing reserved realm {id}, realm name must equal the ReservedRealm enum value.");
-                ReservedRealmsToImport[id] = realm;
+                reservedRealmsToImport[id] = realm;
                 realm.Realm.SetId((ushort)id);
             }
+            ReservedRealmsToImport = reservedRealmsToImport.ToFrozenDictionary();
         }
 
         public static WorldRealm GetReservedRealm(ReservedRealm reservedRealmId)
         {
-            realmsLock.EnterReadLock();
-            try
-            {
-                ReservedRealms.TryGetValue(reservedRealmId, out var worldRealm);
-                return worldRealm;
-            }
-            finally
-            {
-                realmsLock.ExitReadLock();
-            }
+            ReservedRealms.TryGetValue(reservedRealmId, out var worldRealm);
+            return worldRealm;
+        }
+
+        internal static ushort ConvertToValidRealmIdOrZero(int? rawRealmId)
+        {
+            if (((rawRealmId ?? 0) <= 0) || (uint)rawRealmId > 0x7FFF)
+                return 0;
+
+            ushort realmId = (ushort)rawRealmId;
+            if (RealmsByID.ContainsKey(realmId))
+                return realmId;
+            else
+                return 0;
         }
 
         public static WorldRealm GetRealm(ushort? realm_id, bool includeRulesets)
@@ -128,80 +128,61 @@ namespace ACE.Server.Managers
             if (realmId > 0x7FFF)
                 return null;
 
-            realmsLock.EnterReadLock();
-            try
+            if (RealmsByID.TryGetValue(realmId, out var realm))
             {
-                if (RealmsByID.TryGetValue(realmId, out var realm))
-                {
-                    if (!includeRulesets && realm.Realm.Type == RealmType.Ruleset)
-                        return null;
-                    return realm;
-                }
-                return null;
+                if (!includeRulesets && realm.Realm.Type == RealmType.Ruleset)
+                    return null;
+                return realm;
             }
-            finally
-            {
-                realmsLock.ExitReadLock();
-            }
+            return null;
         }
 
         public static WorldRealm GetRealmByName(string name, bool includeRulesets)
         {
-            realmsLock.EnterReadLock();
-            try
+            if (RealmsByName.TryGetValue(name, out var realm))
             {
-                if (RealmsByName.TryGetValue(name, out var realm))
-                {
-                    if (!includeRulesets && realm.Realm.Type == RealmType.Ruleset)
-                        return null;
-                    return realm;
-                }
-                return null;
+                if (!includeRulesets && realm.Realm.Type == RealmType.Ruleset)
+                    return null;
+                return realm;
             }
-            finally
-            {
-                realmsLock.ExitReadLock();
-            }
+            return null;
         }
 
-        internal static RulesetTemplate BuildRuleset(ACE.Entity.Models.Realm realm, RulesetCompilationContext ctx = null)
+        internal static RulesetTemplate BuildRuleset(ACE.Entity.Models.Realm realm,
+            IDictionary<ushort, WorldRealmBase> dependencies,
+            RulesetCompilationContext ctx = null)
         {
-            ctx ??= Ruleset.MakeDefaultContext();
+            if (dependencies == null)
+                dependencies = CompilationContextDependencyHandles;
+            ctx ??= Ruleset.MakeDefaultContext(dependencies);
 
             if (realm.ParentRealmID == null)
                 return RulesetTemplate.MakeTopLevelRuleset(realm, ctx);
-            
-            var worldRealmParent = GetRealm(realm.ParentRealmID.Value, includeRulesets: true);
+
+            var worldRealmParent = (WorldRealm)ctx.Dependencies[(ushort)realm.ParentRealmID];
 
             RulesetTemplate templateParent;
             if (ctx.Trace)
-                templateParent = BuildRuleset(worldRealmParent.Realm, ctx);
+                templateParent = BuildRuleset(worldRealmParent.Realm, dependencies, ctx);
             else
                 templateParent = worldRealmParent.RulesetTemplate;
 
             return RulesetTemplate.MakeRuleset(templateParent, realm, ctx);
         }
 
-        internal static void ClearCache()
+        internal static void ClearRealms()
         {
-            realmsLock.EnterWriteLock();
-            try
-            {
-                foreach (var realm in RealmsByID.Values.Where(x => x != null))
-                {
-                    realm.NeedsRefresh = true;
-                }
+            foreach (var realm in RealmsByID.Values)
+                realm.NeedsRefresh = true;
 
-                DatabaseManager.World.ClearRealmCache();
-                RealmsByID.Clear();
-                RealmsByName.Clear();
-                ReservedRealms.Clear();
-                EphemeralRealmCache.Clear();
-            }
-            finally
-            {
-                realmsLock.ExitWriteLock();
-            }
+            DatabaseManager.World.ClearRealmCache();
+            RealmsByID = FrozenDictionary<ushort, WorldRealm>.Empty;
+            RealmsByName = FrozenDictionary<string, WorldRealm>.Empty;
+            ReservedRealms = FrozenDictionary<ReservedRealm, WorldRealm>.Empty;
+            Realms = FrozenSet<WorldRealm>.Empty;
+            Rulesets = FrozenSet<WorldRealm>.Empty;
+            RealmsAndRulesets = FrozenSet<WorldRealm>.Empty;
+            EphemeralRealmCache.Clear();
         }
 
         /// <summary>
@@ -229,7 +210,6 @@ namespace ACE.Server.Managers
         {
             EphemeralRealm ephemeralRealm;
 
-            // This used to lock on realmsLock but I doubt if it is truly needed.
             ephemeralRealm = EphemeralRealm.Initialize(owner, realmTemplates);
 
             var iid = LandblockManager.RequestNewEphemeralInstanceIDv1(owner.HomeRealm);
@@ -242,67 +222,78 @@ namespace ACE.Server.Managers
         internal static void FullUpdateRealmsRepository(Dictionary<string, RealmToImport> realmsDict,
             Dictionary<ushort, RealmToImport> realmsById)
         {
-            realmsLock.EnterWriteLock();
+            if (!PrepareRealmUpdates(realmsDict, realmsById))
+                return;
+
             try
             {
-                if (!PrepareRealmUpdates(realmsDict, realmsById))
-                    return;
-
-                try
-                {
-                    DatabaseManager.World.ReplaceAllRealms(realmsById);
-                    ClearCache();
-                    LoadAllRealms();
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex.Message, ex);
-                    throw;
-                }
-                FirstImportCompleted = true;
+                DatabaseManager.World.ReplaceAllRealms(realmsById);
+                LoadAllRealms();
             }
-            finally
+            catch (Exception ex)
             {
-                realmsLock.ExitWriteLock();
+                log.Error(ex.Message, ex);
+                throw;
             }
+            FirstImportCompleted = true;
         }
 
         private static void LoadAllRealms()
         {
             var realms = DatabaseManager.World.GetAllRealms().ToDictionary(x => x.Id);
 
+            var realmsById = new Dictionary<ushort, WorldRealm>();
+            var realmsByName = new Dictionary<string, WorldRealm>(StringComparer.OrdinalIgnoreCase);
+            var reservedRealms = new Dictionary<ReservedRealm, WorldRealm>();
+            WorldRealm defaultRealmFallback = null;
+            WorldRealm duelRealm = null;
+
+            var dependencyContext = new Dictionary<ushort, WorldRealmBase>();
             foreach(var realmid in RealmIDsByTopologicalSort)
             {
                 var erealm = RealmConverter.ConvertToEntityRealm(realms[realmid], true);
-                var ruleset = BuildRuleset(erealm);
+                
+                var ruleset = BuildRuleset(erealm, dependencyContext);
                 var wrealm = new WorldRealm(erealm, ruleset);
-                RealmsByID.Add(erealm.Id, wrealm);
-                RealmsByName.Add(erealm.Name, wrealm);
+                realmsById.Add(erealm.Id, wrealm);
+                dependencyContext.Add(erealm.Id, wrealm);
+                realmsByName.Add(erealm.Name, wrealm);
                 if (Enum.IsDefined(typeof(ReservedRealm), erealm.Id))
                 {
-                    ReservedRealms.Add((ReservedRealm)erealm.Id, wrealm);
+                    reservedRealms.Add((ReservedRealm)erealm.Id, wrealm);
                     if (erealm.Id == (ushort)ReservedRealm.@default)
-                        DefaultRealmFallback = wrealm;
+                        defaultRealmFallback = wrealm;
                 }
 
                 // Needs improvement: Only one realm can be set to the dueling realm and it uses a static property, which seems wrong to me
                 if (wrealm.Realm.Type == RealmType.Realm && wrealm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
-                    DuelRealm = wrealm;
+                    duelRealm = wrealm;
             };
 
-            Realms = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Realm).ToList().AsReadOnly();
-            Rulesets = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Ruleset).ToList().AsReadOnly();
-            RealmsAndRulesets = RealmsByID.Values.ToList().AsReadOnly();
+            var realmsByNameFrozen = realmsByName.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
-            ValidateConfiguredRealmName(ACRealmsConfigManager.Config.DefaultRealm, "DefaultRealm", allowDefault: ACRealmsConfigManager.Config.AllowUndefinedDefaultRealm);
-            ValidateConfiguredRealmName(ACRealmsConfigManager.Config.CharacterMigrationOptions.AutoAssignToRealm, "CharacterMigrationOptions.AutoAssignToRealm",
-                allowDefault: ACRealmsConfigManager.Config.AllowUndefinedDefaultRealm,
-                allowNull: true);
+            // Make sure every data structure is built before committing them
+            var realmsByIdFrozen = realmsById.ToFrozenDictionary();
+            var targetRealms = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Realm).ToFrozenSet();
+            var rulesets = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Ruleset).ToFrozenSet();
+            var realmsAndRulesets = RealmsByID.Values.ToFrozenSet();
+            var reservedRealmsFrozen = reservedRealms.ToFrozenDictionary();
+            var dependencyContextFrozen = dependencyContext.ToFrozenDictionary();
 
-            DefaultRealmConfigured = RealmsByName[ACRealmsConfigManager.Config.DefaultRealm];
+            // Commit
+            DefaultRealmConfigured = realmsByNameFrozen[ACRealmsConfigManager.Config.DefaultRealm];
+            CompilationContextDependencyHandles = dependencyContextFrozen;
+            RealmsByID = realmsByIdFrozen;
+            RealmsByName = realmsByNameFrozen;
+            Realms = targetRealms;
+            Rulesets = rulesets;
+            RealmsAndRulesets = realmsAndRulesets;
+            DuelRealm = duelRealm;
+            DefaultRealmFallback = defaultRealmFallback;
+            ReservedRealms = reservedRealmsFrozen;
         }
 
-        private static void ValidateConfiguredRealmName(string realmName, string configLabel, bool allowDefault = false, bool allowNull = false)
+        private static void ValidateConfiguredRealmName(Dictionary<string, RealmType> realmTypesByName, string realmName, string configLabel, bool allowDefault = false, bool allowNull = false)
         {
             if (Enum.TryParse(realmName, true, out ReservedRealm reserved))
             {
@@ -313,9 +304,9 @@ namespace ACE.Server.Managers
                 if (!valid)
                     throw new ConfigurationErrorsException($"{configLabel} in Config.realms.js must choose a user-defined realm, not the reserved realm '{reserved}'");
             }
-            if (!RealmsByName.ContainsKey(realmName))
+            if (!realmTypesByName.ContainsKey(realmName))
                 throw new ConfigurationErrorsException($"Config.realms.js specified {configLabel} '{realmName}', but no json file was defined for that realm. See the README doc for instructions.");
-            else if (RealmsByName[realmName].Realm.Type != RealmType.Realm)
+            else if (realmTypesByName[realmName] != RealmType.Realm)
                 throw new ConfigurationErrorsException($"Config.realms.js specified {configLabel} '{realmName}', but this must be a realm, not a ruleset.");
         }
 
@@ -426,6 +417,14 @@ namespace ACE.Server.Managers
                     throw new InvalidDataException($"Error importing realm {item.ImportItem.Realm.Name}: A circular dependency was detected.", ex);
                 }
             }
+
+            var validateCheck = newRealmsByName.ToDictionary(kvp => kvp.Key, kvp => (RealmType)kvp.Value.Realm.Type);
+
+            ValidateConfiguredRealmName(validateCheck, ACRealmsConfigManager.Config.DefaultRealm, "DefaultRealm", allowDefault: ACRealmsConfigManager.Config.AllowUndefinedDefaultRealm);
+            ValidateConfiguredRealmName(validateCheck, ACRealmsConfigManager.Config.CharacterMigrationOptions.AutoAssignToRealm, "CharacterMigrationOptions.AutoAssignToRealm",
+                allowDefault: ACRealmsConfigManager.Config.AllowUndefinedDefaultRealm,
+                allowNull: true);
+
             return true;
         }
 
@@ -454,33 +453,8 @@ namespace ACE.Server.Managers
             RealmIDsByTopologicalSort.Add(item.ImportItem.Realm.Id);
         }
 
-        internal static RulesetTemplate GetEphemeralRealmRulesetTemplate(string key)
-        {
-            realmsLock.EnterReadLock();
-            try
-            {
-                if (EphemeralRealmCache.TryGetValue(key, out var storedruleset))
-                    return storedruleset;
-                return null;
-            }
-            finally
-            {
-                realmsLock.ExitReadLock();
-            }
-        }
-
-        internal static void CacheEphemeralRealmTemplate(string key, RulesetTemplate template)
-        {
-            realmsLock.EnterWriteLock();
-            try
-            {
-                EphemeralRealmCache[key] = template;
-            }
-            finally
-            {
-                realmsLock.ExitWriteLock();
-            }
-        }
+        internal static RulesetTemplate GetEphemeralRealmRulesetTemplate(string key) => EphemeralRealmCache[key];
+        internal static void CacheEphemeralRealmTemplate(string key, RulesetTemplate template) => EphemeralRealmCache[key] = template;
 
         internal static RealmToImport DeserializeRealmJson(Network.ISession session, string filename, string fileContent)
         {
@@ -619,7 +593,6 @@ namespace ACE.Server.Managers
             reservedRealm = null;
             return false;
         }
-
 
         internal static bool SetHomeRealm(ObjectGuid playerGuidOfflinePlayer, WorldRealm realm)
         {

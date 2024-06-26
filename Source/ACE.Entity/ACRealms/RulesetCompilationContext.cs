@@ -1,5 +1,6 @@
 using ACE.Common;
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -26,6 +27,10 @@ namespace ACE.Entity.ACRealms
         public string GitHash { get; init; } = null;
         private IList<string> LogOutput { get; init; } = null;
 
+        /// <summary>
+        /// We need to store the dependencies here because other rulesets need to be referenced before the compilation finishes
+        /// </summary>
+        public IDictionary<ushort, WorldRealmBase> Dependencies { get; init; } = FrozenDictionary<ushort, WorldRealmBase>.Empty;
 
         public RulesetCompilationContext WithTimeContext(DateTime time) => this with { TimeContext = time };
         public RulesetCompilationContext WithDerivedNewSeed() => (DeriveNewSeedEachPhase && RandomSeed.HasValue) ? WithNewSeed(Randomizer.Next()) : this;
@@ -46,18 +51,21 @@ namespace ACE.Entity.ACRealms
         };
 
         public static RulesetCompilationContext CreateContext(
-# if DEBUG
+#if DEBUG
             int _ = 0, // Force named argument
 # endif
             bool enableSeedTracking = false,
             int? randomSeed = null,
-            string gitHash = null
+            string gitHash = null,
+            IDictionary<ushort, WorldRealmBase> dependencies = null
         ) 
         {
-            if (enableSeedTracking || randomSeed.HasValue)
+            dependencies ??= FrozenDictionary<ushort, WorldRealmBase>.Empty;
+
+            if (enableSeedTracking || randomSeed.HasValue || dependencies.Any())
             {
                 var ctx = new RulesetCompilationContext { GitHash = gitHash, DeriveNewSeedEachPhase = true };
-                return ctx.WithNewSeed(randomSeed ?? GetNewRootSeed());
+                return ctx.WithNewSeed(randomSeed ?? GetNewRootSeed()) with { Dependencies = dependencies };
             }
             else return DefaultShared;
         }

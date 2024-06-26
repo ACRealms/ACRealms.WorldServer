@@ -292,7 +292,7 @@ namespace ACE.Server.Command.Handlers
                 case "full":
                     RulesetTemplate template;
                     if (!session.Player.CurrentLandblock.IsEphemeral)
-                        template = RealmManager.BuildRuleset(session.Player.RealmRuleset.Realm, ctx);
+                        template = RealmManager.BuildRuleset(session.Player.RealmRuleset.Realm, null, ctx);
                     else
                         template = session.Player.CurrentLandblock.InnerRealmInfo.RulesetTemplate.RebuildTemplateWithContext(ctx);
                     ruleset = AppliedRuleset.MakeRerolledRuleset(template, ctx);

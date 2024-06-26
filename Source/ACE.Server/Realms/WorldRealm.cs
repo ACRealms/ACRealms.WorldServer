@@ -1,4 +1,5 @@
 using ACE.Entity;
+using ACE.Entity.ACRealms;
 using ACE.Entity.Enum.Properties;
 using ACE.Entity.Enum.RealmProperties;
 using ACE.Entity.Models;
@@ -11,10 +12,12 @@ using System.Text;
 namespace ACE.Server.Realms
 {
     public class WorldRealm(Realm realm, RulesetTemplate rulesetTemplate)
+        : WorldRealmBase(realm, (RulesetBase)rulesetTemplate)
     {
-        public Realm Realm { get; } = realm;
         public RulesetTemplate RulesetTemplate { get; } = rulesetTemplate;
-        public AppliedRuleset StandardRules { get; } = AppliedRuleset.MakeRerolledRuleset(rulesetTemplate);
+        public AppliedRuleset StandardRules { get; } = AppliedRuleset.MakeRerolledRuleset(rulesetTemplate, rulesetTemplate.Context);
+
+        // This isn't really used yet
         public bool NeedsRefresh { get; internal set; }
 
         internal InstancedPosition DefaultStartingLocation(Player player)

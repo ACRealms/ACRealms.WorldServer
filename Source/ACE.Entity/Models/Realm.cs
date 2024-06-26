@@ -57,11 +57,11 @@ namespace ACE.Entity.Models
             return $"{Links.Count} Links";
         }
 
-        public List<string> GetLogTraceMessages(Dictionary<ushort, string> rulesetNames)
+        public List<string> GetLogTraceMessages(IDictionary<ushort, WorldRealmBase> compilationDependencies)
         {
             var list = new List<string>();
             list.Add($"Job of type {Type}, {Links.Count} links");
-            list.AddRange(Links.Select(x => x.GetLogTrace(rulesetNames[x.RulesetIDToApply])));
+            list.AddRange(Links.Select(x => x.GetLogTrace(compilationDependencies[x.RulesetIDToApply].Realm.Name)));
             return list;
         }
     }

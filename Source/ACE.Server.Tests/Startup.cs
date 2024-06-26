@@ -31,6 +31,7 @@ using Autofac.Extensions.DependencyInjection;
 using Autofac.Core;
 using ACRealms.Tests.Helpers;
 using ACE.Common.ACRealms;
+using ACE.Server.Managers.ACRealms;
 
 namespace ACRealms.Tests
 {
@@ -79,6 +80,7 @@ namespace ACRealms.Tests
             InitializePropertyManager();
             GuidManager.Initialize();
             PlayerManager.Initialize();
+            RealmsFromACESetup.QueryStage1();
             HouseManager.Initialize();
             RealmManager.Initialize(false);
             NetworkManager.Initialize(new FakeNetworkManager());

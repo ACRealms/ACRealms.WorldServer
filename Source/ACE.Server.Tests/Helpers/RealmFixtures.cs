@@ -47,9 +47,9 @@ namespace ACRealms.Tests.Helpers
                 {
                     if (File.Exists(realmsJsoncPath))
                         File.Delete(realmsJsoncPath);
-                    RealmManager.ClearCache();
+                    RealmManager.ClearRealms();
                     DatabaseManager.World.ReplaceAllRealms(new Dictionary<ushort, ACE.Database.Adapter.RealmToImport>());
-                    RealmManager.ClearCache();
+                    RealmManager.ClearRealms();
                 }
                 ACE.Server.Command.Handlers.RealmDataHelpers.ImportJsonRealmsIndex(null, realmsJsoncPath, realms);
             }
