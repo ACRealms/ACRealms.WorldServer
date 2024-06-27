@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 [assembly:InternalsVisibleTo("ACE.Database")]
 [assembly: InternalsVisibleTo("ACE.Server")]
+[assembly: InternalsVisibleTo("LINQPadQuery")]
 
 namespace ACE.Entity.AssemblyInfo
 {

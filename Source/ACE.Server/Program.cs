@@ -19,7 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("ACRealms.Tests")]
-
+[assembly: InternalsVisibleTo("LINQPadQuery")]
 
 namespace ACE.Server
 {

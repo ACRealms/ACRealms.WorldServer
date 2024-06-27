@@ -55,10 +55,20 @@ namespace ACE.Server
 
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        // Some execution environments don't support setting Console.Title
+        private static void SetConsoleTitleSafe(string title)
+        {
+            try
+            {
+                Console.Title = title;
+            }
+            catch (Exception) { }
+        }
+
         public static void ConfigureServicesForLiveEnvironment()
         {
             var consoleTitle = $"AC Realms - v{ServerBuildInfo.FullVersion}";
-            Console.Title = consoleTitle;
+            SetConsoleTitleSafe(consoleTitle);
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
@@ -177,11 +187,18 @@ namespace ACE.Server
             if (ConfigManager.Config.Server.WorldName != "AC Realms")
             {
                 consoleTitle = $"{ConfigManager.Config.Server.WorldName} | {consoleTitle}";
-                Console.Title = consoleTitle;
+                SetConsoleTitleSafe(consoleTitle);
             }
 
             // https://learn.microsoft.com/en-us/dotnet/core/extensions/generic-host?tabs=appbuilder
             var builder = Host.CreateDefaultBuilder();
+            builder.ConfigureLogging((hostingContext, logging) =>
+            {
+                logging.ClearProviders();
+                logging.AddDebug();
+                logging.AddConsole();
+                // logging.AddEventLog(); (This is enabled by default and we are disabling it)
+            });
             builder.ConfigureServices((context, services) =>
             {
                 // Disable logging of db commands

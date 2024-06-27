@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
-
+using System.Threading.Tasks;
 using ACE.Entity.Enum;
 using ACE.Server.Network;
 
@@ -126,6 +126,27 @@ namespace ACE.Server.Command
             thread.Start();
         }
 
+        static IEnumerator<Task<string>> AsyncConsoleInput()
+        {
+            var e = loop(); e.MoveNext(); return e;
+            IEnumerator<Task<string>> loop()
+            {
+                while (true) yield return Task.Run(Console.ReadLine);
+            }
+        }
+
+        static Task<string> ReadLine(this IEnumerator<Task<string>> console)
+        {
+            if (console.Current.IsCompleted) console.MoveNext();
+            return console.Current;
+        }
+
+        private static bool ResetConsole = false;
+        private static string AsyncConsoleCommand = null;
+
+        internal static void ResetConsoleThread() => ResetConsole = true;
+        internal static void WriteAsyncConsoleCommand(string arg) => AsyncConsoleCommand = arg;
+
         private static void CommandThread()
         {
             Console.WriteLine("");
@@ -134,13 +155,58 @@ namespace ACE.Server.Command
             Console.WriteLine("Type \"acecommands\" for help.");
             Console.WriteLine("");
 
+# if DEBUG
+            Console.WriteLine($"DEBUG: Console.IsOutputRedirected: {Console.IsOutputRedirected}");
+            Console.WriteLine($"DEBUG: Console.IsInputRedirected: {Console.IsInputRedirected}");
+#endif
+
+            IEnumerator<Task<string>> console = null;
+            if (Console.IsInputRedirected)
+                console = AsyncConsoleInput();
+
             for (; ; )
             {
+                Console.WriteLine();
                 Console.Write("ACRealms >> ");
 
-                string commandLine = Console.ReadLine();
+                string commandLine;
+                if (Console.IsInputRedirected)
+                {
+                    var resetTask = Task.Run(() =>
+                    {
+                        while (AsyncConsoleCommand == null)
+                        {
+                            Thread.Sleep(100);
+                        }
+                        
+                        //ResetConsole = false;
+                    });
+
+                    if (Task.WaitAny(console.ReadLine(), resetTask) == 0) // if ReadLine finished first
+                    {
+                        Console.WriteLine("DEBUG: ReadLine");
+                        commandLine = console.Current.Result; // last user input (await instead of Result in async method)
+                    }
+                    else // reset 
+                    {
+                        Console.WriteLine("DEBUG: AsyncCommand");
+                        commandLine = AsyncConsoleCommand;
+                        AsyncConsoleCommand = null;
+                        //resetTask.Wait();
+                        //Thread.Sleep(100);
+                        //continue;
+                        //commandLine = console.ReadLine(); // this wont issue another read line because user did not input anything yet. 
+                    }
+                }
+                else
+                {
+                    commandLine = Console.ReadLine();
+                }
+
                 if (string.IsNullOrWhiteSpace(commandLine))
                     continue;
+
+                Console.WriteLine($"DEBUG: {commandLine}");
 
                 string command = null;
                 string[] parameters = null;
@@ -151,7 +217,7 @@ namespace ACE.Server.Command
                 catch (Exception ex)
                 {
                     log.Error($"Exception while parsing command: {commandLine}", ex);
-                    return;
+                    continue;
                 }
                 try
                 {

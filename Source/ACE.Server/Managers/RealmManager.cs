@@ -35,10 +35,11 @@ namespace ACE.Server.Managers
         public static FrozenSet<WorldRealm> Realms { get; private set; } = FrozenSet<WorldRealm>.Empty;
         public static FrozenSet<WorldRealm> Rulesets { get; private set; } = FrozenSet<WorldRealm>.Empty;
         public static FrozenSet<WorldRealm> RealmsAndRulesets { get; private set; } = FrozenSet<WorldRealm>.Empty;
-        private static FrozenDictionary<ushort, WorldRealm> RealmsByID = FrozenDictionary<ushort, WorldRealm>.Empty;
-        private static FrozenDictionary<string, WorldRealm> RealmsByName = FrozenDictionary<string, WorldRealm>.Empty;
+        internal static FrozenDictionary<ushort, WorldRealm> RealmsByID { get; private set; } = FrozenDictionary<ushort, WorldRealm>.Empty;
+        internal static FrozenDictionary<string, WorldRealm> RealmsByName { get; private set; } = FrozenDictionary<string, WorldRealm>.Empty;
+        internal static FrozenDictionary<ReservedRealm, WorldRealm> ReservedRealms { get; private set; } = FrozenDictionary<ReservedRealm, WorldRealm>.Empty;
+
         private static FrozenDictionary<ReservedRealm, RealmToImport> ReservedRealmsToImport = FrozenDictionary<ReservedRealm, RealmToImport>.Empty;
-        private static FrozenDictionary<ReservedRealm, WorldRealm> ReservedRealms = FrozenDictionary<ReservedRealm, WorldRealm>.Empty;
         private static Dictionary<string, RulesetTemplate> EphemeralRealmCache = new Dictionary<string, RulesetTemplate>(StringComparer.OrdinalIgnoreCase);
 
         // We have to use WorldRealmBase (for now) because casting is the lesser evil than polluting the template with more state
