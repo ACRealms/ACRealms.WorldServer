@@ -4112,64 +4112,6 @@ namespace ACE.Server.Command.Handlers
             newName = newName.First().ToString().ToUpper() + newName.Substring(1);
 
             PlayerManager.HandlePlayerRename(session, oldName, newName);
-            var onlinePlayer = PlayerManager.GetOnlinePlayer(oldName);
-            var offlinePlayer = PlayerManager.GetOfflinePlayer(oldName);
-            if (onlinePlayer != null)
-            {
-                DatabaseManager.Shard.IsCharacterNameAvailable(newName, onlinePlayer.HomeRealm, isAvailable =>
-                {
-                    if (!isAvailable)
-                    {
-                        CommandHandlerHelper.WriteOutputInfo(session, $"Error, a player named \"{newName}\" already exists.", ChatMessageType.Broadcast);
-                        return;
-                    }
-
-                    onlinePlayer.Character.Name = newName;
-                    onlinePlayer.CharacterChangesDetected = true;
-                    onlinePlayer.Name = newName;
-                    onlinePlayer.SavePlayerToDatabase();
-
-                    CommandHandlerHelper.WriteOutputInfo(session, $"Player named \"{oldName}\" renamed to \"{newName}\" successfully!", ChatMessageType.Broadcast);
-
-                    onlinePlayer.Session.LogOffPlayer();
-                });
-            }
-            else if (offlinePlayer != null)
-            {
-                DatabaseManager.Shard.IsCharacterNameAvailable(newName, offlinePlayer.HomeRealm, isAvailable =>
-                {
-                    if (!isAvailable)
-                    {
-                        CommandHandlerHelper.WriteOutputInfo(session, $"Error, a player named \"{newName}\" already exists.", ChatMessageType.Broadcast);
-                        return;
-                    }
-
-                    var character = DatabaseManager.Shard.BaseDatabase.GetCharacterStubByName(oldName);
-
-                    DatabaseManager.Shard.GetCharacters(character.AccountId, false, result =>
-                    {
-                        var foundCharacterMatch = result.Where(c => c.Id == character.Id).FirstOrDefault();
-
-                        if (foundCharacterMatch == null)
-                        {
-                            CommandHandlerHelper.WriteOutputInfo(session, $"Error, a player named \"{oldName}\" cannot be found.", ChatMessageType.Broadcast);
-                        }
-
-                        DatabaseManager.Shard.RenameCharacter(foundCharacterMatch, newName, new ReaderWriterLockSlim(), null);
-                    });
-
-                    offlinePlayer.SetProperty(PropertyString.Name, newName);
-                    offlinePlayer.SaveBiotaToDatabase();
-
-                    CommandHandlerHelper.WriteOutputInfo(session, $"Player named \"{oldName}\" renamed to \"{newName}\" successfully!", ChatMessageType.Broadcast);
-                });
-            }
-            else
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"Error, a player named \"{oldName}\" cannot be found.", ChatMessageType.Broadcast);
-                return;
-            }
-
         }
 
         // setadvclass

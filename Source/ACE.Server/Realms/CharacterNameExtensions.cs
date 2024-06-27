@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ACE.Server.Realms
 {
-    internal class CharacterNameExtensions
+    public class CharacterNameExtensions
     {
         public static CanonicalCharacterName FromPlayer(IPlayer player)
             => Make(player.Name, player.HomeRealmIDRaw, player.Account.AccessLevel > 1);
