@@ -120,6 +120,12 @@ namespace ACE.Server.Managers
                 return 0;
         }
 
+        public static string GetDisplayNameForAnyRawRealmId(int? rawRealmId)
+        {
+            ushort realmId = ConvertToValidRealmIdOrZero(rawRealmId);
+            return RealmsByID[realmId].Realm.Name;
+        }
+
         public static WorldRealm GetRealm(ushort? realm_id, bool includeRulesets)
         {
             if (!realm_id.HasValue)

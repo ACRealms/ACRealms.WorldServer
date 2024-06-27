@@ -318,5 +318,34 @@ namespace ACE.Server.Entity
             else
                 RemoveProperty(prop);
         }
+
+        public int? HomeRealmIDRaw => GetProperty(PropertyInt.HomeRealm);
+        public ushort HomeRealm
+        {
+            get
+            {
+                int intid = GetProperty(PropertyInt.HomeRealm) ?? 0;
+                if ((intid < 0) || (uint)intid > 0x7FFF)
+                {
+                    log.Error("Player " + Name + " HomeRealm out of range.");
+                    return 0;
+                }
+                return (ushort)intid;
+            }
+            internal set
+            {
+                if (value == 0)
+                {
+                    RemoveProperty(PropertyInt.HomeRealm);
+                    return;
+                }
+                if (value > 0x7FFF)
+                {
+                    log.Error("Cannot set HomeRealm for Player " + Name + ". Must be between 0 and 32767");
+                    return;
+                }
+                SetProperty(PropertyInt.HomeRealm, value);
+            }
+        }
     }
 }

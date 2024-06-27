@@ -193,11 +193,11 @@ namespace ACE.Database
         }
 
 
-        public void IsCharacterNameAvailable(string name, Action<bool> callback)
+        public void IsCharacterNameAvailable(string name, ushort? realmId, Action<bool> callback, bool? overrideUniquePerHomeRealm = null)
         {
             _queue.Add(new Task(() =>
             {
-                var result = BaseDatabase.IsCharacterNameAvailable(name);
+                var result = BaseDatabase.IsCharacterNameAvailable(name, realmId, overrideUniquePerHomeRealm);
                 callback?.Invoke(result);
             }));
         }

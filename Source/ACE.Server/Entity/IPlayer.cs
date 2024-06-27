@@ -95,5 +95,8 @@ namespace ACE.Server.Entity
         void SaveBiotaToDatabase(bool enqueueSave = true);
 
         void UpdateProperty(PropertyInstanceId prop, ulong? value, bool broadcast = false);
+
+        int? HomeRealmIDRaw { get; }
+        ushort HomeRealm { get; }
     }
 }

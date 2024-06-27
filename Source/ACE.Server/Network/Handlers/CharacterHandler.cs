@@ -52,7 +52,9 @@ namespace ACE.Server.Network.Handlers
         }
 
         public static void CharacterCreateEx(CharacterCreateInfo characterCreateInfo, ISession session)
-        { 
+        {
+            var characterNameTask = PlayerManager.IsCharacterNameAvailableForCreation(characterCreateInfo.Name);
+
             if (PropertyManager.GetBool("taboo_table").Item && DatManager.PortalDat.TabooTable.ContainsBadWord(characterCreateInfo.Name.ToLowerInvariant()))
             {
                 SendCharacterCreateResponse(session, CharacterGenerationVerificationResponse.NameBanned);
@@ -64,15 +66,6 @@ namespace ACE.Server.Network.Handlers
                 SendCharacterCreateResponse(session, CharacterGenerationVerificationResponse.NameBanned);
                 return;
             }
-
-            DatabaseManager.Shard.IsCharacterNameAvailable(characterCreateInfo.Name, isAvailable =>
-            {
-                if (!isAvailable)
-                {
-                    SendCharacterCreateResponse(session, CharacterGenerationVerificationResponse.NameInUse);
-                    return;
-                }
-            });
 
             if ((characterCreateInfo.Heritage == HeritageGroup.Olthoi || characterCreateInfo.Heritage == HeritageGroup.OlthoiAcid) && PropertyManager.GetBool("olthoi_play_disabled").Item)
             {
@@ -121,8 +114,6 @@ namespace ACE.Server.Network.Handlers
                 return;
             }
 
-            var guid = GuidManager.NewPlayerGuid();
-
             var weenieType = weenie.WeenieType;
 
             // If Database didn't have Sentinel/Admin weenies, alter the weenietype coming in.
@@ -134,7 +125,17 @@ namespace ACE.Server.Network.Handlers
                     weenieType = WeenieType.Sentinel;
             }
 
+            if (characterNameTask.IsCompletedSuccessfully)
+            {
+                var isAvailable = characterNameTask.Result;
+                if (!isAvailable)
+                {
+                    SendCharacterCreateResponse(session, CharacterGenerationVerificationResponse.NameInUse);
+                    return;
+                }
+            }
 
+            var guid = GuidManager.NewPlayerGuid();
             var result = PlayerFactory.Create(characterCreateInfo, weenie, guid, session.AccountId, weenieType, out var player);
 
             if (result != PlayerFactory.CreateResult.Success || player == null)
@@ -149,8 +150,15 @@ namespace ACE.Server.Network.Handlers
                 return;
             }
 
-            DatabaseManager.Shard.IsCharacterNameAvailable(characterCreateInfo.Name, isAvailable =>
+            PlayerManager.IsCharacterNameAvailableForCreation(characterCreateInfo.Name).ContinueWith(characterNameTask =>
             {
+                if (!characterNameTask.IsCompletedSuccessfully)
+                {
+                    SendCharacterCreateResponse(session, CharacterGenerationVerificationResponse.DatabaseDown);
+                    return;
+                }
+                var isAvailable = characterNameTask.Result;
+
                 if (!isAvailable)
                 {
                     SendCharacterCreateResponse(session, CharacterGenerationVerificationResponse.NameInUse);
@@ -302,8 +310,25 @@ namespace ACE.Server.Network.Handlers
                 return;
             }
 
-            DatabaseManager.Shard.IsCharacterNameAvailable(character.Name, isAvailable =>
+            var realmIdRaw = DatabaseManager.Shard.BaseDatabase.GetHomeRealm(character.Id);
+            var realmId = RealmManager.ConvertToValidRealmIdOrZero(realmIdRaw);
+            if (realmId == 0)
             {
+                session.SendCharacterError(CharacterError.EnterGameCouldntPlaceCharacter);
+                return;
+            }
+
+            PlayerManager.IsCharacterNameAvailable(character.Name, realmId).ContinueWith(task =>
+            {
+                if (!task.IsCompletedSuccessfully)
+                {
+                    log.Error(task.Exception?.ToString() ?? $"Unknown error in CharacterRestore for {character.Name}");
+                    SendCharacterCreateResponse(session, CharacterGenerationVerificationResponse.DatabaseDown);
+                    return;
+                }
+
+                var isAvailable = task.Result;
+
                 if (!isAvailable)
                 {
                     SendCharacterCreateResponse(session, CharacterGenerationVerificationResponse.NameInUse);

@@ -1981,10 +1981,11 @@ namespace ACE.Server.Command.Handlers
                     var newCharName = newCharacterName ?? existingCharacter.Name;
 
                     var existingPlayerBiota = DatabaseManager.Shard.BaseDatabase.GetBiota(existingCharId);
-
+                    var realmId = existingPlayerBiota.BiotaPropertiesInt.Where(p => p.Type == (ushort)PropertyInt.HomeRealm).Select(x => (ushort?)Convert.ToUInt16(x.Value)).FirstOrDefault();
+                    
                     DatabaseManager.Shard.GetPossessedBiotasInParallel(existingCharId, existingPossessions =>
                     {
-                        DatabaseManager.Shard.IsCharacterNameAvailable(newCharName, isAvailable =>
+                        DatabaseManager.Shard.IsCharacterNameAvailable(newCharName, realmId, isAvailable =>
                         {
                             if (!isAvailable)
                             {
@@ -3559,7 +3560,7 @@ namespace ACE.Server.Command.Handlers
             else
                 name = weenie.GetProperty(PropertyString.Name);
 
-            DatabaseManager.Shard.IsCharacterNameAvailable(name, isAvailable =>
+            DatabaseManager.Shard.IsCharacterNameAvailable(name, null, isAvailable =>
             {
                 if (!isAvailable)
                 {
@@ -3635,7 +3636,7 @@ namespace ACE.Server.Command.Handlers
                 session.Characters.Add(player.Character);
 
                 session.LogOffPlayer();
-            });
+            }, false);
         }
 
         // qst
@@ -4110,11 +4111,12 @@ namespace ACE.Server.Command.Handlers
 
             newName = newName.First().ToString().ToUpper() + newName.Substring(1);
 
+            PlayerManager.HandlePlayerRename(session, oldName, newName);
             var onlinePlayer = PlayerManager.GetOnlinePlayer(oldName);
             var offlinePlayer = PlayerManager.GetOfflinePlayer(oldName);
             if (onlinePlayer != null)
             {
-                DatabaseManager.Shard.IsCharacterNameAvailable(newName, isAvailable =>
+                DatabaseManager.Shard.IsCharacterNameAvailable(newName, onlinePlayer.HomeRealm, isAvailable =>
                 {
                     if (!isAvailable)
                     {
@@ -4134,7 +4136,7 @@ namespace ACE.Server.Command.Handlers
             }
             else if (offlinePlayer != null)
             {
-                DatabaseManager.Shard.IsCharacterNameAvailable(newName, isAvailable =>
+                DatabaseManager.Shard.IsCharacterNameAvailable(newName, offlinePlayer.HomeRealm, isAvailable =>
                 {
                     if (!isAvailable)
                     {

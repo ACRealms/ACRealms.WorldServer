@@ -897,6 +897,7 @@ namespace ACE.Server.WorldObjects
             return true;
         }
 
+        public int? HomeRealmIDRaw => GetProperty(PropertyInt.HomeRealm);
         public ushort HomeRealm
         {
             get
@@ -909,7 +910,7 @@ namespace ACE.Server.WorldObjects
                 }
                 return (ushort)intid;
             }
-            set
+            internal set
             {
                 if (value == 0)
                 {

@@ -21,6 +21,10 @@ using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.WorldObjects;
 
 using Biota = ACE.Entity.Models.Biota;
+using ACE.Entity.ACRealms;
+using System.Collections.Concurrent;
+using ACE.Server.Network;
+using ACE.Server.Command.Handlers;
 
 namespace ACE.Server.Managers
 {
@@ -31,6 +35,9 @@ namespace ACE.Server.Managers
         private static readonly ReaderWriterLockSlim playersLock = new ReaderWriterLockSlim();
         private static readonly Dictionary<ulong, Player> onlinePlayers = new Dictionary<ulong, Player>();
         private static readonly Dictionary<ulong, OfflinePlayer> offlinePlayers = new Dictionary<ulong, OfflinePlayer>();
+
+        // A note on the value type (why there is no ConcurrentHashSet): https://github.com/dotnet/runtime/issues/39919
+        private static readonly ConcurrentDictionary<string, ConcurrentDictionary<ulong, byte>> basicPlayerNames = new ConcurrentDictionary<string, ConcurrentDictionary<ulong, byte>>(StringComparer.OrdinalIgnoreCase);
 
         // indexed by player name
         private static readonly Dictionary<string, IPlayer> playerNames = new Dictionary<string, IPlayer>(StringComparer.OrdinalIgnoreCase);
@@ -61,6 +68,10 @@ namespace ACE.Server.Managers
 
                 lock (playerNames)
                     playerNames[offlinePlayer.Name] = offlinePlayer;
+
+                basicPlayerNames
+                    .GetOrAdd(offlinePlayer.Name, (_) => new ConcurrentDictionary<ulong, byte>())
+                    .AddOrUpdate(offlinePlayer.Guid.Full, 0, (_, _) => 0);
 
                 lock (playerAccounts)
                 {
@@ -194,6 +205,16 @@ namespace ACE.Server.Managers
             }
 
             return null;
+        }
+
+        public static IPlayer GetPlayersByBasicName(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static IPlayer GetPlayerGuidByCanonicalName(CanonicalCharacterName name)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -451,6 +472,98 @@ namespace ACE.Server.Managers
             player.HandleAllegianceOnLogout();
 
             return true;
+        }
+
+        public static async Task<bool> IsCharacterNameAvailableForCreation(string name)
+        {
+            var opts = Common.ACRealms.ACRealmsConfigManager.Config.CharacterCreationOptions;
+
+            ushort? realmId;
+
+            if (opts.CharacterNamesUniquePerHomeRealm)
+                realmId = null;
+            else if (opts.UseRealmSelector)
+                realmId = 0; // Effectively makes it so only admin character names can't be used
+            else
+                realmId = RealmManager.ServerDefaultRealm.Realm.Id;
+
+            return await IsCharacterNameAvailable(name, realmId);
+        }
+
+        public static async Task<bool> IsCharacterNameAvailable(string name, ushort? realmId, bool? overrideUniquePerHomeRealm = null)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            DatabaseManager.Shard.IsCharacterNameAvailable(name, realmId, isAvailable =>
+            {
+                tcs.TrySetResult(isAvailable);
+            }, overrideUniquePerHomeRealm);
+
+            return await tcs.Task;
+        }
+
+        public static void IsCharacterNameAvailable(string name, ushort? realmId, Action<bool> callback, bool? overrideUniquePerHomeRealm = null)
+            => DatabaseManager.Shard.IsCharacterNameAvailable(name, realmId, callback, overrideUniquePerHomeRealm);
+
+        public static void HandlePlayerRename(ISession session, string oldName, string newName)
+        {
+            var onlinePlayer = PlayerManager.GetOnlinePlayer(oldName);
+            var offlinePlayer = PlayerManager.GetOfflinePlayer(oldName);
+            if (onlinePlayer != null)
+            {
+                IsCharacterNameAvailable(newName, onlinePlayer.HomeRealm, isAvailable =>
+                {
+                    if (!isAvailable)
+                    {
+                        CommandHandlerHelper.WriteOutputInfo(session, $"Error, a player named \"{newName}\" already exists.", ChatMessageType.Broadcast);
+                        return;
+                    }
+
+                    onlinePlayer.Character.Name = newName;
+                    onlinePlayer.CharacterChangesDetected = true;
+                    onlinePlayer.Name = newName;
+                    onlinePlayer.SavePlayerToDatabase();
+
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Player named \"{oldName}\" renamed to \"{newName}\" successfully!", ChatMessageType.Broadcast);
+
+                    onlinePlayer.Session.LogOffPlayer();
+                });
+            }
+            else if (offlinePlayer != null)
+            {
+                DatabaseManager.Shard.IsCharacterNameAvailable(newName, offlinePlayer.HomeRealm, isAvailable =>
+                {
+                    if (!isAvailable)
+                    {
+                        CommandHandlerHelper.WriteOutputInfo(session, $"Error, a player named \"{newName}\" already exists.", ChatMessageType.Broadcast);
+                        return;
+                    }
+
+                    var character = DatabaseManager.Shard.BaseDatabase.GetCharacterStubByName(oldName);
+
+                    DatabaseManager.Shard.GetCharacters(character.AccountId, false, result =>
+                    {
+                        var foundCharacterMatch = result.Where(c => c.Id == character.Id).FirstOrDefault();
+
+                        if (foundCharacterMatch == null)
+                        {
+                            CommandHandlerHelper.WriteOutputInfo(session, $"Error, a player named \"{oldName}\" cannot be found.", ChatMessageType.Broadcast);
+                        }
+
+                        DatabaseManager.Shard.RenameCharacter(foundCharacterMatch, newName, new ReaderWriterLockSlim(), null);
+                    });
+
+                    offlinePlayer.SetProperty(PropertyString.Name, newName);
+                    offlinePlayer.SaveBiotaToDatabase();
+
+                    CommandHandlerHelper.WriteOutputInfo(session, $"Player named \"{oldName}\" renamed to \"{newName}\" successfully!", ChatMessageType.Broadcast);
+                });
+            }
+            else
+            {
+                CommandHandlerHelper.WriteOutputInfo(session, $"Error, a player named \"{oldName}\" cannot be found.", ChatMessageType.Broadcast);
+                return;
+            }
         }
 
         /// <summary>

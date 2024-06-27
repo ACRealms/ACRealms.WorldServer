@@ -21,7 +21,18 @@
          This room will use a separate instance ID per player account.
 
          *important*: You must copy the contents of "Content/extensions/Realm Selector" to your root content folder for this to work */
-        "UseRealmSelector": false
+        "UseRealmSelector": false,
+
+     /*  If true, characters can have the same name as long as they have different home realms.
+         If using the realm selector:
+           - The character name will be checked when selecting the realm, and not on character creation.
+           - If the name is in use, the player will be prompted to self-rename through a chat command.
+         If not using the realm selector:
+           - The character creation will be rejected through the usual character creation UI if the name is in use for the default realm
+         In all cases, a character name will be considered as "in use" (for any realm)
+           if the name matches a character on an account with an elevated role (such as Admins)
+         THIS FEATURE IS EXPERIMENTAL! Use at your own risk */
+        "CharacterNamesUniquePerHomeRealm": false
     },
 
   // Options for porting characters that existed before ACRealms v2.1, or existed in ACE (not ACRealms) servers before migrating to ACRealms

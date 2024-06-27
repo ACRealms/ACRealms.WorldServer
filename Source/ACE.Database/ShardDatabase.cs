@@ -20,7 +20,6 @@ using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using Microsoft.Extensions.DependencyInjection;
 using ACE.Database.Models.World;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace ACE.Database
 {
@@ -585,18 +584,54 @@ namespace ACE.Database
             }
         }
 
-
-        public bool IsCharacterNameAvailable(string name)
+        public int? GetHomeRealm(ulong guid)
         {
             using (var context = ContextFactory.CreateDbContext())
             {
-                var result = context.Character
-                    .AsNoTracking()
-                    .Where(r => !r.IsDeleted)
-                    .Where(r => !(r.DeleteTime > 0))
-                    .FirstOrDefault(r => r.Name == name);
+                var query =
+                        from hrint in context.BiotaPropertiesInt.AsNoTracking()
+                        where hrint.ObjectId == guid && hrint.Type == (ushort)PropertyInt.HomeRealm
+                        select (int?)hrint.Value;
+                return query.SingleOrDefault();
+            }
+        }
 
-                return result == null;
+        public bool IsCharacterNameAvailable(string name, ushort? realmId, bool? overrideUniquePerHomeRealm = null)
+        {
+            using (var context = ContextFactory.CreateDbContext())
+            {
+                var uniquePerHomeRealm = Common.ACRealms.ACRealmsConfigManager.Config.CharacterCreationOptions.CharacterNamesUniquePerHomeRealm;
+                if (overrideUniquePerHomeRealm.HasValue)
+                    uniquePerHomeRealm = overrideUniquePerHomeRealm.Value;
+
+                IQueryable<ulong> query;
+
+                if (uniquePerHomeRealm && !realmId.HasValue)
+                {
+                    query =
+                        from c in context.Character.AsNoTracking()
+                        where c.DeleteTime == 0 && !c.IsDeleted && c.Name == name && c.IsPlussed
+                        select c.Id;
+                }
+                else if (uniquePerHomeRealm)
+                {
+                    query = from c in context.Character.AsNoTracking()
+                            join hrint in context.BiotaPropertiesInt.AsNoTracking() on
+                                new { c.Id, Type = (ushort)PropertyInt.HomeRealm } equals
+                                new { Id = hrint.ObjectId, hrint.Type } into hrjoin
+                            from homerealm in hrjoin.DefaultIfEmpty()
+                            where
+                                c.DeleteTime == 0 && !c.IsDeleted && c.Name == name && (c.IsPlussed || homerealm.Value == realmId)
+                            select c.Id;
+                }
+                else
+                {
+                    query = from c in context.Character.AsNoTracking()
+                            where c.DeleteTime == 0 && !c.IsDeleted && c.Name == name
+                            select c.Id;
+                }
+
+                return !query.Any();
             }
         }
 
