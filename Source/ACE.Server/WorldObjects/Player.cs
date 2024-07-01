@@ -36,6 +36,8 @@ namespace ACE.Server.WorldObjects
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public bool IsOnline => true;
+
         public Account Account { get; }
 
         public Character Character { get; }

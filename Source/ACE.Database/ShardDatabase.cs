@@ -813,8 +813,7 @@ namespace ACE.Database
             {
                 var results = context.Character
                     .Where(r => !r.IsDeleted)
-                    .AsNoTracking()
-                    .ToList();
+                    .AsNoTracking();
 
                 Parallel.ForEach(results, result =>
                 {

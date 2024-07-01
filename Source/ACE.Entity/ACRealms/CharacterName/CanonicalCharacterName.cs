@@ -7,16 +7,26 @@ using System.Threading.Tasks;
 
 namespace ACE.Entity.ACRealms
 {
-    public abstract record CanonicalCharacterName(string Name, string RealmName)
+    public abstract record CanonicalName<TEntity, TName>(string Name)
+        where TEntity : ICanonicallyResolvable<TEntity, TName>
+        where TName : CanonicalName<TEntity, TName>
     {
-        /// <summary>
-        /// Gets the name displayed to players sharing the same home realm
-        /// </summary>
-        public abstract string DisplayNameSameRealm { get; protected init; }
 
-        /// <summary>
-        /// Gets the name displayed to players who do not have the same home realm of this character
-        /// </summary>
-        public abstract string DisplayNameOtherRealm { get; protected init; }
+    }
+
+    public interface ICanonicallyResolvable<TEntity, TName>
+        where TEntity : ICanonicallyResolvable<TEntity, TName>
+        where TName : CanonicalName<TEntity, TName>
+    {
+        CanonicalName<TEntity, TName> CanonicalName { get; }
+    }
+
+
+    public abstract record CanonicalResolverContext<TEntity, TName>
+        where TEntity : ICanonicallyResolvable<TEntity, TName>
+        where TName : CanonicalName<TEntity, TName>
+    {
+        public abstract bool TryResolve(out IEnumerable<TEntity> resolveCandidates);
+        public abstract TName CanonicalName { get; }
     }
 }

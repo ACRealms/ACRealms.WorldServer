@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ACE.Entity.Enum;
+using ACE.Server.Managers;
 using ACE.Server.Network;
 
 using log4net;
@@ -113,7 +114,10 @@ namespace ACE.Server.Command
                     }
                 }
             }
+        }
 
+        internal static void InitializeCommandThread()
+        {
             if (NonInteractiveConsole)
             {
                 log.Info("AC Realms command prompt disabled - Environment.GetEnvironmentVariable(ACE_NONINTERACTIVE_CONSOLE) was true");
@@ -149,6 +153,7 @@ namespace ACE.Server.Command
 
         private static void CommandThread()
         {
+            ServerManager.FlushConsoleLogBuffers();
             Console.WriteLine("");
             Console.WriteLine("AC Realms command prompt ready.");
             Console.WriteLine("");
@@ -164,8 +169,10 @@ namespace ACE.Server.Command
             if (Console.IsInputRedirected)
                 console = AsyncConsoleInput();
 
+            ServerManager.FlushConsoleLogBuffers();
             for (; ; )
             {
+                Thread.Sleep(20);
                 Console.WriteLine();
                 Console.Write("ACRealms >> ");
 
@@ -242,6 +249,7 @@ namespace ACE.Server.Command
                 {
                     log.Error($"Exception while getting command handler for: {commandLine}", ex);
                 }
+                ServerManager.FlushConsoleLogBuffers();
             }
         }
 

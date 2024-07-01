@@ -109,21 +109,22 @@ namespace ACE.Server.Managers
             return worldRealm;
         }
 
-        internal static ushort ConvertToValidRealmIdOrZero(int? rawRealmId)
+        internal static ushort ConvertToValidRealmIdOrZero(int? rawRealmId, bool includeRulesets = false)
         {
             if (((rawRealmId ?? 0) <= 0) || (uint)rawRealmId > 0x7FFF)
                 return 0;
 
             ushort realmId = (ushort)rawRealmId;
-            if (RealmsByID.ContainsKey(realmId))
-                return realmId;
-            else
+            if (!RealmsByID.TryGetValue(realmId, out var realm))
                 return 0;
+            if (!includeRulesets && realm.Realm.Type == RealmType.Ruleset)
+                return 0;
+            return realm.Realm.Id;
         }
 
-        public static string GetDisplayNameForAnyRawRealmId(int? rawRealmId)
+        public static string GetDisplayNameForAnyRawRealmId(int? rawRealmId, bool includeRulesets = false)
         {
-            ushort realmId = ConvertToValidRealmIdOrZero(rawRealmId);
+            ushort realmId = ConvertToValidRealmIdOrZero(rawRealmId, includeRulesets);
             return RealmsByID[realmId].Realm.Name;
         }
 

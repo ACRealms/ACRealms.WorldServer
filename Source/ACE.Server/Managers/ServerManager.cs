@@ -10,6 +10,10 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Network.Managers;
 using ACE.Server.Mods;
+using log4net.Repository;
+using log4net.Appender;
+using ACE.Server.Command.Handlers;
+using log4net.Repository.Hierarchy;
 
 namespace ACE.Server.Managers
 {
@@ -58,6 +62,45 @@ namespace ACE.Server.Managers
         {
             // Loads the configuration for ShutdownInterval from the settings file.
             ShutdownInterval = ConfigManager.Config.Server.ShutdownInterval;
+        }
+
+        public static void FlushConsoleLogBuffers()
+        {
+            ILoggerRepository rep = LogManager.GetRepository();
+            foreach (IAppender appender in rep.GetAppenders())
+            {
+                var consoleLogger = appender as ManagedColoredConsoleAppender;
+                if (consoleLogger != null)
+                {
+                    try
+                    {
+                        consoleLogger.Flush(10);
+                    }
+                    catch (Exception) { }
+                }
+            }
+            var commandHandlerLogger = CommandHandlerHelper.log.Logger as Logger;
+            if (commandHandlerLogger != null)
+            {
+                foreach (IAppender appender in rep.GetAppenders())
+                {
+                    var consoleLogger = appender as ManagedColoredConsoleAppender;
+                    if (consoleLogger != null)
+                    {
+                        try
+                        {
+                            consoleLogger.Flush(10);
+                        }
+                        catch (Exception) { }
+                    }
+                }
+            }
+            try
+            {
+                Console.Out.Flush();
+                Console.Error.Flush();
+            }
+            catch (Exception) { }
         }
 
         /// <summary>

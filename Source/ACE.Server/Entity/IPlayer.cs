@@ -2,7 +2,9 @@ using System;
 
 using ACE.Database.Models.Auth;
 using ACE.Entity;
+using ACE.Entity.ACRealms;
 using ACE.Entity.Enum.Properties;
+using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
 
 namespace ACE.Server.Entity
@@ -12,11 +14,12 @@ namespace ACE.Server.Entity
     /// It allows us to maintain two separate lists for online players (Player) and offline players (OfflinePlayer) in PlayerManager and return generic IPlayer results.
     /// </summary>
     public interface IPlayer
+        : ICanonicallyResolvable<IPlayer, CanonicalCharacterName>
     {
         ObjectGuid Guid { get; }
 
         Account Account { get; }
-
+        bool IsOnline { get; }
         bool? GetProperty(PropertyBool property);
         uint? GetProperty(PropertyDataId property);
         double? GetProperty(PropertyFloat property);
@@ -43,6 +46,7 @@ namespace ACE.Server.Entity
 
 
         string Name { get; }
+        new CanonicalCharacterName CanonicalName { get; }
 
         int? Level { get; }
 
@@ -98,5 +102,6 @@ namespace ACE.Server.Entity
 
         int? HomeRealmIDRaw { get; }
         ushort HomeRealm { get; }
+        string DisplayedHomeRealmName { get; }
     }
 }

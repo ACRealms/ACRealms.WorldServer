@@ -28,6 +28,7 @@ using Microsoft.Extensions.Logging;
 using System.Runtime;
 using ACE.Common.ACRealms;
 using ACE.Server.Managers.ACRealms;
+using System.ComponentModel.Composition.Hosting;
 
 namespace ACE.Server
 {
@@ -152,7 +153,9 @@ namespace ACE.Server
             if (Program.IsRunningInContainer)
                 log.Info("AC Realms is running in a container...");
 
-
+            log.Info("Preloading assemblies");
+            new DirectoryCatalog(".");
+            log.Info("Preloading assemblies completed");
 
             var configFile = Path.Combine(exeLocation, "Config.js");
             var configConfigContainer = Path.Combine(containerConfigDirectory, "Config.js");
@@ -414,7 +417,6 @@ namespace ACE.Server
                 GC.Collect();
             }
 
-            // This should be last
             log.Info("Initializing CommandManager...");
             CommandManager.Initialize();
 
@@ -427,6 +429,9 @@ namespace ACE.Server
             {
                 WorldManager.Open(null);
             }
+
+            // This should be last
+            CommandManager.InitializeCommandThread();
         }
 
         private static void CheckForServerUpdate()

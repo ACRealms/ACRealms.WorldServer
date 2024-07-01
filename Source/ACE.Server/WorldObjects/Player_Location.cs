@@ -926,6 +926,9 @@ namespace ACE.Server.WorldObjects
             }
         }
 
+        // This will always return a valid display name, but is not guaranteed to return a valid realm name
+        public string DisplayedHomeRealmName => RealmManager.GetDisplayNameForAnyRawRealmId(HomeRealmIDRaw);
+
         public void ValidateCurrentRealm()
         {
             if (IsAdmin && !PropertyManager.GetBool("acr_validate_realm_position_for_admins").Item)

@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 
 using ACE.Common;
+using ACE.Database;
 using ACE.Database.Models.Shard;
 using ACE.Server.Managers;
+using ACE.Server.Realms;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace ACE.Server.Network.GameMessages.Messages
 {
@@ -14,6 +17,7 @@ namespace ACE.Server.Network.GameMessages.Messages
             Writer.Write(0u);
             Writer.Write(characters.Count);
 
+            var players = PlayerManager.GetAccountPlayers(session.AccountId);
             foreach (var character in characters)
             {
                 Writer.WriteGuid(new ACE.Entity.ObjectGuid(character.Id));
@@ -21,6 +25,8 @@ namespace ACE.Server.Network.GameMessages.Messages
                     Writer.WriteString16L("+" + character.Name);
                 else if (!ConfigManager.Config.Server.Accounts.OverrideCharacterPermissions && character.IsPlussed)
                     Writer.WriteString16L("+" + character.Name);
+                else if (Common.ACRealms.ACRealmsConfigManager.Config.CharacterCreationOptions.CharacterNamesUniquePerHomeRealm)
+                    Writer.WriteString16L($"[{players[character.Id].DisplayedHomeRealmName}] {character.Name}");
                 else
                     Writer.WriteString16L(character.Name);
 

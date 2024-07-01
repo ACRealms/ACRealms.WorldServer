@@ -28,49 +28,46 @@ namespace ACE.Server.Command.Handlers.ACRealms
             if (characterName.StartsWith("+"))
                 characterName = characterName.Substring(1);
 
-            var onlinePlayer = PlayerManager.GetOnlinePlayer(characterName);
-            var offlinePlayer = PlayerManager.GetOfflinePlayer(characterName);
-
-            int? homeRealmRawId;
-            if (onlinePlayer != null)
-                homeRealmRawId = onlinePlayer.GetProperty(PropertyInt.HomeRealm);
-            else if (offlinePlayer != null)
-                homeRealmRawId = offlinePlayer.GetProperty(PropertyInt.HomeRealm);
-            else
+            var resolveContext = new CharacterNameResolverContext("get-home-realm", characterName, session, CharacterNameResolverOptions.MatchAll);
+            if (!resolveContext.TryResolve(out var players))
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Character not found: '{characterName}'", ChatMessageType.Broadcast);
                 return;
             }
-
-            var prefix = $"Home Realm for '{characterName}':";
-
-            if (homeRealmRawId == null)
+            foreach(var player in players)
             {
-                CommandHandlerHelper.WriteOutputInfo(session, $"{prefix} [not present]", ChatMessageType.Broadcast);
-                return;
-            }
-            if (homeRealmRawId.Value < 0 || homeRealmRawId > 0x7FFF)
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"{prefix} {homeRealmRawId} (invalid, out of range)", ChatMessageType.Broadcast);
-                return;
-            }
-            var homeRealmId = (ushort)homeRealmRawId;
+                characterName = player.CanonicalName.DisplayNameOtherRealm;
 
-            if (homeRealmId == 0)
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"{prefix} {homeRealmId} (invalid, NULL realm not allowed)", ChatMessageType.Broadcast);
-                return;
-            }
+                int? homeRealmRawId = player.HomeRealmIDRaw;
+                var prefix = $"Home Realm for '{characterName}':";
+                if (homeRealmRawId == null)
+                {
+                    CommandHandlerHelper.WriteOutputInfo(session, $"{prefix} [not present]", ChatMessageType.Broadcast);
+                    continue;
+                }
+                if (homeRealmRawId.Value < 0 || homeRealmRawId > 0x7FFF)
+                {
+                    CommandHandlerHelper.WriteOutputInfo(session, $"{prefix} {homeRealmRawId} (invalid, out of range)", ChatMessageType.Broadcast);
+                    continue;
+                }
+                var homeRealmId = (ushort)homeRealmRawId;
 
-            var realm = RealmManager.GetRealm(homeRealmId, includeRulesets: false);
-            if (realm == null)
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, $"{prefix} {homeRealmId} (invalid, valid realm not found)", ChatMessageType.Broadcast);
-                return;
-            }
+                if (homeRealmId == 0)
+                {
+                    CommandHandlerHelper.WriteOutputInfo(session, $"{prefix} {homeRealmId} (invalid, NULL realm not allowed)", ChatMessageType.Broadcast);
+                    continue;
+                }
 
-            CommandHandlerHelper.WriteOutputInfo(session, $"{prefix} {homeRealmId} ({realm.Realm.Name})", ChatMessageType.Broadcast);
-            return;
+                var realm = RealmManager.GetRealm(homeRealmId, includeRulesets: false);
+                if (realm == null)
+                {
+                    CommandHandlerHelper.WriteOutputInfo(session, $"{prefix} {homeRealmId} (invalid, valid realm not found)", ChatMessageType.Broadcast);
+                    continue;
+                }
+
+                CommandHandlerHelper.WriteOutputInfo(session, $"{prefix} {homeRealmId} ({realm.Realm.Name})", ChatMessageType.Broadcast);
+                continue;
+            }
         }
 
         [CommandHandler("evict-player-houses", AccessLevel.Admin, CommandHandlerFlag.None, 1, "Evicts a player from all of their housing",

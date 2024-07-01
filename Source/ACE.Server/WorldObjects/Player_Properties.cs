@@ -1,9 +1,12 @@
 using ACE.Common;
 using ACE.Entity;
+using ACE.Entity.ACRealms;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACE.Server.Entity;
 using ACE.Server.Network.GameMessages;
 using ACE.Server.Network.GameMessages.Messages;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -13,7 +16,20 @@ namespace ACE.Server.WorldObjects
         {
             get => IsPlussed && CloakStatus < CloakStatus.Player ? "+" + base.Name : base.Name;
 
-            set => base.Name = value.TrimStart('+');
+            set
+            {
+                base.Name = value.TrimStart('+');
+                CanonicalName = CanonicalCharacterName.FromPlayer(this);
+            }
+        }
+
+        private CanonicalCharacterName _canonicalName;
+        CanonicalName<IPlayer, CanonicalCharacterName> ICanonicallyResolvable<IPlayer, CanonicalCharacterName>.CanonicalName => _canonicalName;
+
+        public CanonicalCharacterName CanonicalName
+        {
+            get { return _canonicalName; }
+            private set { _canonicalName = value; }
         }
 
         public string GetNameWithSuffix()

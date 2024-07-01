@@ -10,7 +10,7 @@ namespace ACE.Server.Command.Handlers
 {
     internal static class CommandHandlerHelper
     {
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        internal static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
         /// This will determine where a command handler should output to, the console or a client session.<para />

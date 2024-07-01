@@ -25,6 +25,10 @@ using ACE.Entity.ACRealms;
 using System.Collections.Concurrent;
 using ACE.Server.Network;
 using ACE.Server.Command.Handlers;
+using ACE.Server.Realms;
+using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
+using System.Collections.Frozen;
 
 namespace ACE.Server.Managers
 {
@@ -35,9 +39,14 @@ namespace ACE.Server.Managers
         private static readonly ReaderWriterLockSlim playersLock = new ReaderWriterLockSlim();
         private static readonly Dictionary<ulong, Player> onlinePlayers = new Dictionary<ulong, Player>();
         private static readonly Dictionary<ulong, OfflinePlayer> offlinePlayers = new Dictionary<ulong, OfflinePlayer>();
+        private static readonly ConcurrentDictionary<ulong, IPlayer> canonicalBackingStore = new ConcurrentDictionary<ulong, IPlayer>();
 
         // A note on the value type (why there is no ConcurrentHashSet): https://github.com/dotnet/runtime/issues/39919
-        private static readonly ConcurrentDictionary<string, ConcurrentDictionary<ulong, byte>> basicPlayerNames = new ConcurrentDictionary<string, ConcurrentDictionary<ulong, byte>>(StringComparer.OrdinalIgnoreCase);
+        // ImmutableArray is better than using ConcurrentDictionary<ulong, byte> as the value
+        // - The value of this array generally has a small number of elements. Most of the time, just a single element
+        // - The only time the array will need to be rebuilt is when a new character is created (where the name matches an already existing player name), or when a character is renamed
+        // Using a Lazy<T> value here allows for atomic writes to the underlying store
+        private static readonly ConcurrentDictionary<string, Lazy<IImmutableList<ulong>>> basicPlayerNames = new ConcurrentDictionary<string, Lazy<IImmutableList<ulong>>>(StringComparer.OrdinalIgnoreCase);
 
         // indexed by player name
         private static readonly Dictionary<string, IPlayer> playerNames = new Dictionary<string, IPlayer>(StringComparer.OrdinalIgnoreCase);
@@ -45,12 +54,87 @@ namespace ACE.Server.Managers
         // indexed by account id
         private static readonly Dictionary<uint, Dictionary<ulong, IPlayer>> playerAccounts = new Dictionary<uint, Dictionary<ulong, IPlayer>>();
 
+        internal static readonly CanonicalCharacterNameStore CanonicalStore = new CanonicalCharacterNameStore(canonicalBackingStore);
+
         /// <summary>
         /// OfflinePlayers will be saved to the database every 1 hour
         /// </summary>
         private static readonly TimeSpan databaseSaveInterval = TimeSpan.FromHours(1);
 
         private static DateTime lastDatabaseSave = DateTime.MinValue;
+
+
+        // Do not use this unless the player is known to exist with the given name
+        private static Lazy<IImmutableList<ulong>> GetOrCreateGuidsForKnownPlayer(string name)
+        {
+            if (basicPlayerNames.TryGetValue(name, out var guids))
+                return guids;
+
+            lock (PlayerNameMutexes.Get(name))
+            {
+                return basicPlayerNames.GetOrAdd(name, (_) =>
+                    new Lazy<IImmutableList<ulong>>(() => ImmutableArray.Create<ulong>(), LazyThreadSafetyMode.PublicationOnly)
+                );
+            }
+        }
+
+        //const string PLAYERNAMES_INTERN_PREFIX = "PlayerManager.PlayerNames";
+
+        //internal static class InternedStringMutex
+        //{
+        //    const string GLOBAL_PREFIX = "InternedStringMutex!!-";
+        //    internal static string LockableString(string prefix, string originalString) => string.Intern(GLOBAL_PREFIX + prefix + originalString);
+        //}
+
+        static PlayerNameMutexPool PlayerNameMutexes = new PlayerNameMutexPool();
+        internal class PlayerNameMutexPool
+        {
+            private readonly ConcurrentDictionary<string, object> _locks =
+                new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+            public object Get(string name) => _locks.GetOrAdd(name, _ => new object());
+        }
+
+        private static void PushGuidForBasicName(string name, ulong guid)
+        {
+            lock (PlayerNameMutexes.Get(name))
+            {
+                var lazyGuids = GetOrCreateGuidsForKnownPlayer(name);
+                basicPlayerNames[name] = new Lazy<IImmutableList<ulong>>(() =>
+                {
+                    var data = lazyGuids.Value;
+                    if (data.Count >= 15 && data is ImmutableArray<ulong> ary)
+                    {
+                        // Convert to ImmutableList which is more efficient for adding, less efficient for retrieving
+                        // If we already have 15, we'll likely get more
+                        // Official docs recommend a threshold of 16 or more items for ImmutableList
+                        // https://learn.microsoft.com/en-us/dotnet/api/system.collections.immutable.immutablearray-1?view=net-8.0
+                        return ary.ToImmutableList().Add(guid);
+                    }
+                    else
+                        return data.Add(guid);
+                }, LazyThreadSafetyMode.PublicationOnly);
+            }
+        }
+
+        private static void RemoveGuidFromBasicNames(string name, ulong guid)
+        {
+            lock (PlayerNameMutexes.Get(name))
+            {
+                var lazyGuids = GetOrCreateGuidsForKnownPlayer(name);
+                basicPlayerNames[name] = new Lazy<IImmutableList<ulong>>(() =>
+                {
+                    var data = lazyGuids.Value;
+                    if (data.Count <= 16 && data is ImmutableList<ulong> list)
+                    {
+                        // Convert back to ImmutableArray
+                        return list.Remove(guid).ToImmutableArray();
+                    }
+                    else
+                        return data.Remove(guid);
+                }, LazyThreadSafetyMode.PublicationOnly);
+            }
+        }
 
         /// <summary>
         /// This will load all the players from the database into the OfflinePlayers dictionary. It should be called before WorldManager is initialized.
@@ -69,9 +153,8 @@ namespace ACE.Server.Managers
                 lock (playerNames)
                     playerNames[offlinePlayer.Name] = offlinePlayer;
 
-                basicPlayerNames
-                    .GetOrAdd(offlinePlayer.Name, (_) => new ConcurrentDictionary<ulong, byte>())
-                    .AddOrUpdate(offlinePlayer.Guid.Full, 0, (_, _) => 0);
+                canonicalBackingStore.TryAdd(result.Id, new StaticPlayer(result));
+                PushGuidForBasicName(offlinePlayer.Name, offlinePlayer.Guid.Full);
 
                 lock (playerAccounts)
                 {
@@ -207,10 +290,11 @@ namespace ACE.Server.Managers
             return null;
         }
 
-        public static IPlayer GetPlayersByBasicName(string name)
-        {
-            throw new NotImplementedException();
-        }
+        public static bool DoesBasicNameExist(string name)
+            => basicPlayerNames.ContainsKey(name);
+
+        public static IImmutableList<ulong> GetPlayerGuidsByBasicName(string name)
+            => basicPlayerNames[name].Value;
 
         public static IPlayer GetPlayerGuidByCanonicalName(CanonicalCharacterName name)
         {
@@ -589,6 +673,7 @@ namespace ACE.Server.Managers
                     return false; // This should never happen
 
                 playerNames.Remove(offlinePlayer.Name);
+                RemoveGuidFromBasicNames(offlinePlayer.Name, guid);
 
                 playerAccounts[offlinePlayer.Account.AccountId].Remove(offlinePlayer.Guid.Full);
             }
