@@ -274,9 +274,9 @@ namespace ACE.Server.Managers
 
             // Make sure every data structure is built before committing them
             var realmsByIdFrozen = realmsById.ToFrozenDictionary();
-            var targetRealms = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Realm).ToFrozenSet();
-            var rulesets = RealmsByID.Values.Where(x => x.Realm.Type == RealmType.Ruleset).ToFrozenSet();
-            var realmsAndRulesets = RealmsByID.Values.ToFrozenSet();
+            var targetRealms = realmsByIdFrozen.Values.Where(x => x.Realm.Type == RealmType.Realm).ToFrozenSet();
+            var rulesets = realmsByIdFrozen.Values.Where(x => x.Realm.Type == RealmType.Ruleset).ToFrozenSet();
+            var realmsAndRulesets = realmsByIdFrozen.Values.ToFrozenSet();
             var reservedRealmsFrozen = reservedRealms.ToFrozenDictionary();
             var dependencyContextFrozen = dependencyContext.ToFrozenDictionary();
 
