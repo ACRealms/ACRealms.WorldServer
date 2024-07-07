@@ -8,6 +8,7 @@ using ACE.Entity.ACRealms;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
+using ACE.Server.Entity.ACRealms;
 using ACE.Server.Entity.Actions;
 using ACE.Server.Managers;
 using ACE.Server.Realms;
@@ -17,11 +18,12 @@ using Newtonsoft.Json.Linq;
 
 namespace ACE.Server.Entity
 {
-    public class OfflinePlayer : IPlayer
+    public sealed class OfflinePlayer : IPlayer
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public virtual bool IsOnline => false;
+        public Aeternum Aeternum { get; }
+        public bool IsOnline => false;
 
         /// <summary>
         /// This is object property overrides that should have come from the shard db (or init to defaults of object is new to this instance).
@@ -40,9 +42,10 @@ namespace ACE.Server.Entity
         /// Restore a WorldObject from the database.
         /// Any properties tagged as Ephemeral will be removed from the biota.
         /// </summary>
-        public OfflinePlayer(Biota biota)
+        internal OfflinePlayer(Biota biota, Aeternum aeternum)
         {
             Biota = biota;
+            Aeternum = aeternum;
             Guid = new ObjectGuid(Biota.Id);
 
             var character = DatabaseManager.Shard.BaseDatabase.GetCharacterStubByGuid(Guid.Full);
@@ -60,7 +63,7 @@ namespace ACE.Server.Entity
 
         public bool ChangesDetected { get; set; }
 
-        public readonly ReaderWriterLockSlim BiotaDatabaseLock = new ReaderWriterLockSlim();
+        public ReaderWriterLockSlim BiotaDatabaseLock { get; } = new ReaderWriterLockSlim();
 
         /// <summary>
         /// This will set the LastRequestedDatabaseSave to UtcNow and ChangesDetected to false.<para />
@@ -366,11 +369,5 @@ namespace ACE.Server.Entity
 
         // This will always return a valid display name, but is not guaranteed to return a valid realm name
         public string DisplayedHomeRealmName => Managers.RealmManager.GetDisplayNameForAnyRawRealmId(HomeRealmIDRaw);
-    }
-
-    internal class StaticPlayer : OfflinePlayer
-    {
-        public override bool IsOnline => PlayerManager.GetOnlinePlayer(Guid) != null;
-        internal StaticPlayer(Biota biota) : base(biota) { }
     }
 }

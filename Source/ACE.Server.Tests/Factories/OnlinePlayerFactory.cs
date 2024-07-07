@@ -1,3 +1,4 @@
+global using PlayerManager = ACE.Server.Managers.ACRealms.PlayerManagerShim;
 using ACE.Entity;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;

@@ -1,9 +1,11 @@
 using System;
-
+using System.Threading;
 using ACE.Database.Models.Auth;
+using ACE.Database.Models.Shard;
 using ACE.Entity;
 using ACE.Entity.ACRealms;
 using ACE.Entity.Enum.Properties;
+using ACE.Server.Entity.ACRealms;
 using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
 
@@ -17,7 +19,7 @@ namespace ACE.Server.Entity
         : ICanonicallyResolvable<IPlayer, CanonicalCharacterName>
     {
         ObjectGuid Guid { get; }
-
+        Aeternum Aeternum { get; }
         Account Account { get; }
         bool IsOnline { get; }
         bool? GetProperty(PropertyBool property);
@@ -103,5 +105,10 @@ namespace ACE.Server.Entity
         int? HomeRealmIDRaw { get; }
         ushort HomeRealm { get; }
         string DisplayedHomeRealmName { get; }
+        bool ChangesDetected { get; }
+
+        ACE.Entity.Models.Biota Biota { get; }
+
+        ReaderWriterLockSlim BiotaDatabaseLock { get; }
     }
 }

@@ -68,6 +68,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.JsonSchemaGenerato
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.RoslynAnalyzer", "ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer.csproj", "{551D86D7-ACC1-479A-99D7-49C69C1C3FC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACRealms.DataStructures", "ACRealms.DataStructures\ACRealms.DataStructures.csproj", "{D4A350AF-16C7-4187-845F-0860321E58AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -110,6 +112,9 @@ Global
 		{551D86D7-ACC1-479A-99D7-49C69C1C3FC0}.Debug|x64.Build.0 = Debug|Any CPU
 		{551D86D7-ACC1-479A-99D7-49C69C1C3FC0}.Release|x64.ActiveCfg = Release|Any CPU
 		{551D86D7-ACC1-479A-99D7-49C69C1C3FC0}.Release|x64.Build.0 = Release|Any CPU
+		{D4A350AF-16C7-4187-845F-0860321E58AD}.Debug|x64.ActiveCfg = Debug|x64
+		{D4A350AF-16C7-4187-845F-0860321E58AD}.Debug|x64.Build.0 = Debug|x64
+		{D4A350AF-16C7-4187-845F-0860321E58AD}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

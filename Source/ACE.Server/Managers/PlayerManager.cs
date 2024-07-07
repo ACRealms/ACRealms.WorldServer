@@ -1,3 +1,4 @@
+global using PlayerManager = ACE.Server.Managers.ACRealms.PlayerManagerShim;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -29,159 +30,63 @@ using ACE.Server.Realms;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using System.Collections.Frozen;
+using ACE.Server.Entity.ACRealms;
+using ACE.Server.Managers.ACRealms;
+using ACRealms.DataStructures.Collections;
 
 namespace ACE.Server.Managers
 {
-    public static class PlayerManager
-    {
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static readonly ReaderWriterLockSlim playersLock = new ReaderWriterLockSlim();
-        private static readonly Dictionary<ulong, Player> onlinePlayers = new Dictionary<ulong, Player>();
-        private static readonly Dictionary<ulong, OfflinePlayer> offlinePlayers = new Dictionary<ulong, OfflinePlayer>();
-        private static readonly ConcurrentDictionary<ulong, IPlayer> canonicalBackingStore = new ConcurrentDictionary<ulong, IPlayer>();
+    public abstract class PlayerServiceBase
+    {
+        protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private readonly ReaderWriterLockSlim playersLock = new ReaderWriterLockSlim();
+        private readonly Dictionary<ulong, Player> onlinePlayers = new Dictionary<ulong, Player>();
+        private readonly Dictionary<ulong, OfflinePlayer> offlinePlayers = new Dictionary<ulong, OfflinePlayer>();
+
+        protected abstract IReadOnlyDictionary<ulong, IPlayer> PrimaryStore { get; init; }
+
+        protected readonly ConcurrentDictionary<ulong, IPlayer> canonicalBackingStore;
 
         // A note on the value type (why there is no ConcurrentHashSet): https://github.com/dotnet/runtime/issues/39919
         // ImmutableArray is better than using ConcurrentDictionary<ulong, byte> as the value
         // - The value of this array generally has a small number of elements. Most of the time, just a single element
         // - The only time the array will need to be rebuilt is when a new character is created (where the name matches an already existing player name), or when a character is renamed
         // Using a Lazy<T> value here allows for atomic writes to the underlying store
-        private static readonly ConcurrentDictionary<string, Lazy<IImmutableList<ulong>>> basicPlayerNames = new ConcurrentDictionary<string, Lazy<IImmutableList<ulong>>>(StringComparer.OrdinalIgnoreCase);
+        protected readonly ConcurrentLazyAssociationMap<string, ulong> basicPlayerNames = new ConcurrentLazyAssociationMap<string, ulong>(StringComparer.OrdinalIgnoreCase);
 
         // indexed by player name
-        private static readonly Dictionary<string, IPlayer> playerNames = new Dictionary<string, IPlayer>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, IPlayer> playerNames = new Dictionary<string, IPlayer>(StringComparer.OrdinalIgnoreCase);
 
         // indexed by account id
-        private static readonly Dictionary<uint, Dictionary<ulong, IPlayer>> playerAccounts = new Dictionary<uint, Dictionary<ulong, IPlayer>>();
+        //protected readonly Dictionary<uint, Dictionary<ulong, IPlayer>> playerAccounts = new Dictionary<uint, Dictionary<ulong, IPlayer>>();
+        protected ConcurrentLazyAssociationMap<uint, ulong> playerAccounts { get; } = new ConcurrentLazyAssociationMap<uint, ulong>();
 
-        internal static readonly CanonicalCharacterNameStore CanonicalStore = new CanonicalCharacterNameStore(canonicalBackingStore);
+        public CanonicalCharacterNameStore CanonicalStore { get; init; }
 
         /// <summary>
         /// OfflinePlayers will be saved to the database every 1 hour
         /// </summary>
-        private static readonly TimeSpan databaseSaveInterval = TimeSpan.FromHours(1);
+        protected readonly TimeSpan databaseSaveInterval = TimeSpan.FromHours(1);
 
-        private static DateTime lastDatabaseSave = DateTime.MinValue;
+        protected DateTime lastDatabaseSave = DateTime.MinValue;
 
-
-        // Do not use this unless the player is known to exist with the given name
-        private static Lazy<IImmutableList<ulong>> GetOrCreateGuidsForKnownPlayer(string name)
+        internal PlayerServiceBase()
         {
-            if (basicPlayerNames.TryGetValue(name, out var guids))
-                return guids;
-
-            lock (PlayerNameMutexes.Get(name))
-            {
-                return basicPlayerNames.GetOrAdd(name, (_) =>
-                    new Lazy<IImmutableList<ulong>>(() => ImmutableArray.Create<ulong>(), LazyThreadSafetyMode.PublicationOnly)
-                );
-            }
+            canonicalBackingStore = new ConcurrentDictionary<ulong, IPlayer>();
+            CanonicalStore = new CanonicalCharacterNameStore(canonicalBackingStore);
         }
 
-        //const string PLAYERNAMES_INTERN_PREFIX = "PlayerManager.PlayerNames";
+        protected readonly LinkedList<Player> playersPendingLogoff = new LinkedList<Player>();
 
-        //internal static class InternedStringMutex
-        //{
-        //    const string GLOBAL_PREFIX = "InternedStringMutex!!-";
-        //    internal static string LockableString(string prefix, string originalString) => string.Intern(GLOBAL_PREFIX + prefix + originalString);
-        //}
-
-        static PlayerNameMutexPool PlayerNameMutexes = new PlayerNameMutexPool();
-        internal class PlayerNameMutexPool
-        {
-            private readonly ConcurrentDictionary<string, object> _locks =
-                new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-
-            public object Get(string name) => _locks.GetOrAdd(name, _ => new object());
-        }
-
-        private static void PushGuidForBasicName(string name, ulong guid)
-        {
-            lock (PlayerNameMutexes.Get(name))
-            {
-                var lazyGuids = GetOrCreateGuidsForKnownPlayer(name);
-                basicPlayerNames[name] = new Lazy<IImmutableList<ulong>>(() =>
-                {
-                    var data = lazyGuids.Value;
-                    if (data.Count >= 15 && data is ImmutableArray<ulong> ary)
-                    {
-                        // Convert to ImmutableList which is more efficient for adding, less efficient for retrieving
-                        // If we already have 15, we'll likely get more
-                        // Official docs recommend a threshold of 16 or more items for ImmutableList
-                        // https://learn.microsoft.com/en-us/dotnet/api/system.collections.immutable.immutablearray-1?view=net-8.0
-                        return ary.ToImmutableList().Add(guid);
-                    }
-                    else
-                        return data.Add(guid);
-                }, LazyThreadSafetyMode.PublicationOnly);
-            }
-        }
-
-        private static void RemoveGuidFromBasicNames(string name, ulong guid)
-        {
-            lock (PlayerNameMutexes.Get(name))
-            {
-                var lazyGuids = GetOrCreateGuidsForKnownPlayer(name);
-                basicPlayerNames[name] = new Lazy<IImmutableList<ulong>>(() =>
-                {
-                    var data = lazyGuids.Value;
-                    if (data.Count <= 16 && data is ImmutableList<ulong> list)
-                    {
-                        // Convert back to ImmutableArray
-                        return list.Remove(guid).ToImmutableArray();
-                    }
-                    else
-                        return data.Remove(guid);
-                }, LazyThreadSafetyMode.PublicationOnly);
-            }
-        }
-
-        /// <summary>
-        /// This will load all the players from the database into the OfflinePlayers dictionary. It should be called before WorldManager is initialized.
-        /// </summary>
-        public static void Initialize()
-        {
-            var results = DatabaseManager.Shard.BaseDatabase.GetAllPlayerBiotasInParallel();
-
-            Parallel.ForEach(results, ConfigManager.Config.Server.Threading.DatabaseParallelOptions, result =>
-            {
-                var offlinePlayer = new OfflinePlayer(result);
-
-                lock (offlinePlayers)
-                    offlinePlayers[offlinePlayer.Guid.Full] = offlinePlayer;
-
-                lock (playerNames)
-                    playerNames[offlinePlayer.Name] = offlinePlayer;
-
-                canonicalBackingStore.TryAdd(result.Id, new StaticPlayer(result));
-                PushGuidForBasicName(offlinePlayer.Name, offlinePlayer.Guid.Full);
-
-                lock (playerAccounts)
-                {
-                    if (offlinePlayer.Account != null)
-                    {
-                        if (!playerAccounts.TryGetValue(offlinePlayer.Account.AccountId, out var playerAccountsDict))
-                        {
-                            playerAccountsDict = new Dictionary<ulong, IPlayer>();
-                            playerAccounts[offlinePlayer.Account.AccountId] = playerAccountsDict;
-                        }
-                        playerAccountsDict[offlinePlayer.Guid.Full] = offlinePlayer;
-                    }
-                    else
-                        log.Error($"PlayerManager.Initialize: couldn't find account for player {offlinePlayer.Name} ({offlinePlayer.Guid})");
-                }
-            });
-        }
-
-        private static readonly LinkedList<Player> playersPendingLogoff = new LinkedList<Player>();
-
-        public static void AddPlayerToLogoffQueue(Player player)
+        public virtual void AddPlayerToLogoffQueue(Player player)
         {
             if (!playersPendingLogoff.Contains(player))
                 playersPendingLogoff.AddLast(player);
         }
 
-        public static void Tick()
+        public virtual void Tick()
         {
             // Database Save
             if (lastDatabaseSave + databaseSaveInterval <= DateTime.UtcNow)
@@ -209,7 +114,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will save any player in the OfflinePlayers dictionary that has ChangesDetected. The biotas are saved in parallel.
         /// </summary>
-        public static void SaveOfflinePlayersWithChanges()
+        public virtual void SaveOfflinePlayersWithChanges()
         {
             lastDatabaseSave = DateTime.UtcNow;
 
@@ -234,39 +139,39 @@ namespace ACE.Server.Managers
 
             DatabaseManager.Shard.SaveBiotasInParallel(biotas, null, true);
         }
-        
+
 
         /// <summary>
         /// This would be used when a new player is created after the server has started.
         /// When a new Player is created, they're created in an offline state, and then set to online shortly after as the login sequence continues.
         /// </summary>
-        public static void AddOfflinePlayer(Player player)
+        public virtual void AddOfflinePlayer(Player player)
         {
-            playersLock.EnterWriteLock();
-            try
-            {
-                var offlinePlayer = new OfflinePlayer(player.Biota);
-                offlinePlayers[offlinePlayer.Guid.Full] = offlinePlayer;
+            //playersLock.EnterWriteLock();
+            //try
+            //{
+            //    var offlinePlayer = new OfflinePlayer(player.Biota);
+            //    offlinePlayers[offlinePlayer.Guid.Full] = offlinePlayer;
 
-                playerNames[offlinePlayer.Name] = offlinePlayer;
+            //    playerNames[offlinePlayer.Name] = offlinePlayer;
 
-                if (!playerAccounts.TryGetValue(offlinePlayer.Account.AccountId, out var playerAccountsDict))
-                {
-                    playerAccountsDict = new Dictionary<ulong, IPlayer>();
-                    playerAccounts[offlinePlayer.Account.AccountId] = playerAccountsDict;
-                }
-                playerAccountsDict[offlinePlayer.Guid.Full] = offlinePlayer;
-            }
-            finally
-            {
-                playersLock.ExitWriteLock();
-            }
+            //    if (!playerAccounts.TryGetValue(offlinePlayer.Account.AccountId, out var playerAccountsDict))
+            //    {
+            //        playerAccountsDict = new Dictionary<ulong, IPlayer>();
+            //        playerAccounts[offlinePlayer.Account.AccountId] = playerAccountsDict;
+            //    }
+            //    playerAccountsDict[offlinePlayer.Guid.Full] = offlinePlayer;
+            //}
+            //finally
+            //{
+            //    playersLock.ExitWriteLock();
+            //}
         }
 
         /// <summary>
         /// This will return null if the player wasn't found.
         /// </summary>
-        public static OfflinePlayer GetOfflinePlayer(ObjectGuid guid)
+        public virtual OfflinePlayer GetOfflinePlayer(ObjectGuid guid)
         {
             return GetOfflinePlayer(guid.Full);
         }
@@ -274,7 +179,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the player wasn't found.
         /// </summary>
-        public static OfflinePlayer GetOfflinePlayer(ulong guid)
+        public virtual OfflinePlayer GetOfflinePlayer(ulong guid)
         {
             playersLock.EnterReadLock();
             try
@@ -290,13 +195,13 @@ namespace ACE.Server.Managers
             return null;
         }
 
-        public static bool DoesBasicNameExist(string name)
+        public virtual bool DoesBasicNameExist(string name)
             => basicPlayerNames.ContainsKey(name);
 
-        public static IImmutableList<ulong> GetPlayerGuidsByBasicName(string name)
+        public virtual IImmutableList<ulong> GetPlayerGuidsByBasicName(string name)
             => basicPlayerNames[name].Value;
 
-        public static IPlayer GetPlayerGuidByCanonicalName(CanonicalCharacterName name)
+        public virtual IPlayer GetPlayerGuidByCanonicalName(CanonicalCharacterName name)
         {
             throw new NotImplementedException();
         }
@@ -304,7 +209,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null of the name was not found.
         /// </summary>
-        public static OfflinePlayer GetOfflinePlayer(string name)
+        public virtual OfflinePlayer GetOfflinePlayer(string name)
         {
             var admin = "+" + name;
 
@@ -330,7 +235,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        public static List<OfflinePlayer> GetOfflinePlayersWithName(string name)
+        public virtual List<OfflinePlayer> GetOfflinePlayersWithName(string name)
         {
             var admin = "+" + name;
 
@@ -344,8 +249,9 @@ namespace ACE.Server.Managers
                 playersLock.ExitReadLock();
             }
         }
+        public abstract List<Player> GetOnlinePlayersWithName(string name);
 
-        public static List<IPlayer> GetAllPlayers()
+        public virtual List<IPlayer> GetAllPlayers()
         {
             var offlinePlayers = GetAllOffline();
             var onlinePlayers = GetAllOnline();
@@ -358,21 +264,22 @@ namespace ACE.Server.Managers
             return allPlayers;
         }
 
-        public static Dictionary<ulong, IPlayer> GetAccountPlayers(uint accountId)
+        public virtual Dictionary<ulong, IPlayer> GetAccountPlayers(uint accountId)
         {
-            playersLock.EnterReadLock();
-            try
-            {
-                playerAccounts.TryGetValue(accountId, out var accountPlayers);
-                return accountPlayers;
-            }
-            finally
-            {
-                playersLock.ExitReadLock();
-            }
+            throw new NotImplementedException();
+            //playersLock.EnterReadLock();
+            //try
+            //{
+            //    playerAccounts.TryGetValue(accountId, out var accountPlayers);
+            //    return accountPlayers;
+            //}
+            //finally
+            //{
+            //    playersLock.ExitReadLock();
+            //}
         }
 
-        public static int GetOfflineCount()
+        public virtual int GetOfflineCount()
         {
             playersLock.EnterReadLock();
             try
@@ -385,7 +292,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        public static List<OfflinePlayer> GetAllOffline()
+        public virtual List<OfflinePlayer> GetAllOffline()
         {
             var results = new List<OfflinePlayer>();
 
@@ -403,7 +310,7 @@ namespace ACE.Server.Managers
             return results;
         }
 
-        public static int GetOnlineCount()
+        public virtual int GetOnlineCount()
         {
             playersLock.EnterReadLock();
             try
@@ -419,7 +326,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the player wasn't found.
         /// </summary>
-        public static Player GetOnlinePlayer(ObjectGuid guid)
+        public virtual Player GetOnlinePlayer(ObjectGuid guid)
         {
             return GetOnlinePlayer(guid.Full);
         }
@@ -427,7 +334,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the player wasn't found.
         /// </summary>
-        public static Player GetOnlinePlayer(ulong guid)
+        public virtual Player GetOnlinePlayer(ulong guid)
         {
             playersLock.EnterReadLock();
             try
@@ -446,7 +353,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null of the name was not found.
         /// </summary>
-        public static Player GetOnlinePlayer(string name)
+        public virtual Player GetOnlinePlayer(string name)
         {
             var admin = "+" + name;
 
@@ -466,7 +373,7 @@ namespace ACE.Server.Managers
             return null;
         }
 
-        public static List<Player> GetAllOnline()
+        public virtual List<Player> GetAllOnline()
         {
             var results = new List<Player>();
 
@@ -490,7 +397,7 @@ namespace ACE.Server.Managers
         /// It will return false if the player was not found in the OfflinePlayers dictionary (which should never happen), or player already exists in the OnlinePlayers dictionary (which should never happen).
         /// This will always be preceded by a call to GetOfflinePlayer()
         /// </summary>
-        public static bool SwitchPlayerFromOfflineToOnline(Player player)
+        public virtual bool SwitchPlayerFromOfflineToOnline(Player player)
         {
             playersLock.EnterWriteLock();
             try
@@ -509,7 +416,7 @@ namespace ACE.Server.Managers
 
                 playerNames[offlinePlayer.Name] = player;
 
-                playerAccounts[offlinePlayer.Account.AccountId][offlinePlayer.Guid.Full] = player;
+                //playerAccounts[offlinePlayer.Account.AccountId][offlinePlayer.Guid.Full] = player;
             }
             finally
             {
@@ -527,7 +434,7 @@ namespace ACE.Server.Managers
         /// This will return true if the player was successfully added.
         /// It will return false if the player was not found in the OnlinePlayers dictionary (which should never happen), or player already exists in the OfflinePlayers dictionary (which should never happen).
         /// </summary>
-        public static bool SwitchPlayerFromOnlineToOffline(Player player)
+        public virtual bool SwitchPlayerFromOnlineToOffline(Player player)
         {
             playersLock.EnterWriteLock();
             try
@@ -545,7 +452,7 @@ namespace ACE.Server.Managers
 
                 playerNames[offlinePlayer.Name] = offlinePlayer;
 
-                playerAccounts[offlinePlayer.Account.AccountId][offlinePlayer.Guid.Full] = offlinePlayer;
+                //playerAccounts[offlinePlayer.Account.AccountId][offlinePlayer.Guid.Full] = offlinePlayer;
             }
             finally
             {
@@ -558,7 +465,7 @@ namespace ACE.Server.Managers
             return true;
         }
 
-        public static async Task<bool> IsCharacterNameAvailableForCreation(string name)
+        public virtual async Task<bool> IsCharacterNameAvailableForCreation(string name)
         {
             var opts = Common.ACRealms.ACRealmsConfigManager.Config.CharacterCreationOptions;
 
@@ -574,7 +481,7 @@ namespace ACE.Server.Managers
             return await IsCharacterNameAvailable(name, realmId);
         }
 
-        public static async Task<bool> IsCharacterNameAvailable(string name, ushort? realmId, bool? overrideUniquePerHomeRealm = null)
+        public virtual async Task<bool> IsCharacterNameAvailable(string name, ushort? realmId, bool? overrideUniquePerHomeRealm = null)
         {
             var tcs = new TaskCompletionSource<bool>();
 
@@ -586,10 +493,10 @@ namespace ACE.Server.Managers
             return await tcs.Task;
         }
 
-        public static void IsCharacterNameAvailable(string name, ushort? realmId, Action<bool> callback, bool? overrideUniquePerHomeRealm = null)
+        public virtual void IsCharacterNameAvailable(string name, ushort? realmId, Action<bool> callback, bool? overrideUniquePerHomeRealm = null)
             => DatabaseManager.Shard.IsCharacterNameAvailable(name, realmId, callback, overrideUniquePerHomeRealm);
 
-        public static void HandlePlayerRename(ISession session, string oldName, string newName)
+        public virtual void HandlePlayerRename(ISession session, string oldName, string newName)
         {
             var onlinePlayer = PlayerManager.GetOnlinePlayer(oldName);
             var offlinePlayer = PlayerManager.GetOfflinePlayer(oldName);
@@ -653,7 +560,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Called when a character is initially deleted on the character select screen
         /// </summary>
-        public static void HandlePlayerDelete(ulong characterGuid)
+        public virtual void HandlePlayerDelete(ulong characterGuid)
         {
             AllegianceManager.HandlePlayerDelete(characterGuid);
 
@@ -664,7 +571,7 @@ namespace ACE.Server.Managers
         /// This will return true if the player was successfully found and removed from the OfflinePlayers dictionary.
         /// It will return false if the player was not found in the OfflinePlayers dictionary (which should never happen).
         /// </summary>
-        public static bool ProcessDeletedPlayer(ulong guid)
+        public virtual bool ProcessDeletedPlayer(ulong guid)
         {
             playersLock.EnterWriteLock();
             try
@@ -673,9 +580,9 @@ namespace ACE.Server.Managers
                     return false; // This should never happen
 
                 playerNames.Remove(offlinePlayer.Name);
-                RemoveGuidFromBasicNames(offlinePlayer.Name, guid);
-
-                playerAccounts[offlinePlayer.Account.AccountId].Remove(offlinePlayer.Guid.Full);
+                basicPlayerNames.Remove(offlinePlayer.Name, guid);
+                playerAccounts.Remove(offlinePlayer.Account.AccountId, offlinePlayer.Guid.Full);
+                //playerAccounts[offlinePlayer.Account.AccountId].Remove(offlinePlayer.Guid.Full);
             }
             finally
             {
@@ -689,7 +596,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the name was not found.
         /// </summary>
-        public static IPlayer FindByName(string name)
+        public virtual IPlayer FindByName(string name)
         {
             return FindByName(name, out _);
         }
@@ -697,7 +604,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the name was not found.
         /// </summary>
-        public static IPlayer FindByName(string name, out bool isOnline)
+        public virtual IPlayer FindByName(string name, out bool isOnline)
         {
             playersLock.EnterReadLock();
             try
@@ -717,7 +624,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the guid was not found.
         /// </summary>
-        public static IPlayer FindByGuid(ObjectGuid guid)
+        public virtual IPlayer FindByGuid(ObjectGuid guid)
         {
             return FindByGuid(guid, out _);
         }
@@ -725,7 +632,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the guid was not found.
         /// </summary>
-        public static IPlayer FindByGuid(ObjectGuid guid, out bool isOnline)
+        public virtual IPlayer FindByGuid(ObjectGuid guid, out bool isOnline)
         {
             return FindByGuid(guid.Full, out isOnline);
         }
@@ -733,7 +640,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the guid was not found.
         /// </summary>
-        public static IPlayer FindByGuid(ulong guid)
+        public virtual IPlayer FindByGuid(ulong guid)
         {
             return FindByGuid(guid, out _);
         }
@@ -741,7 +648,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return null if the guid was not found.
         /// </summary>
-        public static IPlayer FindByGuid(ulong guid, out bool isOnline)
+        public virtual IPlayer FindByGuid(ulong guid, out bool isOnline)
         {
             playersLock.EnterReadLock();
             try
@@ -770,7 +677,7 @@ namespace ACE.Server.Managers
         /// Returns a list of all players who are under a monarch
         /// </summary>
         /// <param name="monarch">The monarch of an allegiance</param>
-        public static List<IPlayer> FindAllByMonarch(ObjectGuid monarch)
+        public virtual List<IPlayer> FindAllByMonarch(ObjectGuid monarch)
         {
             var results = new List<IPlayer>();
 
@@ -796,7 +703,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// This will return a list of Players that have this guid as a friend.
         /// </summary>
-        public static List<Player> GetOnlineInverseFriends(ObjectGuid guid)
+        public virtual List<Player> GetOnlineInverseFriends(ObjectGuid guid)
         {
             var results = new List<Player>();
 
@@ -821,13 +728,13 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Broadcasts GameMessage to all online sessions.
         /// </summary>
-        public static void BroadcastToAll(GameMessage msg)
+        public virtual void BroadcastToAll(GameMessage msg)
         {
             foreach (var player in GetAllOnline())
                 player.Session.Network.EnqueueSend(msg);
         }
 
-        public static void BroadcastToAuditChannel(Player issuer, string message)
+        public virtual void BroadcastToAuditChannel(Player issuer, string message)
         {
             if (issuer != null)
                 BroadcastToChannel(Channel.Audit, issuer, message, true, true);
@@ -835,12 +742,12 @@ namespace ACE.Server.Managers
                 BroadcastToChannelFromConsole(Channel.Audit, message);
 
             //if (PropertyManager.GetBool("log_audit", true).Item)
-                //log.Info($"[AUDIT] {(issuer != null ? $"{issuer.Name} says on the Audit channel: " : "")}{message}");
+            //log.Info($"[AUDIT] {(issuer != null ? $"{issuer.Name} says on the Audit channel: " : "")}{message}");
 
             //LogBroadcastChat(Channel.Audit, issuer, message);
         }
 
-        public static void BroadcastToChannel(Channel channel, Player sender, string message, bool ignoreSquelch = false, bool ignoreActive = false)
+        public virtual void BroadcastToChannel(Channel channel, Player sender, string message, bool ignoreSquelch = false, bool ignoreActive = false)
         {
             if ((sender.ChannelsActive.HasValue && sender.ChannelsActive.Value.HasFlag(channel)) || ignoreActive)
             {
@@ -854,7 +761,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        public static void LogBroadcastChat(Channel channel, WorldObject sender, string message)
+        public virtual void LogBroadcastChat(Channel channel, WorldObject sender, string message)
         {
             switch (channel)
             {
@@ -946,7 +853,7 @@ namespace ACE.Server.Managers
                 log.Info($"[CHAT][GLOBAL] {(sender != null ? sender.Name : "[SYSTEM]")} issued a world broadcast, \"{message}\"");
         }
 
-        public static void BroadcastToChannelFromConsole(Channel channel, string message)
+        public virtual void BroadcastToChannelFromConsole(Channel channel, string message)
         {
             foreach (var player in GetAllOnline().Where(p => (p.ChannelsActive ?? 0).HasFlag(channel)))
                 player.Session.Network.EnqueueSend(new GameEventChannelBroadcast(player.Session, channel, "CONSOLE", message));
@@ -954,13 +861,13 @@ namespace ACE.Server.Managers
             LogBroadcastChat(channel, null, message);
         }
 
-        public static void BroadcastToChannelFromEmote(Channel channel, string message)
+        public virtual void BroadcastToChannelFromEmote(Channel channel, string message)
         {
             foreach (var player in GetAllOnline().Where(p => (p.ChannelsActive ?? 0).HasFlag(channel)))
                 player.Session.Network.EnqueueSend(new GameEventChannelBroadcast(player.Session, channel, "EMOTE", message));
         }
 
-        public static bool GagPlayer(Player issuer, string playerName)
+        public virtual bool GagPlayer(Player issuer, string playerName)
         {
             var player = FindByName(playerName);
 
@@ -978,7 +885,7 @@ namespace ACE.Server.Managers
             return true;
         }
 
-        public static bool UnGagPlayer(Player issuer, string playerName)
+        public virtual bool UnGagPlayer(Player issuer, string playerName)
         {
             var player = FindByName(playerName);
 
@@ -996,13 +903,13 @@ namespace ACE.Server.Managers
             return true;
         }
 
-        public static void BootAllPlayers()
+        public virtual void BootAllPlayers()
         {
             foreach (var player in GetAllOnline().Where(p => p.Session.AccessLevel < AccessLevel.Advocate))
                 player.Session.Terminate(SessionTerminationReason.WorldClosed, new GameMessageBootAccount(" because the world is now closed"), null, "The world is now closed");
         }
 
-        public static void UpdatePKStatusForAllPlayers(string worldType, bool enabled)
+        public virtual void UpdatePKStatusForAllPlayers(string worldType, bool enabled)
         {
             switch (worldType)
             {
@@ -1075,7 +982,7 @@ namespace ACE.Server.Managers
             }
         }
 
-        public static bool IsAccountAtMaxCharacterSlots(string accountName)
+        public virtual bool IsAccountAtMaxCharacterSlots(string accountName)
         {
             var slotsAvailable = (int)PropertyManager.GetLong("max_chars_per_account").Item;
             var onlinePlayersTotal = 0;
@@ -1094,5 +1001,52 @@ namespace ACE.Server.Managers
 
             return (onlinePlayersTotal + offlinePlayersTotal) >= slotsAvailable;
         }
+    }
+
+  
+    public class LegacyPlayerManager : PlayerServiceBase, IPlayerManager
+    {
+
+        protected override IReadOnlyDictionary<ulong, IPlayer> PrimaryStore { get; init; } = new ConcurrentDictionary<ulong, IPlayer>();
+
+        /// <summary>
+        /// This will load all the players from the database into the OfflinePlayers dictionary. It should be called before WorldManager is initialized.
+        /// </summary>
+        public void Initialize()
+        {
+            //var results = DatabaseManager.Shard.BaseDatabase.GetAllPlayerBiotasInParallel();
+
+            //Parallel.ForEach(results, ConfigManager.Config.Server.Threading.DatabaseParallelOptions, result =>
+            //{
+            //    var offlinePlayer = new OfflinePlayer(result);
+
+            //    lock (offlinePlayers)
+            //        offlinePlayers[offlinePlayer.Guid.Full] = offlinePlayer;
+
+            //    lock (playerNames)
+            //        playerNames[offlinePlayer.Name] = offlinePlayer;
+
+            //   // canonicalBackingStore.TryAdd(result.Id, new StaticPlayer(result));
+            //   // PushGuidForBasicName(offlinePlayer.Name, offlinePlayer.Guid.Full);
+
+            //    lock (playerAccounts)
+            //    {
+            //        if (offlinePlayer.Account != null)
+            //        {
+            //            if (!playerAccounts.TryGetValue(offlinePlayer.Account.AccountId, out var playerAccountsDict))
+            //            {
+            //                playerAccountsDict = new Dictionary<ulong, IPlayer>();
+            //                playerAccounts[offlinePlayer.Account.AccountId] = playerAccountsDict;
+            //            }
+            //            playerAccountsDict[offlinePlayer.Guid.Full] = offlinePlayer;
+            //        }
+            //        else
+            //            log.Error($"PlayerManager.Initialize: couldn't find account for player {offlinePlayer.Name} ({offlinePlayer.Guid})");
+            //    }
+            //});
+        }
+
+
+
     }
 }

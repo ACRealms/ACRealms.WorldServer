@@ -9,7 +9,7 @@ using Character = ACE.Database.Models.Shard.Character;
 
 namespace ACE.Server.WorldObjects
 {
-    public class Admin : Sentinel
+    public sealed class Admin : Sentinel
     {
         /// <summary>
         /// A new biota be created taking all of its values from weenie.

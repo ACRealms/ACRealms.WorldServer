@@ -29,6 +29,7 @@ using ACE.Server.WorldObjects.Managers;
 using Character = ACE.Database.Models.Shard.Character;
 using MotionTable = ACE.DatLoader.FileTypes.MotionTable;
 using ACE.Server.Realms;
+using ACE.Server.Entity.ACRealms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -36,6 +37,7 @@ namespace ACE.Server.WorldObjects
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public Aeternum Aeternum { get; }
         public bool IsOnline => true;
 
         public Account Account { get; }
