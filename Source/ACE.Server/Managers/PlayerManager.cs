@@ -33,6 +33,7 @@ using System.Collections.Frozen;
 using ACE.Server.Entity.ACRealms;
 using ACE.Server.Managers.ACRealms;
 using ACRealms.DataStructures.Collections;
+using ACE.Database.Models.Auth;
 
 namespace ACE.Server.Managers
 {
@@ -434,36 +435,36 @@ namespace ACE.Server.Managers
         /// This will return true if the player was successfully added.
         /// It will return false if the player was not found in the OnlinePlayers dictionary (which should never happen), or player already exists in the OfflinePlayers dictionary (which should never happen).
         /// </summary>
-        public virtual bool SwitchPlayerFromOnlineToOffline(Player player)
-        {
-            playersLock.EnterWriteLock();
-            try
-            {
-                if (!onlinePlayers.Remove(player.Guid.Full, out _))
-                    return false; // This should never happen
+        public abstract bool SwitchPlayerFromOnlineToOffline(Player player);
+        //{
+        //    playersLock.EnterWriteLock();
+        //    try
+        //    {
+        //        if (!onlinePlayers.Remove(player.Guid.Full, out _))
+        //            return false; // This should never happen
 
-                var offlinePlayer = new OfflinePlayer(player.Biota);
+        //        var offlinePlayer = new OfflinePlayer(player.Biota, player.Aeternum);
 
-                offlinePlayer.Allegiance = player.Allegiance;
-                offlinePlayer.AllegianceNode = player.AllegianceNode;
+        //        offlinePlayer.Allegiance = player.Allegiance;
+        //        offlinePlayer.AllegianceNode = player.AllegianceNode;
 
-                if (!offlinePlayers.TryAdd(offlinePlayer.Guid.Full, offlinePlayer))
-                    return false;
+        //        if (!offlinePlayers.TryAdd(offlinePlayer.Guid.Full, offlinePlayer))
+        //            return false;
 
-                playerNames[offlinePlayer.Name] = offlinePlayer;
+        //        playerNames[offlinePlayer.Name] = offlinePlayer;
 
-                //playerAccounts[offlinePlayer.Account.AccountId][offlinePlayer.Guid.Full] = offlinePlayer;
-            }
-            finally
-            {
-                playersLock.ExitWriteLock();
-            }
+        //        //playerAccounts[offlinePlayer.Account.AccountId][offlinePlayer.Guid.Full] = offlinePlayer;
+        //    }
+        //    finally
+        //    {
+        //        playersLock.ExitWriteLock();
+        //    }
 
-            player.SendFriendStatusUpdates(false);
-            player.HandleAllegianceOnLogout();
+        //    player.SendFriendStatusUpdates(false);
+        //    player.HandleAllegianceOnLogout();
 
-            return true;
-        }
+        //    return true;
+        //}
 
         public virtual async Task<bool> IsCharacterNameAvailableForCreation(string name)
         {
@@ -982,71 +983,71 @@ namespace ACE.Server.Managers
             }
         }
 
-        public virtual bool IsAccountAtMaxCharacterSlots(string accountName)
-        {
-            var slotsAvailable = (int)PropertyManager.GetLong("max_chars_per_account").Item;
-            var onlinePlayersTotal = 0;
-            var offlinePlayersTotal = 0;
+        public abstract bool IsAccountAtMaxCharacterSlots(Account account);
+        //{
+        //    var slotsAvailable = (int)PropertyManager.GetLong("max_chars_per_account").Item;
+        //    var onlinePlayersTotal = 0;
+        //    var offlinePlayersTotal = 0;
 
-            playersLock.EnterReadLock();
-            try
-            {
-                onlinePlayersTotal = onlinePlayers.Count(a => a.Value.Account.AccountName.Equals(accountName, StringComparison.OrdinalIgnoreCase));
-                offlinePlayersTotal = offlinePlayers.Count(a => a.Value.Account.AccountName.Equals(accountName, StringComparison.OrdinalIgnoreCase));
-            }
-            finally
-            {
-                playersLock.ExitReadLock();
-            }
+        //    playersLock.EnterReadLock();
+        //    try
+        //    {
+        //        onlinePlayersTotal = onlinePlayers.Count(a => a.Value.Account.AccountName.Equals(accountName, StringComparison.OrdinalIgnoreCase));
+        //        offlinePlayersTotal = offlinePlayers.Count(a => a.Value.Account.AccountName.Equals(accountName, StringComparison.OrdinalIgnoreCase));
+        //    }
+        //    finally
+        //    {
+        //        playersLock.ExitReadLock();
+        //    }
 
-            return (onlinePlayersTotal + offlinePlayersTotal) >= slotsAvailable;
-        }
+        //    return (onlinePlayersTotal + offlinePlayersTotal) >= slotsAvailable;
+        //}
     }
 
-  
-    public class LegacyPlayerManager : PlayerServiceBase, IPlayerManager
-    {
 
-        protected override IReadOnlyDictionary<ulong, IPlayer> PrimaryStore { get; init; } = new ConcurrentDictionary<ulong, IPlayer>();
+    //public class LegacyPlayerManager : PlayerServiceBase, IPlayerManager
+    //{
 
-        /// <summary>
-        /// This will load all the players from the database into the OfflinePlayers dictionary. It should be called before WorldManager is initialized.
-        /// </summary>
-        public void Initialize()
-        {
-            //var results = DatabaseManager.Shard.BaseDatabase.GetAllPlayerBiotasInParallel();
+    //    protected override IReadOnlyDictionary<ulong, IPlayer> PrimaryStore { get; init; } = new ConcurrentDictionary<ulong, IPlayer>();
 
-            //Parallel.ForEach(results, ConfigManager.Config.Server.Threading.DatabaseParallelOptions, result =>
-            //{
-            //    var offlinePlayer = new OfflinePlayer(result);
+    //    /// <summary>
+    //    /// This will load all the players from the database into the OfflinePlayers dictionary. It should be called before WorldManager is initialized.
+    //    /// </summary>
+    //    public void Initialize()
+    //    {
+    //        //var results = DatabaseManager.Shard.BaseDatabase.GetAllPlayerBiotasInParallel();
 
-            //    lock (offlinePlayers)
-            //        offlinePlayers[offlinePlayer.Guid.Full] = offlinePlayer;
+    //        //Parallel.ForEach(results, ConfigManager.Config.Server.Threading.DatabaseParallelOptions, result =>
+    //        //{
+    //        //    var offlinePlayer = new OfflinePlayer(result);
 
-            //    lock (playerNames)
-            //        playerNames[offlinePlayer.Name] = offlinePlayer;
+    //        //    lock (offlinePlayers)
+    //        //        offlinePlayers[offlinePlayer.Guid.Full] = offlinePlayer;
 
-            //   // canonicalBackingStore.TryAdd(result.Id, new StaticPlayer(result));
-            //   // PushGuidForBasicName(offlinePlayer.Name, offlinePlayer.Guid.Full);
+    //        //    lock (playerNames)
+    //        //        playerNames[offlinePlayer.Name] = offlinePlayer;
 
-            //    lock (playerAccounts)
-            //    {
-            //        if (offlinePlayer.Account != null)
-            //        {
-            //            if (!playerAccounts.TryGetValue(offlinePlayer.Account.AccountId, out var playerAccountsDict))
-            //            {
-            //                playerAccountsDict = new Dictionary<ulong, IPlayer>();
-            //                playerAccounts[offlinePlayer.Account.AccountId] = playerAccountsDict;
-            //            }
-            //            playerAccountsDict[offlinePlayer.Guid.Full] = offlinePlayer;
-            //        }
-            //        else
-            //            log.Error($"PlayerManager.Initialize: couldn't find account for player {offlinePlayer.Name} ({offlinePlayer.Guid})");
-            //    }
-            //});
-        }
+    //        //   // canonicalBackingStore.TryAdd(result.Id, new StaticPlayer(result));
+    //        //   // PushGuidForBasicName(offlinePlayer.Name, offlinePlayer.Guid.Full);
+
+    //        //    lock (playerAccounts)
+    //        //    {
+    //        //        if (offlinePlayer.Account != null)
+    //        //        {
+    //        //            if (!playerAccounts.TryGetValue(offlinePlayer.Account.AccountId, out var playerAccountsDict))
+    //        //            {
+    //        //                playerAccountsDict = new Dictionary<ulong, IPlayer>();
+    //        //                playerAccounts[offlinePlayer.Account.AccountId] = playerAccountsDict;
+    //        //            }
+    //        //            playerAccountsDict[offlinePlayer.Guid.Full] = offlinePlayer;
+    //        //        }
+    //        //        else
+    //        //            log.Error($"PlayerManager.Initialize: couldn't find account for player {offlinePlayer.Name} ({offlinePlayer.Guid})");
+    //        //    }
+    //        //});
+    //    }
 
 
 
-    }
+//    }
 }

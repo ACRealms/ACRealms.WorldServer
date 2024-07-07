@@ -16,15 +16,15 @@ namespace ACE.Server.Managers.ACRealms
 {
     public class PlayerManagerShim
     {
-        const bool UseLegacyPlayerManager = true;
-        static IPlayerManager Instance { get; }
+        const bool UseLegacyPlayerManager = false;
+        public static IPlayerManager Instance { get; }
 
         static PlayerManagerShim()
         {
-            if (UseLegacyPlayerManager)
-                Instance = new LegacyPlayerManager();
-            else
-                Instance = new AeternumService();
+        //    if (UseLegacyPlayerManager)
+        //        Instance = new LegacyPlayerManager();
+        //    else
+            Instance = new AeternumService();
         }
 
         public static CanonicalCharacterNameStore CanonicalStore => Instance.CanonicalStore;
@@ -205,8 +205,10 @@ namespace ACE.Server.Managers.ACRealms
         public static void UpdatePKStatusForAllPlayers(string worldType, bool enabled)
             => Instance.UpdatePKStatusForAllPlayers(worldType, enabled);
 
-        public static bool IsAccountAtMaxCharacterSlots(string accountName)
-            => Instance.IsAccountAtMaxCharacterSlots(accountName);
+        public static bool IsAccountAtMaxCharacterSlots(uint accountId)
+            => Instance.IsAccountAtMaxCharacterSlots(accountId);
+        public static bool IsAccountAtMaxCharacterSlots(Database.Models.Auth.Account account)
+            => Instance.IsAccountAtMaxCharacterSlots(account.AccountId);
     }
 
 }

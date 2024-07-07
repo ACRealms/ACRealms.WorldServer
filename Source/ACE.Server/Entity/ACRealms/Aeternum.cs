@@ -138,5 +138,11 @@ namespace ACE.Server.Entity.ACRealms
             OnlinePlayer = player;
             OfflinePlayer = null;
         }
+
+        internal static Aeternum Genesis(ACE.Entity.Models.Biota biota)
+        {
+            var player = OfflinePlayer.Genesis(biota);
+            return player.Aeternum;
+        }
     }
 }

@@ -8,6 +8,7 @@ using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity;
 using ACE.Server.Entity.Actions;
 using ACE.Server.Managers;
+using ACE.Server.Managers.ACRealms;
 using ACE.Server.Network.Enum;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
@@ -21,7 +22,16 @@ namespace ACE.Server.WorldObjects
     {
         public void PlayerEnterWorld()
         {
-            PlayerManager.SwitchPlayerFromOfflineToOnline(this);
+            var aeternumService = PlayerManager.Instance as AeternumService;
+
+            if (aeternumService != null)
+            {
+                Aeternum = aeternumService.GetAeternum(Guid.Full)!;
+                aeternumService.SwitchPlayerFromOfflineToOnline(this);
+            }
+            else
+                PlayerManager.SwitchPlayerFromOfflineToOnline(this);
+
             Teleporting = true;
 
             // Save the the LoginTimestamp

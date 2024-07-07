@@ -1,3 +1,4 @@
+using ACE.Database.Models.Auth;
 using ACE.Entity;
 using ACE.Entity.Enum;
 using ACE.Server.Entity;
@@ -170,7 +171,11 @@ namespace ACE.Server.Managers.ACRealms
         bool UnGagPlayer(Player issuer, string playerName);
         void BootAllPlayers();
         void UpdatePKStatusForAllPlayers(string worldType, bool enabled);
-        bool IsAccountAtMaxCharacterSlots(string accountName);
+
+        bool IsAccountAtMaxCharacterSlots(uint accountId);
+
+        [Obsolete("Use the accountId overload")]
+        bool IsAccountAtMaxCharacterSlots(Account account);
     }
 
 }

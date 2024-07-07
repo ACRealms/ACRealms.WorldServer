@@ -1895,7 +1895,7 @@ namespace ACE.Server.Command.Handlers
                             return;
                         }
 
-                        if (PlayerManager.IsAccountAtMaxCharacterSlots(account.AccountName))
+                        if (PlayerManager.IsAccountAtMaxCharacterSlots(account.AccountId))
                         {
                             CommandHandlerHelper.WriteOutputInfo(session, $"Error, cannot restore. Account \"{newAccountName}\" has no free character slots.", ChatMessageType.Broadcast);
                             return;
@@ -1905,7 +1905,7 @@ namespace ACE.Server.Command.Handlers
                     }
                     else
                     {
-                        if (PlayerManager.IsAccountAtMaxCharacterSlots(session.Player.Account.AccountName))
+                        if (PlayerManager.IsAccountAtMaxCharacterSlots(session.Player.Account.AccountId))
                         {
                             CommandHandlerHelper.WriteOutputInfo(session, $"Error, cannot restore. Account \"{session.Player.Account.AccountName}\" has no free character slots.", ChatMessageType.Broadcast);
                             return;
@@ -1916,7 +1916,7 @@ namespace ACE.Server.Command.Handlers
                 }
                 else
                 {
-                    if (PlayerManager.IsAccountAtMaxCharacterSlots(session.Player.Account.AccountName))
+                    if (PlayerManager.IsAccountAtMaxCharacterSlots(session.Player.Account.AccountId))
                     {
                         CommandHandlerHelper.WriteOutputInfo(session, $"Error, cannot restore. Account \"{session.Player.Account.AccountName}\" has no free character slots.", ChatMessageType.Broadcast);
                         return;

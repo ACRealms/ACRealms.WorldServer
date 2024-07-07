@@ -1,6 +1,6 @@
 using ACE.Common;
 using ACE.Database;
-using ACE.Database.Models.Shard;
+using ACE.Database.Models.Auth;
 using ACE.Entity;
 using ACE.Entity.ACRealms;
 using ACE.Entity.Enum;
@@ -28,6 +28,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static ACE.Database.Models.Shard.CharacterExtensions;
 #nullable enable
 
 namespace ACE.Server.Managers.ACRealms
@@ -56,8 +57,8 @@ namespace ACE.Server.Managers.ACRealms
 
             Parallel.ForEach(results, ConfigManager.Config.Server.Threading.DatabaseParallelOptions, result =>
             {
-                var offlinePlayer = new OfflinePlayer(result);
-                var aeternum = new Aeternum(offlinePlayer);
+                var aeternum = Aeternum.Genesis(result);
+                var offlinePlayer = (OfflinePlayer)aeternum.Player;
                 offlinePlayers = offlinePlayers.Add(aeternum);
                 allPlayers = allPlayers.Add(aeternum);
                 primaryStore.TryAdd(offlinePlayer.Guid.Full, aeternum);
@@ -89,8 +90,8 @@ namespace ACE.Server.Managers.ACRealms
 
         public override void AddOfflinePlayer(Player player)
         {
-            var offlinePlayer = new OfflinePlayer(player.Biota);
-            var aeternum = new Aeternum(offlinePlayer);
+            var aeternum = Aeternum.Genesis(player.Biota);
+            var offlinePlayer = (OfflinePlayer)aeternum.Player;
             primaryStore.TryAdd(offlinePlayer.Guid.Full, aeternum);
             allPlayers = allPlayers.Add(aeternum);
             offlinePlayers = offlinePlayers.Add(aeternum);
@@ -180,7 +181,7 @@ namespace ACE.Server.Managers.ACRealms
         
         public override bool SwitchPlayerFromOfflineToOnline(Player player)
         {
-            SwitchPlayerFromOfflineToOnline_Synchronized(player);
+            SwitchPlayerFromOfflineToOnline_Synchronized(player, primaryStore[player.Guid.Full]!);
             AllegianceManager.LoadPlayer(player);
 
             player.SendFriendStatusUpdates();
@@ -189,18 +190,18 @@ namespace ACE.Server.Managers.ACRealms
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private void SwitchPlayerFromOfflineToOnline_Synchronized(Player player)
+        private void SwitchPlayerFromOfflineToOnline_Synchronized(Player player, Aeternum aeternum)
         {
-            var offlinePlayer = (OfflinePlayer)player.Aeternum.Player;
+            var offlinePlayer = (OfflinePlayer)aeternum.Player;
 
-            offlinePlayers = offlinePlayers.Remove(player.Aeternum);
+            offlinePlayers = offlinePlayers.Remove(player.Aeternum!);
             if (offlinePlayer.ChangesDetected)
                 player.ChangesDetected = true;
 
             player.Allegiance = offlinePlayer.Allegiance;
             player.AllegianceNode = offlinePlayer.AllegianceNode;
 
-            player.Aeternum.SetToOnline(player);
+            aeternum.SetToOnline(player);
             onlinePlayers = onlinePlayers.Add(player.Aeternum);
         }
 
@@ -227,6 +228,7 @@ namespace ACE.Server.Managers.ACRealms
 
             onlinePlayers = onlinePlayers.Remove(player.Aeternum);
             offlinePlayers = offlinePlayers.Add(offlinePlayer.Aeternum);
+            player.Aeternum.SetToOffline(offlinePlayer);
         }
 
         public override async Task<bool> IsCharacterNameAvailableForCreation(string name)
@@ -634,24 +636,30 @@ namespace ACE.Server.Managers.ACRealms
             }
         }
 
-        public override bool IsAccountAtMaxCharacterSlots(string accountName)
-        {
-            var slotsAvailable = (int)PropertyManager.GetLong("max_chars_per_account").Item;
-            var onlinePlayersTotal = 0;
-            var offlinePlayersTotal = 0;
+        public bool IsAccountAtMaxCharacterSlots(uint accountId)
+            => playerAccounts[accountId].Value.Count >= PropertyManager.GetLong("max_chars_per_account").Item;
 
-            playersLock.EnterReadLock();
-            try
-            {
-                onlinePlayersTotal = onlinePlayers.Count(a => a.Value.Account.AccountName.Equals(accountName, StringComparison.OrdinalIgnoreCase));
-                offlinePlayersTotal = offlinePlayers.Count(a => a.Value.Account.AccountName.Equals(accountName, StringComparison.OrdinalIgnoreCase));
-            }
-            finally
-            {
-                playersLock.ExitReadLock();
-            }
+        [Obsolete("Use the accountId overload")]
+        public override bool IsAccountAtMaxCharacterSlots(Account account)
+            => IsAccountAtMaxCharacterSlots(account.AccountId);
+        //{
+            //var accountId = DatabaseManager.Authentication.GetAccountByName(accountName)?.AccountId;
+            //var slotsAvailable = (int)PropertyManager.GetLong("max_chars_per_account").Item;
+            //var onlinePlayersTotal = 0;
+            //var offlinePlayersTotal = 0;
+            
+            //playersLock.EnterReadLock();
+            //try
+            //{
+            //    onlinePlayersTotal = onlinePlayers.Count(a => a.Value.Account.AccountName.Equals(accountName, StringComparison.OrdinalIgnoreCase));
+            //    offlinePlayersTotal = offlinePlayers.Count(a => a.Value.Account.AccountName.Equals(accountName, StringComparison.OrdinalIgnoreCase));
+            //}
+            //finally
+            //{
+            //    playersLock.ExitReadLock();
+            //}
 
-            return (onlinePlayersTotal + offlinePlayersTotal) >= slotsAvailable;
-        }
+            //return (onlinePlayersTotal + offlinePlayersTotal) >= slotsAvailable;
+//        }
     }
 }

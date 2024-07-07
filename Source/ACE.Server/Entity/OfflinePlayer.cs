@@ -22,7 +22,7 @@ namespace ACE.Server.Entity
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public Aeternum Aeternum { get; }
+        public Aeternum Aeternum { get; private set; }
         public bool IsOnline => false;
 
         /// <summary>
@@ -43,9 +43,17 @@ namespace ACE.Server.Entity
         /// Any properties tagged as Ephemeral will be removed from the biota.
         /// </summary>
         internal OfflinePlayer(Biota biota, Aeternum aeternum)
+            : this(biota)
+        {
+            if (aeternum == null)
+                throw new ArgumentNullException("aeternum");
+            Aeternum = aeternum;
+        }
+
+        private OfflinePlayer(Biota biota)
         {
             Biota = biota;
-            Aeternum = aeternum;
+
             Guid = new ObjectGuid(Biota.Id);
 
             var character = DatabaseManager.Shard.BaseDatabase.GetCharacterStubByGuid(Guid.Full);
@@ -54,6 +62,14 @@ namespace ACE.Server.Entity
                 Account = DatabaseManager.Authentication.GetAccountById(character.AccountId);
 
             CanonicalName = CanonicalCharacterName.FromPlayer(this);
+        }
+
+        internal static OfflinePlayer Genesis(Biota biota)
+        {
+            var player = new OfflinePlayer(biota);
+            var aeternum = new Aeternum(player);
+            player.Aeternum = aeternum;
+            return player;
         }
 
         public bool IsDeleted => DatabaseManager.Shard.BaseDatabase.GetCharacterStubByGuid(Guid.Full).IsDeleted;

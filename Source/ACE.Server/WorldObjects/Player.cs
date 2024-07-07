@@ -37,7 +37,7 @@ namespace ACE.Server.WorldObjects
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public Aeternum Aeternum { get; }
+        public Aeternum? Aeternum { get; private set; }
         public bool IsOnline => true;
 
         public Account Account { get; }
