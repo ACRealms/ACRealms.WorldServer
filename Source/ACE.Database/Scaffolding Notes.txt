@@ -1,5 +1,10 @@
 
 
+Documentation:
+https://learn.microsoft.com/en-us/ef/core/cli/dotnet#dotnet-ef-dbcontext-scaffold
+https://learn.microsoft.com/en-us/ef/core/cli/dotnet#dotnet-ef-dbcontext-optimize
+
+
 Requires dotnet ef to be installed first:
   dotnet tool install --global dotnet-ef
 

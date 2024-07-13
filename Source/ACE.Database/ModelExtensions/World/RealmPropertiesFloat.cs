@@ -12,7 +12,17 @@ namespace ACE.Database.Models.World
 {
     public partial class RealmPropertiesFloat : RealmPropertiesBase
     {
-        static Type EnumType = typeof(RealmPropertyFloat);
+        public double? RandomLowRange { get; set; }
+        public double? RandomHighRange { get; set; }
+        public byte RandomType { get; set; }
+        public byte CompositionType { get; set; }
+
+        /// <summary>
+        /// Value of this Property
+        /// </summary>
+        public double? Value { get; set; }
+
+        static readonly Type EnumType = typeof(RealmPropertyFloat);
         public override AppliedRealmProperty<double> ConvertRealmProperty()
         {
             var @enum = (RealmPropertyFloat)Type;

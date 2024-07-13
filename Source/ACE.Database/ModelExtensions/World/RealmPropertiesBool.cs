@@ -12,7 +12,12 @@ namespace ACE.Database.Models.World
 {
     public partial class RealmPropertiesBool : RealmPropertiesBase
     {
-        static Type EnumType = typeof(RealmPropertyBool);
+        /// <summary>
+        /// Value of this Property
+        /// </summary>
+        public bool Value { get; set; }
+
+        static readonly Type EnumType = typeof(RealmPropertyBool);
 
         public override AppliedRealmProperty<bool> ConvertRealmProperty()
         {
