@@ -50,6 +50,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACE.DatLoader", "ACE.DatLoader\ACE.DatLoader.csproj", "{3949C280-2162-4465-A688-1F598DD9A18D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.Tests", "ACE.Server.Tests\ACRealms.Tests.csproj", "{3FA44AE5-D8A9-46BC-9052-B4737F5634AB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D4A350AF-16C7-4187-845F-0860321E58AD} = {D4A350AF-16C7-4187-845F-0860321E58AD}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACE.Database", "ACE.Database\ACE.Database.csproj", "{CD2B6DEE-6809-458A-B45A-E0B0BD1308FE}"
 EndProject
@@ -68,7 +71,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.JsonSchemaGenerato
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.RoslynAnalyzer", "ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer.csproj", "{551D86D7-ACC1-479A-99D7-49C69C1C3FC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACRealms.DataStructures", "ACRealms.DataStructures\ACRealms.DataStructures.csproj", "{D4A350AF-16C7-4187-845F-0860321E58AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.DataStructures", "ACRealms.DataStructures\ACRealms.DataStructures.csproj", "{D4A350AF-16C7-4187-845F-0860321E58AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -115,6 +118,7 @@ Global
 		{D4A350AF-16C7-4187-845F-0860321E58AD}.Debug|x64.ActiveCfg = Debug|x64
 		{D4A350AF-16C7-4187-845F-0860321E58AD}.Debug|x64.Build.0 = Debug|x64
 		{D4A350AF-16C7-4187-845F-0860321E58AD}.Release|x64.ActiveCfg = Release|x64
+		{D4A350AF-16C7-4187-845F-0860321E58AD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
