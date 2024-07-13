@@ -29,6 +29,7 @@ using System.Runtime;
 using ACE.Common.ACRealms;
 using ACE.Server.Managers.ACRealms;
 using System.ComponentModel.Composition.Hosting;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace ACE.Server
 {
@@ -207,35 +208,41 @@ namespace ACE.Server
                 // Disable logging of db commands
                 var dbLogger = LoggerFactory.Create(builder => builder.AddFilter(_ => false));
 
-                services.AddDbContextFactory<AuthDbContext>(options =>
+                services.AddPooledDbContextFactory<AuthDbContext>(options =>
                 {
                     options.UseLoggerFactory(dbLogger);
                     var config = ConfigManager.Config.MySql.Authentication;
                     var connectionString = $"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};{config.ConnectionOptions}";
                     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder =>
                     {
-                        builder.EnableRetryOnFailure(10);
-                    });
+                        builder.EnableRetryOnFailure(10)
+                            .EnableRetryOnFailure(10)
+                            .DefaultDataTypeMappings(m => m.WithClrBoolean(MySqlBooleanType.Bit1));
+                    }).UseModel(Database.CompiledModels.Auth.AuthDbContextModel.Instance);
                 });
-                services.AddDbContextFactory<WorldDbContext>(options =>
+                services.AddPooledDbContextFactory<WorldDbContext>(options =>
                 {
                     options.UseLoggerFactory(dbLogger);
                     var config = ConfigManager.Config.MySql.World;
                     var connectionString = $"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};{config.ConnectionOptions}";
                     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder =>
                     {
-                        builder.EnableRetryOnFailure(10);
-                    });
+                        builder
+                            .EnableRetryOnFailure(10)
+                            .DefaultDataTypeMappings(m => m.WithClrBoolean(MySqlBooleanType.Bit1));
+                    }).UseModel(Database.CompiledModels.World.WorldDbContextModel.Instance);
                 });
-                services.AddDbContextFactory<ShardDbContext>(options =>
+                services.AddPooledDbContextFactory<ShardDbContext>(options =>
                 {
                     options.UseLoggerFactory(dbLogger);
                     var config = ConfigManager.Config.MySql.Shard;
                     var connectionString = $"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};{config.ConnectionOptions}";
                     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder =>
                     {
-                        builder.EnableRetryOnFailure(10);
-                    });
+                        builder
+                            .EnableRetryOnFailure(10)
+                            .DefaultDataTypeMappings(m => m.WithClrBoolean(MySqlBooleanType.Bit1));
+                    }).UseModel(Database.CompiledModels.Shard.ShardDbContextModel.Instance);
                 });
             });
             var host = builder.Build();
