@@ -1,25 +1,34 @@
-using ACE.Database.Adapter;
-using ACE.Entity.ACRealms;
-using ACE.Entity.Enum.Properties;
-using ACE.Entity.Enum.RealmProperties;
-using ACE.Entity.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace ACE.Database.Models.World
-{
-    public sealed partial class RealmPropertiesString : RealmPropertiesBase
-    {
-        public string Value { get; set; }
+namespace ACE.Database.Models.World;
 
-        static Type EnumType = typeof(RealmPropertyString);
-        public override AppliedRealmProperty<string> ConvertRealmProperty()
-        {
-            var @enum = (RealmPropertyString)Type;
-            var proto = RealmPropertyPrototypes.String[@enum];
-            var att = proto.PrimaryAttribute;
-            var prop = new RealmPropertyOptions<string>(proto, @enum.ToString(), Realm.Name, att.DefaultValue, Value, Locked, Probability, EnumType, Type);
-            return new AppliedRealmProperty<string>(RulesetCompilationContext.DefaultShared, Type, prop);
-        }
-    }
+/// <summary>
+/// String Properties of Realms
+/// </summary>
+public partial class RealmPropertiesString
+{
+    /// <summary>
+    /// Id of the object this property belongs to
+    /// </summary>
+    public ushort RealmId { get; set; }
+
+    /// <summary>
+    /// Type of Property the value applies to (RealmPropertyString.????)
+    /// </summary>
+    public ushort Type { get; set; }
+
+    /// <summary>
+    /// Value of this Property
+    /// </summary>
+    public string Value { get; set; }
+
+    /// <summary>
+    /// If true, this property cannot be overriden by inherited realms or rulesets.
+    /// </summary>
+    public bool Locked { get; set; }
+
+    public double? Probability { get; set; }
+
+    public virtual Realm Realm { get; set; }
 }

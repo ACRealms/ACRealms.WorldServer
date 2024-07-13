@@ -1,33 +1,42 @@
-using ACE.Database.Adapter;
-using ACE.Entity.ACRealms;
-using ACE.Entity.Enum.Properties;
-using ACE.Entity.Enum.RealmProperties;
-using ACE.Entity.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace ACE.Database.Models.World
-{
-    public sealed partial class RealmPropertiesInt : RealmPropertiesBase
-    {
-        public int? Value { get; set; }
-        public int? RandomLowRange { get; set; }
-        public int? RandomHighRange { get; set; }
-        public byte RandomType { get; set; }
-        public byte CompositionType { get; set; }
+namespace ACE.Database.Models.World;
 
-        static Type EnumType = typeof(RealmPropertyInt);
-        public override AppliedRealmProperty<int> ConvertRealmProperty()
-        {
-            var @enum = (RealmPropertyInt)Type;
-            var proto = RealmPropertyPrototypes.Int[@enum];
-            var att = proto.PrimaryAttribute;
-            RealmPropertyOptions<int> prop;
-            if (Value.HasValue)
-                prop = new RealmPropertyOptions<int>(proto, @enum.ToString(), Realm.Name, att.DefaultValue, Value.Value, Locked, Probability, EnumType, Type);
-            else
-                prop = new MinMaxRangedRealmPropertyOptions<int>(proto, @enum.ToString(), Realm.Name, att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability, EnumType, Type);
-            return new AppliedRealmProperty<int>(RulesetCompilationContext.DefaultShared, Type, prop);
-        }
-    }
+/// <summary>
+/// Int Properties of Realms
+/// </summary>
+public partial class RealmPropertiesInt
+{
+    /// <summary>
+    /// Id of the object this property belongs to
+    /// </summary>
+    public ushort RealmId { get; set; }
+
+    /// <summary>
+    /// Type of Property the value applies to (RealmPropertyInt.????)
+    /// </summary>
+    public ushort Type { get; set; }
+
+    /// <summary>
+    /// Value of this Property
+    /// </summary>
+    public int? Value { get; set; }
+
+    /// <summary>
+    /// If true, this property cannot be overriden by inherited realms or rulesets.
+    /// </summary>
+    public bool Locked { get; set; }
+
+    public int? RandomLowRange { get; set; }
+
+    public int? RandomHighRange { get; set; }
+
+    public double? Probability { get; set; }
+
+    public byte RandomType { get; set; }
+
+    public byte CompositionType { get; set; }
+
+    public virtual Realm Realm { get; set; }
 }

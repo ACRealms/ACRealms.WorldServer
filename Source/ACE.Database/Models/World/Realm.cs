@@ -1,33 +1,43 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace ACE.Database.Models.World
+namespace ACE.Database.Models.World;
+
+/// <summary>
+/// Dynamic Realm of a Shard/World
+/// </summary>
+public partial class Realm
 {
-    public partial class Realm
-    {
-        public Realm()
-        {
-            RealmPropertiesBool = new List<RealmPropertiesBool>();
-            RealmPropertiesFloat = new List<RealmPropertiesFloat>();
-            RealmPropertiesInt = new List<RealmPropertiesInt>();
-            RealmPropertiesInt64 = new List<RealmPropertiesInt64>();
-            RealmPropertiesString = new List<RealmPropertiesString>();
-            RealmRulesetLinksLinkedRealm = new List<RealmRulesetLinks>();
-            RealmRulesetLinksRealm = new List<RealmRulesetLinks>();
-        }
+    /// <summary>
+    /// Unique Realm Id within the Shard
+    /// </summary>
+    public ushort Id { get; set; }
 
-        public ushort Id { get; set; }
-        public ushort Type { get; set; }
-        public string Name { get; set; }
-        public ushort? ParentRealmId { get; set; }
-        public ushort? PropertyCountRandomized { get; set; }
+    public ushort Type { get; set; }
 
-        public virtual IList<RealmPropertiesBool> RealmPropertiesBool { get; set; }
-        public virtual IList<RealmPropertiesFloat> RealmPropertiesFloat { get; set; }
-        public virtual IList<RealmPropertiesInt> RealmPropertiesInt { get; set; }
-        public virtual IList<RealmPropertiesInt64> RealmPropertiesInt64 { get; set; }
-        public virtual IList<RealmPropertiesString> RealmPropertiesString { get; set; }
-        public virtual IList<RealmRulesetLinks> RealmRulesetLinksLinkedRealm { get; set; }
-        public virtual IList<RealmRulesetLinks> RealmRulesetLinksRealm { get; set; }
-    }
+    /// <summary>
+    /// Name of this realm
+    /// </summary>
+    public string Name { get; set; }
+
+    public ushort? ParentRealmId { get; set; }
+
+    /// <summary>
+    /// Maximum number of properties that will be picked from the ruleset at random.
+    /// </summary>
+    public ushort? PropertyCountRandomized { get; set; }
+
+    public virtual ICollection<RealmPropertiesBool> RealmPropertiesBool { get; set; } = new List<RealmPropertiesBool>();
+
+    public virtual ICollection<RealmPropertiesFloat> RealmPropertiesFloat { get; set; } = new List<RealmPropertiesFloat>();
+
+    public virtual ICollection<RealmPropertiesInt> RealmPropertiesInt { get; set; } = new List<RealmPropertiesInt>();
+
+    public virtual ICollection<RealmPropertiesInt64> RealmPropertiesInt64 { get; set; } = new List<RealmPropertiesInt64>();
+
+    public virtual ICollection<RealmPropertiesString> RealmPropertiesString { get; set; } = new List<RealmPropertiesString>();
+
+    public virtual ICollection<RealmRulesetLinks> RealmRulesetLinksLinkedRealm { get; set; } = new List<RealmRulesetLinks>();
+
+    public virtual ICollection<RealmRulesetLinks> RealmRulesetLinksRealm { get; set; } = new List<RealmRulesetLinks>();
 }
