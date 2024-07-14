@@ -15,6 +15,9 @@
   // It is strongly recommended to leave this false, and to define a realm using a realm file, and change "DefaultRealm" to that realm
     "AllowUndefinedDefaultRealm": false,
 
+  // If enabled, enables use of certain commands that are only available in this mode, such as mass creation of accounts.
+    "TestServer": false,
+
     "CharacterCreationOptions": {
       /* If true, players will start in a room with an npc offering the choice of starting realm
          Realms with "CanBeHomeworld": true will be offered in this list

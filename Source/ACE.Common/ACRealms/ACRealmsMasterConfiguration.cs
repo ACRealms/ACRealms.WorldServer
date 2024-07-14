@@ -10,6 +10,7 @@ namespace ACE.Common.ACRealms
         public string DefaultRealm { get; set; } = "default";
 
         public bool AllowUndefinedDefaultRealm { get; set; } = false;
+        public bool TestServer { get; set; } = false;
 
         public CharacterCreationOptions CharacterCreationOptions { get; set; } = new CharacterCreationOptions();
 

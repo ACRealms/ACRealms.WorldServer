@@ -109,6 +109,21 @@ namespace ACE.Database
         }
 
         /// <summary>
+        /// Will return null if the accountName was not found.
+        /// </summary>
+        public List<string> GetAccountNamesStartingWithPrefix(string accountNamePrefix)
+        {
+            using (var context = ContextFactory.CreateDbContext())
+            {
+                return context.Account
+                    .AsNoTracking()
+                    .Where(r => r.AccountName.StartsWith(accountNamePrefix))
+                    .Select(x => x.AccountName)
+                    .ToList();
+            }
+        }
+
+        /// <summary>
         /// id will be 0 if the accountName was not found.
         /// </summary>
         public uint GetAccountIdByName(string accountName)
