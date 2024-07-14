@@ -14,6 +14,8 @@ namespace ACE.Server.Network
 
         private Queue<GameMessage> messages = new Queue<GameMessage>();
 
+        public int MessageCount => messages.Count;
+
         private float clientTime = -1f;
         public float ClientTime
         {

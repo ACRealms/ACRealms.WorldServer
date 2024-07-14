@@ -8,7 +8,7 @@ namespace ACE.Server.Network
 {
     public class PacketHeader
     {
-        public static int HeaderSize { get; } = 20;
+        public const int HeaderSize = 20;
 
         public uint Sequence { get; set; }
         public PacketHeaderFlags Flags { get; set; }
@@ -43,32 +43,45 @@ namespace ACE.Server.Network
 
         public void Pack(byte[] buffer, int offset = 0)
         {
-            buffer[offset++] = (byte)Sequence;
-            buffer[offset++] = (byte)(Sequence >> 8);
-            buffer[offset++] = (byte)(Sequence >> 16);
-            buffer[offset++] = (byte)(Sequence >> 24);
+            Span<byte> stackBuffer = stackalloc byte[20];
+            byte localOffset = 0;
+            var sequence = Sequence;
+            int iFlags = (int)Flags;
+            var checksum = Checksum;
+            var id = Id;
+            var time = Time;
+            var size = Size;
+            var iteration = Iteration;
 
-            buffer[offset++] = (byte)Flags;
-            buffer[offset++] = (byte)((int)Flags >> 8);
-            buffer[offset++] = (byte)((int)Flags >> 16);
-            buffer[offset++] = (byte)((int)Flags >> 24);
+            stackBuffer[localOffset++] = (byte)sequence;
+            stackBuffer[localOffset++] = (byte)(sequence >> 8);
+            stackBuffer[localOffset++] = (byte)(sequence >> 16);
+            stackBuffer[localOffset++] = (byte)(sequence >> 24);
 
-            buffer[offset++] = (byte)Checksum;
-            buffer[offset++] = (byte)(Checksum >> 8);
-            buffer[offset++] = (byte)(Checksum >> 16);
-            buffer[offset++] = (byte)(Checksum >> 24);
+            
+            stackBuffer[localOffset++] = (byte)iFlags;
+            stackBuffer[localOffset++] = (byte)(iFlags >> 8);
+            stackBuffer[localOffset++] = (byte)(iFlags >> 16);
+            stackBuffer[localOffset++] = (byte)(iFlags >> 24);
 
-            buffer[offset++] = (byte)Id;
-            buffer[offset++] = (byte)(Id >> 8);
+            stackBuffer[localOffset++] = (byte)checksum;
+            stackBuffer[localOffset++] = (byte)(checksum >> 8);
+            stackBuffer[localOffset++] = (byte)(checksum >> 16);
+            stackBuffer[localOffset++] = (byte)(checksum >> 24);
 
-            buffer[offset++] = (byte)Time;
-            buffer[offset++] = (byte)(Time >> 8);
+            stackBuffer[localOffset++] = (byte)id;
+            stackBuffer[localOffset++] = (byte)(id >> 8);
 
-            buffer[offset++] = (byte)Size;
-            buffer[offset++] = (byte)(Size >> 8);
+            stackBuffer[localOffset++] = (byte)time;
+            stackBuffer[localOffset++] = (byte)(time >> 8);
 
-            buffer[offset++] = (byte)Iteration;
-            buffer[offset++] = (byte)(Iteration >> 8);
+            stackBuffer[localOffset++] = (byte)size;
+            stackBuffer[localOffset++] = (byte)(size >> 8);
+
+            stackBuffer[localOffset++] = (byte)iteration;
+            stackBuffer[localOffset++] = (byte)(iteration >> 8);
+
+            stackBuffer.CopyTo(new Span<byte>(buffer, offset, 20));
         }
 
         public uint CalculateHash32()

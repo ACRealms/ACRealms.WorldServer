@@ -5,10 +5,10 @@ using ACE.Common.Cryptography;
 
 namespace ACE.Server.Network
 {
-    public class ServerPacket : Packet
+    public class ServerPacket : Packet, IDisposable
     {
         // TODO: I don't know why this value is 464. The reasoning and math needs to be documented here.
-        public static int MaxPacketSize { get; } = 464;
+        public const int MaxPacketSize = 464;
 
         /// <summary>
         /// Make sure you call InitializeDataWriter() before you use this
@@ -49,13 +49,18 @@ namespace ACE.Server.Network
 
             int offset = PacketHeader.HeaderSize;
 
-            if (Data != null && Data.Length > 0)
+            var data = Data;
+            if (data != null)
             {
-                var body = Data.GetBuffer();
-                Buffer.BlockCopy(body, 0, buffer, offset, (int)Data.Length);
-                offset += (int)Data.Length;
+                int dataLen = (int)data.Length;
+                if (dataLen > 0)
+                {
+                    var body = data.GetBuffer();
+                    Buffer.BlockCopy(body, 0, buffer, offset, dataLen);
+                    offset += dataLen;
 
-                payloadChecksum += Hash32.Calculate(body, (int)Data.Length);
+                    payloadChecksum += Hash32.Calculate(body, dataLen);
+                }
             }
 
             foreach (ServerPacketFragment fragment in Fragments)
@@ -63,18 +68,26 @@ namespace ACE.Server.Network
 
             size = offset;
 
-            Header.Size = (ushort)(size - PacketHeader.HeaderSize);
+            var header = Header;
+            header.Size = (ushort)(size - PacketHeader.HeaderSize);
 
-            var headerChecksum = Header.CalculateHash32();
+            var headerChecksum = header.CalculateHash32();
             finalChecksum = headerChecksum + payloadChecksum;
-            Header.Checksum = headerChecksum + (payloadChecksum ^ issacXor);
-            Header.Pack(buffer);
+            header.Checksum = headerChecksum + (payloadChecksum ^ issacXor);
+            header.Pack(buffer);
         }
 
         public override string ToString()
         {
             var c = Header.HasFlag(PacketHeaderFlags.EncryptedChecksum) ? $" CRC: {finalChecksum} XOR: {issacXor}" : "";
             return $">>> {Header}{c}".TrimEnd();
+        }
+
+        public void Dispose()
+        {
+            DataWriter?.Dispose();
+            DataWriter = null;
+            Data = null;
         }
     }
 }

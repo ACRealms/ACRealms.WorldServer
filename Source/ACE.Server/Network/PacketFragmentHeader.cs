@@ -6,7 +6,7 @@ namespace ACE.Server.Network
 {
     public class PacketFragmentHeader
     {
-        public static int HeaderSize { get; } = 16;
+        public const int HeaderSize = 16;
 
         public uint Sequence { get; set; }
         public uint Id { get; set; }
