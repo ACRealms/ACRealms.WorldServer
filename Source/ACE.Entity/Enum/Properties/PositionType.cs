@@ -179,7 +179,6 @@ namespace ACE.Entity.Enum.Properties
         /// <summary>
         /// Position data is relative to Location
         /// </summary>
-        [Instanced]
         RelativeDestination = 26,
 
         /// <summary>
