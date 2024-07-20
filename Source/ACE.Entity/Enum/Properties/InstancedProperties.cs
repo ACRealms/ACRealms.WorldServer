@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,6 @@ namespace ACE.Entity.Enum.Properties
         /// <summary>
         /// returns a list of values for PositionType that are [Instanced]
         /// </summary>
-        public static HashSet<PositionType> PositionTypes = GetValues<PositionType>();
+        public static FrozenSet<PositionType> PositionTypes = GetValues<PositionType>().ToFrozenSet();
     }
 }

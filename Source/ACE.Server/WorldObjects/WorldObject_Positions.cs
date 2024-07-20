@@ -145,9 +145,9 @@ namespace ACE.Server.WorldObjects
             set { SetPosition(PositionType.Save9, value); }
         }
 
-        public InstancedPosition RelativeDestination
+        public LocalPosition RelativeDestination
         {
-            get { return (InstancedPosition)GetPosition(PositionType.RelativeDestination); }
+            get { return (LocalPosition)GetPosition(PositionType.RelativeDestination); }
             set { SetPosition(PositionType.RelativeDestination, value); }
         }
 
