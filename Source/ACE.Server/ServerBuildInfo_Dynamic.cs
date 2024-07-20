@@ -6,7 +6,7 @@ namespace ACE.Server
         public static string Branch = "master"; 
         public static string Commit = "bbf0afdaa7a2a6756d8dd84434e636c67b1f4e95"; 
  
-        public static string Version = "2.1.3"; 
+        public static string Version = "2.1.4"; 
         public static string Build   = "0"; 
  
         public static int BuildYear   = 2024; 
