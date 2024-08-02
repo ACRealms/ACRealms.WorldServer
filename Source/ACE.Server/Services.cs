@@ -187,32 +187,36 @@ namespace ACE.Server
                 // Disable logging of db commands
                 var dbLogger = LoggerFactory.Create(builder => builder.AddFilter(_ => false));
 
+                var config = ConfigManager.Config.MySql.Authentication;
+                var connectionStringAuth = $"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};{config.ConnectionOptions}";
+
                 services.AddDbContextFactory<AuthDbContext>(options =>
                 {
                     options.UseLoggerFactory(dbLogger);
-                    var config = ConfigManager.Config.MySql.Authentication;
-                    var connectionString = $"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};{config.ConnectionOptions}";
-                    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder =>
+                    options.UseMySql(connectionStringAuth, ServerVersion.AutoDetect(connectionStringAuth), builder =>
                     {
                         builder.EnableRetryOnFailure(10);
                     });
                 });
+
+                config = ConfigManager.Config.MySql.World;
+                var connectionStringWorld = $"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};{config.ConnectionOptions}";
+
                 services.AddDbContextFactory<WorldDbContext>(options =>
                 {
                     options.UseLoggerFactory(dbLogger);
-                    var config = ConfigManager.Config.MySql.World;
-                    var connectionString = $"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};{config.ConnectionOptions}";
-                    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder =>
+                    options.UseMySql(connectionStringWorld, ServerVersion.AutoDetect(connectionStringWorld), builder =>
                     {
                         builder.EnableRetryOnFailure(10);
                     });
                 });
+
+                config = ConfigManager.Config.MySql.Shard;
+                var connectionStringShard = $"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};{config.ConnectionOptions}";
                 services.AddDbContextFactory<ShardDbContext>(options =>
                 {
                     options.UseLoggerFactory(dbLogger);
-                    var config = ConfigManager.Config.MySql.Shard;
-                    var connectionString = $"server={config.Host};port={config.Port};user={config.Username};password={config.Password};database={config.Database};{config.ConnectionOptions}";
-                    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder =>
+                    options.UseMySql(connectionStringShard, ServerVersion.AutoDetect(connectionStringShard), builder =>
                     {
                         builder.EnableRetryOnFailure(10);
                     });
