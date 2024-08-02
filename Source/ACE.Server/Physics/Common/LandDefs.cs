@@ -111,7 +111,7 @@ namespace ACE.Server.Physics.Common
 
         public static List<float> LandHeightTable; // Should be set immediately after DatManager initialize
 
-        public static bool AdjustToOutside(PhysicsPosition pos)
+        public static bool AdjustToOutside(ref PhysicsPosition pos)
         {
             return AdjustToOutside(ref pos.ObjCellID, ref pos.Frame.Origin);
         }
