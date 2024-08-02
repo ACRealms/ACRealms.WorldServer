@@ -136,7 +136,7 @@ namespace ACE.Server.Physics.BSP
             var center = path.LocalSpaceCurrCenter[0].Center;
             var localSphere = path.LocalSpaceSphere[0];
 
-            var localSphere_ = path.NumSphere > 1 ? path.LocalSpaceSphere[1] : null;
+            var localSphere_ = path.NumSphere > 1 ? path.LocalSpaceSphere[1] : new Sphere();
 
             var movement = localSphere.Center - center;
 
@@ -246,9 +246,11 @@ namespace ACE.Server.Physics.BSP
             var validPos = new Sphere(path.LocalSpaceSphere[0]);
             var rad = validPos.Radius;
 
-            Sphere validPos_ = null;
+            Sphere validPos_;
             if (path.NumSphere > 1)
                 validPos_ = new Sphere(path.LocalSpaceSphere[1]);
+            else
+                validPos_ = new Sphere();
 
             var clearCell = true;
             if (path.BuildingCheck)

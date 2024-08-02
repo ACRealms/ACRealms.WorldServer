@@ -12,7 +12,7 @@ namespace ACE.Server.Physics
     /// <summary>
     /// Spherical collision detection
     /// </summary>
-    public class Sphere: IEquatable<Sphere>
+    public struct Sphere: IEquatable<Sphere>
     {
         /// <summary>
         /// The center point of the sphere
@@ -290,7 +290,7 @@ namespace ACE.Server.Physics
             var globSphere = transition.SpherePath.GlobalSphere[0];
             var disp = globSphere.Center - center;
 
-            Sphere globSphere_ = null;
+            Sphere globSphere_;
             Vector3 disp_ = Vector3.Zero;
 
             if (transition.SpherePath.NumSphere > 1)
@@ -298,6 +298,8 @@ namespace ACE.Server.Physics
                 globSphere_ = transition.SpherePath.GlobalSphere[1];
                 disp_ = globSphere_.Center - center;
             }
+            else
+                globSphere_ = new Sphere();
 
             var radsum = globSphere.Radius + radius - PhysicsGlobals.EPSILON;
 

@@ -108,7 +108,7 @@ namespace ACE.Server.Physics
                 // destroy
                 return false;
             }
-            PhysicsObj = PhysicsObj.makeParticleObject(Info.MaxParticles, Info.SortingSphere);
+            PhysicsObj = PhysicsObj.makeParticleObject(Info.MaxParticles);
             LastEmitOffset = PhysicsObj.Position.Frame.Origin;
             Parts = PhysicsObj.PartArray.Parts;
             PartStorage = new PhysicsPart[Info.MaxParticles];

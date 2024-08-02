@@ -227,7 +227,7 @@ namespace ACE.Server.Physics
             var globSphere = path.GlobalSphere[0];
             var disp = globSphere.Center - LowPoint;
 
-            Sphere globSphere_ = null;
+            Sphere globSphere_;
             Vector3 disp_ = Vector3.Zero;
 
             if (path.NumSphere > 1)
@@ -235,6 +235,8 @@ namespace ACE.Server.Physics
                 globSphere_ = path.GlobalSphere[1];
                 disp_ = globSphere_.Center - LowPoint;
             }
+            else
+                globSphere_ = new Sphere();
 
             var radsum = Radius - PhysicsGlobals.EPSILON + globSphere.Radius;
 
@@ -390,7 +392,7 @@ namespace ACE.Server.Physics
         {
             var path = transition.SpherePath;
 
-            Sphere globSphere_ = null;
+            Sphere globSphere_;
             Vector3 disp_ = Vector3.Zero;
 
             if (path.NumSphere > 1)
@@ -398,6 +400,8 @@ namespace ACE.Server.Physics
                 globSphere_ = path.GlobalSphere[1];
                 disp_ = globSphere_.Center - LowPoint;
             }
+            else
+                globSphere_ = new Sphere();
 
             if (CollidesWithSphere(checkPos, disp, radsum) || path.NumSphere > 1 && CollidesWithSphere(globSphere_, disp_, radsum))
             {

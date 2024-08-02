@@ -116,7 +116,7 @@ namespace ACE.Server.Physics
             var gfxObj = GfxObjCache.Get(gfxObjID);
             if (gfxObj != null)
             {
-                if (gfxObj.PhysicsSphere != null)
+                if (gfxObj.PhysicsSphere.Radius != 0)
                     setup.SortingSphere = gfxObj.PhysicsSphere;
                 else
                     setup.SortingSphere = gfxObj.DrawingSphere;

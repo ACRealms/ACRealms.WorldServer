@@ -149,7 +149,7 @@ namespace ACE.Server.Physics.Animation
                 GlobalCurrCenter.Add(new Sphere());
 
             for (var i = 0; i < NumSphere; i++)
-                GlobalCurrCenter[i].Center = CurPos.LocalToGlobal(LocalSphere[i].Center);
+                GlobalCurrCenter[i] = GlobalCurrCenter[i] with { Center = CurPos.LocalToGlobal(LocalSphere[i].Center) };
         }
 
         /// <summary>
@@ -160,8 +160,8 @@ namespace ACE.Server.Physics.Animation
         {
             if (offset != null)
             {
-                foreach (var globSphere in GlobalSphere)
-                    globSphere.Center += offset.Value;
+                for (var i = 0; i < GlobalSphere.Count; i++)
+                    GlobalSphere[i] = GlobalSphere[i] with { Center = GlobalSphere[i].Center + offset.Value };
 
                 GlobalLowPoint += offset.Value;
             }
@@ -172,8 +172,11 @@ namespace ACE.Server.Physics.Animation
 
                 for (var i = 0; i < NumSphere; i++)
                 {
-                    GlobalSphere[i].Radius = LocalSphere[i].Radius;
-                    GlobalSphere[i].Center = CheckPos.LocalToGlobal(LocalSphere[i].Center);
+                    GlobalSphere[i] = GlobalSphere[i] with
+                    {
+                        Radius = LocalSphere[i].Radius,
+                        Center = CheckPos.LocalToGlobal(LocalSphere[i].Center)
+                    };
                 }
                 GlobalLowPoint = CheckPos.LocalToGlobal(LocalLowPoint);
             }
@@ -197,10 +200,13 @@ namespace ACE.Server.Physics.Animation
 
                 // localspacecurrcenter = curpos in local space
                 // localspacesphere = checkpos in local space
-                LocalSpaceCurrCenter[i].Center = pos.LocalToLocal(CurPos, LocalSphere[i].Center) * invScale;
+                LocalSpaceCurrCenter[i] = LocalSpaceCurrCenter[i] with { Center = pos.LocalToLocal(CurPos, LocalSphere[i].Center) * invScale };
 
-                LocalSpaceSphere[i].Radius = LocalSphere[i].Radius * invScale;
-                LocalSpaceSphere[i].Center = pos.LocalToLocal(CheckPos, LocalSphere[i].Center) * invScale;
+                LocalSpaceSphere[i] = LocalSpaceSphere[i] with
+                {
+                    Radius = LocalSphere[i].Radius * invScale,
+                    Center = pos.LocalToLocal(CheckPos, LocalSphere[i].Center) * invScale
+                };
             }
             LocalSpacePos = new PhysicsPosition(pos);
             LocalSpaceZ = pos.GlobalToLocalVec(Vector3.UnitZ);

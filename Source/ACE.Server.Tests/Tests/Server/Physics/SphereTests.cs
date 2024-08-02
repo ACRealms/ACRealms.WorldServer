@@ -119,7 +119,7 @@ namespace ACE.Server.Tests.Physics
             transition.SpherePath.NumSphere = 1;
             transition.SpherePath.InsertType = InsertType.Placement;
             transition.SpherePath.GlobalSphere.Add(sphereNonCollide);
-            transition.SpherePath.GlobalSphere.Add(null);
+            transition.SpherePath.GlobalSphere.Add(new Sphere());
             transition.SpherePath.GlobalCurrCenter.AddRange(new List<Sphere>() { new Sphere(Vector3.Zero, 0), new Sphere(Vector3.Zero, 0) });
 
             Sphere_IntersectsSphere_Inner(sphere, transition, sphereCollide, sphereNonCollide);

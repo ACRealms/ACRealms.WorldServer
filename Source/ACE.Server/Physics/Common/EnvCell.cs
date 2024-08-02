@@ -155,13 +155,13 @@ namespace ACE.Server.Physics.Common
             {
                 if (part == null) continue;
 
-                Sphere boundingSphere = null;
-                if (part.GfxObj.PhysicsSphere != null)
+                Sphere boundingSphere;
+                if (part.GfxObj.PhysicsSphere.Radius != 0)
                     boundingSphere = part.GfxObj.PhysicsSphere;
                 else
                     boundingSphere = part.GfxObj.DrawingSphere;
 
-                if (boundingSphere == null) continue;
+                if (boundingSphere.Radius == 0) continue;
 
                 var center = Pos.LocalToLocal(part.Pos, boundingSphere.Center);
                 var rad = boundingSphere.Radius + PhysicsGlobals.EPSILON;
@@ -254,9 +254,9 @@ namespace ACE.Server.Physics.Common
                 {
                     if (part == null) continue;
                     var sphere = part.GfxObj.PhysicsSphere;
-                    if (sphere == null)
+                    if (sphere.Radius == 0)
                         sphere = part.GfxObj.DrawingSphere;
-                    if (sphere == null)
+                    if (sphere.Radius == 0)
                         continue;
 
                     var center = Pos.LocalToLocal(part.Pos, sphere.Center);

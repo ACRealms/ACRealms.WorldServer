@@ -620,7 +620,7 @@ namespace ACE.Server.Physics
             if (PartArray != null)
                 return PartArray.GetSelectionSphere(selectionSphere);
             else
-                return null;
+                return new Sphere();
         }
 
         public uint GetSetupID()
@@ -2108,7 +2108,7 @@ namespace ACE.Server.Physics
                 else
                 {
                     // added sorting sphere null check
-                    var sphere = PartArray != null && PartArray.Setup.SortingSphere != null ? PartArray.GetSortingSphere() : PhysicsGlobals.DummySphere;
+                    var sphere = PartArray != null && PartArray.Setup.SortingSphere.Radius != 0 ? PartArray.GetSortingSphere() : PhysicsGlobals.DummySphere;
                     ObjCell.find_cell_list(ref Position, sphere, CellArray, null, instance);
                 }
             }
@@ -2972,11 +2972,11 @@ namespace ACE.Server.Physics
             return obj;
         }
 
-        public static PhysicsObj makeParticleObject(int numParts, Sphere sortingSphere)
+        public static PhysicsObj makeParticleObject(int numParts)
         {
             var particle = new PhysicsObj();
             particle.State = PhysicsState.Static | PhysicsState.ReportCollisions;
-            particle.PartArray = PartArray.CreateParticle(particle, numParts, sortingSphere);
+            particle.PartArray = PartArray.CreateParticle(particle, numParts);
             return particle;
         }
 

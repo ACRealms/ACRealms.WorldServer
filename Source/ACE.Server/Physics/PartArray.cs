@@ -86,7 +86,7 @@ namespace ACE.Server.Physics
             return mesh;
         }
 
-        public static PartArray CreateParticle(PhysicsObj owner, int numParts, Sphere sortingSphere = null)
+        public static PartArray CreateParticle(PhysicsObj owner, int numParts)
         {
             var particle = new PartArray();
             particle.Owner = owner;
@@ -208,7 +208,7 @@ namespace ACE.Server.Physics
 
         public Sphere GetSelectionSphere(Sphere selectionSphere)
         {
-            if (Setup == null) return null;
+            if (Setup == null) return new Sphere();
             return new Sphere(selectionSphere.Center * Scale, selectionSphere.Radius * Scale.Z);
         }
 

@@ -121,7 +121,7 @@ namespace ACE.Server.Physics
             var diff = radius - dp;
             var adjusted = Plane.Normal * diff;
             hitSphere.Center += adjusted;
-            if (otherSphere != null)
+            if (otherSphere.Radius != 0)
                 otherSphere.Center += adjusted;
         }
 

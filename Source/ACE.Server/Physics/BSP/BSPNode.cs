@@ -326,7 +326,7 @@ namespace ACE.Server.Physics.BSP
 
         public bool Equals(BSPNode node)
         {
-            if (Sphere != null && !Sphere.Equals(node.Sphere) || !SplittingPlane.is_equal(node.SplittingPlane) || Type != node.Type || Typename != null && !Typename.Equals(node.Typename) || NumPolys != node.NumPolys)
+            if (Sphere.Radius != 0 && !Sphere.Equals(node.Sphere) || !SplittingPlane.is_equal(node.SplittingPlane) || Type != node.Type || Typename != null && !Typename.Equals(node.Typename) || NumPolys != node.NumPolys)
                 return false;
 
             for (var i = 0; i < NumPolys; i++)
@@ -348,7 +348,7 @@ namespace ACE.Server.Physics.BSP
         {
             int hash = 0;
 
-            if (Sphere != null)
+            if (Sphere.Radius != 0)
                 hash = (hash * 397) ^ Sphere.GetHashCode();
 
             hash = (hash * 397) ^ SplittingPlane.get_hash_code();
