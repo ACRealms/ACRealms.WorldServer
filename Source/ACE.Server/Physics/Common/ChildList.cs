@@ -30,24 +30,24 @@ namespace ACE.Server.Physics.Common
             return -1;
         }
 
-        public void AddChild(PhysicsObj obj, AFrame frame, int partIdx, int locationID)
-        {
-            Objects.Add(obj);
-            Frames.Add(frame);
-            PartNumbers.Add(partIdx);
-            LocationIDs.Add(locationID);
-            NumObjects++;
-        }
+        //public void AddChild(PhysicsObj obj, AFrame frame, int partIdx, int locationID)
+        //{
+        //    Objects.Add(obj);
+        //    Frames.Add(frame);
+        //    PartNumbers.Add(partIdx);
+        //    LocationIDs.Add(locationID);
+        //    NumObjects++;
+        //}
 
-        public bool RemoveChild(PhysicsObj obj)
-        {
-            var idx = FindChildIndex(obj);
-            if (idx == -1) return false;
-            Objects.RemoveAt(idx);
-            Frames.RemoveAt(idx);
-            PartNumbers.RemoveAt(idx);
-            LocationIDs.RemoveAt(idx);
-            return true;
-        }
+        //public bool RemoveChild(PhysicsObj obj)
+        //{
+        //    var idx = FindChildIndex(obj);
+        //    if (idx == -1) return false;
+        //    Objects.RemoveAt(idx);
+        //    Frames.RemoveAt(idx);
+        //    PartNumbers.RemoveAt(idx);
+        //    LocationIDs.RemoveAt(idx);
+        //    return true;
+        //}
     }
 }

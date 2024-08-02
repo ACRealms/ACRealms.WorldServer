@@ -13,36 +13,36 @@ namespace ACE.Server.Physics
             ParticleTable = new Dictionary<int, ParticleEmitter>();
         }
 
-        public int CreateBlockingParticleEmitter(PhysicsObj obj, uint emitterInfoID, int partIdx, AFrame offset, int emitterID)
-        {
-            if (emitterID != 0)
-            {
-                if (ParticleTable.ContainsKey(emitterID))
-                    return 0;
-            }
-            return CreateBlockingParticleEmitter(obj, emitterInfoID, partIdx, offset, emitterID);
-        }
+        //public int CreateBlockingParticleEmitter(PhysicsObj obj, uint emitterInfoID, int partIdx, AFrame offset, int emitterID)
+        //{
+        //    if (emitterID != 0)
+        //    {
+        //        if (ParticleTable.ContainsKey(emitterID))
+        //            return 0;
+        //    }
+        //    return CreateBlockingParticleEmitter(obj, emitterInfoID, partIdx, offset, emitterID);
+        //}
 
-        public int CreateParticleEmitter(PhysicsObj obj, uint emitterInfoID, int partIdx, AFrame offset, int emitterID)
-        {
-            if (emitterID != 0)
-                ParticleTable.Remove(emitterID);
+        //public int CreateParticleEmitter(PhysicsObj obj, uint emitterInfoID, int partIdx, AFrame offset, int emitterID)
+        //{
+        //    if (emitterID != 0)
+        //        ParticleTable.Remove(emitterID);
 
-            var emitter = ParticleEmitter.makeParticleEmitter(obj);
+        //    var emitter = ParticleEmitter.makeParticleEmitter(obj);
 
-            if (!emitter.SetInfo(emitterInfoID) || !emitter.SetParenting(partIdx, offset))
-                return 0;
+        //    if (!emitter.SetInfo(emitterInfoID) || !emitter.SetParenting(partIdx, offset))
+        //        return 0;
 
-            emitter.InitEnd();
+        //    emitter.InitEnd();
 
-            var currentID = emitterID;
-            if (emitterID == 0)
-                currentID = NextEmitterId++;
+        //    var currentID = emitterID;
+        //    if (emitterID == 0)
+        //        currentID = NextEmitterId++;
 
-            emitter.ID = currentID;
-            ParticleTable.Add(currentID, emitter);
-            return currentID;
-        }
+        //    emitter.ID = currentID;
+        //    ParticleTable.Add(currentID, emitter);
+        //    return currentID;
+        //}
 
         public int GetNumEmitters()
         {

@@ -223,22 +223,22 @@ namespace ACE.Server.Physics
             var shadowObj = new ShadowObj(this, objCell);
             objCell.AddShadowObject(shadowObj);
 
-            if (PartArray != null)
-                PartArray.AddPartsShadow(objCell, 1);
+            //if (PartArray != null)
+            //    PartArray.AddPartsShadow(objCell, 1);
         }
 
         public void AddPartToShadowCells(PhysicsPart part)
         {
             if (CurCell != null) part.Pos.ObjCellID = CurCell.ID;
-            foreach (var shadowObj in ShadowObjects.Values)
-            {
-                var shadowCell = shadowObj.Cell;
-                if (shadowCell != null)
-                {
-                    shadowCell.AddPart(part, null,
-                        shadowCell.Pos.Frame, ShadowObjects.Count);
-                }
-            }
+            //foreach (var shadowObj in ShadowObjects.Values)
+            //{
+            //    var shadowCell = shadowObj.Cell;
+            //    if (shadowCell != null)
+            //    {
+            //        shadowCell.AddPart(part, null,
+            //            shadowCell.Pos.Frame, ShadowObjects.Count);
+            //    }
+            //}
         }
 
         public ObjCell AdjustPosition(PhysicsPosition position, Vector3 low_pt, bool dontCreateCells, bool searchCells, uint instance)
@@ -1028,11 +1028,11 @@ namespace ACE.Server.Physics
             if (part == null) return;
 
             if (CurCell != null) part.Pos.ObjCellID = CurCell.ID;
-            foreach (var shadowObj in ShadowObjects.Values)
-            {
-                if (shadowObj.Cell != null)
-                    shadowObj.Cell.RemovePart(part);
-            }
+            //foreach (var shadowObj in ShadowObjects.Values)
+            //{
+            //    if (shadowObj.Cell != null)
+            //        shadowObj.Cell.RemovePart(part);
+            //}
         }
 
         public void RestoreLighting()
@@ -1656,10 +1656,10 @@ namespace ACE.Server.Physics
 
         public void UpdateChildrenInternal()
         {
-            if (PartArray == null || Children == null || Children.NumObjects == 0) return;
+            //if (PartArray == null || Children == null || Children.NumObjects == 0) return;
 
-            for (var i = 0; i < Children.Objects.Count; i++)
-                UpdateChild(Children.Objects[i], Children.PartNumbers[i], Children.Frames[i]);
+            //for (var i = 0; i < Children.Objects.Count; i++)
+            //    UpdateChild(Children.Objects[i], Children.PartNumbers[i], Children.Frames[i]);
         }
 
         public int InitialUpdates;
@@ -1931,29 +1931,29 @@ namespace ACE.Server.Physics
             AnimHooks.Add(hook);
         }
 
-        public bool add_child(PhysicsObj obj, int where)
-        {
-            if (PartArray == null || obj.Equals(this)) return false;
+        //public bool add_child(PhysicsObj obj, int where)
+        //{
+        //    if (PartArray == null || obj.Equals(this)) return false;
 
-            var setup = PartArray.Setup.GetHoldingLocation(where);
-            if (setup == null) return false;
+        //    var setup = PartArray.Setup.GetHoldingLocation(where);
+        //    if (setup == null) return false;
 
-            if (Children == null) Children = new ChildList();
-            Children.AddChild(obj, new AFrame(setup.Frame), setup.PartId, where);
-            return true;
-        }
+        //    if (Children == null) Children = new ChildList();
+        //    Children.AddChild(obj, new AFrame(setup.Frame), setup.PartId, where);
+        //    return true;
+        //}
 
-        public bool add_child(PhysicsObj obj, int partIdx, AFrame frame)
-        {
-            if (obj.Equals(this)) return false;
+        //public bool add_child(PhysicsObj obj, int partIdx, AFrame frame)
+        //{
+        //    if (obj.Equals(this)) return false;
 
-            if (PartArray == null || partIdx != -1 && partIdx >= PartArray.NumParts)
-                return false;
+        //    if (PartArray == null || partIdx != -1 && partIdx >= PartArray.NumParts)
+        //        return false;
 
-            if (Children == null) Children = new ChildList();
-            Children.AddChild(obj, frame, partIdx, 0);
-            return true;
-        }
+        //    if (Children == null) Children = new ChildList();
+        //    Children.AddChild(obj, frame, partIdx, 0);
+        //    return true;
+        //}
 
         public void add_obj_to_cell(ObjCell newCell, ref AFrame newFrame)
         {
@@ -1974,8 +1974,8 @@ namespace ACE.Server.Physics
             var shadowObj = new ShadowObj(this, CurCell);
             ShadowObjects.Add(1, shadowObj);
 
-            if (PartArray != null)
-                PartArray.AddPartsShadow(CurCell, 1);
+            //if (PartArray != null)
+            //    PartArray.AddPartsShadow(CurCell, 1);
         }
 
         public void add_shadows_to_cell(CellArray cellArray)
@@ -1996,8 +1996,8 @@ namespace ACE.Server.Physics
 
                     if (cell != null) cell.AddShadowObject(shadowObj);
 
-                    if (PartArray != null)
-                        PartArray.AddPartsShadow(cell, NumShadowObjects);
+                    //if (PartArray != null)
+                    //    PartArray.AddPartsShadow(cell, NumShadowObjects);
 
                 }
             }
@@ -2018,8 +2018,8 @@ namespace ACE.Server.Physics
 
             if (cell != null) cell.AddShadowObject(shadowObj);
 
-            if (PartArray != null)
-                PartArray.AddPartsShadow(cell, NumShadowObjects);
+            //if (PartArray != null)
+            //    PartArray.AddPartsShadow(cell, NumShadowObjects);
         }
 
         public void add_voyeur(ulong objectID, float radius, double quantum)
@@ -2234,43 +2234,43 @@ namespace ACE.Server.Physics
                 return contact;
         }
 
-        public void clear_sequence_anims()
-        {
-            if (PartArray != null)
-                PartArray.Sequence.clear_animations();
-        }
+        //public void clear_sequence_anims()
+        //{
+        //    if (PartArray != null)
+        //        PartArray.Sequence.clear_animations();
+        //}
 
         public void clear_target()
         {
             if (TargetManager != null) TargetManager.ClearTarget();
         }
 
-        public void clear_transient_states()
-        {
-            TransientState &= ~TransientStateFlags.Contact;
-            calc_acceleration();
-            var walkable = TransientState.HasFlag(TransientStateFlags.OnWalkable);
-            TransientState &= ~(TransientStateFlags.OnWalkable | TransientStateFlags.WaterContact);
-            if (MovementManager != null && walkable) MovementManager.LeaveGround();
-            calc_acceleration();
-            TransientState = 0;
-        }
+        //public void clear_transient_states()
+        //{
+        //    TransientState &= ~TransientStateFlags.Contact;
+        //    calc_acceleration();
+        //    var walkable = TransientState.HasFlag(TransientStateFlags.OnWalkable);
+        //    TransientState &= ~(TransientStateFlags.OnWalkable | TransientStateFlags.WaterContact);
+        //    if (MovementManager != null && walkable) MovementManager.LeaveGround();
+        //    calc_acceleration();
+        //    TransientState = 0;
+        //}
 
-        public int create_blocking_particle_emitter(uint emitterInfoID, int partIdx, AFrame offset, int emitterID)
-        {
-            if (ParticleManager == null)
-                ParticleManager = new ParticleManager();
+        //public int create_blocking_particle_emitter(uint emitterInfoID, int partIdx, AFrame offset, int emitterID)
+        //{
+        //    if (ParticleManager == null)
+        //        ParticleManager = new ParticleManager();
 
-            return ParticleManager.CreateBlockingParticleEmitter(this, emitterInfoID, partIdx, offset, emitterID);
-        }
+        //    return ParticleManager.CreateBlockingParticleEmitter(this, emitterInfoID, partIdx, offset, emitterID);
+        //}
 
-        public int create_particle_emitter(uint emitterInfoID, int partIdx, AFrame offset, int emitterID)
-        {
-            if (ParticleManager == null)
-                ParticleManager = new ParticleManager();
+        //public int create_particle_emitter(uint emitterInfoID, int partIdx, AFrame offset, int emitterID)
+        //{
+        //    if (ParticleManager == null)
+        //        ParticleManager = new ParticleManager();
 
-            return ParticleManager.CreateParticleEmitter(this, emitterInfoID, partIdx, offset, emitterID);
-        }
+        //    return ParticleManager.CreateParticleEmitter(this, emitterInfoID, partIdx, offset, emitterID);
+        //}
 
         public bool destroy_particle_emitter(int emitterID)
         {
@@ -3833,65 +3833,65 @@ namespace ACE.Server.Physics
         /// <param name="obj">The parent object</param>
         /// <param name="idx">The child index in the parent object</param>
         /// <returns>True if success</returns>
-        public bool set_parent(PhysicsObj obj, int idx)
-        {
-            if (obj == null) return false;
-            if (!obj.add_child(this, idx)) return false;
+        //public bool set_parent(PhysicsObj obj, int idx)
+        //{
+        //    if (obj == null) return false;
+        //    if (!obj.add_child(this, idx)) return false;
 
-            unset_parent();
-            leave_world();
+        //    unset_parent();
+        //    leave_world();
 
-            Parent = obj;
+        //    Parent = obj;
 
-            if (obj.CurCell != null)
-            {
-                change_cell(obj.CurCell);
+        //    if (obj.CurCell != null)
+        //    {
+        //        change_cell(obj.CurCell);
 
-                if (obj.Children != null)
-                {
-                    var index = obj.Children.FindChildIndex(this);
-                    if (index != -1)
-                    {
-                        obj.UpdateChild(this, obj.Children.PartNumbers[index], obj.Children.Frames[index]);
-                        recalc_cross_cells();
-                    }
-                }
-            }
+        //        if (obj.Children != null)
+        //        {
+        //            var index = obj.Children.FindChildIndex(this);
+        //            if (index != -1)
+        //            {
+        //                obj.UpdateChild(this, obj.Children.PartNumbers[index], obj.Children.Frames[index]);
+        //                recalc_cross_cells();
+        //            }
+        //        }
+        //    }
 
-            if (Parent.State.HasFlag(PhysicsState.Hidden))
-            {
-                State |= PhysicsState.NoDraw;
-                if (PartArray != null)
-                    PartArray.SetNoDrawInternal(true);
-            }
+        //    if (Parent.State.HasFlag(PhysicsState.Hidden))
+        //    {
+        //        State |= PhysicsState.NoDraw;
+        //        if (PartArray != null)
+        //            PartArray.SetNoDrawInternal(true);
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
 
         /// <summary>
         /// Sets the parent object for this physics object
         /// </summary>
-        public bool set_parent(PhysicsObj obj, int partIdx, AFrame frame)
-        {
-            if (obj == null) return false;
-            if (!obj.add_child(this, partIdx, frame)) return false;
+        //public bool set_parent(PhysicsObj obj, int partIdx, AFrame frame)
+        //{
+        //    if (obj == null) return false;
+        //    if (!obj.add_child(this, partIdx, frame)) return false;
 
-            ExaminationObject = obj.ExaminationObject;
+        //    ExaminationObject = obj.ExaminationObject;
 
-            unset_parent();
-            leave_world();
+        //    unset_parent();
+        //    leave_world();
 
-            Parent = obj;
+        //    Parent = obj;
 
-            if (obj.CurCell != null)
-            {
-                change_cell(obj.CurCell);
-                obj.UpdateChild(this, partIdx, frame);
-                recalc_cross_cells();
-            }
+        //    if (obj.CurCell != null)
+        //    {
+        //        change_cell(obj.CurCell);
+        //        obj.UpdateChild(this, partIdx, frame);
+        //        recalc_cross_cells();
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
 
         private Vector3 requestCachedVelocity;
 
@@ -4124,28 +4124,28 @@ namespace ACE.Server.Physics
             MovementManager.unpack_movement(addr, size);
         }
 
-        public void unparent_children()
-        {
-            if (Children == null) return;
-            foreach (var child in Children.Objects)
-                child.unset_parent();
-        }
+        //public void unparent_children()
+        //{
+        //    if (Children == null) return;
+        //    foreach (var child in Children.Objects)
+        //        child.unset_parent();
+        //}
 
-        public void unset_parent()
-        {
-            if (Parent == null) return;
-            if (Parent.Children != null)
-                Parent.Children.RemoveChild(this);
-            if (Parent.State.HasFlag(PhysicsState.Hidden))
-            {
-                State &= ~PhysicsState.Hidden;
-                if (PartArray != null)
-                    PartArray.SetNoDrawInternal(false);
-            }
-            Parent = null;
-            UpdateTime = PhysicsTimer.CurrentTime;
-            clear_transient_states();
-        }
+        //public void unset_parent()
+        //{
+        //    if (Parent == null) return;
+        //    if (Parent.Children != null)
+        //        Parent.Children.RemoveChild(this);
+        //    if (Parent.State.HasFlag(PhysicsState.Hidden))
+        //    {
+        //        State &= ~PhysicsState.Hidden;
+        //        if (PartArray != null)
+        //            PartArray.SetNoDrawInternal(false);
+        //    }
+        //    Parent = null;
+        //    UpdateTime = PhysicsTimer.CurrentTime;
+        //    clear_transient_states();
+        //}
 
         public void unstick_from_object()
         {

@@ -37,15 +37,15 @@ namespace ACE.Server.Physics
             LastEmitTime = PhysicsTimer.CurrentTime;
         }
 
-        public bool SetParenting(int partIdx, AFrame frame)
-        {
-            if (PhysicsObj == null || !PhysicsObj.set_parent(Parent, partIdx, frame))
-                return false;
+        //public bool SetParenting(int partIdx, AFrame frame)
+        //{
+        //    if (PhysicsObj == null || !PhysicsObj.set_parent(Parent, partIdx, frame))
+        //        return false;
 
-            PartIndex = partIdx;
-            ParentOffset = new AFrame(frame);
-            return true;
-        }
+        //    PartIndex = partIdx;
+        //    ParentOffset = new AFrame(frame);
+        //    return true;
+        //}
 
         public bool KillParticle(int i)
         {

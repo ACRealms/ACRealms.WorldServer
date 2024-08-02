@@ -11,22 +11,22 @@ namespace ACE.Server.Physics.Common
         public AFrame Frame;
         public PhysicsPart Part;
 
-        public ShadowPart() { }
+        //public ShadowPart() { }
 
-        public ShadowPart(int numPlanes, List<int> planes, AFrame frame, PhysicsPart part)
-        {
-            NumPlanes = numPlanes;
-            Planes = planes;
-            Frame = frame;
-            Part = part;
-        }
+        //public ShadowPart(int numPlanes, List<int> planes, AFrame frame, PhysicsPart part)
+        //{
+        //    NumPlanes = numPlanes;
+        //    Planes = planes;
+        //    Frame = frame;
+        //    Part = part;
+        //}
 
-        public ShadowPart(List<int> planes, AFrame frame, PhysicsPart part)
-        {
-            NumPlanes = planes != null ? planes.Count : 0;
-            Planes = planes;
-            Frame = frame;
-            Part = part;
-        }
+        //public ShadowPart(List<int> planes, AFrame frame, PhysicsPart part)
+        //{
+        //    NumPlanes = planes != null ? planes.Count : 0;
+        //    Planes = planes;
+        //    Frame = frame;
+        //    Part = part;
+        //}
     }
 }

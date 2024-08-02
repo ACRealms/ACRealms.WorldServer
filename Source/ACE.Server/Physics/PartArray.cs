@@ -30,19 +30,19 @@ namespace ACE.Server.Physics
             Scale = Vector3.One;
         }
 
-        public void AddPartsShadow(ObjCell objCell, int numShadowParts)
-        {
-            List<int> clipPlaneList = null;
+        //public void AddPartsShadow(ObjCell objCell, int numShadowParts)
+        //{
+        //    List<int> clipPlaneList = null;
 
-            if (numShadowParts > 1)
-                clipPlaneList = objCell.ClipPlanes;
+        //    if (numShadowParts > 1)
+        //        clipPlaneList = objCell.ClipPlanes;
 
-            for (var i = 0; i < NumParts; i++)
-            {
-                if (Parts[i] != null)
-                    objCell.AddPart(Parts[i], clipPlaneList, objCell.Pos.Frame, numShadowParts);
-            }
-        }
+        //    for (var i = 0; i < NumParts; i++)
+        //    {
+        //        if (Parts[i] != null)
+        //            objCell.AddPart(Parts[i], clipPlaneList, objCell.Pos.Frame, numShadowParts);
+        //    }
+        //}
 
         public bool AllowsFreeHeading()
         {
@@ -378,8 +378,8 @@ namespace ACE.Server.Physics
 
         public void RemoveParts(ObjCell cell)
         {
-            foreach (var part in Parts)
-                cell.RemovePart(part);
+            //foreach (var part in Parts)
+            //    cell.RemovePart(part);
         }
 
         public void SetCellID(uint cellID)
