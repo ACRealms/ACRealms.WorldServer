@@ -386,30 +386,22 @@ namespace ACE.Server.Physics.Common
             }
             if (!cellArray.LoadCells && (position.ObjCellID & 0xFFFF) >= 0x100)
             {
-                var cells = cellArray.Cells.Values.ToList();
-                foreach (var cell in cells)
+                var cellsToRemove = new List<uint>();
+                var visibleEnvCell = (EnvCell)visibleCell;
+                foreach (var cell in cellArray.Cells.Values)
                 {
                     if (cell == null) continue;
 
-                    if (visibleCell.ID == cell.ID)
+                    var id = cell.ID;
+                    if (visibleCell.ID == id)
                         continue;
 
-                    var found = false;
-
-                    foreach (var stab in ((EnvCell)visibleCell).VisibleCells.Values)
-                    {
-                        if (stab == null)
-                            continue;
-
-                        if (cell.ID == stab.ID)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
+                    var found = visibleEnvCell.VisibleCells.ContainsKey(id & 0xFFFF); // Need to verify/confirm this id is correct, was previously checking the values
                     if (!found)
-                        cellArray.remove_cell(cell);
+                        cellsToRemove.Add(id);
                 }
+                foreach (var cellToRemove in cellsToRemove)
+                    cellArray.remove_cell(cellToRemove);
             }
         }
 
