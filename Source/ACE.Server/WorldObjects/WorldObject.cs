@@ -207,7 +207,7 @@ namespace ACE.Server.WorldObjects
             location.Frame.Origin = Location.Pos;
             location.Frame.Orientation = Location.Rotation;
 
-            var success = PhysicsObj.enter_world(location, Location.Instance);
+            var success = PhysicsObj.enter_world(ref location, Location.Instance);
 
             if (!success || PhysicsObj.CurCell == null)
             {
@@ -310,7 +310,7 @@ namespace ACE.Server.WorldObjects
             var startPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
             var targetPos = new Physics.Common.PhysicsPosition(wo.PhysicsObj.Position);
 
-            if (PhysicsObj.GetBlockDist(startPos, targetPos) > 1)
+            if (PhysicsObj.GetBlockDist(ref startPos, ref targetPos) > 1)
                 return false;
 
             // set to eye level
@@ -348,7 +348,7 @@ namespace ACE.Server.WorldObjects
             var startPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
             var targetPos = new Physics.Common.PhysicsPosition(pos);
 
-            if (PhysicsObj.GetBlockDist(startPos, targetPos) > 1)
+            if (PhysicsObj.GetBlockDist(ref startPos, ref targetPos) > 1)
                 return false;
 
             // set to eye level

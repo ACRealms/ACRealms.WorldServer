@@ -148,7 +148,7 @@ namespace ACE.Server.WorldObjects
             {
                 // check healing move distance cap
                 var endPos = new Physics.Common.PhysicsPosition(healer.PhysicsObj.Position);
-                var dist = startPos.Distance(endPos);
+                var dist = startPos.Distance(ref endPos);
 
                 //Console.WriteLine($"Dist: {dist}");
 

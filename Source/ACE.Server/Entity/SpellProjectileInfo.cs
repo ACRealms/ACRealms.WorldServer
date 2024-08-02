@@ -14,7 +14,7 @@ namespace ACE.Server.Entity
 
         public Vector3? CachedVelocity;
 
-        public Physics.Common.PhysicsPosition StartPos;
+        public readonly Physics.Common.PhysicsPosition StartPos;
 
         public SpellProjectileInfo(SpellProjectile spellProjectile)
         {
@@ -29,8 +29,7 @@ namespace ACE.Server.Entity
             if (target?.Location != null)
                 TargetPos = new InstancedPosition(target.Location);
 
-            if (spellProjectile.PhysicsObj.Position != null)
-                StartPos = new Physics.Common.PhysicsPosition(spellProjectile.PhysicsObj.Position);
+            StartPos = new Physics.Common.PhysicsPosition(spellProjectile.PhysicsObj.Position);
 
             CachedVelocity = target?.PhysicsObj.CachedVelocity;
         }

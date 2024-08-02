@@ -125,7 +125,7 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public void check_building_transit(ushort portalId, PhysicsPosition pos, int numSphere, List<Sphere> spheres, CellArray cellArray, SpherePath path)
+        public void check_building_transit(ushort portalId, int numSphere, List<Sphere> spheres, CellArray cellArray, SpherePath path)
         {
             //if (portalId == 0) return;
             if (portalId == ushort.MaxValue) return;
@@ -308,7 +308,7 @@ namespace ACE.Server.Physics.Common
                 LandCell.add_all_outside_cells(numParts, parts, cellArray, ID);
         }
 
-        public override void find_transit_cells(PhysicsPosition position, int numSphere, List<Sphere> spheres, CellArray cellArray, SpherePath path, uint instance)
+        public override void find_transit_cells(ref PhysicsPosition position, int numSphere, List<Sphere> spheres, CellArray cellArray, SpherePath path, uint instance)
         {
             var checkOutside = false;
 
@@ -367,7 +367,7 @@ namespace ACE.Server.Physics.Common
                 }
             }
             if (checkOutside)
-                LandCell.add_all_outside_cells(position, numSphere, spheres, cellArray, instance);
+                LandCell.add_all_outside_cells(ref position, numSphere, spheres, cellArray, instance);
         }
 
         public void init_static_objects()

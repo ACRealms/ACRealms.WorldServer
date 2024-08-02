@@ -164,7 +164,7 @@ namespace ACE.Server.Physics
             foreach (var part in Parts)
             {
                 var partBox = part.GetBoundingBox();
-                partBox.ConvertToGlobal(part.Pos);
+                partBox.ConvertToGlobal(ref part.Pos);
                 partBox.BuildBoundingBox(bbox);
             }
             return bbox;

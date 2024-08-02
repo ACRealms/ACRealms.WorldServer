@@ -51,13 +51,13 @@ namespace ACE.Server.Physics.Common
             return transitionState;
         }
 
-        public void find_building_transit_cells(PhysicsPosition pos, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
+        public void find_building_transit_cells(int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
         {
             foreach (var portal in Portals)
             {
                 var otherCell = portal.GetOtherCell(CurCell.ID, instance);
                 if (otherCell != null)
-                    otherCell.check_building_transit(portal.OtherPortalId, pos, numSphere, sphere, cellArray, path);
+                    otherCell.check_building_transit(portal.OtherPortalId, numSphere, sphere, cellArray, path);
             }
         }
 

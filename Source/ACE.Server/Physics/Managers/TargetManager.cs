@@ -59,7 +59,7 @@ namespace ACE.Server.Physics.Combat
 
             if (PhysicsTimer.CurrentTime - LastUpdateTime < 0.5f) return;
 
-            if (TargetInfo != null && TargetInfo.TargetPosition == null)
+            if (TargetInfo != null && TargetInfo.TargetPosition.ObjCellID == 0)
             {
                 //Console.WriteLine("TargetManager.HandleTargetting - null position");
                 return;
@@ -80,18 +80,16 @@ namespace ACE.Server.Physics.Combat
 
         public void CheckAndUpdateVoyeur(TargettedVoyeurInfo voyeur)
         {
-            var newPos = GetInterpolatedPosition(voyeur.Quantum);
-            if (newPos != null)
+            if (PhysicsObj != null)
             {
-                if (newPos.Distance(voyeur.LastSentPosition) > voyeur.Radius)
-                    SendVoyeurUpdate(voyeur, newPos, TargetStatus.OK);
+                var newPos = GetInterpolatedPosition(voyeur.Quantum);
+                if (newPos.Distance(ref voyeur.LastSentPosition) > voyeur.Radius)
+                    SendVoyeurUpdate(voyeur, ref newPos, TargetStatus.OK);
             }
         }
 
         public PhysicsPosition GetInterpolatedPosition(double quantum)
         {
-            if (PhysicsObj == null) return null;
-
             var pos = new PhysicsPosition(PhysicsObj.Position);
             pos.Frame.Origin += PhysicsObj.get_velocity() * (float)quantum;
             return pos;
@@ -115,7 +113,7 @@ namespace ACE.Server.Physics.Combat
             if (PhysicsObj == null || VoyeurTable == null) return;
 
             foreach (var voyeur in VoyeurTable.Values.ToList())
-                SendVoyeurUpdate(voyeur, PhysicsObj.Position, status);
+                SendVoyeurUpdate(voyeur, ref PhysicsObj.Position, status);
         }
 
         public void ReceiveUpdate(TargetInfo update)
@@ -153,10 +151,10 @@ namespace ACE.Server.Physics.Combat
             var info = new TargettedVoyeurInfo(objectID, radius, quantum);
             VoyeurTable.Add(objectID, info);
 
-            SendVoyeurUpdate(info, PhysicsObj.Position, TargetStatus.OK);
+            SendVoyeurUpdate(info, ref PhysicsObj.Position, TargetStatus.OK);
         }
 
-        public void SendVoyeurUpdate(TargettedVoyeurInfo voyeur, PhysicsPosition pos, TargetStatus status)
+        public void SendVoyeurUpdate(TargettedVoyeurInfo voyeur, ref PhysicsPosition pos, TargetStatus status)
         {
             voyeur.LastSentPosition = new PhysicsPosition(pos);    // ref?
 

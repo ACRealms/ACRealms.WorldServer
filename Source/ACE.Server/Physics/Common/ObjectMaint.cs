@@ -437,7 +437,7 @@ namespace ACE.Server.Physics.Common
 
                 if (InitialClamp && !KnownObjects.ContainsKey(obj.ID))
                 {
-                    var distSq = PhysicsObj.Position.Distance2DSquared(obj.Position);
+                    var distSq = PhysicsObj.Position.Distance2DSquared(ref obj.Position);
 
                     if (distSq > InitialClamp_DistSq)
                         return false;
@@ -967,7 +967,7 @@ namespace ACE.Server.Physics.Common
 
             if (clamp && InitialClamp && obj.IsPlayer && !obj.ObjMaint.KnownObjects.ContainsKey(obj.ID))
             {
-                var distSq = PhysicsObj.Position.Distance2DSquared(obj.Position);
+                var distSq = PhysicsObj.Position.Distance2DSquared(ref obj.Position);
 
                 if (distSq > InitialClamp_DistSq)
                     return false;
@@ -1030,7 +1030,7 @@ namespace ACE.Server.Physics.Common
                 var dist = new List<PhysicsObj>();
                 foreach (var obj in visibleObjs)
                 {
-                    var distSq = PhysicsObj.Position.Distance2DSquared(obj.Position);
+                    var distSq = PhysicsObj.Position.Distance2DSquared(ref obj.Position);
 
                     if (distSq <= InitialClamp_DistSq)
                         dist.Add(obj);

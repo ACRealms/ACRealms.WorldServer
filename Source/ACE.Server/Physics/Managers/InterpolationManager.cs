@@ -33,7 +33,7 @@ namespace ACE.Server.Physics.Animation
             return new InterpolationManager(obj);
         }
 
-        public void InterpolateTo(PhysicsPosition position, bool keepHeading)
+        public void InterpolateTo(ref PhysicsPosition position, bool keepHeading)
         {
             if (PhysicsObj == null)
                 return;
@@ -41,16 +41,16 @@ namespace ACE.Server.Physics.Animation
             var dest = PositionQueue.Count > 0 && PositionQueue.Last.Value.Type == InterpolationNodeType.PositionType ?
                 PositionQueue.Last.Value.Position : PhysicsObj.Position;
 
-            var dist = dest.Distance(position);
+            var dist = dest.Distance(ref position);
 
             if (PhysicsObj.GetAutonomyBlipDistance() >= dist)
             {
-                if (PhysicsObj.Position.Distance(position) > 0.05f)
+                if (PhysicsObj.Position.Distance(ref position) > 0.05f)
                 {
                     while (PositionQueue.Count > 0)
                     {
                         var lastNode = PositionQueue.Last.Value;
-                        if (lastNode.Type != InterpolationNodeType.PositionType || lastNode.Position.Distance(position) >= 0.05f)
+                        if (lastNode.Type != InterpolationNodeType.PositionType || lastNode.Position.Distance(ref position) >= 0.05f)
                             break;
 
                         PositionQueue.RemoveLast();
@@ -102,7 +102,7 @@ namespace ACE.Server.Physics.Animation
             if (PositionQueue.Count > 1)
             {
                 if (next.Type == InterpolationNodeType.PositionType)
-                    OriginalDistance = PhysicsObj.Position.Distance(next.Position);
+                    OriginalDistance = PhysicsObj.Position.Distance(ref next.Position);
 
                 else if (!success)
                 {
@@ -151,7 +151,7 @@ namespace ACE.Server.Physics.Animation
                 var last = PositionQueue.Last.Value;
                 if (last.Type != InterpolationNodeType.JumpType && last.Type != InterpolationNodeType.VelocityType)
                 {
-                    if (PhysicsObj.SetPositionSimple(last.Position, true, instance) != SetPositionError.OK)
+                    if (PhysicsObj.SetPositionSimple(ref last.Position, true, instance) != SetPositionError.OK)
                         return;
 
                     StopInterpolating();
@@ -165,7 +165,7 @@ namespace ACE.Server.Physics.Animation
                         var node = PositionQueue.ElementAt(i);
                         if (node.Type == InterpolationNodeType.PositionType)
                         {
-                            if (PhysicsObj.SetPositionSimple(node.Position, true, instance) != SetPositionError.OK)
+                            if (PhysicsObj.SetPositionSimple(ref node.Position, true, instance) != SetPositionError.OK)
                                 return;
 
                             PhysicsObj.set_velocity(last.Velocity, true);
@@ -175,7 +175,7 @@ namespace ACE.Server.Physics.Animation
                     }
                 }
 
-                if (PhysicsObj.SetPositionSimple(BlipToPosition, true, instance) != SetPositionError.OK)
+                if (PhysicsObj.SetPositionSimple(ref BlipToPosition, true, instance) != SetPositionError.OK)
                     return;
 
                 StopInterpolating();
@@ -205,7 +205,7 @@ namespace ACE.Server.Physics.Animation
             if (first.Type == InterpolationNodeType.JumpType || first.Type == InterpolationNodeType.VelocityType)
                 return;
 
-            var dist = PhysicsObj.Position.Distance(first.Position);
+            var dist = PhysicsObj.Position.Distance(ref first.Position);
             if (dist < 0.05f)
             {
                 NodeCompleted(true);
@@ -237,7 +237,7 @@ namespace ACE.Server.Physics.Animation
                     OriginalDistance = dist;
                 }
 
-                var offset = first.Position.Subtract(PhysicsObj.Position);
+                var offset = first.Position.Subtract(ref PhysicsObj.Position);
                 var maxQuantum = maxSpeed * quantum;
                 var distance = offset.Origin.Length();
 

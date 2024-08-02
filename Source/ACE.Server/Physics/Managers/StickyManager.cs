@@ -101,7 +101,7 @@ namespace ACE.Server.Physics.Animation
             offset.Origin.Z = 0.0f;
 
             var radius = PhysicsObj.GetRadius();
-            var dist = PhysicsPosition.CylinderDistanceNoZ(radius, PhysicsObj.Position, TargetRadius, targetPosition) - StickyRadius;
+            var dist = PhysicsPosition.CylinderDistanceNoZ(radius, ref PhysicsObj.Position, TargetRadius, ref targetPosition) - StickyRadius;
 
             if (Vec.NormalizeCheckSmall(ref offset.Origin))
                 offset.Origin = Vector3.Zero;
@@ -121,7 +121,7 @@ namespace ACE.Server.Physics.Animation
             offset.Origin *= delta;
 
             var curHeading = PhysicsObj.Position.Frame.get_heading();
-            var targetHeading = PhysicsObj.Position.heading(targetPosition);
+            var targetHeading = PhysicsObj.Position.heading(ref targetPosition);
             var heading = targetHeading - curHeading;
             if (Math.Abs(heading) < PhysicsGlobals.EPSILON)
                 heading = 0.0f;

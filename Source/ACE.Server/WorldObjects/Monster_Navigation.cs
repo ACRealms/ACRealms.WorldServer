@@ -213,8 +213,8 @@ namespace ACE.Server.WorldObjects
             //var radialDist = dist - (AttackTarget.PhysicsObj.GetRadius() + PhysicsObj.GetRadius());
 
             // always use spheres?
-            var cylDist = (float)Physics.Common.PhysicsPosition.CylinderDistance(PhysicsObj.GetRadius(), PhysicsObj.GetHeight(), PhysicsObj.Position,
-                AttackTarget.PhysicsObj.GetRadius(), AttackTarget.PhysicsObj.GetHeight(), AttackTarget.PhysicsObj.Position);
+            var cylDist = (float)Physics.Common.PhysicsPosition.CylinderDistance(PhysicsObj.GetRadius(), PhysicsObj.GetHeight(), ref PhysicsObj.Position,
+                AttackTarget.PhysicsObj.GetRadius(), AttackTarget.PhysicsObj.GetHeight(), ref AttackTarget.PhysicsObj.Position);
 
             if (DebugMove)
                 Console.WriteLine($"{Name}.DistanceToTarget: {cylDist}");

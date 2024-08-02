@@ -65,7 +65,7 @@ namespace ACE.Server.Physics.Collision
                    (point.Z >= Min.Z && point.Z <= Max.Z);
         }
 
-        public void ConvertToGlobal(PhysicsPosition pos)
+        public void ConvertToGlobal(ref PhysicsPosition pos)
         {
             var transform = Matrix4x4.CreateFromQuaternion(pos.Frame.Orientation) * Matrix4x4.CreateTranslation(pos.Frame.Origin);
             Min = Vector3.Transform(Min, transform);

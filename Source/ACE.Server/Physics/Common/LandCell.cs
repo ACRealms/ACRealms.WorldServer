@@ -79,7 +79,7 @@ namespace ACE.Server.Physics.Common
             for (var i = 0; i < 2; i++) Polygons.Add(null);
         }
 
-        public static void add_all_outside_cells(PhysicsPosition position, int numSphere, List<Sphere> spheres, CellArray cellArray, uint instance)
+        public static void add_all_outside_cells(ref PhysicsPosition position, int numSphere, List<Sphere> spheres, CellArray cellArray, uint instance)
         {
             if (cellArray.AddedOutside) return;
 
@@ -109,7 +109,7 @@ namespace ACE.Server.Physics.Common
             }
             else
             {
-                if (!LandDefs.AdjustToOutside(position)) return;
+                if (!LandDefs.AdjustToOutside(ref position)) return;
 
                 var lcoord = LandDefs.gid_to_lcoord(position.ObjCellID);
                 if (lcoord != null)
@@ -138,7 +138,7 @@ namespace ACE.Server.Physics.Common
 
                 var loc = new PhysicsPosition(curPart.Pos);
 
-                if (!LandDefs.AdjustToOutside(loc))
+                if (!LandDefs.AdjustToOutside(ref loc))
                     continue;
 
                 var _lcoord = LandDefs.gid_to_lcoord(loc.ObjCellID);
@@ -276,10 +276,10 @@ namespace ACE.Server.Physics.Common
             base.find_transit_cells(numParts, parts, cellArray, instance);
         }
 
-        public override void find_transit_cells(PhysicsPosition position, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
+        public override void find_transit_cells(ref PhysicsPosition position, int numSphere, List<Sphere> sphere, CellArray cellArray, SpherePath path, uint instance)
         {
-            add_all_outside_cells(position, numSphere, sphere, cellArray, instance);
-            base.find_transit_cells(position, numSphere, sphere, cellArray, path, instance);
+            add_all_outside_cells(ref position, numSphere, sphere, cellArray, instance);
+            base.find_transit_cells(ref position, numSphere, sphere, cellArray, path, instance);
         }
 
         public override bool point_in_cell(Vector3 point)

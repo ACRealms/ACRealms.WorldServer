@@ -173,12 +173,12 @@ namespace ACE.Server.Physics.BSP
                     var collisionNormal = path.LocalSpacePos.LocalToGlobalVec(offset) * scale;
                     path.AddOffsetToCheckPos(collisionNormal);
 
-                    var contactPlane = hitPoly.Plane.LocalToGlobal(path.CheckPos, path.LocalSpacePos, hitPoly.Plane);
+                    var contactPlane = hitPoly.Plane.LocalToGlobal(ref path.CheckPos, ref path.LocalSpacePos, hitPoly.Plane);
                     contactPlane.D *= scale;
 
                     collisions.SetContactPlane(contactPlane, false);
                     collisions.ContactPlaneCellID = path.CheckPos.ObjCellID;
-                    path.SetWalkable(validPos, hitPoly, path.LocalSpaceZ, path.LocalSpacePos, scale);
+                    path.SetWalkable(validPos, hitPoly, path.LocalSpaceZ, ref path.LocalSpacePos, scale);
 
                     return TransitionState.Adjusted;
                 }
@@ -341,7 +341,7 @@ namespace ACE.Server.Physics.BSP
                 path.CheckPos.Frame.Origin += offset;
                 path.CacheGlobalSphere(offset);
 
-                var contactPlane = polyHit.Plane.LocalToGlobal(path.CheckPos, path.LocalSpacePos, polyHit.Plane);
+                var contactPlane = polyHit.Plane.LocalToGlobal(ref path.CheckPos, ref path.LocalSpacePos, polyHit.Plane);
 
                 collisions.ContactPlaneValid = true;
                 collisions.ContactPlane.Normal = contactPlane.Normal;
@@ -350,7 +350,7 @@ namespace ACE.Server.Physics.BSP
                 collisions.ContactPlaneIsWater = false;
                 collisions.ContactPlaneCellID = path.CheckPos.ObjCellID;
 
-                path.SetWalkable(validPos, polyHit, path.LocalSpaceZ, path.LocalSpacePos, scale);
+                path.SetWalkable(validPos, polyHit, path.LocalSpaceZ, ref path.LocalSpacePos, scale);
 
                 return TransitionState.Adjusted;
             }

@@ -98,7 +98,7 @@ namespace ACE.Server.Physics.Animation
                     MoveToObject(mvs.ObjectId, mvs.TopLevelId, mvs.Radius, mvs.Height, mvs.Params);
                     break;
                 case MovementType.MoveToPosition:
-                    MoveToPosition(mvs.Position, mvs.Params);
+                    MoveToPosition(ref mvs.Position, mvs.Params);
                     break;
                 case MovementType.TurnToObject:
                     TurnToObject(mvs.ObjectId, mvs.TopLevelId, mvs.Params);
@@ -138,7 +138,7 @@ namespace ACE.Server.Physics.Animation
             PhysicsObj.StopCompletely(false);
         }
 
-        public void MoveToObject_Internal(PhysicsPosition targetPosition, PhysicsPosition interpolatedPosition)
+        public void MoveToObject_Internal(ref PhysicsPosition targetPosition, ref PhysicsPosition interpolatedPosition)
         {
             //Console.WriteLine("MoveToObject_Internal");
 
@@ -151,7 +151,7 @@ namespace ACE.Server.Physics.Animation
             SoughtPosition = new PhysicsPosition(interpolatedPosition);
             CurrentTargetPosition = new PhysicsPosition(targetPosition);
 
-            var iHeading = PhysicsObj.Position.heading(interpolatedPosition);
+            var iHeading = PhysicsObj.Position.heading(ref interpolatedPosition);
             var heading = iHeading - PhysicsObj.get_heading();
             var dist = GetCurrentDistance();
 
@@ -181,7 +181,7 @@ namespace ACE.Server.Physics.Animation
             BeginNextNode();
         }
 
-        public void MoveToPosition(PhysicsPosition position, MovementParameters movementParams)
+        public void MoveToPosition(ref PhysicsPosition position, MovementParameters movementParams)
         {
             //Console.WriteLine("MoveToPosition");
 
@@ -193,7 +193,7 @@ namespace ACE.Server.Physics.Animation
             SoughtObjectRadius = 0.0f;
 
             var distance = GetCurrentDistance();
-            var headingDiff = PhysicsObj.Position.heading(position) - PhysicsObj.get_heading();
+            var headingDiff = PhysicsObj.Position.heading(ref position) - PhysicsObj.get_heading();
 
             if (Math.Abs(headingDiff) < PhysicsGlobals.EPSILON)
                 headingDiff = 0.0f;
@@ -207,7 +207,7 @@ namespace ACE.Server.Physics.Animation
 
             if (command != 0)
             {
-                AddTurnToHeadingNode(PhysicsObj.Position.heading(position));
+                AddTurnToHeadingNode(PhysicsObj.Position.heading(ref position));
                 AddMoveToPositionNode();
             }
 
@@ -258,7 +258,7 @@ namespace ACE.Server.Physics.Animation
             PhysicsObj.StopCompletely(false);
         }
 
-        public void TurnToObject_Internal(PhysicsPosition targetPosition)
+        public void TurnToObject_Internal(ref PhysicsPosition targetPosition)
         {
             //Console.WriteLine("TurnToObject_Internal");
 
@@ -270,7 +270,7 @@ namespace ACE.Server.Physics.Animation
 
             CurrentTargetPosition = new PhysicsPosition(targetPosition); // ref?
 
-            var targetHeading = PhysicsObj.Position.heading(CurrentTargetPosition);
+            var targetHeading = PhysicsObj.Position.heading(ref CurrentTargetPosition);
             var soughtHeading = SoughtPosition.Frame.get_heading();
             var heading = (targetHeading + soughtHeading) % 360.0f;
             SoughtPosition.Frame.set_heading(heading);
@@ -359,7 +359,7 @@ namespace ACE.Server.Physics.Animation
             }
 
             var dist = GetCurrentDistance();
-            var heading = PhysicsObj.Position.heading(CurrentTargetPosition) - PhysicsObj.get_heading();
+            var heading = PhysicsObj.Position.heading(ref CurrentTargetPosition) - PhysicsObj.get_heading();
             if (Math.Abs(heading) < PhysicsGlobals.EPSILON)
                 heading = 0.0f;
             if (heading < -PhysicsGlobals.EPSILON)
@@ -421,7 +421,7 @@ namespace ACE.Server.Physics.Animation
 
             if (!PhysicsObj.IsAnimating)
             {
-                var heading = MovementParams.get_desired_heading(CurrentCommand, MovingAway) + curPos.heading(CurrentTargetPosition);
+                var heading = MovementParams.get_desired_heading(CurrentCommand, MovingAway) + curPos.heading(ref CurrentTargetPosition);
                 if (heading >= 360.0f) heading -= 360.0f;
 
                 var diff = heading - PhysicsObj.get_heading();
@@ -485,7 +485,7 @@ namespace ACE.Server.Physics.Animation
                 }
                 else
                 {
-                    if (StartingPosition.Distance(PhysicsObj.Position) > MovementParams.FailDistance)
+                    if (StartingPosition.Distance(ref PhysicsObj.Position) > MovementParams.FailDistance)
                         CancelMoveTo(WeenieError.YouChargedTooFar);
                 }
             }
@@ -657,9 +657,9 @@ namespace ACE.Server.Physics.Animation
             else if (targetInfo.Status == TargetStatus.OK)
             {
                 if (MovementType == MovementType.MoveToObject)
-                    MoveToObject_Internal(targetInfo.TargetPosition, targetInfo.InterpolatedPosition);
+                    MoveToObject_Internal(ref targetInfo.TargetPosition, ref targetInfo.InterpolatedPosition);
                 else if (MovementType == MovementType.TurnToObject)
-                    TurnToObject_Internal(targetInfo.TargetPosition);
+                    TurnToObject_Internal(ref targetInfo.TargetPosition);
             }
             else
                 CancelMoveTo(WeenieError.NoObject);
@@ -734,10 +734,10 @@ namespace ACE.Server.Physics.Animation
                 return float.MaxValue;
 
             if (!MovementParams.Flags.HasFlag(MovementParamFlags.UseSpheres))
-                return PhysicsObj.Position.Distance(CurrentTargetPosition);
+                return PhysicsObj.Position.Distance(ref CurrentTargetPosition);
 
-            return (float)PhysicsPosition.CylinderDistance(PhysicsObj.GetRadius(), PhysicsObj.GetHeight(), PhysicsObj.Position,
-                SoughtObjectRadius, SoughtObjectHeight, CurrentTargetPosition);
+            return (float)PhysicsPosition.CylinderDistance(PhysicsObj.GetRadius(), PhysicsObj.GetHeight(), ref PhysicsObj.Position,
+                SoughtObjectRadius, SoughtObjectHeight, ref CurrentTargetPosition);
         }
 
         public void HitGround()

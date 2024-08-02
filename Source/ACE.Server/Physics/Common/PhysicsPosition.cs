@@ -9,29 +9,29 @@ using ACE.Server.Physics.Util;
 
 namespace ACE.Server.Physics.Common
 {
-    public class PhysicsPosition: IEquatable<PhysicsPosition>
+    public struct PhysicsPosition: IEquatable<PhysicsPosition>
     {
         public uint ObjCellID;
         public AFrame Frame;
 
-        public uint Landblock => ObjCellID >> 16;
+        public readonly uint Landblock => ObjCellID >> 16;
 
-        public uint LandblockX => ObjCellID >> 24;
+        public readonly uint LandblockX => ObjCellID >> 24;
 
-        public uint LandblockY => (ObjCellID >> 16) & 0xFF;
+        public readonly uint LandblockY => (ObjCellID >> 16) & 0xFF;
 
         public PhysicsPosition()
         {
-            Init();
+            Frame = new AFrame();
         }
 
         public PhysicsPosition(uint objCellID)
         {
             ObjCellID = objCellID;
-            Init();
+            Frame = new AFrame();
         }
 
-        public PhysicsPosition(uint objCellID, AFrame frame)
+        public PhysicsPosition(uint objCellID, AFrame frame) // callers are sending new frame
         {
             ObjCellID = objCellID;
             Frame = frame;
@@ -39,12 +39,12 @@ namespace ACE.Server.Physics.Common
 
         public PhysicsPosition(PhysicsPosition p)
         {
-            if (p == null)
-            {
-                Console.WriteLine("Position copy constructor - null");
-                Frame = new AFrame();
-                return;
-            }
+            //if (p == null)
+            //{
+            //    Console.WriteLine("Position copy constructor - null");
+            //    Frame = new AFrame();
+            //    return;
+            //}
 
             ObjCellID = p.ObjCellID;
             Frame = new AFrame(p.Frame);
@@ -56,12 +56,7 @@ namespace ACE.Server.Physics.Common
             Frame = new AFrame(p.Pos, p.Rotation);
         }
 
-        public void Init()
-        {
-            Frame = new AFrame();
-        }
-
-        public Vector3 LocalToLocal(PhysicsPosition pos, Vector3 offset)
+        public readonly Vector3 LocalToLocal(PhysicsPosition pos, Vector3 offset)
         {
             var cellOffset = pos.Frame.LocalToGlobal(offset);
             var blockOffset = LandDefs.GetBlockOffset(ObjCellID, pos.ObjCellID);
@@ -69,12 +64,12 @@ namespace ACE.Server.Physics.Common
             return Frame.GlobalToLocal(blockOffset + cellOffset);
         }
 
-        public Vector3 LocalToGlobal(Vector3 point)
+        public readonly Vector3 LocalToGlobal(Vector3 point)
         {
             return Frame.LocalToGlobal(point);
         }
 
-        public Vector3 LocalToGlobal(PhysicsPosition pos, Vector3 point)
+        public readonly Vector3 LocalToGlobal(PhysicsPosition pos, Vector3 point)
         {
             var cellOffset = pos.Frame.LocalToGlobal(point);
             var blockOffset = LandDefs.GetBlockOffset(ObjCellID, pos.ObjCellID);
@@ -82,22 +77,22 @@ namespace ACE.Server.Physics.Common
             return blockOffset + cellOffset;
         }
 
-        public Vector3 LocalToGlobalVec(Vector3 point)
+        public readonly Vector3 LocalToGlobalVec(Vector3 point)
         {
             return Frame.LocalToGlobalVec(point);
         }
 
-        public float Distance(PhysicsPosition pos)
+        public readonly float Distance(ref PhysicsPosition pos)
         {
             return GetOffset(pos).Length();
         }
 
-        public float DistanceSquared(PhysicsPosition pos)
+        public readonly float DistanceSquared(ref PhysicsPosition pos)
         {
             return GetOffset(pos).LengthSquared();
         }
 
-        public static double CylinderDistance(float radius, float height, PhysicsPosition pos, float otherRadius, float otherHeight, PhysicsPosition otherPos)
+        public static double CylinderDistance(float radius, float height, ref PhysicsPosition pos, float otherRadius, float otherHeight, ref PhysicsPosition otherPos)
         {
             var offset = pos.GetOffset(otherPos);
             var reach = offset.Length() - (radius + otherRadius);
@@ -114,7 +109,7 @@ namespace ACE.Server.Physics.Common
         }
 
         // custom, based on above
-        public static double CylinderDistanceSq(float radius, float height, PhysicsPosition pos, float otherRadius, float otherHeight, PhysicsPosition otherPos)
+        public static double CylinderDistanceSq(float radius, float height, ref PhysicsPosition pos, float otherRadius, float otherHeight, ref PhysicsPosition otherPos)
         {
             var offset = pos.GetOffset(otherPos);
             var reach = offset.Length() - (radius + otherRadius);
@@ -130,16 +125,16 @@ namespace ACE.Server.Physics.Common
                 return reach * reach;
         }
 
-        public static float CylinderDistanceNoZ(float radius, PhysicsPosition pos, float otherRadius, PhysicsPosition otherPos)
+        public static float CylinderDistanceNoZ(float radius, ref PhysicsPosition pos, float otherRadius, ref PhysicsPosition otherPos)
         {
             var offset = pos.GetOffset(otherPos);
             return offset.Length() - (radius + otherRadius);
         }
 
-        public static readonly float ThresholdMed = 1.0f / 3.0f;
-        public static readonly float ThresholdHigh = 2.0f / 3.0f;
+        public const float ThresholdMed = 1.0f / 3.0f;
+        public const float ThresholdHigh = 2.0f / 3.0f;
 
-        public Quadrant DetermineQuadrant(float height, PhysicsPosition position)
+        public readonly Quadrant DetermineQuadrant(float height, ref PhysicsPosition position)
         {
             var hitpoint = LocalToLocal(position, Vector3.Zero);
 
@@ -157,12 +152,12 @@ namespace ACE.Server.Physics.Common
             return quadrant;
         }
 
-        public Vector3 GlobalToLocalVec(Vector3 point)
+        public readonly Vector3 GlobalToLocalVec(Vector3 point)
         {
             return Frame.GlobalToLocalVec(point);
         }
 
-        public Vector3 GetOffset(PhysicsPosition pos)
+        public readonly Vector3 GetOffset(PhysicsPosition pos)
         {
             var blockOffset = LandDefs.GetBlockOffset(ObjCellID, pos.ObjCellID);
             var globalOffset = blockOffset + pos.Frame.Origin - Frame.Origin;
@@ -170,18 +165,18 @@ namespace ACE.Server.Physics.Common
             return globalOffset;
         }
 
-        public Vector3 GetOffset(PhysicsPosition pos, Vector3 rotation)
+        public readonly Vector3 GetOffset(ref PhysicsPosition pos, Vector3 rotation)
         {
             var blockOffset = LandDefs.GetBlockOffset(ObjCellID, pos.ObjCellID);
             return blockOffset + pos.LocalToGlobal(rotation) - Frame.Origin;
         }
 
-        public Vector3 GetOrigin()
+        public readonly Vector3 GetOrigin()
         {
             return Frame.Origin;
         }
 
-        public AFrame Subtract(PhysicsPosition pos)
+        public AFrame Subtract(ref PhysicsPosition pos)
         {
             Frame.Subtract(pos.Frame);
             return Frame;
@@ -194,10 +189,10 @@ namespace ACE.Server.Physics.Common
 
         public void adjust_to_outside()
         {
-            LandDefs.AdjustToOutside(this);
+            LandDefs.AdjustToOutside(ref this);
         }
 
-        public float heading(PhysicsPosition position)
+        public readonly float heading(ref PhysicsPosition position)
         {
             var dir = GetOffset(position);
             dir.Z = 0.0f;
@@ -208,9 +203,9 @@ namespace ACE.Server.Physics.Common
             return (450.0f - ((float)Math.Atan2(dir.Y, dir.X)).ToDegrees()) % 360.0f;
         }
 
-        public float heading_diff(PhysicsPosition position)
+        public readonly float heading_diff(ref PhysicsPosition position)
         {
-            return heading(position) - Frame.get_heading();
+            return heading(ref position) - Frame.get_heading();
         }
 
         public uint GetCell(uint blockCellID, uint instance)
@@ -222,7 +217,7 @@ namespace ACE.Server.Physics.Common
                 return GetOutdoorCell(blockCellID, instance);
         }
 
-        public uint GetOutdoorCell(uint blockCellID, uint instance)
+        public readonly uint GetOutdoorCell(uint blockCellID, uint instance)
         {
             var cellX = (uint)(Frame.Origin.X / LandDefs.CellLength);
             var cellY = (uint)(Frame.Origin.Y / LandDefs.CellLength);
@@ -236,7 +231,7 @@ namespace ACE.Server.Physics.Common
             //return cellID;
         }
 
-        public uint GetIndoorCell(uint blockCellID, uint instance)
+        public readonly uint GetIndoorCell(uint blockCellID, uint instance)
         {
             var dungeonID = blockCellID >> 16;
 
@@ -261,7 +256,7 @@ namespace ACE.Server.Physics.Common
         /// <summary>
         /// Returns the squared 2D distance between 2 positions
         /// </summary>
-        public float Distance2DSquared(PhysicsPosition p)
+        public readonly float Distance2DSquared(ref PhysicsPosition p)
         {
             if (Landblock == p.Landblock)
             {
@@ -277,17 +272,17 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public bool Equals(PhysicsPosition pos)
+        public readonly bool Equals(PhysicsPosition pos)
         {
             return ObjCellID == pos.ObjCellID && Frame.Equals(pos.Frame);
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return $"0x{ObjCellID:X8} {Frame}";
         }
 
-        public string ShortLoc()
+        public readonly string ShortLoc()
         {
             return $"0x{ObjCellID:X8} [{Frame.Origin.X} {Frame.Origin.Y} {Frame.Origin.Z}]";
         }

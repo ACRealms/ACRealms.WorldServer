@@ -27,12 +27,12 @@ namespace ACE.Server.Physics.Animation
                 ConstraintManager.adjust_offset(ref frame, quantum);
         }
 
-        public void ConstrainTo(PhysicsPosition position, float startDistance, float maxDistance)
+        public void ConstrainTo(ref PhysicsPosition position, float startDistance, float maxDistance)
         {
             if (ConstraintManager == null)
                 ConstraintManager = ConstraintManager.Create(PhysicsObj);
 
-            ConstraintManager.ConstrainTo(position, startDistance, maxDistance);
+            ConstraintManager.ConstrainTo(ref position, startDistance, maxDistance);
         }
 
         public static PositionManager Create(PhysicsObj physicsObj)
@@ -52,12 +52,12 @@ namespace ACE.Server.Physics.Animation
                 StickyManager.HandleUpdateTarget(targetInfo);
         }
 
-        public void InterpolateTo(PhysicsPosition position, bool keepHeading)
+        public void InterpolateTo(ref PhysicsPosition position, bool keepHeading)
         {
             if (InterpolationManager == null)
                 InterpolationManager = InterpolationManager.Create(PhysicsObj);
 
-            InterpolationManager.InterpolateTo(position, keepHeading);
+            InterpolationManager.InterpolateTo(ref position, keepHeading);
         }
 
         public bool IsFullyConstrained()

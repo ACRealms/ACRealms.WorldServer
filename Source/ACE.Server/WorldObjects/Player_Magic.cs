@@ -867,7 +867,7 @@ namespace ACE.Server.WorldObjects
                 TryBurnComponents(spell);
 
             // check windup move distance cap
-            var dist = StartPos.Distance(PhysicsObj.Position);
+            var dist = StartPos.Distance(ref PhysicsObj.Position);
 
             // only PKs affected by these caps?
             var Windup_MaxMove = RealmRuleset.GetProperty(ACE.Entity.Enum.Properties.RealmPropertyFloat.SpellCastingPvPWindupMaxMove);
@@ -1337,7 +1337,7 @@ namespace ACE.Server.WorldObjects
         {
             if (MagicState.CastGestureStartTime != DateTime.MinValue)
             {
-                var dist = StartPos.Distance(PhysicsObj.Position);
+                var dist = StartPos.Distance(ref PhysicsObj.Position);
 
                 var Windup_MaxMove = RealmRuleset.GetProperty(ACE.Entity.Enum.Properties.RealmPropertyFloat.SpellCastingPvPWindupMaxMove);
 

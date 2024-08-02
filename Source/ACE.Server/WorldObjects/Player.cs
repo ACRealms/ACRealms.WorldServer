@@ -1135,7 +1135,7 @@ namespace ACE.Server.WorldObjects
                         if (colliding)
                         {
                             // try initial placement
-                            var result = PhysicsObj.SetPositionSimple(PhysicsObj.Position, true, Location.Instance);
+                            var result = PhysicsObj.SetPositionSimple(ref PhysicsObj.Position, true, Location.Instance);
 
                             if (result == SetPositionError.OK)
                             {

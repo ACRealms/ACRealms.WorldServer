@@ -70,7 +70,7 @@ namespace ACE.Server.WorldObjects
 
         public float GetAngle_Physics2(WorldObject target)
         {
-            return PhysicsObj.Position.heading_diff(target.PhysicsObj.Position);
+            return PhysicsObj.Position.heading_diff(ref target.PhysicsObj.Position);
         }
 
         /// <summary>

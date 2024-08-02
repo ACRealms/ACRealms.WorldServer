@@ -244,7 +244,7 @@ namespace ACE.Server.Physics.Common
                         // load scenery
                         var pos = new PhysicsPosition(ID);
                         pos.Frame.Origin = loc;
-                        var outside = LandDefs.AdjustToOutside(pos);
+                        LandDefs.AdjustToOutside(ref pos);
                         var cell = get_landcell(pos.ObjCellID);
                         if (cell == null) continue;
 
@@ -443,7 +443,7 @@ namespace ACE.Server.Physics.Common
             {
                 var building = BuildingObj.makeBuilding(info.ModelId, info.Portals, info.NumLeaves);
                 var position = new PhysicsPosition(ID, new AFrame(info.Frame));
-                var outside = LandDefs.AdjustToOutside(position);
+                LandDefs.AdjustToOutside(ref position);
                 var cell = get_landcell(position.ObjCellID);
                 if (cell == null) continue;
                 building.set_initial_frame(ref position.Frame);
@@ -507,7 +507,7 @@ namespace ACE.Server.Physics.Common
                     var obj = PhysicsObj.makeObject(info.Id, 0, false);
                     obj.DatObject = true;
                     var position = new PhysicsPosition(ID, new AFrame(info.Frame));
-                    var outside = LandDefs.AdjustToOutside(position);
+                    LandDefs.AdjustToOutside(ref position);
                     var cell = get_landcell(position.ObjCellID);
                     if (cell == null)
                     {

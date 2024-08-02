@@ -82,21 +82,22 @@ namespace ACE.Server.Physics.Animation
             PlacementAllowsSliding = true;
         }
 
-        public void InitPath(ObjCell beginCell, PhysicsPosition beginPos, PhysicsPosition endPos)
+        public void InitPath(ObjCell beginCell, PhysicsPosition beginPos, PhysicsPosition endPos, bool isPlacement)
         {
-            BeginPos = beginPos;
             BeginCell = beginCell;
             EndPos = endPos;
 
-            if (beginPos != null)
+            if (isPlacement)
             {
-                InsertType = InsertType.Transition;
-                CurPos = new PhysicsPosition(beginPos);
+                BeginPos = endPos;
+                InsertType = InsertType.Placement;
+                CurPos = new PhysicsPosition(endPos);
             }
             else
             {
-                InsertType = InsertType.Placement;
-                CurPos = new PhysicsPosition(endPos);
+                BeginPos = beginPos;
+                InsertType = InsertType.Transition;
+                CurPos = new PhysicsPosition(beginPos);
             }
 
             CurCell = beginCell;
@@ -268,7 +269,7 @@ namespace ACE.Server.Physics.Animation
             BackupCheckPos = new PhysicsPosition(CheckPos);
         }
 
-        public void SetCheckPos(PhysicsPosition position, ObjCell cell)
+        public void SetCheckPos(ref PhysicsPosition position, ObjCell cell)
         {
             CheckPos = new PhysicsPosition(position);
             CheckCell = cell;
@@ -292,7 +293,7 @@ namespace ACE.Server.Physics.Animation
             NegCollisionNormal = -collisionNormal;
         }
 
-        public void SetWalkable(Sphere sphere, Polygon poly, Vector3 zAxis, PhysicsPosition localPos, float scale)
+        public void SetWalkable(Sphere sphere, Polygon poly, Vector3 zAxis, ref PhysicsPosition localPos, float scale)
         {
             WalkableCheckPos = new Sphere(sphere);
             Walkable = poly;

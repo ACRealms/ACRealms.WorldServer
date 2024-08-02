@@ -63,7 +63,7 @@ namespace ACE.Server.Physics
         public static readonly float ThresholdMed = 1.0f / 3.0f;
         public static readonly float ThresholdHigh = 2.0f / 3.0f;
 
-        public static Quadrant Attack(PhysicsPosition targetPos, float targetRadius, float targetHeight, PhysicsPosition attackPos, Vector2 left, Vector2 right, float attackRadius, float attackHeight)
+        public static Quadrant Attack(ref PhysicsPosition targetPos, float targetRadius, float targetHeight, ref PhysicsPosition attackPos, Vector2 left, Vector2 right, float attackRadius, float attackHeight)
         {
             var center = attackPos.LocalToLocal(targetPos, Vector3.Zero);
 
@@ -261,7 +261,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Determines if this sphere collides with any other spheres during its transitions
         /// </summary>
-        public TransitionState IntersectsSphere(PhysicsPosition position, float scale, Transition transition, bool isCreature)
+        public TransitionState IntersectsSphere(ref PhysicsPosition position, float scale, Transition transition, bool isCreature)
         {
             var globPos = transition.SpherePath.CheckPos.LocalToGlobal(position, Center * scale);
             return IntersectsSphere(globPos, Radius * scale, transition, isCreature);

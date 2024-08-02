@@ -106,12 +106,12 @@ namespace ACE.Server.Physics.Animation
             if (State.HasFlag(ObjectInfoState.IsViewer))
             {
                 var dist = Vector3.Dot(checkPos.Center, contactPlane.Normal) + contactPlane.D - checkPos.Radius;
-                if (dist > -PhysicsGlobals.EPSILON && path.BeginPos != null && (path.BeginPos.ObjCellID & 0xFFFF) >= 0x100)
+                if (dist > -PhysicsGlobals.EPSILON && (path.BeginPos.ObjCellID & 0xFFFF) >= 0x100)
                     return TransitionState.OK;
 
                 var offset = checkPos.Center - path.GlobalCurrCenter[0].Center;
                 var angle = dist / Vector3.Dot(offset, contactPlane.Normal);
-                if ((angle <= 0.0f || angle > 1.0f) && path.BeginPos != null && (path.BeginPos.ObjCellID & 0xFFFF) >= 0x100)
+                if ((angle <= 0.0f || angle > 1.0f) && (path.BeginPos.ObjCellID & 0xFFFF) >= 0x100)
                     return TransitionState.OK;
 
                 path.AddOffsetToCheckPos(offset * -angle);

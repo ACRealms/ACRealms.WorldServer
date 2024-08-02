@@ -24,14 +24,14 @@ namespace ACE.Server.Physics.Animation
             return new ConstraintManager(obj);
         }
 
-        public void ConstrainTo(PhysicsPosition position, float startDistance, float maxDistance)
+        public void ConstrainTo(ref PhysicsPosition position, float startDistance, float maxDistance)
         {
             IsConstrained = true;
 
             ConstraintPos = new PhysicsPosition(position);
             ConstraintDistanceStart = startDistance;
             ConstraintDistanceMax = maxDistance;
-            ConstraintPosOffset = position.Distance(PhysicsObj.Position);
+            ConstraintPosOffset = position.Distance(ref PhysicsObj.Position);
         }
 
         public bool IsFullyConstrained()
