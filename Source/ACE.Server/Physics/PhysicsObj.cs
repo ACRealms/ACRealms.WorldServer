@@ -2042,8 +2042,8 @@ namespace ACE.Server.Physics
             }
             if (State.HasFlag(PhysicsState.HasDefaultAnim))
             {
-                AFrame empty = AFrame.Disabled;
-                PartArray.Update(deltaTime, ref empty);
+                AFrame empty = new AFrame();
+                PartArray.Update(deltaTime, ref empty, ignoreOffsetFrame: true);
                 Position.Frame.Rotate(Omega);
                 UpdatePartsInternal();
                 UpdateChildrenInternal();

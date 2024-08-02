@@ -129,26 +129,26 @@ namespace ACE.Server.Physics.Animation
             Velocity = velocity;
         }
 
-        public void Update(float quantum, ref AFrame offsetFrame)
+        public void Update(float quantum, ref AFrame offsetFrame, bool ignoreOffsetFrame)
         {
             if (AnimList.First != null)
             {
-                update_internal(quantum, ref CurrAnim, ref FrameNumber, ref offsetFrame);
+                update_internal(quantum, ref CurrAnim, ref FrameNumber, ref offsetFrame, ignoreOffsetFrame);
                 apricot();
             }
-            else if (!offsetFrame.disabled)
+            else if (!ignoreOffsetFrame)
             {
                 apply_physics(ref offsetFrame, quantum, quantum);
             }
         }
 
-        public void advance_to_next_animation(float timeElapsed, ref LinkedListNode<AnimSequenceNode> animNode, ref float frameNum, ref AFrame frame)
+        public void advance_to_next_animation(float timeElapsed, ref LinkedListNode<AnimSequenceNode> animNode, ref float frameNum, ref AFrame frame, bool ignoreFrame)
         {
             var currAnim = animNode.Value;
 
             if (timeElapsed >= 0.0f)
             {
-                if (!frame.disabled && currAnim.Framerate < 0.0f)
+                if (!ignoreFrame && currAnim.Framerate < 0.0f)
                 {
                     if (currAnim.Anim.PosFrames.Count > 0)
                         frame.Subtract(currAnim.get_pos_frame((int)frameNum));
@@ -164,7 +164,7 @@ namespace ACE.Server.Physics.Animation
 
                 frameNum = currAnim.get_starting_frame();
 
-                if (!frame.disabled && currAnim.Framerate > 0.0f)
+                if (!ignoreFrame && currAnim.Framerate > 0.0f)
                 {
                     if (currAnim.Anim.PosFrames.Count > 0)
                         frame = AFrame.Combine(frame, currAnim.get_pos_frame((int)frameNum));
@@ -174,7 +174,7 @@ namespace ACE.Server.Physics.Animation
             }
             else
             {
-                if (!frame.disabled && currAnim.Framerate >= 0.0f)
+                if (!ignoreFrame && currAnim.Framerate >= 0.0f)
                 {
                     if (currAnim.Anim.PosFrames.Count > 0)
                         frame.Subtract(currAnim.get_pos_frame((int)frameNum));
@@ -190,7 +190,7 @@ namespace ACE.Server.Physics.Animation
 
                 frameNum = currAnim.get_ending_frame();
 
-                if (!frame.disabled && currAnim.Framerate < 0.0f)
+                if (!ignoreFrame && currAnim.Framerate < 0.0f)
                 {
                     if (currAnim.Anim.PosFrames.Count > 0)
                         frame = AFrame.Combine(frame, currAnim.get_pos_frame((int)frameNum));
@@ -348,7 +348,7 @@ namespace ACE.Server.Physics.Animation
             Omega -= omega;
         }
 
-        public void update_internal(float timeElapsed, ref LinkedListNode<AnimSequenceNode> animNode, ref float frameNum, ref AFrame frame)
+        public void update_internal(float timeElapsed, ref LinkedListNode<AnimSequenceNode> animNode, ref float frameNum, ref AFrame frame, bool ignoreFrame)
         {
             var currAnim = animNode.Value;
 
@@ -377,7 +377,7 @@ namespace ACE.Server.Physics.Animation
                 }
                 while (Math.Floor(frameNum) > lastFrame)
                 {
-                    if (!frame.disabled)
+                    if (!ignoreFrame)
                     {
                         if (currAnim.Anim.PosFrames != null)
                             frame = AFrame.Combine(frame, currAnim.get_pos_frame(lastFrame));
@@ -406,7 +406,7 @@ namespace ACE.Server.Physics.Animation
                 }
                 while (Math.Floor(frameNum) < lastFrame)
                 {
-                    if (!frame.disabled)
+                    if (!ignoreFrame)
                     {
                         if (currAnim.Anim.PosFrames != null)
                             frame.Subtract(currAnim.get_pos_frame(lastFrame));
@@ -421,7 +421,7 @@ namespace ACE.Server.Physics.Animation
             }
             else
             {
-                if (!frame.disabled && Math.Abs(timeElapsed) > PhysicsGlobals.EPSILON)
+                if (!ignoreFrame && Math.Abs(timeElapsed) > PhysicsGlobals.EPSILON)
                     apply_physics(ref frame, timeElapsed, timeElapsed);
             }
 
@@ -435,11 +435,11 @@ namespace ACE.Server.Physics.Animation
                     HookObj.add_anim_hook(AnimationHook.AnimDoneHook);
             }
 
-            advance_to_next_animation(timeElapsed, ref animNode, ref frameNum, ref frame);
+            advance_to_next_animation(timeElapsed, ref animNode, ref frameNum, ref frame, ignoreFrame);
             timeElapsed = frameTimeElapsed;
 
             // loop to next anim
-            update_internal(timeElapsed, ref animNode, ref frameNum, ref frame);    
+            update_internal(timeElapsed, ref animNode, ref frameNum, ref frame, ignoreFrame);    
         }
     }
 }

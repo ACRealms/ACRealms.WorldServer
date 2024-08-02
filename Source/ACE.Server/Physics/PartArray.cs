@@ -586,9 +586,9 @@ namespace ACE.Server.Physics
             return MotionTableManager.PerformMovement(mvs, Sequence);
         }
 
-        public void Update(double quantum, ref AFrame offsetFrame)
+        public void Update(double quantum, ref AFrame offsetFrame, bool ignoreOffsetFrame = false)
         {
-            Sequence.Update((float)quantum, ref offsetFrame);
+            Sequence.Update((float)quantum, ref offsetFrame, ignoreOffsetFrame);
         } 
 
         public void UpdateParts(AFrame frame)

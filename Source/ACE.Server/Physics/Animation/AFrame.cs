@@ -9,12 +9,7 @@ namespace ACE.Server.Physics.Animation
     {
         public Vector3 Origin;
         public Quaternion Orientation;
-        public bool disabled;
 
-        /// <summary>
-        /// Returns a special case of AFrame which will not be operated on. This is a substitute for the null AFrame, where unboxed structs cannot be null
-        /// </summary>
-        public static AFrame Disabled => new() { disabled = true };
         public AFrame()
         {
             Origin = Vector3.Zero;
