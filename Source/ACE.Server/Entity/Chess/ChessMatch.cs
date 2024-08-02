@@ -557,7 +557,7 @@ namespace ACE.Server.Entity.Chess
                 SendOpponentStalemate(opSide.GetPlayer(), side.Color, action.Stalemate);
         }
 
-        public void CalculateWeeniePosition(ChessPieceCoord coord, ChessColor color, AFrame frame)
+        public void CalculateWeeniePosition(ChessPieceCoord coord, ChessColor color, ref AFrame frame)
         {
             var heading = (uint)ChessBoard.PhysicsObj.Position.Frame.get_heading();
             heading += color == ChessColor.Black ? 180u : 0u;
@@ -570,7 +570,7 @@ namespace ACE.Server.Entity.Chess
         public void AddWeeniePiece(BasePiece piece)
         {
             var frame = new AFrame(ChessBoard.PhysicsObj.Position.Frame);
-            CalculateWeeniePosition(piece.Coord, piece.Color, frame);
+            CalculateWeeniePosition(piece.Coord, piece.Color, ref frame);
 
             var monster = piece.Color == ChessColor.White ? "drudge" : "mosswart";
             var weeniename = "";
@@ -622,7 +622,7 @@ namespace ACE.Server.Entity.Chess
             }
 
             var frame = new AFrame(ChessBoard.PhysicsObj.Position.Frame);
-            CalculateWeeniePosition(piece.Coord, piece.Color, frame);
+            CalculateWeeniePosition(piece.Coord, piece.Color, ref frame);
 
             var position = new InstancedPosition(ChessBoard.Location);
             position = position.SetPos(frame.Origin);
@@ -644,7 +644,7 @@ namespace ACE.Server.Entity.Chess
             Debug.Assert(gamePiece != null);
 
             var frame = new AFrame(ChessBoard.PhysicsObj.Position.Frame);
-            CalculateWeeniePosition(piece.Coord, piece.Color, frame);
+            CalculateWeeniePosition(piece.Coord, piece.Color, ref frame);
 
             var position = new InstancedPosition(ChessBoard.Location);
             position = position.SetPos(frame.Origin);

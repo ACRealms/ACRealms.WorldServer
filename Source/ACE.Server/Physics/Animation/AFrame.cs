@@ -5,11 +5,16 @@ using ACE.Server.Physics.Extensions;
 
 namespace ACE.Server.Physics.Animation
 {
-    public class AFrame: IEquatable<AFrame>
+    public struct AFrame: IEquatable<AFrame>
     {
         public Vector3 Origin;
         public Quaternion Orientation;
+        public bool disabled;
 
+        /// <summary>
+        /// Returns a special case of AFrame which will not be operated on. This is a substitute for the null AFrame, where unboxed structs cannot be null
+        /// </summary>
+        public static AFrame Disabled => new() { disabled = true };
         public AFrame()
         {
             Origin = Vector3.Zero;
@@ -42,26 +47,30 @@ namespace ACE.Server.Physics.Animation
 
         public static AFrame Combine(AFrame a, AFrame b)
         {
-            var frame = new AFrame();
-            frame.Origin = a.Origin + Vector3.Transform(b.Origin, a.Orientation);
-            frame.Orientation = Quaternion.Multiply(a.Orientation, b.Orientation);
-            return frame;
+            return new AFrame
+            {
+                Origin = a.Origin + Vector3.Transform(b.Origin, a.Orientation),
+                Orientation = Quaternion.Multiply(a.Orientation, b.Orientation)
+            };
         }
 
         public void Combine(AFrame a, AFrame b, Vector3 scale)
         {
-            Origin = a.Origin + Vector3.Transform(b.Origin * scale, a.Orientation);
-            Orientation = Quaternion.Multiply(a.Orientation, b.Orientation);
+            this = this with
+            {
+                Origin = a.Origin + Vector3.Transform(b.Origin * scale, a.Orientation),
+                Orientation = Quaternion.Multiply(a.Orientation, b.Orientation)
+            };
         }
 
-        public Vector3 GlobalToLocal(Vector3 point)
+        public readonly Vector3 GlobalToLocal(Vector3 point)
         {
             var offset = point - Origin;
             var rotate = GlobalToLocalVec(offset); 
             return rotate;
         }
 
-        public Vector3 GlobalToLocalVec(Vector3 point)
+        public readonly Vector3 GlobalToLocalVec(Vector3 point)
         {
             var rotate = Matrix4x4.Transpose(Matrix4x4.CreateFromQuaternion(Orientation));
             return Vector3.Transform(point, rotate);
@@ -69,49 +78,49 @@ namespace ACE.Server.Physics.Animation
 
         public void InterpolateOrigin(AFrame from, AFrame to, float t)
         {
-            Origin = Vector3.Lerp(from.Origin, to.Origin, t);
+            this = this with { Origin = Vector3.Lerp(from.Origin, to.Origin, t) };
         }
 
         public void InterpolateRotation(AFrame from, AFrame to, float t)
         {
-            Orientation = Quaternion.Lerp(from.Orientation, to.Orientation, t);
+            this = this with { Orientation = Quaternion.Lerp(from.Orientation, to.Orientation, t) };
         }
 
-        public bool IsEqual(AFrame frame)
+        public readonly bool IsEqual(AFrame frame)
         {
             // implement IEquatable
             return frame.Equals(this);  
         }
 
-        public bool IsQuaternionEqual(AFrame frame)
+        public readonly bool IsQuaternionEqual(AFrame frame)
         {
             return Orientation.Equals(frame.Orientation);
         }
 
-        public bool IsValid()
+        public readonly bool IsValid()
         {
             return Origin.IsValid() && Orientation.IsValid();
         }
 
-        public bool IsValidExceptForHeading()
+        public readonly bool IsValidExceptForHeading()
         {
             return Origin.IsValid();
         }
 
-        public Vector3 LocalToGlobal(Vector3 point)
+        public readonly Vector3 LocalToGlobal(Vector3 point)
         {
             return Origin + LocalToGlobalVec(point);
         }
 
-        public Vector3 LocalToGlobalVec(Vector3 point)
+        public readonly Vector3 LocalToGlobalVec(Vector3 point)
         {
             return Vector3.Transform(point, Orientation);
         }
 
         public void GRotate(Vector3 rotation)
         {
-            Orientation *= Quaternion.CreateFromYawPitchRoll(rotation.X, rotation.Y, rotation.Z);
-            Orientation  = Quaternion.Normalize(Orientation);
+            var orientation = Orientation * Quaternion.CreateFromYawPitchRoll(rotation.X, rotation.Y, rotation.Z);
+            this = this with { Orientation = Quaternion.Normalize(orientation) };
         }
 
         public void Rotate(Vector3 rotation)
@@ -122,18 +131,21 @@ namespace ACE.Server.Physics.Animation
 
         public void Rotate(Quaternion rotation)
         {
-            Orientation = Quaternion.Multiply(rotation, Orientation);
-            Orientation = Quaternion.Normalize(Orientation);
+            var orientation = Quaternion.Multiply(rotation, Orientation);
+            this = this with { Orientation = Quaternion.Normalize(orientation) };
         }
 
         public void Subtract(AFrame frame)
         {
-            Origin -= Vector3.Transform(frame.Origin, frame.Orientation);
             //Orientation *= Quaternion.Conjugate(frame.Orientation);
-            Orientation *= Quaternion.Inverse(frame.Orientation);
+            this = this with
+            {
+                Origin = Origin - Vector3.Transform(frame.Origin, frame.Orientation),
+                Orientation = Orientation * Quaternion.Inverse(frame.Orientation)
+            };
         }
 
-        public bool close_rotation(AFrame a, AFrame b)
+        public readonly bool close_rotation(AFrame a, AFrame b)
         {
             var ao = a.Orientation;
             var bo = b.Orientation;
@@ -144,22 +156,23 @@ namespace ACE.Server.Physics.Animation
                    Math.Abs(ao.W - bo.W) < PhysicsGlobals.EPSILON;
         }
 
-        public float get_heading()
+        public readonly float get_heading()
         {
             var matrix = Matrix4x4.CreateFromQuaternion(Orientation);
             var heading = (float)Math.Atan2(matrix.M22, matrix.M21);
             return (450.0f - heading.ToDegrees()) % 360.0f;
         }
 
-        public Vector3 get_vector_heading()
+        public readonly Vector3 get_vector_heading()
         {
             var matrix = Matrix4x4.CreateFromQuaternion(Orientation);
 
-            var heading = new Vector3();
-
-            heading.X = matrix.M21;
-            heading.Y = matrix.M22;
-            heading.Z = matrix.M23;
+            var heading = new Vector3
+            {
+                X = matrix.M21,
+                Y = matrix.M22,
+                Z = matrix.M23
+            };
 
             return heading;
         }
@@ -171,10 +184,10 @@ namespace ACE.Server.Physics.Animation
             return rotate;
         }
 
-        public void rotate_around_axis_to_vector(int axis, Vector3 dir)
-        {
-            // will implement when actually needed...
-        }
+        //public void rotate_around_axis_to_vector(int axis, Vector3 dir)
+        //{
+        //    // will implement when actually needed...
+        //}
 
         public void set_heading(float degrees)
         {
@@ -186,19 +199,19 @@ namespace ACE.Server.Physics.Animation
             var heading = new Vector3((float)Math.Sin(rads), (float)Math.Cos(rads), matrix.M23 + matrix.M13);
             set_vector_heading(heading);
 
-            var newHeading = get_heading();
+            //var newHeading = get_heading();
             //Console.WriteLine("new_heading: " + newHeading);
         }
 
         public void set_position(AFrame frame)
         {
             var offset = frame.Origin - Origin;
-            Origin += Vector3.Transform(offset, Orientation);
+            this = this with { Origin = Origin + Vector3.Transform(offset, Orientation) };
         }
 
         public void set_rotate(Quaternion orientation)
         {
-            Orientation = Quaternion.Normalize(orientation);
+            this = this with { Orientation = Quaternion.Normalize(orientation) };
         }
 
         public void set_vector_heading(Vector3 heading)
@@ -215,12 +228,12 @@ namespace ACE.Server.Physics.Animation
             set_rotate(rotate);
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return $"[{Origin.X} {Origin.Y} {Origin.Z}] {Orientation.W} {Orientation.X} {Orientation.Y} {Orientation.Z}";
         }
 
-        public bool Equals(AFrame frame)
+        public readonly bool Equals(AFrame frame)
         {
             var originEpsilonEqual = Math.Abs(frame.Origin.X - Origin.X) <= PhysicsGlobals.EPSILON &&
                 Math.Abs(frame.Origin.Y - Origin.Y) <= PhysicsGlobals.EPSILON &&

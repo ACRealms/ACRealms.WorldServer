@@ -17,14 +17,14 @@ namespace ACE.Server.Physics.Animation
             SetPhysicsObject(obj);
         }
 
-        public void AdjustOffset(AFrame frame, double quantum)
+        public void AdjustOffset(ref AFrame frame, double quantum)
         {
             if (InterpolationManager != null)
                 InterpolationManager.adjust_offset(frame, quantum);
             if (StickyManager != null)
-                StickyManager.adjust_offset(frame, quantum);
+                StickyManager.adjust_offset(ref frame, quantum);
             if (ConstraintManager != null)
-                ConstraintManager.adjust_offset(frame, quantum);
+                ConstraintManager.adjust_offset(ref frame, quantum);
         }
 
         public void ConstrainTo(PhysicsPosition position, float startDistance, float maxDistance)

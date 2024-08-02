@@ -59,7 +59,7 @@ namespace ACE.Server.Physics.Animation
             // empty
         }
 
-        public void adjust_offset(AFrame offset, double quantum)
+        public void adjust_offset(ref AFrame offset, double quantum)
         {
             if (PhysicsObj == null || !IsConstrained) return;
 

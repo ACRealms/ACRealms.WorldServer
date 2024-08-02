@@ -545,7 +545,7 @@ namespace ACE.Server.Physics
         public SetPositionError ForceIntoCell(ObjCell newCell, PhysicsPosition pos)
         {
             if (newCell == null) return SetPositionError.NoCell;
-            set_frame(pos.Frame);
+            set_frame(ref pos.Frame);
             if (CurCell != newCell)
             {
                 change_cell(newCell);
@@ -1199,7 +1199,7 @@ namespace ACE.Server.Physics
             }
 
             // modified: maintain consistency for Position.Frame in change_cell
-            set_frame(curPos.Frame);
+            set_frame(ref curPos.Frame);
 
             if (transitCell.Equals(CurCell))
             {
@@ -1643,12 +1643,12 @@ namespace ACE.Server.Physics
             MovementManager.PerformMovement(mvs);
         }
 
-        public void UpdateChild(PhysicsObj childObj, int partIdx, AFrame childFrame)
+        public void UpdateChild(PhysicsObj childObj, int partIdx, ref AFrame childFrame)
         {
             var frame = partIdx >= PartArray.NumParts ?
                 AFrame.Combine(Position.Frame, childFrame) : AFrame.Combine(PartArray.Parts[partIdx].Pos.Frame, childFrame);
 
-            childObj.set_frame(frame);
+            childObj.set_frame(ref frame);
 
             if (childObj.ParticleManager != null) childObj.ParticleManager.UpdateParticles();
             if (childObj.ScriptManager != null) childObj.ScriptManager.UpdateScripts();
@@ -1681,7 +1681,7 @@ namespace ACE.Server.Physics
                 if (newPos.Frame.Equals(Position.Frame))
                 {
                     CachedVelocity = Vector3.Zero;
-                    set_frame(newPos.Frame);
+                    set_frame(ref newPos.Frame);
                     InitialUpdates++;
                 }
                 else
@@ -1718,7 +1718,7 @@ namespace ACE.Server.Physics
                             log.Warn($"{Name} ({ID:X8}).UpdateObjectInternal({quantum}) - avoided CurCell=null from {Position} to {newPos}");
 
                         newPos.Frame.Origin = Position.Frame.Origin;
-                        set_initial_frame(newPos.Frame);
+                        set_initial_frame(ref newPos.Frame);
                         CachedVelocity = Vector3.Zero;
                     }
                 }
@@ -1729,7 +1729,7 @@ namespace ACE.Server.Physics
                     TransientState &= ~TransientStateFlags.Active;
 
                 newPos.Frame.Origin = Position.Frame.Origin;
-                set_frame(newPos.Frame);
+                set_frame(ref newPos.Frame);
                 CachedVelocity = Vector3.Zero;
                 InitialUpdates++;
             }
@@ -1828,7 +1828,7 @@ namespace ACE.Server.Physics
             if (PartArray != null)
                 PartArray.Update(quantum, ref newPos.Frame);
 
-            set_frame(newPos.Frame);
+            set_frame(ref newPos.Frame);
 
             if (PartArray != null) PartArray.HandleMovement();
         }
@@ -1885,7 +1885,7 @@ namespace ACE.Server.Physics
                     offsetFrame.Origin *= 0.0f;     // OnWalkable getting reset?
             }
             if (PositionManager != null)
-                PositionManager.AdjustOffset(offsetFrame, quantum);
+                PositionManager.AdjustOffset(ref offsetFrame, quantum);
 
             newFrame = AFrame.Combine(Position.Frame, offsetFrame);
 
@@ -1955,7 +1955,7 @@ namespace ACE.Server.Physics
             return true;
         }
 
-        public void add_obj_to_cell(ObjCell newCell, AFrame newFrame)
+        public void add_obj_to_cell(ObjCell newCell, ref AFrame newFrame)
         {
             enter_cell(newCell);
 
@@ -2042,7 +2042,7 @@ namespace ACE.Server.Physics
             }
             if (State.HasFlag(PhysicsState.HasDefaultAnim))
             {
-                AFrame empty = null;
+                AFrame empty = AFrame.Disabled;
                 PartArray.Update(deltaTime, ref empty);
                 Position.Frame.Rotate(Omega);
                 UpdatePartsInternal();
@@ -3439,8 +3439,10 @@ namespace ACE.Server.Physics
 
         public void rotate(Vector3 offset)
         {
-            var offsetFrame = new AFrame();
-            offsetFrame.Orientation = AFrame.get_rotate_offset(offset);
+            var offsetFrame = new AFrame
+            {
+                Orientation = AFrame.get_rotate_offset(offset)
+            };
             //set_frame(newFrame);
             Position.Frame.GRotate(offset);
             PartArray.SetFrame(offsetFrame);
@@ -3641,7 +3643,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Sets the current frame of animation for this object
         /// </summary>
-        public void set_frame(AFrame frame)
+        public void set_frame(ref AFrame frame)
         {
             if (!frame.IsValid() && frame.IsValidExceptForHeading())
                 frame.Orientation = new Quaternion(0, 0, 0, 0);
@@ -3667,7 +3669,7 @@ namespace ACE.Server.Physics
         public void set_heading(float degrees, bool sendEvent)
         {
             Position.Frame.set_heading(degrees);
-            set_frame(Position.Frame);
+            set_frame(ref Position.Frame);
         }
 
         /// <summary>
@@ -3749,7 +3751,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Sets the initial frame of animation for this object
         /// </summary>
-        public void set_initial_frame(AFrame frame)
+        public void set_initial_frame(ref AFrame frame)
         {
             Position.Frame = frame;
 
@@ -4042,7 +4044,7 @@ namespace ACE.Server.Physics
                 PartArray.SetCellID(pos.ObjCellID);
 
             set_cell_id(pos.ObjCellID);
-            set_frame(pos.Frame);
+            set_frame(ref pos.Frame);
         }
 
         public void teleport_hook(bool hide)
@@ -4407,7 +4409,7 @@ namespace ACE.Server.Physics
                 }*/
                 var frame = new AFrame();
                 UpdatePositionInternal(deltaTime, ref frame);
-                set_frame(frame);
+                set_frame(ref frame);
                 if (ParticleManager != null)
                     ParticleManager.UpdateParticles();
                 if (ScriptManager != null)

@@ -74,8 +74,10 @@ namespace ACE.Server.Physics.Common
         /// </summary>
         public static AFrame RotateObj(DatLoader.Entity.ObjectDesc obj, uint x, uint y, uint k, Vector3 loc)
         {
-            var frame = new AFrame(obj.BaseLoc);
-            frame.Origin = loc;
+            var frame = new AFrame(obj.BaseLoc)
+            {
+                Origin = loc
+            };
             if (obj.MaxRotation > 0.0f)
             {
                 var degrees = (float)((1813693831 * y - (k + 63127) * (1360117743 * y * x + 1888038839) - 1109124029 * x) * 2.3283064e-10 * obj.MaxRotation);

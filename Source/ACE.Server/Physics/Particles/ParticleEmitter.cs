@@ -217,7 +217,7 @@ namespace ACE.Server.Physics
                 {
                     for (var i = 0; i < Info.MaxParticles; i++)
                     {
-                        AFrame frame = null;
+                        AFrame frame;
                         var part = Parts[i];
                         if (part != null)
                         {

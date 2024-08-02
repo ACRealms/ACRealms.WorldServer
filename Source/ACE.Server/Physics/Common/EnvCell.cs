@@ -388,7 +388,8 @@ namespace ACE.Server.Physics.Common
                 {
                     var staticObj = PhysicsObj.makeObject(StaticObjectIDs[i], 0, false);
                     staticObj.DatObject = true;
-                    staticObj.add_obj_to_cell(this, StaticObjectFrames[i]);
+                    var frame = StaticObjectFrames[i];
+                    staticObj.add_obj_to_cell(this, ref frame);
                     if (staticObj.CurCell == null)
                     {
                         //Console.WriteLine($"EnvCell {ID:X8}: failed to add {staticObj.ID:X8}");

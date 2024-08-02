@@ -88,7 +88,7 @@ namespace ACE.Server.Physics.Animation
                 ClearTarget();
         }
 
-        public void adjust_offset(AFrame offset, double quantum)
+        public void adjust_offset(ref AFrame offset, double quantum)
         {
             if (PhysicsObj == null || TargetID == 0 || !Initialized)
                 return;

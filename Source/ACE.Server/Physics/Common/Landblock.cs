@@ -121,7 +121,7 @@ namespace ACE.Server.Physics.Common
                 if (Math.Abs(objPos.Z - adjZ) > PhysicsGlobals.EPSILON)
                 {
                     objPos.Z = adjZ;
-                    obj.set_initial_frame(obj.Position.Frame);
+                    obj.set_initial_frame(ref obj.Position.Frame);
                 }
             }
         }
@@ -270,7 +270,7 @@ namespace ACE.Server.Physics.Common
                         // build object
                         var physicsObj = PhysicsObj.makeObject(obj.ObjId, 0, false);
                         physicsObj.DatObject = true;
-                        physicsObj.set_initial_frame(pos.Frame);
+                        physicsObj.set_initial_frame(ref pos.Frame);
                         if (!physicsObj.obj_within_block())
                         {
                             //Console.WriteLine($"Landblock {ID:X8} scenery: failed to spawn {obj.ObjId:X8}");
@@ -278,7 +278,7 @@ namespace ACE.Server.Physics.Common
                             continue;
                         }
 
-                        physicsObj.add_obj_to_cell(cell, pos.Frame);
+                        physicsObj.add_obj_to_cell(cell, ref pos.Frame);
                         var scale = ObjectDesc.ScaleObj(obj, globalCellX, globalCellY, j);
                         physicsObj.SetScaleStatic(scale);
                         Scenery.Add(physicsObj);
@@ -446,7 +446,7 @@ namespace ACE.Server.Physics.Common
                 var outside = LandDefs.AdjustToOutside(position);
                 var cell = get_landcell(position.ObjCellID);
                 if (cell == null) continue;
-                building.set_initial_frame(position.Frame);
+                building.set_initial_frame(ref position.Frame);
 
                 // hack
                 building.PartArray.Parts[0].Pos = position;
@@ -515,7 +515,7 @@ namespace ACE.Server.Physics.Common
                         obj.DestroyObject();
                         continue;
                     }
-                    obj.add_obj_to_cell(cell, position.Frame);
+                    obj.add_obj_to_cell(cell, ref position.Frame);
                     add_static_object(obj);
                 }
 
