@@ -10,7 +10,7 @@ namespace ACE.Server.Physics
     /// <summary>
     /// A cylinder sphere
     /// </summary>
-    public class CylSphere: IEquatable<CylSphere>
+    public struct CylSphere: IEquatable<CylSphere>
     {
         /// <summary>
         /// The base of the cylinder sphere
@@ -470,7 +470,7 @@ namespace ACE.Server.Physics
 
         public bool Equals(CylSphere cylSphere)
         {
-            return cylSphere != null && Height == cylSphere.Height && Radius == cylSphere.Radius && LowPoint == cylSphere.LowPoint;
+            return cylSphere.Radius != 0 && Height == cylSphere.Height && Radius == cylSphere.Radius && LowPoint == cylSphere.LowPoint;
         }
 
         public override int GetHashCode()
