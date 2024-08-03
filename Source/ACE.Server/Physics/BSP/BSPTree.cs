@@ -40,7 +40,7 @@ namespace ACE.Server.Physics.BSP
             RootNode.LinkPortals(RootNode.PurgePortals());
         }
 
-        public bool adjust_to_plane(Sphere checkPos, Vector3 curPos, Polygon hitPoly, Vector3 contactPoint)
+        public bool adjust_to_plane(ref Sphere checkPos, Vector3 curPos, Polygon hitPoly, Vector3 contactPoint)
         {
             var movement = checkPos.Center - curPos;
             var lowerTime = 0.0;
@@ -49,12 +49,12 @@ namespace ACE.Server.Physics.BSP
             var maxIterations = 15;    // hardcoded
             for (var i = 0; i < maxIterations; i++)
             {
-                var touchTime = hitPoly.adjust_sphere_to_poly(checkPos, curPos, movement);
+                var touchTime = hitPoly.adjust_sphere_to_poly(in checkPos, curPos, movement);
                 if (touchTime == 1.0f)
                 {
                     checkPos.Center = curPos + movement * (float)touchTime;
 
-                    if (!RootNode.sphere_intersects_poly(checkPos, movement, ref hitPoly, ref contactPoint))
+                    if (!RootNode.sphere_intersects_poly(in checkPos, movement, ref hitPoly, ref contactPoint))
                     {
                         lowerTime = touchTime;
                         break;
@@ -72,7 +72,7 @@ namespace ACE.Server.Physics.BSP
 
                 checkPos.Center = curPos + movement * (float)averageTime;
 
-                if (!RootNode.sphere_intersects_poly(checkPos, movement, ref hitPoly, ref contactPoint))
+                if (!RootNode.sphere_intersects_poly(in checkPos, movement, ref hitPoly, ref contactPoint))
                     upperTime = (lowerTime + upperTime) * 0.5f;
                 else
                     lowerTime = (lowerTime + upperTime) * 0.5f;
@@ -94,13 +94,13 @@ namespace ACE.Server.Physics.BSP
             // for rendering
         }
 
-        public TransitionState check_walkable(SpherePath path, Sphere checkPos, float scale)
+        public TransitionState check_walkable(SpherePath path, ref readonly Sphere checkPos, float scale)
         {
             var validPos = new Sphere(checkPos);
-            return RootNode.hits_walkable(path, validPos, path.LocalSpaceZ) ? TransitionState.Collided : TransitionState.OK;
+            return RootNode.hits_walkable(path, ref validPos, path.LocalSpaceZ) ? TransitionState.Collided : TransitionState.OK;
         }
 
-        public TransitionState collide_with_pt(Transition transition, Sphere checkPos, Vector3 curPos, Polygon hitPoly, Vector3 contactPoint, float scale)
+        public TransitionState collide_with_pt(Transition transition, ref readonly Sphere checkPos, Vector3 curPos, Polygon hitPoly, Vector3 contactPoint, float scale)
         {
             var obj = transition.ObjectInfo;
             var path = transition.SpherePath;
@@ -115,7 +115,7 @@ namespace ACE.Server.Physics.BSP
 
             var validPos = new Sphere(checkPos);
 
-            if (!adjust_to_plane(validPos, curPos, hitPoly, contactPoint))
+            if (!adjust_to_plane(ref validPos, curPos, hitPoly, contactPoint))
                 return TransitionState.Collided;
 
             collisions.SetCollisionNormal(collisionNormal);
@@ -146,17 +146,17 @@ namespace ACE.Server.Physics.BSP
                 if (path.BuildingCheck)
                     clearCell = !path.HitsInteriorCell;
 
-                if (RootNode.sphere_intersects_solid(localSphere, clearCell) || path.NumSphere > 1 && RootNode.sphere_intersects_solid(localSphere_, clearCell))
+                if (RootNode.sphere_intersects_solid(ref localSphere, clearCell) || path.NumSphere > 1 && RootNode.sphere_intersects_solid(ref localSphere_, clearCell))
                     return TransitionState.Collided;
                 else
                     return TransitionState.OK;
             }
 
             if (path.CheckWalkable)
-                return check_walkable(path, localSphere, scale);
+                return check_walkable(path, ref localSphere, scale);
 
             if (path.StepDown)
-                return step_sphere_down(transition, localSphere, scale);
+                return step_sphere_down(transition, ref localSphere, scale);
 
             Polygon hitPoly = null;
 
@@ -165,7 +165,7 @@ namespace ACE.Server.Physics.BSP
                 var changed = false;
                 var validPos = new Sphere(localSphere);
 
-                RootNode.find_walkable(path, validPos, ref hitPoly, movement, path.LocalSpaceZ, ref changed);
+                RootNode.find_walkable(path, ref validPos, ref hitPoly, movement, path.LocalSpaceZ, ref changed);
 
                 if (changed)
                 {
@@ -191,14 +191,14 @@ namespace ACE.Server.Physics.BSP
 
             if (obj.State.HasFlag(ObjectInfoState.Contact))
             {
-                if (RootNode.sphere_intersects_poly(localSphere, movement, ref hitPoly, ref contactPoint))
+                if (RootNode.sphere_intersects_poly(in localSphere, movement, ref hitPoly, ref contactPoint))
                     return step_sphere_up(transition, hitPoly.Plane.Normal);
 
                 if (path.NumSphere > 1)
                 {
                     Polygon hitPoly_ = null;
 
-                    if (RootNode.sphere_intersects_poly(localSphere_, movement, ref hitPoly_, ref contactPoint))
+                    if (RootNode.sphere_intersects_poly(in localSphere_, movement, ref hitPoly_, ref contactPoint))
                         return slide_sphere(transition, hitPoly_.Plane.Normal);
 
                     if (hitPoly_ != null) return NegPolyHit(path, hitPoly_, false);
@@ -210,7 +210,7 @@ namespace ACE.Server.Physics.BSP
             if (RootNode.sphere_intersects_poly(localSphere, movement, ref hitPoly, ref contactPoint) || hitPoly != null)
             {
                 if (obj.State.HasFlag(ObjectInfoState.PathClipped))
-                    return collide_with_pt(transition, localSphere, center, hitPoly, contactPoint, scale);
+                    return collide_with_pt(transition, in localSphere, center, hitPoly, contactPoint, scale);
 
                 var collisionNormal = path.LocalSpacePos.LocalToGlobalVec(hitPoly.Plane.Normal);
                 path.WalkableAllowance = PhysicsGlobals.LandingZ;
@@ -262,11 +262,11 @@ namespace ACE.Server.Physics.BSP
             for (var i = 0; i < maxIterations; i++)
             {
                 var centerSolid = false;
-                if (RootNode.sphere_intersects_solid_poly(validPos, rad, ref centerSolid, ref hitPoly, clearCell))
+                if (RootNode.sphere_intersects_solid_poly(in validPos, rad, ref centerSolid, ref hitPoly, clearCell))
                 {
                     if (hitPoly != null)
                     {
-                        hitPoly.adjust_to_placement_poly(validPos, validPos_, rad, centerSolid, clearCell);
+                        hitPoly.adjust_to_placement_poly(ref validPos, ref validPos_, rad, centerSolid, clearCell);
                         continue;
                     }
                 }
@@ -274,26 +274,26 @@ namespace ACE.Server.Physics.BSP
                 {
                     if (path.NumSphere >= 2)
                     {
-                        if (RootNode.sphere_intersects_solid_poly(validPos_, rad, ref centerSolid, ref hitPoly, clearCell))
+                        if (RootNode.sphere_intersects_solid_poly(in validPos_, rad, ref centerSolid, ref hitPoly, clearCell))
                         {
                             if (hitPoly != null)
                             {
-                                hitPoly.adjust_to_placement_poly(validPos_, validPos, rad, centerSolid, clearCell);
+                                hitPoly.adjust_to_placement_poly(ref validPos, ref validPos, rad, centerSolid, clearCell);
                                 continue;
                             }
                         }
                         else
-                            return placement_insert_inner(validPos, path, i);
+                            return placement_insert_inner(in validPos, path, i);
                     }
                     else
-                        return placement_insert_inner(validPos, path, i);
+                        return placement_insert_inner(in validPos, path, i);
                 }
                 rad *= 2;
             }
             return TransitionState.Collided;
         }
 
-        public TransitionState placement_insert_inner(Sphere validPos, SpherePath path, int i)
+        public TransitionState placement_insert_inner(ref readonly Sphere validPos, SpherePath path, int i)
         {
             if (i == 0)
                 return TransitionState.OK;
@@ -322,7 +322,7 @@ namespace ACE.Server.Physics.BSP
             return RootNode.sphere_intersects_cell_bsp(sphere);
         }
 
-        public TransitionState step_sphere_down(Transition transition, Sphere checkPos, float scale)
+        public TransitionState step_sphere_down(Transition transition, ref readonly Sphere checkPos, float scale)
         {
             var path = transition.SpherePath;
             var collisions = transition.CollisionInfo;
@@ -334,7 +334,7 @@ namespace ACE.Server.Physics.BSP
             var changed = false;
             Polygon polyHit = null;
 
-            RootNode.find_walkable(path, validPos, ref polyHit, movement, path.LocalSpaceZ, ref changed);
+            RootNode.find_walkable(path, ref validPos, ref polyHit, movement, path.LocalSpaceZ, ref changed);
 
             if (changed)
             {

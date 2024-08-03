@@ -110,10 +110,10 @@ namespace ACE.Server.Physics.BSP
             return portals;
         }
 
-        public int TraceRay(Ray ray, float delta, Vector3 collisionNormal)
-        {
-            return -1;  // unused?
-        }
+        //public int TraceRay(Ray ray, float delta, Vector3 collisionNormal)
+        //{
+        //    return -1;  // unused?
+        //}
 
         public bool box_intersects_cell_bsp(BBox box)
         {
@@ -138,51 +138,51 @@ namespace ACE.Server.Physics.BSP
             return true;
         }
 
-        public void build_draw_portals_only(int portalPolyOrPortalContents)
-        {
-            // for rendering
-        }
+        //public void build_draw_portals_only(int portalPolyOrPortalContents)
+        //{
+        //    // for rendering
+        //}
 
-        public virtual void find_walkable(SpherePath path, Sphere validPos, ref Polygon polygon, Vector3 movement, Vector3 up, ref bool changed)
+        public virtual void find_walkable(SpherePath path, ref Sphere validPos, ref Polygon polygon, Vector3 movement, Vector3 up, ref bool changed)
         {
-            if (!Sphere.Intersects(validPos)) return;
+            if (!Sphere.Intersects(in validPos)) return;
 
             var dist = Vector3.Dot(SplittingPlane.Normal, validPos.Center) + SplittingPlane.D;
             var reach = validPos.Radius - PhysicsGlobals.EPSILON;
 
             if (dist >= reach)
             {
-                PosNode.find_walkable(path, validPos, ref polygon, movement, up, ref changed);
+                PosNode.find_walkable(path, ref validPos, ref polygon, movement, up, ref changed);
                 return;
             }
             if (dist <= -reach)
             {
-                NegNode.find_walkable(path, validPos, ref polygon, movement, up, ref changed);
+                NegNode.find_walkable(path, ref validPos, ref polygon, movement, up, ref changed);
                 return;
             }
-            PosNode.find_walkable(path, validPos, ref polygon, movement, up, ref changed);
+            PosNode.find_walkable(path, ref validPos, ref polygon, movement, up, ref changed);
 
-            NegNode.find_walkable(path, validPos, ref polygon, movement, up, ref changed);
+            NegNode.find_walkable(path, ref validPos, ref polygon, movement, up, ref changed);
         }
 
-        public virtual bool hits_walkable(SpherePath path, Sphere validPos, Vector3 up)
+        public virtual bool hits_walkable(SpherePath path, ref readonly Sphere validPos, Vector3 up)
         {
-            if (!Sphere.Intersects(validPos))
+            if (!Sphere.Intersects(in validPos))
                 return false;
 
             var dist = Vector3.Dot(SplittingPlane.Normal, validPos.Center) + SplittingPlane.D;
             var reach = validPos.Radius - PhysicsGlobals.EPSILON;
 
             if (dist >= reach)
-                return PosNode.hits_walkable(path, validPos, up);
+                return PosNode.hits_walkable(path, in validPos, up);
 
             if (dist <= -reach)
-                return NegNode.hits_walkable(path, validPos, up);
+                return NegNode.hits_walkable(path, in validPos, up);
 
-            if (PosNode.hits_walkable(path, validPos, up))
+            if (PosNode.hits_walkable(path, in validPos, up))
                 return true;
 
-            if (NegNode.hits_walkable(path, validPos, up))
+            if (NegNode.hits_walkable(path, in validPos, up))
                 return true;
 
             return false;
@@ -239,88 +239,88 @@ namespace ACE.Server.Physics.BSP
             return BoundingType.PartiallyInside;
         }
 
-        public virtual bool sphere_intersects_poly(Sphere checkPos, Vector3 movement, ref Polygon polygon, ref Vector3 contactPoint)
+        public virtual bool sphere_intersects_poly(ref readonly Sphere checkPos, Vector3 movement, ref Polygon polygon, ref Vector3 contactPoint)
         {
-            if (!Sphere.Intersects(checkPos))
+            if (!Sphere.Intersects(in checkPos))
                 return false;
 
             var dist = Vector3.Dot(SplittingPlane.Normal, checkPos.Center) + SplittingPlane.D;
             var reach = checkPos.Radius - PhysicsGlobals.EPSILON;
 
             if (dist >= reach)
-                return PosNode.sphere_intersects_poly(checkPos, movement, ref polygon, ref contactPoint);
+                return PosNode.sphere_intersects_poly(in checkPos, movement, ref polygon, ref contactPoint);
 
             if (dist <= -reach)
-                return NegNode.sphere_intersects_poly(checkPos, movement, ref polygon, ref contactPoint);
+                return NegNode.sphere_intersects_poly(in checkPos, movement, ref polygon, ref contactPoint);
 
-            if (PosNode != null && PosNode.sphere_intersects_poly(checkPos, movement, ref polygon, ref contactPoint))
+            if (PosNode != null && PosNode.sphere_intersects_poly(in checkPos, movement, ref polygon, ref contactPoint))
                 return true;
 
-            if (NegNode != null && NegNode.sphere_intersects_poly(checkPos, movement, ref polygon, ref contactPoint))
+            if (NegNode != null && NegNode.sphere_intersects_poly(in checkPos, movement, ref polygon, ref contactPoint))
                 return true;
 
             return false;
         }
 
-        public virtual bool sphere_intersects_solid(Sphere checkPos, bool centerCheck)
+        public virtual bool sphere_intersects_solid(ref readonly Sphere checkPos, bool centerCheck)
         {
-            if (!Sphere.Intersects(checkPos))
+            if (!Sphere.Intersects(in checkPos))
                 return false;
 
             var dist = Vector3.Dot(SplittingPlane.Normal, checkPos.Center) + SplittingPlane.D;
             var reach = checkPos.Radius - PhysicsGlobals.EPSILON;
 
             if (dist >= reach)
-                return PosNode.sphere_intersects_solid(checkPos, centerCheck);
+                return PosNode.sphere_intersects_solid(in checkPos, centerCheck);
 
             if (dist <= -reach)
-                return NegNode.sphere_intersects_solid(checkPos, centerCheck);
+                return NegNode.sphere_intersects_solid(in checkPos, centerCheck);
 
             if (dist < 0.0f)
             {
-                if (PosNode.sphere_intersects_solid(checkPos, false))
+                if (PosNode.sphere_intersects_solid(in checkPos, false))
                     return true;
 
-                return NegNode.sphere_intersects_solid(checkPos, centerCheck);
+                return NegNode.sphere_intersects_solid(in checkPos, centerCheck);
             }
             else
             {
-                if (PosNode.sphere_intersects_solid(checkPos, centerCheck))
+                if (PosNode.sphere_intersects_solid(in checkPos, centerCheck))
                     return true;
 
-                return NegNode.sphere_intersects_solid(checkPos, false);
+                return NegNode.sphere_intersects_solid(in checkPos, false);
             }
         }
 
-        public virtual bool sphere_intersects_solid_poly(Sphere checkPos, float radius, ref bool centerSolid, ref Polygon hitPoly, bool centerCheck)
+        public virtual bool sphere_intersects_solid_poly(ref readonly Sphere checkPos, float radius, ref bool centerSolid, ref Polygon hitPoly, bool centerCheck)
         {
-            if (!Sphere.Intersects(checkPos))
+            if (!Sphere.Intersects(in checkPos))
                 return false;
 
             var dist = Vector3.Dot(SplittingPlane.Normal, checkPos.Center) + SplittingPlane.D;
             var reach = radius - PhysicsGlobals.EPSILON;
 
             if (dist >= reach)
-                return PosNode.sphere_intersects_solid_poly(checkPos, radius, ref centerSolid, ref hitPoly, centerCheck);
+                return PosNode.sphere_intersects_solid_poly(in checkPos, radius, ref centerSolid, ref hitPoly, centerCheck);
 
             if (dist <= -reach)
-                return NegNode.sphere_intersects_solid_poly(checkPos, radius, ref centerSolid, ref hitPoly, centerCheck);
+                return NegNode.sphere_intersects_solid_poly(in checkPos, radius, ref centerSolid, ref hitPoly, centerCheck);
 
             if (dist <= 0.0f)
             {
-                NegNode.sphere_intersects_solid_poly(checkPos, radius, ref centerSolid, ref hitPoly, centerCheck);
+                NegNode.sphere_intersects_solid_poly(in checkPos, radius, ref centerSolid, ref hitPoly, centerCheck);
 
                 if (hitPoly != null) return centerSolid;
 
-                return PosNode.sphere_intersects_solid_poly(checkPos, radius, ref centerSolid, ref hitPoly, false);
+                return PosNode.sphere_intersects_solid_poly(in checkPos, radius, ref centerSolid, ref hitPoly, false);
             }
             else
             {
-                PosNode.sphere_intersects_solid_poly(checkPos, radius, ref centerSolid, ref hitPoly, centerCheck);
+                PosNode.sphere_intersects_solid_poly(in checkPos, radius, ref centerSolid, ref hitPoly, centerCheck);
 
                 if (hitPoly != null) return centerSolid;
 
-                return NegNode.sphere_intersects_solid_poly(checkPos, radius, ref centerSolid, ref hitPoly, false);
+                return NegNode.sphere_intersects_solid_poly(in checkPos, radius, ref centerSolid, ref hitPoly, false);
             }
         }
 

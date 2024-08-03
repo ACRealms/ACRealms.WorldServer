@@ -60,79 +60,94 @@ namespace ACE.Server.Physics
             Radius = sphere.Radius;
         }
 
-        public static readonly float ThresholdMed = 1.0f / 3.0f;
-        public static readonly float ThresholdHigh = 2.0f / 3.0f;
+        //public static readonly float ThresholdMed = 1.0f / 3.0f;
+        //public static readonly float ThresholdHigh = 2.0f / 3.0f;
 
-        public static Quadrant Attack(ref PhysicsPosition targetPos, float targetRadius, float targetHeight, ref PhysicsPosition attackPos, Vector2 left, Vector2 right, float attackRadius, float attackHeight)
-        {
-            var center = attackPos.LocalToLocal(targetPos, Vector3.Zero);
+        //public static Quadrant Attack(ref PhysicsPosition targetPos, float targetRadius, float targetHeight, ref PhysicsPosition attackPos, Vector2 left, Vector2 right, float attackRadius, float attackHeight)
+        //{
+        //    var center = attackPos.LocalToLocal(targetPos, Vector3.Zero);
 
-            if (attackHeight < 0.0f || attackHeight > targetHeight)
-                return Quadrant.None;
+        //    if (attackHeight < 0.0f || attackHeight > targetHeight)
+        //        return Quadrant.None;
 
-            var radsum = targetRadius + attackRadius;
+        //    var radsum = targetRadius + attackRadius;
 
-            var distSq = center.LengthSquared2D();
-            if (distSq > radsum * radsum)
-                return Quadrant.None;
+        //    var distSq = center.LengthSquared2D();
+        //    if (distSq > radsum * radsum)
+        //        return Quadrant.None;
 
-            var hitLoc = targetPos.LocalToLocal(attackPos, Vector3.Zero);
+        //    var hitLoc = targetPos.LocalToLocal(attackPos, Vector3.Zero);
 
-            var quadrant = hitLoc.X <= 0.0f ? Quadrant.Left : Quadrant.Right;
+        //    var quadrant = hitLoc.X <= 0.0f ? Quadrant.Left : Quadrant.Right;
 
-            quadrant |= hitLoc.Y > 0.0f ? Quadrant.Front : Quadrant.Back;
+        //    quadrant |= hitLoc.Y > 0.0f ? Quadrant.Front : Quadrant.Back;
 
-            if (attackHeight < targetHeight * ThresholdMed)
-                quadrant |= Quadrant.Low;
-            else if (attackHeight < targetHeight * ThresholdHigh)
-                quadrant |= Quadrant.Medium;
-            else
-                quadrant |= Quadrant.High;
+        //    if (attackHeight < targetHeight * ThresholdMed)
+        //        quadrant |= Quadrant.Low;
+        //    else if (attackHeight < targetHeight * ThresholdHigh)
+        //        quadrant |= Quadrant.Medium;
+        //    else
+        //        quadrant |= Quadrant.High;
 
-            // 2d cross product?
-            var attack_ht = center.Y * left.X - center.X * left.Y;
-            var right_dist = center.X * right.Y - center.Y * right.X;
+        //    // 2d cross product?
+        //    var attack_ht = center.Y * left.X - center.X * left.Y;
+        //    var right_dist = center.X * right.Y - center.Y * right.X;
 
-            if (attack_ht <= 0.0f && right_dist <= 0.0f)
-                return quadrant;
+        //    if (attack_ht <= 0.0f && right_dist <= 0.0f)
+        //        return quadrant;
 
-            if (left.X * right.Y - left.Y * right.X >= 0.0f)
-            {
-                if (right_dist * attack_ht <= 0.0f || attack_ht <= targetRadius || right_dist <= targetRadius)
-                    return quadrant;
-                else
-                    return Quadrant.None;
-            }
+        //    if (left.X * right.Y - left.Y * right.X >= 0.0f)
+        //    {
+        //        if (right_dist * attack_ht <= 0.0f || attack_ht <= targetRadius || right_dist <= targetRadius)
+        //            return quadrant;
+        //        else
+        //            return Quadrant.None;
+        //    }
 
-            if (attack_ht < 0.0f)
-            {
-                if (right_dist <= targetRadius)
-                    return quadrant;
-                else
-                    return Quadrant.None;
-            }
+        //    if (attack_ht < 0.0f)
+        //    {
+        //        if (right_dist <= targetRadius)
+        //            return quadrant;
+        //        else
+        //            return Quadrant.None;
+        //    }
 
-            if (right_dist >= 0.0f)
-            {
-                if (distSq <= targetRadius * targetRadius)
-                    return quadrant;
-                else
-                    return Quadrant.None;
-            }
+        //    if (right_dist >= 0.0f)
+        //    {
+        //        if (distSq <= targetRadius * targetRadius)
+        //            return quadrant;
+        //        else
+        //            return Quadrant.None;
+        //    }
 
-            if (attack_ht < 0.0f)
-            {
-                if (right_dist <= targetRadius)
-                    return quadrant;
-                else
-                    return Quadrant.None;
-            }
+        //    if (attack_ht < 0.0f)
+        //    {
+        //        if (right_dist <= targetRadius)
+        //            return quadrant;
+        //        else
+        //            return Quadrant.None;
+        //    }
 
-            if (attack_ht <= targetRadius)
-                return quadrant;
-            else
-                return Quadrant.None;
-        }
+        //    if (attack_ht <= targetRadius)
+        //        return quadrant;
+        //    else
+        //        return Quadrant.None;
+        //}
+
+        ///// <summary>
+        ///// Redirects a sphere to be on collision course towards a point
+        ///// </summary>
+        ///// <param name="transition">The transition information for the sphere</param>
+        ///// <param name="checkPos">The spherical point to redirect towards</param>
+        ///// <param name="disp">Currently doesn't seem to be used?</param>
+        ///// <param name="radsum">The sum of the sphere and spherical point radii</param>
+        ///// <param name="sphereNum">Used as an offset in path.GlobalCurrCenter to determine movement</param>
+        ///// <returns>The TransitionState either collided or adjusted</returns>
+        //[Obsolete("Use CollideWithPoint without disp")]
+        //public readonly TransitionState CollideWithPoint(Transition transition, Sphere checkPos, Vector3 disp, float radsum, int sphereNum)
+        //{
+        //    return CollideWithPoint(transition, checkPos, radsum, sphereNum);
+        //}
 
         /// <summary>
         /// Redirects a sphere to be on collision course towards a point
@@ -143,22 +158,7 @@ namespace ACE.Server.Physics
         /// <param name="radsum">The sum of the sphere and spherical point radii</param>
         /// <param name="sphereNum">Used as an offset in path.GlobalCurrCenter to determine movement</param>
         /// <returns>The TransitionState either collided or adjusted</returns>
-        [Obsolete("Use CollideWithPoint without disp")]
-        public TransitionState CollideWithPoint(Transition transition, Sphere checkPos, Vector3 disp, float radsum, int sphereNum)
-        {
-            return CollideWithPoint(transition, checkPos, radsum, sphereNum);
-        }
-
-        /// <summary>
-        /// Redirects a sphere to be on collision course towards a point
-        /// </summary>
-        /// <param name="transition">The transition information for the sphere</param>
-        /// <param name="checkPos">The spherical point to redirect towards</param>
-        /// <param name="disp">Currently doesn't seem to be used?</param>
-        /// <param name="radsum">The sum of the sphere and spherical point radii</param>
-        /// <param name="sphereNum">Used as an offset in path.GlobalCurrCenter to determine movement</param>
-        /// <returns>The TransitionState either collided or adjusted</returns>
-        public TransitionState CollideWithPoint(Transition transition, Sphere checkPos, float radsum, int sphereNum)
+        public readonly TransitionState CollideWithPoint(Transition transition, Sphere checkPos, float radsum, int sphereNum)
         {
             return CollideWithPoint(Center, transition, checkPos, radsum, sphereNum);
         }
@@ -251,7 +251,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Returns true if this sphere intersects with another sphere
         /// </summary>
-        public bool Intersects(Sphere sphere)
+        public readonly bool Intersects(ref readonly Sphere sphere)
         {
             var delta = sphere.Center - Center;
             var radSum = Radius + sphere.Radius;
@@ -261,23 +261,23 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Determines if this sphere collides with any other spheres during its transitions
         /// </summary>
-        public TransitionState IntersectsSphere(ref PhysicsPosition position, float scale, Transition transition, bool isCreature)
+        public readonly TransitionState IntersectsSphere(ref PhysicsPosition position, float scale, Transition transition, bool isCreature)
         {
             var globPos = transition.SpherePath.CheckPos.LocalToGlobal(position, Center * scale);
             return IntersectsSphere(globPos, Radius * scale, transition, isCreature);
         }
 
-        /// <summary>
-        /// Determines if this sphere collides with anything during its transition<para />
-        /// Note: For high load scenarios, consider the static function to avoid excess heap usage: IntersectsSphere(Vector3 center, float radius, Transition transition, bool isCreature)
-        /// </summary>
-        /// <param name="transition">The transition path for this sphere</param>
-        /// <param name="isCreature">Flag indicates if this sphere is a player / monster</param>
-        /// <returns>The collision result for this transition path</returns>
-        public TransitionState IntersectsSphere(Transition transition, bool isCreature)
-        {
-            return IntersectsSphere(Center, Radius, transition, isCreature);
-        }
+        ///// <summary>
+        ///// Determines if this sphere collides with anything during its transition<para />
+        ///// Note: For high load scenarios, consider the static function to avoid excess heap usage: IntersectsSphere(Vector3 center, float radius, Transition transition, bool isCreature)
+        ///// </summary>
+        ///// <param name="transition">The transition path for this sphere</param>
+        ///// <param name="isCreature">Flag indicates if this sphere is a player / monster</param>
+        ///// <returns>The collision result for this transition path</returns>
+        //public readonly TransitionState IntersectsSphere(Transition transition, bool isCreature)
+        //{
+        //    return IntersectsSphere(Center, Radius, transition, isCreature);
+        //}
 
         /// <summary>
         /// Determines if this sphere collides with anything during its transition
@@ -416,22 +416,22 @@ namespace ACE.Server.Physics
             return TransitionState.Adjusted;
         }
 
-        /// <summary>
-        /// Handles the collision when an object lands on a sphere
-        /// </summary>
-        [Obsolete("Use LandOnShere without checkPos, disp, radsum")]
-        public TransitionState LandOnSphere(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
-        {
-            return LandOnSphere(transition);
-        }
+        ///// <summary>
+        ///// Handles the collision when an object lands on a sphere
+        ///// </summary>
+        //[Obsolete("Use LandOnShere without checkPos, disp, radsum")]
+        //public TransitionState LandOnSphere(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
+        //{
+        //    return LandOnSphere(transition);
+        //}
 
-        /// <summary>
-        /// Handles the collision when an object lands on a sphere
-        /// </summary>
-        public TransitionState LandOnSphere(Transition transition)
-        {
-            return LandOnSphere(Center, transition);
-        }
+        ///// <summary>
+        ///// Handles the collision when an object lands on a sphere
+        ///// </summary>
+        //public readonly TransitionState LandOnSphere(Transition transition)
+        //{
+        //    return LandOnSphere(Center, transition);
+        //}
 
         /// <summary>
         /// Handles the collision when an object lands on a sphere
@@ -452,22 +452,22 @@ namespace ACE.Server.Physics
             }
         }
 
-        /// <summary>
-        /// Attempts to slide the sphere from a collision
-        /// </summary>
-        [Obsolete("Use SlideSphere without radsum")]
-        public TransitionState SlideSphere(Transition transition, Vector3 disp, float radsum, int sphereNum)
-        {
-            return SlideSphere(transition, disp, sphereNum);
-        }
+        ///// <summary>
+        ///// Attempts to slide the sphere from a collision
+        ///// </summary>
+        //[Obsolete("Use SlideSphere without radsum")]
+        //public TransitionState SlideSphere(Transition transition, Vector3 disp, float radsum, int sphereNum)
+        //{
+        //    return SlideSphere(transition, disp, sphereNum);
+        //}
 
-        /// <summary>
-        /// Attempts to slide the sphere from a collision
-        /// </summary>
-        public TransitionState SlideSphere(Transition transition, Vector3 disp, int sphereNum)
-        {
-            return SlideSphere(Center, transition, disp, sphereNum);
-        }
+        ///// <summary>
+        ///// Attempts to slide the sphere from a collision
+        ///// </summary>
+        //public readonly TransitionState SlideSphere(Transition transition, Vector3 disp, int sphereNum)
+        //{
+        //    return SlideSphere(Center, transition, disp, sphereNum);
+        //}
 
         /// <summary>
         /// Attempts to slide the sphere from a collision
@@ -522,22 +522,22 @@ namespace ACE.Server.Physics
             return TransitionState.Slid;
         }
 
-        /// <summary>
-        /// Attempts to slide a sphere from a collision
-        /// </summary>
-        [Obsolete("Use SlideSphere without disp and radsum")]
-        public TransitionState SlideSphere(Transition transition, Sphere checkPos, Vector3 disp, float radsum, int sphereNum)
-        {
-            return SlideSphere(transition, checkPos, sphereNum);
-        }
+        ///// <summary>
+        ///// Attempts to slide a sphere from a collision
+        ///// </summary>
+        //[Obsolete("Use SlideSphere without disp and radsum")]
+        //public TransitionState SlideSphere(Transition transition, Sphere checkPos, Vector3 disp, float radsum, int sphereNum)
+        //{
+        //    return SlideSphere(transition, checkPos, sphereNum);
+        //}
 
-        /// <summary>
-        /// Attempts to slide a sphere from a collision
-        /// </summary>
-        public TransitionState SlideSphere(Transition transition, Sphere checkPos, int sphereNum)
-        {
-            return SlideSphere(Center, transition, checkPos, sphereNum);
-        }
+        ///// <summary>
+        ///// Attempts to slide a sphere from a collision
+        ///// </summary>
+        //public readonly TransitionState SlideSphere(Transition transition, Sphere checkPos, int sphereNum)
+        //{
+        //    return SlideSphere(Center, transition, checkPos, sphereNum);
+        //}
 
         /// <summary>
         /// Attempts to slide a sphere from a collision
@@ -557,7 +557,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Attempts to slide a sphere from a collision
         /// </summary>
-        public TransitionState SlideSphere(Transition transition, ref Vector3 collisionNormal, Vector3 currPos)
+        public readonly TransitionState SlideSphere(Transition transition, ref Vector3 collisionNormal, Vector3 currPos)
         {
             var path = transition.SpherePath;
             var collisions = transition.CollisionInfo;
@@ -605,13 +605,13 @@ namespace ACE.Server.Physics
             return TransitionState.OK;
         }
 
-        /// <summary>
-        /// Attempts to move the sphere down from a collision
-        /// </summary>
-        public TransitionState StepSphereDown(Transition transition, Sphere checkPos, ref Vector3 disp, float radsum)
-        {
-            return StepSphereDown(Center, Radius, transition, checkPos, ref disp, radsum);
-        }
+        ///// <summary>
+        ///// Attempts to move the sphere down from a collision
+        ///// </summary>
+        //public readonly TransitionState StepSphereDown(Transition transition, Sphere checkPos, ref Vector3 disp, float radsum)
+        //{
+        //    return StepSphereDown(Center, Radius, transition, checkPos, ref disp, radsum);
+        //}
 
         /// <summary>
         /// Attempts to move the sphere down from a collision
@@ -665,22 +665,22 @@ namespace ACE.Server.Physics
             return TransitionState.Adjusted;
         }
 
-        /// <summary>
-        /// Attempts to move the sphere up from a collision
-        /// </summary>
-        [Obsolete("Use override without checkPos")]
-        public TransitionState StepSphereUp(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
-        {
-            return StepSphereUp(transition, disp, radsum);
-        }
+        ///// <summary>
+        ///// Attempts to move the sphere up from a collision
+        ///// </summary>
+        //[Obsolete("Use override without checkPos")]
+        //public TransitionState StepSphereUp(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
+        //{
+        //    return StepSphereUp(transition, disp, radsum);
+        //}
 
-        /// <summary>
-        /// Attempts to move the sphere up from a collision
-        /// </summary>
-        public TransitionState StepSphereUp(Transition transition, Vector3 disp, float radsum)
-        {
-            return StepSphereUp(Center, transition, disp, radsum);
-        }
+        ///// <summary>
+        ///// Attempts to move the sphere up from a collision
+        ///// </summary>
+        //public readonly TransitionState StepSphereUp(Transition transition, Vector3 disp, float radsum)
+        //{
+        //    return StepSphereUp(Center, transition, disp, radsum);
+        //}
 
         /// <summary>
         /// Attempts to move the sphere up from a collision
@@ -712,7 +712,7 @@ namespace ACE.Server.Physics
         /// - If the sphere is behind the ray start point, with the ray direction pointing away from the sphere,
         ///   it can still return true for intersection, with timeOfIntersection as a negative value.
         /// </remarks>
-        public bool SphereIntersectsRay(Ray ray, out double timeOfIntersection)
+        public readonly bool SphereIntersectsRay(Ray ray, out double timeOfIntersection)
         {
             timeOfIntersection = 0;
 
@@ -738,17 +738,17 @@ namespace ACE.Server.Physics
             return true;
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return string.Format("Center: {0} Radius: {1}", Center, Radius);
         }
 
-        public bool Equals(Sphere sphere)
+        public readonly bool Equals(Sphere sphere)
         {
             return Center.X == sphere.Center.X && Center.Y == sphere.Center.Y && Center.Z == sphere.Center.Z && Radius == sphere.Radius;
         }
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return HashCode.Combine(Center, Radius);
         }

@@ -521,7 +521,7 @@ namespace ACE.Server.Physics
                     var playerSphere = new Sphere(Position.Frame.LocalToGlobal(pSphere.Center), pSphere.Radius);
                     var globSphere = new Sphere(obj.Position.Frame.LocalToGlobal(sphere.Center), sphere.Radius);
 
-                    if (playerSphere.Intersects(globSphere))
+                    if (playerSphere.Intersects(in globSphere))
                         return true;
                 }
 
@@ -4419,7 +4419,7 @@ namespace ACE.Server.Physics
         //        UpdateTime = PhysicsTimer.CurrentTime;
         //}
 
-        public bool IsGrounded { get => TransientState.HasFlag(TransientStateFlags.OnWalkable) && CachedVelocity.Equals(Vector3.Zero); }
+       // public bool IsGrounded { get => TransientState.HasFlag(TransientStateFlags.OnWalkable) && CachedVelocity.Equals(Vector3.Zero); }
 
         public bool Equals(PhysicsObj obj)
         {

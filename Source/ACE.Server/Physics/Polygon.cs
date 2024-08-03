@@ -70,7 +70,7 @@ namespace ACE.Server.Physics
             NegSurface = -1;
         }
 
-        public bool adjust_sphere_to_plane(SpherePath path, Sphere validPos, Vector3 movement)
+        public bool adjust_sphere_to_plane(SpherePath path, ref Sphere validPos, Vector3 movement)
         {
             var dpPos = Vector3.Dot(validPos.Center, Plane.Normal) + Plane.D;
             var dpMove = Vector3.Dot(movement, Plane.Normal);
@@ -96,7 +96,7 @@ namespace ACE.Server.Physics
             return true;
         }
 
-        public double adjust_sphere_to_poly(Sphere checkPos, Vector3 currPos, Vector3 movement)
+        public double adjust_sphere_to_poly(ref readonly Sphere checkPos, Vector3 currPos, Vector3 movement)
         {
             var dpPos = Vector3.Dot(currPos, Plane.Normal) + Plane.D;
             if (Math.Abs(dpPos) < checkPos.Radius)
@@ -113,7 +113,7 @@ namespace ACE.Server.Physics
             return (dist - dpPos) / dpMove;
         }
 
-        public void adjust_to_placement_poly(Sphere hitSphere, Sphere otherSphere, float radius, bool centerSolid, bool solidCheck)
+        public void adjust_to_placement_poly(ref Sphere hitSphere, ref Sphere otherSphere, float radius, bool centerSolid, bool solidCheck)
         {
             var dp = Vector3.Dot(hitSphere.Center, Plane.Normal) + Plane.D;
             if (solidCheck && (centerSolid || dp <= 0.0f))
@@ -201,10 +201,10 @@ namespace ACE.Server.Physics
             return false;
         }
 
-        public bool hits_sphere(Sphere sphere)
+        public bool hits_sphere(ref readonly Sphere sphere)
         {
             Vector3 contactPoint = Vector3.Zero;
-            return polygon_hits_sphere_precise(sphere, ref contactPoint);
+            return polygon_hits_sphere_precise(in sphere, ref contactPoint);
         }
 
         public void make_plane()
@@ -275,18 +275,18 @@ namespace ACE.Server.Physics
             return true;
         }
 
-        public bool polygon_hits_ray(Ray ray, ref float time)
-        {
-            if (SidesType == CullMode.Landblock && Vector3.Dot(Plane.Normal, ray.Dir) > 0.0f)   // dist?
-                return false;
+        //public bool polygon_hits_ray(Ray ray, ref float time)
+        //{
+        //    if (SidesType == CullMode.Landblock && Vector3.Dot(Plane.Normal, ray.Dir) > 0.0f)   // dist?
+        //        return false;
 
-            if (!Plane.compute_time_of_intersection(ray, ref time))
-                return false;
+        //    if (!Plane.compute_time_of_intersection(ray, ref time))
+        //        return false;
 
-            return point_in_polygon(ray.Point + ray.Dir * time);
-        }
+        //    return point_in_polygon(ray.Point + ray.Dir * time);
+        //}
 
-        public bool polygon_hits_sphere(Sphere sphere, ref Vector3 contactPoint)
+        public bool polygon_hits_sphere(ref readonly Sphere sphere, ref Vector3 contactPoint)
         {
             var dpPos = Vector3.Dot(sphere.Center, Plane.Normal) + Plane.D;
             var rad = sphere.Radius - PhysicsGlobals.EPSILON;
@@ -328,7 +328,7 @@ namespace ACE.Server.Physics
             return result;
         }
 
-        public bool polygon_hits_sphere_precise(Sphere sphere, ref Vector3 contactPoint)
+        public bool polygon_hits_sphere_precise(ref readonly Sphere sphere, ref Vector3 contactPoint)
         {
             if (NumPoints == 0) return true;
 
@@ -383,9 +383,9 @@ namespace ACE.Server.Physics
             return true;
         }
 
-        public bool pos_hits_sphere(Sphere sphere, Vector3 movement, ref Vector3 contactPoint, ref Polygon hitPoly)
+        public bool pos_hits_sphere(ref readonly Sphere sphere, Vector3 movement, ref Vector3 contactPoint, ref Polygon hitPoly)
         {
-            var hit = polygon_hits_sphere_precise(sphere, ref contactPoint);
+            var hit = polygon_hits_sphere_precise(in sphere, ref contactPoint);
 
             if (hit)
                 hitPoly = this;
@@ -397,16 +397,16 @@ namespace ACE.Server.Physics
             return hit;
         }
 
-        public bool walkable_hits_sphere(SpherePath path, Sphere sphere, Vector3 up)
+        public bool walkable_hits_sphere(SpherePath path, ref readonly Sphere sphere, Vector3 up)
         {
             var dp = Vector3.Dot(up, Plane.Normal);
             if (dp <= path.WalkableAllowance) return false;
             Vector3 contactPoint = Vector3.Zero;
-            var hit = polygon_hits_sphere_precise(sphere, ref contactPoint);
-            if (hit != polygon_hits_sphere(sphere, ref contactPoint))
+            var hit = polygon_hits_sphere_precise(in sphere, ref contactPoint);
+            if (hit != polygon_hits_sphere(in sphere, ref contactPoint))
             {
-                polygon_hits_sphere_precise(sphere, ref contactPoint);
-                polygon_hits_sphere(sphere, ref contactPoint);
+                polygon_hits_sphere_precise(in sphere, ref contactPoint);
+                polygon_hits_sphere(in sphere, ref contactPoint);
             }
             return hit;
         }

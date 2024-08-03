@@ -26,17 +26,17 @@ namespace ACE.Server.Physics.BSP
             Solid = node.Solid == 1;
         }
 
-        public override void find_walkable(SpherePath path, Sphere validPos, ref Polygon hitPoly, Vector3 movement, Vector3 up, ref bool changed)
+        public override void find_walkable(SpherePath path, ref Sphere validPos, ref Polygon hitPoly, Vector3 movement, Vector3 up, ref bool changed)
         {
-            if (NumPolys == 0 || !Sphere.Intersects(validPos))
+            if (NumPolys == 0 || !Sphere.Intersects(in validPos))
                 return;
 
             foreach (var polygon in Polygons)
             {
-                var walkable = polygon.walkable_hits_sphere(path, validPos, up);
+                var walkable = polygon.walkable_hits_sphere(path, in validPos, up);
                 var adjusted = false;
                 if (walkable)
-                    adjusted = polygon.adjust_sphere_to_plane(path, validPos, movement);
+                    adjusted = polygon.adjust_sphere_to_plane(path, ref validPos, movement);
 
                 if (walkable && adjusted)
                 {
@@ -46,7 +46,7 @@ namespace ACE.Server.Physics.BSP
             }
         }
 
-        public override bool hits_walkable(SpherePath path, Sphere validPos, Vector3 up)
+        public override bool hits_walkable(SpherePath path, ref readonly Sphere validPos, Vector3 up)
         {
             if (NumPolys == 0 || !Sphere.Intersects(validPos))
                 return false;
@@ -64,45 +64,45 @@ namespace ACE.Server.Physics.BSP
             return NumPolys != 0;
         }
 
-        public override bool sphere_intersects_poly(Sphere checkPos, Vector3 movement, ref Polygon hitPoly, ref Vector3 contactPoint)
+        public override bool sphere_intersects_poly(ref readonly Sphere checkPos, Vector3 movement, ref Polygon hitPoly, ref Vector3 contactPoint)
         {
-            if (NumPolys == 0 || !Sphere.Intersects(checkPos))
+            if (NumPolys == 0 || !Sphere.Intersects(in checkPos))
                 return false;
 
             foreach (var polygon in Polygons)
             {
-                if (polygon.pos_hits_sphere(checkPos, movement, ref contactPoint, ref hitPoly))
+                if (polygon.pos_hits_sphere(in checkPos, movement, ref contactPoint, ref hitPoly))
                     return true;
             }
             return false;
         }
 
-        public override bool sphere_intersects_solid(Sphere checkPos, bool checkCenter)
+        public override bool sphere_intersects_solid(ref readonly Sphere checkPos, bool checkCenter)
         {
             if (NumPolys == 0) return false;
             if (checkCenter && Solid) return true;
-            if (!Sphere.Intersects(checkPos)) return false;
+            if (!Sphere.Intersects(in checkPos)) return false;
 
             foreach (var polygon in Polygons)
-                if (polygon.hits_sphere(checkPos))
+                if (polygon.hits_sphere(in checkPos))
                     return true;
 
             return false;
         }
 
-        public override bool sphere_intersects_solid_poly(Sphere checkPos, float radius, ref bool centerSolid, ref Polygon hitPoly, bool checkCenter)
+        public override bool sphere_intersects_solid_poly(ref readonly Sphere checkPos, float radius, ref bool centerSolid, ref Polygon hitPoly, bool checkCenter)
         {
             if (NumPolys == 0) return false;
 
             if (checkCenter && Solid)
                 centerSolid = true;
 
-            if (!Sphere.Intersects(checkPos))
+            if (!Sphere.Intersects(in checkPos))
                 return centerSolid;
 
             foreach (var polygon in Polygons)
             {
-                if (polygon.hits_sphere(checkPos))
+                if (polygon.hits_sphere(in checkPos))
                 {
                     hitPoly = polygon;
                     return true;
