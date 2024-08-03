@@ -10,22 +10,22 @@ namespace ACE.Server.Physics
     /// <summary>
     /// A cylinder sphere
     /// </summary>
-    public struct CylSphere: IEquatable<CylSphere>
+    public readonly struct CylSphere: IEquatable<CylSphere>
     {
         /// <summary>
         /// The base of the cylinder sphere
         /// </summary>
-        public Vector3 LowPoint;
+        public readonly Vector3 LowPoint;
 
         /// <summary>
         /// The height of the cylinder sphere
         /// </summary>
-        public float Height;
+        public readonly float Height;
 
         /// <summary>
         /// The radius of the cylinder sphere
         /// </summary>
-        public float Radius;
+        public readonly float Radius;
 
         /// <summary>
         /// Default constructor
@@ -81,14 +81,13 @@ namespace ACE.Server.Physics
         /// <param name="radsum">The sum of the sphere and spherical point radii</param>
         /// <param name="sphereNum">Used as an offset in path.GlobalCurrCenter to determine movement</param>
         /// <returns>The TransitionState either collided or adjusted</returns>
-        public TransitionState CollideWithPoint(Transition transition, Sphere checkPos, Vector3 disp, float radsum, int sphereNum)
+        public readonly TransitionState CollideWithPoint(Transition transition, Sphere checkPos, Vector3 disp, float radsum, int sphereNum)
         {
             var obj = transition.ObjectInfo;
             var path = transition.SpherePath;
             var collisions = transition.CollisionInfo;
 
-            Vector3 collisionNormal;
-            var definate = CollisionNormal(transition, checkPos, disp, radsum, sphereNum, out collisionNormal);
+            var definate = CollisionNormal(transition, checkPos, disp, radsum, sphereNum, out var collisionNormal);
             if (Vec.NormalizeCheckSmall(ref collisionNormal))
                 return TransitionState.Collided;
             if (!obj.State.HasFlag(ObjectInfoState.PerfectClip))
@@ -202,7 +201,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Returns true if this CylSphere collides with a sphere
         /// </summary>
-        public bool CollidesWithSphere(Sphere checkPos, Vector3 disp, float radsum)
+        public readonly bool CollidesWithSphere(Sphere checkPos, Vector3 disp, float radsum)
         {
             var result = false;
 
@@ -219,7 +218,7 @@ namespace ACE.Server.Physics
         /// </summary>
         /// <param name="transition">The transition path for this cylinder sphere</param>
         /// <returns>The collision result for this transition path</returns>
-        public TransitionState IntersectsSphere(Transition transition)
+        public readonly TransitionState IntersectsSphere(Transition transition)
         {
             var obj = transition.ObjectInfo;
             var path = transition.SpherePath;
@@ -343,24 +342,21 @@ namespace ACE.Server.Physics
         /// Determines if this sphere collides with anything during its transition
         /// </summary>
         /// <returns>The collision result for this transition path</returns>
-        public TransitionState IntersectsSphere(ref PhysicsPosition pos, float scale, Transition transition)
+        public readonly TransitionState IntersectsSphere(ref PhysicsPosition pos, float scale, Transition transition)
         {
             var path = transition.SpherePath;
 
             path.CacheLocalSpaceSphere(pos, 1.0f);
-            var global_cylsphere = new CylSphere(LowPoint, Height, Radius, scale);
-            global_cylsphere.LowPoint = path.CheckPos.LocalToGlobal(pos, global_cylsphere.LowPoint);
-
+            var global_cylsphere = new CylSphere(path.CheckPos.LocalToGlobal(pos, LowPoint), Height, Radius, scale);
             return global_cylsphere.IntersectsSphere(transition);
         }
 
         /// <summary>
         /// Handles the collision when an object lands on a cylinder sphere
         /// </summary>
-        public TransitionState LandOnCylinder(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
+        public readonly TransitionState LandOnCylinder(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
         {
-            Vector3 collisionNormal;
-            CollisionNormal(transition, checkPos, disp, radsum, 0, out collisionNormal);
+            CollisionNormal(transition, checkPos, disp, radsum, 0, out var collisionNormal);
 
             if (Vec.NormalizeCheckSmall(ref collisionNormal))
                 return TransitionState.Collided;
@@ -375,10 +371,9 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Attempts to slide the CylSphere from a collision
         /// </summary>
-        public TransitionState SlideSphere(Transition transition, Sphere checkPos, Vector3 disp, float radsum, int sphereNum)
+        public readonly TransitionState SlideSphere(Transition transition, Sphere checkPos, Vector3 disp, float radsum, int sphereNum)
         {
-            Vector3 collisionNormal;
-            CollisionNormal(transition, checkPos, disp, radsum, sphereNum, out collisionNormal);
+            CollisionNormal(transition, checkPos, disp, radsum, sphereNum, out var collisionNormal);
             if (Vec.NormalizeCheckSmall(ref collisionNormal))
                 return TransitionState.Collided;
 
@@ -388,7 +383,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Attempts to move the CylSphere down from a collision
         /// </summary>
-        public TransitionState StepSphereDown(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
+        public readonly TransitionState StepSphereDown(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
         {
             var path = transition.SpherePath;
 
@@ -431,15 +426,14 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Attempts to move the CylSphere up from a collision
         /// </summary>
-        public TransitionState StepSphereUp(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
+        public readonly TransitionState StepSphereUp(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
         {
             var obj = transition.ObjectInfo;
 
             if (obj.StepUpHeight < checkPos.Radius + Height - disp.Z)
                 return SlideSphere(transition, checkPos, disp, radsum, 0);
 
-            Vector3 collisionNormal;
-            CollisionNormal(transition, checkPos, disp, radsum, 0, out collisionNormal);
+            CollisionNormal(transition, checkPos, disp, radsum, 0, out var collisionNormal);
             if (Vec.NormalizeCheckSmall(ref collisionNormal))
                 return TransitionState.Collided;
 
@@ -454,7 +448,7 @@ namespace ACE.Server.Physics
         /// <summary>
         /// Returns the collision normal for this CylSphere transition
         /// </summary>
-        public bool CollisionNormal(Transition transition, Sphere checkPos, Vector3 _disp, float radsum, int sphereNum, out Vector3 normal)
+        public readonly bool CollisionNormal(Transition transition, Sphere checkPos, Vector3 _disp, float radsum, int sphereNum, out Vector3 normal)
         {
             var disp = transition.SpherePath.GlobalCurrCenter[sphereNum].Center - LowPoint;
             if (radsum * radsum < disp.LengthSquared2D())
@@ -468,20 +462,14 @@ namespace ACE.Server.Physics
             return true;
         }
 
-        public bool Equals(CylSphere cylSphere)
+        public readonly bool Equals(CylSphere cylSphere)
         {
             return cylSphere.Radius != 0 && Height == cylSphere.Height && Radius == cylSphere.Radius && LowPoint == cylSphere.LowPoint;
         }
 
-        public override int GetHashCode()
+        public readonly override int GetHashCode()
         {
-            int hash = 0;
-
-            hash = (hash * 397) ^ Height.GetHashCode();
-            hash = (hash * 397) ^ Radius.GetHashCode();
-            hash = (hash * 397) ^ LowPoint.GetHashCode();
-
-            return hash;
+            return HashCode.Combine(Height, Radius, LowPoint);
         }
     }
 }
