@@ -63,42 +63,42 @@ namespace ACE.Server.Physics.Common
             ImageData = new RenderSurface(renderSurface);
         }
 
-        public static ImgTex CreateLScapeTexture(byte[] rawData, uint i_width, uint i_height)
-        {
-            var texture = new ImgTex();     // 0x88 / 136
-            CurrentTextureScale = ImageScaleType.Full;
-            if (!texture.LoadCSI(rawData, i_width, i_height))
-                return null;
+        //public static ImgTex CreateLScapeTexture(byte[] rawData, uint i_width, uint i_height)
+        //{
+        //    var texture = new ImgTex();     // 0x88 / 136
+        //    CurrentTextureScale = ImageScaleType.Full;
+        //    if (!texture.LoadCSI(rawData, i_width, i_height))
+        //        return null;
 
-            CustomTextureTable.Add(texture);
-            return texture;
-        }
+        //    CustomTextureTable.Add(texture);
+        //    return texture;
+        //}
 
-        public bool LoadCSI(byte[] csi_data, uint csi_width, uint csi_height)
-        {
-            var surface = new RenderSurface();  // RenderDevice.CreateSurface
-            surface.Create(csi_width, csi_height, SurfacePixelFormat.PFID_X8R8G8B8, true);
-            ImageData = surface;
+        //public bool LoadCSI(byte[] csi_data, uint csi_width, uint csi_height)
+        //{
+        //    var surface = new RenderSurface();  // RenderDevice.CreateSurface
+        //    surface.Create(csi_width, csi_height, SurfacePixelFormat.PFID_X8R8G8B8, true);
+        //    ImageData = surface;
 
-            var tempBuffer = GetTempBuffer(csi_width, csi_height, SurfacePixelFormat.PFID_X8R8G8B8);
-            //var data = tempBuffer.GetData();
-            tempBuffer.CSI2TGA(csi_data, csi_width, csi_height, ImageData.Data, csi_width, csi_height, tempBuffer.Pitch);
+        //    var tempBuffer = GetTempBuffer(csi_width, csi_height, SurfacePixelFormat.PFID_X8R8G8B8);
+        //    //var data = tempBuffer.GetData();
+        //    tempBuffer.CSI2TGA(csi_data, csi_width, csi_height, ImageData.Data, csi_width, csi_height, tempBuffer.Pitch);
 
-            Load(ImageData.Data, csi_width, tempBuffer);  // loads onto gpu?
-            return true;
-        }
+        //    Load(ImageData.Data, csi_width, tempBuffer);  // loads onto gpu?
+        //    return true;
+        //}
 
-        public bool CSI2TGA(byte[] csi_data, uint csi_width, uint csi_height, byte[] tga_data, uint tga_width, uint tga_height, int tga_pitch)
-        {
-            if (csi_width != tga_width || csi_height != tga_height)
-                return false;
+        //public bool CSI2TGA(byte[] csi_data, uint csi_width, uint csi_height, byte[] tga_data, uint tga_width, uint tga_height, int tga_pitch)
+        //{
+        //    if (csi_width != tga_width || csi_height != tga_height)
+        //        return false;
 
-            // qmemcpy(dst, src, size)
-            // qmemcpy(tga_data, csi_data, (4 * tga_height * tga_width) / 2)
-            Array.Copy(csi_data, tga_data, csi_width * csi_height * 4);
+        //    // qmemcpy(dst, src, size)
+        //    // qmemcpy(tga_data, csi_data, (4 * tga_height * tga_width) / 2)
+        //    Array.Copy(csi_data, tga_data, csi_width * csi_height * 4);
 
-            return true;
-        }
+        //    return true;
+        //}
 
         public static void CopyCSI(byte[] data, uint height, uint width, ImgTex csi_tex, uint tiling)
         {

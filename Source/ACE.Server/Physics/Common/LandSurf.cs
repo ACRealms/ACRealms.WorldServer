@@ -11,11 +11,11 @@ namespace ACE.Server.Physics.Common
         public PalShift PalShift;
         public TexMerge TexMerge;
         public Dictionary<uint, SurfInfo> SurfInfo;
-        public uint NumLSurf;
+       // public uint NumLSurf;
         public Dictionary<uint, Surface> LSurf;
         public uint NumUniqueSurfaces;
-        public uint NumBlockSurfs;
-        public List<Surface> BlockSurface;
+       // public uint NumBlockSurfs;
+       // public List<Surface> BlockSurface;
         public byte CurrentTex;
 
         static LandSurf()
@@ -106,10 +106,10 @@ namespace ACE.Server.Physics.Common
             return NextSurfNum++;
         }
 
-        public Surface GetLandSurface(uint surf_id)
-        {
-            LSurf.TryGetValue(surf_id, out var surface);
-            return surface;
-        }
+        //public Surface GetLandSurface(uint surf_id)
+        //{
+        //    LSurf.TryGetValue(surf_id, out var surface);
+        //    return surface;
+        //}
     }
 }

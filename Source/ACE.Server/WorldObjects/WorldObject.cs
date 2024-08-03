@@ -310,7 +310,7 @@ namespace ACE.Server.WorldObjects
             var startPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
             var targetPos = new Physics.Common.PhysicsPosition(wo.PhysicsObj.Position);
 
-            if (PhysicsObj.GetBlockDist(ref startPos, ref targetPos) > 1)
+            if (PhysicsObj.GetBlockDist(startPos.ObjCellID, targetPos.ObjCellID) > 1)
                 return false;
 
             // set to eye level
@@ -336,43 +336,43 @@ namespace ACE.Server.WorldObjects
             return isVisible;
         }
 
-        public bool IsDirectVisible(InstancedPosition pos)
-        {
-            if (PhysicsObj == null)
-                return false;
+        //public bool IsDirectVisible(InstancedPosition pos)
+        //{
+        //    if (PhysicsObj == null)
+        //        return false;
 
-            var SightObj = PhysicsObj.makeObject(0x02000124, 0, false, true);
+        //    var SightObj = PhysicsObj.makeObject(0x02000124, 0, false, true);
 
-            SightObj.State |= PhysicsState.Missile;
+        //    SightObj.State |= PhysicsState.Missile;
 
-            var startPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
-            var targetPos = new Physics.Common.PhysicsPosition(pos);
+        //    var startPos = new Physics.Common.PhysicsPosition(PhysicsObj.Position);
+        //    var targetPos = new Physics.Common.PhysicsPosition(pos);
 
-            if (PhysicsObj.GetBlockDist(ref startPos, ref targetPos) > 1)
-                return false;
+        //    if (PhysicsObj.GetBlockDist(startPos.ObjCellID, targetPos.ObjCellID) > 1)
+        //        return false;
 
-            // set to eye level
-            startPos.Frame.Origin.Z += PhysicsObj.GetHeight() - SightObj.GetHeight();
-            targetPos.Frame.Origin.Z += SightObj.GetHeight();
+        //    // set to eye level
+        //    startPos.Frame.Origin.Z += PhysicsObj.GetHeight() - SightObj.GetHeight();
+        //    targetPos.Frame.Origin.Z += SightObj.GetHeight();
 
-            var dir = Vector3.Normalize(targetPos.Frame.Origin - startPos.Frame.Origin);
-            var radsum = PhysicsObj.GetPhysicsRadius() + SightObj.GetPhysicsRadius();
-            startPos.Frame.Origin += dir * radsum;
+        //    var dir = Vector3.Normalize(targetPos.Frame.Origin - startPos.Frame.Origin);
+        //    var radsum = PhysicsObj.GetPhysicsRadius() + SightObj.GetPhysicsRadius();
+        //    startPos.Frame.Origin += dir * radsum;
 
-            SightObj.CurCell = PhysicsObj.CurCell;
-            SightObj.ProjectileTarget = PhysicsObj;
+        //    SightObj.CurCell = PhysicsObj.CurCell;
+        //    SightObj.ProjectileTarget = PhysicsObj;
 
-            // perform line of sight test
-            var transition = SightObj.transition(targetPos, startPos, false);
+        //    // perform line of sight test
+        //    var transition = SightObj.transition(targetPos, startPos, false);
 
-            SightObj.DestroyObject();
+        //    SightObj.DestroyObject();
 
-            if (transition == null) return false;
+        //    if (transition == null) return false;
 
-            // check if target object was reached
-            var isVisible = transition.CollisionInfo.CollideObject.FirstOrDefault(c => c.ID == PhysicsObj.ID) != null;
-            return isVisible;
-        }
+        //    // check if target object was reached
+        //    var isVisible = transition.CollisionInfo.CollideObject.FirstOrDefault(c => c.ID == PhysicsObj.ID) != null;
+        //    return isVisible;
+        //}
 
         public bool IsMeleeVisible(WorldObject wo)
         {

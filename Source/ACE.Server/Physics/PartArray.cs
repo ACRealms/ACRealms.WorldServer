@@ -86,19 +86,19 @@ namespace ACE.Server.Physics
             return mesh;
         }
 
-        public static PartArray CreateParticle(PhysicsObj owner, int numParts)
-        {
-            var particle = new PartArray();
-            particle.Owner = owner;
-            particle.Sequence.SetObject(owner);
+        //public static PartArray CreateParticle(PhysicsObj owner, int numParts)
+        //{
+        //    var particle = new PartArray();
+        //    particle.Owner = owner;
+        //    particle.Sequence.SetObject(owner);
 
-            particle.Setup = Setup.MakeParticleSetup(numParts);
+        //    particle.Setup = Setup.MakeParticleSetup(numParts);
 
-            if (particle.Setup == null || !particle.InitParts())
-                return null;
+        //    if (particle.Setup == null || !particle.InitParts())
+        //        return null;
 
-            return particle;
-        }
+        //    return particle;
+        //}
 
         public static PartArray CreateSetup(PhysicsObj owner, uint setupDID, bool createParts)
         {

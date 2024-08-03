@@ -93,19 +93,19 @@ namespace ACE.Server.Physics
             return new Setup(DBObj.GetSetup(setupID));
         }
 
-        public LocationType GetHoldingLocation(int location_idx)
-        {
-            LocationType locationType = null;
-            _dat.HoldingLocations.TryGetValue(location_idx, out locationType);
-            return locationType;
-        }
+        //public LocationType GetHoldingLocation(int location_idx)
+        //{
+        //    LocationType locationType = null;
+        //    _dat.HoldingLocations.TryGetValue(location_idx, out locationType);
+        //    return locationType;
+        //}
 
-        public static Setup MakeParticleSetup(int numParticles)
-        {
-            var setup = new Setup();
-            setup.NumParts = numParticles;
-            return setup;
-        }
+        //public static Setup MakeParticleSetup(int numParticles)
+        //{
+        //    var setup = new Setup();
+        //    setup.NumParts = numParticles;
+        //    return setup;
+        //}
 
         public static Setup MakeSimpleSetup(uint gfxObjID)
         {
@@ -132,10 +132,10 @@ namespace ACE.Server.Physics
             return setup;
         }
 
-        public List<int> GetSubDataIDs()
-        {
-            // gets a list of all the data IDs from all parts and tables
-            return null;
-        }
+        //public List<int> GetSubDataIDs()
+        //{
+        //    // gets a list of all the data IDs from all parts and tables
+        //    return null;
+        //}
     }
 }

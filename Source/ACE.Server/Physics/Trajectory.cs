@@ -257,25 +257,25 @@ namespace ACE.Server.Physics
         // initial_height (float): distance above flat terrain
         //
         // return (float): maximum range
-        public static float ballistic_range(float speed, float gravity, float initial_height)
-        {
-            // Handling these cases is up to your project's coding standards
-            //Debug.Assert(speed > 0 && gravity > 0 && initial_height >= 0, "fts.ballistic_range called with invalid data");
-            if (speed <= 0 || gravity <= 0 || initial_height < 0)
-                return 0.0f;
+        //public static float ballistic_range(float speed, float gravity, float initial_height)
+        //{
+        //    // Handling these cases is up to your project's coding standards
+        //    //Debug.Assert(speed > 0 && gravity > 0 && initial_height >= 0, "fts.ballistic_range called with invalid data");
+        //    if (speed <= 0 || gravity <= 0 || initial_height < 0)
+        //        return 0.0f;
 
-            // Derivation
-            //   (1) x = speed * time * cos O
-            //   (2) z = initial_height + (speed * time * sin O) - (.5 * gravity*time*time)
-            //   (3) via quadratic: t = (speed*sin O)/gravity + sqrt(speed*speed*sin O + 2*gravity*initial_height)/gravity    [ignore smaller root]
-            //   (4) solution: range = x = (speed*cos O)/gravity * sqrt(speed*speed*sin O + 2*gravity*initial_height)    [plug t back into x=speed*time*cos O]
-            var angle = 45 * 0.0174533; // no air resistence, so 45 degrees provides maximum range
-            var cos = Math.Cos(angle);
-            var sin = Math.Sin(angle);
+        //    // Derivation
+        //    //   (1) x = speed * time * cos O
+        //    //   (2) z = initial_height + (speed * time * sin O) - (.5 * gravity*time*time)
+        //    //   (3) via quadratic: t = (speed*sin O)/gravity + sqrt(speed*speed*sin O + 2*gravity*initial_height)/gravity    [ignore smaller root]
+        //    //   (4) solution: range = x = (speed*cos O)/gravity * sqrt(speed*speed*sin O + 2*gravity*initial_height)    [plug t back into x=speed*time*cos O]
+        //    var angle = 45 * 0.0174533; // no air resistence, so 45 degrees provides maximum range
+        //    var cos = Math.Cos(angle);
+        //    var sin = Math.Sin(angle);
 
-            var range = (speed * cos / gravity) * (speed * sin + Math.Sqrt(speed * speed * sin * sin + 2 * gravity * initial_height));
-            return (float)range;
-        }
+        //    var range = (speed * cos / gravity) * (speed * sin + Math.Sqrt(speed * speed * sin * sin + 2 * gravity * initial_height));
+        //    return (float)range;
+        //}
 
         // Solve firing angles for a ballistic projectile with speed and gravity to hit a fixed position.
         //
@@ -465,43 +465,43 @@ namespace ACE.Server.Physics
         /// <param name="velocityVector"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        public static bool SolveBallisticArc(Vector3 projectilePosition, float lateralSpeed, Vector3 targetPosition, out Vector3 velocityVector, out float time)
-        {
-            // Handling these cases is up to your project's coding standards
-            //Debug.Assert(projectilePosition != targetPosition && lateralSpeed > 0, "fts.solve_ballistic_arc called with invalid data");
-            velocityVector = Vector3.Zero;
-            time = float.NaN;
+        //public static bool SolveBallisticArc(Vector3 projectilePosition, float lateralSpeed, Vector3 targetPosition, out Vector3 velocityVector, out float time)
+        //{
+        //    // Handling these cases is up to your project's coding standards
+        //    //Debug.Assert(projectilePosition != targetPosition && lateralSpeed > 0, "fts.solve_ballistic_arc called with invalid data");
+        //    velocityVector = Vector3.Zero;
+        //    time = float.NaN;
 
-            if (projectilePosition == targetPosition || lateralSpeed <= 0)
-                return false;
+        //    if (projectilePosition == targetPosition || lateralSpeed <= 0)
+        //        return false;
 
-            Vector3 diff = targetPosition - projectilePosition;
-            Vector3 diffXY = new Vector3(diff.X, diff.Y, 0f);
-            float lateralDist = diffXY.Length();
+        //    Vector3 diff = targetPosition - projectilePosition;
+        //    Vector3 diffXY = new Vector3(diff.X, diff.Y, 0f);
+        //    float lateralDist = diffXY.Length();
 
-            if (lateralDist == 0)
-                return false;
+        //    if (lateralDist == 0)
+        //        return false;
 
-            time = lateralDist / lateralSpeed;
+        //    time = lateralDist / lateralSpeed;
 
-            velocityVector = Vector3.Normalize(diffXY) * lateralSpeed;
+        //    velocityVector = Vector3.Normalize(diffXY) * lateralSpeed;
 
-            // System of equations. Hit max_height at t=.5*time. Hit target at t=time.
-            //
-            // peak = z0 + vertical_speed*halfTime + .5*gravity*halfTime^2
-            // end = z0 + vertical_speed*time + .5*gravity*time^s
-            // Wolfram Alpha: solve b = a + .5*v*t + .5*g*(.5*t)^2, c = a + vt + .5*g*t^2 for g, v
-            float a = projectilePosition.Z; // initial
-            float c = targetPosition.Z;     // final
+        //    // System of equations. Hit max_height at t=.5*time. Hit target at t=time.
+        //    //
+        //    // peak = z0 + vertical_speed*halfTime + .5*gravity*halfTime^2
+        //    // end = z0 + vertical_speed*time + .5*gravity*time^s
+        //    // Wolfram Alpha: solve b = a + .5*v*t + .5*g*(.5*t)^2, c = a + vt + .5*g*t^2 for g, v
+        //    float a = projectilePosition.Z; // initial
+        //    float c = targetPosition.Z;     // final
 
-            // Gravity value pulled from ACE property
-            var g = PhysicsGlobals.Gravity;
-            var b = (4 * a + 4 * c - g * time * time) / 8;
+        //    // Gravity value pulled from ACE property
+        //    var g = PhysicsGlobals.Gravity;
+        //    var b = (4 * a + 4 * c - g * time * time) / 8;
 
-            velocityVector.Z = (2 * a - 2 * c + g * time * time) / (time * 2) * -1;
+        //    velocityVector.Z = (2 * a - 2 * c + g * time * time) / (time * 2) * -1;
 
-            return true;
-        }
+        //    return true;
+        //}
 
         // Solve the firing arc with a fixed lateral speed. Vertical speed and gravity varies. 
         // This enables a visually pleasing arc.
@@ -515,42 +515,42 @@ namespace ACE.Server.Physics
         // gravity (out float): gravity necessary to projectile to hit precisely max_height
         //
         // return (bool): true if a valid solution was found
-        public static bool solve_ballistic_arc_lateral(Vector3 proj_pos, float lateral_speed, Vector3 target_pos, float max_height, out Vector3 fire_velocity, out float gravity)
-        {
-            // Handling these cases is up to your project's coding standards
-            Debug.Assert(proj_pos != target_pos && lateral_speed > 0 && max_height > proj_pos.Z, "fts.solve_ballistic_arc called with invalid data");
+        //public static bool solve_ballistic_arc_lateral(Vector3 proj_pos, float lateral_speed, Vector3 target_pos, float max_height, out Vector3 fire_velocity, out float gravity)
+        //{
+        //    // Handling these cases is up to your project's coding standards
+        //    Debug.Assert(proj_pos != target_pos && lateral_speed > 0 && max_height > proj_pos.Z, "fts.solve_ballistic_arc called with invalid data");
 
-            fire_velocity = Vector3.Zero;
-            gravity = float.NaN;
+        //    fire_velocity = Vector3.Zero;
+        //    gravity = float.NaN;
 
-            if (proj_pos == target_pos || lateral_speed <= 0 || max_height <= proj_pos.Z)
-                return false;
+        //    if (proj_pos == target_pos || lateral_speed <= 0 || max_height <= proj_pos.Z)
+        //        return false;
 
-            Vector3 diff = target_pos - proj_pos;
-            Vector3 diffXY = new Vector3(diff.X, diff.Y, 0f);
-            float lateralDist = diffXY.Length();
+        //    Vector3 diff = target_pos - proj_pos;
+        //    Vector3 diffXY = new Vector3(diff.X, diff.Y, 0f);
+        //    float lateralDist = diffXY.Length();
 
-            if (lateralDist == 0)
-                return false;
+        //    if (lateralDist == 0)
+        //        return false;
 
-            float time = lateralDist / lateral_speed;
+        //    float time = lateralDist / lateral_speed;
 
-            fire_velocity = Vector3.Normalize(diffXY) * lateral_speed;
+        //    fire_velocity = Vector3.Normalize(diffXY) * lateral_speed;
 
-            // System of equations. Hit max_height at t=.5*time. Hit target at t=time.
-            //
-            // peak = z0 + vertical_speed*halfTime + .5*gravity*halfTime^2
-            // end = z0 + vertical_speed*time + .5*gravity*time^s
-            // Wolfram Alpha: solve b = a + .5*v*t + .5*g*(.5*t)^2, c = a + vt + .5*g*t^2 for g, v
-            float a = proj_pos.Z;       // initial
-            float b = max_height;       // peak
-            float c = target_pos.Z;     // final
+        //    // System of equations. Hit max_height at t=.5*time. Hit target at t=time.
+        //    //
+        //    // peak = z0 + vertical_speed*halfTime + .5*gravity*halfTime^2
+        //    // end = z0 + vertical_speed*time + .5*gravity*time^s
+        //    // Wolfram Alpha: solve b = a + .5*v*t + .5*g*(.5*t)^2, c = a + vt + .5*g*t^2 for g, v
+        //    float a = proj_pos.Z;       // initial
+        //    float b = max_height;       // peak
+        //    float c = target_pos.Z;     // final
 
-            gravity = -4 * (a - 2 * b + c) / (time * time);
-            fire_velocity.Z = -(3 * a - 4 * b + c) / time;
+        //    gravity = -4 * (a - 2 * b + c) / (time * time);
+        //    fire_velocity.Z = -(3 * a - 4 * b + c) / time;
 
-            return true;
-        }
+        //    return true;
+        //}
 
         // Solve the firing arc with a fixed lateral speed. Vertical speed and gravity varies. 
         // This enables a visually pleasing arc.

@@ -18,7 +18,7 @@ namespace ACE.Server.Physics
         public StipplingType Stippling;
         public CullMode SidesType;
         public List<byte> PosUVIndices;   // texture coordinates unused by server
-        public List<byte> NegUVIndices;
+        //public List<byte> NegUVIndices;
         public short PosSurface;
         public short NegSurface;
         public Plane Plane;             // not directly in this DAT structure

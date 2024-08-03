@@ -358,11 +358,11 @@ namespace ACE.Server.Physics.Common
             // omitted vertex lighting
         }
 
-        public bool FSplitNESW(int x, int y)
-        {
-            var split = x * y * 0xCCAC033 - x * 0x421BE3BD + (y * 0x6C1AC587 - 0x519B8F25) / 2147483648;
-            return split % 2 != 0;
-        }
+        //public bool FSplitNESW(int x, int y)
+        //{
+        //    var split = x * y * 0xCCAC033 - x * 0x421BE3BD + (y * 0x6C1AC587 - 0x519B8F25) / 2147483648;
+        //    return split % 2 != 0;
+        //}
 
         public bool Generate(uint landblockID, int cellScale, LandDefs.Direction transAdj)
         {
@@ -454,7 +454,7 @@ namespace ACE.Server.Physics.Common
 
             singleTextureCell = r1 != 0 ? singleRoadCell : singleRoadCell && singleTypeCell;
 
-            var regionDesc = DatManager.PortalDat.RegionDesc;
+            //var regionDesc = DatManager.PortalDat.RegionDesc;
             var minimizePal = true;
 
             LandSurf.Instance.SelectTerrain(globalCellX, globalCellY, ref surfNum, ref rotation, palCodes, 1, minimizePal);

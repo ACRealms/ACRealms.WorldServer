@@ -375,54 +375,54 @@ namespace ACE.Server.Physics.Common
             return null;
         }
 
-        public bool CopyAndTile(byte[] data, uint texSize, TerrainTex terrainTex)
-        {
-            var baseTexture = terrainTex.BaseTexture;
+        //public bool CopyAndTile(byte[] data, uint texSize, TerrainTex terrainTex)
+        //{
+        //    var baseTexture = terrainTex.BaseTexture;
 
-            if (baseTexture != null)
-            {
-                ImgTex.CopyCSI(data, texSize, texSize, baseTexture, terrainTex.TexTiling);
-                return true;
-            }
+        //    if (baseTexture != null)
+        //    {
+        //        ImgTex.CopyCSI(data, texSize, texSize, baseTexture, terrainTex.TexTiling);
+        //        return true;
+        //    }
 
-            if (terrainTex.TexGID != 0) // stru_841760
-            {
-                var qdid = new QualifiedDataID(11, terrainTex.TexGID);
+        //    if (terrainTex.TexGID != 0) // stru_841760
+        //    {
+        //        var qdid = new QualifiedDataID(11, terrainTex.TexGID);
 
-                var surfaceTexture = DBObj.GetSurfaceTexture(terrainTex.TexGID);
-                terrainTex.BaseTexture = new ImgTex(surfaceTexture);
-            }
-            baseTexture = terrainTex.BaseTexture;
+        //        var surfaceTexture = DBObj.GetSurfaceTexture(terrainTex.TexGID);
+        //        terrainTex.BaseTexture = new ImgTex(surfaceTexture);
+        //    }
+        //    baseTexture = terrainTex.BaseTexture;
             
-            if (baseTexture != null)
-            {
-                ImgTex.CopyCSI(data, texSize, texSize, baseTexture, terrainTex.TexTiling);
-                return true;
-            }
-            else
-            {
-                ImgTex.CopyCSI(data, texSize, texSize, null, 1);
-                return false;
-            }
-        }
+        //    if (baseTexture != null)
+        //    {
+        //        ImgTex.CopyCSI(data, texSize, texSize, baseTexture, terrainTex.TexTiling);
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        ImgTex.CopyCSI(data, texSize, texSize, null, 1);
+        //        return false;
+        //    }
+        //}
 
-        public static bool Merge(byte[] data, uint texSize, ImgTex texture, LandDefs.Rotation rot, TerrainTex terrainTex)
-        {
-            if (texture == null)
-                return false;
+        //public static bool Merge(byte[] data, uint texSize, ImgTex texture, LandDefs.Rotation rot, TerrainTex terrainTex)
+        //{
+        //    if (texture == null)
+        //        return false;
 
-            var baseTexture = terrainTex.BaseTexture;
-            if (baseTexture != null)
-            {
-                ImgTex.MergeTexture(data, texSize, texSize, baseTexture, terrainTex.TexTiling, texture, rot);
-                return true;
-            }
-            else if (terrainTex.InitEnd())
-            {
-                ImgTex.MergeTexture(data, texSize, texSize, terrainTex.BaseTexture, terrainTex.TexTiling, texture, rot);
-                return true;
-            }
-            return false;
-        }
+        //    var baseTexture = terrainTex.BaseTexture;
+        //    if (baseTexture != null)
+        //    {
+        //        ImgTex.MergeTexture(data, texSize, texSize, baseTexture, terrainTex.TexTiling, texture, rot);
+        //        return true;
+        //    }
+        //    else if (terrainTex.InitEnd())
+        //    {
+        //        ImgTex.MergeTexture(data, texSize, texSize, terrainTex.BaseTexture, terrainTex.TexTiling, texture, rot);
+        //        return true;
+        //    }
+        //    return false;
+        //}
     }
 }

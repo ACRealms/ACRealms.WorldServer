@@ -83,16 +83,16 @@ namespace ACE.Server.Physics.Animation
             return MotionInterpreter.InterpretedState;
         }
 
-        public RawMotionState InqRawMotionState()
-        {
-            if (MotionInterpreter == null)
-            {
-                MotionInterpreter = MotionInterp.Create(PhysicsObj, WeenieObj);
-                if (PhysicsObj != null)
-                    MotionInterpreter.enter_default_state();
-            }
-            return MotionInterpreter.RawState;
-        }
+        //public RawMotionState InqRawMotionState()
+        //{
+        //    if (MotionInterpreter == null)
+        //    {
+        //        MotionInterpreter = MotionInterp.Create(PhysicsObj, WeenieObj);
+        //        if (PhysicsObj != null)
+        //            MotionInterpreter.enter_default_state();
+        //    }
+        //    return MotionInterpreter.RawState;
+        //}
 
         public bool IsMovingTo()
         {
@@ -109,11 +109,11 @@ namespace ACE.Server.Physics.Animation
             // NoticeHandler::RecvNotice_PrevSpellSection
         }
 
-        public void MakeMoveToManager()
-        {
-            if (MoveToManager == null)
-                MoveToManager = MoveToManager.Create(PhysicsObj, WeenieObj);
-        }
+        //public void MakeMoveToManager()
+        //{
+        //    if (MoveToManager == null)
+        //        MoveToManager = MoveToManager.Create(PhysicsObj, WeenieObj);
+        //}
 
         public void MotionDone(uint motion, bool success)
         {
@@ -192,24 +192,24 @@ namespace ACE.Server.Physics.Animation
         /// <summary>
         /// Alternatively, you can use PhysicsObj.IsAnimating for better performance.
         /// </summary>
-        public bool motions_pending()
-        {
-            if (MotionInterpreter == null) return false;
+        //public bool motions_pending()
+        //{
+        //    if (MotionInterpreter == null) return false;
 
-            return MotionInterpreter.motions_pending();
-        }
+        //    return MotionInterpreter.motions_pending();
+        //}
 
-        public void move_to_interpreted_state(InterpretedMotionState state)
-        {
-            if (MotionInterpreter == null)
-            {
-                MotionInterpreter = MotionInterp.Create(PhysicsObj, WeenieObj);
-                if (PhysicsObj != null)
-                    MotionInterpreter.enter_default_state();
-            }
-            MotionInterpreter.move_to_interpreted_state(state);
-        }
+        //public void move_to_interpreted_state(InterpretedMotionState state)
+        //{
+        //    if (MotionInterpreter == null)
+        //    {
+        //        MotionInterpreter = MotionInterp.Create(PhysicsObj, WeenieObj);
+        //        if (PhysicsObj != null)
+        //            MotionInterpreter.enter_default_state();
+        //    }
+        //    MotionInterpreter.move_to_interpreted_state(state);
+        //}
 
-        public void unpack_movement(object addr, uint size) { }
+        //public void unpack_movement(object addr, uint size) { }
     }
 }

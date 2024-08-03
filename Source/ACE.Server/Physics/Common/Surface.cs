@@ -9,14 +9,14 @@ namespace ACE.Server.Physics.Common
         public int ColorValue;
         public int SolidIndex;
         public uint IndexedTextureID;
-        public ImgTex Base1Map;
+       // public ImgTex Base1Map;
         //public Palette Base1Pal;
-        public float Translucency;
-        public float Luminosity;
+        //public float Translucency;
+        //public float Luminosity;
         public float Diffuse;
         public uint OrigTextureID;
-        public uint OrigPaletteID;
-        public float OrigLuminosity;
+       // public uint OrigPaletteID;
+       // public float OrigLuminosity;
         public float OrigDiffuse;
         public TextureMergeInfo Info;
 
@@ -45,20 +45,20 @@ namespace ACE.Server.Physics.Common
             return surface;
         }
 
-        public bool UseTextureMap(ImgTex texture, SurfaceHandler sh)
-        {
-            if (sh != Handler || texture == null)
-                return false;
+        //public bool UseTextureMap(ImgTex texture, SurfaceHandler sh)
+        //{
+        //    if (sh != Handler || texture == null)
+        //        return false;
 
-            Type = 2;
-            Base1Map = texture;
-            // vfptr->AddRef(texture)
-            if (OrigTextureID == 0) // stru_845060
-                OrigTextureID = Base1Map.ID;
+        //    Type = 2;
+        //    Base1Map = texture;
+        //    // vfptr->AddRef(texture)
+        //    if (OrigTextureID == 0) // stru_845060
+        //        OrigTextureID = Base1Map.ID;
 
-            //Base1Pal = null;
+        //    //Base1Pal = null;
 
-            return true;
-        }
+        //    return true;
+        //}
     }
 }

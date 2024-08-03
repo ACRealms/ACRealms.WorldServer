@@ -52,13 +52,13 @@ namespace ACE.Server.Physics.Animation
                 StickyManager.HandleUpdateTarget(targetInfo);
         }
 
-        public void InterpolateTo(ref PhysicsPosition position, bool keepHeading)
-        {
-            if (InterpolationManager == null)
-                InterpolationManager = InterpolationManager.Create(PhysicsObj);
+        //public void InterpolateTo(ref PhysicsPosition position, bool keepHeading)
+        //{
+        //    if (InterpolationManager == null)
+        //        InterpolationManager = InterpolationManager.Create(PhysicsObj);
 
-            InterpolationManager.InterpolateTo(ref position, keepHeading);
-        }
+        //    InterpolationManager.InterpolateTo(ref position, keepHeading);
+        //}
 
         public bool IsFullyConstrained()
         {

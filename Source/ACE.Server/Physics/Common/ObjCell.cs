@@ -108,26 +108,26 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public void CheckAttack(ulong attackerID, ref PhysicsPosition attackerPos, float attackerScale, AttackCone attackCone, AttackInfo attackInfo)
-        {
-            readerWriterLockSlim.EnterReadLock();
-            try
-            {
-                foreach (var shadowObj in ShadowObjectList)
-                {
-                    var pObj = shadowObj.PhysicsObj;
-                    if (pObj.ID == attackerID || pObj.State.HasFlag(PhysicsState.Static)) continue;
+        //public void CheckAttack(ulong attackerID, ref PhysicsPosition attackerPos, float attackerScale, AttackCone attackCone, AttackInfo attackInfo)
+        //{
+        //    readerWriterLockSlim.EnterReadLock();
+        //    try
+        //    {
+        //        foreach (var shadowObj in ShadowObjectList)
+        //        {
+        //            var pObj = shadowObj.PhysicsObj;
+        //            if (pObj.ID == attackerID || pObj.State.HasFlag(PhysicsState.Static)) continue;
 
-                    var hitLocation = pObj.check_attack(ref attackerPos, attackerScale, attackCone, attackInfo.AttackRadius);
-                    if (hitLocation != 0)
-                        attackInfo.AddObject(pObj.ID, hitLocation);
-                }
-            }
-            finally
-            {
-                readerWriterLockSlim.ExitReadLock();
-            }
-        }
+        //            var hitLocation = pObj.check_attack(ref attackerPos, attackerScale, attackCone, attackInfo.AttackRadius);
+        //            if (hitLocation != 0)
+        //                attackInfo.AddObject(pObj.ID, hitLocation);
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        readerWriterLockSlim.ExitReadLock();
+        //    }
+        //}
 
         public bool Equals(ObjCell objCell)
         {

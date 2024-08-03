@@ -319,6 +319,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Physics\Hooks\AnimHook.cs" />
+    <Compile Remove="Physics\Hooks\FPHook.cs" />
+    <Compile Remove="Physics\Hooks\PhysicsHookType.cs" />
+    <Compile Remove="Physics\Hooks\PhysicsObjHook.cs" />
+    <Compile Remove="Physics\Hooks\VectorHook.cs" />
+    <Compile Remove="Physics\PhysObjProfile.cs" />
+    <Compile Remove="Physics\Sound\SoundTable.cs" />
+    <Compile Remove="Physics\Sound\SoundTableData.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Physics\Hooks\" />
     <Folder Include="Realms\Constants\" />
   </ItemGroup>
 
