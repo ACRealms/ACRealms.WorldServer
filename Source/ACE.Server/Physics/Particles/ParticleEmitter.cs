@@ -99,33 +99,33 @@ namespace ACE.Server.Physics
             return new ParticleEmitter(parent);
         }
 
-        public bool SetInfo(ParticleEmitterInfo info)
-        {
-            // destroy first?
-            Info = info;
-            if (Info.HWGfxObjID == 0)
-            {
-                // destroy
-                return false;
-            }
-            PhysicsObj = PhysicsObj.makeParticleObject(Info.MaxParticles);
-            LastEmitOffset = PhysicsObj.Position.Frame.Origin;
-            Parts = PhysicsObj.PartArray.Parts;
-            PartStorage = new PhysicsPart[Info.MaxParticles];
-            for (var i = 0; i < Info.MaxParticles; i++)
-                PartStorage[i] = PhysicsPart.MakePhysicsPart(Info.HWGfxObjID);
-            // omitted degrade distance
-            DegradeDistance = float.MaxValue;
-            Particles = new Particle[Info.MaxParticles];
-            for (var i = 0; i < Info.MaxParticles; i++)
-                Particles[i] = new Particle();  // ??
-            return true;
-        }
+        //public bool SetInfo(ParticleEmitterInfo info)
+        //{
+        //    // destroy first?
+        //    Info = info;
+        //    if (Info.HWGfxObjID == 0)
+        //    {
+        //        // destroy
+        //        return false;
+        //    }
+        //    PhysicsObj = PhysicsObj.makeParticleObject(Info.MaxParticles);
+        //    LastEmitOffset = PhysicsObj.Position.Frame.Origin;
+        //    Parts = PhysicsObj.PartArray.Parts;
+        //    PartStorage = new PhysicsPart[Info.MaxParticles];
+        //    for (var i = 0; i < Info.MaxParticles; i++)
+        //        PartStorage[i] = PhysicsPart.MakePhysicsPart(Info.HWGfxObjID);
+        //    // omitted degrade distance
+        //    DegradeDistance = float.MaxValue;
+        //    Particles = new Particle[Info.MaxParticles];
+        //    for (var i = 0; i < Info.MaxParticles; i++)
+        //        Particles[i] = new Particle();  // ??
+        //    return true;
+        //}
 
-        public bool SetInfo(uint emitterID)
-        {
-            return SetInfo(new ParticleEmitterInfo(DBObj.GetParticleEmitterInfo(emitterID)));
-        }
+        //public bool SetInfo(uint emitterID)
+        //{
+        //    return SetInfo(new ParticleEmitterInfo(DBObj.GetParticleEmitterInfo(emitterID)));
+        //}
 
         public void EmitParticle()
         {
@@ -254,12 +254,12 @@ namespace ACE.Server.Physics
             }
         }
 
-        public void InitEnd()
-        {
-            CreationTime = PhysicsTimer.CurrentTime;
+        //public void InitEnd()
+        //{
+        //    CreationTime = PhysicsTimer.CurrentTime;
 
-            for (var i = 0; i < Info.TotalParticles; i++)
-                EmitParticle();
-        }
+        //    for (var i = 0; i < Info.TotalParticles; i++)
+        //        EmitParticle();
+        //}
     }
 }

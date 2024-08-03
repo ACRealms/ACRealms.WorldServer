@@ -84,7 +84,7 @@ namespace ACE.Server.Physics
         public DetectionManager DetectionManager;
         public AttackManager AttackManager;
         public TargetManager TargetManager;
-        public ParticleManager ParticleManager;
+        //public ParticleManager ParticleManager;
         public WeenieObject WeenieObj;
         public Plane ContactPlane;
         public uint ContactPlaneCellID;
@@ -180,7 +180,7 @@ namespace ACE.Server.Physics
         {
             MovementManager = null;
             PositionManager = null;
-            ParticleManager = null;
+            //ParticleManager = null;
             ScriptManager = null;
             Hooks = null;
 
@@ -1650,7 +1650,7 @@ namespace ACE.Server.Physics
 
             childObj.set_frame(ref frame);
 
-            if (childObj.ParticleManager != null) childObj.ParticleManager.UpdateParticles();
+           // if (childObj.ParticleManager != null) childObj.ParticleManager.UpdateParticles();
             if (childObj.ScriptManager != null) childObj.ScriptManager.UpdateScripts();
         }
 
@@ -1744,7 +1744,7 @@ namespace ACE.Server.Physics
 
             if (PositionManager != null) PositionManager.UseTime(instance);
 
-            if (ParticleManager != null) ParticleManager.UpdateParticles();
+            //if (ParticleManager != null) ParticleManager.UpdateParticles();
 
             if (ScriptManager != null) ScriptManager.UpdateScripts();
         }
@@ -1806,7 +1806,7 @@ namespace ACE.Server.Physics
 
             if (PositionManager != null) PositionManager.UseTime(instance);
 
-            if (ParticleManager != null) ParticleManager.UpdateParticles();
+           // if (ParticleManager != null) ParticleManager.UpdateParticles();
 
             if (ScriptManager != null) ScriptManager.UpdateScripts();
 
@@ -2050,10 +2050,10 @@ namespace ACE.Server.Physics
             }
             if (ScriptManager != null && State.HasFlag(PhysicsState.HasDefaultScript))
                 ScriptManager.UpdateScripts();
-            if (ParticleManager != null)
-            {
-                ParticleManager.UpdateParticles();
-            }
+            //if (ParticleManager != null)
+            //{
+            //    ParticleManager.UpdateParticles();
+            //}
             process_hooks();
             UpdateTime = PhysicsTimer.CurrentTime;
         }
@@ -2272,16 +2272,16 @@ namespace ACE.Server.Physics
         //    return ParticleManager.CreateParticleEmitter(this, emitterInfoID, partIdx, offset, emitterID);
         //}
 
-        public bool destroy_particle_emitter(int emitterID)
-        {
-            if (ParticleManager == null) return false;
-            return ParticleManager.DestroyParticleEmitter(emitterID);
-        }
+        //public bool destroy_particle_emitter(int emitterID)
+        //{
+        //    if (ParticleManager == null) return false;
+        //    return ParticleManager.DestroyParticleEmitter(emitterID);
+        //}
 
-        public void destroy_particle_manager()
-        {
-            ParticleManager = null;
-        }
+        //public void destroy_particle_manager()
+        //{
+        //    ParticleManager = null;
+        //}
 
         /// <summary>
         /// This is to mitigate possible decal crashes w/ CO messages being sent
@@ -2587,13 +2587,13 @@ namespace ACE.Server.Physics
             return MovementManager.get_minterp();
         }
 
-        public int get_num_emitters()
-        {
-            if (ParticleManager == null)
-                return 0;
+        //public int get_num_emitters()
+        //{
+        //    if (ParticleManager == null)
+        //        return 0;
 
-            return ParticleManager.GetNumEmitters();
-        }
+        //    return ParticleManager.GetNumEmitters();
+        //}
 
         public ObjectInfo get_object_info(Transition transition, bool adminMove)
         {
@@ -4028,11 +4028,11 @@ namespace ACE.Server.Physics
                 PositionManager.StickTo(objectA.ID, 0, 0);
         }
 
-        public bool stop_particle_emitter(int emitterID)
-        {
-            if (ParticleManager == null) return false;
-            return ParticleManager.StopParticleEmitter(emitterID);
-        }
+        //public bool stop_particle_emitter(int emitterID)
+        //{
+        //    if (ParticleManager == null) return false;
+        //    return ParticleManager.StopParticleEmitter(emitterID);
+        //}
 
         public void store_position(ref PhysicsPosition pos)
         {
@@ -4410,8 +4410,8 @@ namespace ACE.Server.Physics
                 var frame = new AFrame();
                 UpdatePositionInternal(deltaTime, ref frame);
                 set_frame(ref frame);
-                if (ParticleManager != null)
-                    ParticleManager.UpdateParticles();
+                //if (ParticleManager != null)
+                //    ParticleManager.UpdateParticles();
                 if (ScriptManager != null)
                     ScriptManager.UpdateScripts();
                 UpdateTime = PhysicsTimer.CurrentTime;
