@@ -162,7 +162,7 @@ namespace ACE.Server.WorldObjects
             }
             else
             {
-                PhysicsObj = new PhysicsObj();
+                PhysicsObj = new PhysicsObj(Guid.Full);
                 PhysicsObj.makeAnimObject(SetupTableId, true);
             }
 

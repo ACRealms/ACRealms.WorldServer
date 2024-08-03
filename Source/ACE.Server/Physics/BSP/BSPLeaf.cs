@@ -48,12 +48,12 @@ namespace ACE.Server.Physics.BSP
 
         public override bool hits_walkable(SpherePath path, ref readonly Sphere validPos, Vector3 up)
         {
-            if (NumPolys == 0 || !Sphere.Intersects(validPos))
+            if (NumPolys == 0 || !Sphere.Intersects(in validPos))
                 return false;
 
             foreach (var polygon in Polygons)
             {
-                if (polygon.walkable_hits_sphere(path, validPos, up) && polygon.check_small_walkable(validPos, up))
+                if (polygon.walkable_hits_sphere(path, in validPos, up) && polygon.check_small_walkable(in validPos, up))
                     return true;
             }
             return false;

@@ -207,7 +207,7 @@ namespace ACE.Server.Physics.BSP
                 return TransitionState.OK;
             }
             
-            if (RootNode.sphere_intersects_poly(localSphere, movement, ref hitPoly, ref contactPoint) || hitPoly != null)
+            if (RootNode.sphere_intersects_poly(in localSphere, movement, ref hitPoly, ref contactPoint) || hitPoly != null)
             {
                 if (obj.State.HasFlag(ObjectInfoState.PathClipped))
                     return collide_with_pt(transition, in localSphere, center, hitPoly, contactPoint, scale);
@@ -220,7 +220,7 @@ namespace ACE.Server.Physics.BSP
             }
             else if (path.NumSphere > 1)
             {
-                if (RootNode.sphere_intersects_poly(localSphere_, movement, ref hitPoly, ref contactPoint) || hitPoly != null)
+                if (RootNode.sphere_intersects_poly(in localSphere_, movement, ref hitPoly, ref contactPoint) || hitPoly != null)
                 {
                     var collisionNormal = path.LocalSpacePos.LocalToGlobalVec(hitPoly.Plane.Normal);
                     collisions.SetCollisionNormal(collisionNormal);

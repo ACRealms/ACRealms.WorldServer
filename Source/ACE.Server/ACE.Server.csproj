@@ -319,11 +319,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Physics\Combat\AtkCollisionProfile.cs" />
+    <Compile Remove="Physics\Combat\AtkObjInfo.cs" />
+    <Compile Remove="Physics\Combat\AttackCone.cs" />
     <Compile Remove="Physics\Hooks\AnimHook.cs" />
     <Compile Remove="Physics\Hooks\FPHook.cs" />
     <Compile Remove="Physics\Hooks\PhysicsHookType.cs" />
     <Compile Remove="Physics\Hooks\PhysicsObjHook.cs" />
     <Compile Remove="Physics\Hooks\VectorHook.cs" />
+    <Compile Remove="Physics\Managers\AttackManager.cs" />
     <Compile Remove="Physics\PhysObjProfile.cs" />
     <Compile Remove="Physics\Sound\SoundTable.cs" />
     <Compile Remove="Physics\Sound\SoundTableData.cs" />

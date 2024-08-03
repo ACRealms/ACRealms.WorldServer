@@ -125,12 +125,12 @@ namespace ACE.Server.Physics
                 otherSphere.Center += adjusted;
         }
 
-        public bool check_small_walkable(Sphere sphere, Vector3 up)
+        public bool check_small_walkable(ref readonly Sphere sphere, Vector3 up)
         {
-            return check_walkable(sphere, up, true);
+            return check_walkable(in sphere, up, true);
         }
 
-        public bool check_walkable(Sphere sphere, Vector3 up, bool small = false)
+        public bool check_walkable(ref readonly Sphere sphere, Vector3 up, bool small = false)
         {
             var angleUp = Vector3.Dot(Plane.Normal, up);    // dist?
             if (angleUp < PhysicsGlobals.EPSILON) return false;

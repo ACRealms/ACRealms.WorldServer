@@ -747,8 +747,8 @@ namespace ACE.Server.Physics.Animation
             if (WeenieObj == null && !WeenieObj.IsCreature() || !PhysicsObj.State.HasFlag(PhysicsState.Gravity) ||
                 PhysicsObj.TransientState.HasFlag(TransientStateFlags.Contact | TransientStateFlags.OnWalkable))
             {
-                if (PhysicsObj.IsFullyConstrained())
-                    return WeenieError.GeneralMovementFailure;
+                //if (PhysicsObj.IsFullyConstrained())
+                //    return WeenieError.GeneralMovementFailure;
 
                 if (PendingMotions.Count > 1 && PendingMotions.First.Value.JumpErrorCode != 0)
                     return PendingMotions.First.Value.JumpErrorCode;

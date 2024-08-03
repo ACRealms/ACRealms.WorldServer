@@ -212,7 +212,7 @@ namespace ACE.Server.Physics.Common
             var x = (uint)_x;
             var y = (uint)_y;
 
-            if (x >= 0 && y >= 0 && x < 2040 && y < 2040)
+            if (x < 2040 && y < 2040)
             {
                 var cellID = (((y >> 3) | 32 * (x & 0xFFFFFFF8)) << 16) | ((y & 7) + 8 * (x & 7) + 1);
                 var landCell = Get(cellID, instance);

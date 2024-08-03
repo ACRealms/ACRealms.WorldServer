@@ -14,10 +14,14 @@ namespace ACE.Server.Physics.Common
     {
         public uint ID;
         //public Vector3 VertexLighting;    // RGBColor
-        public LandDefs.Direction TransDir;
-        public int SideVertexCount;
-        public int SidePolyCount;
-        public int SideCellCount;
+        public const LandDefs.Direction TransDir = LandDefs.Direction.Unknown;
+        
+        
+
+        public const int SideCellCount = LandDefs.BlockSide;
+        public const int SideVertexCount = SideCellCount * LandDefs.VertexPerCell + 1;
+        public const int SidePolyCount = SideCellCount * LandDefs.VertexPerCell;
+
         public LandDefs.WaterType WaterType;
         public List<byte> Height;
         public List<ushort> Terrain;
@@ -40,7 +44,7 @@ namespace ACE.Server.Physics.Common
         public static List<byte> NE_Corner;
         public static List<byte> NW_Corner;
 
-        public static LandSurf LandSurf;
+       // public static LandSurf LandSurf;
 
         static LandblockStruct()
         {
@@ -75,16 +79,63 @@ namespace ACE.Server.Physics.Common
 
         public LandblockStruct()
         {
-            Init();
+            //TransDir = LandDefs.Direction.Unknown;
+            WaterType = LandDefs.WaterType.NotWater;
+            //BlockSurfaceIndex = -1;
+
+            // init for landcell
+            LandCells = new ConcurrentDictionary<int, ObjCell>();
+            for (uint i = 1; i <= 64; i++) LandCells.TryAdd((int)i, new LandCell((i)));
         }
 
         public LandblockStruct(CellLandblock landblock)
+            : this()
         {
-            Init();
             Height = landblock.Height;
             Terrain = landblock.Terrain;
             // originally called from LScape.update_block()
-            Generate(landblock.Id, 1, LandDefs.Direction.Unknown);
+            var landblockID = landblock.Id;
+           // const LandDefs.Direction transAdj = LandDefs.Direction.Unknown;
+            //const int cellWidth = LandDefs.BlockSide;
+
+            //if (cellWidth == SideCellCount && TransDir == transAdj)
+            //    return;
+
+            //var cellRegen = false;
+
+            //if (cellWidth != SideCellCount)
+            //{
+            //var cellRegen = true;
+
+                //if (SideCellCount > 0)
+                //    Destroy();
+
+            //SideCellCount = cellWidth;
+
+            //SideVertexCount = SideCellCount * LandDefs.VertexPerCell + 1;
+            //SidePolyCount = SideCellCount * LandDefs.VertexPerCell;
+
+            InitPVArrays();
+
+            //TransDir = transAdj;
+            ConstructVertices();
+
+            //if (TransDir != LandDefs.Direction.Inside && SideCellCount > 1 && SideCellCount < LandDefs.BlockSide)
+            //    TransAdjust();
+
+            //if (!cellRegen)
+            //    AdjustPlanes();
+            //else
+            //{
+            ConstructPolygons(landblockID);
+
+            if (!PhysicsEngine.Instance.Server)
+                ConstructUVs(landblockID);      // client mode only
+            //}
+
+            CalcWater();
+
+            FinalizePVArrays();
         }
 
         public Polygon AddPolygon(int polyIdx, int _v0, int _v1, int _v2)
@@ -112,17 +163,17 @@ namespace ACE.Server.Physics.Common
             return polygon;
         }
 
-        public void AdjustPlanes()
-        {
-            for (var x = 0; x < SidePolyCount; x++)
-            {
-                for (var y = 0; y < SidePolyCount; y++)
-                {
-                    for (var polyIdx = 0; polyIdx < 2; polyIdx++)
-                        Polygons[(x * SidePolyCount + y) * 2 + polyIdx].make_plane();
-                }
-            }
-        }
+        //public void AdjustPlanes()
+        //{
+        //    for (var x = 0; x < SidePolyCount; x++)
+        //    {
+        //        for (var y = 0; y < SidePolyCount; y++)
+        //        {
+        //            for (var polyIdx = 0; polyIdx < 2; polyIdx++)
+        //                Polygons[(x * SidePolyCount + y) * 2 + polyIdx].make_plane();
+        //        }
+        //    }
+        //}
 
         public void CalcCellWater(int x, int y, out bool cellHasWater, out bool cellFullyFlooded)
         {
@@ -364,52 +415,10 @@ namespace ACE.Server.Physics.Common
         //    return split % 2 != 0;
         //}
 
-        public bool Generate(uint landblockID, int cellScale, LandDefs.Direction transAdj)
-        {
-            var cellWidth = LandDefs.BlockSide / cellScale;
-
-            if (cellWidth == SideCellCount && TransDir == transAdj)
-                return false;
-
-            var cellRegen = false;
-
-            if (cellWidth != SideCellCount)
-            {
-                cellRegen = true;
-
-                if (SideCellCount > 0)
-                    Destroy();
-
-                SideCellCount = cellWidth;
-
-                SideVertexCount = SideCellCount * LandDefs.VertexPerCell + 1;
-                SidePolyCount = SideCellCount * LandDefs.VertexPerCell;
-
-                InitPVArrays();
-            }
-
-            TransDir = transAdj;
-            ConstructVertices();
-
-            if (TransDir != LandDefs.Direction.Inside && SideCellCount > 1 && SideCellCount < LandDefs.BlockSide)
-                TransAdjust();
-
-            if (!cellRegen)
-                AdjustPlanes();
-            else
-            {
-                ConstructPolygons(landblockID);
-
-                if (!PhysicsEngine.Instance.Server)
-                    ConstructUVs(landblockID);      // client mode only
-            }
-
-            CalcWater();
-
-            FinalizePVArrays();
-
-            return cellRegen;
-        }
+        //public bool Generate(uint landblockID)
+        //{
+            
+        //}
 
         public void GetCellRotation(uint landblockID, uint x, uint y, ref bool singleTextureCell, ref uint surfNum, ref LandDefs.Rotation rotation)
         {
@@ -442,9 +451,10 @@ namespace ACE.Server.Physics.Common
                 Console.WriteLine($"R1: {r1}, R2: {r2}, R3: {r3}, R4: {r4}");
             Console.WriteLine($"T1: {(LandDefs.TerrainType)t1}, T2: {(LandDefs.TerrainType)t2}, T3: {(LandDefs.TerrainType)t3}, T4: {(LandDefs.TerrainType)t4}");*/
 
-            var palCodes = new List<uint>();
-
-            palCodes.Add(GetPalCode(r1, r2, r3, r4, t1, t2, t3, t4));   // 0
+            var palCodes = new List<uint>
+            {
+                GetPalCode(r1, r2, r3, r4, t1, t2, t3, t4)   // 0
+            };
             //palCodes.Add(GetPalCode(r2, r3, r4, r1, t2, t3, t4, t1));   // 270
             //palCodes.Add(GetPalCode(r3, r4, r1, r2, t3, t4, t1, t2));   // 180
             //palCodes.Add(GetPalCode(r4, r1, r2, r3, t4, t1, t2, t3));   // 90
@@ -471,17 +481,6 @@ namespace ACE.Server.Physics.Common
             return (uint)(sizeBits | roadBits | terrainBits);
 
             //return (uint)(sizeBits + t4 + 32 * (t3 + 32 * (t2 + 32 * (t1 + 32 * (r4 + 4 * (r3 + 4 * (r2 + 4 * r1)))))));
-        }
-
-        public void Init()
-        {
-            TransDir = LandDefs.Direction.Unknown;
-            WaterType = LandDefs.WaterType.NotWater;
-            //BlockSurfaceIndex = -1;
-
-            // init for landcell
-            LandCells = new ConcurrentDictionary<int, ObjCell>();
-            for (uint i = 1; i <= 64; i++) LandCells.TryAdd((int)i, new LandCell((i)));
         }
 
         /// <summary>
@@ -536,121 +535,121 @@ namespace ACE.Server.Physics.Common
             // possibly only for rendering textures?
         }
 
-        public void TransAdjust()
-        {
-            // refactor me..
-            if (TransDir == LandDefs.Direction.North || TransDir == LandDefs.Direction.NorthWest || TransDir == LandDefs.Direction.NorthEast)
-            {
-                for (var i = 1; i < SidePolyCount; i += 2)
-                {
-                    var v0 = VertexArray.Vertices[((i - 1) * SideVertexCount) + SidePolyCount];
-                    var v1 = VertexArray.Vertices[((i + 1) * SideVertexCount) + SidePolyCount];
-                    var v2 = VertexArray.Vertices[(i * SideVertexCount) + SidePolyCount];
+        //public void TransAdjust()
+        //{
+        //    // refactor me..
+        //    if (TransDir == LandDefs.Direction.North || TransDir == LandDefs.Direction.NorthWest || TransDir == LandDefs.Direction.NorthEast)
+        //    {
+        //        for (var i = 1; i < SidePolyCount; i += 2)
+        //        {
+        //            var v0 = VertexArray.Vertices[((i - 1) * SideVertexCount) + SidePolyCount];
+        //            var v1 = VertexArray.Vertices[((i + 1) * SideVertexCount) + SidePolyCount];
+        //            var v2 = VertexArray.Vertices[(i * SideVertexCount) + SidePolyCount];
 
-                    v2.Origin.Z = (v0.Origin.Z + v1.Origin.Z) / 2;
-                }
-            }
-            if (TransDir == LandDefs.Direction.West || TransDir == LandDefs.Direction.NorthWest || TransDir == LandDefs.Direction.SouthWest)
-            {
-                for (var i = 1; i < SidePolyCount; i += 2)
-                {
-                    var v0 = VertexArray.Vertices[i - 1];
-                    var v1 = VertexArray.Vertices[i + 1];
-                    var v2 = VertexArray.Vertices[i];
+        //            v2.Origin.Z = (v0.Origin.Z + v1.Origin.Z) / 2;
+        //        }
+        //    }
+        //    if (TransDir == LandDefs.Direction.West || TransDir == LandDefs.Direction.NorthWest || TransDir == LandDefs.Direction.SouthWest)
+        //    {
+        //        for (var i = 1; i < SidePolyCount; i += 2)
+        //        {
+        //            var v0 = VertexArray.Vertices[i - 1];
+        //            var v1 = VertexArray.Vertices[i + 1];
+        //            var v2 = VertexArray.Vertices[i];
 
-                    v2.Origin.Z = (v0.Origin.Z + v1.Origin.Z) / 2;
-                }
-            }
-            if (TransDir == LandDefs.Direction.South || TransDir == LandDefs.Direction.SouthWest || TransDir == LandDefs.Direction.SouthEast)
-            {
-                for (var i = 1; i < SidePolyCount; i += 2)
-                {
-                    var v0 = VertexArray.Vertices[(i - 1) * SideVertexCount];
-                    var v1 = VertexArray.Vertices[(i + 1) * SideVertexCount];
-                    var v2 = VertexArray.Vertices[i * SideVertexCount];
+        //            v2.Origin.Z = (v0.Origin.Z + v1.Origin.Z) / 2;
+        //        }
+        //    }
+        //    if (TransDir == LandDefs.Direction.South || TransDir == LandDefs.Direction.SouthWest || TransDir == LandDefs.Direction.SouthEast)
+        //    {
+        //        for (var i = 1; i < SidePolyCount; i += 2)
+        //        {
+        //            var v0 = VertexArray.Vertices[(i - 1) * SideVertexCount];
+        //            var v1 = VertexArray.Vertices[(i + 1) * SideVertexCount];
+        //            var v2 = VertexArray.Vertices[i * SideVertexCount];
 
-                    v2.Origin.Z = (v0.Origin.Z + v1.Origin.Z) / 2;
-                }
-            }
-            if (TransDir == LandDefs.Direction.East || TransDir == LandDefs.Direction.NorthEast || TransDir == LandDefs.Direction.SouthEast)
-            {
-                for (var i = 1; i < SidePolyCount; i += 2)
-                {
-                    var v0 = VertexArray.Vertices[SideVertexCount * SidePolyCount + i - 1];
-                    var v1 = VertexArray.Vertices[SideVertexCount * SidePolyCount + i + 1];
-                    var v2 = VertexArray.Vertices[SideVertexCount * SidePolyCount + i];
+        //            v2.Origin.Z = (v0.Origin.Z + v1.Origin.Z) / 2;
+        //        }
+        //    }
+        //    if (TransDir == LandDefs.Direction.East || TransDir == LandDefs.Direction.NorthEast || TransDir == LandDefs.Direction.SouthEast)
+        //    {
+        //        for (var i = 1; i < SidePolyCount; i += 2)
+        //        {
+        //            var v0 = VertexArray.Vertices[SideVertexCount * SidePolyCount + i - 1];
+        //            var v1 = VertexArray.Vertices[SideVertexCount * SidePolyCount + i + 1];
+        //            var v2 = VertexArray.Vertices[SideVertexCount * SidePolyCount + i];
 
-                    v2.Origin.Z = (v0.Origin.Z + v1.Origin.Z) / 2;
-                }
-            }
+        //            v2.Origin.Z = (v0.Origin.Z + v1.Origin.Z) / 2;
+        //        }
+        //    }
 
-            if (SideCellCount != LandDefs.BlockSide / 2)
-                return;
+        //    if (SideCellCount != LandDefs.BlockSide / 2)
+        //        return;
 
-            if (TransDir == LandDefs.Direction.North)
-            {
-                for (int i = 1, j = 4; i < SidePolyCount; i += 2, j += 4)
-                {
-                    var vertex = VertexArray.Vertices[i * SideVertexCount];
+        //    if (TransDir == LandDefs.Direction.North)
+        //    {
+        //        for (int i = 1, j = 4; i < SidePolyCount; i += 2, j += 4)
+        //        {
+        //            var vertex = VertexArray.Vertices[i * SideVertexCount];
 
-                    var height0 = LandDefs.LandHeightTable[Height[(j - 1) * SideVertexCount]];
-                    var height1 = LandDefs.LandHeightTable[Height[j * SideVertexCount]];
-                    var height2 = LandDefs.LandHeightTable[Height[(j - 3) * SideVertexCount]];
-                    var height3 = LandDefs.LandHeightTable[Height[(j - 4) * SideVertexCount]];
+        //            var height0 = LandDefs.LandHeightTable[Height[(j - 1) * SideVertexCount]];
+        //            var height1 = LandDefs.LandHeightTable[Height[j * SideVertexCount]];
+        //            var height2 = LandDefs.LandHeightTable[Height[(j - 3) * SideVertexCount]];
+        //            var height3 = LandDefs.LandHeightTable[Height[(j - 4) * SideVertexCount]];
 
-                    vertex.Origin.Z = Math.Min(vertex.Origin.Z, height2 * 2 - height3);
-                    vertex.Origin.Z = Math.Min(vertex.Origin.Z, height0 * 2 - height1);
-                }
-            }
+        //            vertex.Origin.Z = Math.Min(vertex.Origin.Z, height2 * 2 - height3);
+        //            vertex.Origin.Z = Math.Min(vertex.Origin.Z, height0 * 2 - height1);
+        //        }
+        //    }
 
-            if (TransDir == LandDefs.Direction.South)
-            {
-                for (int i = 1, j = 4; i < SidePolyCount; i += 2, j += 4)
-                {
-                    var vertex = VertexArray.Vertices[i * SideVertexCount + SidePolyCount];
+        //    if (TransDir == LandDefs.Direction.South)
+        //    {
+        //        for (int i = 1, j = 4; i < SidePolyCount; i += 2, j += 4)
+        //        {
+        //            var vertex = VertexArray.Vertices[i * SideVertexCount + SidePolyCount];
 
-                    var height0 = LandDefs.LandHeightTable[Height[(j - 1) * SideVertexCount + SideVertexCount - 1]];
-                    var height1 = LandDefs.LandHeightTable[Height[j * SideVertexCount + SideVertexCount - 1]];
-                    var height2 = LandDefs.LandHeightTable[Height[(j - 3) * SideVertexCount + SideVertexCount - 1]];
-                    var height3 = LandDefs.LandHeightTable[Height[(j - 4) * SideVertexCount + SideVertexCount - 1]];
+        //            var height0 = LandDefs.LandHeightTable[Height[(j - 1) * SideVertexCount + SideVertexCount - 1]];
+        //            var height1 = LandDefs.LandHeightTable[Height[j * SideVertexCount + SideVertexCount - 1]];
+        //            var height2 = LandDefs.LandHeightTable[Height[(j - 3) * SideVertexCount + SideVertexCount - 1]];
+        //            var height3 = LandDefs.LandHeightTable[Height[(j - 4) * SideVertexCount + SideVertexCount - 1]];
 
-                    vertex.Origin.Z = Math.Min(vertex.Origin.Z, height2 * 2 - height3);
-                    vertex.Origin.Z = Math.Min(vertex.Origin.Z, height0 * 2 - height1);
-                }
-            }
+        //            vertex.Origin.Z = Math.Min(vertex.Origin.Z, height2 * 2 - height3);
+        //            vertex.Origin.Z = Math.Min(vertex.Origin.Z, height0 * 2 - height1);
+        //        }
+        //    }
 
-            if (TransDir == LandDefs.Direction.East)
-            {
-                for (int i = 1; i < SidePolyCount; i += 2)
-                {
-                    var vertex = VertexArray.Vertices[i];
+        //    if (TransDir == LandDefs.Direction.East)
+        //    {
+        //        for (int i = 1; i < SidePolyCount; i += 2)
+        //        {
+        //            var vertex = VertexArray.Vertices[i];
 
-                    var height0 = LandDefs.LandHeightTable[Height[i * 2 + 1]];
-                    var height1 = LandDefs.LandHeightTable[Height[i * 2 + 2]];
-                    var height2 = LandDefs.LandHeightTable[Height[i * 2 - 1]];
-                    var height3 = LandDefs.LandHeightTable[Height[i * 2 - 2]];
+        //            var height0 = LandDefs.LandHeightTable[Height[i * 2 + 1]];
+        //            var height1 = LandDefs.LandHeightTable[Height[i * 2 + 2]];
+        //            var height2 = LandDefs.LandHeightTable[Height[i * 2 - 1]];
+        //            var height3 = LandDefs.LandHeightTable[Height[i * 2 - 2]];
 
-                    vertex.Origin.Z = Math.Min(vertex.Origin.Z, height2 * 2 - height3);
-                    vertex.Origin.Z = Math.Min(vertex.Origin.Z, height0 * 2 - height1);
-                }
-            }
+        //            vertex.Origin.Z = Math.Min(vertex.Origin.Z, height2 * 2 - height3);
+        //            vertex.Origin.Z = Math.Min(vertex.Origin.Z, height0 * 2 - height1);
+        //        }
+        //    }
 
-            if (TransDir == LandDefs.Direction.West)
-            {
-                for (int i = 1; i < SidePolyCount; i += 2)
-                {
-                    var vertex = VertexArray.Vertices[i + SideVertexCount * SideVertexCount];
+        //    if (TransDir == LandDefs.Direction.West)
+        //    {
+        //        for (int i = 1; i < SidePolyCount; i += 2)
+        //        {
+        //            var vertex = VertexArray.Vertices[i + SideVertexCount * SideVertexCount];
 
-                    var height0 = LandDefs.LandHeightTable[Height[SideVertexCount * (SideVertexCount - 1) + i * 2 + 1]];
-                    var height1 = LandDefs.LandHeightTable[Height[SideVertexCount * (SideVertexCount - 1) + i * 2 + 2]];
-                    var height2 = LandDefs.LandHeightTable[Height[SideVertexCount * (SideVertexCount - 1) + i * 2 - 1]];
-                    var height3 = LandDefs.LandHeightTable[Height[SideVertexCount * (SideVertexCount - 1) + i * 2 - 2]];
+        //            var height0 = LandDefs.LandHeightTable[Height[SideVertexCount * (SideVertexCount - 1) + i * 2 + 1]];
+        //            var height1 = LandDefs.LandHeightTable[Height[SideVertexCount * (SideVertexCount - 1) + i * 2 + 2]];
+        //            var height2 = LandDefs.LandHeightTable[Height[SideVertexCount * (SideVertexCount - 1) + i * 2 - 1]];
+        //            var height3 = LandDefs.LandHeightTable[Height[SideVertexCount * (SideVertexCount - 1) + i * 2 - 2]];
 
-                    vertex.Origin.Z = Math.Min(vertex.Origin.Z, height2 * 2 - height3);
-                    vertex.Origin.Z = Math.Min(vertex.Origin.Z, height0 * 2 - height1);
-                }
-            }
-        }
+        //            vertex.Origin.Z = Math.Min(vertex.Origin.Z, height2 * 2 - height3);
+        //            vertex.Origin.Z = Math.Min(vertex.Origin.Z, height0 * 2 - height1);
+        //        }
+        //    }
+        //}
 
         public float calc_water_depth(uint blockCellID, Vector3 point)
         {

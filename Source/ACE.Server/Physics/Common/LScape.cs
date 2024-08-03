@@ -13,40 +13,40 @@ namespace ACE.Server.Physics.Common
     //REALMS TODO: Fix caching used here 
     public static class LScape
     {
-        public static int MidRadius = 5;
-        public static int MidWidth = 11;
+        //public static int MidRadius = 5;
+        //public static int MidWidth = 11;
 
-        private static readonly object landblockMutex = new object();
+        private static readonly object landblockMutex = new();
         /// <summary>
         /// This is not used if PhysicsEngine.Instance.Server is true
         /// </summary>
         private static ConcurrentDictionary<ulong, Landblock> Landblocks = new ConcurrentDictionary<ulong, Landblock>();
         //public static Dictionary<uint, Landblock> BlockDrawList = new Dictionary<uint, Landblock>();
 
-        public static uint LoadedCellID;
-        public static uint ViewerCellID;
-        public static int ViewerXOffset;
-        public static int ViewerYOffset;
+        //public static uint LoadedCellID;
+        //public static uint ViewerCellID;
+        //public static int ViewerXOffset;
+        //public static int ViewerYOffset;
         //public static GameSky GameSky;
         //public static Surface LandscapeDetailSurface;
         //public static Surface EnvironmentDetailSurface;
         //public static Surface BuildingDetailSurface;
         //public static Surface ObjectDetailSurface;
 
-        public static float AmbientLevel = 0.4f;
-        public static Vector3 Sunlight = new Vector3(1.2f, 0, 0.5f);
+        //public static float AmbientLevel = 0.4f;
+        //public static Vector3 Sunlight = new Vector3(1.2f, 0, 0.5f);
 
-        public static bool SetMidRadius(int radius)
-        {
-            if (radius < 1 || Landblocks == null)
-                return false;
+        //public static bool SetMidRadius(int radius)
+        //{
+        //    if (radius < 1 || Landblocks == null)
+        //        return false;
 
-            MidRadius = radius;
-            MidWidth = 2 * radius + 1;
-            return true;
-        }
+        //    MidRadius = radius;
+        //    MidWidth = 2 * radius + 1;
+        //    return true;
+        //}
 
-        public static int LandblocksCount => Landblocks.Count;
+        //public static int LandblocksCount => Landblocks.Count;
 
         /// <summary>
         /// Loads the backing store landblock structure<para />
@@ -135,14 +135,14 @@ namespace ACE.Server.Physics.Common
                 return null;
 
             var cellID = blockCellID & 0xFFFF;
-            ObjCell cell = null;
+            ObjCell cell;
 
             // outdoor cells
             if (cellID < 0x100)
             {
                 var lcoord = LandDefs.gid_to_lcoord(blockCellID, false);
                 if (lcoord == null) return null;
-                var landCellIdx = ((int)lcoord.Value.Y % 8) + ((int)lcoord.Value.X % 8) * landblock.SideCellCount;
+                var landCellIdx = ((int)lcoord.Value.Y % 8) + ((int)lcoord.Value.X % 8) * LandblockStruct.SideCellCount;
                 landblock.LandCells.TryGetValue(landCellIdx, out cell);
             }
             // indoor cells

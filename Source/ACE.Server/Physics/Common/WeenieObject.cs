@@ -195,7 +195,7 @@ namespace ACE.Server.Physics.Common
                 prof.Flags |= ObjCollisionProfileFlags.Door;
         }
 
-        public int DoCollision(ObjCollisionProfile prof, ObjectGuid guid, PhysicsObj target)
+        public int DoCollision(PhysicsObj target)//(ObjCollisionProfile prof, ObjectGuid guid, PhysicsObj target)
         {
             var wo = WorldObject;
 

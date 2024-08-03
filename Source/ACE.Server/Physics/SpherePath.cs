@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 using ACE.Server.Physics.Common;
 
 namespace ACE.Server.Physics.Animation
@@ -14,7 +15,8 @@ namespace ACE.Server.Physics.Animation
     public class SpherePath
     {
         public int NumSphere;                       // 0
-        public List<Sphere> LocalSphere;            // 4
+        private Sphere[] LocalSphere;            // 4
+        public ref readonly Sphere LocalSphereAt(int index) => ref LocalSphere[index];
         public Vector3 LocalLowPoint;               // 8
         public List<Sphere> GlobalSphere;           // 12
         public Vector3 GlobalLowPoint;              // 16
@@ -67,12 +69,12 @@ namespace ACE.Server.Physics.Animation
             WalkableCheckPos = new Sphere();
             //NumSphere = 2;
 
-            LocalSphere = new List<Sphere>();
-            GlobalSphere = new List<Sphere>();
-            LocalSpaceSphere = new List<Sphere>();
+            LocalSphere = [];
+            GlobalSphere = [];
+            LocalSpaceSphere = [];
 
-            LocalSpaceCurrCenter = new List<Sphere>();
-            GlobalCurrCenter = new List<Sphere>();
+            LocalSpaceCurrCenter = [];
+            GlobalCurrCenter = [];
 
             Init();
         }
@@ -111,8 +113,9 @@ namespace ACE.Server.Physics.Animation
             else
                 NumSphere = 2;
 
+            LocalSphere = new Sphere[NumSphere];
             for (var i = 0; i < NumSphere; i++)
-                LocalSphere.Add(new Sphere(spheres[i].Center * scale, spheres[i].Radius * scale));
+                LocalSphere[i] = new Sphere(spheres[i].Center * scale, spheres[i].Radius * scale);
 
             // are these inited elsewhere,
             // or should they be created here?
@@ -218,7 +221,7 @@ namespace ACE.Server.Physics.Animation
             if (Walkable == null) return true;
 
             var walkCheckPos = new Sphere(WalkableCheckPos.Center, WalkableCheckPos.Radius * 0.5f);
-            return Walkable.check_walkable(walkCheckPos, WalkableUp);
+            return Walkable.check_walkable(ref walkCheckPos, WalkableUp);
         }
 
         public Vector3 GetCurPosCheckPosBlockOffset()

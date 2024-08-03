@@ -35,17 +35,29 @@ namespace ACE.Server.Physics.Common
 
         public uint Instance;
 
-        public static bool UseSceneFiles = true;
+        public const bool UseSceneFiles = true;
 
-        public Landblock() : base()
+        public Landblock()
         {
-            Init();
+            InView = BoundingType.Outside;
+            Dir = LandDefs.Direction.Unknown;
+            Closest = new Vector2(-1, -1);
+            BlockCoord = new Vector2();
+            StaticObjects = new List<PhysicsObj>();
+            Buildings = new List<BuildingObj>();
+            ServerObjects = new List<PhysicsObj>();
         }
 
         public Landblock(CellLandblock landblock, uint instance)
             : base(landblock)
         {
-            Init();
+            InView = BoundingType.Outside;
+            Dir = LandDefs.Direction.Unknown;
+            Closest = new Vector2(-1, -1);
+            BlockCoord = new Vector2();
+            StaticObjects = new List<PhysicsObj>();
+            Buildings = new List<BuildingObj>();
+            ServerObjects = new List<PhysicsObj>();
 
             ID = landblock.Id;
             //Console.WriteLine("Loading landblock " + ID.ToString("X8"));
@@ -59,16 +71,10 @@ namespace ACE.Server.Physics.Common
             Instance = instance;
         }
 
-        public new void Init()
-        {
-            InView = BoundingType.Outside;
-            Dir = LandDefs.Direction.Unknown;
-            Closest = new Vector2(-1, -1);
-            BlockCoord = new Vector2();
-            StaticObjects = new List<PhysicsObj>();
-            Buildings = new List<BuildingObj>();
-            ServerObjects = new List<PhysicsObj>();
-        }
+        //public void Init()
+        //{
+            
+        //}
 
         public void PostInit()
         {
@@ -152,22 +158,22 @@ namespace ACE.Server.Physics.Common
             return (LandCell)LScape.get_landcell((uint)blockCellID, Instance);
         }
 
-        public void destroy_buildings()
-        {
-            foreach (var building in Buildings)
-                building.remove();
+        //public void destroy_buildings()
+        //{
+        //    foreach (var building in Buildings)
+        //        building.remove();
 
-            Buildings.Clear();
-            StabList.Clear();
-        }
+        //    Buildings.Clear();
+        //    StabList.Clear();
+        //}
 
-        public void destroy_static_objects()
-        {
-            foreach (var obj in StaticObjects)
-                obj.leave_world();
+        //public void destroy_static_objects()
+        //{
+        //    foreach (var obj in StaticObjects)
+        //        obj.leave_world();
 
-            StaticObjects.Clear();
-        }
+        //    StaticObjects.Clear();
+        //}
 
         public void get_land_limits()
         {
@@ -288,19 +294,19 @@ namespace ACE.Server.Physics.Common
             //Console.WriteLine("Landblock " + ID.ToString("X8") + " scenery count: " + Scenery.Count);
         }
 
-        public static float RoadWidth = 5.0f;
-        public static float TileLength = 24.0f;
+        public const float RoadWidth = 5.0f;
+        public const float TileLength = 24.0f;
 
         /// <summary>
         /// Returns TRUE if x,y is located on a road cell
         /// </summary>
-        public bool IsRoad(DatLoader.Entity.ObjectDesc obj, float x, float y)
-        {
-            var cellX = (int)Math.Floor(x / LandDefs.CellLength);
-            var cellY = (int)Math.Floor(y / LandDefs.CellLength);
-            var terrain = Terrain[cellX * LandDefs.BlockSide + cellY];     // ensure within bounds?
-            return (terrain & 0x3) != 0;    // TODO: more complicated check for within road range
-        }
+        //public bool IsRoad(DatLoader.Entity.ObjectDesc obj, float x, float y)
+        //{
+        //    var cellX = (int)Math.Floor(x / LandDefs.CellLength);
+        //    var cellY = (int)Math.Floor(y / LandDefs.CellLength);
+        //    var terrain = Terrain[cellX * LandDefs.BlockSide + cellY];     // ensure within bounds?
+        //    return (terrain & 0x3) != 0;    // TODO: more complicated check for within road range
+        //}
 
         public bool OnRoad(Vector3 obj)
         {
@@ -421,18 +427,18 @@ namespace ACE.Server.Physics.Common
                 return null;
         }
 
-        public uint get_terrain(uint cellID, Vector3 point)
-        {
-            var lcoord = LandDefs.gid_to_lcoord(cellID).Value;
+        //public uint get_terrain(uint cellID, Vector3 point)
+        //{
+        //    var lcoord = LandDefs.gid_to_lcoord(cellID).Value;
 
-            return Terrain[(int)lcoord.X * 255 * 9 + (int)lcoord.Y];
-        }
+        //    return Terrain[(int)lcoord.X * 255 * 9 + (int)lcoord.Y];
+        //}
 
-        public void grab_visible_cells()
-        {
-            // legacy method
-            //EnvCell.grab_visible(StabList);
-        }
+        //public void grab_visible_cells()
+        //{
+        //    // legacy method
+        //    //EnvCell.grab_visible(StabList);
+        //}
 
         public void init_buildings()
         {
@@ -459,19 +465,19 @@ namespace ACE.Server.Physics.Common
             }
         }
 
-        public void init_dyn_objs()
-        {
-            if (SideCellCount != 8 || DynObjsInitDone)
-                return;
+        //public void init_dyn_objs()
+        //{
+        //    if (SideCellCount != 8 || DynObjsInitDone)
+        //        return;
 
-            for (var i = 0; i < SideCellCount; i++)
-            {
-                var cell = (ObjCell)LandCells[i];
-                var offset = i * SideCellCount * 11;    // ?
-                cell.init_objects();
-            }
-            DynObjsInitDone = true;
-        }
+        //    for (var i = 0; i < SideCellCount; i++)
+        //    {
+        //        var cell = (ObjCell)LandCells[i];
+        //        var offset = i * SideCellCount * 11;    // ?
+        //        cell.init_objects();
+        //    }
+        //    DynObjsInitDone = true;
+        //}
 
         public void init_landcell()
         {
@@ -492,7 +498,7 @@ namespace ACE.Server.Physics.Common
 
         public void init_static_objs()
         {
-            if (SideCellCount != 8) return;
+            //if (SideCellCount != 8) return;
             if (StaticObjects.Count > 0)
             {
                 adjust_scene_obj_height();
@@ -537,33 +543,33 @@ namespace ACE.Server.Physics.Common
                 get_land_scenes();
         }
 
-        public void notify_change_size()
-        {
-            release_visible_cells();
-            release_objs();
-            destroy_static_objects();
-            destroy_buildings();
-            Closest = new Vector2(-1, -1);
-        }
+        //public void notify_change_size()
+        //{
+        //    release_visible_cells();
+        //    release_objs();
+        //    destroy_static_objects();
+        //    destroy_buildings();
+        //    Closest = new Vector2(-1, -1);
+        //}
 
-        public void release_all()
-        {
-            release_objs();
-            release_visible_cells();
-        }
+        //public void release_all()
+        //{
+        //    release_objs();
+        //    release_visible_cells();
+        //}
 
-        public void release_objs()
-        {
-            if (SideVertexCount != 9) return;
+        //public void release_objs()
+        //{
+        //    if (SideVertexCount != 9) return;
 
-            for (var i = 0; i < SideCellCount; i++)
-            {
-                var cell = (ObjCell)LandCells[i];
-                var offset = i * SideCellCount * 11;    // ?
-                cell.release_objects();
-            }
-            DynObjsInitDone = false;
-        }
+        //    for (var i = 0; i < SideCellCount; i++)
+        //    {
+        //        var cell = (ObjCell)LandCells[i];
+        //        var offset = i * SideCellCount * 11;    // ?
+        //        cell.release_objects();
+        //    }
+        //    DynObjsInitDone = false;
+        //}
 
         /// <summary>
         /// Release shadow objects pointing to cells in this landblock
@@ -574,11 +580,11 @@ namespace ACE.Server.Physics.Common
                 cell.release_shadow_objs();
         }
 
-        public void release_visible_cells()
-        {
-            // legacy method
-            //EnvCell.release_visible(StabList);
-        }
+        //public void release_visible_cells()
+        //{
+        //    // legacy method
+        //    //EnvCell.release_visible(StabList);
+        //}
 
         private bool? isDungeon;
 

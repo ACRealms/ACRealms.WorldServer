@@ -20,17 +20,21 @@ namespace ACE.Server.Physics.Animation
 
     public class Transition
     {
-        public ObjectInfo ObjectInfo;
+        public readonly ObjectInfo ObjectInfo;
         public SpherePath SpherePath;
         public CollisionInfo CollisionInfo;
         public CellArray CellArray;
         //public ObjCell NewCellPtr;
-        public uint Instance { get; }
+        public readonly uint Instance;
 
         public Transition(uint instance)
         {
             Instance = instance;
-            Init();
+            ObjectInfo = new ObjectInfo();
+            SpherePath = new SpherePath();
+            CollisionInfo = new CollisionInfo();
+            CellArray = new CellArray();
+            //NewCellPtr = new ObjCell();
         }
 
         public Vector3 AdjustOffset(Vector3 _offset)
@@ -107,7 +111,7 @@ namespace ACE.Server.Physics.Animation
             //}
             offset = SpherePath.BeginPos.GetOffset(SpherePath.EndPos);
             var dist = offset.Length();
-            var step = dist / SpherePath.LocalSphere[0].Radius;
+            var step = dist / SpherePath.LocalSphereAt(0).Radius;
 
             if (!ObjectInfo.State.HasFlag(ObjectInfoState.IsViewer))
             {
@@ -357,7 +361,7 @@ namespace ACE.Server.Physics.Animation
 
             var adjustDist = 4.0f;
             var adjustRad = adjustDist;
-            var sphereRad = SpherePath.LocalSphere[0].Radius;
+            var sphereRad = SpherePath.LocalSphereAt(0).Radius;
 
             var fakeSphere = false;
 
@@ -543,7 +547,7 @@ namespace ACE.Server.Physics.Animation
                         if (offsetLen > PhysicsGlobals.EPSILON)
                         {
                             redo = lastStep;
-                            offsetPerStep = offset * (offsetLen - SpherePath.LocalSphere[0].Radius * lastStep) / offsetLen;
+                            offsetPerStep = offset * (offsetLen - SpherePath.LocalSphereAt(0).Radius * lastStep) / offsetLen;
                         }
                     }
                 }
@@ -605,14 +609,10 @@ namespace ACE.Server.Physics.Animation
 
         public void Init()
         {
-            ObjectInfo = new ObjectInfo();
-            SpherePath = new SpherePath();
-            CollisionInfo = new CollisionInfo();
-            CellArray = new CellArray();
-            //NewCellPtr = new ObjCell();
+            
         }
 
-        public void InitContactPlane(uint cellID, Plane contactPlane, bool isWater)
+        public void InitContactPlane(uint cellID, in Plane contactPlane, bool isWater)
         {
             InitLastKnownContactPlane(cellID, contactPlane, isWater);
 
@@ -622,7 +622,7 @@ namespace ACE.Server.Physics.Animation
             CollisionInfo.ContactPlaneCellID = cellID;
         }
 
-        public void InitLastKnownContactPlane(uint cellID, Plane contactPlane, bool isWater)
+        public void InitLastKnownContactPlane(uint cellID, in Plane contactPlane, bool isWater)
         {
             CollisionInfo.LastKnownContactPlaneValid = true;
             CollisionInfo.LastKnownContactPlane = new Plane(contactPlane.Normal, contactPlane.D);
@@ -692,7 +692,6 @@ namespace ACE.Server.Physics.Animation
         public static Transition MakeTransition(uint instance)
         {
             var transition = new Transition(instance);
-            transition.Init();
             return transition;
         }
 

@@ -16,7 +16,7 @@ namespace ACE.Server.Physics.Common
 
         public uint LandblockID { get => CurCell.ID | 0xFFFF; }
 
-        public BuildingObj() : base()
+        public BuildingObj(uint guid) : base(guid)
         {
             Portals = new List<BldPortal>();
             LeafCells = new List<PartCell>();
@@ -97,20 +97,18 @@ namespace ACE.Server.Physics.Common
                 add_cells_recursive(visibleCell);
         }
 
-        public PhysicsObj get_object(ulong objectID)
-        {
-            // visited cells?
-            return null;
-        }
+        //public PhysicsObj get_object(ulong objectID)
+        //{
+        //    // visited cells?
+        //    return null;
+        //}
 
         public static BuildingObj makeBuilding(uint buildingID, List<CBldPortal> portals, uint numLeaves)
         {
-            var building = new BuildingObj();
+            var building = new BuildingObj(0);
 
-            if (!building.InitObjectBegin(0, false) || !building.InitPartArrayObject(buildingID, true))
+            if (!building.InitObjectBegin(false) || !building.InitPartArrayObject(buildingID, true))
                 return null;
-
-            building.ID = buildingID;
 
             building.NumLeaves = numLeaves;
             building.LeafCells = new List<PartCell>();

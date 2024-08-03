@@ -12,27 +12,27 @@ namespace ACE.Server.Physics.Animation
         public float ConstraintDistanceStart;
         public float ConstraintDistanceMax;
 
-        public ConstraintManager() { }
+        //public ConstraintManager() { }
 
-        public ConstraintManager(PhysicsObj obj)
-        {
-            SetPhysicsObject(obj);
-        }
+        //public ConstraintManager(PhysicsObj obj)
+        //{
+        //    SetPhysicsObject(obj);
+        //}
 
-        public static ConstraintManager Create(PhysicsObj obj)
-        {
-            return new ConstraintManager(obj);
-        }
+        //public static ConstraintManager Create(PhysicsObj obj)
+        //{
+        //    return new ConstraintManager(obj);
+        //}
 
-        public void ConstrainTo(ref PhysicsPosition position, float startDistance, float maxDistance)
-        {
-            IsConstrained = true;
+        //public void ConstrainTo(ref PhysicsPosition position, float startDistance, float maxDistance)
+        //{
+        //    IsConstrained = true;
 
-            ConstraintPos = new PhysicsPosition(position);
-            ConstraintDistanceStart = startDistance;
-            ConstraintDistanceMax = maxDistance;
-            ConstraintPosOffset = position.Distance(ref PhysicsObj.Position);
-        }
+        //    ConstraintPos = new PhysicsPosition(position);
+        //    ConstraintDistanceStart = startDistance;
+        //    ConstraintDistanceMax = maxDistance;
+        //    ConstraintPosOffset = position.Distance(ref PhysicsObj.Position);
+        //}
 
         public bool IsFullyConstrained()
         {
