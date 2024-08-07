@@ -11,6 +11,7 @@ using ACRealms.Tests.Helpers;
 using log4net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System;
 using System.Collections.Generic;
@@ -84,16 +85,22 @@ namespace ACRealms.Tests.Fixtures.Database
             var config = ConfigManager.Config.MySql.World;
             var connectionStringBase = $"server={config.Host};port={config.Port};user={TestUserName};password={TestUserPassword};{config.ConnectionOptions}";
 
+            // Disable logging of db commands
+            var dbLogger = LoggerFactory.Create(builder => builder.AddFilter(_ => false));
+
             services.AddDbContextFactory<AuthDbContext>(options =>
             {
+                options.UseLoggerFactory(dbLogger);
                 var connectionString = $"{connectionStringBase};database={AuthDbName}";
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             }).AddDbContextFactory<WorldDbContext>(options =>
             {
+                options.UseLoggerFactory(dbLogger);
                 var connectionString = $"{connectionStringBase};database={WorldDbName}";
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             }).AddDbContextFactory<ShardDbContext>(options =>
             {
+                options.UseLoggerFactory(dbLogger);
                 var connectionString = $"{connectionStringBase};database={ShardDbName}";
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             });

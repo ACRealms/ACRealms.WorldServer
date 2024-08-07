@@ -79,6 +79,8 @@ namespace ACE.Server.Managers
                 }
         }
 
+        internal static int LoadedLandblocksCount => loadedLandblocks.Count;
+
         /// <summary>
         /// DestructionQueue is concurrent because it can be added to by multiple threads at once, publicly via AddToDestructionQueue()
         /// </summary>
@@ -741,7 +743,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Processes the destruction queue in a thread-safe manner
         /// </summary>
-        private static void UnloadLandblocks()
+        internal static void UnloadLandblocks()
         {
             bool aceMigrationUnload = false;
             if (UnloadingAfterACEMigration)

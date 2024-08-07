@@ -1269,6 +1269,8 @@ Please report this to the ACRealms developer.");
             actionQueue.Clear();
         }
 
+        internal List<Creature> GetAllCreatures() => worldObjects.Values.Where(x => x is Creature).Cast<Creature>().ToList();
+
         private void SaveDB()
         {
             var biotas = new Collection<(Biota biota, ReaderWriterLockSlim rwLock)>();

@@ -37,10 +37,12 @@ namespace ACRealms.Tests
 {
     public class Startup
     {
+        public static string RelativeConfigPath = ".";
+
         public void ConfigureHostApplicationBuilder(IHostApplicationBuilder hostApplicationBuilder)
         {
-            ConfigManager.Initialize();
-            ACRealmsConfigManager.Initialize();
+            ConfigManager.Initialize($"{RelativeConfigPath}\\Config.js");
+            ACRealmsConfigManager.Initialize($"{RelativeConfigPath}\\Config.realms.js");
             TestDatabaseService.Initialize(hostApplicationBuilder.Services);
         }
 

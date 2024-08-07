@@ -43,6 +43,10 @@ namespace ACE.Server.Managers
         public static bool WorldActive { get; private set; }
         private static volatile bool pendingWorldStop;
 
+        // For testing only
+        internal static bool Paused;
+        internal static bool PendingPause;
+
         public enum WorldStatusState
         {
             Closed,
@@ -60,8 +64,10 @@ namespace ACE.Server.Managers
             Physics.Server = true;
         }
 
-        public static void Initialize()
+        public static void Initialize(bool startPaused = false)
         {
+            if (startPaused)
+                Paused = true;
             var thread = new Thread(() =>
             {
                 LandblockManager.PreloadConfigLandblocks();
@@ -529,6 +535,14 @@ namespace ACE.Server.Managers
                    - DeveloperCommand Handlers
                 */
 
+                if (Paused)
+                {
+                    if (PendingPause)
+                        PendingPause = false;
+                    Thread.Sleep(10);
+                    continue;
+                }
+
                 worldTickTimer.Restart();
 
                 ServerPerformanceMonitor.RestartEvent(ServerPerformanceMonitor.MonitorType.PlayerManager_Tick);
@@ -558,6 +572,11 @@ namespace ACE.Server.Managers
 
                 ServerPerformanceMonitor.Tick();
 
+                if (PendingPause)
+                {
+                    PendingPause = false;
+                    Paused = true;
+                }
                 // We only relax the CPU if our game world is able to update at the target rate.
                 // We do not sleep if our game world just updated. This is to prevent the scenario where our game world can't keep up. We don't want to add further delays.
                 // If our game world is able to keep up, it will not be updated on most ticks. It's on those ticks (between updates) that we will relax the CPU.
