@@ -25,10 +25,21 @@ namespace ACRealms.Tests.Benchmarks
             b.Teardown();
         }
 
+        static void RunForProfiler()
+        {
+            var b = new UpdateObjectServerNewBenchmark();
+            b.Setup();
+            b.IterationSetup();
+            while(true)
+            {
+                b.Creature!.PhysicsObj.update_object_server_new(b.Landblock.Instance);
+            }
+        }
+
         static void RunBenchmarks()
         {
-            BenchmarkRunner.Run<PhysicsLandblockSmiteBenchmark>();
-            BenchmarkRunner.Run<PhysicsLandblockLoadBenchmark>();
+            //RunForProfiler();
+            BenchmarkRunner.Run<LandDefsAdjustToOutsideBenchmark>();
         }
     }
 }

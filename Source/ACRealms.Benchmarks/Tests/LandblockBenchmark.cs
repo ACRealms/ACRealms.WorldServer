@@ -6,7 +6,7 @@ namespace ACRealms.Tests.Benchmarks.Tests
     public abstract class LandblockBenchmark : ACRBenchmark
     {
         protected uint CurrentInstance;
-        protected Landblock? Landblock;
+        public Landblock? Landblock;
 
         protected virtual bool LandblockLoadDuringSetup => true;
         protected virtual bool IncrementInstanceID => true;
