@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 
 using ACE.Entity.Enum;
+using ACE.Server.PerfStats;
 using ACE.Server.Physics.BSP;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.Collision;
@@ -13,6 +14,10 @@ namespace ACE.Server.Physics.Common
 {
     public class EnvCell: ObjCell, IEquatable<EnvCell>
     {
+#if METHODSTATISTICS
+        public new static readonly System.Type ThisType = typeof(EnvCell);
+#endif
+
         public int NumSurfaces;
         //public List<Surface> Surfaces;
         public CellStruct CellStructure;
@@ -35,11 +40,17 @@ namespace ACE.Server.Physics.Common
 
         public EnvCell() : base()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor()");
+#endif
             Init();
         }
 
         public EnvCell(DatLoader.FileTypes.EnvCell envCell): base()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor(DatLoader.FileTypes.EnvCell)");
+#endif
             _envCell = envCell;
 
             Flags = envCell.Flags;
@@ -76,12 +87,18 @@ namespace ACE.Server.Physics.Common
 
         public void PostInit()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "PostInit()");
+#endif
             build_visible_cells();
             init_static_objects();
         }
 
         public override TransitionState FindEnvCollisions(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "FindEnvCollisions(Transition)");
+#endif
             var transitState = check_entry_restrictions(transition);
 
             if (transitState != TransitionState.OK)
@@ -106,6 +123,9 @@ namespace ACE.Server.Physics.Common
 
         public override TransitionState FindCollisions(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "FindCollisions(Transition)");
+#endif
             var transitionState = FindEnvCollisions(transition);
             if (transitionState == TransitionState.OK)
                 transitionState = FindObjCollisions(transition);
@@ -114,6 +134,9 @@ namespace ACE.Server.Physics.Common
 
         public void build_visible_cells()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "build_visible_cells()");
+#endif
             VisibleCells = new Dictionary<uint, EnvCell>();
 
             foreach (var visibleCellID in VisibleCellIDs)
@@ -127,6 +150,9 @@ namespace ACE.Server.Physics.Common
 
         public void check_building_transit(ushort portalId, PhysicsPosition pos, int numSphere, List<Sphere> spheres, CellArray cellArray, SpherePath path)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "check_building_transit(ushort, PhysicsPosition, int, List<Sphere>, CellArray, SpherePath)");
+#endif
             //if (portalId == 0) return;
             if (portalId == ushort.MaxValue) return;
 
@@ -145,6 +171,9 @@ namespace ACE.Server.Physics.Common
 
         public void check_building_transit(int portalId, int numParts, List<PhysicsPart> parts, CellArray cellArray, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "check_building_transit(int, int, List<PhysicsPart>, CellArray, uint)");
+#endif
             //if (portalId == 0) return;
             if (portalId == ushort.MaxValue) return;
 
@@ -193,6 +222,9 @@ namespace ACE.Server.Physics.Common
 
         public ObjCell find_visible_child_cell(Vector3 origin, bool searchCells)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "find_visible_child_cell(Vector3, bool)");
+#endif
             if (point_in_cell(origin))
                 return this;
 
@@ -221,6 +253,9 @@ namespace ACE.Server.Physics.Common
 
         public EnvCell GetVisible(uint cellID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetVisible(uint)");
+#endif
             EnvCell envCell = null;
             VisibleCells.TryGetValue(cellID, out envCell);
             return envCell;
@@ -228,6 +263,9 @@ namespace ACE.Server.Physics.Common
 
         public new void Init()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Init()");
+#endif
             CellStructure = new CellStruct();
             StaticObjectIDs = new List<uint>();
             StaticObjectFrames = new List<AFrame>();
@@ -237,6 +275,9 @@ namespace ACE.Server.Physics.Common
 
         public EnvCell add_visible_cell(uint cellID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "add_visible_cell(uint)");
+#endif
             var envCell = DBObj.GetEnvCell(cellID);
             VisibleCells.Add(cellID, envCell);
             return envCell;
@@ -244,6 +285,9 @@ namespace ACE.Server.Physics.Common
 
         public override void find_transit_cells(int numParts, List<PhysicsPart> parts, CellArray cellArray, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "find_transit_cells(int, List<PhysicsPart>, CellArray, uint)");
+#endif
             var checkOutside = false;
 
             foreach (var portal in Portals)
@@ -310,6 +354,9 @@ namespace ACE.Server.Physics.Common
 
         public override void find_transit_cells(PhysicsPosition position, int numSphere, List<Sphere> spheres, CellArray cellArray, SpherePath path, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "find_transit_cells(PhysicsPosition, int, List<Sphere>, CellArray, SpherePath, uint)");
+#endif
             var checkOutside = false;
 
             foreach (var portal in Portals)
@@ -372,6 +419,9 @@ namespace ACE.Server.Physics.Common
 
         public void init_static_objects()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "init_static_objects()");
+#endif
             if (StaticObjects != null)
             {
                 foreach (var staticObj in StaticObjects)
@@ -417,6 +467,9 @@ namespace ACE.Server.Physics.Common
 
         public override bool point_in_cell(Vector3 point)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "point_in_cell(Vector3)");
+#endif
             var localPoint = Pos.Frame.GlobalToLocal(point);
             return CellStructure.point_in_cell(localPoint);
         }
@@ -429,6 +482,9 @@ namespace ACE.Server.Physics.Common
 
         public bool Equals(EnvCell envCell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Equals(EnvCell)");
+#endif
             if (envCell == null)
                 return false;
 
@@ -437,11 +493,17 @@ namespace ACE.Server.Physics.Common
 
         public override int GetHashCode()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetHashCode()");
+#endif
             return ID.GetHashCode();
         }
 
         public bool IsVisibleIndoors(ObjCell cell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "IsVisibleIndoors(ObjCell)");
+#endif
             var blockDist = PhysicsObj.GetBlockDist(ID, cell.ID);
 
             // if landblocks equal
@@ -457,6 +519,9 @@ namespace ACE.Server.Physics.Common
 
         public override bool handle_move_restriction(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "handle_move_restriction(Transition)");
+#endif
             return true;
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using ACE.Entity.Enum;
+using ACE.Server.PerfStats;
 
 namespace ACE.Server.Physics.Animation
 {
@@ -24,6 +25,9 @@ namespace ACE.Server.Physics.Animation
 
     public class ObjectInfo
     {
+#if METHODSTATISTICS
+        public static readonly Type ThisType = typeof(ObjectInfo);
+#endif
         public PhysicsObj Object;
         public ObjectInfoState State;
         public float Scale;
@@ -35,11 +39,17 @@ namespace ACE.Server.Physics.Animation
 
         public float GetWalkableZ()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetWalkableZ()");
+#endif
             return Object.get_walkable_z();
         }
 
         public void Init(PhysicsObj obj, ObjectInfoState state)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Init(PhysicsObj, ObjectInfoState)");
+#endif
             Object = obj;
             State = state;   // copy constructor?
             Scale = Object.Scale;
@@ -65,11 +75,17 @@ namespace ACE.Server.Physics.Animation
 
         public bool IsValidWalkable(Vector3 normal)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "IsValidWalkable(Vector3)");
+#endif
             return PhysicsObj.is_valid_walkable(normal);
         }
 
         public bool MissileIgnore(PhysicsObj collideObj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "MissileIgnore(PhysicsObj)");
+#endif
             // modified for 2-way
             if (collideObj.State.HasFlag(PhysicsState.Missile))
             {
@@ -95,11 +111,17 @@ namespace ACE.Server.Physics.Animation
 
         public void StopVelocity()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "StopVelocity()");
+#endif
             Object.set_velocity(Vector3.Zero, false);
         }
 
         public TransitionState ValidateWalkable(Sphere checkPos, Plane contactPlane, bool isWater, float waterDepth, Transition transition, uint landCellID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ValidateWalkable(Sphere, Plane, bool, float, Transition, uint)");
+#endif
             var path = transition.SpherePath;
             var collision = transition.CollisionInfo;
 

@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Numerics;
 using ACE.Server.Physics.Extensions;
 using ACE.DatLoader;
+using ACE.Server.PerfStats;
 
 namespace ACE.Server.Physics.Common
 {
     public class LandDefs
     {
+#if METHODSTATISTICS
+        public static readonly Type ThisType = typeof(LandDefs);
+#endif
         public enum Direction
         {
             Inside = 0x0,
@@ -113,11 +117,17 @@ namespace ACE.Server.Physics.Common
 
         public static bool AdjustToOutside(PhysicsPosition pos)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AdjustToOutside(PhysicsPosition)");
+#endif
             return AdjustToOutside(ref pos.ObjCellID, ref pos.Frame.Origin);
         }
 
         public static bool AdjustToOutside(ref uint blockCellID, ref Vector3 loc)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AdjustToOutside(uint, Vector3)");
+#endif
             var cellID = (uint)(blockCellID & CellID_Mask);
 
             if (cell_in_range(cellID))
@@ -142,6 +152,9 @@ namespace ACE.Server.Physics.Common
 
         public static Vector3 GetBlockOffset(uint cellFrom, uint cellTo)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetBlockOffset(uint, uint)");
+#endif
             if (cellFrom >> BlockPartShift == cellTo >> BlockPartShift)
                 return Vector3.Zero;
 
@@ -153,6 +166,9 @@ namespace ACE.Server.Physics.Common
 
         public static bool InBlock(Vector3 pos, float radius)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "InBlock(Vector3, float)");
+#endif
             if (pos.X < radius || pos.Y < radius)
                 return false;
 
@@ -162,6 +178,9 @@ namespace ACE.Server.Physics.Common
 
         public static Vector2? blockid_to_lcoord(uint cellID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "blockid_to_lcoord(uint)");
+#endif
             var x = (cellID >> BlockPartShift & BlockX_Mask) >> MaxBlockShift << LandblockShift;
             var y = (cellID >> BlockPartShift & BlockY_Mask) << LandblockShift;
 
@@ -173,6 +192,9 @@ namespace ACE.Server.Physics.Common
 
         public static Vector2? gid_to_lcoord(uint cellID, bool envCheck = true)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "gid_to_lcoord(uint, bool)");
+#endif
             if (!inbound_valid_cellid(cellID))
                 return null;
 
@@ -193,6 +215,9 @@ namespace ACE.Server.Physics.Common
 
         public static Vector2? get_outside_lcoord(uint blockCellID, float _x, float _y)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_outside_lcoord(uint, float, float)");
+#endif
             var cellID = (uint)(blockCellID & CellID_Mask);
              
             if (cell_in_range(cellID))
@@ -213,6 +238,9 @@ namespace ACE.Server.Physics.Common
 
         public static bool cell_in_range(uint cellID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "cell_in_range(uint)");
+#endif
             return cellID == BlockCellID ||
                    cellID >= FirstLandCellID && cellID <= LastLandCellID ||
                    cellID >= FirstEnvCellID  && cellID <= LastEnvCellID;
@@ -220,6 +248,9 @@ namespace ACE.Server.Physics.Common
 
         public static int lcoord_to_gid(float _x, float _y)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "lcoord_to_gid(float, float)");
+#endif
             var x = (int)_x;
             var y = (int)_y;
 
@@ -234,6 +265,9 @@ namespace ACE.Server.Physics.Common
 
         public static bool inbound_valid_cellid(uint blockCellID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "inbound_valid_cellid(uint)");
+#endif
             var cellID = (uint)(blockCellID & CellID_Mask);
 
             if (cell_in_range(cellID))

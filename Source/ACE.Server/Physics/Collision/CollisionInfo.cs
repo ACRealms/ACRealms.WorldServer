@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using ACE.Server.PerfStats;
 using ACE.Server.Physics.Common;
 using ACE.Server.Physics.Animation;
 
@@ -8,6 +9,9 @@ namespace ACE.Server.Physics.Collision
 {
     public class CollisionInfo
     {
+#if METHODSTATISTICS
+        public static readonly System.Type ThisType = typeof(CollisionInfo);
+#endif
         public bool LastKnownContactPlaneValid;
         public Plane LastKnownContactPlane;
         public bool LastKnownContactPlaneIsWater;
@@ -32,16 +36,25 @@ namespace ACE.Server.Physics.Collision
 
         public CollisionInfo()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor()");
+#endif
             Init();
         }
 
         public void Init()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Init()");
+#endif
             CollideObject = new List<PhysicsObj>();
         }
 
         public void SetContactPlane(Plane plane, bool isWater)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetContactPlane(Plane, bool)");
+#endif
             ContactPlaneValid = true;
             ContactPlane = new Plane(plane.Normal, plane.D);
             ContactPlaneIsWater = isWater;
@@ -49,6 +62,9 @@ namespace ACE.Server.Physics.Collision
 
         public void SetCollisionNormal(Vector3 normal)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetCollisionNormal(Vector3)");
+#endif
             CollisionNormalValid = true;
             CollisionNormal = normal;   // use original?
             if (Vec.NormalizeCheckSmall(ref normal))
@@ -57,6 +73,9 @@ namespace ACE.Server.Physics.Collision
 
         public void SetSlidingNormal(Vector3 normal)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetSlidingNormal(Vector3)");
+#endif
             SlidingNormalValid = true;
             SlidingNormal = new Vector3(normal.X, normal.Y, 0.0f);
             if (Vec.NormalizeCheckSmall(ref normal))
@@ -65,6 +84,9 @@ namespace ACE.Server.Physics.Collision
 
         public void AddObject(PhysicsObj obj, TransitionState state)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AddObject(PhysicsObj, TransitionState)");
+#endif
             if (CollideObject.Contains(obj))
                 return;
 

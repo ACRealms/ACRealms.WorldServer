@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using ACE.Server.PerfStats;
 using ACE.Server.Physics.Common;
 
 namespace ACE.Server.Physics.Animation
@@ -13,6 +14,10 @@ namespace ACE.Server.Physics.Animation
     };
     public class SpherePath
     {
+#if METHODSTATISTICS
+        public static readonly Type ThisType = typeof(SpherePath);
+#endif
+
         public int NumSphere;                       // 0
         public List<Sphere> LocalSphere;            // 4
         public Vector3 LocalLowPoint;               // 8
@@ -60,6 +65,9 @@ namespace ACE.Server.Physics.Animation
 
         public SpherePath()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor()");
+#endif
             LocalSpacePos = new PhysicsPosition();
             CurPos = new PhysicsPosition();
             CheckPos = new PhysicsPosition();
@@ -79,11 +87,17 @@ namespace ACE.Server.Physics.Animation
 
         public void Init()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Init()");
+#endif
             PlacementAllowsSliding = true;
         }
 
         public void InitPath(ObjCell beginCell, PhysicsPosition beginPos, PhysicsPosition endPos)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "InitPath(ObjCell, PhysicsPosition, PhysicsPosition)");
+#endif
             BeginPos = beginPos;
             BeginCell = beginCell;
             EndPos = endPos;
@@ -105,6 +119,9 @@ namespace ACE.Server.Physics.Animation
 
         public void InitSphere(int numSphere, List<Sphere> spheres, float scale)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "InitSphere(int, List<Sphere>, float)");
+#endif
             if (numSphere <= 2)
                 NumSphere = numSphere;
             else
@@ -121,6 +138,9 @@ namespace ACE.Server.Physics.Animation
 
         public void AddOffsetToCheckPos(Vector3 offset)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AddOffsetToCheckPos(Vector3)");
+#endif
             CellArrayValid = false;
             CheckPos.Frame.Origin += offset;
             CacheGlobalSphere(offset);
@@ -128,11 +148,17 @@ namespace ACE.Server.Physics.Animation
 
         public void AddOffsetToCheckPos(Vector3 offset, float radius)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AddOffsetToCheckPos(Vector3, float)");
+#endif
             AddOffsetToCheckPos(offset);    // radius ignored?
         }
 
         public void AdjustCheckPos(uint cellID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AdjustCheckPos(uint)");
+#endif
             if ((cellID & 0xFFFF) < 0x100)
             {
                 var offset = LandDefs.GetBlockOffset(cellID, CheckPos.ObjCellID);
@@ -144,6 +170,9 @@ namespace ACE.Server.Physics.Animation
 
         public void CacheGlobalCurrCenter()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CacheGlobalCurrCenter()");
+#endif
             while (GlobalCurrCenter.Count < NumSphere)
                 GlobalCurrCenter.Add(new Sphere());
 
@@ -157,6 +186,9 @@ namespace ACE.Server.Physics.Animation
         /// </summary>
         public void CacheGlobalSphere(Vector3? offset)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CacheGlobalSphere(Vector3?)");
+#endif
             if (offset != null)
             {
                 foreach (var globSphere in GlobalSphere)
@@ -180,6 +212,9 @@ namespace ACE.Server.Physics.Animation
 
         public void CacheLocalSpaceSphere(PhysicsPosition pos, float scaleZ)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CacheLocalSpaceSphere(PhysicsPosition, float)");
+#endif
             var invScale = 1.0f / scaleZ;
 
             while (LocalSpaceCurrCenter.Count < NumSphere)
@@ -208,6 +243,9 @@ namespace ACE.Server.Physics.Animation
 
         public bool CheckWalkables()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CheckWalkables()");
+#endif
             if (Walkable == null) return true;
 
             var walkCheckPos = new Sphere(WalkableCheckPos.Center, WalkableCheckPos.Radius * 0.5f);
@@ -216,21 +254,33 @@ namespace ACE.Server.Physics.Animation
 
         public Vector3 GetCurPosCheckPosBlockOffset()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetCurPosCheckPosBlockOffset()");
+#endif
             return LandDefs.GetBlockOffset(CurPos.ObjCellID, CheckPos.ObjCellID);
         }
 
         public PhysicsPosition GetWalkablePos()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetWalkablePos()");
+#endif
             return WalkablePos;
         }
 
         public bool IsWalkableAllowable(float zval)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "IsWalkableAllowable(float)");
+#endif
             return zval > WalkableAllowance;
         }
 
         public TransitionState PrecipiceSlide(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "PrecipiceSlide(Transition)");
+#endif
             var collisions = transition.CollisionInfo;
             Vector3 collisionNormal = Vector3.Zero;
             var found = Walkable.find_crossed_edge(WalkableCheckPos, WalkableUp, ref collisionNormal);
@@ -256,6 +306,9 @@ namespace ACE.Server.Physics.Animation
 
         public void RestoreCheckPos()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "RestoreCheckPos()");
+#endif
             CheckPos = new PhysicsPosition(BackupCheckPos);
             CheckCell = BackupCell;
             CellArrayValid = false;
@@ -264,12 +317,18 @@ namespace ACE.Server.Physics.Animation
 
         public void SaveCheckPos()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SaveCheckPos()");
+#endif
             BackupCell = CheckCell;
             BackupCheckPos = new PhysicsPosition(CheckPos);
         }
 
         public void SetCheckPos(PhysicsPosition position, ObjCell cell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetCheckPos(PhysicsPosition, ObjCell)");
+#endif
             CheckPos = new PhysicsPosition(position);
             CheckCell = cell;
             CellArrayValid = false;
@@ -278,6 +337,9 @@ namespace ACE.Server.Physics.Animation
 
         public void SetCollide(Vector3 collisionNormal)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetCollide(Vector3)");
+#endif
             Collide = true;
             BackupCell = CheckCell;
             BackupCheckPos = new PhysicsPosition(CheckPos);
@@ -287,6 +349,9 @@ namespace ACE.Server.Physics.Animation
 
         public void SetNegPolyHit(bool stepUp, Vector3 collisionNormal)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetNegPolyHit(bool, Vector3)");
+#endif
             NegStepUp = stepUp;
             NegPolyHit = true;
             NegCollisionNormal = -collisionNormal;
@@ -294,6 +359,9 @@ namespace ACE.Server.Physics.Animation
 
         public void SetWalkable(Sphere sphere, Polygon poly, Vector3 zAxis, PhysicsPosition localPos, float scale)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetWalkable(Sphere, Polygon, Vector3, PhysicsPosition, float)");
+#endif
             WalkableCheckPos = new Sphere(sphere);
             Walkable = poly;
             WalkableUp = zAxis;
@@ -303,11 +371,17 @@ namespace ACE.Server.Physics.Animation
 
         public void SetWalkableCheckPos(Sphere sphere)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetWalkableCheckPos(Sphere)");
+#endif
             WalkableCheckPos = new Sphere(sphere);
         }
 
         public TransitionState StepUpSlide(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "StepUpSlide(Transition)");
+#endif
             var collisions = transition.CollisionInfo;
 
             collisions.ContactPlaneValid = false;

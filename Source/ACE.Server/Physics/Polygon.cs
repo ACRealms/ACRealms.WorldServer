@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using ACE.Entity.Enum;
+using ACE.Server.PerfStats;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.Physics.Entity;
@@ -10,6 +11,10 @@ namespace ACE.Server.Physics
 {
     public class Polygon: IEquatable<Polygon>
     {
+#if METHODSTATISTICS
+        public static readonly System.Type ThisType = typeof(Polygon);
+#endif
+
         public List<Vertex> Vertices;   // not directly in this DAT structure
         public List<short> VertexIDs;
         //public List<Vector2> Screen;
@@ -28,6 +33,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public Polygon(int idx, int numPoints, CullMode cullMode)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor(int, int, CullMode)");
+#endif
             Init();
 
             PolyID = idx;
@@ -48,6 +56,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public Polygon(DatLoader.Entity.Polygon polygon, DatLoader.Entity.CVertexArray vertexArray)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor(DatLoader.Entity.Polygon, DatLoader.Entity.CVertexArray)");
+#endif
             NegSurface = polygon.NegSurface;
             //NegUVIndices = polygon.NegUVIndices;
             NumPoints = polygon.NumPts;
@@ -65,6 +76,9 @@ namespace ACE.Server.Physics
 
         public void Init()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Init()");
+#endif
             PolyID = -1;
             PosSurface = -1;
             NegSurface = -1;
@@ -72,6 +86,9 @@ namespace ACE.Server.Physics
 
         public bool adjust_sphere_to_plane(SpherePath path, Sphere validPos, Vector3 movement)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "adjust_sphere_to_plane(SpherePath, Sphere, Vector3)");
+#endif
             var dpPos = Vector3.Dot(validPos.Center, Plane.Normal) + Plane.D;
             var dpMove = Vector3.Dot(movement, Plane.Normal);
             var dist = 0.0f;
@@ -98,6 +115,9 @@ namespace ACE.Server.Physics
 
         public double adjust_sphere_to_poly(Sphere checkPos, Vector3 currPos, Vector3 movement)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "adjust_sphere_to_poly(Sphere, Vector3, Vector3)");
+#endif
             var dpPos = Vector3.Dot(currPos, Plane.Normal) + Plane.D;
             if (Math.Abs(dpPos) < checkPos.Radius)
                 return 1.0f;
@@ -115,6 +135,9 @@ namespace ACE.Server.Physics
 
         public void adjust_to_placement_poly(Sphere hitSphere, Sphere otherSphere, float radius, bool centerSolid, bool solidCheck)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "adjust_to_placement_poly(Sphere, Sphere, float, bool, bool)");
+#endif
             var dp = Vector3.Dot(hitSphere.Center, Plane.Normal) + Plane.D;
             if (solidCheck && (centerSolid || dp <= 0.0f))
                 radius *= -1.0f;
@@ -127,11 +150,17 @@ namespace ACE.Server.Physics
 
         public bool check_small_walkable(Sphere sphere, Vector3 up)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "check_small_walkable(Sphere, Vector3)");
+#endif
             return check_walkable(sphere, up, true);
         }
 
         public bool check_walkable(Sphere sphere, Vector3 up, bool small = false)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "check_walkable(Sphere, Vector3, bool)");
+#endif
             var angleUp = Vector3.Dot(Plane.Normal, up);    // dist?
             if (angleUp < PhysicsGlobals.EPSILON) return false;
 
@@ -174,6 +203,9 @@ namespace ACE.Server.Physics
 
         public bool find_crossed_edge(Sphere sphere, Vector3 up, ref Vector3 normal)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "find_crossed_edge(Sphere, Vector3, Vector3)");
+#endif
             var angleUp = Vector3.Dot(Plane.Normal, up);
             if (Math.Abs(angleUp) < PhysicsGlobals.EPSILON)
                 return false;
@@ -203,12 +235,18 @@ namespace ACE.Server.Physics
 
         public bool hits_sphere(Sphere sphere)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "hits_sphere(Sphere)");
+#endif
             Vector3 contactPoint = Vector3.Zero;
             return polygon_hits_sphere_precise(sphere, ref contactPoint);
         }
 
         public void make_plane()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "make_plane()");
+#endif
             var normal = Vector3.Zero;
 
             // calculate plane normal
@@ -233,6 +271,9 @@ namespace ACE.Server.Physics
 
         public bool point_in_poly2D(Vector3 point, Sidedness side)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "point_in_poly2D(Vector3, Sidedness)");
+#endif
             var prevIdx = 0;
             for (var i = NumPoints - 1; i >= 0; i--)
             {
@@ -261,6 +302,9 @@ namespace ACE.Server.Physics
 
         public bool point_in_polygon(Vector3 point)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "point_in_polygon(Vector3)");
+#endif
             var lastVertex = Vertices[NumPoints - 1];
 
             foreach (var vertex in Vertices)
@@ -288,6 +332,9 @@ namespace ACE.Server.Physics
 
         public bool polygon_hits_sphere(Sphere sphere, ref Vector3 contactPoint)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "polygon_hits_sphere(Sphere, Vector3)");
+#endif
             var dpPos = Vector3.Dot(sphere.Center, Plane.Normal) + Plane.D;
             var rad = sphere.Radius - PhysicsGlobals.EPSILON;
 
@@ -330,6 +377,9 @@ namespace ACE.Server.Physics
 
         public bool polygon_hits_sphere_precise(Sphere sphere, ref Vector3 contactPoint)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "polygon_hits_sphere_precise(Sphere, Vector3)");
+#endif
             if (NumPoints == 0) return true;
 
             var dpPos = Vector3.Dot(Plane.Normal, sphere.Center) + Plane.D;
@@ -385,6 +435,9 @@ namespace ACE.Server.Physics
 
         public bool pos_hits_sphere(Sphere sphere, Vector3 movement, ref Vector3 contactPoint, ref Polygon hitPoly)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "pos_hits_sphere(Sphere, Vector3, Vector3, Polygon)");
+#endif
             var hit = polygon_hits_sphere_precise(sphere, ref contactPoint);
 
             if (hit)
@@ -399,6 +452,9 @@ namespace ACE.Server.Physics
 
         public bool walkable_hits_sphere(SpherePath path, Sphere sphere, Vector3 up)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "walkable_hits_sphere(SpherePath, Sphere, Vector3)");
+#endif
             var dp = Vector3.Dot(up, Plane.Normal);
             if (dp <= path.WalkableAllowance) return false;
             Vector3 contactPoint = Vector3.Zero;
@@ -413,6 +469,9 @@ namespace ACE.Server.Physics
 
         public bool Equals(Polygon p)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Equals(Polygon)");
+#endif
             if (PolyID != p.PolyID || NumPoints != p.NumPoints || Stippling != p.Stippling || SidesType != p.SidesType ||
                 PosSurface != p.PosSurface || NegSurface != p.NegSurface) return false;
 
@@ -429,6 +488,9 @@ namespace ACE.Server.Physics
 
         public override int GetHashCode()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetHashCode()");
+#endif
             int hash = 0;
 
             hash = (hash * 397) ^ PolyID.GetHashCode();

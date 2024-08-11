@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Platforms>x64</Platforms>
+    <Configurations>Debug;Release;MethodStatistics</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>

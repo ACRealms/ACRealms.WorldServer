@@ -1,18 +1,31 @@
 using System.Collections.Generic;
 using System.Numerics;
+using ACE.Server.PerfStats;
 using ACE.Server.Physics.Common;
 
 namespace ACE.Server.Physics.Collision
 {
     public class BBox
     {
+#if METHODSTATISTICS
+        public static readonly System.Type ThisType = typeof(PhysicsPosition);
+#endif
+
         public Vector3 Min;
         public Vector3 Max;
 
-        public BBox() { }
+        public BBox()
+        {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor()");
+#endif
+        }
 
         public BBox(List<DatLoader.Entity.Polygon> polys, Matrix4x4 transform)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor(List<DatLoader.Entity.Polygon, Matrix4x4)");
+#endif
             Min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             Max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
@@ -35,6 +48,9 @@ namespace ACE.Server.Physics.Collision
 
         public void AdjustBBox(Vector3 v)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AdjustBBox(Vector3)");
+#endif
             if (v.X < Min.X) Min.X = v.X;
             if (v.Y < Min.Y) Min.Y = v.Y;
             if (v.Z < Min.Z) Min.Z = v.Z;
@@ -46,6 +62,9 @@ namespace ACE.Server.Physics.Collision
 
         public void BuildBoundingBox(BBox bbox)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "BuildBoundingBox(BBox)");
+#endif
             if (Min.X < bbox.Min.X) bbox.Min.X = Min.X;
             if (Min.Y < bbox.Min.Y) bbox.Min.Y = Min.Y;
             if (Min.Z < bbox.Min.Z) bbox.Min.Z = Min.Z;
@@ -60,6 +79,9 @@ namespace ACE.Server.Physics.Collision
         /// </summary>
         public bool Contains(Vector3 point)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Contains(Vector3)");
+#endif
             return (point.X >= Min.X && point.X <= Max.X) &&
                    (point.Y >= Min.Y && point.Y <= Max.Y) &&
                    (point.Z >= Min.Z && point.Z <= Max.Z);
@@ -67,6 +89,9 @@ namespace ACE.Server.Physics.Collision
 
         public void ConvertToGlobal(PhysicsPosition pos)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ConvertToGlobal(PhysicsPosition)");
+#endif
             var transform = Matrix4x4.CreateFromQuaternion(pos.Frame.Orientation) * Matrix4x4.CreateTranslation(pos.Frame.Origin);
             Min = Vector3.Transform(Min, transform);
             Max = Vector3.Transform(Max, transform);
@@ -80,6 +105,9 @@ namespace ACE.Server.Physics.Collision
 
         public List<Vector3> GetCorners()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetCorners()");
+#endif
             // cache?
             return new List<Vector3>()
             {
@@ -102,6 +130,9 @@ namespace ACE.Server.Physics.Collision
 
         public void LocalToGlobal(BBox fromBox, PhysicsPosition fromPos, PhysicsPosition toPos)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "LocalToGlobal(BBox, PhysicsPosition, PhysicsPositon)");
+#endif
             Min = toPos.LocalToGlobal(fromPos, fromBox.Min);
             Max = toPos.LocalToGlobal(fromPos, fromBox.Max);
 
@@ -115,6 +146,9 @@ namespace ACE.Server.Physics.Collision
 
         public void LocalToLocal(BBox fromBox, PhysicsPosition fromPos, PhysicsPosition toPos)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "LocalToLocal(BBox, PhysicsPosition, PhysicsPositon)");
+#endif
             Min = toPos.LocalToLocal(fromPos, fromBox.Min);
             Max = toPos.LocalToLocal(fromPos, fromBox.Max);
 

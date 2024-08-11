@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using ACE.Server.PerfStats;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.Collision;
 using ACE.Server.Physics.Common;
@@ -12,6 +13,10 @@ namespace ACE.Server.Physics
     /// </summary>
     public class CylSphere: IEquatable<CylSphere>
     {
+#if METHODSTATISTICS
+        public static readonly Type ThisType = typeof(CylSphere);
+#endif
+
         /// <summary>
         /// The base of the cylinder sphere
         /// </summary>
@@ -83,6 +88,9 @@ namespace ACE.Server.Physics
         /// <returns>The TransitionState either collided or adjusted</returns>
         public TransitionState CollideWithPoint(Transition transition, Sphere checkPos, Vector3 disp, float radsum, int sphereNum)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CollideWithPoint(Transition, Sphere, Vector3, float, int)");
+#endif
             var obj = transition.ObjectInfo;
             var path = transition.SpherePath;
             var collisions = transition.CollisionInfo;
@@ -204,6 +212,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool CollidesWithSphere(Sphere checkPos, Vector3 disp, float radsum)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CollidesWithSphere(Sphere, Vector3, float)");
+#endif
             var result = false;
 
             if (disp.X * disp.X + disp.Y * disp.Y <= radsum * radsum)
@@ -221,6 +232,9 @@ namespace ACE.Server.Physics
         /// <returns>The collision result for this transition path</returns>
         public TransitionState IntersectsSphere(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "IntersectsSphere(Transition)");
+#endif
             var obj = transition.ObjectInfo;
             var path = transition.SpherePath;
 
@@ -343,6 +357,9 @@ namespace ACE.Server.Physics
         /// <returns>The collision result for this transition path</returns>
         public TransitionState IntersectsSphere(PhysicsPosition pos, float scale, Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "IntersectsSphere(PhysicsPosition, float, Transition)");
+#endif
             var path = transition.SpherePath;
 
             path.CacheLocalSpaceSphere(pos, 1.0f);
@@ -357,6 +374,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public TransitionState LandOnCylinder(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "LandOnCylinder(Transition, Sphere, Vector3, float)");
+#endif
             Vector3 collisionNormal;
             CollisionNormal(transition, checkPos, disp, radsum, 0, out collisionNormal);
 
@@ -375,6 +395,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public TransitionState SlideSphere(Transition transition, Sphere checkPos, Vector3 disp, float radsum, int sphereNum)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SlideSphere(Transition, Sphere, Vector3, float, int)");
+#endif
             Vector3 collisionNormal;
             CollisionNormal(transition, checkPos, disp, radsum, sphereNum, out collisionNormal);
             if (Vec.NormalizeCheckSmall(ref collisionNormal))
@@ -388,6 +411,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public TransitionState StepSphereDown(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "StepSphereDown(Transition, Sphere, Vector3, float)");
+#endif
             var path = transition.SpherePath;
 
             Sphere globSphere_ = null;
@@ -429,6 +455,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public TransitionState StepSphereUp(Transition transition, Sphere checkPos, Vector3 disp, float radsum)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "StepSphereUp(Transition, Sphere, Vector3, float)");
+#endif
             var obj = transition.ObjectInfo;
 
             if (obj.StepUpHeight < checkPos.Radius + Height - disp.Z)
@@ -452,6 +481,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool CollisionNormal(Transition transition, Sphere checkPos, Vector3 _disp, float radsum, int sphereNum, out Vector3 normal)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CollisionNormal(Transition, Sphere, Vector3, float, int, Vector3)");
+#endif
             var disp = transition.SpherePath.GlobalCurrCenter[sphereNum].Center - LowPoint;
             if (radsum * radsum < disp.LengthSquared2D())
             {
@@ -466,11 +498,17 @@ namespace ACE.Server.Physics
 
         public bool Equals(CylSphere cylSphere)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Equals(CylSphere)");
+#endif
             return cylSphere != null && Height == cylSphere.Height && Radius == cylSphere.Radius && LowPoint == cylSphere.LowPoint;
         }
 
         public override int GetHashCode()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetHashCode()");
+#endif
             int hash = 0;
 
             hash = (hash * 397) ^ Height.GetHashCode();

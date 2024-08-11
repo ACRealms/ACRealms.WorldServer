@@ -442,5 +442,15 @@ namespace ACE.Server.Command.Handlers.ACRealms
             }
             CommandHandlerHelper.WriteOutputInfo(session, $"Completed transfer of characters to {newRealm.Realm.Name}.", ChatMessageType.Broadcast);
         }
+
+#if METHODSTATISTICS
+        [CommandHandler("dump-method-statistics", AccessLevel.Admin, CommandHandlerFlag.None, 0, "Dump method statistics")]
+        public static void HandleDumpMethodStatistics(ISession session, params string[] parameters)
+        {
+            System.IO.File.WriteAllText("method-statistics.txt",PerfStats.MethodStatistics.Dump());
+            CommandHandlerHelper.WriteOutputInfo(session, $"Dumped method statistics to method-statistics.txt", ChatMessageType.Broadcast);
+        }
+#endif
+
     }
 }

@@ -8,6 +8,7 @@ using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Server.Entity.Actions;
 using ACE.Server.Managers;
+using ACE.Server.PerfStats;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.Collision;
 using ACE.Server.Physics.Combat;
@@ -28,6 +29,10 @@ namespace ACE.Server.Physics
     /// </summary>
     public class PhysicsObj
     {
+#if METHODSTATISTICS
+        public static readonly Type ThisType = typeof(PhysicsObj);
+#endif
+
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public ulong ID;
@@ -132,6 +137,9 @@ namespace ACE.Server.Physics
 
         public PhysicsObj()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor()");
+#endif
             PlayerVector = new Vector3(0, 0, 1);
             PlayerDistance = float.MaxValue;
             CYpt = float.MaxValue;
@@ -178,6 +186,9 @@ namespace ACE.Server.Physics
 
         public void Destroy()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Destroy()");
+#endif
             MovementManager = null;
             PositionManager = null;
             ParticleManager = null;
@@ -200,6 +211,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public void DestroyObject()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "DestroyObject()");
+#endif
             leave_cell(false);
             remove_shadows_from_cells();
             leave_world();
@@ -229,6 +243,9 @@ namespace ACE.Server.Physics
 
         public void AddPartToShadowCells(PhysicsPart part)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AddPartToShadowCells()");
+#endif
             if (CurCell != null) part.Pos.ObjCellID = CurCell.ID;
             foreach (var shadowObj in ShadowObjects.Values)
             {
@@ -243,6 +260,9 @@ namespace ACE.Server.Physics
 
         public ObjCell AdjustPosition(PhysicsPosition position, Vector3 low_pt, bool dontCreateCells, bool searchCells, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AdjustPosition(PhysicsPosition, Vector3, bool, bool, uint)");
+#endif
             var cellID = position.ObjCellID & 0xFFFF;
 
             if ((cellID < 1 || cellID > 0x40) && (cellID < 0x100 || cellID > 0xFFFD) && cellID != 0xFFFF)
@@ -274,6 +294,9 @@ namespace ACE.Server.Physics
 
         public bool CacheHasPhysicsBSP()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CacheHasPhysicsBSP()");
+#endif
             if (PartArray != null && PartArray.CacheHasPhysicsBSP())
             {
                 State |= PhysicsState.HasPhysicsBSP;
@@ -301,18 +324,27 @@ namespace ACE.Server.Physics
 
         public void CallPESInternal(uint pes, float curValue)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CallPESInternal()");
+#endif
             if (CurCell != null && curValue >= 1.0f)
                 play_script_internal(pes);
         }
 
         public void CheckForCompletedMotions()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CheckForCompletedMotions()");
+#endif
             if (PartArray != null)
                 PartArray.CheckForCompletedMotions();
         }
 
         public bool CheckPositionInternal(ObjCell newCell, PhysicsPosition newPos, Transition transition, SetPosition setPos)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CheckPositionInternal(ObjCell, PhysicsPosition, Transition, SetPosition)");
+#endif
             transition.InitPath(newCell, null, newPos);
 
             if (!setPos.Flags.HasFlag(SetPositionFlags.Slide))
@@ -336,6 +368,9 @@ namespace ACE.Server.Physics
 
         public void ConstrainTo(PhysicsPosition pos, float startDistance, float maxDistance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ConstrainTo(PhysicsPosition, float, float)");
+#endif
             MakePositionManager();
             if (PositionManager != null)
                 PositionManager.ConstrainTo(pos, startDistance, maxDistance);
@@ -343,6 +378,9 @@ namespace ACE.Server.Physics
 
         public WeenieError DoInterpretedMotion(uint motion, MovementParameters movementParams)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "DoInterpretedMotion(uint, MovementParameters)");
+#endif
             if (PartArray == null)
                 return WeenieError.GeneralMovementFailure;
 
@@ -351,6 +389,9 @@ namespace ACE.Server.Physics
 
         public WeenieError DoMotion(uint motion, MovementParameters movementParams)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "DoMotion(uint, MovementParameters)");
+#endif
             LastMoveWasAutonomous = true;
             if (MovementManager == null) return WeenieError.NoAnimationTable;
             var mvs = new MovementStruct(MovementType.RawCommand, motion, movementParams);
@@ -392,6 +433,9 @@ namespace ACE.Server.Physics
 
         public TransitionState FindObjCollisions(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "FindObjCollisions(Transition)");
+#endif
             bool ethereal = false;
 
             if (State.HasFlag(PhysicsState.Ethereal) && State.HasFlag(PhysicsState.IgnoreCollisions))
@@ -467,6 +511,9 @@ namespace ACE.Server.Physics
 
         public TransitionState FindObjCollisions_Inner(Transition transition, TransitionState result, bool ethereal, bool isCreature)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "FindObjCollisions_Inner(Transition, TransitionState, bool, bool)");
+#endif
             if (!transition.SpherePath.StepDown)
             {
                 if (State.HasFlag(PhysicsState.Static))
@@ -489,6 +536,9 @@ namespace ACE.Server.Physics
 
         public bool is_touching(PhysicsObj obj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "is_touching(PhysicsObj)");
+#endif
             // custom for hotspots
 
             // possible collision detection object types:
@@ -544,6 +594,9 @@ namespace ACE.Server.Physics
 
         public SetPositionError ForceIntoCell(ObjCell newCell, PhysicsPosition pos)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ForceIntoCell(ObjCell, PhysicsPosition)");
+#endif
             if (newCell == null) return SetPositionError.NoCell;
             set_frame(pos.Frame);
             if (CurCell != newCell)
@@ -556,6 +609,9 @@ namespace ACE.Server.Physics
 
         public double GetAutonomyBlipDistance()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetAutonomyBlipDistance()");
+#endif
             if ((Position.ObjCellID & 0xFFFF) < 0x100) return 100.0f;
 
             return IsPlayer ? 25.0f : 20.0f;
@@ -575,6 +631,9 @@ namespace ACE.Server.Physics
 
         public float GetHeight()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetHeight()");
+#endif
             if (PartArray == null) return 0.0f;
             return PartArray.GetHeight();
         }
@@ -586,11 +645,17 @@ namespace ACE.Server.Physics
 
         public PhysicsObj GetObjectA(ulong objectID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetObjectA(ulong)");
+#endif
             return ServerObjectManager.GetObjectA(objectID);
         }
 
         public float GetRadius()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetRadius()");
+#endif
             if (PartArray != null)
                 return PartArray.GetRadius();
             else
@@ -599,6 +664,9 @@ namespace ACE.Server.Physics
 
         public float GetPhysicsRadius()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetPhysicsRadius()");
+#endif
             if (State.HasFlag(PhysicsState.HasPhysicsBSP))
                 return 0.0f;
 
@@ -636,18 +704,27 @@ namespace ACE.Server.Physics
 
         public float GetStepDownHeight()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetStepDownHeight()");
+#endif
             if (PartArray == null) return 0;
             return PartArray.GetStepDownHeight();
         }
 
         public float GetStepUpHeight()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetStepUpHeight()");
+#endif
             if (PartArray == null) return 0;
             return PartArray.GetStepUpHeight();
         }
 
         public void HandleUpdateTarget(TargetInfo targetInfo)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "HandleUpdateTarget(TargetInfo)");
+#endif
             if (targetInfo.ContextID != 0) return;
 
             if (MovementManager != null)
@@ -664,6 +741,9 @@ namespace ACE.Server.Physics
 
         public void Hook_AnimDone()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Hook_AnimDone()");
+#endif
             if (PartArray != null)
                 PartArray.AnimationDone(true);
         }
@@ -673,6 +753,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public void InitDefaults(Setup setup)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "InitDefaults(Setup)");
+#endif
             if (setup._dat.DefaultScript != 0)
                 play_script_internal(setup._dat.DefaultScript);
 
@@ -735,6 +818,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool InitObjectBegin(uint objectIID, bool dynamic)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "InitObjectBegin(uint, bool)");
+#endif
             ID = objectIID;
 
             if (!dynamic)
@@ -753,6 +839,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool InitObjectEnd()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "InitObjectEnd()");
+#endif
             if (PartArray != null)
             {
                 PartArray.SetPlacementFrame(0x65);
@@ -768,6 +857,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool InitPartArrayObject(uint dataDID, bool createParts)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "InitPartArrayObject(uint, bool)");
+#endif
             if (dataDID == 0) return false;     // stru_843D84
             var ethereal = false;
 
@@ -811,12 +903,18 @@ namespace ACE.Server.Physics
         /// </summary>
         public void InitializeMotionTables()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "InitializeMotionTables()");
+#endif
             if (PartArray != null)
                 PartArray.InitializeMotionTables();
         }
 
         public InterpretedMotionState InqInterpretedMotionState()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "InqInterpretedMotionState()");
+#endif
             if (MovementManager == null)
                 return null;
             else
@@ -833,12 +931,18 @@ namespace ACE.Server.Physics
 
         public void InterpolateTo(PhysicsPosition p, bool keepHeading)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "InterpolateTo(PhysicsPosition, bool)");
+#endif
             MakePositionManager();
             PositionManager.InterpolateTo(p, keepHeading);
         }
 
         public bool IsFullyConstrained()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "IsFullyConstrained()");
+#endif
             if (PositionManager == null)
                 return false;
             else
@@ -847,6 +951,9 @@ namespace ACE.Server.Physics
 
         public bool IsInterpolating()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "IsInterpolating()");
+#endif
             if (PositionManager == null)
                 return false;
             else
@@ -855,6 +962,9 @@ namespace ACE.Server.Physics
 
         public bool IsMovingTo()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "IsMovingTo()");
+#endif
             if (MovementManager == null)
                 return false;
             else
@@ -863,6 +973,9 @@ namespace ACE.Server.Physics
 
         public void MakeMovementManager(bool init_motion)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "MakeMovementManager(bool)");
+#endif
             if (MovementManager != null) return;
 
             MovementManager = MovementManager.Create(this, WeenieObj);
@@ -881,6 +994,9 @@ namespace ACE.Server.Physics
 
         public void MakePositionManager()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "MakePositionManager()");
+#endif
             if (PositionManager != null) return;
 
             PositionManager = PositionManager.Create(this);
@@ -896,6 +1012,9 @@ namespace ACE.Server.Physics
 
         public bool MorphToExistingObject(PhysicsObj obj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "MorphToExistingObject(PhysicsObj)");
+#endif
             var result = PartArray != null && obj.PartArray != null ?
                 PartArray.MorphToExistingObject(obj.PartArray) : false;
 
@@ -910,6 +1029,9 @@ namespace ACE.Server.Physics
 
         public void MotionDone(uint motion, bool success)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "MotionDone(uint, bool)");
+#endif
             if (MovementManager != null)
                 MovementManager.MotionDone(motion, success);
         }
@@ -947,6 +1069,9 @@ namespace ACE.Server.Physics
 
         public void MoveToObject(PhysicsObj obj, MovementParameters movementParams)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "MoveToObject(PhysicsObj, MovementParameters)");
+#endif
             if (MovementManager == null)
             {
                 MovementManager = MovementManager.Create(this, WeenieObj);
@@ -969,6 +1094,9 @@ namespace ACE.Server.Physics
 
         public void MoveToObject_Internal(PhysicsObj obj, ulong topLevelID, float objRadius, float objHeight, MovementParameters movementParams)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "MoveToObject_Internal(PhysicsObj, ulong, float, float, MovementParameters)");
+#endif
             if (MovementManager == null)
             {
                 MovementManager = MovementManager.Create(this, WeenieObj);
@@ -994,6 +1122,9 @@ namespace ACE.Server.Physics
 
         public void MoveToPosition(PhysicsPosition pos, MovementParameters movementParams)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "MoveToPosition(PhysicsPosition, MovementParameters)");
+#endif
             var mvs = new MovementStruct();
             mvs.Position = new PhysicsPosition(pos);
             mvs.Type = MovementType.MoveToPosition;
@@ -1003,12 +1134,18 @@ namespace ACE.Server.Physics
 
         public void RemoveLinkAnimations()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "RemoveLinkAnimations()");
+#endif
             if (PartArray != null)
                 PartArray.HandleEnterWorld();
         }
 
         public void RemoveObjectFromSingleCell(ObjCell objCell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "RemoveObjectFromSingleCell(ObjCell)");
+#endif
             if (CurCell != null) leave_cell(true);
             Position.ObjCellID = 0;
             if (PartArray != null && !State.HasFlag(PhysicsState.ParticleEmitter))
@@ -1025,6 +1162,9 @@ namespace ACE.Server.Physics
 
         public void RemovePartFromShadowCells(PhysicsPart part)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "RemovePartFromShadowCells(PhysicsPart)");
+#endif
             if (part == null) return;
 
             if (CurCell != null) part.Pos.ObjCellID = CurCell.ID;
@@ -1074,6 +1214,9 @@ namespace ACE.Server.Physics
 
         public bool SetMotionTableID(uint mtableID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetMotionTableID(uint)");
+#endif
             if (PartArray == null) return false;
             if (!PartArray.SetMotionTableID(mtableID)) return false;
 
@@ -1085,6 +1228,9 @@ namespace ACE.Server.Physics
 
         public void SetNoDraw(bool noDraw)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetNoDraw(bool)");
+#endif
             if (PartArray != null)
                 PartArray.SetNoDrawInternal(noDraw);
         }
@@ -1151,6 +1297,9 @@ namespace ACE.Server.Physics
 
         public bool SetPlacementFrameInternal(int frameID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetPlacementFrameInternal(int)");
+#endif
             bool result = false;
             if (PartArray != null)
             {
@@ -1163,6 +1312,9 @@ namespace ACE.Server.Physics
 
         public SetPositionError SetPosition(SetPosition setPos)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetPosition(SetPosition)");
+#endif
             var transition = Transition.MakeTransition(setPos.Instance);
             if (transition == null)
                 return SetPositionError.GeneralFailure;
@@ -1182,6 +1334,9 @@ namespace ACE.Server.Physics
 
         public bool SetPositionInternal(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetPositionInternal(Transition)");
+#endif
             var prevOnWalkable = (TransientState & TransientStateFlags.OnWalkable) != 0;
             var transitCell = transition.SpherePath.CurCell;
             var prevContact = (TransientState & TransientStateFlags.Contact) != 0;
@@ -1288,6 +1443,9 @@ namespace ACE.Server.Physics
 
         public SetPositionError SetPositionInternal(PhysicsPosition pos, SetPosition setPos, Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetPositionInternal(PhysicsPosition, SetPosition, Transition)");
+#endif
             if (CurCell == null) prepare_to_enter_world();
 
             var newCell = AdjustPosition(pos, transition.SpherePath.LocalSphere[0].Center, setPos.Flags.HasFlag(SetPositionFlags.DontCreateCells), true, transition.Instance);
@@ -1349,6 +1507,9 @@ namespace ACE.Server.Physics
 
         public SetPositionError SetPositionInternal(SetPosition setPos, Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetPositionInternal(SetPosition, Transition)");
+#endif
             var wo = WeenieObj.WorldObject;
 
             if (wo == null)
@@ -1373,6 +1534,9 @@ namespace ACE.Server.Physics
 
         public SetPositionError SetPositionSimple(PhysicsPosition pos, bool sliding, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetPositionSimple(PhysicsPosition, bool, uint)");
+#endif
             var setPos = new SetPosition(instance);
             setPos.Pos = pos;
             setPos.Flags = SetPositionFlags.Teleport | SetPositionFlags.SendPositionEvent;
@@ -1385,6 +1549,9 @@ namespace ACE.Server.Physics
 
         public void SetScale(float scale, double delta = 0.0)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetScale(float, double)");
+#endif
             if (delta < PhysicsGlobals.EPSILON)
             {
                 if (PartArray != null)
@@ -1397,6 +1564,9 @@ namespace ACE.Server.Physics
 
         public void SetScaleStatic(float scale)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetScaleStatic(float)");
+#endif
             Scale = scale;
             if (PartArray != null)
                 PartArray.SetScaleInternal(new Vector3(scale, scale, scale));
@@ -1406,6 +1576,9 @@ namespace ACE.Server.Physics
 
         public SetPositionError SetScatterPositionInternal(SetPosition setPos, Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetScatterPositionInternal(SetPosition, Transition)");
+#endif
             var result = SetPositionError.GeneralFailure;
 
             for (var i = 0; i < setPos.NumTries; i++)
@@ -1530,6 +1703,9 @@ namespace ACE.Server.Physics
 
         public void SetTranslucencyHierarchial(float translucency)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetTranslucencyHierarchial(float)");
+#endif
             Translucency = translucency < TranslucencyOriginal ?
                    translucency : TranslucencyOriginal;
 
@@ -1542,6 +1718,9 @@ namespace ACE.Server.Physics
 
         public void SetTranslucencyInternal(float translucency)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "SetTranslucencyInternal(float)");
+#endif
             Translucency = translucency < TranslucencyOriginal ?
                    translucency : TranslucencyOriginal;
 
@@ -1551,12 +1730,18 @@ namespace ACE.Server.Physics
 
         public bool ShouldDrawParticles(float degradeDistance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ShouldDrawParticles(float)");
+#endif
             if (!ExaminationObject) return true;
             return !(CYpt > degradeDistance || CurCell == null /*|| vftable unknown release */);
         }
 
         public void StopCompletely(bool sendEvent)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "StopCompletely(bool)");
+#endif
             if (MovementManager == null) return;
             var mvs = new MovementStruct(MovementType.StopCompletely);
             MovementManager.PerformMovement(mvs);
@@ -1564,24 +1749,36 @@ namespace ACE.Server.Physics
 
         public void StopCompletely_Internal()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "StopCompletely_Internal()");
+#endif
             if (PartArray != null)
                 PartArray.StopCompletelyInternal();
         }
 
         public void StopInterpolating()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "StopInterpolating()");
+#endif
             if (PositionManager != null)
                 PositionManager.StopInterpolating();
         }
 
         public WeenieError StopInterpretedMotion(uint motion, MovementParameters movementParams)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "StopInterpretedMotion(uint, MovementParameters)");
+#endif
             if (PartArray == null) return WeenieError.GeneralMovementFailure;
             return PartArray.StopInterpretedMotion(motion, movementParams);
         }
 
         public WeenieError StopMotion(uint motion, MovementParameters movementParams, bool sendEvent)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "StopMotion(uint, MovementParameters, bool)");
+#endif
             LastMoveWasAutonomous = true;
             if (MovementManager == null) return WeenieError.NoAnimationTable;
             var mvs = new MovementStruct(MovementType.StopRawCommand);
@@ -1612,6 +1809,9 @@ namespace ACE.Server.Physics
 
         public bool TurnToObject(PhysicsObj obj, MovementParameters movementParams)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "TurnToObject(PhysicsObj, MovementParameters)");
+#endif
             if (obj == null) return false;
 
             var parent = obj.Parent != null ? obj.Parent : obj;
@@ -1623,6 +1823,9 @@ namespace ACE.Server.Physics
 
         public void TurnToObject_Internal(ulong objectID, ulong topLevelID, MovementParameters movementParams)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "TurnToObject_Internal(ulong, ulong, MovementParameters)");
+#endif
             if (MovementManager == null)
             {
                 // refactor into common method
@@ -1645,6 +1848,9 @@ namespace ACE.Server.Physics
 
         public void UpdateChild(PhysicsObj childObj, int partIdx, AFrame childFrame)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "UpdateChild(PhysicsObject, int, AFrame)");
+#endif
             var frame = partIdx >= PartArray.NumParts ?
                 AFrame.Combine(Position.Frame, childFrame) : AFrame.Combine(PartArray.Parts[partIdx].Pos.Frame, childFrame);
 
@@ -1656,6 +1862,9 @@ namespace ACE.Server.Physics
 
         public void UpdateChildrenInternal()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "UpdateChildrenInternal()");
+#endif
             if (PartArray == null || Children == null || Children.NumObjects == 0) return;
 
             for (var i = 0; i < Children.Objects.Count; i++)
@@ -1666,6 +1875,9 @@ namespace ACE.Server.Physics
 
         public void UpdateObjectInternal(double quantum, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "UpdateObjectInternal(double, uint)");
+#endif
             if ((TransientState & TransientStateFlags.Active) == 0 || CurCell == null)
                 return;
 
@@ -1751,6 +1963,9 @@ namespace ACE.Server.Physics
 
         public static int GetBlockDist(PhysicsPosition a, PhysicsPosition b)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetBlockDist(PhysicsPosition, PhysicsPosition)");
+#endif
             // protection, figure out FastTeleport state
             if (a == null || b == null)
                 return 0;
@@ -1760,6 +1975,9 @@ namespace ACE.Server.Physics
 
         public static int GetBlockDist(uint a, uint b)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetBlockDist(uint, uint)");
+#endif
             var lbx_a = a >> 24;
             var lby_a = (a >> 16) & 0xFF;
 
@@ -1777,6 +1995,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool UpdateObjectInternalServer(double quantum, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "UpdateObjectInternalServer(double, uint)");
+#endif
             //var offsetFrame = new AFrame();
             //UpdatePhysicsInternal((float)quantum, ref offsetFrame);
             if (GetBlockDist(Position, RequestPos) > 1)
@@ -1815,6 +2036,9 @@ namespace ACE.Server.Physics
 
         public void UpdateAnimationInternal(double quantum)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "UpdateAnimationInternal(double)");
+#endif
             if (!TransientState.HasFlag(TransientStateFlags.Active))
                 return;
 
@@ -1835,6 +2059,9 @@ namespace ACE.Server.Physics
 
         public void UpdatePartsInternal()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "UpdatePartsInternal()");
+#endif
             if (PartArray == null || State.HasFlag(PhysicsState.ParticleEmitter))
                 return;
 
@@ -1843,6 +2070,9 @@ namespace ACE.Server.Physics
 
         public void UpdatePhysicsInternal(float quantum, ref AFrame frameOffset)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "UpdatePhysicsInternal(float, AFrame)");
+#endif
             var velocity_mag2 = Velocity.LengthSquared();
 
             if (velocity_mag2 <= 0.0f)
@@ -1873,6 +2103,9 @@ namespace ACE.Server.Physics
 
         public void UpdatePositionInternal(double quantum, ref AFrame newFrame)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "UpdatePositionInternal(double, AFrame)");
+#endif
             var offsetFrame = new AFrame();
 
             if (!State.HasFlag(PhysicsState.Hidden))
@@ -1903,6 +2136,9 @@ namespace ACE.Server.Physics
 
         public void UpdateViewerDistance()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "UpdateViewerDistance()");
+#endif
             var min_2D_degrade_dist_sq = State.HasFlag(PhysicsState.ParticleEmitter) ?
                 Render.ParticleDistance2DSquared : Render.ObjectDistance2DSquared;
 
@@ -1918,6 +2154,9 @@ namespace ACE.Server.Physics
 
         public void UpdateViewerDistanceRecursive()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "UpdateViewerDistanceRecursive()");
+#endif
             UpdateViewerDistance();
 
             if (Children == null || Children.NumObjects == 0) return;
@@ -1928,11 +2167,17 @@ namespace ACE.Server.Physics
 
         public void add_anim_hook(DatLoader.Entity.AnimationHook hook)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "add_anim_hook(DatLoader.Entity.AnimationHook)");
+#endif
             AnimHooks.Add(hook);
         }
 
         public bool add_child(PhysicsObj obj, int where)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "add_child(PhysicsObj, int)");
+#endif
             if (PartArray == null || obj.Equals(this)) return false;
 
             var setup = PartArray.Setup.GetHoldingLocation(where);
@@ -1945,6 +2190,9 @@ namespace ACE.Server.Physics
 
         public bool add_child(PhysicsObj obj, int partIdx, AFrame frame)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "add_child(PhysicsObj, int, AFrame)");
+#endif
             if (obj.Equals(this)) return false;
 
             if (PartArray == null || partIdx != -1 && partIdx >= PartArray.NumParts)
@@ -1957,6 +2205,9 @@ namespace ACE.Server.Physics
 
         public void add_obj_to_cell(ObjCell newCell, AFrame newFrame)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "add_obj_to_cell(ObjCell, AFrame)");
+#endif
             enter_cell(newCell);
 
             Position.Frame = newFrame;
@@ -1969,6 +2220,9 @@ namespace ACE.Server.Physics
 
         public void add_particle_shadow_to_cell()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "add_particle_shadow_to_cell()");
+#endif
             NumShadowObjects = 1;
 
             var shadowObj = new ShadowObj(this, CurCell);
@@ -1980,6 +2234,9 @@ namespace ACE.Server.Physics
 
         public void add_shadows_to_cell(CellArray cellArray)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "add_shadows_to_cell(CellArray)");
+#endif
             if (State.HasFlag(PhysicsState.ParticleEmitter))
                 add_particle_shadow_to_cell();
             else
@@ -2024,6 +2281,9 @@ namespace ACE.Server.Physics
 
         public void add_voyeur(ulong objectID, float radius, double quantum)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "add_voyeur(ulong, float, double)");
+#endif
             if (TargetManager == null) TargetManager = new TargetManager(this);
             TargetManager.AddVoyeur(objectID, radius, quantum);
         }
@@ -2060,6 +2320,9 @@ namespace ACE.Server.Physics
 
         public void attack(AttackCone attackCone)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "attack(AttackCone)");
+#endif
             if (CurCell.ID == 0) return;
             if (AttackManager == null) AttackManager = new AttackManager();
 
@@ -2084,6 +2347,9 @@ namespace ACE.Server.Physics
 
         public void calc_acceleration()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "calc_acceleration()");
+#endif
             if (TransientState.HasFlag(TransientStateFlags.Contact) && TransientState.HasFlag(TransientStateFlags.OnWalkable))
                 Omega = Acceleration = Vector3.Zero;
             else
@@ -2097,6 +2363,9 @@ namespace ACE.Server.Physics
 
         public void calc_cross_cells(uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "calc_cross_cells()");
+#endif
             CellArray.SetDynamic();
 
             if (State.HasFlag(PhysicsState.HasPhysicsBSP))
@@ -2118,6 +2387,9 @@ namespace ACE.Server.Physics
 
         public void calc_cross_cells_static()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "calc_cross_cells_static()");
+#endif
             CellArray.SetStatic();
 
             if (PartArray != null && PartArray.GetNumCylsphere() != 0 && !State.HasFlag(PhysicsState.HasPhysicsBSP))
@@ -2131,6 +2403,9 @@ namespace ACE.Server.Physics
 
         public void calc_friction(double quantum, float velocity_mag2)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "calc_friction(double, float)");
+#endif
             if (!TransientState.HasFlag(TransientStateFlags.OnWalkable)) return;
 
             var angle = Vector3.Dot(Velocity, ContactPlane.Normal);
@@ -2154,12 +2429,18 @@ namespace ACE.Server.Physics
 
         public void cancel_moveto()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "cancel_moveto()");
+#endif
             if (MovementManager != null)
                 MovementManager.CancelMoveTo(WeenieError.ActionCancelled);
         }
 
         public void change_cell(ObjCell newCell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "change_cell(ObjCell)");
+#endif
             if (PhysicsEngine.Instance.Server)
             {
                 change_cell_server(newCell);
@@ -2181,6 +2462,9 @@ namespace ACE.Server.Physics
 
         public void change_cell_server(ObjCell newCell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "change_cell_server(ObjCell)");
+#endif
             if (CurCell != null) leave_cell(true);
             if (newCell == null)
             {
@@ -2196,6 +2480,9 @@ namespace ACE.Server.Physics
 
         public Quadrant check_attack(PhysicsPosition attackerPos, float attackerScale, AttackCone attackCone, float attackerAttackRadius)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "check_attack(PhysicsPosition, float, AttackCone, float)");
+#endif
             if (Parent != null || State.HasFlag(PhysicsState.IgnoreCollisions) || State.HasFlag(PhysicsState.ReportCollisionsAsEnvironment))
                 return 0;
 
@@ -2210,6 +2497,9 @@ namespace ACE.Server.Physics
 
         public bool check_collision(PhysicsObj obj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "check_collision(PhysicsObj)");
+#endif
             if (State.HasFlag(PhysicsState.Static))
                 return false;
 
@@ -2228,6 +2518,9 @@ namespace ACE.Server.Physics
 
         public bool check_contact(bool contact)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "check_contact(bool)");
+#endif
             if (TransientState.HasFlag(TransientStateFlags.Contact) && Vector3.Dot(Velocity, ContactPlane.Normal) > PhysicsGlobals.EPSILON)
                 return false;
             else
@@ -2242,11 +2535,17 @@ namespace ACE.Server.Physics
 
         public void clear_target()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "clear_target()");
+#endif
             if (TargetManager != null) TargetManager.ClearTarget();
         }
 
         public void clear_transient_states()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "clear_transient_states()");
+#endif
             TransientState &= ~TransientStateFlags.Contact;
             calc_acceleration();
             var walkable = TransientState.HasFlag(TransientStateFlags.OnWalkable);
@@ -2291,6 +2590,9 @@ namespace ACE.Server.Physics
 
         public void enqueue_objs(IEnumerable<PhysicsObj> newlyVisible)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "enqueue_objs(IEnumerable<PhysicsObj>)");
+#endif
             if (!IsPlayer || !(WeenieObj.WorldObject is Player player))
                 return;
 
@@ -2334,6 +2636,9 @@ namespace ACE.Server.Physics
 
         public void enqueue_obj(PhysicsObj newlyVisible)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "enqueue_objs(PhysicsObj)");
+#endif
             if (!IsPlayer || !(WeenieObj.WorldObject is Player player))
                 return;
 
@@ -2365,6 +2670,9 @@ namespace ACE.Server.Physics
 
         public void enter_cell(ObjCell newCell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "enter_cell(ObjCell)");
+#endif
             if (PartArray == null) return;
             newCell.AddObject(this);
             foreach (var child in Children.Objects)
@@ -2385,6 +2693,9 @@ namespace ACE.Server.Physics
 
         public void enter_cell_server(ObjCell newCell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "enter_cell_server(ObjCell)");
+#endif
             //Console.WriteLine($"{Name}.enter_cell_server({newCell.ID:X8})");
 
             enter_cell(newCell);
@@ -2419,6 +2730,9 @@ namespace ACE.Server.Physics
 
         public bool enter_world(PhysicsPosition pos, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "enter_world(PhysicsPosition, uint)");
+#endif
             entering_world = true;
 
             store_position(pos);
@@ -2431,6 +2745,9 @@ namespace ACE.Server.Physics
 
         public bool enter_world(bool slide, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "enter_world(bool, uint)");
+#endif
             if (Parent != null) return false;
 
             UpdateTime = PhysicsTimer.CurrentTime;
@@ -2460,6 +2777,9 @@ namespace ACE.Server.Physics
 
         public bool ethereal_check_for_collisions()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ethereal_check_for_collisions()");
+#endif
             foreach (var shadowObj in ShadowObjects.Values)
             {
                 if (shadowObj.Cell != null && shadowObj.Cell.check_collisions(this))
@@ -2470,6 +2790,9 @@ namespace ACE.Server.Physics
 
         public void exit_world()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "exit_world()");
+#endif
             if (PartArray != null)
                 PartArray.HandleExitWorld();
             if (MovementManager != null)
@@ -2489,6 +2812,9 @@ namespace ACE.Server.Physics
 
         public void find_bbox_cell_list(CellArray cellArray)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "find_bbox_cell_list(CellArray)");
+#endif
             if (PartArray == null || CurCell == null) return;
             cellArray.NumCells = 0;
             cellArray.AddedOutside = false;
@@ -2515,6 +2841,9 @@ namespace ACE.Server.Physics
 
         public double get_distance_to_object(PhysicsObj obj, bool use_cyls)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_distance_to_object(PhysicsObj, bool)");
+#endif
             if (!use_cyls)
                 return Position.Distance(obj.Position);
 
@@ -2530,6 +2859,9 @@ namespace ACE.Server.Physics
         // custom, based on above
         public double get_distance_sq_to_object(PhysicsObj obj, bool use_cyls)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_distance_sq_to_object(PhysicsObj, bool)");
+#endif
             if (!use_cyls)
                 return Position.DistanceSquared(obj.Position);
 
@@ -2549,6 +2881,9 @@ namespace ACE.Server.Physics
 
         public float get_heading()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_heading()");
+#endif
             return Position.Frame.get_heading();
         }
 
@@ -2569,6 +2904,9 @@ namespace ACE.Server.Physics
 
         public MotionInterp get_minterp()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_minterp()");
+#endif
             if (MovementManager == null)
             {
                 MovementManager = MovementManager.Create(this, WeenieObj);
@@ -2597,6 +2935,9 @@ namespace ACE.Server.Physics
 
         public ObjectInfo get_object_info(Transition transition, bool adminMove)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_object_info(Transition, bool)");
+#endif
             var objInfo = new ObjectInfo();
             if (State.HasFlag(PhysicsState.EdgeSlide))
                 objInfo.State |= ObjectInfoState.EdgeSlide;
@@ -2635,6 +2976,9 @@ namespace ACE.Server.Physics
 
         public PositionManager get_position_manager()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_position_manager()");
+#endif
             MakePositionManager();
 
             return PositionManager;
@@ -2642,6 +2986,9 @@ namespace ACE.Server.Physics
 
         public ulong get_sticky_object()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_sticky_object()");
+#endif
             if (PositionManager == null) return 0;
 
             return PositionManager.GetStickyObjectID();
@@ -2649,6 +2996,9 @@ namespace ACE.Server.Physics
 
         public double get_target_quantum()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_target_quantum()");
+#endif
             if (TargetManager == null || TargetManager.TargetInfo == null)
                 return 0.0f;
 
@@ -2657,16 +3007,25 @@ namespace ACE.Server.Physics
 
         public Vector3 get_velocity()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_velocity()");
+#endif
             return CachedVelocity;
         }
 
         public float get_walkable_z()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_walkable_z()");
+#endif
             return PhysicsGlobals.FloorZ;
         }
 
         public bool handle_all_collisions(CollisionInfo collisions, bool prev_has_contact, bool prev_on_walkable)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "handle_all_collisions(CollisionInfo, bool, bool)");
+#endif
             var apply_bounce = true;
             if (prev_on_walkable && TransientState.HasFlag(TransientStateFlags.OnWalkable) && !State.HasFlag(PhysicsState.Sledding))
                 apply_bounce = false;
@@ -2738,6 +3097,9 @@ namespace ACE.Server.Physics
         /// <returns>The list of newly visible objects since last call</returns>
         public List<PhysicsObj> handle_visible_cells()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "handle_visible_cells()");
+#endif
             //return new List<PhysicsObj>();
 
             //Console.WriteLine($"handle_visible_cells({CurCell.ID:X8}) for {Name}");
@@ -2785,6 +3147,9 @@ namespace ACE.Server.Physics
 
         public void handle_visible_cells_non_player()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "handle_visible_cells_non_player()");
+#endif
             if (WeenieObj.IsMonster)
             {
                 // players and combat pets
@@ -2812,6 +3177,9 @@ namespace ACE.Server.Physics
 
         public bool handle_visible_obj(PhysicsObj obj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "handle_visible_obj(PhysicsObj)");
+#endif
             if (CurCell == null || obj.CurCell == null)
             {
                 if (CurCell == null)
@@ -2851,6 +3219,9 @@ namespace ACE.Server.Physics
 
         public bool is_completely_visible()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "is_completely_visible()");
+#endif
             if (CurCell == null || NumShadowObjects == 0)
                 return false;
 
@@ -2872,11 +3243,17 @@ namespace ACE.Server.Physics
 
         public static bool is_valid_walkable(Vector3 normal)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "is_valid_walkable(Vector3)");
+#endif
             return normal.Z >= PhysicsGlobals.FloorZ;
         }
 
         public void leave_cell(bool is_changing_cell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "leave_cell(bool)");
+#endif
             if (CurCell == null) return;
             CurCell.RemoveObject(this);
             foreach (var child in Children.Objects)
@@ -2902,6 +3279,9 @@ namespace ACE.Server.Physics
 
         public void leave_world()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "leave_world()");
+#endif
             report_collision_end(true);
             if (ObjMaint != null)
             {
@@ -2927,6 +3307,9 @@ namespace ACE.Server.Physics
 
         public bool makeAnimObject(uint setupID, bool createParts)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "makeAnimObject(uint, bool)");
+#endif
             PartArray = PartArray.CreateSetup(this, setupID, createParts);
             return PartArray != null;
         }
@@ -2961,6 +3344,9 @@ namespace ACE.Server.Physics
 
         public static PhysicsObj makeObject(uint dataDID, uint objectIID, bool dynamic, bool sightObj = false)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "makeObject(uint, uint, bool, bool)");
+#endif
             var obj = new PhysicsObj();
             obj.InitObjectBegin(objectIID, dynamic);
             obj.InitPartArrayObject(dataDID, true);
@@ -2974,6 +3360,9 @@ namespace ACE.Server.Physics
 
         public static PhysicsObj makeParticleObject(int numParts, Sphere sortingSphere)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "makeParticleObject(int, Sphere)");
+#endif
             var particle = new PhysicsObj();
             particle.State = PhysicsState.Static | PhysicsState.ReportCollisions;
             particle.PartArray = PartArray.CreateParticle(particle, numParts, sortingSphere);
@@ -2982,11 +3371,17 @@ namespace ACE.Server.Physics
 
         public bool movement_is_autonomous()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "movement_is_autonomous()");
+#endif
             return LastMoveWasAutonomous;
         }
 
         public bool newer_event(int stamp, int newTime)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "newer_event(int, int)");
+#endif
             var updateTime = UpdateTimes[stamp];
 
             if (Math.Abs(newTime - updateTime) > Int16.MaxValue)
@@ -2997,6 +3392,9 @@ namespace ACE.Server.Physics
 
         public bool obj_within_block()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "obj_within_block()");
+#endif
             var sortingSphere = PartArray != null ? PartArray.GetSortingSphere() : PhysicsGlobals.DummySphere;
             var globCenter = Position.Frame.LocalToGlobal(sortingSphere.Center);
 
@@ -3091,6 +3489,9 @@ namespace ACE.Server.Physics
 
         public bool play_script_internal(uint scriptID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "play_script_internal()");
+#endif
             if (scriptID == 0) return false;
             if (ScriptManager == null) ScriptManager = new ScriptManager(this);
 
@@ -3106,6 +3507,9 @@ namespace ACE.Server.Physics
 
         public void prepare_to_enter_world()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "prepare_to_enter_world()");
+#endif
             UpdateTime = PhysicsTimer.CurrentTime;
 
             //ObjMaint.RemoveFromLostCell(this);
@@ -3125,6 +3529,9 @@ namespace ACE.Server.Physics
 
         public bool prepare_to_leave_visibility()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "prepare_to_leave_visibility()");
+#endif
             remove_shadows_from_cells();
             //ObjMaint.RemoveFromLostCell(this);
             leave_cell(false);
@@ -3139,6 +3546,9 @@ namespace ACE.Server.Physics
 
         public void process_fp_hook(PhysicsHookType type, float curr_value, Object userData)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "process_fp_hook(PhysicsHookType, float, Object)");
+#endif
             switch (type)
             {
                 case PhysicsHookType.Scale:
@@ -3170,6 +3580,9 @@ namespace ACE.Server.Physics
 
         public void process_hooks()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "process_hooks()");
+#endif
             for (var i = 0; i < Hooks.Count; i++)
             {
                 var hook = Hooks[i];
@@ -3194,6 +3607,9 @@ namespace ACE.Server.Physics
 
         public void recalc_cross_cells()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "recalc_cross_cells()");
+#endif
             if (PartArray == null) return;
             if (Position.ObjCellID != 0)
                 calc_cross_cells(CurLandblock?.Instance ?? 0);
@@ -3208,6 +3624,9 @@ namespace ACE.Server.Physics
 
         public void receive_detection_update(DetectionInfo info)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "receive_detection_update(DetectionInfo)");
+#endif
             if (DetectionManager == null) return;
             DetectionManager.ReceiveDetectionUpdate(info);
 
@@ -3220,6 +3639,9 @@ namespace ACE.Server.Physics
 
         public void receive_target_update(TargetInfo info)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "receive_target_update(TargetInfo)");
+#endif
             if (TargetManager != null)
                 TargetManager.ReceiveUpdate(info);
         }
@@ -3233,12 +3655,18 @@ namespace ACE.Server.Physics
 
         public void remove_parts(ObjCell objCell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "remove_parts(ObjCell)");
+#endif
             if (PartArray != null)
                 PartArray.RemoveParts(objCell);
         }
 
         public void remove_shadows_from_cells()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "remove_shadows_from_cells()");
+#endif
             foreach (var shadowObj in ShadowObjects.Values)
             {
                 if (shadowObj.Cell == null) continue;
@@ -3267,12 +3695,18 @@ namespace ACE.Server.Physics
 
         public bool remove_voyeur(ulong objectID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "remove_voyeur(ulong)");
+#endif
             if (TargetManager == null) return false;
             return TargetManager.RemoveVoyeur(objectID);
         }
 
         public void report_attacks(AttackInfo attackInfo)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "report_attacks(AttackInfo)");
+#endif
             // wobj virtual function call
             for (var i = 0; i < attackInfo.NumObjects; i++)
             {
@@ -3291,6 +3725,9 @@ namespace ACE.Server.Physics
 
         public void report_collision_end(bool forceEnd)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "report_collision_end(bool)");
+#endif
             if (CollisionTable == null) return;
 
             var ends = new List<ulong>();
@@ -3315,6 +3752,9 @@ namespace ACE.Server.Physics
 
         public void report_collision_start()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "report_collision_start()");
+#endif
             if (CollisionTable == null || ObjMaint == null) return;
 
             foreach (var objectID in CollisionTable.Keys)
@@ -3327,6 +3767,9 @@ namespace ACE.Server.Physics
 
         public bool report_environment_collision(bool prev_has_contact)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "report_environment_collision(bool)");
+#endif
             if (CollidingWithEnvironment) return false;
 
             var result = false;
@@ -3345,11 +3788,17 @@ namespace ACE.Server.Physics
 
         public void report_exhaustion()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "report_exhaustion()");
+#endif
             if (MovementManager != null) MovementManager.ReportExhaustion();
         }
 
         public bool report_object_collision(PhysicsObj obj, bool prev_has_contact)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "report_object_collision(PhysicsObj, bool)");
+#endif
             if (obj.State.HasFlag(PhysicsState.ReportCollisionsAsEnvironment))
                 return report_environment_collision(prev_has_contact);
 
@@ -3391,6 +3840,9 @@ namespace ACE.Server.Physics
 
         public bool report_object_collision_end(ulong objectID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "report_object_collision_end(ulong)");
+#endif
             if (ObjMaint != null)
             {
                 var collision = ServerObjectManager.GetObjectA(objectID);
@@ -3415,6 +3867,9 @@ namespace ACE.Server.Physics
 
         public ObjCollisionProfile build_collision_profile(PhysicsObj obj, bool amIInContact, Vector3 velocityCollide)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "build_collision_profile(PhysicsObj, bool, Vector3)");
+#endif
             if (State.HasFlag(PhysicsState.Missile))
             {
                 return new AtkCollisionProfile(obj.ID, -1, obj.Position.DetermineQuadrant(obj.GetHeight(), Position));
@@ -3427,6 +3882,9 @@ namespace ACE.Server.Physics
 
         public ObjCollisionProfile build_collision_profile(PhysicsObj obj, Vector3 velocity, bool amIInContact, bool objIsMissile, bool objHasContact)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "build_collision_profile(PhysicsObj, Vector3, bool, bool, bool)");
+#endif
             if (WeenieObj == null)
                 return null;
 
@@ -3439,6 +3897,9 @@ namespace ACE.Server.Physics
 
         public void rotate(Vector3 offset)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "rotate(Vector3)");
+#endif
             var offsetFrame = new AFrame();
             offsetFrame.Orientation = AFrame.get_rotate_offset(offset);
             //set_frame(newFrame);
@@ -3451,6 +3912,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool set_active(bool active)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_active(bool)");
+#endif
             if (active)
             {
                 if (State.HasFlag(PhysicsState.Static))
@@ -3471,11 +3935,17 @@ namespace ACE.Server.Physics
 
         public bool is_active()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "is_active()");
+#endif
             return (TransientState & TransientStateFlags.Active) != 0;
         }
 
         public void set_current_pos(PhysicsPosition newPos, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_current_pos(newPos, uint)");
+#endif
             Position.ObjCellID = newPos.ObjCellID;
             Position.Frame = new AFrame(newPos.Frame);
 
@@ -3503,6 +3973,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public void set_cell_id(uint newCellID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_cell_id(uint)");
+#endif
             Position.ObjCellID = newCellID;
             if (!State.HasFlag(PhysicsState.ParticleEmitter) && PartArray != null)
                 PartArray.SetCellID(newCellID);
@@ -3513,6 +3986,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public void set_cell_id_recursive(uint newCellID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_cell_id_recursive(uint)");
+#endif
             set_cell_id(newCellID);
             for (var i = 0; i < Children.Objects.Count; i++)
             {
@@ -3597,6 +4073,9 @@ namespace ACE.Server.Physics
         /// <returns>boolean success</returns>
         public bool set_elasticity(float elasticity)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_elasticity(float)");
+#endif
             if (elasticity < 0.0f)
             {
                 Elasticity = 0.0f;
@@ -3616,6 +4095,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool set_ethereal(bool ethereal, bool sendEvent)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_ethereal(bool, bool)");
+#endif
             if (ethereal)
             {
                 State |= PhysicsState.Ethereal;
@@ -3643,6 +4125,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public void set_frame(AFrame frame)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_frame(AFrame)");
+#endif
             if (!frame.IsValid() && frame.IsValidExceptForHeading())
                 frame.Orientation = new Quaternion(0, 0, 0, 0);
 
@@ -3666,6 +4151,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public void set_heading(float degrees, bool sendEvent)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_heading(float, bool)");
+#endif
             Position.Frame.set_heading(degrees);
             set_frame(Position.Frame);
         }
@@ -3675,6 +4163,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public void set_hidden(bool hidden, bool sendEvent)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_hidden(bool, bool)");
+#endif
             if (hidden)
             {
                 State |= PhysicsState.Hidden;
@@ -3751,6 +4242,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public void set_initial_frame(AFrame frame)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_initial_frame(AFrame)");
+#endif
             Position.Frame = frame;
 
             if (PartArray != null && !State.HasFlag(PhysicsState.ParticleEmitter))
@@ -3769,18 +4263,27 @@ namespace ACE.Server.Physics
         /// </summary>
         public void set_local_velocity(Vector3 newVel, bool sendEvent)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_local_velocity(Vector3, bool)");
+#endif
             var globalVec = Position.LocalToGlobalVec(newVel);
             set_velocity(globalVec, sendEvent);
         }
 
         public bool set_nodraw(bool nodraw, bool sendEvent)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_nodraw(bool, bool)");
+#endif
             // needed for server physics?
             return true;
         }
 
         public void set_object_guid(ObjectGuid guid)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_object_guid(ObjectGuid)");
+#endif
             ObjID = guid;
             ID = guid.Full;
 
@@ -3802,6 +4305,9 @@ namespace ACE.Server.Physics
         /// <param name="isOnWalkable">Flag indicates if this object is currently standing on the ground</param>
         public void set_on_walkable(bool isOnWalkable)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_on_walkable(bool)");
+#endif
             var prevOnWalkable = TransientState.HasFlag(TransientStateFlags.OnWalkable);
 
             if (isOnWalkable)
@@ -3871,6 +4377,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool set_parent(PhysicsObj obj, int partIdx, AFrame frame)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_parent(PhysicsObj, int, AFrame)");
+#endif
             if (obj == null) return false;
             if (!obj.add_child(this, partIdx, frame)) return false;
 
@@ -3899,6 +4408,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public void set_request_pos(Vector3 pos, Quaternion rotation, ObjCell cell, uint blockCellID, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_request_pos(Vector3, Quaternion, ObjCell, uint, uint)");
+#endif
             RequestPos.Frame.Origin = pos;
             RequestPos.Frame.Orientation = rotation;
 
@@ -3931,6 +4443,9 @@ namespace ACE.Server.Physics
 
         public bool set_state(PhysicsState newState, bool sendEvent)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_state(PhysicsState, bool)");
+#endif
             var stateDiff = State ^ newState;
 
             // lighting stuff needed for server?
@@ -3960,6 +4475,9 @@ namespace ACE.Server.Physics
 
         public void set_target(uint contextID, ulong objectID, float radius, double quantum)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_target(uint, ulong, float, double)");
+#endif
             if (TargetManager == null)
                 TargetManager = new TargetManager(this);
 
@@ -3968,6 +4486,9 @@ namespace ACE.Server.Physics
 
         public void set_target_quantum(double new_quantum)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_target_quantum(double)");
+#endif
             if (TargetManager != null)
                 TargetManager.SetTargetQuantum(new_quantum);
         }
@@ -3979,6 +4500,9 @@ namespace ACE.Server.Physics
         /// <param name="sendEvent">Flag indicates if this event should send a network broadcast</param>
         public void set_velocity(Vector3 velocity, bool sendEvent)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_velocity(Vector3)");
+#endif
             if (!velocity.Equals(Velocity))
             {
                 Velocity = velocity;
@@ -4005,6 +4529,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public void set_weenie_obj(WeenieObject wobj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "set_weenie_obj(WeenieObject)");
+#endif
             WeenieObj = wobj;
             if (MovementManager != null)
                 MovementManager.SetWeenieObject(wobj);
@@ -4012,6 +4539,9 @@ namespace ACE.Server.Physics
 
         public void stick_to_object(ulong objectID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "stick_to_object(ulong)");
+#endif
             MakePositionManager();
             if (ObjMaint == null) return;
 
@@ -4034,6 +4564,9 @@ namespace ACE.Server.Physics
 
         public void store_position(PhysicsPosition pos)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "store_position(PhysicsPosition)");
+#endif
             // position ref?
             if ((pos.ObjCellID & 0xFFFF) < 0x100)
                 LandDefs.AdjustToOutside(pos);
@@ -4047,6 +4580,9 @@ namespace ACE.Server.Physics
 
         public void teleport_hook(bool hide)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "teleport_hook(bool)");
+#endif
             if (MovementManager != null)
                 MovementManager.CancelMoveTo(WeenieError.ITeleported);
 
@@ -4066,6 +4602,9 @@ namespace ACE.Server.Physics
 
         public bool track_object_collision(PhysicsObj obj, bool prev_has_contact)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "track_object_collision(PhysicsObj, bool)");
+#endif
             if (obj.State.HasFlag(PhysicsState.Static))
                 return report_environment_collision(prev_has_contact);
 
@@ -4079,6 +4618,9 @@ namespace ACE.Server.Physics
 
         public Transition transition(PhysicsPosition oldPos, PhysicsPosition newPos, bool adminMove)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "transition(PhysicsPosition, PhysicsPosition, bool)");
+#endif
             var trans = Transition.MakeTransition(CurLandblock.Instance);
             if (trans == null) return null;
 
@@ -4113,6 +4655,9 @@ namespace ACE.Server.Physics
 
         public void unpack_movement(Object addr, uint size)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "unpack_movement(Object, uint)");
+#endif
             if (MovementManager == null)
             {
                 MovementManager = MovementManager.Create(this, WeenieObj);
@@ -4131,6 +4676,9 @@ namespace ACE.Server.Physics
 
         public void unset_parent()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "unset_parent()");
+#endif
             if (Parent == null) return;
             if (Parent.Children != null)
                 Parent.Children.RemoveChild(this);
@@ -4147,6 +4695,9 @@ namespace ACE.Server.Physics
 
         public void unstick_from_object()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "unstick_from_object()");
+#endif
             if (PositionManager != null)
                 PositionManager.Unstick();
         }
@@ -4155,6 +4706,9 @@ namespace ACE.Server.Physics
 
         public bool update_object(uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "update_object(uint)");
+#endif
             if (Parent != null || CurCell == null || State.HasFlag(PhysicsState.Frozen))
             {
                 TransientState &= ~TransientStateFlags.Active;
@@ -4245,6 +4799,9 @@ namespace ACE.Server.Physics
 
         public void StartTimer(double delta = 0)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "StartTimer(double)");
+#endif
             UpdateTime = PhysicsTimer.CurrentTime - delta;
         }
 
@@ -4265,6 +4822,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool update_object_server(uint instance, bool forcePos = true)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "update_object_server(uint, bool)");
+#endif
             var deltaTime = PhysicsTimer.CurrentTime - UpdateTime;
 
             var wo = WeenieObj.WorldObject;
@@ -4307,6 +4867,9 @@ namespace ACE.Server.Physics
         /// </summary>
         public bool update_object_server_new(uint instance, bool forcePos = true)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "update_object_server_new(uint, bool)");
+#endif
             if (Parent != null || CurCell == null || State.HasFlag(PhysicsState.Frozen))
             {
                 TransientState &= ~TransientStateFlags.Active;
@@ -4422,17 +4985,26 @@ namespace ACE.Server.Physics
 
         public bool Equals(PhysicsObj obj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Equals(PhysicsObj)");
+#endif
             if (obj == null) return false;
             return ID == obj.ID;
         }
 
         public override int GetHashCode()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetHashCode()");
+#endif
             return ID.GetHashCode();
         }
 
         public override string ToString()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ToString()");
+#endif
             return $"{Name} ({ID:X8})";
         }
     }

@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Threading;
 
 using ACE.Entity.Enum;
+using ACE.Server.PerfStats;
 using ACE.Server.Physics.Animation;
 using ACE.Server.Physics.Combat;
 using ACE.Server.Physics.Managers;
@@ -16,6 +17,9 @@ namespace ACE.Server.Physics.Common
     public class ObjCell: PartCell, IEquatable<ObjCell>
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+#if METHODSTATISTICS
+        public static readonly System.Type ThisType = typeof(ObjCell);
+#endif
 
         public uint ID;
         public LandDefs.WaterType WaterType;
@@ -55,17 +59,26 @@ namespace ACE.Server.Physics.Common
 
         public ObjCell(): base()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor()");
+#endif
             Init();
         }
 
         public ObjCell(uint cellID): base()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "ctor(uint)");
+#endif
             ID = cellID;
             Init();
         }
 
         public void AddObject(PhysicsObj obj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AddObject(PhysicsObj)");
+#endif
             readerWriterLockSlim.EnterWriteLock();
             try
             {
@@ -95,6 +108,9 @@ namespace ACE.Server.Physics.Common
 
         public void AddShadowObject(ShadowObj shadowObj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AddShadowObject(ShadowObj)");
+#endif
             readerWriterLockSlim.EnterWriteLock();
             try
             {
@@ -110,6 +126,9 @@ namespace ACE.Server.Physics.Common
 
         public void CheckAttack(ulong attackerID, PhysicsPosition attackerPos, float attackerScale, AttackCone attackCone, AttackInfo attackInfo)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "CheckAttack(ulong, PhysicsPosition, float, AttackCone, AttackInfo)");
+#endif
             readerWriterLockSlim.EnterReadLock();
             try
             {
@@ -131,6 +150,9 @@ namespace ACE.Server.Physics.Common
 
         public bool Equals(ObjCell objCell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Equals(ObjCell)");
+#endif
             if (objCell == null)
                 return false;
 
@@ -139,6 +161,9 @@ namespace ACE.Server.Physics.Common
 
         public virtual TransitionState FindCollisions(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "FindCollisions(Transition)");
+#endif
             return TransitionState.Invalid;
         }
 
@@ -149,6 +174,9 @@ namespace ACE.Server.Physics.Common
 
         public TransitionState FindObjCollisions(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "FindObjCollisions(Transition)");
+#endif
             readerWriterLockSlim.EnterReadLock();
             try
             {
@@ -200,6 +228,9 @@ namespace ACE.Server.Physics.Common
 
         public static ObjCell Get(uint cellID)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Get(uint)");
+#endif
             if (cellID == 0) return null;
 
             var objCell = new ObjCell(cellID);
@@ -211,6 +242,9 @@ namespace ACE.Server.Physics.Common
 
         public PhysicsObj GetObject(ulong id)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetObject(ulong)");
+#endif
             readerWriterLockSlim.EnterReadLock();
             try
             {
@@ -230,6 +264,9 @@ namespace ACE.Server.Physics.Common
 
         public static ObjCell GetVisible(uint cellID, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "GetVisible(uint, uint)");
+#endif
             if (cellID == 0) return null;
 
             // is this supposed to return a list?
@@ -242,6 +279,9 @@ namespace ACE.Server.Physics.Common
 
         public void Init()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "Init()");
+#endif
             Pos = new PhysicsPosition();
             ObjectList = new List<PhysicsObj>();
             ShadowObjectList = new List<ShadowObj>();
@@ -250,6 +290,9 @@ namespace ACE.Server.Physics.Common
 
         public void RemoveObject(PhysicsObj obj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "RemoveObject(PhysicsObj)");
+#endif
             readerWriterLockSlim.EnterWriteLock();
             try
             {
@@ -265,6 +308,9 @@ namespace ACE.Server.Physics.Common
 
         public bool check_collisions(PhysicsObj obj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "check_collisions(PhysicsObj)");
+#endif
             readerWriterLockSlim.EnterReadLock();
             try
             {
@@ -285,6 +331,9 @@ namespace ACE.Server.Physics.Common
 
         public TransitionState check_entry_restrictions(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "check_entry_restrictions(Transition)");
+#endif
             // custom - acclient checks for entry restrictions (housing barriers)
             // for each tick in the transition, regardless if there is a cell change
 
@@ -328,12 +377,18 @@ namespace ACE.Server.Physics.Common
 
         public virtual bool handle_move_restriction(Transition transition)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "handle_move_restriction(Transition)");
+#endif
             // empty base?
             return false;
         }
 
         public static void find_cell_list(PhysicsPosition position, int numSphere, List<Sphere> sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "find_cell_list(PhysicsPosition, int, List<Sphere>, CellArray, ObjCell, SpherePath, uint)");
+#endif
             cellArray.NumCells = 0;
             cellArray.AddedOutside = false;
 
@@ -415,6 +470,9 @@ namespace ACE.Server.Physics.Common
 
         public static void find_cell_list(PhysicsPosition position, int numCylSphere, List<CylSphere> cylSphere, CellArray cellArray, SpherePath path, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "find_cell_list(PhysicsPosition, int, List<CylSphere>, CellArray, ObjCell, SpherePath, uint)");
+#endif
             if (numCylSphere > 10)
                 numCylSphere = 10;
 
@@ -434,6 +492,9 @@ namespace ACE.Server.Physics.Common
 
         public static void find_cell_list(PhysicsPosition position, Sphere sphere, CellArray cellArray, SpherePath path, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "find_cell_list(PhysicsPosition, Sphere, CellArray, SpherePath, uint)");
+#endif
             var globalSphere = new Sphere();
             globalSphere.Center = position.LocalToGlobal(sphere.Center);
             globalSphere.Radius = sphere.Radius;
@@ -444,11 +505,17 @@ namespace ACE.Server.Physics.Common
 
         public static void find_cell_list(CellArray cellArray, ref ObjCell checkCell, SpherePath path, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "find_cell_list(CellArray, ObjCell, SpherePath, uint)");
+#endif
             find_cell_list(path.CheckPos, path.NumSphere, path.GlobalSphere, cellArray, ref checkCell, path, instance);
         }
 
         public static void find_cell_list(PhysicsPosition position, int numSphere, Sphere sphere, CellArray cellArray, ref ObjCell currCell, SpherePath path, uint instance)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "find_cell_list(PhysicsPosition, int, Sphere, CellArray, ObjCell, SpherePath, uint)");
+#endif
             find_cell_list(position, numSphere, new List<Sphere>() { sphere }, cellArray, ref currCell, path, instance);
         }
 
@@ -464,6 +531,9 @@ namespace ACE.Server.Physics.Common
 
         public LandDefs.WaterType get_block_water_type()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_block_water_type()");
+#endif
             if (CurLandblock != null)
                 return CurLandblock.WaterType;
 
@@ -472,6 +542,9 @@ namespace ACE.Server.Physics.Common
 
         public float get_water_depth(Vector3 point)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "get_water_depth(Vector3)");
+#endif
             if (WaterType == LandDefs.WaterType.NotWater)
                 return 0.0f;
 
@@ -486,11 +559,17 @@ namespace ACE.Server.Physics.Common
 
         public void hide_object(PhysicsObj obj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "hide_object(PhysicsObj)");
+#endif
             update_all_voyeur(obj, DetectionType.LeftDetection);
         }
 
         public void init_objects()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "init_objects()");
+#endif
             readerWriterLockSlim.EnterReadLock();
             try
             {
@@ -506,17 +585,26 @@ namespace ACE.Server.Physics.Common
 
         public virtual bool point_in_cell(Vector3 point)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "point_in_cell(Vector3)");
+#endif
             return false;
         }
 
         public void release_shadow_objs()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "release_shadow_objs()");
+#endif
             foreach (var shadowObj in ShadowObjectList)
                 shadowObj.PhysicsObj.ShadowObjects.Remove(ID);
         }
 
         public void release_objects()
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "release_objects()");
+#endif
             readerWriterLockSlim.EnterWriteLock();
             try
             {
@@ -539,6 +627,9 @@ namespace ACE.Server.Physics.Common
 
         public void remove_shadow_object(ShadowObj shadowObj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "remove_shadow_object(ShadowObj)");
+#endif
             readerWriterLockSlim.EnterWriteLock();
             try
             {
@@ -555,11 +646,17 @@ namespace ACE.Server.Physics.Common
 
         public void unhide_object(PhysicsObj obj)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "unhide_object(PhysicsObj)");
+#endif
             update_all_voyeur(obj, DetectionType.EnteredDetection, false);
         }
 
         public void update_all_voyeur(PhysicsObj obj, DetectionType type, bool checkDetection = true)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "update_all_voyeur(PhysicsObj, DetectionType, bool)");
+#endif
             if (obj.ID == 0 || obj.Parent != null || VoyeurTable == null)
                 return;
 
@@ -581,6 +678,9 @@ namespace ACE.Server.Physics.Common
 
         public bool IsVisible(ObjCell cell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "IsVisible(ObjCell)");
+#endif
             if (ID == cell.ID) return true;
 
             if ((ID & 0xFFFF) >= 0x100)
@@ -610,12 +710,18 @@ namespace ACE.Server.Physics.Common
 
         public bool IsVisibleOutdoors(ObjCell cell)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "IsVisibleOutdoors(ObjCell)");
+#endif
             var blockDist = PhysicsObj.GetBlockDist(ID, cell.ID);
             return blockDist <= 1;
         }
 
         public void AddObjectListTo(List<PhysicsObj> target)
         {
+#if METHODSTATISTICS
+            MethodStatistics.Increment(ThisType, "AddObjectListTo(List<PhysicsObj>)");
+#endif
             readerWriterLockSlim.EnterReadLock();
             try
             {
