@@ -101,9 +101,9 @@ namespace ACE.Server.Realms
 
         public string ToLOCString() => Position.ToLOCString();
 
-        public static readonly int BlockLength = Position.BlockLength;
-        public static readonly int CellSide = Position.CellSide;
-        public static readonly int CellLength = Position.CellLength;
+        public const int BlockLength = Position.BlockLength;
+        public const int CellSide = Position.CellSide;
+        public const int CellLength = Position.CellLength;
 
         public Vector2? GetMapCoords()
         {

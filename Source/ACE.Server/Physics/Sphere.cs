@@ -64,8 +64,8 @@ namespace ACE.Server.Physics
             Radius = sphere.Radius;
         }
 
-        public static readonly float ThresholdMed = 1.0f / 3.0f;
-        public static readonly float ThresholdHigh = 2.0f / 3.0f;
+        public const float ThresholdMed = 1.0f / 3.0f;
+        public const float ThresholdHigh = 2.0f / 3.0f;
 
         public static Quadrant Attack(PhysicsPosition targetPos, float targetRadius, float targetHeight, PhysicsPosition attackPos, Vector2 left, Vector2 right, float attackRadius, float attackHeight)
         {

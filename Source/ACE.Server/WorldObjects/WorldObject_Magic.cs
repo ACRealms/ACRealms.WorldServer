@@ -1569,7 +1569,7 @@ namespace ACE.Server.WorldObjects
             return LaunchSpellProjectiles(spell, target, spellType, weapon, isWeaponSpell, fromProc, origins, velocity, lifeProjectileDamage);
         }
 
-        public static readonly float ProjHeight = 2.0f / 3.0f;
+        public const float ProjHeight = 2.0f / 3.0f;
 
         public Vector3 CalculatePreOffset(Spell spell, ProjectileSpellType spellType, WorldObject target)
         {
@@ -1733,7 +1733,7 @@ namespace ACE.Server.WorldObjects
 
         public static readonly Quaternion OneEighty = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)Math.PI);
 
-        public static readonly float ProjHeightArc = 5.0f / 6.0f;
+        public const float ProjHeightArc = 5.0f / 6.0f;
 
         /// <summary>
         /// Calculates the spell projectile velocity in global space
@@ -2246,7 +2246,7 @@ namespace ACE.Server.WorldObjects
             IsAffecting = false;
         }
 
-        private static readonly double defaultIgnoreSomeMagicProjectileDamage = 0.25;
+        private const double defaultIgnoreSomeMagicProjectileDamage = 0.25;
 
         public double? GetAbsorbMagicDamage()
         {
