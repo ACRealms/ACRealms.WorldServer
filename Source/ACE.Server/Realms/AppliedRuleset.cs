@@ -663,7 +663,7 @@ namespace ACE.Server.Realms
                 return 0;
         }
 
-        private ushort GetClassicalShortInstanceID(IPlayer player, bool isFellowLeader = false)
+        internal ushort GetClassicalShortInstanceID(IPlayer player, bool isFellowLeader = false)
         {
             if (!isFellowLeader && player is Player p && p.Fellowship != null)
             {

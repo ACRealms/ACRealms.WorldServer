@@ -29,13 +29,40 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void HandleActionBuyHouse(ObjectGuid slumlord_id, List<uint> item_ids)
         {
+
+            bool HousingInstanceRestricted()
+            {
+                if (IsInPrimaryInstance)
+                    return false;
+                if (RealmRuleset.GetProperty(RealmPropertyBool.Housing_DisablePrimaryInstancePurchaseRestriction))
+                    return false;
+                if (RealmRuleset.GetProperty(RealmPropertyBool.ClassicalInstances_AllowHousingPurchase) && IsInOwnedClassicalInstance)
+                    return false;
+                return true;
+            }
+
+
             //Console.WriteLine($"\n{Name}.HandleActionBuyHouse()");
             log.Info($"[HOUSE] {Name}.HandleActionBuyHouse()");
 
-            if (!CurrentLandblock.IsHomeInstanceForPlayer(this))
+            if (IsInEphemeralRealm)
             {
-                Session.Network.EnqueueSend(new GameMessageSystemChat("You may only purchase a house in your home realm.", ChatMessageType.Broadcast));
-                log.Info($"[HOUSE] {Name}.HandleActionBuyHouse(): Failed pre-purchase requirement - Not in home realm instance");
+                Session.Network.EnqueueSend(new GameMessageSystemChat("You may not purchase housing in ephemeral realms.", ChatMessageType.Broadcast));
+                log.Info($"[HOUSE] {Name}.HandleActionBuyHouse(): Failed pre-purchase requirement - Ephemeral Realm");
+                return;
+            }
+
+            if (!RealmRuleset.GetProperty(RealmPropertyBool.Housing_DisableHomeRealmPurchaseRestriction) && !IsInHomeRealm)
+            {
+                Session.Network.EnqueueSend(new GameMessageSystemChat("You may not purchase housing in this realm.", ChatMessageType.Broadcast));
+                log.Info($"[HOUSE] {Name}.HandleActionBuyHouse(): Failed pre-purchase requirement - Realm Restricted");
+                return;
+            }
+
+            if (HousingInstanceRestricted())
+            {
+                Session.Network.EnqueueSend(new GameMessageSystemChat("You may not purchase housing in this instance.", ChatMessageType.Broadcast));
+                log.Info($"[HOUSE] {Name}.HandleActionBuyHouse(): Failed pre-purchase requirement - Instance Restricted");
                 return;
             }
 
