@@ -53,6 +53,7 @@ namespace ACE.Server.Command.Handlers
             try
             {
                 RealmManager.ReloadPeripherals();
+                session?.Network.EnqueueSend(new GameMessageSystemChat($"Peripherals reloaded.", ChatMessageType.Broadcast));
             }
             catch (Exception ex)
             {
