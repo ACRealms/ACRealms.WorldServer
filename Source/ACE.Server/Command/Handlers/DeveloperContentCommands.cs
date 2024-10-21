@@ -2154,7 +2154,7 @@ namespace ACE.Server.Command.Handlers.Processors
             }
 
             var instances = DatabaseManager.World.GetCachedInstancesByLandblock(landblockId);
-            if (instances == null)
+            if (instances == null || instances.Count == 0)
             {
                 CommandHandlerHelper.WriteOutputInfo(session, $"Couldn't find landblock {landblockId:X4}");
                 return;
