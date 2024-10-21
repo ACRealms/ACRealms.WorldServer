@@ -74,6 +74,18 @@ will be moved to the parent realm.")]
         [Description("If enabled, classical instances will be active regardless of the character's location. This is not recommended for realms other than true solo-self-found realms, and is considered an advanced feature.")]
         [RealmPropertyBool(false)]
         ClassicalInstances_EnableForAllLandblocks_Dangerous = 13,
+
+        [Description("If enabled, players can purchase houses in the instance ID assigned to the player.")]
+        [RealmPropertyBool(false)]
+        ClassicalInstances_AllowHousingPurchase = 14,
+
+        [Description("Disables the primary instance restriction from house purchases. This is separate from the home realm restriction. Consider using ClassicalInstances_AllowHousingPurchase instead.")]
+        [RealmPropertyBool(false)]
+        Housing_DisablePrimaryInstancePurchaseRestriction = 15,
+
+        [Description("Disables the home realm requirement for house purchases. This configuration should be applied to the realm the house is located in, not the home realm of the player.")]
+        [RealmPropertyBool(false)]
+        Housing_DisableHomeRealmPurchaseRestriction = 16
     }
 
     public static class RealmPropertyBoolExtensions
