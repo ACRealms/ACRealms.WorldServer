@@ -957,7 +957,12 @@ namespace ACE.Server.Command.Handlers
                 uint inst = 0;
                 if (parameters.Length >= 9)
                 {
-                    inst = uint.Parse(parameters[8].Trim());
+                    string instParam = parameters[8].Trim();
+                    if (instParam.StartsWith("0x"))
+                        inst = uint.Parse(instParam[2..], NumberStyles.HexNumber);
+                    else
+                        inst = uint.Parse(instParam);
+
                     if (inst == 0)
                     {
                         // REALMS-TODO: Better validation of instance id
