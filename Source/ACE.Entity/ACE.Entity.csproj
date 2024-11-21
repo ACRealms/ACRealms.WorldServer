@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ACE.Common\ACE.Common.csproj" />
     <ProjectReference Include="..\ACRealms.RealmProps\ACRealms.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
     <ItemGroup>
@@ -45,6 +46,10 @@
 
   <ItemGroup>
     <AdditionalFiles Include="ACRealms\RealmProps\json-schema\realm-property-schema.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ACRealms\RealmProps\json\player\" />
   </ItemGroup>
     <Target Name="ExcludeGeneratedFiles" BeforeTargets="CoreCompile">
         <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != ''">

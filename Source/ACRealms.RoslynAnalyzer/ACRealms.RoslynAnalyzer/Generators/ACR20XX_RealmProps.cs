@@ -1,11 +1,16 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text;
+# nullable enable
 
 namespace ACRealms.RoslynAnalyzer.Generators
 {
@@ -14,14 +19,18 @@ namespace ACRealms.RoslynAnalyzer.Generators
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ACR20XX_RealmProps : DiagnosticAnalyzer
     {
-        private const string Category = "Generators.RealmProps";
+       // static string SchemaFile { get; } = File.ReadAllText($"{SolutionPath}/ACE.Entity/ACRealms/RealmProps/json-schema/realm-property-schema.json");
+
+        private const string Category = "Generators";
 
         private static readonly string Title = "RealmProps";
 
         public enum DescriptorType : byte
         {
             None,
-            FailedToParse
+            MissingSchema,
+            FailedToParse,
+            JSONValidation
         }
 
         internal record IntermediateDescriptor
@@ -39,14 +48,122 @@ namespace ACRealms.RoslynAnalyzer.Generators
 
         private static readonly FrozenDictionary<DescriptorType, DiagnosticDescriptor> Descriptors = new Dictionary<DescriptorType, IntermediateDescriptor>()
         {
-            { DescriptorType.FailedToParse, new IntermediateDescriptor() { MessageFormat = "Failed to parse JSON" } }
+            { DescriptorType.MissingSchema, new IntermediateDescriptor() { MessageFormat = "Missing JSON Schema file {0}" } },
+            { DescriptorType.FailedToParse, new IntermediateDescriptor() { MessageFormat = "Failed to parse JSON for file {0}" } },
+            { DescriptorType.JSONValidation, new IntermediateDescriptor() { MessageFormat = "Validation Error: {0}" } }
         }.ToFrozenDictionary(kvp => kvp.Key, kvp => kvp.Value.ToDescriptor(kvp.Key));
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return Descriptors.Values; } }
 
+        private static Diagnostic Diag(DescriptorType type, Location? location = null, object?[]? messageArgs = null)
+        {
+            return Diagnostic.Create(Descriptors[type], location, messageArgs);
+        }
+
+        private static void Diag(CompilationStartAnalysisContext ctx, DescriptorType type, Location? location = null, object?[]? messageArgs = null)
+        {
+            ctx.RegisterCompilationEndAction(c => c.ReportDiagnostic(Diag(type, location, messageArgs)));
+        }
+
         public override void Initialize(AnalysisContext context)
         {
-            throw new NotImplementedException();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.ReportDiagnostics);
+            context.EnableConcurrentExecution();
+
+            context.RegisterCompilationStartAction(SchemaValidationActions);
+          /*  context.RegisterAdditionalFileAction(action =>
+            {
+                if (action.AdditionalFile.Path == "fff")
+                {
+                    context.r
+                }
+            });*/
+           // throw new NotImplementedException();
+        }
+
+        private void SchemaValidationActions(CompilationStartAnalysisContext context)
+        {
+            if (context.Compilation.AssemblyName != "ACE.Entity")
+                return;
+
+            ImmutableArray<AdditionalText> additionalFiles = context.Options.AdditionalFiles;
+            var sep = Path.DirectorySeparatorChar;
+            var pathSuffix = $"ACRealms{sep}RealmProps{sep}json-schema{sep}realm-property-schema.json";
+            AdditionalText realmPropSchema = additionalFiles.FirstOrDefault(file => file.Path.EndsWith(pathSuffix));
+            if (realmPropSchema == null)
+            {
+                Diag(context, DescriptorType.MissingSchema, null, [pathSuffix]);
+                return;
+            }
+
+            var schemaText = realmPropSchema.GetText(context.CancellationToken);
+            JSchema schema;
+            if (schemaText == null)
+            {
+                Diag(context, DescriptorType.FailedToParse, null, [pathSuffix]);
+                return;
+            }
+            try
+            {
+                schema = JSchema.Parse(schemaText.ToString());
+            }
+            catch (Exception)
+            {
+                Diag(context, DescriptorType.FailedToParse, null, [pathSuffix]);
+                return;
+            }
+
+            var realmPropFiles = additionalFiles.Where(f => f.Path.Contains($"ACRealms{sep}RealmProps{sep}json{sep}") && f.Path.EndsWith(".jsonc")).ToList();
+            foreach(var file in realmPropFiles)
+            {
+                var text = file.GetText(context.CancellationToken);
+                if (text == null)
+                {
+                    Diag(context, DescriptorType.FailedToParse, Location.Create(
+                            file.Path,
+                            TextSpan.FromBounds(1, 1),
+                            new LinePositionSpan(
+                                new LinePosition(1, 1),
+                                new LinePosition(1, 1)
+                            )
+                        ), [file.Path]);
+                    continue;
+                }
+                var raw = text.ToString();
+                JObject realmPropsObj;
+                try
+                {
+                    realmPropsObj = JObject.Parse(raw);
+                }
+                catch (Exception)
+                {
+                    Diag(context, DescriptorType.FailedToParse, Location.Create(
+                            file.Path,
+                            TextSpan.FromBounds(1, 1),
+                            new LinePositionSpan(
+                                new LinePosition(1, 1),
+                                new LinePosition(1, 1)
+                            )
+                        ), [file.Path]);
+                    continue;
+                }
+                try
+                {
+                    realmPropsObj.Validate(schema);
+                }
+                catch (JSchemaValidationException ex)
+                {
+                    Diag(context, DescriptorType.JSONValidation,
+                        Location.Create(
+                            file.Path,
+                            TextSpan.FromBounds(ex.LineNumber, ex.LineNumber),
+                            new LinePositionSpan(
+                                new LinePosition(ex.LineNumber, ex.LinePosition),
+                                new LinePosition(ex.LineNumber, ex.LinePosition)
+                            )
+                        ),[ex.Message]);
+                }
+            }
         }
     }
 }

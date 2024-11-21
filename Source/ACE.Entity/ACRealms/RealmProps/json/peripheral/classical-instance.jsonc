@@ -17,7 +17,7 @@
         "IgnoreCharacterProp": [
           "If enabled, classical instances will be active regardless of the character's PropertyBool.ClassicalInstancesActive."
         ],
-        "EnableForAllLandblocks_Dangerous": [
+        "EnableForAllLandblocksDangerous": [
           "If enabled, classical instances will be active regardless of the character's location. \n",
           "This is not recommended for realms other than true solo-self-found realms, and is considered an advanced feature."
         ],

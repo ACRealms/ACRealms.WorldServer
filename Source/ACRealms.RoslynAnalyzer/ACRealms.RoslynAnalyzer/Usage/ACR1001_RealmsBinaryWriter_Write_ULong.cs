@@ -21,9 +21,9 @@ namespace ACRealms.RoslynAnalyzer.Usage
         private static readonly string Description = "This rule is intended to prevent a client crash when sending a 64-bit GUID instead of the 32-bit ClientGUID.";
         private const string Category = "Usage";
 
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor Rule = new (DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return [Rule]; } }
 
         public override void Initialize(AnalysisContext context)
         {
@@ -43,8 +43,7 @@ namespace ACRealms.RoslynAnalyzer.Usage
             if (memberAccessExpr?.Name.ToString().ToLower() != "write")
                 return;
 
-            var methodSymbol = context.SemanticModel.GetSymbolInfo(invocationExpr, context.CancellationToken).Symbol as IMethodSymbol;
-            if (methodSymbol == null)
+            if (context.SemanticModel.GetSymbolInfo(invocationExpr, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
                 return;
             if (methodSymbol.ReceiverType.Name != "RealmsBinaryWriter")
                 return;
