@@ -19,12 +19,13 @@
       <PrivateAssets>all</PrivateAssets>
       <!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0"  />
     <!--<PackageReference Include="Newtonsoft.Json" Version="13.0.3" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" PrivateAssets="all" GeneratePathProperty="true" />-->
     <PackageReference Include="System.Collections.Immutable" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="Corvus.Json.Validator" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -38,6 +39,7 @@
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Collections_Immutable)\lib\netstandard2.0\System.Collections.Immutable.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_Validator)\lib\netstandard2.0\Corvus.Json.Validator.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_ExtendedTypes)\lib\netstandard2.0\Corvus.Json.ExtendedTypes.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Json)\lib\netstandard2.0\System.Text.Json.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
   <ItemGroup>

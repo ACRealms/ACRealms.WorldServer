@@ -20,7 +20,9 @@ namespace ACRealms.RealmProps
     //            This allows for more accurate errors to be displayed during compilation
     //
     // The C# model classes in ACRealms.RealmProps.RealmPropModels are generated through a manual script invocation as needed
+#pragma warning disable RS1038 // Compiler extensions should be implemented in assemblies with compiler-provided references
     [Generator(LanguageNames.CSharp)]
+#pragma warning restore RS1038 // Compiler extensions should be implemented in assemblies with compiler-provided references
     public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
