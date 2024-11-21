@@ -12,6 +12,8 @@ using System.Linq;
 using System.Text;
 # nullable enable
 
+// This is not a generator, it is a generator diagnostic
+// The actual generator is in the project ACRealms.RealmsProps
 namespace ACRealms.RoslynAnalyzer.Generators
 {
     // https://github.com/dotnet/roslyn/blob/ee941ffa3c753fd3f0760d34ca9bca6ba83ea080/docs/features/incremental-generators.cookbook.md#issue-diagnostics
@@ -25,19 +27,11 @@ namespace ACRealms.RoslynAnalyzer.Generators
 
         private static readonly string Title = "RealmProps";
 
-        public enum DescriptorType : byte
-        {
-            None,
-            MissingSchema,
-            FailedToParse,
-            JSONValidation
-        }
-
         internal record IntermediateDescriptor
         {
             public DiagnosticSeverity Severity { get; init; } = DiagnosticSeverity.Error;
             public required string MessageFormat { get; init; }
-            public string Description { get; init; }
+            public string? Description { get; init; }
 
             public DiagnosticDescriptor ToDescriptor(DescriptorType type)
             {
@@ -46,11 +40,21 @@ namespace ACRealms.RoslynAnalyzer.Generators
             }
         }
 
+        public enum DescriptorType : byte
+        {
+            None,
+            MissingSchema,
+            FailedToParse,
+            JSONValidation,
+            Deserialization
+        }
+
         private static readonly FrozenDictionary<DescriptorType, DiagnosticDescriptor> Descriptors = new Dictionary<DescriptorType, IntermediateDescriptor>()
         {
             { DescriptorType.MissingSchema, new IntermediateDescriptor() { MessageFormat = "Missing JSON Schema file {0}" } },
             { DescriptorType.FailedToParse, new IntermediateDescriptor() { MessageFormat = "Failed to parse JSON for file {0}" } },
-            { DescriptorType.JSONValidation, new IntermediateDescriptor() { MessageFormat = "Validation Error: {0}" } }
+            { DescriptorType.JSONValidation, new IntermediateDescriptor() { MessageFormat = "Validation Error: {0}" } },
+            { DescriptorType.Deserialization, new IntermediateDescriptor() { MessageFormat = "(Likely ACRealms bug, please report) - Failed to deserialize valid JSON" } }
         }.ToFrozenDictionary(kvp => kvp.Key, kvp => kvp.Value.ToDescriptor(kvp.Key));
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return Descriptors.Values; } }
@@ -60,47 +64,38 @@ namespace ACRealms.RoslynAnalyzer.Generators
             return Diagnostic.Create(Descriptors[type], location, messageArgs);
         }
 
-        private static void Diag(CompilationStartAnalysisContext ctx, DescriptorType type, Location? location = null, object?[]? messageArgs = null)
-        {
-            ctx.RegisterCompilationEndAction(c => c.ReportDiagnostic(Diag(type, location, messageArgs)));
-        }
-
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.EnableConcurrentExecution();
-
             context.RegisterCompilationStartAction(SchemaValidationActions);
-          /*  context.RegisterAdditionalFileAction(action =>
-            {
-                if (action.AdditionalFile.Path == "fff")
-                {
-                    context.r
-                }
-            });*/
-           // throw new NotImplementedException();
         }
 
         private void SchemaValidationActions(CompilationStartAnalysisContext context)
         {
+            void Report(DescriptorType type, Location? location = null, object?[]? messageArgs = null)
+            {
+                context.RegisterCompilationEndAction(c => c.ReportDiagnostic(Diagnostic.Create(Descriptors[type], location, messageArgs)));
+            }
+
             if (context.Compilation.AssemblyName != "ACE.Entity")
                 return;
 
             ImmutableArray<AdditionalText> additionalFiles = context.Options.AdditionalFiles;
             var sep = Path.DirectorySeparatorChar;
             var pathSuffix = $"ACRealms{sep}RealmProps{sep}json-schema{sep}realm-property-schema.json";
-            AdditionalText realmPropSchema = additionalFiles.FirstOrDefault(file => file.Path.EndsWith(pathSuffix));
+            AdditionalText? realmPropSchema = additionalFiles.FirstOrDefault(file => file.Path.EndsWith(pathSuffix));
             if (realmPropSchema == null)
             {
-                Diag(context, DescriptorType.MissingSchema, null, [pathSuffix]);
+                Report(DescriptorType.MissingSchema, null, [pathSuffix]);
                 return;
             }
 
-            var schemaText = realmPropSchema.GetText(context.CancellationToken);
+            var schemaText = realmPropSchema!.GetText(context.CancellationToken);
             JSchema schema;
             if (schemaText == null)
             {
-                Diag(context, DescriptorType.FailedToParse, null, [pathSuffix]);
+                Report(DescriptorType.FailedToParse, null, [pathSuffix]);
                 return;
             }
             try
@@ -109,17 +104,21 @@ namespace ACRealms.RoslynAnalyzer.Generators
             }
             catch (Exception)
             {
-                Diag(context, DescriptorType.FailedToParse, null, [pathSuffix]);
+                Report(DescriptorType.FailedToParse, null, [pathSuffix]);
                 return;
             }
 
+            context.RegisterAdditionalFileAction(ctx =>
+            {
+                
+            });
             var realmPropFiles = additionalFiles.Where(f => f.Path.Contains($"ACRealms{sep}RealmProps{sep}json{sep}") && f.Path.EndsWith(".jsonc")).ToList();
             foreach(var file in realmPropFiles)
             {
                 var text = file.GetText(context.CancellationToken);
                 if (text == null)
                 {
-                    Diag(context, DescriptorType.FailedToParse, Location.Create(
+                    Report(DescriptorType.FailedToParse, Location.Create(
                             file.Path,
                             TextSpan.FromBounds(1, 1),
                             new LinePositionSpan(
@@ -137,7 +136,7 @@ namespace ACRealms.RoslynAnalyzer.Generators
                 }
                 catch (Exception)
                 {
-                    Diag(context, DescriptorType.FailedToParse, Location.Create(
+                    Report(DescriptorType.FailedToParse, Location.Create(
                             file.Path,
                             TextSpan.FromBounds(1, 1),
                             new LinePositionSpan(
@@ -153,7 +152,7 @@ namespace ACRealms.RoslynAnalyzer.Generators
                 }
                 catch (JSchemaValidationException ex)
                 {
-                    Diag(context, DescriptorType.JSONValidation,
+                    Report(DescriptorType.JSONValidation,
                         Location.Create(
                             file.Path,
                             TextSpan.FromBounds(ex.LineNumber, ex.LineNumber),
@@ -162,6 +161,7 @@ namespace ACRealms.RoslynAnalyzer.Generators
                                 new LinePosition(ex.LineNumber, ex.LinePosition)
                             )
                         ),[ex.Message]);
+                    continue;
                 }
             }
         }

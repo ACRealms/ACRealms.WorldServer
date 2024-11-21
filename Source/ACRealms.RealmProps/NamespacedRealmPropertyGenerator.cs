@@ -7,42 +7,22 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System;
-using Newtonsoft.Json.Schema;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Newtonsoft.Json.Linq;
+using System.Xml.Serialization;
+using Corvus.Json.Validator;
+using System.Text.Json.Nodes;
+using JsonObject = Corvus.Json.JsonObject;
 
 namespace ACRealms.RealmProps
 {
+    // To debug: Test Explorer -> ACRealms.Tests.Tests.RealmPropGenerator -> Debug CanGenerateRealmProps test
+    // Important: Significant changes to this generator's process or algorithm should be reflected in ACRealms.RoslynAnalyzer.ACR20XX_RealmProps where applicable
+    //            This allows for more accurate errors to be displayed during compilation
+    //
+    // The C# model classes in ACRealms.RealmProps.RealmPropModels are generated through a manual script invocation as needed
     [Generator(LanguageNames.CSharp)]
     public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
     {
-       
-        /*
-        public void Initialize(IncrementalGeneratorInitializationContext initContext)
-        {
-            if (!Debugger.IsAttached)
-            {
-               //Debugger.Launch();
-            }
-            // define the execution pipeline here via a series of transformations:
-
-            // find all additional files that end with .txt
-            IncrementalValuesProvider<AdditionalText> textFiles = initContext.AdditionalTextsProvider.Where(static file => file.Path.EndsWith(".jsonc"));
-
-            // read their contents and save their name
-            IncrementalValuesProvider<(string name, string content)> namesAndContents = textFiles.Select((text, cancellationToken) => (name: Path.GetFileNameWithoutExtension(text.Path), content: text.GetText(cancellationToken)!.ToString()));
-
-            // generate a class that contains their values as const strings
-           /* initContext.RegisterSourceOutput(namesAndContents, (spc, nameAndContent) =>
-            {
-                spc.AddSource($"ConstStrings.{nameAndContent.name}", $@"
-    public static partial class ConstStrings
-    {{
-        public const string {nameAndContent.name} = ""{nameAndContent.content}"";
-    }}");
-            });*/
-        //}
-
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Regex for property names: https://regexr.com/8915n
@@ -55,21 +35,26 @@ namespace ACRealms.RealmProps
             var schema = realmPropsDirContext
                 .Where(static file => { var sep = Path.DirectorySeparatorChar; return file.Path.EndsWith($"{sep}RealmProps{sep}json-schema{sep}realm-property-schema.json"); })
                 .Select(static (text, cancellationToken) => text.GetText(cancellationToken)!.ToString())
-                .Select(static (text, cancellationToken) => JSchema.Parse(text))
+                .Select(static (text, cancellationToken) => JsonSchema.FromText(text))
                 .Collect()
                 .WithTrackingName("schema");
 
-            IncrementalValuesProvider<((string Path, JObject RealmPropsObj) ParsedFile, ImmutableArray<JSchema> Schema)> unvalidatedRealmPropObjects = realmPropsDirContext
+            IncrementalValuesProvider<((string Path, JsonObject RealmPropsObj) ParsedFile, ImmutableArray<JsonSchema> Schema)> unvalidatedRealmPropObjects = realmPropsDirContext
                 .Where(static file => { var sep = Path.DirectorySeparatorChar; return file.Path.Contains($"{sep}RealmProps{sep}json{sep}"); })
                 .Where(static file => Path.GetExtension(file.Path).Equals(".jsonc", StringComparison.OrdinalIgnoreCase))
                 .Select(static (text, cancellationToken) => ((string Path, string Raw))(text.Path, text.GetText(cancellationToken).ToString()))
-                .Select(static (data, cancellationToken) => ((string Path, JObject RealmPropsObj))(data.Path, JObject.Parse(data.Raw)))
+                .Select(static (data, cancellationToken) => ((string Path, JsonObject RealmPropsObj))(data.Path, JsonObject.Parse(data.Raw)))
                 .Combine(schema);
 
             var validatedRealmPropObjects = unvalidatedRealmPropObjects.Select(static (realmPropsFileContext, cancellationToken) =>
             {
                 var schema = realmPropsFileContext.Schema.Single();
-                realmPropsFileContext.ParsedFile.RealmPropsObj.Validate(schema);
+                var realmPropsJObject = realmPropsFileContext.ParsedFile.RealmPropsObj;
+
+                var validation = schema.Validate(realmPropsJObject.AsJsonElement);
+                if (!validation.IsValid)
+                    throw new InvalidOperationException("Invalid JSON!");
+
                 return realmPropsFileContext.ParsedFile;
             });
 
@@ -103,10 +88,10 @@ namespace ACRealms.RealmProps
                 return sb.ToString();
             }
         }
-        private static string GenerateSourceCode(string className, JObject RealmPropNamespace)
+        private static string GenerateSourceCode(string className, JsonObject realmPropNamespace)
         {
             return $$"""
-                namespace ACRealms.RealmProps.Generated
+                
                 """;
         }
 

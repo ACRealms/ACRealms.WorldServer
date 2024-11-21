@@ -59,7 +59,7 @@ namespace ACRealms.Tests.Tests.RealmPropGenerator
                 throw EmptyException.ForNonEmptyCollection(collectionName);
         }
 
-        void IVerifier.Equal<T>(T expected, T actual, string message)
+        void IVerifier.Equal<T>(T expected, T actual, string? message)
         {
             if (EqualityComparer<T>.Default.Equals(expected, actual))
                 return;
@@ -67,18 +67,18 @@ namespace ACRealms.Tests.Tests.RealmPropGenerator
             if (message is null && Context.IsEmpty)
                 throw EqualException.ForMismatchedValues(expected, actual);
             else
-                throw EqualException.ForMismatchedValuesWithError(expected, actual, new Exception(CreateMessage(message)));
+                throw EqualException.ForMismatchedValuesWithError(expected, actual, new Exception(CreateMessage(message!)));
         }
 
         [DoesNotReturn]
         void IVerifier.Fail(string? message) => Assert.Fail(message is null ? "<no message provided>" : CreateMessage(message));
 
-        void IVerifier.False([DoesNotReturnIf(true)] bool assert, string message)
+        void IVerifier.False([DoesNotReturnIf(true)] bool assert, string? message)
         {
             if (message is null && Context.IsEmpty)
                 Assert.False(assert);
             else
-                Assert.False(assert, CreateMessage(message));
+                Assert.False(assert, CreateMessage(message!));
         }
 
         void IVerifier.LanguageIsSupported(string language) =>
@@ -102,13 +102,13 @@ namespace ACRealms.Tests.Tests.RealmPropGenerator
             return new RealmPropVerifier(Context.Push(context));
         }
 
-        void IVerifier.SequenceEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual, IEqualityComparer<T>? equalityComparer, string message)
+        void IVerifier.SequenceEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual, IEqualityComparer<T>? equalityComparer, string? message)
         {
             var comparer = new SequenceEqualEnumerableEqualityComparer<T>(equalityComparer);
             var areEqual = comparer.Equals(expected, actual);
 
             if (!areEqual)
-                throw EqualException.ForMismatchedValuesWithError(expected, actual, new Exception(CreateMessage(message)));
+                throw EqualException.ForMismatchedValuesWithError(expected, actual, new Exception(CreateMessage(message!)));
         }
 
         void IVerifier.True([DoesNotReturnIf(false)] bool assert, string? message)
@@ -116,7 +116,7 @@ namespace ACRealms.Tests.Tests.RealmPropGenerator
             if (message is null && Context.IsEmpty)
                 Assert.True(assert);
             else
-                Assert.True(assert, CreateMessage(message));
+                Assert.True(assert, CreateMessage(message!));
         }
     }
 
@@ -141,6 +141,7 @@ namespace ACRealms.Tests.Tests.RealmPropGenerator
         static string SchemaFile { get; } = File.ReadAllText($"{Paths.SolutionPath}/ACE.Entity/ACRealms/RealmProps/json-schema/realm-property-schema.json");
 
         [Fact]
+        [SuppressMessage("Usage", "xUnit1030:Do not call ConfigureAwait(false) in test method", Justification = "<Pending>")]
         public async Task CanGenerateRealmProps()
         {
             await RunTest<RealmPropGeneratorTest>(
