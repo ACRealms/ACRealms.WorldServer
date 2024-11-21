@@ -1,0 +1,11 @@
+{
+  "$schema_version": 1,
+  "namespace": "Core.Realm",
+  "properties": {
+    "Description": {
+      "description": "A description of the ruleset.",
+      "type": "string",
+      "default": "No Description"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema_version": 1,
+  "namespace": "Core.Landblock",
+  "properties": {
+    "UnloadInterval": {
+      "description": "Landblocks which have been inactive for this many minutes will be unloaded",
+      "type": "integer",
+      "default": 5,
+      "min_value": 1,
+      "max_value": 1440
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema_version": 1,
+  "namespace": "Creature.Attribute",
+  "groups": [
+    {
+      "type": "integer",
+      "key_prefix": "Creature", "key_suffix": "Added",
+      "min_value": -10000000, "max_value": 10000000,
+      "description_format": "All creatures will have this value added to their {short_key} attribute",
+      "properties": [ "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self" ]
+    }
+  ]
+}
