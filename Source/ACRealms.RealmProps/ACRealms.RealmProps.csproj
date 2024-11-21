@@ -23,7 +23,18 @@
     <!--<PackageReference Include="Newtonsoft.Json" Version="13.0.3" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" PrivateAssets="all" GeneratePathProperty="true" />-->
     <PackageReference Include="System.Collections.Immutable" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="Corvus.Json.Validator" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="System.IO.Pipelines" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+   <!-- <PackageReference Include="Corvus.Json.Validator" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.CodeGeneration" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.CodeGeneration.201909" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.CodeGeneration.202012" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.CodeGeneration.4" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.CodeGeneration.6" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.CodeGeneration.7" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.CodeGeneration.CorvusVocabulary" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.CodeGeneration.CSharp" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.CodeGeneration.HttpClientDocumentResolver" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.CodeGeneration.OpenApi30" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />  -->
     <PackageReference Include="Corvus.Json.ExtendedTypes" Version="4.0.12" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="System.Text.Json" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
@@ -37,9 +48,21 @@
       <!--<TargetPathWithTargetPlatformMoniker Include="$(PkgNewtonsoft_Json_Schema)\lib\netstandard2.0\Newtonsoft.Json.Schema.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGNewtonsoft_Json)\lib\netstandard2.0\Newtonsoft.Json.dll" IncludeRuntimeDependency="false" />-->
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Collections_Immutable)\lib\netstandard2.0\System.Collections.Immutable.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_Validator)\lib\netstandard2.0\Corvus.Json.Validator.dll" IncludeRuntimeDependency="false" />
+      <!--<TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_Validator)\lib\netstandard2.0\Corvus.Json.Validator.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_CodeGeneration)\lib\netstandard2.0\Corvus.Json.CodeGeneration.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_CodeGeneration_201909)\lib\netstandard2.0\Corvus.Json.CodeGeneration.201909.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_CodeGeneration_202012)\lib\netstandard2.0\Corvus.Json.CodeGeneration.202012.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_CodeGeneration_4)\lib\netstandard2.0\Corvus.Json.CodeGeneration.4.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_CodeGeneration_6)\lib\netstandard2.0\Corvus.Json.CodeGeneration.6.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_CodeGeneration_7)\lib\netstandard2.0\Corvus.Json.CodeGeneration.7.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_CodeGeneration_CorvusVocabulary)\lib\netstandard2.0\Corvus.Json.CodeGeneration.CorvusVocabulary.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_CodeGeneration_CSharp)\lib\netstandard2.0\Corvus.Json.CodeGeneration.CSharp.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_CodeGeneration_HttpClientDocumentResolver)\lib\netstandard2.0\Corvus.Json.CodeGeneration.HttpClientDocumentResolver.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_CodeGeneration_OpenApi30)\lib\netstandard2.0\Corvus.Json.CodeGeneration.OpenApi30.dll" IncludeRuntimeDependency="false" />-->
       <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_ExtendedTypes)\lib\netstandard2.0\Corvus.Json.ExtendedTypes.dll" IncludeRuntimeDependency="false" />
+        
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Json)\lib\netstandard2.0\System.Text.Json.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_IO_Pipelines)\lib\netstandard2.0\System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
   <ItemGroup>

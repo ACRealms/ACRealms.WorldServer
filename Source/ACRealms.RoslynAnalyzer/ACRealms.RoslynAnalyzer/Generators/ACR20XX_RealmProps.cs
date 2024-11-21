@@ -1,15 +1,12 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text;
 # nullable enable
 
 // This is not a generator, it is a generator diagnostic
@@ -91,8 +88,9 @@ namespace ACRealms.RoslynAnalyzer.Generators
                 return;
             }
 
+            /*
             var schemaText = realmPropSchema!.GetText(context.CancellationToken);
-            JSchema schema;
+            Schema schema;
             if (schemaText == null)
             {
                 Report(DescriptorType.FailedToParse, null, [pathSuffix]);
@@ -108,10 +106,6 @@ namespace ACRealms.RoslynAnalyzer.Generators
                 return;
             }
 
-            context.RegisterAdditionalFileAction(ctx =>
-            {
-                
-            });
             var realmPropFiles = additionalFiles.Where(f => f.Path.Contains($"ACRealms{sep}RealmProps{sep}json{sep}") && f.Path.EndsWith(".jsonc")).ToList();
             foreach(var file in realmPropFiles)
             {
@@ -163,7 +157,7 @@ namespace ACRealms.RoslynAnalyzer.Generators
                         ),[ex.Message]);
                     continue;
                 }
-            }
+            }*/
         }
     }
 }

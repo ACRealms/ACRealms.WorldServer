@@ -1,17 +1,10 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
-using System;
-using Microsoft.CodeAnalysis.Diagnostics;
-using System.Xml.Serialization;
-using Corvus.Json.Validator;
 using System.Text.Json.Nodes;
+/*using Corvus.Json.Validator;
 using JsonObject = Corvus.Json.JsonObject;
+using JsonSchema = Corvus.Json.Validator.JsonSchema;
+using ValidationContext = Corvus.Json.ValidationContext;*/
 
 namespace ACRealms.RealmProps
 {
@@ -31,6 +24,26 @@ namespace ACRealms.RealmProps
 
             // TODO: DELETE FILES THAT AREN'T GENERATED
 
+            var realmPropsDirContext = context.AdditionalTextsProvider
+                .Where(static file => { var sep = Path.DirectorySeparatorChar; return file.Path.Contains($"{sep}RealmProps{sep}json"); });
+
+            IncrementalValuesProvider<(string Path, JsonObject RealmPropsObj)> realmPropObjects = realmPropsDirContext
+                .Where(static file => { var sep = Path.DirectorySeparatorChar; return file.Path.Contains($"{sep}RealmProps{sep}json{sep}"); })
+                .Where(static file => Path.GetExtension(file.Path).Equals(".jsonc", StringComparison.OrdinalIgnoreCase))
+                .Select(static (text, cancellationToken) => ((string Path, string Raw))(text.Path, text.GetText(cancellationToken).ToString()))
+                .Select(static (data, cancellationToken) => ((string Path, JsonObject RealmPropsObj))(data.Path, JsonObject.Parse(data.Raw)));
+
+            context.RegisterSourceOutput(realmPropObjects, (spc, data) =>
+            {
+                var fileName = Path.GetFileNameWithoutExtension(data.Path);
+                var jsonObject = data.RealmPropsObj;
+                var sourceCode = GenerateSourceCode(fileName.Replace("-", "_"), jsonObject);
+                spc.AddSource($"{fileName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
+            });
+        }
+        /*
+        static void OldMethod()
+        {
             var realmPropsDirContext = context.AdditionalTextsProvider
                 .Where(static file => { var sep = Path.DirectorySeparatorChar; return file.Path.Contains($"{sep}RealmProps{sep}json"); });
 
@@ -67,7 +80,7 @@ namespace ACRealms.RealmProps
                 var sourceCode = GenerateSourceCode(fileName.Replace("-", "_"), jsonObject);
                 spc.AddSource($"{fileName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
             });
-        }
+        }*/
 
         private static string RemoveJsonComments(string jsonc)
         {
