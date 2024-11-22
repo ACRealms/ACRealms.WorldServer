@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <!--<PackageReference Include="Corvus.Json.Validator" Version="4.0.12" />-->
+    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="3.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,9 +27,32 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Text.Json" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+    </ItemGroup>
+    
+
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ACRealms.RealmProps\ACRealms.RealmProps.csproj" />
+  </ItemGroup>
+
+  <!-- Required for running in VS -->
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.5" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="System.IO.Pipelines" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.7" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" PrivateAssets="all" GeneratePathProperty="true" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <None Update="lib\netstandard2.0\_._">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <PropertyGroup>
@@ -38,10 +62,15 @@
   <Target Name="GetDependencyTargetPaths">
     <ItemGroup>
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Json)\lib\netstandard2.0\System.Text.Json.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Collections_Immutable)\lib\netstandard2.0\System.Collections.Immutable.dll" IncludeRuntimeDependency="false" />
+        <!--Immutable must be the supplied v8, or analyzers will fail <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Collections_Immutable)\lib\netstandard2.0\System.Collections.Immutable.dll" IncludeRuntimeDependency="false" />-->
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_IO_Pipelines)\lib\netstandard2.0\System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Encodings_Web)\lib\netstandard2.0\System.Text.Encodings.Web.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_HashCode)\lib\netstandard2.0\Microsoft.Bcl.HashCode.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_AsyncInterfaces)\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Extensions_ObjectPool)\lib\netstandard2.0\Microsoft.Extensions.ObjectPool.dll" IncludeRuntimeDependency="false" />        
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCommunityToolkit_HighPerformance)\lib\netstandard2.0\CommunityToolkit.HighPerformance.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
-
+  <!-- End Section Required for running in VS -->
 
 </Project>

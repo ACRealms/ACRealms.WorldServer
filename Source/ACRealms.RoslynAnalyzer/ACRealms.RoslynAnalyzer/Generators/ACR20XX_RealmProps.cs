@@ -1,4 +1,7 @@
+using ACRealms.RealmProps.IntermediateModels;
+using Corvus.Json;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using System;
@@ -7,6 +10,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Nodes;
+using JsonObject = Corvus.Json.JsonObject;
+
 
 // This is not a generator, it is a generator diagnostic
 // The actual generator is in the project ACRealms.RealmsProps
@@ -50,7 +56,7 @@ namespace ACRealms.RoslynAnalyzer.Generators
             { DescriptorType.MissingSchema, new IntermediateDescriptor() { MessageFormat = "Missing JSON Schema file {0}" } },
             { DescriptorType.FailedToParse, new IntermediateDescriptor() { MessageFormat = "Failed to parse JSON for file {0}" } },
             { DescriptorType.JSONValidation, new IntermediateDescriptor() { MessageFormat = "Validation Error: {0}" } },
-            { DescriptorType.Deserialization, new IntermediateDescriptor() { MessageFormat = "(Likely ACRealms bug, please report) - Failed to deserialize valid JSON" } }
+            { DescriptorType.Deserialization, new IntermediateDescriptor() { MessageFormat = "(Likely ACRealms bug, please report) - Failed to deserialize valid JSON: {0}" } }
         }.ToFrozenDictionary(kvp => kvp.Key, kvp => kvp.Value.ToDescriptor(kvp.Key));
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return Descriptors.Values; } }
@@ -73,7 +79,6 @@ namespace ACRealms.RoslynAnalyzer.Generators
             {
                 context.RegisterCompilationEndAction(c => c.ReportDiagnostic(Diagnostic.Create(Descriptors[type], location, messageArgs)));
             }
-
             if (context.Compilation.AssemblyName != "ACE.Entity")
                 return;
 
@@ -87,17 +92,17 @@ namespace ACRealms.RoslynAnalyzer.Generators
                 return;
             }
 
-            /*
             var schemaText = realmPropSchema!.GetText(context.CancellationToken);
-            Schema schema;
             if (schemaText == null)
             {
                 Report(DescriptorType.FailedToParse, null, [pathSuffix]);
                 return;
             }
+
+            JsonObject schema;
             try
             {
-                schema = JSchema.Parse(schemaText.ToString());
+                schema = JsonObject.Parse(schemaText.ToString());
             }
             catch (Exception)
             {
@@ -105,58 +110,95 @@ namespace ACRealms.RoslynAnalyzer.Generators
                 return;
             }
 
-            var realmPropFiles = additionalFiles.Where(f => f.Path.Contains($"ACRealms{sep}RealmProps{sep}json{sep}") && f.Path.EndsWith(".jsonc")).ToList();
-            foreach(var file in realmPropFiles)
+            context.RegisterAdditionalFileAction(c => FileValidationActions(c, realmPropSchema, schema));
+        }
+
+
+        private void FileValidationActions(AdditionalFileAnalysisContext c, AdditionalText realmPropSchema, JsonObject schema)
+        {
+            void Report(DescriptorType type, Location? location = null, object?[]? messageArgs = null)
             {
-                var text = file.GetText(context.CancellationToken);
-                if (text == null)
-                {
-                    Report(DescriptorType.FailedToParse, Location.Create(
-                            file.Path,
-                            TextSpan.FromBounds(1, 1),
-                            new LinePositionSpan(
-                                new LinePosition(1, 1),
-                                new LinePosition(1, 1)
-                            )
-                        ), [file.Path]);
-                    continue;
-                }
-                var raw = text.ToString();
-                JObject realmPropsObj;
+                c.ReportDiagnostic(Diagnostic.Create(Descriptors[type], location, messageArgs));
+            }
+
+            var sep = Path.DirectorySeparatorChar;
+            if (!c.AdditionalFile.Path.Contains($"ACRealms{sep}RealmProps{sep}json{sep}") || !c.AdditionalFile.Path.EndsWith(".jsonc"))
+                return;
+
+            var file = c.AdditionalFile;
+            var text = file.GetText(c.CancellationToken);
+            if (text == null)
+            {
+                Report(DescriptorType.FailedToParse, Location.Create(
+                        file.Path,
+                        TextSpan.FromBounds(1, 1),
+                        new LinePositionSpan(
+                            new LinePosition(1, 1),
+                            new LinePosition(1, 1)
+                        )
+                    ), [file.Path]);
+                return;
+            }
+
+            var raw = text.ToString();
+            JsonObject realmPropsObj;
+            try
+            {
+                realmPropsObj = JsonObject.Parse(raw);
+            }
+            catch (Exception)
+            {
+                Report(DescriptorType.FailedToParse, Location.Create(
+                        file.Path,
+                        TextSpan.FromBounds(1, 1),
+                        new LinePositionSpan(
+                            new LinePosition(1, 1),
+                            new LinePosition(1, 1)
+                        )
+                    ), [file.Path]);
+                return;
+            }
+
+            try
+            {
                 try
                 {
-                    realmPropsObj = JObject.Parse(raw);
+                    var ctx = new ValidationContext().UsingResults().PushSchemaLocation(realmPropSchema.Path);
+                    var realmPropsObjParsed = RealmPropertySchema.FromJson(realmPropsObj.AsJsonElement);
+                    var validation = realmPropsObjParsed.Validate(ctx, ValidationLevel.Detailed);
+
+                    if (!validation.IsValid)
+                    {
+                        foreach (var badResult in validation.Results)
+                        {
+                            //var loc = badResult.Location.Value;
+                            var lineNum = 1;
+                            var linePos = 1;
+                            Report(DescriptorType.JSONValidation,
+                            Location.Create(
+                                file.Path,
+                                TextSpan.FromBounds(lineNum, lineNum),
+                                new LinePositionSpan(
+                                    new LinePosition(lineNum, linePos),
+                                    new LinePosition(lineNum, linePos)
+                                )
+                            ), [badResult.Message]);
+                        }
+                    }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    Report(DescriptorType.FailedToParse, Location.Create(
-                            file.Path,
-                            TextSpan.FromBounds(1, 1),
-                            new LinePositionSpan(
-                                new LinePosition(1, 1),
-                                new LinePosition(1, 1)
-                            )
-                        ), [file.Path]);
-                    continue;
+                    throw ex.InnerException?.InnerException ?? ex.InnerException ?? ex;
                 }
-                try
-                {
-                    realmPropsObj.Validate(schema);
-                }
-                catch (JSchemaValidationException ex)
-                {
-                    Report(DescriptorType.JSONValidation,
-                        Location.Create(
-                            file.Path,
-                            TextSpan.FromBounds(ex.LineNumber, ex.LineNumber),
-                            new LinePositionSpan(
-                                new LinePosition(ex.LineNumber, ex.LinePosition),
-                                new LinePosition(ex.LineNumber, ex.LinePosition)
-                            )
-                        ),[ex.Message]);
-                    continue;
-                }
-            }*/
+            }
+            catch (Exception ex)
+            {
+                var lineNum = 1;
+                var linePos = 1;
+                Report(DescriptorType.Deserialization,
+                Location.Create(file.Path, TextSpan.FromBounds(lineNum, lineNum),
+                    new LinePositionSpan(new LinePosition(lineNum, linePos), new LinePosition(lineNum, linePos))), [ex.Message]);
+            }
         }
     }
 }
