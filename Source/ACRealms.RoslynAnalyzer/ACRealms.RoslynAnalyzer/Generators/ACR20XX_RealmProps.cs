@@ -8,6 +8,7 @@ using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Nodes;
@@ -163,7 +164,11 @@ namespace ACRealms.RoslynAnalyzer.Generators
             {
                 try
                 {
-                    var ctx = new ValidationContext().UsingResults().PushSchemaLocation(realmPropSchema.Path);
+                    var ctx = new ValidationContext()
+                        .UsingResults()
+                        .UsingEvaluatedProperties()
+                        .UsingEvaluatedItems()
+                        .PushSchemaLocation(realmPropSchema.Path);
                     var realmPropsObjParsed = RealmPropertySchema.FromJson(realmPropsObj.AsJsonElement);
                     var validation = realmPropsObjParsed.Validate(ctx, ValidationLevel.Detailed);
 
@@ -171,6 +176,8 @@ namespace ACRealms.RoslynAnalyzer.Generators
                     {
                         foreach (var badResult in validation.Results)
                         {
+                           if (!Debugger.IsAttached)
+                              Debugger.Launch();
                             //var loc = badResult.Location.Value;
                             var lineNum = 1;
                             var linePos = 1;
