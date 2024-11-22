@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-# nullable enable
 
 // This is not a generator, it is a generator diagnostic
 // The actual generator is in the project ACRealms.RealmsProps

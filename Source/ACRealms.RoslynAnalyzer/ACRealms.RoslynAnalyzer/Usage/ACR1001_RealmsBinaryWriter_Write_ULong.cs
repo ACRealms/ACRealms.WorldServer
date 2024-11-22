@@ -18,7 +18,7 @@ namespace ACRealms.RoslynAnalyzer.Usage
 
         private static readonly DiagnosticDescriptor Rule = new (DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return [Rule]; } }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[] { Rule }.ToImmutableArray();
 
         public override void Initialize(AnalysisContext context)
         {
@@ -33,7 +33,7 @@ namespace ACRealms.RoslynAnalyzer.Usage
             var memberAccessExpr = invocationExpr.Expression as MemberAccessExpressionSyntax;
             if (memberAccessExpr?.Name.ToString().ToLower() != "write")
                 return;
-
+            
             if (context.SemanticModel.GetSymbolInfo(invocationExpr, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
                 return;
             if (methodSymbol.ReceiverType.Name != "RealmsBinaryWriter")
