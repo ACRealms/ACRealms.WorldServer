@@ -3,6 +3,7 @@
   "namespace": "Peripheral.ClassicalInstance",
   "groups": [
     {
+      //Foo
       "type": "boolean",
       "default": false,
       "properties": { 
@@ -10,7 +11,7 @@
           "Enables classical instances for the realm. \n",
           "Use the dungeon-sets peripheral configuration file to define landblocks for which players will be given private instances."
         ],
-        "ShareWithPlayerAccount_1": [
+        "ShareWithPlayerAccount": [
           "If enabled, classical instances will be assigned per account instead of per character. \n",
           "If a player owns a house in a classical instance, they will lose access to it if this is toggled."
         ],

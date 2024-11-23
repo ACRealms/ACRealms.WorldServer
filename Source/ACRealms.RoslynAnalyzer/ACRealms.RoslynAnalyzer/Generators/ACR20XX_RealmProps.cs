@@ -13,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json.Nodes;
 using JsonObject = Corvus.Json.JsonObject;
-
+#nullable enable
 
 // This is not a generator, it is a generator diagnostic
 // The actual generator is in the project ACRealms.RealmsProps
@@ -60,12 +60,7 @@ namespace ACRealms.RoslynAnalyzer.Generators
             { DescriptorType.Deserialization, new IntermediateDescriptor() { MessageFormat = "(Likely ACRealms bug, please report) - Failed to deserialize valid JSON: {0}" } }
         }.ToFrozenDictionary(kvp => kvp.Key, kvp => kvp.Value.ToDescriptor(kvp.Key));
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return Descriptors.Values; } }
-
-        private static Diagnostic Diag(DescriptorType type, Location? location = null, object?[]? messageArgs = null)
-        {
-            return Diagnostic.Create(Descriptors[type], location, messageArgs);
-        }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Descriptors.Values;
 
         public override void Initialize(AnalysisContext context)
         {
@@ -111,11 +106,11 @@ namespace ACRealms.RoslynAnalyzer.Generators
                 return;
             }
 
-            context.RegisterAdditionalFileAction(c => FileValidationActions(c, realmPropSchema, schema));
+            context.RegisterAdditionalFileAction(c => FileValidationActions(c, realmPropSchema));
         }
 
 
-        private void FileValidationActions(AdditionalFileAnalysisContext c, AdditionalText realmPropSchema, JsonObject schema)
+        private void FileValidationActions(AdditionalFileAnalysisContext c, AdditionalText realmPropSchema)
         {
             void Report(DescriptorType type, Location? location = null, object?[]? messageArgs = null)
             {
@@ -145,8 +140,10 @@ namespace ACRealms.RoslynAnalyzer.Generators
             JsonObject realmPropsObj;
             try
             {
+                raw = RealmProps.NamespacedRealmPropertyGenerator.RemoveJsonComments(raw, c.CancellationToken);
                 realmPropsObj = JsonObject.Parse(raw);
             }
+            catch (OperationCanceledException) { throw; }
             catch (Exception)
             {
                 Report(DescriptorType.FailedToParse, Location.Create(
@@ -164,11 +161,11 @@ namespace ACRealms.RoslynAnalyzer.Generators
             {
                 try
                 {
-                    var ctx = new ValidationContext()
+                    var ctxOrig = new ValidationContext()
                         .UsingResults()
                         .UsingEvaluatedProperties()
-                        .UsingEvaluatedItems()
-                        .PushSchemaLocation(realmPropSchema.Path);
+                        .UsingEvaluatedItems();
+                    var ctx = ctxOrig.PushSchemaLocation(realmPropSchema.Path);
                     var realmPropsObjParsed = RealmPropertySchema.FromJson(realmPropsObj.AsJsonElement);
                     var validation = realmPropsObjParsed.Validate(ctx, ValidationLevel.Detailed);
 
@@ -176,8 +173,8 @@ namespace ACRealms.RoslynAnalyzer.Generators
                     {
                         foreach (var badResult in validation.Results)
                         {
-                           if (!Debugger.IsAttached)
-                              Debugger.Launch();
+                          // if (!Debugger.IsAttached)
+                          //    Debugger.Launch();
                             //var loc = badResult.Location.Value;
                             var lineNum = 1;
                             var linePos = 1;
@@ -193,11 +190,13 @@ namespace ACRealms.RoslynAnalyzer.Generators
                         }
                     }
                 }
+                catch (OperationCanceledException) { throw; }
                 catch (Exception ex)
                 {
                     throw ex.InnerException?.InnerException ?? ex.InnerException ?? ex;
                 }
             }
+            catch (OperationCanceledException) { throw; }
             catch (Exception ex)
             {
                 var lineNum = 1;

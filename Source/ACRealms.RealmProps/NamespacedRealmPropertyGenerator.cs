@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System.Text.Json.Nodes;
+using System.Threading;
 /*using Corvus.Json.Validator;
 using JsonObject = Corvus.Json.JsonObject;
 using JsonSchema = Corvus.Json.Validator.JsonSchema;
@@ -13,9 +14,9 @@ namespace ACRealms.RealmProps
     //            This allows for more accurate errors to be displayed during compilation
     //
     // The C# model classes in ACRealms.RealmProps.RealmPropModels are generated through a manual script invocation as needed
-#pragma warning disable RS1038 // Compiler extensions should be implemented in assemblies with compiler-provided references
+//#pragma warning disable RS1038 // Compiler extensions should be implemented in assemblies with compiler-provided references
     [Generator(LanguageNames.CSharp)]
-#pragma warning restore RS1038 // Compiler extensions should be implemented in assemblies with compiler-provided references
+//#pragma warning restore RS1038 // Compiler extensions should be implemented in assemblies with compiler-provided references
     public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -31,6 +32,7 @@ namespace ACRealms.RealmProps
                 .Where(static file => { var sep = Path.DirectorySeparatorChar; return file.Path.Contains($"{sep}RealmProps{sep}json{sep}"); })
                 .Where(static file => Path.GetExtension(file.Path).Equals(".jsonc", StringComparison.OrdinalIgnoreCase))
                 .Select(static (text, cancellationToken) => ((string Path, string Raw))(text.Path, text.GetText(cancellationToken).ToString()))
+                .Select(static (text, cancellationToken) => ((string Path, string Raw))(text.Path, RemoveJsonComments(text.Raw, cancellationToken)))
                 .Select(static (data, cancellationToken) => ((string Path, JsonObject RealmPropsObj))(data.Path, JsonObject.Parse(data.Raw)));
 
             context.RegisterSourceOutput(realmPropObjects, (spc, data) =>
@@ -82,26 +84,25 @@ namespace ACRealms.RealmProps
             });
         }*/
 
-        private static string RemoveJsonComments(string jsonc)
+        public static string RemoveJsonComments(string jsonc, CancellationToken token)
         {
             var sb = new StringBuilder();
-            using (var reader = new StringReader(jsonc))
+            using var reader = new StringReader(jsonc);
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    // Remove single-line comments
-                    var index = line.IndexOf("//");
-                    if (index >= 0)
-                        line = line.Substring(0, index);
+                token.ThrowIfCancellationRequested();
+                // Remove single-line comments
+                var index = line.IndexOf("//");
+                if (index >= 0)
+                    line = line[..index];
 
-                    // Remove block comments (simple implementation)
-                    // You can enhance this to handle multi-line block comments
-                    sb.AppendLine(line);
-                }
-
-                return sb.ToString();
+                // Remove block comments (simple implementation)
+                // You can enhance this to handle multi-line block comments
+                sb.AppendLine(line);
             }
+
+            return sb.ToString();
         }
         private static string GenerateSourceCode(string className, JsonObject realmPropNamespace)
         {
