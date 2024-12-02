@@ -31,7 +31,8 @@
     <PackageIconUrl />
     <ApplicationIcon>images\acrealms-icon.ico</ApplicationIcon>
     <Product>ACRealms.WorldServer</Product>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
 
   <ItemGroup>
@@ -326,14 +327,15 @@
     <Folder Include="Realms\Constants\" />
   </ItemGroup>
 
+    <!--
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="if not exist &quot;$(ProjectDir)log4net.config&quot; if exist &quot;$(TargetDir)log4net.config&quot; copy &quot;$(TargetDir)log4net.config&quot; &quot;$(ProjectDir)log4net.config&quot;&#xD;&#xA;if exist &quot;$(ProjectDir)log4net.config&quot; copy &quot;$(ProjectDir)log4net.config&quot; &quot;$(TargetDir)log4net.config&quot;" Condition="'$(OS)' == 'Windows_NT'" />
+    <Exec Command="" Condition="'$(OS)' == 'Windows_NT'" />
     <Exec Command="if [ -f &quot;$(ProjectDir)Config.js&quot; ] ; then cp &quot;$(ProjectDir)Config.js&quot; &quot;$(TargetDir)Config.js&quot; ; fi&#xD;&#xA;if [ ! -f &quot;$(ProjectDir)log4net.config&quot; ] &amp;&amp; [ -f &quot;$(TargetDir)log4net.config&quot; ] ; then cp &quot;$(TargetDir)log4net.config&quot; &quot;$(ProjectDir)log4net.config&quot; ; fi&#xD;&#xA;if [ -f &quot;$(ProjectDir)log4net.config&quot; ] ; then cp &quot;$(ProjectDir)log4net.config&quot; &quot;$(TargetDir)log4net.config&quot; ; fi" Condition="'$(OS)' != 'Windows_NT'" />
-  </Target>
+  </Target>-->
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="dotnet $(TargetDir)ACRealms.JsonSchemaGenerator.dll" />
-  </Target>
+  </Target>-->
   <Target Name="GetGitHash" BeforeTargets="WriteGitHash" Condition="'$(BuildHash)' == ''">
     <PropertyGroup>
       <VerFile>$(IntermediateOutputPath)gitver</VerFile>
@@ -346,7 +348,7 @@
       <BuildHash>@(GitVersion)</BuildHash>
     </PropertyGroup>
   </Target>
-  <Target Name="WriteGitHash" BeforeTargets="CoreCompile">
+  <!--<Target Name="WriteGitHash" BeforeTargets="CoreCompile">
     <PropertyGroup>
       <CustomAssemblyInfoFile>$(IntermediateOutputPath)CustomAssemblyInfo.cs</CustomAssemblyInfoFile>
     </PropertyGroup>
@@ -360,5 +362,5 @@
       </AssemblyAttributes>
     </ItemGroup>
     <WriteCodeFragment Language="C#" OutputFile="$(CustomAssemblyInfoFile)" AssemblyAttributes="@(AssemblyAttributes)" />
-  </Target>
+  </Target>-->
 </Project>

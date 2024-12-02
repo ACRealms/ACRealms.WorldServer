@@ -24,8 +24,6 @@ namespace ACRealms.RoslynAnalyzer.Generators
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ACR20XX_RealmProps : DiagnosticAnalyzer
     {
-       // static string SchemaFile { get; } = File.ReadAllText($"{SolutionPath}/ACE.Entity/ACRealms/RealmProps/json-schema/realm-property-schema.json");
-
         private const string Category = "Generators";
 
         private static readonly string Title = "RealmProps";
@@ -66,7 +64,12 @@ namespace ACRealms.RoslynAnalyzer.Generators
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.EnableConcurrentExecution();
-            context.RegisterCompilationStartAction(SchemaValidationActions);
+            context.RegisterCompilationStartAction(c =>
+            {
+                if (c.Compilation.AssemblyName != "ACE.Entity")
+                    return; // make sure its ACE.Entity only, perhaps later we can have assembly attributes to enable this for other assemblies
+                SchemaValidationActions(c);
+            });
         }
 
         private void SchemaValidationActions(CompilationStartAnalysisContext context)
@@ -140,7 +143,7 @@ namespace ACRealms.RoslynAnalyzer.Generators
             JsonObject realmPropsObj;
             try
             {
-                raw = RealmProps.NamespacedRealmPropertyGenerator.RemoveJsonComments(raw, c.CancellationToken);
+                raw = CodeGen.NamespacedRealmPropertyGenerator.RemoveJsonComments(raw, c.CancellationToken);
                 realmPropsObj = JsonObject.Parse(raw);
             }
             catch (OperationCanceledException) { throw; }

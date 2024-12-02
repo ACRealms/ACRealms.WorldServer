@@ -35,7 +35,7 @@ namespace ACRealms.Tests.Fixtures.Database
     // http://xunitpatterns.com/Table%20Truncation%20Teardown.html
     // https://umplify.github.io/xunit-dependency-injection/
     // https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/
-    public class TestDatabaseService : IDisposable
+    public sealed class TestDatabaseService : IDisposable
     {
         public static string TestUserName { get; } = "acrealms_test_db_user";
         private static string TestUserFull { get; } = $"'{TestUserName}'@'%'";
@@ -111,11 +111,9 @@ namespace ACRealms.Tests.Fixtures.Database
             bool validDb = false;
             try
             {
-                using (var context = provider.GetRequiredService<IDbContextFactory<WorldDbContext>>().CreateDbContext())
-                {
-                    if (context.Weenie.First() != null)
-                        validDb = true;
-                }
+                using var context = provider.GetRequiredService<IDbContextFactory<WorldDbContext>>().CreateDbContext();
+                if (context.Weenie.First() != null)
+                    validDb = true;
             }
             catch (Exception) { }
 
@@ -157,7 +155,7 @@ namespace ACRealms.Tests.Fixtures.Database
                     while ((line = sr.ReadLine()) != null)
                     {
                         line = line.Replace("ace_world", WorldDbName);
-                        if (line.EndsWith(";"))
+                        if (line.EndsWith(';'))
                         {
                             completeSQLline += line + Environment.NewLine;
                             var command = connection.CreateCommand();
@@ -207,14 +205,10 @@ namespace ACRealms.Tests.Fixtures.Database
 
         static string FileMD5Sum(string filePath)
         {
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = new BufferedStream(System.IO.File.OpenRead(filePath), 1200000))
-                {
-                    var hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
+            using var md5 = MD5.Create();
+            using var stream = new BufferedStream(System.IO.File.OpenRead(filePath), 1200000);
+            var hash = md5.ComputeHash(stream);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
         static bool IsFileValid(string filePath, string knownMd5, bool raiseOnMd5Mismatch = true)
@@ -275,30 +269,31 @@ namespace ACRealms.Tests.Fixtures.Database
             command.ExecuteNonQuery();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Depends on constant value")]
         static void CleanupDbState()
         {
-            using (var context = new RootDbContext())
+            using var context = new RootDbContext();
+            var connection = context.Database.GetDbConnection();
+            connection.Open();
+            var command = connection.CreateCommand();
+            if (RESET_DB_EACH_RUN) // Can be temporarily false when trying to make specific tests pass, but some tests need this to be true
             {
-                var connection = context.Database.GetDbConnection();
-                connection.Open();
-                var command = connection.CreateCommand();
-                if (RESET_DB_EACH_RUN) // Can be temporarily false when trying to make specific tests pass, but some tests need this to be true
-                {
-                    command.CommandText = @$"
+#pragma warning disable CS0162 // Unreachable code detected
+                command.CommandText = @$"
                     DROP DATABASE IF EXISTS `{AuthDbName}`;
                     DROP DATABASE IF EXISTS `{WorldDbName}`;
                     DROP DATABASE IF EXISTS `{ShardDbName}`;
                     DROP USER IF EXISTS {TestUserFull};";
-                }
-                else
-                {
-#pragma warning disable CS0162 // Unreachable code detected
-                    command.CommandText = $"DROP USER IF EXISTS {TestUserFull};";
 #pragma warning restore CS0162 // Unreachable code detected
-                }
-                
-                command.ExecuteNonQuery();
             }
+            else
+            {
+#pragma warning disable CS0162 // Unreachable code detected
+                command.CommandText = $"DROP USER IF EXISTS {TestUserFull};";
+#pragma warning restore CS0162 // Unreachable code detected
+            }
+
+            command.ExecuteNonQuery();
         }
         public void Dispose()
         {
@@ -307,7 +302,7 @@ namespace ACRealms.Tests.Fixtures.Database
         private static string RandomPassword()
         {
             string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-            StringBuilder res = new StringBuilder();
+            StringBuilder res = new();
             var len = 32;
             using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
             {

@@ -15,11 +15,27 @@
     "valLong": { "type": "integer", "minimum": -9223372036854775808, "maximum": 9223372036854775807, "default": 0 },
     "valFloat": { "type": "number", "minimum": -1.79769313486231E308, "maximum": 1.79769313486231E308, "default": 0 },
     "valBool": { "type": "boolean", "default": false },
+    "valStringSimple": { "type": "string", "default": "", "maxLength": 64000 },
+    "valStringArray": { "type": "array", "maxItems": 320,
+      "description": "list of string fragments to be concatenated together to allow json string to be broken up into multiple lines in the editor",
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+    },
     "valString": { "oneOf": [
-        { "type": "string", "default": "", "maxLength": 64000 },
-        { "type": "array", "maxItems": 320,
-          "description": "list of string fragments to be concatenated together to allow json string to be broken up into multiple lines in the editor",
-          "items": { "type": "string", "minLength": 1, "maxLength": 200 } }
+        { "$ref": "#/definitions/valStringSimple" },
+        { "$ref": "#/definitions/valStringArray" }
+      ]
+    },
+    "descriptionPattern": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9 ,.'?~=(){}!@#$^&*\\-+/_\\[\\]]+$"
+    },
+    "descriptionArray": {
+      "allOf": [ { "$ref": "#/definitions/valStringArray" }, { "items": { "$ref": "#/definitions/descriptionPattern" } } ]
+    },
+    "valDescription": {
+      "oneOf": [
+        { "$ref": "#/definitions/descriptionPattern", "allOf": { "$ref": "#/definitions/valStringSimple" } },
+        { "$ref": "#/definitions/descriptionArray" }
       ]
     },
     "objPropList": {
@@ -73,7 +89,7 @@
     },
     "objProp": {
       "properties": {
-        "description": { "$ref": "#/definitions/valString" },
+        "description": { "$ref": "#/definitions/valDescription" },
         "description_format": false
       },
       "allOf": [ { "$ref": "#/definitions/objPropOrGroup" } ],
@@ -82,14 +98,14 @@
     "propDef": {
       "oneOf": [
         { "$ref": "#/definitions/objProp" },
-        { "$ref": "#/definitions/valString",
+        { "$ref": "#/definitions/valDescription",
           "description": "The description of the property, or the short description if contained in a group defining description_format" }
       ]
     },
     "propertytype": { "type": "string", "enum": [ "integer", "boolean", "float", "int64", "string", "enum" ] },
     "group": {
       "properties": {
-        "description_format": { "$ref": "#/definitions/valString" },
+        "description_format": { "$ref": "#/definitions/valDescription" },
         "key_prefix": {
           "maxLength": 30, "allOf": [ { "$ref": "#/definitions/propName" } ],
           "description": "Property names in this group will be prefixed with this value" },

@@ -146,6 +146,8 @@ namespace ACRealms.Tests.Tests.RealmPropGenerator
         public async Task CanGenerateRealmProps()
         {
             await RunTest<RealmPropGeneratorTest>(
+                "creature\\attribute.jsonc",
+                "attribute.g.cs",
                 """
                     {
                         "$schema_version": 1,
@@ -162,6 +164,60 @@ namespace ACRealms.Tests.Tests.RealmPropGenerator
                     }
                 """,
                 """
+namespace ACRealms.RealmProps.Creature
+{
+    public enum Attribute
+    {
+        [Description("All creatures will have this value added to their Strength attribute")]
+        CreatureStrengthAdded,
+
+        [Description("All creatures will have this value added to their Endurance attribute")]
+        CreatureEnduranceAdded,
+
+        [Description("All creatures will have this value added to their Coordination attribute")]
+        CreatureCoordinationAdded,
+
+        [Description("All creatures will have this value added to their Quickness attribute")]
+        CreatureQuicknessAdded,
+
+        [Description("All creatures will have this value added to their Focus attribute")]
+        CreatureFocusAdded,
+
+        [Description("All creatures will have this value added to their Self attribute")]
+        CreatureSelfAdded,
+    }
+}
+"""
+).ConfigureAwait(false);
+        }
+
+        [Fact]
+        [SuppressMessage("Usage", "xUnit1030:Do not call ConfigureAwait(false) in test method", Justification = "<Pending>")]
+        public async Task CanGenerateRealmProps2()
+        {
+            await RunTest<RealmPropGeneratorTest>(
+                "core\\instance.jsonc",
+                "instance.g.cs",
+                """
+                {
+                    "$schema_version": 1,
+                    "namespace": "Core.Instance",
+                    "groups": [
+                    {
+                        "type": "enum",
+                        "enum": "PlayerInstanceSelectMode",
+                        "key_suffix": "InstanceSelectMode",
+                        "default": "HomeRealm",
+                        "description_format": "When {short_description}, determines which mode to use to select the realm or instance.",
+                        "properties": {
+                            "Recall": "recalling",
+                            "Portal": "using a portal"
+                        }
+                    }
+                  ]
+                }
+                """,
+                """
 namespace ACRealms.RealmProps.Generated
 {
     public partial class Foo1
@@ -176,7 +232,7 @@ namespace ACRealms.RealmProps.Generated
 ).ConfigureAwait(false);
         }
 
-        private static async Task RunTest<TestType>(string testSource, string generatedSource, DiagnosticResult? expectedDiagnostic = null)
+        private static async Task RunTest<TestType>(string sourceFilename, string expectedDestFilename, string testSource, string generatedSource, DiagnosticResult? expectedDiagnostic = null)
            where TestType : SourceGeneratorTest<RealmPropVerifier>, IGeneratorTestBase, new()
         {
             var test = new TestType
@@ -187,9 +243,9 @@ namespace ACRealms.RealmProps.Generated
             {
                 test.ExpectedDiagnostics.Add(expectedDiagnostic.Value);
             }
-            test.TestState.AdditionalFiles.Add(("ACRealms\\RealmProps\\json\\peripheral\\classical-instance.jsonc", SourceText.From(testSource)));
+            test.TestState.AdditionalFiles.Add(($"ACRealms\\RealmProps\\json\\{sourceFilename}", SourceText.From(testSource)));
             test.TestState.AdditionalFiles.Add(("ACRealms\\RealmProps\\json-schema\\realm-property-schema.json", SourceText.From(SchemaFile)));
-            test.TestState.GeneratedSources.Add((typeof(Gen), "classical-instance.g.cs", generatedSource));
+            test.TestState.GeneratedSources.Add((typeof(Gen), expectedDestFilename, generatedSource));
             await test.RunAsync();
         }
     }

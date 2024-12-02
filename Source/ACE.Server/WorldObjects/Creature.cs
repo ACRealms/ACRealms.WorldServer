@@ -16,6 +16,8 @@ using ACE.Server.WorldObjects.Entity;
 
 using Position = ACE.Entity.Position;
 using ACE.Server.Realms;
+using Props = ACRealms.Props.Creature;
+using ACRealms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -83,7 +85,7 @@ namespace ACE.Server.WorldObjects
                     Biota.PropertiesAttribute[PropertyAttribute.Strength].InitLevel =
                         ClampStat(
                             (int)Biota.PropertiesAttribute[PropertyAttribute.Strength].InitLevel,
-                            ruleset.GetProperty(RealmPropertyInt.CreatureStrengthAdded),
+                            ruleset.ValueOf(Props.Attributes.StrengthAdded),
                             ruleset.GetProperty(RealmPropertyFloat.CreatureStrengthMultiplier)
                         );
                 }

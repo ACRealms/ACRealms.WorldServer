@@ -5,6 +5,6 @@ namespace ACE.Server
 {
     partial class Services
     {
-       
+        const int a = 3;
     }
 }

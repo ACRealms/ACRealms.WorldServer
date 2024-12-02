@@ -3,23 +3,22 @@
   "namespace": "Peripheral.ClassicalInstance",
   "groups": [
     {
-      //Foo
       "type": "boolean",
       "default": false,
-      "properties": { 
+      "properties": {
         "Enabled": [
-          "Enables classical instances for the realm. \n",
+          "Enables classical instances for the realm. ",
           "Use the dungeon-sets peripheral configuration file to define landblocks for which players will be given private instances."
         ],
         "ShareWithPlayerAccount": [
-          "If enabled, classical instances will be assigned per account instead of per character. \n",
+          "If enabled, classical instances will be assigned per account instead of per character. ",
           "If a player owns a house in a classical instance, they will lose access to it if this is toggled."
         ],
         "IgnoreCharacterProp": [
           "If enabled, classical instances will be active regardless of the character's PropertyBool.ClassicalInstancesActive."
         ],
         "EnableForAllLandblocksDangerous": [
-          "If enabled, classical instances will be active regardless of the character's location. \n",
+          "If enabled, classical instances will be active regardless of the character's location. ",
           "This is not recommended for realms other than true solo-self-found realms, and is considered an advanced feature."
         ],
         "AllowHousingPurchase": "If enabled, players can purchase houses in the instance ID assigned to the player."
@@ -31,8 +30,8 @@
       "type": "string",
       "default": "default",
       "description": [
-        "For the landblocks matching the name of this dungeon set,\n",
-        "classical instances will be enabled for players with the ClassicalInstancesActive boolean property,\n",
+        "For the landblocks matching the name of this dungeon set,",
+        "classical instances will be enabled for players with the ClassicalInstancesActive boolean property,",
         "if the ruleset also has UseClassicalInstances set to true."
       ]
     }

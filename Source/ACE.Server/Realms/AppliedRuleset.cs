@@ -541,20 +541,22 @@ namespace ACE.Server.Realms
             }
         }
 
-        public bool GetProperty(RealmPropertyBool property)
+        public bool GetProperty(RealmPropertyBool prop) => ValueOf(prop);
+        public bool ValueOf(RealmPropertyBool prop)
         {
-            var att = RealmPropertyPrototypes.Bool[property].PrimaryAttribute;
-            if (PropertiesBool.TryGetValue(property, out var value))
+            var att = RealmPropertyPrototypes.Bool[prop].PrimaryAttribute;
+            if (PropertiesBool.TryGetValue(prop, out var value))
                 return value.Value;
             if (att.DefaultFromServerProperty != null)
                 return PropertyManager.GetBool(att.DefaultFromServerProperty, att.DefaultValue).Item;
             return att.DefaultValue;
         }
 
-        public double GetProperty(RealmPropertyFloat property)
+        public double GetProperty(RealmPropertyFloat prop) => ValueOf(prop);
+        public double ValueOf(RealmPropertyFloat prop)
         {
-            var att = RealmPropertyPrototypes.Float[property].PrimaryAttribute;
-            if (PropertiesFloat.TryGetValue(property, out var result))
+            var att = RealmPropertyPrototypes.Float[prop].PrimaryAttribute;
+            if (PropertiesFloat.TryGetValue(prop, out var result))
             {
                 var val = result.Value;
                 val = Math.Max(val, att.MinValue);
@@ -569,10 +571,11 @@ namespace ACE.Server.Realms
             return retval;
         }
 
-        public int GetProperty(RealmPropertyInt property)
+        public int GetProperty(RealmPropertyInt prop) => ValueOf(prop);
+        public int ValueOf(RealmPropertyInt prop)
         {
-            var att = RealmPropertyPrototypes.Int[property].PrimaryAttribute;
-            if (PropertiesInt.TryGetValue(property, out var result))
+            var att = RealmPropertyPrototypes.Int[prop].PrimaryAttribute;
+            if (PropertiesInt.TryGetValue(prop, out var result))
             {
                 var val = result.Value;
                 val = Math.Max(val, att.MinValue);
@@ -595,10 +598,11 @@ namespace ACE.Server.Realms
             return retval;
         }
 
-        public long GetProperty(RealmPropertyInt64 property)
+        public long GetProperty(RealmPropertyInt64 prop) => ValueOf(prop);
+        public long ValueOf(RealmPropertyInt64 prop)
         {
-            var att = RealmPropertyPrototypes.Int64[property].PrimaryAttribute;
-            if (PropertiesInt64.TryGetValue(property, out var result))
+            var att = RealmPropertyPrototypes.Int64[prop].PrimaryAttribute;
+            if (PropertiesInt64.TryGetValue(prop, out var result))
             {
                 var val = result.Value;
                 val = Math.Max(val, att.MinValue);
@@ -613,10 +617,11 @@ namespace ACE.Server.Realms
             return retval;
         }
 
-        public string GetProperty(RealmPropertyString property)
+        public string GetProperty(RealmPropertyString prop) => ValueOf(prop);
+        public string ValueOf(RealmPropertyString prop)
         {
-            var att = RealmPropertyPrototypes.String[property].PrimaryAttribute;
-            if (PropertiesString.TryGetValue(property, out var result))
+            var att = RealmPropertyPrototypes.String[prop].PrimaryAttribute;
+            if (PropertiesString.TryGetValue(prop, out var result))
                 return result.Value;
             if (att.DefaultFromServerProperty != null)
                 return PropertyManager.GetString(att.DefaultFromServerProperty, att.DefaultValue).Item;

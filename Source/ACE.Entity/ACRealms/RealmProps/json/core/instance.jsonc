@@ -3,8 +3,9 @@
   "namespace": "Core.Instance",
   "groups": [
     {
-      "type": "enum",
-      "enum": "PlayerInstanceSelectMode",
+      //"type": "enum",
+      "type": "string",
+      //"enum": "PlayerInstanceSelectMode",
       "key_suffix": "InstanceSelectMode",
       "default": "HomeRealm",
       "description_format": "When {short_description}, determines which mode to use to select the realm or instance.",

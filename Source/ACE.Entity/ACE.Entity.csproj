@@ -13,7 +13,7 @@
     <Company>ACEmulator</Company>
     <Version>1.0.0</Version>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>ACRealms/RealmProps/Generated</CompilerGeneratedFilesOutputPath>
+    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 
   </PropertyGroup>
 
@@ -69,21 +69,30 @@
     <None Remove="ACRealms\RealmProps\json-schema\realm-property-schema.json" />
   </ItemGroup>
 
+ <!-- <Target Name="CleanSourceGeneratedFiles" BeforeTargets="BeforeBuild" DependsOnTargets="$(BeforeBuildDependsOn)">
+    <RemoveDir Directories="$(CompilerGeneratedFilesOutputPath)\ACRealms.RealmProps" />
+    <ItemGroup>
+      <Compile Remove="$(CompilerGeneratedFilesOutputPath)\ACRealms.RealmProps\**" />
+      <Content Include="$(CompilerGeneratedFilesOutputPath)\ACRealms.RealmProps\**" />
+    </ItemGroup>
+  </Target>-->
+
   <ItemGroup>
     <AdditionalFiles Include="ACRealms\RealmProps\json-schema\realm-property-schema.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ACRealms\RealmProps\json\player\" />
+    <Folder Include="Generated\" />
   </ItemGroup>
+
     <Target Name="ExcludeGeneratedFiles" BeforeTargets="CoreCompile">
         <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != ''">
             <!-- Don't include the output from a previous source generator execution into future runs; -->
             <!-- the */** trick here ensures that there's at least one subdirectory, which is our key  -->
             <!-- that it's coming from a source generator as opposed to something that is coming from  -->
             <!-- some other tool. -->
-            <Compile Remove="$(CompilerGeneratedFilesOutputPath)/*/**/*.g.cs" />
-            <None Include="$(CompilerGeneratedFilesOutputPath)/**" />
+            <Compile Remove="$(CompilerGeneratedFilesOutputPath)/ACRealms.RealmProps/*/**/*.g.cs" />
+            <None Include="$(CompilerGeneratedFilesOutputPath)/ACRealms.RealmProps/**" />
         </ItemGroup>
     </Target>
 </Project>
