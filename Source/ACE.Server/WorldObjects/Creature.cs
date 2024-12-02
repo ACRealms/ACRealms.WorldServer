@@ -85,7 +85,15 @@ namespace ACE.Server.WorldObjects
                     Biota.PropertiesAttribute[PropertyAttribute.Strength].InitLevel =
                         ClampStat(
                             (int)Biota.PropertiesAttribute[PropertyAttribute.Strength].InitLevel,
-                            ruleset.ValueOf(Props.Attributes.StrengthAdded),
+
+                            //old syntax
+                            ruleset.GetProperty(RealmPropertyInt.CreatureStrengthAdded),
+
+                            //new syntax (note the file header has: "using Props = ACRealms.Props.Creature;")
+                            //  ruleset.ValueOf(Props.Attributes.StrengthAdded),
+
+                            // Or without the using alias: ruleset.ValueOf(Props.Creature.Attributes.StrengthAdded)
+                            
                             ruleset.GetProperty(RealmPropertyFloat.CreatureStrengthMultiplier)
                         );
                 }

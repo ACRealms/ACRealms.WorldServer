@@ -8,18 +8,21 @@ global using RealmPropertyIntStaging = ACE.Entity.Enum.Properties.RealmPropertyI
 //global using RealmPropertyFloatStaging = ACE.Entity.Enum.Properties.RealmPropertyFloatStaging;
 global using RealmPropertyBoolStaging = ACE.Entity.Enum.Properties.RealmPropertyBoolStaging;
 global using RealmPropertyStringStaging = ACE.Entity.Enum.Properties.RealmPropertyStringStaging;
-namespace ACRealms.Props
+namespace ACRealms;
+
+public enum RealmPropertyInt2
 {
-    public enum RealmPropertyInt2
+    None,
+    Creature_Attributes_StrengthAddedA,
+    Creature_Attributes_EnduranceAddedA,
+    Creature_Attributes_CoordinationAddedA
+}
+
+public static partial class Props
+{
+    public static partial class Creature
     {
-        None,
-        Creature_Attributes_StrengthAddedA,
-        Creature_Attributes_EnduranceAddedA,
-        Creature_Attributes_CoordinationAddedA
-    }
-    public static class Creature
-    {
-        public static class Attributes
+        public static class Attributes2
         {
             /// <summary>All creatures will have this value added to their Strength attribute</summary>
             public const RealmPropertyInt2 StrengthAddedA = RealmPropertyInt2.Creature_Attributes_StrengthAddedA;
@@ -28,11 +31,11 @@ namespace ACRealms.Props
             /// <summary>All creatures will have this value added to their Coordination attribute</summary>
             public const RealmPropertyInt2 CoordinationAddedA = RealmPropertyInt2.Creature_Attributes_CoordinationAddedA;
             /// <summary>All creatures will have this value added to their Quickness attribute</summary>
-          //  public const RealmPropertyInt2 QuicknessAddedA = RealmPropertyInt2.Creature_Attributes_QuicknessAddedA;
+            //  public const RealmPropertyInt2 QuicknessAddedA = RealmPropertyInt2.Creature_Attributes_QuicknessAddedA;
             /// <summary>All creatures will have this value added to their Focus attribute</summary>
-         //   public const RealmPropertyInt2 FocusAddedA = RealmPropertyInt2.Creature_Attributes_FocusAddedA;
+            //   public const RealmPropertyInt2 FocusAddedA = RealmPropertyInt2.Creature_Attributes_FocusAddedA;
             /// <summary>All creatures will have this value added to their Self attribute</summary>
-          //  public const RealmPropertyInt2 SelfAddedA = RealmPropertyInt2.Creature_Attributes_SelfAddedA;
+            //  public const RealmPropertyInt2 SelfAddedA = RealmPropertyInt2.Creature_Attributes_SelfAddedA;
         }
     }
 }
