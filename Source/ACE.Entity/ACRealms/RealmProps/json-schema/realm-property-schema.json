@@ -30,7 +30,8 @@
       "pattern": "^[A-Za-z0-9 ,.'?~=(){}!@#$^&*\\-+/_\\[\\]]+$"
     },
     "descriptionArray": {
-      "allOf": [ { "$ref": "#/definitions/valStringArray" }, { "items": { "$ref": "#/definitions/descriptionPattern" } } ]
+      "$ref": "#/definitions/valStringArray",
+      "items": { "type": "string", "minLength": 1, "maxLength": 200, "allOf": [ { "$ref": "#/definitions/descriptionPattern" } ] }
     },
     "valDescription": {
       "oneOf": [
