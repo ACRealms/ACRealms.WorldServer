@@ -33,7 +33,7 @@ public readonly partial struct RealmPropertySchema
                 childContext0 = childContext0.PushValidationLocationArrayIndex(0);
             }
 
-            ValidationContext oneOfResult0 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity>().Validate(childContext0.CreateChildContext(), level);
+            ValidationContext oneOfResult0 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity>().Validate(childContext0.CreateChildContext(), level);
             if (oneOfResult0.IsValid)
             {
                 result = result.MergeChildContext(oneOfResult0, level >= ValidationLevel.Verbose);
@@ -58,7 +58,7 @@ public readonly partial struct RealmPropertySchema
                 childContext1 = childContext1.PushValidationLocationArrayIndex(1);
             }
 
-            ValidationContext oneOfResult1 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray>().Validate(childContext1.CreateChildContext(), level);
+            ValidationContext oneOfResult1 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray>().Validate(childContext1.CreateChildContext(), level);
             if (oneOfResult1.IsValid)
             {
                 result = result.MergeChildContext(oneOfResult1, level >= ValidationLevel.Verbose);

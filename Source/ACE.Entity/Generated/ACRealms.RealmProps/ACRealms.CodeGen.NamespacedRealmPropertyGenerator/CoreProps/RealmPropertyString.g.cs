@@ -3,10 +3,10 @@ using System;
 using System.ComponentModel;
 using RealmPropertyStringAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrimaryAttribute<string>;
 
-namespace ACE.Entity.Enum.Properties.STAGING;
+namespace ACE.Entity.Enum.Properties;
 
 [RequiresPrimaryAttribute<RealmPropertyPrimaryAttribute<string>, string>]
-public enum RealmPropertyString : ushort
+public enum RealmPropertyStringStaging : ushort
 {
     Undef = 0,
 

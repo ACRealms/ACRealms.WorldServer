@@ -13,12 +13,12 @@ using Corvus.Json;
 namespace ACRealms.RealmProps.IntermediateModels;
 public readonly partial struct RealmPropertySchema
 {
-    public readonly partial struct ValStringEntity
+    public readonly partial struct ValStringArrayValStringArrayEntityArray
     {
         /// <summary>
         /// Generated from JSON Schema.
         /// </summary>
-        public readonly partial struct OneOf0Entity
+        public readonly partial struct ValStringArrayValStringArrayEntity
         {
             /// <inheritdoc/>
             public ValidationContext Validate(in ValidationContext validationContext, ValidationLevel level = ValidationLevel.Flag)
@@ -32,7 +32,7 @@ public readonly partial struct RealmPropertySchema
                 if (level > ValidationLevel.Basic)
                 {
                     result = result.UsingStack();
-                    result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/valString/oneOf/0");
+                    result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/valStringArray/items");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;
@@ -42,7 +42,7 @@ public readonly partial struct RealmPropertySchema
                     return result;
                 }
 
-                result = Corvus.Json.Validate.ValidateString(this, result, level, 64000, null, null);
+                result = Corvus.Json.Validate.ValidateString(this, result, level, 200, 1, null);
                 if (level == ValidationLevel.Flag && !result.IsValid)
                 {
                     return result;

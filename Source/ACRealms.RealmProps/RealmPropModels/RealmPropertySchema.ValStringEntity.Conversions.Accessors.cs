@@ -18,68 +18,68 @@ public readonly partial struct RealmPropertySchema
     public readonly partial struct ValStringEntity
     {
         /// <summary>
-        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity"/>.
+        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity"/>.
         /// </summary>
-        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity AsOneOf0Entity
+        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity AsValStringSimpleEntity
         {
             get
             {
-                return (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity)this;
+                return (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity)this;
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether this is a valid <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity"/>.
+        /// Gets a value indicating whether this is a valid <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity"/>.
         /// </summary>
-        public bool IsOneOf0Entity
+        public bool IsValStringSimpleEntity
         {
             get
             {
-                return ((ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity)this).IsValid();
+                return ((ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity)this).IsValid();
             }
         }
 
         /// <summary>
-        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity"/>.
+        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity"/>.
         /// </summary>
         /// <param name = "result">The result of the conversion.</param>
         /// <returns><c>True</c> if the conversion was valid.</returns>
-        public bool TryGetAsOneOf0Entity(out ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity result)
+        public bool TryGetAsValStringSimpleEntity(out ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity result)
         {
-            result = (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity)this;
+            result = (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity)this;
             return result.IsValid();
         }
 
         /// <summary>
-        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray"/>.
+        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray"/>.
         /// </summary>
-        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray AsType1EntityArray
+        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray AsValStringArrayValStringArrayEntityArray
         {
             get
             {
-                return (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray)this;
+                return (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray)this;
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether this is a valid <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray"/>.
+        /// Gets a value indicating whether this is a valid <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray"/>.
         /// </summary>
-        public bool IsType1EntityArray
+        public bool IsValStringArrayValStringArrayEntityArray
         {
             get
             {
-                return ((ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray)this).IsValid();
+                return ((ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray)this).IsValid();
             }
         }
 
         /// <summary>
-        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray"/>.
+        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray"/>.
         /// </summary>
         /// <param name = "result">The result of the conversion.</param>
         /// <returns><c>True</c> if the conversion was valid.</returns>
-        public bool TryGetAsType1EntityArray(out ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray result)
+        public bool TryGetAsValStringArrayValStringArrayEntityArray(out ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray result)
         {
-            result = (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray)this;
+            result = (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray)this;
             return result.IsValid();
         }
     }

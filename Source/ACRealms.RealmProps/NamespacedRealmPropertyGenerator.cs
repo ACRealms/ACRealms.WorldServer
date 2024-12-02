@@ -200,7 +200,7 @@ namespace ACRealms.CodeGen
                 return
                 $$"""
                     /// <summary>{{Description}}</summary>
-                    public const {{CoreEnumType}} {{Key}} = {{CoreEnumType}}.{{CoreKey}};
+                    public const {{CoreEnumType}}Staging {{Key}} = {{CoreEnumType}}Staging.{{CoreKey}};
                 """;
             }
 
@@ -251,7 +251,7 @@ namespace ACRealms.CodeGen
             }
         }
 
-        private static string GetDescription(RealmPropertySchema.ValStringEntity descriptionDef)
+        private static string GetDescription(RealmPropertySchema.ValDescriptionEntity descriptionDef)
         {
             // This needs to eventually be handled with fixed line widths and proper wrapping
             string newline = $$"""
@@ -262,8 +262,8 @@ namespace ACRealms.CodeGen
                 return "No Description";
             if (descriptionDef.IsOneOf0Entity)
                 return descriptionDef.AsOneOf0Entity.AsString.GetString()!;
-            if (descriptionDef.IsType1EntityArray)
-                return string.Join(newline, descriptionDef.AsType1EntityArray.Select(x => x.AsString.GetString()!));
+            if (descriptionDef.IsDescriptionArrayEntity)
+                return string.Join(newline, descriptionDef.AsDescriptionArrayEntity.Select(x => x.AsString.GetString()!));
             throw new ArgumentException("Unhandled description type in schema");
         }
 
@@ -349,7 +349,7 @@ namespace ACRealms.CodeGen
             else
                 key = $"{groupDefaults.KeyPrefix}{shortKey}{groupDefaults.KeySuffix}";
 
-            if (propDef.IsValStringEntity)
+            if (propDef.IsValDescriptionEntity)
             {
                 if (groupDefaults == null)
                     throw new ArgumentException("Prop from string short description definition only allowed within a group!");
@@ -639,10 +639,10 @@ namespace ACRealms.CodeGen
                 using System.ComponentModel;
                 using {{AliasedPrimaryAttributeType}} = ACE.Entity.Enum.Properties.{{CanonicalPrimaryAttributeType}}<{{ValuePrimitiveType}}>;
 
-                namespace ACE.Entity.Enum.Properties.STAGING;
+                namespace ACE.Entity.Enum.Properties;
 
                 [RequiresPrimaryAttribute<{{CanonicalPrimaryAttributeType}}<{{ValuePrimitiveType}}>, {{ValuePrimitiveType}}>]
-                public enum {{targetEnumTypeName}} : ushort
+                public enum {{targetEnumTypeName}}Staging : ushort
                 {
                     Undef = 0,
 

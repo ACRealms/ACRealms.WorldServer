@@ -13,34 +13,29 @@ using Corvus.Json;
 namespace ACRealms.RealmProps.IntermediateModels;
 public readonly partial struct RealmPropertySchema
 {
-    public readonly partial struct ValStringEntity
+    public readonly partial struct ValStringArrayValStringArrayEntityArray
     {
         /// <summary>
         /// Generated from JSON Schema.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// list of string fragments to be concatenated together to allow json string to be broken up into multiple lines in the editor
-        /// </para>
-        /// </remarks>
-        public readonly partial struct Type1EntityArray
+        public readonly partial struct ValStringArrayValStringArrayEntity
         {
             private ValidationContext ValidateType(JsonValueKind valueKind, in ValidationContext validationContext, ValidationLevel level)
             {
                 ValidationContext result = validationContext;
                 bool isValid = false;
-                ValidationContext localResultArray = Corvus.Json.Validate.TypeArray(valueKind, result.CreateChildContext(), level);
-                if (level == ValidationLevel.Flag && localResultArray.IsValid)
+                ValidationContext localResultString = Corvus.Json.Validate.TypeString(valueKind, result.CreateChildContext(), level);
+                if (level == ValidationLevel.Flag && localResultString.IsValid)
                 {
                     return validationContext;
                 }
 
-                if (localResultArray.IsValid)
+                if (localResultString.IsValid)
                 {
                     isValid = true;
                 }
 
-                result = result.MergeResults(isValid, level, localResultArray);
+                result = result.MergeResults(isValid, level, localResultString);
                 return result;
             }
         }

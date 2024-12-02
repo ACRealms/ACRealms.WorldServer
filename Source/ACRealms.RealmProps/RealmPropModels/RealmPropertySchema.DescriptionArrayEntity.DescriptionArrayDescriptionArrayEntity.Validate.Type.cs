@@ -13,12 +13,12 @@ using Corvus.Json;
 namespace ACRealms.RealmProps.IntermediateModels;
 public readonly partial struct RealmPropertySchema
 {
-    public readonly partial struct ValStringEntity
+    public readonly partial struct DescriptionArrayEntity
     {
         /// <summary>
         /// Generated from JSON Schema.
         /// </summary>
-        public readonly partial struct OneOf0Entity
+        public readonly partial struct DescriptionArrayDescriptionArrayEntity
         {
             private ValidationContext ValidateType(JsonValueKind valueKind, in ValidationContext validationContext, ValidationLevel level)
             {

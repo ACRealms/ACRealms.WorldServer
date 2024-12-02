@@ -613,24 +613,24 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <summary>
-        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity"/>.
+        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity"/>.
         /// </summary>
         /// <param name = "value">The value from which to convert.</param>
-        public static explicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity(PropDefEntity value)
+        public static explicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity(PropDefEntity value)
         {
             if ((value.backing & Backing.JsonElement) != 0)
             {
                 return new(value.AsJsonElement);
             }
 
-            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Undefined;
+            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity.Undefined;
         }
 
         /// <summary>
-        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity"/>.
+        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity"/>.
         /// </summary>
         /// <param name = "value">The value from which to convert.</param>
-        public static implicit operator PropDefEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity value)
+        public static implicit operator PropDefEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -644,10 +644,41 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <summary>
-        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity"/>.
+        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity.OneOf0Entity"/>.
         /// </summary>
         /// <param name = "value">The value from which to convert.</param>
-        public static explicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity(PropDefEntity value)
+        public static explicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity.OneOf0Entity(PropDefEntity value)
+        {
+            if ((value.backing & Backing.JsonElement) != 0)
+            {
+                return new(value.AsJsonElement);
+            }
+
+            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity.OneOf0Entity.Undefined;
+        }
+
+        /// <summary>
+        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity.OneOf0Entity"/>.
+        /// </summary>
+        /// <param name = "value">The value from which to convert.</param>
+        public static implicit operator PropDefEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity.OneOf0Entity value)
+        {
+            if (value.HasJsonElementBacking)
+            {
+                return new(value.AsJsonElement);
+            }
+
+            return value.ValueKind switch
+            {
+                _ => Undefined
+            };
+        }
+
+        /// <summary>
+        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity"/>.
+        /// </summary>
+        /// <param name = "value">The value from which to convert.</param>
+        public static implicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity(PropDefEntity value)
         {
             if ((value.backing & Backing.JsonElement) != 0)
             {
@@ -659,14 +690,14 @@ public readonly partial struct RealmPropertySchema
                 return new(value.stringBacking);
             }
 
-            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity.Undefined;
+            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity.Undefined;
         }
 
         /// <summary>
-        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity"/>.
+        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity"/>.
         /// </summary>
         /// <param name = "value">The value from which to convert.</param>
-        public static implicit operator PropDefEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity value)
+        public static explicit operator PropDefEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -681,10 +712,47 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <summary>
-        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray"/>.
+        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPatternEntity"/>.
         /// </summary>
         /// <param name = "value">The value from which to convert.</param>
-        public static explicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray(PropDefEntity value)
+        public static implicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPatternEntity(PropDefEntity value)
+        {
+            if ((value.backing & Backing.JsonElement) != 0)
+            {
+                return new(value.AsJsonElement);
+            }
+
+            if ((value.backing & Backing.String) != 0)
+            {
+                return new(value.stringBacking);
+            }
+
+            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPatternEntity.Undefined;
+        }
+
+        /// <summary>
+        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPatternEntity"/>.
+        /// </summary>
+        /// <param name = "value">The value from which to convert.</param>
+        public static explicit operator PropDefEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPatternEntity value)
+        {
+            if (value.HasJsonElementBacking)
+            {
+                return new(value.AsJsonElement);
+            }
+
+            return value.ValueKind switch
+            {
+                JsonValueKind.String => new((string)value),
+                _ => Undefined
+            };
+        }
+
+        /// <summary>
+        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionArrayEntity"/>.
+        /// </summary>
+        /// <param name = "value">The value from which to convert.</param>
+        public static explicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionArrayEntity(PropDefEntity value)
         {
             if ((value.backing & Backing.JsonElement) != 0)
             {
@@ -696,14 +764,51 @@ public readonly partial struct RealmPropertySchema
                 return new(value.arrayBacking);
             }
 
-            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray.Undefined;
+            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionArrayEntity.Undefined;
         }
 
         /// <summary>
-        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray"/>.
+        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionArrayEntity"/>.
         /// </summary>
         /// <param name = "value">The value from which to convert.</param>
-        public static implicit operator PropDefEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray value)
+        public static implicit operator PropDefEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionArrayEntity value)
+        {
+            if (value.HasJsonElementBacking)
+            {
+                return new(value.AsJsonElement);
+            }
+
+            return value.ValueKind switch
+            {
+                JsonValueKind.Array => new(value.AsImmutableList()),
+                _ => Undefined
+            };
+        }
+
+        /// <summary>
+        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray"/>.
+        /// </summary>
+        /// <param name = "value">The value from which to convert.</param>
+        public static implicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray(PropDefEntity value)
+        {
+            if ((value.backing & Backing.JsonElement) != 0)
+            {
+                return new(value.AsJsonElement);
+            }
+
+            if ((value.backing & Backing.Array) != 0)
+            {
+                return new(value.arrayBacking);
+            }
+
+            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray.Undefined;
+        }
+
+        /// <summary>
+        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray"/>.
+        /// </summary>
+        /// <param name = "value">The value from which to convert.</param>
+        public static explicit operator PropDefEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray value)
         {
             if (value.HasJsonElementBacking)
             {

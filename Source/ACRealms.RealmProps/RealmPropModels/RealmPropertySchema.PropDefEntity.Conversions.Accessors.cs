@@ -51,35 +51,35 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <summary>
-        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity"/>.
+        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity"/>.
         /// </summary>
-        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity AsValStringEntity
+        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity AsValDescriptionEntity
         {
             get
             {
-                return (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity)this;
+                return (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity)this;
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether this is a valid <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity"/>.
+        /// Gets a value indicating whether this is a valid <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity"/>.
         /// </summary>
-        public bool IsValStringEntity
+        public bool IsValDescriptionEntity
         {
             get
             {
-                return ((ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity)this).IsValid();
+                return ((ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity)this).IsValid();
             }
         }
 
         /// <summary>
-        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity"/>.
+        /// Gets the value as a <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity"/>.
         /// </summary>
         /// <param name = "result">The result of the conversion.</param>
         /// <returns><c>True</c> if the conversion was valid.</returns>
-        public bool TryGetAsValStringEntity(out ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity result)
+        public bool TryGetAsValDescriptionEntity(out ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity result)
         {
-            result = (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity)this;
+            result = (ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity)this;
             return result.IsValid();
         }
     }

@@ -32,7 +32,7 @@ public readonly partial struct RealmPropertySchema
             }
 
             int arrayLength = 0;
-            using JsonArrayEnumerator<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.GroupEntity> arrayEnumerator = this.EnumerateArray();
+            using var arrayEnumerator = this.EnumerateArray();
             while (arrayEnumerator.MoveNext())
             {
                 if (level > ValidationLevel.Basic)
@@ -45,7 +45,7 @@ public readonly partial struct RealmPropertySchema
                     result = result.PushValidationLocationProperty("items");
                 }
 
-                result = arrayEnumerator.Current.Validate(result, level);
+                result = arrayEnumerator.Current.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.GroupEntity>().Validate(result, level);
                 if (level == ValidationLevel.Flag && !result.IsValid)
                 {
                     return result;

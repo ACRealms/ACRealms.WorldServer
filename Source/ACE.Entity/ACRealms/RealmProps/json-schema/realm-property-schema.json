@@ -35,7 +35,8 @@
     },
     "valDescription": {
       "oneOf": [
-        { "$ref": "#/definitions/descriptionPattern", "allOf": { "$ref": "#/definitions/valStringSimple" } },
+        { "$ref": "#/definitions/descriptionPattern",
+          "allOf": [ { "$ref": "#/definitions/valStringSimple" } ] },
         { "$ref": "#/definitions/descriptionArray" }
       ]
     },

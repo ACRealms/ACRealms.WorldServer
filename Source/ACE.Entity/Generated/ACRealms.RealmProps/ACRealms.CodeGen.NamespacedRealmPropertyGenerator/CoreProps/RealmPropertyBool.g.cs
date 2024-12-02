@@ -3,10 +3,10 @@ using System;
 using System.ComponentModel;
 using RealmPropertyBoolAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrimaryAttribute<bool>;
 
-namespace ACE.Entity.Enum.Properties.STAGING;
+namespace ACE.Entity.Enum.Properties;
 
 [RequiresPrimaryAttribute<RealmPropertyPrimaryAttribute<bool>, bool>]
-public enum RealmPropertyBool : ushort
+public enum RealmPropertyBoolStaging : ushort
 {
     Undef = 0,
 

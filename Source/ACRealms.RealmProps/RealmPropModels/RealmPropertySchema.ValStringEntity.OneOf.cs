@@ -25,18 +25,18 @@ public readonly partial struct RealmPropertySchema
         /// Matches the value against each of the any of values, and returns the result of calling the provided match function for the first match found.
         /// </summary>
         /// <param name = "context">The context to pass to the match function.</param>
-        /// <param name = "match0">The function to call if the value matches the <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity"/> type.</param>
-        /// <param name = "match1">The function to call if the value matches the <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray"/> type.</param>
+        /// <param name = "match0">The function to call if the value matches the <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity"/> type.</param>
+        /// <param name = "match1">The function to call if the value matches the <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray"/> type.</param>
         /// <param name = "defaultMatch">The fallback match.</param>
-        public TOut Match<TIn, TOut>(in TIn context, Matcher<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity, TIn, TOut> match0, Matcher<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray, TIn, TOut> match1, Matcher<ValStringEntity, TIn, TOut> defaultMatch)
+        public TOut Match<TIn, TOut>(in TIn context, Matcher<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity, TIn, TOut> match0, Matcher<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray, TIn, TOut> match1, Matcher<ValStringEntity, TIn, TOut> defaultMatch)
         {
-            var oneOf0 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity>();
+            var oneOf0 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity>();
             if (oneOf0.IsValid())
             {
                 return match0(oneOf0, context);
             }
 
-            var oneOf1 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray>();
+            var oneOf1 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray>();
             if (oneOf1.IsValid())
             {
                 return match1(oneOf1, context);
@@ -48,18 +48,18 @@ public readonly partial struct RealmPropertySchema
         /// <summary>
         /// Matches the value against each of the any of values, and returns the result of calling the provided match function for the first match found.
         /// </summary>
-        /// <param name = "match0">The function to call if the value matches the <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity"/> type.</param>
-        /// <param name = "match1">The function to call if the value matches the <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray"/> type.</param>
+        /// <param name = "match0">The function to call if the value matches the <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity"/> type.</param>
+        /// <param name = "match1">The function to call if the value matches the <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray"/> type.</param>
         /// <param name = "defaultMatch">The fallback match.</param>
-        public TOut Match<TOut>(Matcher<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity, TOut> match0, Matcher<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray, TOut> match1, Matcher<ValStringEntity, TOut> defaultMatch)
+        public TOut Match<TOut>(Matcher<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity, TOut> match0, Matcher<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray, TOut> match1, Matcher<ValStringEntity, TOut> defaultMatch)
         {
-            var oneOf0 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity>();
+            var oneOf0 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity>();
             if (oneOf0.IsValid())
             {
                 return match0(oneOf0);
             }
 
-            var oneOf1 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray>();
+            var oneOf1 = this.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray>();
             if (oneOf1.IsValid())
             {
                 return match1(oneOf1);

@@ -21,10 +21,10 @@ public readonly partial struct RealmPropertySchema
     public readonly partial struct ValStringEntity
     {
         /// <summary>
-        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity"/>.
+        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity"/>.
         /// </summary>
         /// <param name = "value">The value from which to convert.</param>
-        public static explicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity(ValStringEntity value)
+        public static explicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity(ValStringEntity value)
         {
             if ((value.backing & Backing.JsonElement) != 0)
             {
@@ -36,14 +36,14 @@ public readonly partial struct RealmPropertySchema
                 return new(value.stringBacking);
             }
 
-            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity.Undefined;
+            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity.Undefined;
         }
 
         /// <summary>
-        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity"/>.
+        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity"/>.
         /// </summary>
         /// <param name = "value">The value from which to convert.</param>
-        public static implicit operator ValStringEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.OneOf0Entity value)
+        public static implicit operator ValStringEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringSimpleEntity value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -58,10 +58,10 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <summary>
-        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray"/>.
+        /// Conversion to <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray"/>.
         /// </summary>
         /// <param name = "value">The value from which to convert.</param>
-        public static explicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray(ValStringEntity value)
+        public static explicit operator ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray(ValStringEntity value)
         {
             if ((value.backing & Backing.JsonElement) != 0)
             {
@@ -73,14 +73,14 @@ public readonly partial struct RealmPropertySchema
                 return new(value.arrayBacking);
             }
 
-            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray.Undefined;
+            return ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray.Undefined;
         }
 
         /// <summary>
-        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray"/>.
+        /// Conversion from <see cref = "ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray"/>.
         /// </summary>
         /// <param name = "value">The value from which to convert.</param>
-        public static implicit operator ValStringEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity.Type1EntityArray value)
+        public static implicit operator ValStringEntity(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringArrayValStringArrayEntityArray value)
         {
             if (value.HasJsonElementBacking)
             {

@@ -18,59 +18,54 @@ using Corvus.Json.Internal;
 namespace ACRealms.RealmProps.IntermediateModels;
 public readonly partial struct RealmPropertySchema
 {
-    public readonly partial struct ValStringEntity
+    public readonly partial struct ValStringArrayValStringArrayEntityArray
     {
         /// <summary>
         /// Generated from JSON Schema.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// list of string fragments to be concatenated together to allow json string to be broken up into multiple lines in the editor
-        /// </para>
-        /// </remarks>
-        [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<Type1EntityArray>))]
-        public readonly partial struct Type1EntityArray
+        [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<ValStringArrayValStringArrayEntity>))]
+        public readonly partial struct ValStringArrayValStringArrayEntity
         {
             private readonly Backing backing;
             private readonly JsonElement jsonElementBacking;
-            private readonly ImmutableList<JsonAny> arrayBacking;
+            private readonly string stringBacking;
             /// <summary>
-            /// Initializes a new instance of the <see cref = "Type1EntityArray"/> struct.
+            /// Initializes a new instance of the <see cref = "ValStringArrayValStringArrayEntity"/> struct.
             /// </summary>
-            public Type1EntityArray()
+            public ValStringArrayValStringArrayEntity()
             {
                 this.jsonElementBacking = default;
                 this.backing = Backing.JsonElement;
-                this.arrayBacking = ImmutableList<JsonAny>.Empty;
+                this.stringBacking = string.Empty;
             }
 
             /// <summary>
-            /// Initializes a new instance of the <see cref = "Type1EntityArray"/> struct.
+            /// Initializes a new instance of the <see cref = "ValStringArrayValStringArrayEntity"/> struct.
             /// </summary>
             /// <param name = "value">The value from which to construct the instance.</param>
-            public Type1EntityArray(in JsonElement value)
+            public ValStringArrayValStringArrayEntity(in JsonElement value)
             {
                 this.jsonElementBacking = value;
                 this.backing = Backing.JsonElement;
-                this.arrayBacking = ImmutableList<JsonAny>.Empty;
+                this.stringBacking = string.Empty;
             }
 
             /// <summary>
             /// Gets the schema location from which this type was generated.
             /// </summary>
-            public static string SchemaLocation { get; } = "https://realm.ac/schema/v1/realm-property-schema.json#/definitions/valString/oneOf/1";
+            public static string SchemaLocation { get; } = "https://realm.ac/schema/v1/realm-property-schema.json#/definitions/valStringArray/items";
             /// <summary>
             /// Gets a Null instance.
             /// </summary>
-            public static Type1EntityArray Null { get; } = new(JsonValueHelpers.NullElement);
+            public static ValStringArrayValStringArrayEntity Null { get; } = new(JsonValueHelpers.NullElement);
             /// <summary>
             /// Gets an Undefined instance.
             /// </summary>
-            public static Type1EntityArray Undefined { get; }
+            public static ValStringArrayValStringArrayEntity Undefined { get; }
             /// <summary>
             /// Gets the default instance of the type.
             /// </summary>
-            public static Type1EntityArray DefaultInstance { get; }
+            public static ValStringArrayValStringArrayEntity DefaultInstance { get; }
 
             /// <inheritdoc/>
             public JsonAny AsAny
@@ -82,9 +77,9 @@ public readonly partial struct RealmPropertySchema
                         return new(this.jsonElementBacking);
                     }
 
-                    if ((this.backing & Backing.Array) != 0)
+                    if ((this.backing & Backing.String) != 0)
                     {
-                        return new(this.arrayBacking);
+                        return new(this.stringBacking);
                     }
 
                     if ((this.backing & Backing.Null) != 0)
@@ -106,9 +101,9 @@ public readonly partial struct RealmPropertySchema
                         return this.jsonElementBacking;
                     }
 
-                    if ((this.backing & Backing.Array) != 0)
+                    if ((this.backing & Backing.String) != 0)
                     {
-                        return JsonValueHelpers.ArrayToJsonElement(this.arrayBacking);
+                        return JsonValueHelpers.StringToJsonElement(this.stringBacking);
                     }
 
                     if ((this.backing & Backing.Null) != 0)
@@ -121,13 +116,18 @@ public readonly partial struct RealmPropertySchema
             }
 
             /// <inheritdoc/>
-            JsonString IJsonValue.AsString
+            public JsonString AsString
             {
                 get
                 {
                     if ((this.backing & Backing.JsonElement) != 0)
                     {
                         return new(this.jsonElementBacking);
+                    }
+
+                    if ((this.backing & Backing.String) != 0)
+                    {
+                        return new(this.stringBacking);
                     }
 
                     throw new InvalidOperationException();
@@ -177,18 +177,13 @@ public readonly partial struct RealmPropertySchema
             }
 
             /// <inheritdoc/>
-            public JsonArray AsArray
+            JsonArray IJsonValue.AsArray
             {
                 get
                 {
                     if ((this.backing & Backing.JsonElement) != 0)
                     {
                         return new(this.jsonElementBacking);
-                    }
-
-                    if ((this.backing & Backing.Array) != 0)
-                    {
-                        return new(this.arrayBacking);
                     }
 
                     throw new InvalidOperationException();
@@ -223,9 +218,9 @@ public readonly partial struct RealmPropertySchema
                         return this.jsonElementBacking.ValueKind;
                     }
 
-                    if ((this.backing & Backing.Array) != 0)
+                    if ((this.backing & Backing.String) != 0)
                     {
-                        return JsonValueKind.Array;
+                        return JsonValueKind.String;
                     }
 
                     if ((this.backing & Backing.Null) != 0)
@@ -242,9 +237,9 @@ public readonly partial struct RealmPropertySchema
             /// </summary>
             /// <param name = "value">The value from which to convert.</param>
             /// <exception cref = "InvalidOperationException">The value was not compatible with this type.</exception>
-            public static implicit operator Type1EntityArray(in JsonAny value)
+            public static implicit operator ValStringArrayValStringArrayEntity(in JsonAny value)
             {
-                return value.As<Type1EntityArray>();
+                return value.As<ValStringArrayValStringArrayEntity>();
             }
 
             /// <summary>
@@ -252,7 +247,7 @@ public readonly partial struct RealmPropertySchema
             /// </summary>
             /// <param name = "value">The value from which to convert.</param>
             /// <exception cref = "InvalidOperationException">The value was not compatible with this type.</exception>
-            public static implicit operator JsonAny(in Type1EntityArray value)
+            public static implicit operator JsonAny(in ValStringArrayValStringArrayEntity value)
             {
                 return value.AsAny;
             }
@@ -263,7 +258,7 @@ public readonly partial struct RealmPropertySchema
             /// <param name = "left">The lhs.</param>
             /// <param name = "right">The rhs.</param>
             /// <returns><c>True</c> if the values are equal.</returns>
-            public static bool operator ==(in Type1EntityArray left, in Type1EntityArray right)
+            public static bool operator ==(in ValStringArrayValStringArrayEntity left, in ValStringArrayValStringArrayEntity right)
             {
                 return left.Equals(right);
             }
@@ -274,7 +269,7 @@ public readonly partial struct RealmPropertySchema
             /// <param name = "left">The lhs.</param>
             /// <param name = "right">The rhs.</param>
             /// <returns><c>True</c> if the values are equal.</returns>
-            public static bool operator !=(in Type1EntityArray left, in Type1EntityArray right)
+            public static bool operator !=(in ValStringArrayValStringArrayEntity left, in ValStringArrayValStringArrayEntity right)
             {
                 return !left.Equals(right);
             }
@@ -288,7 +283,7 @@ public readonly partial struct RealmPropertySchema
             /// value cannot be constructed from the given instance (e.g. because they have an incompatible dotnet backing type.
             /// </remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Type1EntityArray FromAny(in JsonAny value)
+            public static ValStringArrayValStringArrayEntity FromAny(in JsonAny value)
             {
                 if (value.HasJsonElementBacking)
                 {
@@ -298,7 +293,7 @@ public readonly partial struct RealmPropertySchema
                 JsonValueKind valueKind = value.ValueKind;
                 return valueKind switch
                 {
-                    JsonValueKind.Array => new(value.AsArray.AsImmutableList()),
+                    JsonValueKind.String => new((string)value.AsString),
                     JsonValueKind.Null => Null,
                     _ => Undefined,
                 };
@@ -310,7 +305,7 @@ public readonly partial struct RealmPropertySchema
             /// <param name = "value">The <see cref = "JsonElement"/> value from which to instantiate the instance.</param>
             /// <returns>An instance of this type, initialized from the <see cref = "JsonElement"/>.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Type1EntityArray FromJson(in JsonElement value)
+            public static ValStringArrayValStringArrayEntity FromJson(in JsonElement value)
             {
                 return new(value);
             }
@@ -322,47 +317,9 @@ public readonly partial struct RealmPropertySchema
     /// <typeparam name = "TValue">The type of the value.</typeparam>
     /// <param name="value">The value from which to instantiate the instance.</param>
     /// <returns>An instance of this type, initialized from the value.</returns>
-    /// <remarks>This will be Type1EntityArray.Undefined if the type is not compatible.</remarks>
+    /// <remarks>This will be ValStringArrayValStringArrayEntity.Undefined if the type is not compatible.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static Type1EntityArray IJsonValue<Type1EntityArray>.FromBoolean<TValue>(in TValue value)
-    {
-        if (value.HasJsonElementBacking)
-        {
-            return new(value.AsJsonElement);
-        }
-
-        return Undefined;
-    }
-#endif
-#if NET8_0_OR_GREATER
-    /// <summary>
-    /// Gets an instance of the JSON value from a string value.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="value">The value from which to instantiate the instance.</param>
-    /// <returns>An instance of this type, initialized from the value.</returns>
-    /// <remarks>This will be Type1EntityArray.Undefined if the type is not compatible.</remarks>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static Type1EntityArray IJsonValue<Type1EntityArray>.FromString<TValue>(in TValue value)
-    {
-        if (value.HasJsonElementBacking)
-        {
-            return new(value.AsJsonElement);
-        }
-
-        return Undefined;
-    }
-#endif
-#if NET8_0_OR_GREATER
-    /// <summary>
-    /// Gets an instance of the JSON value from a number value.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="value">The value from which to instantiate the instance.</param>
-    /// <returns>An instance of this type, initialized from the value.</returns>
-    /// <remarks>This will be Type1EntityArray.Undefined if the type is not compatible.</remarks>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static Type1EntityArray IJsonValue<Type1EntityArray>.FromNumber<TValue>(in TValue value)
+    static ValStringArrayValStringArrayEntity IJsonValue<ValStringArrayValStringArrayEntity>.FromBoolean<TValue>(in TValue value)
     {
         if (value.HasJsonElementBacking)
         {
@@ -373,24 +330,24 @@ public readonly partial struct RealmPropertySchema
     }
 #endif
             /// <summary>
-            /// Gets an instance of the JSON value from an array value.
+            /// Gets an instance of the JSON value from a string value.
             /// </summary>
             /// <typeparam name = "TValue">The type of the value.</typeparam>
             /// <param name = "value">The value from which to instantiate the instance.</param>
             /// <returns>An instance of this type, initialized from the value.</returns>
-            /// <remarks>This will be Type1EntityArray.Undefined if the type is not compatible.</remarks>
+            /// <remarks>This will be ValStringArrayValStringArrayEntity.Undefined if the type is not compatible.</remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Type1EntityArray FromArray<TValue>(in TValue value)
-                where TValue : struct, IJsonArray<TValue>
+            public static ValStringArrayValStringArrayEntity FromString<TValue>(in TValue value)
+                where TValue : struct, IJsonString<TValue>
             {
                 if (value.HasJsonElementBacking)
                 {
                     return new(value.AsJsonElement);
                 }
 
-                if (value.ValueKind == JsonValueKind.Array)
+                if (value.ValueKind == JsonValueKind.String)
                 {
-                    return new(value.AsImmutableList());
+                    return new(value.GetString()!);
                 }
 
                 return Undefined;
@@ -398,14 +355,52 @@ public readonly partial struct RealmPropertySchema
 
 #if NET8_0_OR_GREATER
     /// <summary>
+    /// Gets an instance of the JSON value from a number value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value from which to instantiate the instance.</param>
+    /// <returns>An instance of this type, initialized from the value.</returns>
+    /// <remarks>This will be ValStringArrayValStringArrayEntity.Undefined if the type is not compatible.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static ValStringArrayValStringArrayEntity IJsonValue<ValStringArrayValStringArrayEntity>.FromNumber<TValue>(in TValue value)
+    {
+        if (value.HasJsonElementBacking)
+        {
+            return new(value.AsJsonElement);
+        }
+
+        return Undefined;
+    }
+#endif
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// Gets an instance of the JSON value from an array value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value from which to instantiate the instance.</param>
+    /// <returns>An instance of this type, initialized from the value.</returns>
+    /// <remarks>This will be ValStringArrayValStringArrayEntity.Undefined if the type is not compatible.</remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    static ValStringArrayValStringArrayEntity IJsonValue<ValStringArrayValStringArrayEntity>.FromArray<TValue>(in TValue value)
+    {
+        if (value.HasJsonElementBacking)
+        {
+            return new(value.AsJsonElement);
+        }
+
+        return Undefined;
+    }
+#endif
+#if NET8_0_OR_GREATER
+    /// <summary>
     /// Gets an instance of the JSON value from an object value.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value from which to instantiate the instance.</param>
     /// <returns>An instance of this type, initialized from the value.</returns>
-    /// <remarks>This will be Type1EntityArray.Undefined if the type is not compatible.</remarks>
+    /// <remarks>This will be ValStringArrayValStringArrayEntity.Undefined if the type is not compatible.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static Type1EntityArray IJsonValue<Type1EntityArray>.FromObject<TValue>(in TValue value)
+    static ValStringArrayValStringArrayEntity IJsonValue<ValStringArrayValStringArrayEntity>.FromObject<TValue>(in TValue value)
     {
         if (value.HasJsonElementBacking)
         {
@@ -416,63 +411,63 @@ public readonly partial struct RealmPropertySchema
     }
 #endif
             /// <summary>
-            /// Parses a JSON string into a Type1EntityArray.
+            /// Parses a JSON string into a ValStringArrayValStringArrayEntity.
             /// </summary>
             /// <param name = "json">The json string to parse.</param>
             /// <param name = "options">The (optional) JsonDocumentOptions.</param>
-            /// <returns>A <see cref = "Type1EntityArray"/> instance built from the JSON string.</returns>
-            public static Type1EntityArray Parse(string json, JsonDocumentOptions options = default)
+            /// <returns>A <see cref = "ValStringArrayValStringArrayEntity"/> instance built from the JSON string.</returns>
+            public static ValStringArrayValStringArrayEntity Parse(string json, JsonDocumentOptions options = default)
             {
                 using var jsonDocument = JsonDocument.Parse(json, options);
-                return new Type1EntityArray(jsonDocument.RootElement.Clone());
+                return new ValStringArrayValStringArrayEntity(jsonDocument.RootElement.Clone());
             }
 
             /// <summary>
-            /// Parses a JSON string into a Type1EntityArray.
+            /// Parses a JSON string into a ValStringArrayValStringArrayEntity.
             /// </summary>
             /// <param name = "utf8Json">The json string to parse.</param>
             /// <param name = "options">The (optional) JsonDocumentOptions.</param>
-            /// <returns>A <see cref = "Type1EntityArray"/> instance built from the JSON string.</returns>
-            public static Type1EntityArray Parse(Stream utf8Json, JsonDocumentOptions options = default)
+            /// <returns>A <see cref = "ValStringArrayValStringArrayEntity"/> instance built from the JSON string.</returns>
+            public static ValStringArrayValStringArrayEntity Parse(Stream utf8Json, JsonDocumentOptions options = default)
             {
                 using var jsonDocument = JsonDocument.Parse(utf8Json, options);
-                return new Type1EntityArray(jsonDocument.RootElement.Clone());
+                return new ValStringArrayValStringArrayEntity(jsonDocument.RootElement.Clone());
             }
 
             /// <summary>
-            /// Parses a JSON string into a Type1EntityArray.
+            /// Parses a JSON string into a ValStringArrayValStringArrayEntity.
             /// </summary>
             /// <param name = "utf8Json">The json string to parse.</param>
             /// <param name = "options">The (optional) JsonDocumentOptions.</param>
-            /// <returns>A <see cref = "Type1EntityArray"/> instance built from the JSON string.</returns>
-            public static Type1EntityArray Parse(ReadOnlyMemory<byte> utf8Json, JsonDocumentOptions options = default)
+            /// <returns>A <see cref = "ValStringArrayValStringArrayEntity"/> instance built from the JSON string.</returns>
+            public static ValStringArrayValStringArrayEntity Parse(ReadOnlyMemory<byte> utf8Json, JsonDocumentOptions options = default)
             {
                 using var jsonDocument = JsonDocument.Parse(utf8Json, options);
-                return new Type1EntityArray(jsonDocument.RootElement.Clone());
+                return new ValStringArrayValStringArrayEntity(jsonDocument.RootElement.Clone());
             }
 
             /// <summary>
-            /// Parses a JSON string into a Type1EntityArray.
+            /// Parses a JSON string into a ValStringArrayValStringArrayEntity.
             /// </summary>
             /// <param name = "json">The json string to parse.</param>
             /// <param name = "options">The (optional) JsonDocumentOptions.</param>
-            /// <returns>A <see cref = "Type1EntityArray"/> instance built from the JSON string.</returns>
-            public static Type1EntityArray Parse(ReadOnlyMemory<char> json, JsonDocumentOptions options = default)
+            /// <returns>A <see cref = "ValStringArrayValStringArrayEntity"/> instance built from the JSON string.</returns>
+            public static ValStringArrayValStringArrayEntity Parse(ReadOnlyMemory<char> json, JsonDocumentOptions options = default)
             {
                 using var jsonDocument = JsonDocument.Parse(json, options);
-                return new Type1EntityArray(jsonDocument.RootElement.Clone());
+                return new ValStringArrayValStringArrayEntity(jsonDocument.RootElement.Clone());
             }
 
             /// <summary>
-            /// Parses a JSON string into a Type1EntityArray.
+            /// Parses a JSON string into a ValStringArrayValStringArrayEntity.
             /// </summary>
             /// <param name = "utf8Json">The json string to parse.</param>
             /// <param name = "options">The (optional) JsonDocumentOptions.</param>
-            /// <returns>A <see cref = "Type1EntityArray"/> instance built from the JSON string.</returns>
-            public static Type1EntityArray Parse(ReadOnlySequence<byte> utf8Json, JsonDocumentOptions options = default)
+            /// <returns>A <see cref = "ValStringArrayValStringArrayEntity"/> instance built from the JSON string.</returns>
+            public static ValStringArrayValStringArrayEntity Parse(ReadOnlySequence<byte> utf8Json, JsonDocumentOptions options = default)
             {
                 using var jsonDocument = JsonDocument.Parse(utf8Json, options);
-                return new Type1EntityArray(jsonDocument.RootElement.Clone());
+                return new ValStringArrayValStringArrayEntity(jsonDocument.RootElement.Clone());
             }
 
             /// <summary>
@@ -480,12 +475,12 @@ public readonly partial struct RealmPropertySchema
             /// </summary>
             /// <param name = "buffer">The buffer from which to parse the value.</param>
             /// <returns>The parsed value.</returns>
-            static Type1EntityArray ParseValue(ReadOnlySpan<char> buffer)
+            static ValStringArrayValStringArrayEntity ParseValue(ReadOnlySpan<char> buffer)
             {
 #if NET8_0_OR_GREATER
-        return IJsonValue<Type1EntityArray>.ParseValue(buffer);
+        return IJsonValue<ValStringArrayValStringArrayEntity>.ParseValue(buffer);
 #else
-                return JsonValueHelpers.ParseValue<Type1EntityArray>(buffer);
+                return JsonValueHelpers.ParseValue<ValStringArrayValStringArrayEntity>(buffer);
 #endif
             }
 
@@ -494,12 +489,12 @@ public readonly partial struct RealmPropertySchema
             /// </summary>
             /// <param name = "buffer">The buffer from which to parse the value.</param>
             /// <returns>The parsed value.</returns>
-            static Type1EntityArray ParseValue(ReadOnlySpan<byte> buffer)
+            static ValStringArrayValStringArrayEntity ParseValue(ReadOnlySpan<byte> buffer)
             {
 #if NET8_0_OR_GREATER
-        return IJsonValue<Type1EntityArray>.ParseValue(buffer);
+        return IJsonValue<ValStringArrayValStringArrayEntity>.ParseValue(buffer);
 #else
-                return JsonValueHelpers.ParseValue<Type1EntityArray>(buffer);
+                return JsonValueHelpers.ParseValue<ValStringArrayValStringArrayEntity>(buffer);
 #endif
             }
 
@@ -508,12 +503,12 @@ public readonly partial struct RealmPropertySchema
             /// </summary>
             /// <param name = "reader">The reader from which to parse the value.</param>
             /// <returns>The parsed value.</returns>
-            static Type1EntityArray ParseValue(ref Utf8JsonReader reader)
+            static ValStringArrayValStringArrayEntity ParseValue(ref Utf8JsonReader reader)
             {
 #if NET8_0_OR_GREATER
-        return IJsonValue<Type1EntityArray>.ParseValue(ref reader);
+        return IJsonValue<ValStringArrayValStringArrayEntity>.ParseValue(ref reader);
 #else
-                return JsonValueHelpers.ParseValue<Type1EntityArray>(ref reader);
+                return JsonValueHelpers.ParseValue<ValStringArrayValStringArrayEntity>(ref reader);
 #endif
             }
 
@@ -532,9 +527,9 @@ public readonly partial struct RealmPropertySchema
             return TTarget.FromJson(this.jsonElementBacking);
         }
 
-        if ((this.backing & Backing.Array) != 0)
+        if ((this.backing & Backing.String) != 0)
         {
-            return TTarget.FromArray(this);
+            return TTarget.FromString(this);
         }
 
         if ((this.backing & Backing.Null) != 0)
@@ -544,7 +539,7 @@ public readonly partial struct RealmPropertySchema
 
         return TTarget.Undefined;
 #else
-                return this.As<Type1EntityArray, TTarget>();
+                return this.As<ValStringArrayValStringArrayEntity, TTarget>();
 #endif
             }
 
@@ -566,7 +561,7 @@ public readonly partial struct RealmPropertySchema
             /// </summary>
             /// <param name = "other">The other item with which to compare.</param>
             /// <returns><see langword="true"/> if the values were equal.</returns>
-            public bool Equals(in Type1EntityArray other)
+            public bool Equals(in ValStringArrayValStringArrayEntity other)
             {
                 return JsonValueHelpers.CompareValues(this, other);
             }
@@ -584,9 +579,9 @@ public readonly partial struct RealmPropertySchema
                     return;
                 }
 
-                if ((this.backing & Backing.Array) != 0)
+                if ((this.backing & Backing.String) != 0)
                 {
-                    JsonValueHelpers.WriteItems(this.arrayBacking, writer);
+                    writer.WriteStringValue(this.stringBacking);
                     return;
                 }
 

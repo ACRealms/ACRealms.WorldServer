@@ -150,7 +150,7 @@ public readonly partial struct RealmPropertySchema
         /// <summary>
         /// Gets the (optional) <c>description_format</c> property.
         /// </summary>
-        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity DescriptionFormat
+        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity DescriptionFormat
         {
             get
             {
@@ -163,7 +163,7 @@ public readonly partial struct RealmPropertySchema
 
                     if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DescriptionFormatUtf8, out JsonElement result))
                     {
-                        return new ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity(result);
+                        return new ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity(result);
                     }
                 }
 
@@ -171,7 +171,7 @@ public readonly partial struct RealmPropertySchema
                 {
                     if (this.objectBacking.TryGetValue(JsonPropertyNames.DescriptionFormat, out JsonAny result))
                     {
-                        return result.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity>();
+                        return result.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity>();
                     }
                 }
 
@@ -421,7 +421,7 @@ public readonly partial struct RealmPropertySchema
         /// <summary>
         /// Creates an instance of a <see cref = "GroupEntity"/>.
         /// </summary>
-        public static GroupEntity Create(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity? @default = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity? descriptionFormat = null, Corvus.Json.JsonString? @enum = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.GroupEntity.PropertyNamesInThisGroupWillBePrefixedWithThisValue? keyPrefix = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.GroupEntity.PropertyNamesInThisGroupWillBeSuffixedWithThisValue? keySuffix = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? maxValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? minValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropListForGroupEntity? properties = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.PropertytypeEntity? type = null)
+        public static GroupEntity Create(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity? @default = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity? descriptionFormat = null, Corvus.Json.JsonString? @enum = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.GroupEntity.PropertyNamesInThisGroupWillBePrefixedWithThisValue? keyPrefix = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.GroupEntity.PropertyNamesInThisGroupWillBeSuffixedWithThisValue? keySuffix = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? maxValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? minValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropListForGroupEntity? properties = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.PropertytypeEntity? type = null)
         {
             var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
             if (@default is ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity @default__)
@@ -429,7 +429,7 @@ public readonly partial struct RealmPropertySchema
                 builder.Add(JsonPropertyNames.Default, @default__.AsAny);
             }
 
-            if (descriptionFormat is ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity descriptionFormat__)
+            if (descriptionFormat is ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity descriptionFormat__)
             {
                 builder.Add(JsonPropertyNames.DescriptionFormat, descriptionFormat__.AsAny);
             }
@@ -487,7 +487,7 @@ public readonly partial struct RealmPropertySchema
         /// </summary>
         /// <param name = "value">The value to set.</param>
         /// <returns>The entity with the updated property.</returns>
-        public GroupEntity WithDescriptionFormat(in ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity value)
+        public GroupEntity WithDescriptionFormat(in ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity value)
         {
             return this.SetProperty(JsonPropertyNames.DescriptionFormat, value);
         }
@@ -564,7 +564,7 @@ public readonly partial struct RealmPropertySchema
 
         private static ValidationContext __CorvusValidateDescriptionFormat(in JsonObjectProperty property, in ValidationContext validationContext, ValidationLevel level)
         {
-            return property.ValueAs<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity>().Validate(validationContext, level);
+            return property.ValueAs<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity>().Validate(validationContext, level);
         }
 
         private static ValidationContext __CorvusValidateKeyPrefix(in JsonObjectProperty property, in ValidationContext validationContext, ValidationLevel level)

@@ -132,7 +132,7 @@ public readonly partial struct RealmPropertySchema
         /// <summary>
         /// Gets the (optional) <c>description</c> property.
         /// </summary>
-        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity Description
+        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity Description
         {
             get
             {
@@ -145,7 +145,7 @@ public readonly partial struct RealmPropertySchema
 
                     if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DescriptionUtf8, out JsonElement result))
                     {
-                        return new ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity(result);
+                        return new ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity(result);
                     }
                 }
 
@@ -153,7 +153,7 @@ public readonly partial struct RealmPropertySchema
                 {
                     if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
                     {
-                        return result.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity>();
+                        return result.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity>();
                     }
                 }
 
@@ -329,7 +329,7 @@ public readonly partial struct RealmPropertySchema
         /// <summary>
         /// Creates an instance of a <see cref = "ObjPropEntity"/>.
         /// </summary>
-        public static ObjPropEntity Create(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity? @default = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity? description = null, Corvus.Json.JsonNotAny? descriptionFormat = null, Corvus.Json.JsonString? @enum = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? maxValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? minValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.PropertytypeEntity? type = null)
+        public static ObjPropEntity Create(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity? @default = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity? description = null, Corvus.Json.JsonNotAny? descriptionFormat = null, Corvus.Json.JsonString? @enum = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? maxValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? minValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.PropertytypeEntity? type = null)
         {
             var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
             if (@default is ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity @default__)
@@ -337,7 +337,7 @@ public readonly partial struct RealmPropertySchema
                 builder.Add(JsonPropertyNames.Default, @default__.AsAny);
             }
 
-            if (description is ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity description__)
+            if (description is ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity description__)
             {
                 builder.Add(JsonPropertyNames.Description, description__.AsAny);
             }
@@ -385,7 +385,7 @@ public readonly partial struct RealmPropertySchema
         /// </summary>
         /// <param name = "value">The value to set.</param>
         /// <returns>The entity with the updated property.</returns>
-        public ObjPropEntity WithDescription(in ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity value)
+        public ObjPropEntity WithDescription(in ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity value)
         {
             return this.SetProperty(JsonPropertyNames.Description, value);
         }
@@ -442,7 +442,7 @@ public readonly partial struct RealmPropertySchema
 
         private static ValidationContext __CorvusValidateDescription(in JsonObjectProperty property, in ValidationContext validationContext, ValidationLevel level)
         {
-            return property.ValueAs<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValStringEntity>().Validate(validationContext, level);
+            return property.ValueAs<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity>().Validate(validationContext, level);
         }
 
         private static ValidationContext __CorvusValidateDescriptionFormat(in JsonObjectProperty property, in ValidationContext validationContext, ValidationLevel level)

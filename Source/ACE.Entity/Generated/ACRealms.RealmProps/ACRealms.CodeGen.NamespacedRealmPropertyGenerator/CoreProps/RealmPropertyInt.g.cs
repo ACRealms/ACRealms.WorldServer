@@ -3,10 +3,10 @@ using System;
 using System.ComponentModel;
 using RealmPropertyIntAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrimaryMinMaxAttribute<int>;
 
-namespace ACE.Entity.Enum.Properties.STAGING;
+namespace ACE.Entity.Enum.Properties;
 
 [RequiresPrimaryAttribute<RealmPropertyPrimaryMinMaxAttribute<int>, int>]
-public enum RealmPropertyInt : ushort
+public enum RealmPropertyIntStaging : ushort
 {
     Undef = 0,
 

@@ -13,17 +13,12 @@ using Corvus.Json;
 namespace ACRealms.RealmProps.IntermediateModels;
 public readonly partial struct RealmPropertySchema
 {
-    public readonly partial struct ValStringEntity
+    public readonly partial struct DescriptionArrayEntity
     {
         /// <summary>
         /// Generated from JSON Schema.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// list of string fragments to be concatenated together to allow json string to be broken up into multiple lines in the editor
-        /// </para>
-        /// </remarks>
-        public readonly partial struct Type1EntityArray
+        public readonly partial struct DescriptionArrayDescriptionArrayEntity
         {
             /// <inheritdoc/>
             public ValidationContext Validate(in ValidationContext validationContext, ValidationLevel level = ValidationLevel.Flag)
@@ -37,7 +32,7 @@ public readonly partial struct RealmPropertySchema
                 if (level > ValidationLevel.Basic)
                 {
                     result = result.UsingStack();
-                    result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/valString/oneOf/1");
+                    result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/descriptionArray/items");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;
@@ -47,7 +42,13 @@ public readonly partial struct RealmPropertySchema
                     return result;
                 }
 
-                result = this.ValidateArray(valueKind, result, level);
+                result = Corvus.Json.Validate.ValidateString(this, result, level, 200, 1, null);
+                if (level == ValidationLevel.Flag && !result.IsValid)
+                {
+                    return result;
+                }
+
+                result = this.ValidateAllOf(result, level);
                 if (level == ValidationLevel.Flag && !result.IsValid)
                 {
                     return result;
