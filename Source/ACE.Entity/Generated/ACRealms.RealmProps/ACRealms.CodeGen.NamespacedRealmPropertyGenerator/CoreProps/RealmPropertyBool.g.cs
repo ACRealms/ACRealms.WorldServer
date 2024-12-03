@@ -16,19 +16,19 @@ public enum RealmPropertyBoolStaging : ushort
     [RealmPropertyBoolAttribute(false)]
     Peripheral_ClassicalInstance_AllowHousingPurchase,
 
-    [Description("No description")]
+    [Description("Enables classical instances for the realm.  Use the dungeon-sets peripheral configuration file to define landblocks for which players will be given private instances.")]
     [RealmPropertyBoolAttribute(false)]
     Peripheral_ClassicalInstance_Enabled,
 
-    [Description("No description")]
+    [Description("If enabled, classical instances will be active regardless of the character's location.  This is not recommended for realms other than true solo-self-found realms, and is considered an advanced feature.")]
     [RealmPropertyBoolAttribute(false)]
     Peripheral_ClassicalInstance_EnableForAllLandblocksDangerous,
 
-    [Description("No description")]
+    [Description("If enabled, classical instances will be active regardless of the character's PropertyBool.ClassicalInstancesActive.")]
     [RealmPropertyBoolAttribute(false)]
     Peripheral_ClassicalInstance_IgnoreCharacterProp,
 
-    [Description("No description")]
+    [Description("If enabled, classical instances will be assigned per account instead of per character.  If a player owns a house in a classical instance, they will lose access to it if this is toggled.")]
     [RealmPropertyBoolAttribute(false)]
     Peripheral_ClassicalInstance_ShareWithPlayerAccount,
 }

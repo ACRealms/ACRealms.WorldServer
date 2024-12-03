@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using RealmPropertyIntAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrimaryMinMaxAttribute<int>;
+//using RealmPropertyEnumAttribute<T> = ACE.Entity.Enum.Properties.RealmPropertyEnumAttribute<T>;
 
 namespace ACE.Entity.Enum.Properties
 {
@@ -20,7 +21,7 @@ namespace ACE.Entity.Enum.Properties
         [RealmPropertyInt(0, 0, 0xFFFF)]
         RulesetStampVendorCategory = 1,
 
-
+        #region ported
         [Description("All creatures will have this value added to their strength attribute")]
         [RealmPropertyInt(0, -10000000, 10000000)]
         CreatureStrengthAdded = 2,
@@ -45,8 +46,9 @@ namespace ACE.Entity.Enum.Properties
         [RealmPropertyInt(0, -10000000, 10000000)]
         CreatureSelfAdded = 7,
 
+        #endregion
         /*Below not implemented*/
-        [Description("NOT IMPLEMENTED")]
+        /*[Description("NOT IMPLEMENTED")]
         [RealmPropertyInt(0, -100000, 100000)]
         PlayerDamageMeleeAdded = 8,
 
@@ -64,7 +66,7 @@ namespace ACE.Entity.Enum.Properties
 
         [Description("NOT IMPLEMENTED")]
         [RealmPropertyInt(0, -100000, 100000)]
-        FoodRestoreAmountAdded = 12,
+        FoodRestoreAmountAdded = 12,*/
 
         [Description("When recalling, determines which mode to use to select the realm. Defaults to 1 for PlayerInstanceSelectMode.HomeRealm")]
         [RealmPropertyInt((int)PlayerInstanceSelectMode.HomeRealm, 1, (ushort)PlayerInstanceSelectMode.reserved - 1)]

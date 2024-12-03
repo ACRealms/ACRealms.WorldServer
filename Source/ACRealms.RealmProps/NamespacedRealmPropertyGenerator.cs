@@ -213,7 +213,7 @@ namespace ACRealms.CodeGen
                     PrimitiveType.@double => "0.0",
                     PrimitiveType.@int => "0",
                     PrimitiveType.@long => "0",
-                    PrimitiveType.@string => "\"\"",
+                    PrimitiveType.@string => "\"1\"",
                     _ => "<!INVALID!>"
                 };
             }
@@ -252,20 +252,47 @@ namespace ACRealms.CodeGen
             }
         }
 
-        private static string GetDescription(RealmPropertySchema.ValDescriptionEntity descriptionDef)
+        private static string GetUnformattedDescription(RealmPropertySchema.DescriptionArrayEntity descriptionArray)
         {
             // This needs to eventually be handled with fixed line widths and proper wrapping
             string newline = $$"""
 
                 """ + " ";
+            return string.Join(newline, descriptionArray.Select(x => x.AsString.GetString()!));
+        }
 
-            if (descriptionDef.IsNullOrUndefined())
-                return "No Description";
-            if (descriptionDef.IsOneOf0Entity)
-                return descriptionDef.AsOneOf0Entity.AsString.GetString()!;
-            if (descriptionDef.IsDescriptionArrayEntity)
-                return string.Join(newline, descriptionDef.AsDescriptionArrayEntity.Select(x => x.AsString.GetString()!));
+        private static string? GetUnformattedDescription(RealmPropertySchema.ValDescriptionEntity? descriptionDef)
+        {
+            if (!descriptionDef.HasValue || descriptionDef.Value.IsNullOrUndefined())
+                return null;
+            if (descriptionDef.Value.AsString.GetString() is string d)
+                return d;
+            if (descriptionDef.Value.IsOneOf0Entity)
+            {
+                var def = descriptionDef.Value.AsOneOf0Entity;
+                if (def.IsValStringSimpleEntity)
+                    return def.AsValStringSimpleEntity.AsString.GetString();
+                if (def.IsDescriptionPatternEntity)
+                    return def.AsDescriptionPatternEntity.AsString.GetString();
+            }
+            if (descriptionDef.Value.IsDescriptionArrayEntity)
+                return GetUnformattedDescription(descriptionDef.Value.AsDescriptionArrayEntity);
             throw new ArgumentException("Unhandled description type in schema");
+        }
+
+        private static string GetFullDescription(string shortKey, RealmPropertySchema.ValDescriptionEntity? descriptionDef, GroupDefaults? groupDefaults)
+        {
+            var unformattedDescription = GetUnformattedDescription(descriptionDef);
+            if (unformattedDescription == null)
+            {
+                if (groupDefaults == null || groupDefaults.DescriptionFormat == null)
+                    return "No description (1)";
+                unformattedDescription = groupDefaults.DescriptionFormat;
+            }
+            if (groupDefaults == null)
+                return unformattedDescription;
+
+            return groupDefaults!.GetDescriptionFromFormat(shortKey, unformattedDescription);
         }
 
         private static string? GetNumericValue(PropType type, RealmPropertySchema.ValFloatEntity? numericValueSrc)
@@ -354,10 +381,14 @@ namespace ACRealms.CodeGen
             {
                 if (groupDefaults == null)
                     throw new ArgumentException("Prop from string short description definition only allowed within a group!");
+
+                var description = GetUnformattedDescription(propDef.AsValDescriptionEntity);
+                description = groupDefaults.GetDescriptionFromFormat(shortKey, description);
+                
                 return new ObjPropInfo(namespaceRaw, key)
                 {
                     Type = groupDefaults.PropType!,
-                    Description = groupDefaults!.GetDescriptionFromFormat(shortKey, propDef.AsString.GetString()),
+                    Description = description,
                     Default = groupDefaults.Default,
                     Enum = groupDefaults.Enum,
                     MinValue = groupDefaults.MinValue,
@@ -369,12 +400,14 @@ namespace ACRealms.CodeGen
                 var prop = propDef.AsObjPropEntity;
                 Enum.TryParse(prop.Type.GetString()!, false, out PropType propType);
 
-                var desc = GetDescription(prop.Description) ?? groupDefaults?.GetDescriptionFromFormat(shortKey) ?? "No description";
+                var unformattedDesc = GetUnformattedDescription(prop.Description);
+
+                var desc = groupDefaults?.GetDescriptionFromFormat(shortKey, unformattedDesc) ?? unformattedDesc;
                 var type = propType == PropType.None ? groupDefaults!.PropType : propType;
 
                 return new ObjPropInfo(namespaceRaw, key)
                 {
-                    Description = desc, // TODO: Add ShortDescription to schema
+                    Description = desc!,
                     MinValue = GetNumericValue(propType, prop.MinValue) ?? groupDefaults?.MinValue,
                     MaxValue = GetNumericValue(propType, prop.MaxValue) ?? groupDefaults?.MaxValue,
                     Default = GetLiteralValue(propType, prop.Default) ?? groupDefaults?.Default,
@@ -405,15 +438,19 @@ namespace ACRealms.CodeGen
             public string? Enum { get; init; }
             public PropType PropType { get; init; }
 
-            public string GetDescriptionFromFormat(string shortKey, string? shortDescription = null)
+            private string Format(string shortKey, string? unformattedDescription)
             {
-                if (DescriptionFormat == null)
-                    return shortDescription ?? "No description";
+                if (unformattedDescription == null)
+                    return DescriptionFormat?.Replace("{short_key}", shortKey) ?? "No description (3)";
 
-                string format = DescriptionFormat!;
-                return format
-                    .Replace("{short_description}", shortDescription ?? "(Missing Short Description!)")
-                    .Replace("{short_key}", shortKey);
+                return DescriptionFormat?.Replace("{short_key}", shortKey)?.Replace("{short_description}", unformattedDescription ?? "No description (5)")
+                    ?? unformattedDescription?.Replace("{short_key}", shortKey)
+                    ?? "No description (4)";
+            }
+
+            public string GetDescriptionFromFormat(string shortKey, string? unformattedDescription = null)
+            {
+                return Format(shortKey, unformattedDescription);
             }
         }
 
@@ -450,7 +487,7 @@ namespace ACRealms.CodeGen
 
                         return new ObjPropInfo(namespaceRaw, key)
                         {
-                            Description = gDefaults.GetDescriptionFromFormat(shortKey),
+                            Description = gDefaults.GetDescriptionFromFormat(shortKey, null),
                             MinValue = gDefaults.MinValue,
                             MaxValue = gDefaults.MaxValue,
                             Default = gDefaults.Default,
@@ -537,20 +574,6 @@ namespace ACRealms.CodeGen
             public string OriginalPath { get; private init; }
             public ImmutableArrayWrapper<ObjPropInfo> ObjProps { get; private init; }
             public string NamespaceFull { get; private init; }
-
-
-            /// <summary>
-            /// The C# class name to be generated
-            /// </summary>
-            //public string ClassName { get; private init; }
-
-            //private string NamespacePrefix { get; init; } = $"ACRealms.RealmProps";
-
-           // public string? ClassNamespace { get; private init; }
-
-            /// <summary>
-            /// The C# namespace to be generated
-            /// </summary>
             public ImmutableArray<string> NestedClassNames { get; private init; }
             public NamespaceData(string originalPath, string namespaceFull, ImmutableArrayWrapper<ObjPropInfo> objProps)
             {
@@ -561,17 +584,6 @@ namespace ACRealms.CodeGen
                 var parts = namespaceFull.Split('.');
                 
                 NestedClassNames = parts.ToImmutableArray();
-                //ClassName = parts.Last();
-
-                //// Calc the C# Namespace to use
-                //if (parts.Length > 1)
-                //{
-                //    // The "Namespace" value in the json file, except for the last part
-                //    ClassNamespace = String.Join(".", parts.Take(parts.Length - 1));
-                //    EffectiveNamespace = $"{NamespacePrefix}.{ClassNamespace}";
-                //}
-                //else
-                //    EffectiveNamespace = NamespacePrefix;
             }
 
             internal string ToCompilationSource()
@@ -640,7 +652,7 @@ namespace ACRealms.CodeGen
             try
             {
                 (string AliasedPrimaryAttributeType, string CanonicalPrimaryAttributeType, PrimitiveType)? primaryAttrDataNullable = targetEnumTypeName switch
-                {//using RealmPropertyFloatAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrimaryMinMaxAttribute<double>;
+                {
                     "RealmPropertyString" => ("RealmPropertyStringAttribute", "RealmPropertyPrimaryAttribute", PrimitiveType.@string),
                     "RealmPropertyInt" => ("RealmPropertyIntAttribute", "RealmPropertyPrimaryMinMaxAttribute", PrimitiveType.@int),
                     "RealmPropertyInt64" => ("RealmPropertyInt64Attribute", "RealmPropertyPrimaryMinMaxAttribute", PrimitiveType.@long),

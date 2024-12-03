@@ -99,7 +99,7 @@ namespace ACE.Entity.Enum.Properties
     }
 
     public class RealmPropertyPrimaryMinMaxAttribute<TPrimitive> : RealmPropertyPrimaryAttribute<TPrimitive>
-         where TPrimitive : notnull, IComparable<TPrimitive>, IEquatable<TPrimitive>, IMinMaxValue<TPrimitive>, INumber<TPrimitive>, ISignedNumber<TPrimitive>, IAdditionOperators<TPrimitive, TPrimitive, TPrimitive>, IMultiplyOperators<TPrimitive, TPrimitive, TPrimitive>
+         where TPrimitive : notnull, IComparable<TPrimitive>, IEquatable<TPrimitive>, IMinMaxValue<TPrimitive>, INumber<TPrimitive>, IAdditionOperators<TPrimitive, TPrimitive, TPrimitive>, IMultiplyOperators<TPrimitive, TPrimitive, TPrimitive>
     {
         public TPrimitive MinValue { get; }
         public TPrimitive MaxValue { get; }
@@ -120,6 +120,40 @@ namespace ACE.Entity.Enum.Properties
         }
     }
 
+    public class RealmPropertyEnumAttribute<TEnum>
+        : RealmPropertyPrimaryMinMaxAttribute<int>
+        // Must be int for the following reasons:
+        // 1. Fast conversion with Unsafe.As requires both types to be the same underlying size in bytes (32 bits for the default enum type)
+        // 2. Compatibility with the underlying RealmPropertyInt requires a range that doesn't exceed RealmPropertyInt's range (which is that of a signed int32)
+         where TEnum : struct, System.Enum, IEquatable<int>
+    {
+        private static readonly Dictionary<Type, (int min, int max)> EnumMinMaxCache = [];
+
+        public RealmPropertyEnumAttribute(TEnum defaultValue) : base(UnsafeCast(defaultValue))
+        {
+        }
+
+        private static int UnsafeCast(TEnum enumValue)
+        {
+
+            return System.Runtime.CompilerServices.Unsafe.As<TEnum, int>(ref enumValue);
+        }
+
+        public RealmPropertyEnumAttribute(string defaultFromServerProperty, TEnum defaultValue)
+            : base(defaultFromServerProperty, UnsafeCast(defaultValue))
+        {
+        }
+
+        public RealmPropertyEnumAttribute(TEnum defaultValue, int minValue, int maxValue)
+            : base(UnsafeCast(defaultValue), minValue, maxValue)
+        {
+        }
+
+        public RealmPropertyEnumAttribute(string defaultFromServerProperty, TEnum defaultValue, int minValue, int maxValue)
+            : base(defaultFromServerProperty, UnsafeCast(defaultValue), minValue, maxValue)
+        {
+        }
+    }
     /*
     public class RealmPropertyIntAttribute : RealmPropertyPrimaryMinMaxAttribute<int>
     {
