@@ -1,0 +1,14 @@
+{
+  "$schema_version": 1,
+  "namespace": "Core.RulesetCrafting",
+  "properties": {
+    "RulesetStampVendorCategory": {
+      "description": "Vendor weenies with a matching PropertyInt.RulesetStampVendorType will include this ruleset as a stamp for sale, to allow players to craft these rulesets for ephemeral instances",
+      "obsolete": "This will be changed to a string",
+      "type": "integer",
+      "default": 0,
+      "min_value": 0,
+      "max_value": 65535
+    }
+  }
+}

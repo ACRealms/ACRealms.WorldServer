@@ -12,6 +12,32 @@ public enum RealmPropertyBoolStaging : ushort
 {
     Undef = 0,
 
+
+
+    [Description("If true, realm will be listed as available from the realm selector (Blaine)")]
+    [RealmPropertyBoolAttribute(false)]
+    Core_Realm_CanBeHomeworld,
+
+    [Description("Players with a homeworld of this realm may enter the neutral zone if true")]
+    [RealmPropertyBoolAttribute(false)]
+    Core_Realm_CanInteractWithNeutralZone,
+
+    [Description("Allows players to use the /hideout command to teleport to a personal instanced hideout")]
+    [RealmPropertyBoolAttribute(false)]
+    Core_Realm_HideoutEnabled,
+
+    [Description("If true, any player with a home realm with the property 'CanInteractWithNeutralZone' may travel to this realm")]
+    [RealmPropertyBoolAttribute(false)]
+    Core_Realm_IsNeutralZone,
+
+    [Description("Disables the home realm requirement for house purchases.  This configuration should be applied to the realm the house is located in, not the home realm of the player.")]
+    [RealmPropertyBoolAttribute(false)]
+    Housing_PurchaseRestrictions_IgnoreHomeRealm,
+
+    [Description("Disables the primary instance restriction from house purchases.  This is separate from the home realm restriction.  Consider using ClassicalInstances_AllowHousingPurchase instead.")]
+    [RealmPropertyBoolAttribute(false)]
+    Housing_PurchaseRestrictions_IgnorePrimaryInstance,
+
     [Description("If enabled, players can purchase houses in the instance ID assigned to the player.")]
     [RealmPropertyBoolAttribute(false)]
     Peripheral_ClassicalInstance_AllowHousingPurchase,
@@ -32,5 +58,15 @@ public enum RealmPropertyBoolStaging : ushort
     [RealmPropertyBoolAttribute(false)]
     Peripheral_ClassicalInstance_ShareWithPlayerAccount,
 
+    [Description("Enables a double collision algorithm for projectile spells. In theory, this makes them harder to dodge.")]
+    [RealmPropertyBoolAttribute(true)]
+    Projectile_Magic_DoubleCollisionCheck,
 
+    [Description("Set this to true to designate this realm as the dueling realm. Allows /rebuff command, all summoned portals lead to ephemeral instances, and no vitae.")]
+    [RealmPropertyBoolAttribute(false)]
+    Pvp_World_IsDuelingRealm,
+
+    [Description("Standard 'Red server' rules. Players are always Player Killer status unless recently killed by a player killer")]
+    [RealmPropertyBoolAttribute(false)]
+    Pvp_World_IsPkOnly,
 }

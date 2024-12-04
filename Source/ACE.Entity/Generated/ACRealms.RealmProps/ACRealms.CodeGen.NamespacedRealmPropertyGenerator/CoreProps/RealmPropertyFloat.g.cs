@@ -13,4 +13,69 @@ public enum RealmPropertyFloatStaging : ushort
     Undef = 0,
 
 
+
+    [Description("Creature Coordination will be multiplied by this amount")]
+    [RealmPropertyFloatAttribute(1, 0.01, 100)]
+    Creature_Attributes_CoordinationMultiplier,
+
+    [Description("Creature Damage will be multiplied by this amount")]
+    [RealmPropertyFloatAttribute(1, 0.01, 100)]
+    Creature_Attributes_DamageMultiplier,
+
+    [Description("Creature Endurance will be multiplied by this amount")]
+    [RealmPropertyFloatAttribute(1, 0.01, 100)]
+    Creature_Attributes_EnduranceMultiplier,
+
+    [Description("Creature Focus will be multiplied by this amount")]
+    [RealmPropertyFloatAttribute(1, 0.01, 100)]
+    Creature_Attributes_FocusMultiplier,
+
+    [Description("Creature Quickness will be multiplied by this amount")]
+    [RealmPropertyFloatAttribute(1, 0.01, 100)]
+    Creature_Attributes_QuicknessMultiplier,
+
+    [Description("Creature Self will be multiplied by this amount")]
+    [RealmPropertyFloatAttribute(1, 0.01, 100)]
+    Creature_Attributes_SelfMultiplier,
+
+    [Description("Creature Strength will be multiplied by this amount")]
+    [RealmPropertyFloatAttribute(1, 0.01, 100)]
+    Creature_Attributes_StrengthMultiplier,
+
+    [Description("Scales the chance for cantrips to drop in each tier. Defaults to 1.0, as per end of retail")]
+    [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
+    [RealmPropertyFloatAttribute(1, 0, 100000)]
+    Loot_DropRates_CantripDropRate,
+
+    [Description("Scales the chance for Epic cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail")]
+    [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
+    [RealmPropertyFloatAttribute(1, 0, 100000)]
+    Loot_DropRates_EpicCantripDropRate,
+
+    [Description("Scales the chance for Legendary cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail")]
+    [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
+    [RealmPropertyFloatAttribute(1, 0, 100000)]
+    Loot_DropRates_LegendaryCantripDropRate,
+
+    [Description("Scales the chance for Major cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail")]
+    [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
+    [RealmPropertyFloatAttribute(1, 0, 100000)]
+    Loot_DropRates_MajorCantripDropRate,
+
+    [Description("Scales the chance for Minor cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail")]
+    [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
+    [RealmPropertyFloatAttribute(1, 0, 100000)]
+    Loot_DropRates_MinorCantripDropRate,
+
+    [Description("The maximum distance a player may move during a spellcast without the cast being cancelled with 'Your movement disrupted spell casting!'")]
+    [RealmPropertyFloatAttribute(6, 1, 250)]
+    Player_Pvp_Spellcasting_WindupMaxMove,
+
+    [Description("The maximum angle a player allowed to face away from the target before releasing a spell.")]
+    [RealmPropertyFloatAttribute(20, 0, 360)]
+    Player_Spellcasting_MaxAngle,
+
+    [Description("If you wish for players to glitch around less during powerslides, lower this value")]
+    [RealmPropertyFloatAttribute(1, 0.1, 5)]
+    Player_Spellcasting_MoveToStateUpdatePositionThreshold,
 }

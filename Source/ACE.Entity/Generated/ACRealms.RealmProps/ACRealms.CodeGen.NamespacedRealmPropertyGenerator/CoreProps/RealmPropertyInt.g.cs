@@ -12,41 +12,46 @@ public enum RealmPropertyIntStaging : ushort
 {
     Undef = 0,
 
-    [Description("All creatures will have this value added to their Coordination attribute")]
-    [RealmPropertyIntAttribute(0, -10000000, 10000000)]
-    Creature_Attributes_CoordinationAdded,
 
-    [Description("All creatures will have this value added to their Endurance attribute")]
-    [RealmPropertyIntAttribute(0, -10000000, 10000000)]
-    Creature_Attributes_EnduranceAdded,
-
-    [Description("All creatures will have this value added to their Focus attribute")]
-    [RealmPropertyIntAttribute(0, -10000000, 10000000)]
-    Creature_Attributes_FocusAdded,
 
     [Description("When using a portal, determines which mode to use to select the realm or instance.")]
     [RealmPropertyEnumAttribute<PlayerInstanceSelectMode>(PlayerInstanceSelectMode.HomeRealm)]
     Core_Instance_PortalInstanceSelectMode,
 
-    [Description("All creatures will have this value added to their Quickness attribute")]
-    [RealmPropertyIntAttribute(0, -10000000, 10000000)]
-    Creature_Attributes_QuicknessAdded,
-
     [Description("When recalling, determines which mode to use to select the realm or instance.")]
     [RealmPropertyEnumAttribute<PlayerInstanceSelectMode>(PlayerInstanceSelectMode.HomeRealm)]
     Core_Instance_RecallInstanceSelectMode,
 
-    [Description("All creatures will have this value added to their Self attribute")]
-    [RealmPropertyIntAttribute(0, -10000000, 10000000)]
-    Creature_Attributes_SelfAdded,
-
-    [Description("All creatures will have this value added to their Strength attribute")]
-    [RealmPropertyIntAttribute(0, -10000000, 10000000)]
-    Creature_Attributes_StrengthAdded,
-
-
-
     [Description("Landblocks which have been inactive for this many minutes will be unloaded")]
     [RealmPropertyIntAttribute(5, 1, 1440)]
     Core_Landblock_UnloadInterval,
+
+    [Description("Vendor weenies with a matching PropertyInt.RulesetStampVendorType will include this ruleset as a stamp for sale, to allow players to craft these rulesets for ephemeral instances")]
+    [Obsolete("This will be changed to a string")]
+    [RealmPropertyIntAttribute(0, 0, 65535)]
+    Core_RulesetCrafting_RulesetStampVendorCategory,
+
+    [Description("All creatures will have this value added to their Coordination attribute")]
+    [RealmPropertyIntAttribute(0, -10000, 10000)]
+    Creature_Attributes_CoordinationAdded,
+
+    [Description("All creatures will have this value added to their Endurance attribute")]
+    [RealmPropertyIntAttribute(0, -10000, 10000)]
+    Creature_Attributes_EnduranceAdded,
+
+    [Description("All creatures will have this value added to their Focus attribute")]
+    [RealmPropertyIntAttribute(0, -10000, 10000)]
+    Creature_Attributes_FocusAdded,
+
+    [Description("All creatures will have this value added to their Quickness attribute")]
+    [RealmPropertyIntAttribute(0, -10000, 10000)]
+    Creature_Attributes_QuicknessAdded,
+
+    [Description("All creatures will have this value added to their Self attribute")]
+    [RealmPropertyIntAttribute(0, -10000, 10000)]
+    Creature_Attributes_SelfAdded,
+
+    [Description("All creatures will have this value added to their Strength attribute")]
+    [RealmPropertyIntAttribute(0, -10000, 10000)]
+    Creature_Attributes_StrengthAdded,
 }

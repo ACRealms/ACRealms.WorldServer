@@ -58,6 +58,7 @@
         "enum": { "type": "string" },
         "default": { "description": "The hard default value for the realm property (ultimate fallback)" },
         "reroll_restricted_to": { "enum": [ "never", "manual", "landblock", "always" ] },
+        "obsolete": { "type": "string" },
         "default_from_server_property": { "type": "string" }
       },
       "allOf": [

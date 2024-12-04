@@ -98,7 +98,7 @@ namespace ACRealms.CodeGen
 
             context.RegisterSourceOutput(realmPropNamespaces, (spc, data) =>
             {
-                var fileName = Path.GetFileNameWithoutExtension(data.OriginalPath);
+                var fileName = string.Join("/", data.NestedClassNames);
                 var sourceCode = GenerateSourceCode(data);
                 spc.AddSource($"NamespacedProps/{fileName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
             });
@@ -130,7 +130,7 @@ namespace ACRealms.CodeGen
                     data.TargetEnumTypeName,
                     data.AllProps.Where(p =>
                         ObjPropInfo.PropMap[p.Type] == data.TargetEnumTypeName
-                    ).OrderBy(p => p.Key).ToImmutableArray()
+                    ).OrderBy(p => p.CoreKey).ToImmutableArray()
                 ));
 
             context.RegisterSourceOutput(corePropsSource, (spc, data) =>
@@ -191,7 +191,7 @@ namespace ACRealms.CodeGen
 
         record ObjPropInfo(string NamespaceRaw, string Key)
         {
-            private string CoreKey { get; } = $"{NamespaceRaw.Replace('.', '_')}_{Key}";
+            public string CoreKey { get; } = $"{NamespaceRaw.Replace('.', '_')}_{Key}";
             public required string Description { get; init; }
             public required PropType Type { get; init; }
             public string? Enum { get; init; }
@@ -199,6 +199,9 @@ namespace ACRealms.CodeGen
 
             public string? MinValue { get; init; }
             public string? MaxValue { get; init; }
+            public string? RerollRestrictedTo { get; init; }
+            public string? ObsoleteReason { get; init; }
+            public string? DefaultFromServerProp { get; init; }
 
             public static readonly FrozenDictionary<PropType, string> PropMap = new Dictionary<PropType, string>()
             {
@@ -213,9 +216,14 @@ namespace ACRealms.CodeGen
             private string CoreEnumType => PropMap[Type];
             public string ToNamespacedAliasDeclaration(string spacer)
             {
+                var obs = ObsoleteReason != null ? $$"""
+
+                {{spacer}}[System.Obsolete("{{ObsoleteReason}}")]
+                """ : "";
+
                 return
                 $$"""
-                {{spacer}}/// <summary>{{Description}}</summary>
+                {{spacer}}/// <summary>{{Description}}</summary>{{obs}}
                 {{spacer}}public const {{CoreEnumType}}Staging {{Key}} = {{CoreEnumType}}Staging.{{CoreKey}};
                 """;
             }
@@ -264,11 +272,22 @@ namespace ACRealms.CodeGen
                 """;
             }
 
-            public string ToCoreEnumDeclaration(string aliasedPrimaryAttributeType, string canonicalPrimaryAttributeType, PrimitiveType valuePrimitiveType)
+            public string ToCoreEnumDeclaration(
+                string aliasedPrimaryAttributeType,
+                string canonicalPrimaryAttributeType,
+                PrimitiveType valuePrimitiveType)
             {
+                var obs = ObsoleteReason != null ? $$"""
+
+                    [Obsolete("{{ObsoleteReason}}")]
+                """ : "";
+                var rerollRestriction = RerollRestrictedTo != null ? $$"""
+
+                    [RerollRestrictedTo(RealmPropertyRerollType.{{RerollRestrictedTo}})]
+                """ : "";
                 return
                 $$"""
-                    [Description("{{Description}}")]
+                    [Description("{{Description}}")]{{obs}}{{rerollRestriction}}
                     {{CorePrimaryAttribute(aliasedPrimaryAttributeType, canonicalPrimaryAttributeType, valuePrimitiveType)}}
                     {{CoreKey}},
                 """;
@@ -417,6 +436,8 @@ namespace ACRealms.CodeGen
                     Enum = groupDefaults.Enum,
                     MinValue = groupDefaults.MinValue,
                     MaxValue = groupDefaults.MaxValue,
+                    ObsoleteReason = groupDefaults.ObsoleteReason,
+                    RerollRestrictedTo = groupDefaults.RerollRestrictedTo,
                 };
             }
             else if (propDef.IsObjPropEntity)
@@ -436,6 +457,9 @@ namespace ACRealms.CodeGen
                     MaxValue = GetNumericValue(propType, prop.MaxValue) ?? groupDefaults?.MaxValue,
                     Default = GetLiteralValue(propType, prop.Default) ?? groupDefaults?.Default,
                     Enum = prop.Enum.GetString() ?? groupDefaults?.Enum,
+                    DefaultFromServerProp = prop.DefaultFromServerProperty.GetString(),
+                    ObsoleteReason = prop.Obsolete.GetString(),
+                    RerollRestrictedTo = prop.RerollRestrictedTo.IsNotNullOrUndefined() ? prop.RerollRestrictedTo.AsString.GetString() : null,
                     Type = type
                 };
             }
@@ -461,6 +485,8 @@ namespace ACRealms.CodeGen
             public string? Default { get; init; }
             public string? Enum { get; init; }
             public PropType PropType { get; init; }
+            public string? ObsoleteReason { get; init; }
+            public string? RerollRestrictedTo { get; init; }
 
             private string Format(string shortKey, string? unformattedDescription)
             {
@@ -498,7 +524,8 @@ namespace ACRealms.CodeGen
                     MaxValue = GetNumericValue(gPropType, group.MaxValue),
                     Default = GetLiteralValue(gPropType, group.Default, group.Enum.AsString.GetString()),
                     Enum = group.Enum.GetString(),
-                    PropType = gPropType
+                    PropType = gPropType,
+                    RerollRestrictedTo = group.RerollRestrictedTo.IsNotNullOrUndefined() ? group.RerollRestrictedTo.AsString.GetString() : null
                 };
 
                 var props = group.Properties;
@@ -516,7 +543,9 @@ namespace ACRealms.CodeGen
                             MaxValue = gDefaults.MaxValue,
                             Default = gDefaults.Default,
                             Enum = gDefaults.Enum,
-                            Type = gDefaults.PropType
+                            Type = gDefaults.PropType,
+                            ObsoleteReason = gDefaults.ObsoleteReason,
+                            RerollRestrictedTo = gDefaults.RerollRestrictedTo
                         };
                     });
                 }

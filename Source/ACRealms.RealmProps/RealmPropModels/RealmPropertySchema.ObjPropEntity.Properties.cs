@@ -37,6 +37,15 @@ public readonly partial struct RealmPropertySchema
             /// </summary>
             public const string Default = "default";
             /// <summary>
+            /// JSON property name for <see cref = "DefaultFromServerProperty"/>.
+            /// </summary>
+            public static ReadOnlySpan<byte> DefaultFromServerPropertyUtf8 => "default_from_server_property"u8;
+
+            /// <summary>
+            /// JSON property name for <see cref = "DefaultFromServerProperty"/>.
+            /// </summary>
+            public const string DefaultFromServerProperty = "default_from_server_property";
+            /// <summary>
             /// JSON property name for <see cref = "Description"/>.
             /// </summary>
             public static ReadOnlySpan<byte> DescriptionUtf8 => "description"u8;
@@ -82,6 +91,24 @@ public readonly partial struct RealmPropertySchema
             /// </summary>
             public const string MinValue = "min_value";
             /// <summary>
+            /// JSON property name for <see cref = "Obsolete"/>.
+            /// </summary>
+            public static ReadOnlySpan<byte> ObsoleteUtf8 => "obsolete"u8;
+
+            /// <summary>
+            /// JSON property name for <see cref = "Obsolete"/>.
+            /// </summary>
+            public const string Obsolete = "obsolete";
+            /// <summary>
+            /// JSON property name for <see cref = "RerollRestrictedTo"/>.
+            /// </summary>
+            public static ReadOnlySpan<byte> RerollRestrictedToUtf8 => "reroll_restricted_to"u8;
+
+            /// <summary>
+            /// JSON property name for <see cref = "RerollRestrictedTo"/>.
+            /// </summary>
+            public const string RerollRestrictedTo = "reroll_restricted_to";
+            /// <summary>
             /// JSON property name for <see cref = "Type"/>.
             /// </summary>
             public static ReadOnlySpan<byte> TypeUtf8 => "type"u8;
@@ -122,6 +149,38 @@ public readonly partial struct RealmPropertySchema
                     if (this.objectBacking.TryGetValue(JsonPropertyNames.Default, out JsonAny result))
                     {
                         return result.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity>();
+                    }
+                }
+
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// Gets the (optional) <c>default_from_server_property</c> property.
+        /// </summary>
+        public Corvus.Json.JsonString DefaultFromServerProperty
+        {
+            get
+            {
+                if ((this.backing & Backing.JsonElement) != 0)
+                {
+                    if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                    {
+                        return default;
+                    }
+
+                    if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultFromServerPropertyUtf8, out JsonElement result))
+                    {
+                        return new Corvus.Json.JsonString(result);
+                    }
+                }
+
+                if ((this.backing & Backing.Object) != 0)
+                {
+                    if (this.objectBacking.TryGetValue(JsonPropertyNames.DefaultFromServerProperty, out JsonAny result))
+                    {
+                        return result.As<Corvus.Json.JsonString>();
                     }
                 }
 
@@ -295,6 +354,70 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <summary>
+        /// Gets the (optional) <c>obsolete</c> property.
+        /// </summary>
+        public Corvus.Json.JsonString Obsolete
+        {
+            get
+            {
+                if ((this.backing & Backing.JsonElement) != 0)
+                {
+                    if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                    {
+                        return default;
+                    }
+
+                    if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.ObsoleteUtf8, out JsonElement result))
+                    {
+                        return new Corvus.Json.JsonString(result);
+                    }
+                }
+
+                if ((this.backing & Backing.Object) != 0)
+                {
+                    if (this.objectBacking.TryGetValue(JsonPropertyNames.Obsolete, out JsonAny result))
+                    {
+                        return result.As<Corvus.Json.JsonString>();
+                    }
+                }
+
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// Gets the (optional) <c>reroll_restricted_to</c> property.
+        /// </summary>
+        public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.RerollRestrictedToEntity RerollRestrictedTo
+        {
+            get
+            {
+                if ((this.backing & Backing.JsonElement) != 0)
+                {
+                    if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                    {
+                        return default;
+                    }
+
+                    if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.RerollRestrictedToUtf8, out JsonElement result))
+                    {
+                        return new ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.RerollRestrictedToEntity(result);
+                    }
+                }
+
+                if ((this.backing & Backing.Object) != 0)
+                {
+                    if (this.objectBacking.TryGetValue(JsonPropertyNames.RerollRestrictedTo, out JsonAny result))
+                    {
+                        return result.As<ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.RerollRestrictedToEntity>();
+                    }
+                }
+
+                return default;
+            }
+        }
+
+        /// <summary>
         /// Gets the (optional) <c>type</c> property.
         /// </summary>
         public ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.PropertytypeEntity Type
@@ -329,12 +452,17 @@ public readonly partial struct RealmPropertySchema
         /// <summary>
         /// Creates an instance of a <see cref = "ObjPropEntity"/>.
         /// </summary>
-        public static ObjPropEntity Create(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity? @default = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity? description = null, Corvus.Json.JsonNotAny? descriptionFormat = null, Corvus.Json.JsonString? @enum = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? maxValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? minValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.PropertytypeEntity? type = null)
+        public static ObjPropEntity Create(ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity? @default = null, Corvus.Json.JsonString? defaultFromServerProperty = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity? description = null, Corvus.Json.JsonNotAny? descriptionFormat = null, Corvus.Json.JsonString? @enum = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? maxValue = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity? minValue = null, Corvus.Json.JsonString? obsolete = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.RerollRestrictedToEntity? rerollRestrictedTo = null, ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.PropertytypeEntity? type = null)
         {
             var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
             if (@default is ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity @default__)
             {
                 builder.Add(JsonPropertyNames.Default, @default__.AsAny);
+            }
+
+            if (defaultFromServerProperty is Corvus.Json.JsonString defaultFromServerProperty__)
+            {
+                builder.Add(JsonPropertyNames.DefaultFromServerProperty, defaultFromServerProperty__.AsAny);
             }
 
             if (description is ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValDescriptionEntity description__)
@@ -362,6 +490,16 @@ public readonly partial struct RealmPropertySchema
                 builder.Add(JsonPropertyNames.MinValue, minValue__.AsAny);
             }
 
+            if (obsolete is Corvus.Json.JsonString obsolete__)
+            {
+                builder.Add(JsonPropertyNames.Obsolete, obsolete__.AsAny);
+            }
+
+            if (rerollRestrictedTo is ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.RerollRestrictedToEntity rerollRestrictedTo__)
+            {
+                builder.Add(JsonPropertyNames.RerollRestrictedTo, rerollRestrictedTo__.AsAny);
+            }
+
             if (type is ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.PropertytypeEntity type__)
             {
                 builder.Add(JsonPropertyNames.Type, type__.AsAny);
@@ -378,6 +516,16 @@ public readonly partial struct RealmPropertySchema
         public ObjPropEntity WithDefault(in ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity value)
         {
             return this.SetProperty(JsonPropertyNames.Default, value);
+        }
+
+        /// <summary>
+        /// Sets default_from_server_property.
+        /// </summary>
+        /// <param name = "value">The value to set.</param>
+        /// <returns>The entity with the updated property.</returns>
+        public ObjPropEntity WithDefaultFromServerProperty(in Corvus.Json.JsonString value)
+        {
+            return this.SetProperty(JsonPropertyNames.DefaultFromServerProperty, value);
         }
 
         /// <summary>
@@ -428,6 +576,26 @@ public readonly partial struct RealmPropertySchema
         public ObjPropEntity WithMinValue(in ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ValFloatEntity value)
         {
             return this.SetProperty(JsonPropertyNames.MinValue, value);
+        }
+
+        /// <summary>
+        /// Sets obsolete.
+        /// </summary>
+        /// <param name = "value">The value to set.</param>
+        /// <returns>The entity with the updated property.</returns>
+        public ObjPropEntity WithObsolete(in Corvus.Json.JsonString value)
+        {
+            return this.SetProperty(JsonPropertyNames.Obsolete, value);
+        }
+
+        /// <summary>
+        /// Sets reroll_restricted_to.
+        /// </summary>
+        /// <param name = "value">The value to set.</param>
+        /// <returns>The entity with the updated property.</returns>
+        public ObjPropEntity WithRerollRestrictedTo(in ACRealms.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropOrGroupEntity.RerollRestrictedToEntity value)
+        {
+            return this.SetProperty(JsonPropertyNames.RerollRestrictedTo, value);
         }
 
         /// <summary>
