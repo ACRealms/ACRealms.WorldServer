@@ -24,9 +24,17 @@ public enum RealmPropertyIntStaging : ushort
     [RealmPropertyIntAttribute(0, -10000000, 10000000)]
     Creature_Attributes_FocusAdded,
 
+    [Description("When using a portal, determines which mode to use to select the realm or instance.")]
+    [RealmPropertyEnumAttribute<PlayerInstanceSelectMode>(PlayerInstanceSelectMode.HomeRealm)]
+    Core_Instance_PortalInstanceSelectMode,
+
     [Description("All creatures will have this value added to their Quickness attribute")]
     [RealmPropertyIntAttribute(0, -10000000, 10000000)]
     Creature_Attributes_QuicknessAdded,
+
+    [Description("When recalling, determines which mode to use to select the realm or instance.")]
+    [RealmPropertyEnumAttribute<PlayerInstanceSelectMode>(PlayerInstanceSelectMode.HomeRealm)]
+    Core_Instance_RecallInstanceSelectMode,
 
     [Description("All creatures will have this value added to their Self attribute")]
     [RealmPropertyIntAttribute(0, -10000000, 10000000)]

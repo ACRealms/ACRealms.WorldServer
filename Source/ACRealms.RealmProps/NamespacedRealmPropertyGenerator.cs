@@ -172,6 +172,7 @@ namespace ACRealms.CodeGen
             @long,
             @double,
             @string,
+            @enum
         }
 
         record ObjPropInfo(string NamespaceRaw, string Key)
@@ -205,7 +206,7 @@ namespace ACRealms.CodeGen
                 """;
             }
 
-            private static string DefaultLiteral(PrimitiveType valuePrimitiveType)
+            private string DefaultLiteral(PrimitiveType valuePrimitiveType)
             {
                 return valuePrimitiveType switch
                 {
@@ -213,7 +214,8 @@ namespace ACRealms.CodeGen
                     PrimitiveType.@double => "0.0",
                     PrimitiveType.@int => "0",
                     PrimitiveType.@long => "0",
-                    PrimitiveType.@string => "\"1\"",
+                    PrimitiveType.@string => "\"\"",
+                    PrimitiveType.@enum => $"({Enum})0",
                     _ => "<!INVALID!>"
                 };
             }
@@ -223,6 +225,7 @@ namespace ACRealms.CodeGen
                 return canonicalPrimaryAttributeType switch
                 {
                     "RealmPropertyPrimaryAttribute" => [Default ?? DefaultLiteral(valuePrimitiveType)],
+                    "RealmPropertyEnumAttribute" => [Default ?? DefaultLiteral(valuePrimitiveType)],
                     "RealmPropertyPrimaryMinMaxAttribute" => [
                         Default ?? DefaultLiteral(valuePrimitiveType),
                         MinValue ?? DefaultLiteral(valuePrimitiveType),
@@ -234,10 +237,16 @@ namespace ACRealms.CodeGen
 
             private string CorePrimaryAttribute(string aliasedPrimaryAttributeType, string canonicalPrimaryAttributeType, PrimitiveType valuePrimitiveType)
             {
+                string typeArg = valuePrimitiveType switch
+                {
+                    PrimitiveType.@enum => $"<{Enum}>",
+                    _ => String.Empty
+                };
+
                 var primaryArgs = string.Join(", ", CorePrimaryAttributeArgs(canonicalPrimaryAttributeType, valuePrimitiveType));
                 return
                 $$"""
-                [{{aliasedPrimaryAttributeType}}({{primaryArgs}})]
+                [{{aliasedPrimaryAttributeType}}{{typeArg}}({{primaryArgs}})]
                 """;
             }
 
@@ -335,7 +344,7 @@ namespace ACRealms.CodeGen
             };
         }
 
-        private static string GetSanitizedLiteralValue(PropType type, string unsanitizedValue)
+        private static string GetSanitizedLiteralValue(PropType type, string unsanitizedValue, string? enumType = null)
         {
             var result = type switch
             {
@@ -344,12 +353,13 @@ namespace ACRealms.CodeGen
                 PropType.@float => GetSanitizedDoubleValue(unsanitizedValue),
                 PropType.boolean => GetSanitizedBoolValue(unsanitizedValue),
                 PropType.@string => unsanitizedValue,
+                PropType.@enum => $"{enumType}.{unsanitizedValue.Replace("\"", "")}",
                 _ => throw new ArgumentException($"Invalid PropType ({type})")
             };
             return result;
         }
 
-        private static string? GetLiteralValue(PropType type, RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity? valueSrc)
+        private static string? GetLiteralValue(PropType type, RealmPropertySchema.ObjPropOrGroupEntity.DefaultEntity? valueSrc, string? enumType = null)
         {
             if (!valueSrc.HasValue || valueSrc.Value.IsNullOrUndefined())
                 return null;
@@ -366,7 +376,7 @@ namespace ACRealms.CodeGen
                 },
                 _ => throw new ArgumentException($"Unexpected type {valueSrc.Value.ValueKind}")
             };
-            return GetSanitizedLiteralValue(type, s!);
+            return GetSanitizedLiteralValue(type, s!, enumType);
         }
 
         private static ObjPropInfo GetProp(string namespaceRaw, string shortKey, RealmPropertySchema.PropDefEntity propDef, GroupDefaults? groupDefaults = null)
@@ -472,7 +482,7 @@ namespace ACRealms.CodeGen
                     KeySuffix = group.KeySuffix.IsNullOrUndefined() ? string.Empty : group.KeySuffix.AsString.GetString()!,
                     MinValue = GetNumericValue(gPropType, group.MinValue),
                     MaxValue = GetNumericValue(gPropType, group.MaxValue),
-                    Default = GetLiteralValue(gPropType, group.Default),
+                    Default = GetLiteralValue(gPropType, group.Default, group.Enum.AsString.GetString()),
                     Enum = group.Enum.GetString(),
                     PropType = gPropType
                 };
@@ -658,7 +668,8 @@ namespace ACRealms.CodeGen
                     "RealmPropertyInt64" => ("RealmPropertyInt64Attribute", "RealmPropertyPrimaryMinMaxAttribute", PrimitiveType.@long),
                     "RealmPropertyBool" => ("RealmPropertyBoolAttribute", "RealmPropertyPrimaryAttribute", PrimitiveType.@bool),
                     "RealmPropertyFloat" => ("RealmPropertyFloatAttribute", "RealmPropertyPrimaryMinMaxAttribute", PrimitiveType.@double),
-                    _ => null
+                   // "RealmPropertyEnum" => ("RealmPropertyEnumAttribute", "RealmPropertyEnumAttribute", PrimitiveType.@enum),
+                    _ => throw new Exception($"Unexpected propType '{targetEnumTypeName}'")
                 };
                 if (!primaryAttrDataNullable.HasValue)
                     throw new Exception($"Unexpected propType '{targetEnumTypeName}'");
@@ -671,9 +682,27 @@ namespace ACRealms.CodeGen
                 """;
 
                 var canonicalPropDecls = string.Join(newline, propsOfType.Select(p =>
-                    p.ToCoreEnumDeclaration(AliasedPrimaryAttributeType, CanonicalPrimaryAttributeType, ValuePrimitiveType)));
+                {
+                    var thisAliasedPrimaryAttributeType = p.Type switch
+                    {
+                        PropType.@enum => "RealmPropertyEnumAttribute",
+                        _ => AliasedPrimaryAttributeType
+                    };
+                    var thisCanonicalPrimaryAttributeType = p.Type switch
+                    {
+                        PropType.@enum => "RealmPropertyEnumAttribute",
+                        _ => CanonicalPrimaryAttributeType
+                    };
+                    var thisValuePrimitiveType = p.Type switch
+                    {
+                        PropType.@enum => PrimitiveType.@enum,
+                        _ => ValuePrimitiveType
+                    };
+                    return p.ToCoreEnumDeclaration(thisAliasedPrimaryAttributeType, thisCanonicalPrimaryAttributeType, thisValuePrimitiveType);
+                }));
+                //{{(targetEnumTypeName == "RealmPropertyInt" ? $"using RealmPropertyEnumAttribute = ACE.Entity.Enum.Properties.RealmPropertyEnumAttribute<{ValuePrimitiveType}>;" : "")}}}
 
-                return $$"""
+                return $$""""
                 using ACE.Entity.Enum.RealmProperties;
                 using System;
                 using System.ComponentModel;
@@ -691,7 +720,7 @@ namespace ACRealms.CodeGen
                 {{canonicalPropDecls}}
                 }
                 
-                """;
+                """";
             }
             catch (Exception ex)
             {

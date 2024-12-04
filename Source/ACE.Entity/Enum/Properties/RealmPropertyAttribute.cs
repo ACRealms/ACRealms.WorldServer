@@ -125,7 +125,8 @@ namespace ACE.Entity.Enum.Properties
         // Must be int for the following reasons:
         // 1. Fast conversion with Unsafe.As requires both types to be the same underlying size in bytes (32 bits for the default enum type)
         // 2. Compatibility with the underlying RealmPropertyInt requires a range that doesn't exceed RealmPropertyInt's range (which is that of a signed int32)
-         where TEnum : struct, System.Enum, IEquatable<int>
+         where TEnum : struct, System.Enum
+        
     {
         private static readonly Dictionary<Type, (int min, int max)> EnumMinMaxCache = [];
 
@@ -135,7 +136,6 @@ namespace ACE.Entity.Enum.Properties
 
         private static int UnsafeCast(TEnum enumValue)
         {
-
             return System.Runtime.CompilerServices.Unsafe.As<TEnum, int>(ref enumValue);
         }
 

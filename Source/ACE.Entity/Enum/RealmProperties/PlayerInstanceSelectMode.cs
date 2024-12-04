@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ACE.Entity.Enum.RealmProperties
 {
     
-    public enum PlayerInstanceSelectMode : uint
+    public enum PlayerInstanceSelectMode : int
     {
         Undefined = 0,
         Same,
