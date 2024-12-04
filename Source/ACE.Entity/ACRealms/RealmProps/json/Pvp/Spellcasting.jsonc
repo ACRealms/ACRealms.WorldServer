@@ -1,6 +1,6 @@
 {
   "$schema_version": 1,
-  "namespace": "Player.Pvp.Spellcasting",
+  "namespace": "Pvp.Spellcasting",
   "properties": {
     "WindupMaxMove": {
       "type": "float",

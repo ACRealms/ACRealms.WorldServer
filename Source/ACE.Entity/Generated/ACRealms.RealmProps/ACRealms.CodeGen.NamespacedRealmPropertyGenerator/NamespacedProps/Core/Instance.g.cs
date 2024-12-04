@@ -9,9 +9,9 @@ public static partial class Props
         public static class Instance
         {
             /// <summary>When recalling, determines which mode to use to select the realm or instance.</summary>
-            public const RealmPropertyIntStaging RecallInstanceSelectMode = RealmPropertyIntStaging.Core_Instance_RecallInstanceSelectMode;
+            public const RealmPropertyInt RecallInstanceSelectMode = RealmPropertyInt.Core_Instance_RecallInstanceSelectMode;
             /// <summary>When using a portal, determines which mode to use to select the realm or instance.</summary>
-            public const RealmPropertyIntStaging PortalInstanceSelectMode = RealmPropertyIntStaging.Core_Instance_PortalInstanceSelectMode;
+            public const RealmPropertyInt PortalInstanceSelectMode = RealmPropertyInt.Core_Instance_PortalInstanceSelectMode;
         }
     }
 }

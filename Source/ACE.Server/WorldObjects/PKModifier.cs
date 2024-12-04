@@ -12,6 +12,7 @@ using ACE.Server.Entity.Actions;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
+using ACRealms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -58,7 +59,7 @@ namespace ACE.Server.WorldObjects
                 return new ActivationResult(false);
             }
 
-            if (player.PkLevel > PKLevel.PK || player.RealmRuleset.GetProperty(RealmPropertyBool.IsPKOnly) || PropertyManager.GetBool("pkl_server").Item)
+            if (player.PkLevel > PKLevel.PK || player.RealmRuleset.GetProperty(Props.Pvp.World.IsPkOnly) || PropertyManager.GetBool("pkl_server").Item)
             {
                 if (!string.IsNullOrWhiteSpace(GetProperty(PropertyString.UsePkServerError)))
                     player.Session.Network.EnqueueSend(new GameMessageSystemChat(GetProperty(PropertyString.UsePkServerError), ChatMessageType.Broadcast));

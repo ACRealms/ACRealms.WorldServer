@@ -8,7 +8,7 @@ namespace ACE.Entity.Enum.Properties
     #pragma warning disable IDE0001
     [RequiresPrimaryAttribute<RealmPropertyPrimaryAttribute<bool>, bool>]
     #pragma warning restore IDE0001
-    public enum RealmPropertyBool : ushort
+    public enum RealmPropertyBoolOld : ushort
     {
         [RealmPropertyBool(defaultValue: false)]
         Undef                            = 0,

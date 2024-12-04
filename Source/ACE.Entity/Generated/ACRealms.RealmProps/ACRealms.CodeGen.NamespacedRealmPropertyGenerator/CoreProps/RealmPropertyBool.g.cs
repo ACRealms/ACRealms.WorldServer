@@ -8,7 +8,7 @@ using RealmPropertyBoolAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrima
 namespace ACE.Entity.Enum.Properties;
 
 [RequiresPrimaryAttribute<RealmPropertyPrimaryAttribute<bool>, bool>]
-public enum RealmPropertyBoolStaging : ushort
+public enum RealmPropertyBool : uint
 {
     Undef = 0,
 
@@ -21,6 +21,10 @@ public enum RealmPropertyBoolStaging : ushort
     [Description("Players with a homeworld of this realm may enter the neutral zone if true")]
     [RealmPropertyBoolAttribute(false)]
     Core_Realm_CanInteractWithNeutralZone,
+
+    [Description("Enables the console commands for recalling to various locations (marketplace, house, etc)")]
+    [RealmPropertyBoolAttribute(true)]
+    Core_Realm_HasRecalls,
 
     [Description("Allows players to use the /hideout command to teleport to a personal instanced hideout")]
     [RealmPropertyBoolAttribute(false)]

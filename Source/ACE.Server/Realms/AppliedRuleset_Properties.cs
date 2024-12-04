@@ -10,7 +10,7 @@ namespace ACE.Server.Realms
 {
     partial class AppliedRuleset
     {
-        public PlayerInstanceSelectMode RecallInstanceSelectMode => (PlayerInstanceSelectMode)GetProperty(RealmPropertyInt.RecallInstanceSelectMode);
-        public PlayerInstanceSelectMode PortalInstanceSelectMode => (PlayerInstanceSelectMode)GetProperty(RealmPropertyInt.PortalInstanceSelectMode);
+        public PlayerInstanceSelectMode RecallInstanceSelectMode => (PlayerInstanceSelectMode)GetProperty(Props.Core.Instance.RecallInstanceSelectMode);
+        public PlayerInstanceSelectMode PortalInstanceSelectMode => (PlayerInstanceSelectMode)GetProperty(Props.Core.Instance.PortalInstanceSelectMode);
     }
 }

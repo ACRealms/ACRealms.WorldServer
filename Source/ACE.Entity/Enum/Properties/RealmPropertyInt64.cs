@@ -7,7 +7,7 @@ namespace ACE.Entity.Enum.Properties
     #pragma warning disable IDE0001
     [RequiresPrimaryAttribute<RealmPropertyPrimaryAttribute<long>, long>]
     #pragma warning restore IDE0001
-    public enum RealmPropertyInt64 : ushort
+    public enum RealmPropertyInt64Old : ushort
     {
         [RealmPropertyInt64(defaultValue: 0, minValue: 0, maxValue: 0)]
         Undef               = 0,

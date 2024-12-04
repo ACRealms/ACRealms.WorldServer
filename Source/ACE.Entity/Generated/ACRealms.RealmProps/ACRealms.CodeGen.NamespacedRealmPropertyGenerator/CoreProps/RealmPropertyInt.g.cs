@@ -8,7 +8,7 @@ using RealmPropertyIntAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrimar
 namespace ACE.Entity.Enum.Properties;
 
 [RequiresPrimaryAttribute<RealmPropertyPrimaryMinMaxAttribute<int>, int>]
-public enum RealmPropertyIntStaging : ushort
+public enum RealmPropertyInt : uint
 {
     Undef = 0,
 
@@ -54,4 +54,16 @@ public enum RealmPropertyIntStaging : ushort
     [Description("All creatures will have this value added to their Strength attribute")]
     [RealmPropertyIntAttribute(0, -10000, 10000)]
     Creature_Attributes_StrengthAdded,
+
+    [Description("All creatures will have this value added to their Health vital")]
+    [RealmPropertyIntAttribute(0, -10000, 10000)]
+    Creature_Vitals_HealthAdded,
+
+    [Description("All creatures will have this value added to their Mana vital")]
+    [RealmPropertyIntAttribute(0, -10000, 10000)]
+    Creature_Vitals_ManaAdded,
+
+    [Description("All creatures will have this value added to their Stamina vital")]
+    [RealmPropertyIntAttribute(0, -10000, 10000)]
+    Creature_Vitals_StaminaAdded,
 }

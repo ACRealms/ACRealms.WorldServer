@@ -8,7 +8,7 @@ using RealmPropertyInt64Attribute = ACE.Entity.Enum.Properties.RealmPropertyPrim
 namespace ACE.Entity.Enum.Properties;
 
 [RequiresPrimaryAttribute<RealmPropertyPrimaryMinMaxAttribute<long>, long>]
-public enum RealmPropertyInt64Staging : ushort
+public enum RealmPropertyInt64 : uint
 {
     Undef = 0,
 

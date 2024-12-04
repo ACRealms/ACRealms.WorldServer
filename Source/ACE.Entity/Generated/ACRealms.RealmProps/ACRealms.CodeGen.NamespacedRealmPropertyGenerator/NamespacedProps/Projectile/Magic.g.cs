@@ -9,7 +9,7 @@ public static partial class Props
         public static class Magic
         {
             /// <summary>Enables a double collision algorithm for projectile spells. In theory, this makes them harder to dodge.</summary>
-            public const RealmPropertyBoolStaging DoubleCollisionCheck = RealmPropertyBoolStaging.Projectile_Magic_DoubleCollisionCheck;
+            public const RealmPropertyBool DoubleCollisionCheck = RealmPropertyBool.Projectile_Magic_DoubleCollisionCheck;
         }
     }
 }

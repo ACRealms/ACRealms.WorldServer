@@ -9,7 +9,7 @@ namespace ACE.Entity.Enum.Properties
     #pragma warning disable IDE0001
     [RequiresPrimaryAttribute<RealmPropertyPrimaryMinMaxAttribute<double>, double>]
     #pragma warning restore IDE0001
-    public enum RealmPropertyFloat : ushort
+    public enum RealmPropertyFloatOld : ushort
     {
         [RealmPropertyFloat(defaultValue: 0f, minValue: 0f, maxValue: 0f)]
         Undef                          = 0,

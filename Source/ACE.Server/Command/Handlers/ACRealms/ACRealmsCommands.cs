@@ -11,6 +11,7 @@ using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Common;
 using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
+using ACRealms;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
@@ -86,7 +87,7 @@ namespace ACE.Server.Command.Handlers
         {
             if (session?.Player?.HomeRealm == null)
                 return;
-            if (!Managers.RealmManager.GetRealm(session.Player.HomeRealm, includeRulesets: false).StandardRules.GetProperty(RealmPropertyBool.HideoutEnabled))
+            if (!Managers.RealmManager.GetRealm(session.Player.HomeRealm, includeRulesets: false).StandardRules.ValueOf(Props.Core.Realm.HideoutEnabled))
             {
                 session.Network.EnqueueSend(new GameMessageSystemChat($"Your home realm has not enabled hideouts.", ChatMessageType.Broadcast));
                 return;
@@ -103,7 +104,7 @@ namespace ACE.Server.Command.Handlers
             var player = session.Player;
             var realm = RealmManager.GetRealm(player.HomeRealm, includeRulesets: false);
             if (realm == null) return;
-            if (!realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm)) return;
+            if (!realm.StandardRules.GetProperty(Props.Pvp.World.IsDuelingRealm)) return;
             var ts = player.GetProperty(PropertyInt.LastRebuffTimestamp);
             if (ts != null)
             {

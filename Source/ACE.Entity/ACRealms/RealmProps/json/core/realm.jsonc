@@ -11,6 +11,13 @@
         "IsNeutralZone": "If true, any player with a home realm with the property 'CanInteractWithNeutralZone' may travel to this realm",
         "CanInteractWithNeutralZone": "Players with a homeworld of this realm may enter the neutral zone if true"
       }
+    },
+    {
+      "type": "boolean",
+      "default": true,
+      "properties": {
+        "HasRecalls": "Enables the console commands for recalling to various locations (marketplace, house, etc)"
+      }
     }
   ],
   "properties": {

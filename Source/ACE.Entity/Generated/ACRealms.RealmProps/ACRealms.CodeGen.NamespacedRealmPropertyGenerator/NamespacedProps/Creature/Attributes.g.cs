@@ -9,31 +9,29 @@ public static partial class Props
         public static class Attributes
         {
             /// <summary>All creatures will have this value added to their Strength attribute</summary>
-            public const RealmPropertyIntStaging StrengthAdded = RealmPropertyIntStaging.Creature_Attributes_StrengthAdded;
+            public const RealmPropertyInt StrengthAdded = RealmPropertyInt.Creature_Attributes_StrengthAdded;
             /// <summary>All creatures will have this value added to their Endurance attribute</summary>
-            public const RealmPropertyIntStaging EnduranceAdded = RealmPropertyIntStaging.Creature_Attributes_EnduranceAdded;
+            public const RealmPropertyInt EnduranceAdded = RealmPropertyInt.Creature_Attributes_EnduranceAdded;
             /// <summary>All creatures will have this value added to their Coordination attribute</summary>
-            public const RealmPropertyIntStaging CoordinationAdded = RealmPropertyIntStaging.Creature_Attributes_CoordinationAdded;
+            public const RealmPropertyInt CoordinationAdded = RealmPropertyInt.Creature_Attributes_CoordinationAdded;
             /// <summary>All creatures will have this value added to their Quickness attribute</summary>
-            public const RealmPropertyIntStaging QuicknessAdded = RealmPropertyIntStaging.Creature_Attributes_QuicknessAdded;
+            public const RealmPropertyInt QuicknessAdded = RealmPropertyInt.Creature_Attributes_QuicknessAdded;
             /// <summary>All creatures will have this value added to their Focus attribute</summary>
-            public const RealmPropertyIntStaging FocusAdded = RealmPropertyIntStaging.Creature_Attributes_FocusAdded;
+            public const RealmPropertyInt FocusAdded = RealmPropertyInt.Creature_Attributes_FocusAdded;
             /// <summary>All creatures will have this value added to their Self attribute</summary>
-            public const RealmPropertyIntStaging SelfAdded = RealmPropertyIntStaging.Creature_Attributes_SelfAdded;
+            public const RealmPropertyInt SelfAdded = RealmPropertyInt.Creature_Attributes_SelfAdded;
             /// <summary>Creature Strength will be multiplied by this amount</summary>
-            public const RealmPropertyFloatStaging StrengthMultiplier = RealmPropertyFloatStaging.Creature_Attributes_StrengthMultiplier;
+            public const RealmPropertyFloat StrengthMultiplier = RealmPropertyFloat.Creature_Attributes_StrengthMultiplier;
             /// <summary>Creature Endurance will be multiplied by this amount</summary>
-            public const RealmPropertyFloatStaging EnduranceMultiplier = RealmPropertyFloatStaging.Creature_Attributes_EnduranceMultiplier;
+            public const RealmPropertyFloat EnduranceMultiplier = RealmPropertyFloat.Creature_Attributes_EnduranceMultiplier;
             /// <summary>Creature Coordination will be multiplied by this amount</summary>
-            public const RealmPropertyFloatStaging CoordinationMultiplier = RealmPropertyFloatStaging.Creature_Attributes_CoordinationMultiplier;
+            public const RealmPropertyFloat CoordinationMultiplier = RealmPropertyFloat.Creature_Attributes_CoordinationMultiplier;
             /// <summary>Creature Quickness will be multiplied by this amount</summary>
-            public const RealmPropertyFloatStaging QuicknessMultiplier = RealmPropertyFloatStaging.Creature_Attributes_QuicknessMultiplier;
+            public const RealmPropertyFloat QuicknessMultiplier = RealmPropertyFloat.Creature_Attributes_QuicknessMultiplier;
             /// <summary>Creature Focus will be multiplied by this amount</summary>
-            public const RealmPropertyFloatStaging FocusMultiplier = RealmPropertyFloatStaging.Creature_Attributes_FocusMultiplier;
+            public const RealmPropertyFloat FocusMultiplier = RealmPropertyFloat.Creature_Attributes_FocusMultiplier;
             /// <summary>Creature Self will be multiplied by this amount</summary>
-            public const RealmPropertyFloatStaging SelfMultiplier = RealmPropertyFloatStaging.Creature_Attributes_SelfMultiplier;
-            /// <summary>Creature Damage will be multiplied by this amount</summary>
-            public const RealmPropertyFloatStaging DamageMultiplier = RealmPropertyFloatStaging.Creature_Attributes_DamageMultiplier;
+            public const RealmPropertyFloat SelfMultiplier = RealmPropertyFloat.Creature_Attributes_SelfMultiplier;
         }
     }
 }

@@ -9,9 +9,9 @@ public static partial class Props
         public static class PurchaseRestrictions
         {
             /// <summary>Disables the primary instance restriction from house purchases.  This is separate from the home realm restriction.  Consider using ClassicalInstances_AllowHousingPurchase instead.</summary>
-            public const RealmPropertyBoolStaging IgnorePrimaryInstance = RealmPropertyBoolStaging.Housing_PurchaseRestrictions_IgnorePrimaryInstance;
+            public const RealmPropertyBool IgnorePrimaryInstance = RealmPropertyBool.Housing_PurchaseRestrictions_IgnorePrimaryInstance;
             /// <summary>Disables the home realm requirement for house purchases.  This configuration should be applied to the realm the house is located in, not the home realm of the player.</summary>
-            public const RealmPropertyBoolStaging IgnoreHomeRealm = RealmPropertyBoolStaging.Housing_PurchaseRestrictions_IgnoreHomeRealm;
+            public const RealmPropertyBool IgnoreHomeRealm = RealmPropertyBool.Housing_PurchaseRestrictions_IgnoreHomeRealm;
         }
     }
 }

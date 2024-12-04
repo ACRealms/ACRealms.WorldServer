@@ -10,7 +10,7 @@ public static partial class Props
         {
             /// <summary>Vendor weenies with a matching PropertyInt.RulesetStampVendorType will include this ruleset as a stamp for sale, to allow players to craft these rulesets for ephemeral instances</summary>
             [System.Obsolete("This will be changed to a string")]
-            public const RealmPropertyIntStaging RulesetStampVendorCategory = RealmPropertyIntStaging.Core_RulesetCrafting_RulesetStampVendorCategory;
+            public const RealmPropertyInt RulesetStampVendorCategory = RealmPropertyInt.Core_RulesetCrafting_RulesetStampVendorCategory;
         }
     }
 }

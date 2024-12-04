@@ -9,9 +9,9 @@ public static partial class Props
         public static class World
         {
             /// <summary>Standard 'Red server' rules. Players are always Player Killer status unless recently killed by a player killer</summary>
-            public const RealmPropertyBoolStaging IsPkOnly = RealmPropertyBoolStaging.Pvp_World_IsPkOnly;
+            public const RealmPropertyBool IsPkOnly = RealmPropertyBool.Pvp_World_IsPkOnly;
             /// <summary>Set this to true to designate this realm as the dueling realm. Allows /rebuff command, all summoned portals lead to ephemeral instances, and no vitae.</summary>
-            public const RealmPropertyBoolStaging IsDuelingRealm = RealmPropertyBoolStaging.Pvp_World_IsDuelingRealm;
+            public const RealmPropertyBool IsDuelingRealm = RealmPropertyBool.Pvp_World_IsDuelingRealm;
         }
     }
 }

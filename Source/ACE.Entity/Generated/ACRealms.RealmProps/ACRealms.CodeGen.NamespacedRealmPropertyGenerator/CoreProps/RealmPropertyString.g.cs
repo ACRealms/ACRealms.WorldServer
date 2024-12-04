@@ -8,7 +8,7 @@ using RealmPropertyStringAttribute = ACE.Entity.Enum.Properties.RealmPropertyPri
 namespace ACE.Entity.Enum.Properties;
 
 [RequiresPrimaryAttribute<RealmPropertyPrimaryAttribute<string>, string>]
-public enum RealmPropertyStringStaging : ushort
+public enum RealmPropertyString : uint
 {
     Undef = 0,
 

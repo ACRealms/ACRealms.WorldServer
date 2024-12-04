@@ -224,7 +224,7 @@ namespace ACRealms.CodeGen
                 return
                 $$"""
                 {{spacer}}/// <summary>{{Description}}</summary>{{obs}}
-                {{spacer}}public const {{CoreEnumType}}Staging {{Key}} = {{CoreEnumType}}Staging.{{CoreKey}};
+                {{spacer}}public const {{CoreEnumType}} {{Key}} = {{CoreEnumType}}.{{CoreKey}};
                 """;
             }
 
@@ -758,7 +758,7 @@ namespace ACRealms.CodeGen
                 namespace ACE.Entity.Enum.Properties;
 
                 [RequiresPrimaryAttribute<{{CanonicalPrimaryAttributeType}}<{{ValuePrimitiveType}}>, {{ValuePrimitiveType}}>]
-                public enum {{targetEnumTypeName}}Staging : ushort
+                public enum {{targetEnumTypeName}} : uint
                 {
                     Undef = 0,
 

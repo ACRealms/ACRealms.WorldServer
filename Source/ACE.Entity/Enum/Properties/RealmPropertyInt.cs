@@ -11,7 +11,7 @@ namespace ACE.Entity.Enum.Properties
     #pragma warning disable IDE0001
     [RequiresPrimaryAttribute<RealmPropertyPrimaryMinMaxAttribute<int>, int>]
     #pragma warning restore IDE0001
-    public enum RealmPropertyInt : ushort
+    public enum RealmPropertyIntOld : ushort
     {
         [RealmPropertyInt(defaultValue: 0, minValue: 0, maxValue: 0)]
         Undef                                    = 0,

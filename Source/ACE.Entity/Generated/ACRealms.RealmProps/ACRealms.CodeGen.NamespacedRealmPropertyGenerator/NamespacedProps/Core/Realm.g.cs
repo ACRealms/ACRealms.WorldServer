@@ -9,15 +9,17 @@ public static partial class Props
         public static class Realm
         {
             /// <summary>A description of the ruleset.</summary>
-            public const RealmPropertyStringStaging Description = RealmPropertyStringStaging.Core_Realm_Description;
+            public const RealmPropertyString Description = RealmPropertyString.Core_Realm_Description;
             /// <summary>If true, realm will be listed as available from the realm selector (Blaine)</summary>
-            public const RealmPropertyBoolStaging CanBeHomeworld = RealmPropertyBoolStaging.Core_Realm_CanBeHomeworld;
+            public const RealmPropertyBool CanBeHomeworld = RealmPropertyBool.Core_Realm_CanBeHomeworld;
             /// <summary>Allows players to use the /hideout command to teleport to a personal instanced hideout</summary>
-            public const RealmPropertyBoolStaging HideoutEnabled = RealmPropertyBoolStaging.Core_Realm_HideoutEnabled;
+            public const RealmPropertyBool HideoutEnabled = RealmPropertyBool.Core_Realm_HideoutEnabled;
             /// <summary>If true, any player with a home realm with the property 'CanInteractWithNeutralZone' may travel to this realm</summary>
-            public const RealmPropertyBoolStaging IsNeutralZone = RealmPropertyBoolStaging.Core_Realm_IsNeutralZone;
+            public const RealmPropertyBool IsNeutralZone = RealmPropertyBool.Core_Realm_IsNeutralZone;
             /// <summary>Players with a homeworld of this realm may enter the neutral zone if true</summary>
-            public const RealmPropertyBoolStaging CanInteractWithNeutralZone = RealmPropertyBoolStaging.Core_Realm_CanInteractWithNeutralZone;
+            public const RealmPropertyBool CanInteractWithNeutralZone = RealmPropertyBool.Core_Realm_CanInteractWithNeutralZone;
+            /// <summary>Enables the console commands for recalling to various locations (marketplace, house, etc)</summary>
+            public const RealmPropertyBool HasRecalls = RealmPropertyBool.Core_Realm_HasRecalls;
         }
     }
 }

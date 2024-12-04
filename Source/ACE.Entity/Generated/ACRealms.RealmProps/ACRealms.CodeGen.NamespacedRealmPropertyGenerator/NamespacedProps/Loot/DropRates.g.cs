@@ -9,15 +9,15 @@ public static partial class Props
         public static class DropRates
         {
             /// <summary>Scales the chance for cantrips to drop in each tier. Defaults to 1.0, as per end of retail</summary>
-            public const RealmPropertyFloatStaging CantripDropRate = RealmPropertyFloatStaging.Loot_DropRates_CantripDropRate;
+            public const RealmPropertyFloat CantripDropRate = RealmPropertyFloat.Loot_DropRates_CantripDropRate;
             /// <summary>Scales the chance for Minor cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail</summary>
-            public const RealmPropertyFloatStaging MinorCantripDropRate = RealmPropertyFloatStaging.Loot_DropRates_MinorCantripDropRate;
+            public const RealmPropertyFloat MinorCantripDropRate = RealmPropertyFloat.Loot_DropRates_MinorCantripDropRate;
             /// <summary>Scales the chance for Major cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail</summary>
-            public const RealmPropertyFloatStaging MajorCantripDropRate = RealmPropertyFloatStaging.Loot_DropRates_MajorCantripDropRate;
+            public const RealmPropertyFloat MajorCantripDropRate = RealmPropertyFloat.Loot_DropRates_MajorCantripDropRate;
             /// <summary>Scales the chance for Epic cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail</summary>
-            public const RealmPropertyFloatStaging EpicCantripDropRate = RealmPropertyFloatStaging.Loot_DropRates_EpicCantripDropRate;
+            public const RealmPropertyFloat EpicCantripDropRate = RealmPropertyFloat.Loot_DropRates_EpicCantripDropRate;
             /// <summary>Scales the chance for Legendary cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail</summary>
-            public const RealmPropertyFloatStaging LegendaryCantripDropRate = RealmPropertyFloatStaging.Loot_DropRates_LegendaryCantripDropRate;
+            public const RealmPropertyFloat LegendaryCantripDropRate = RealmPropertyFloat.Loot_DropRates_LegendaryCantripDropRate;
         }
     }
 }

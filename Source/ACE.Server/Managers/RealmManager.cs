@@ -24,6 +24,7 @@ using System.Configuration;
 using ACE.Entity;
 using ACE.Server.Realms.Peripherals;
 using System.Collections.Frozen;
+using ACRealms;
 
 namespace ACE.Server.Managers
 {
@@ -266,7 +267,7 @@ namespace ACE.Server.Managers
                 }
 
                 // Needs improvement: Only one realm can be set to the dueling realm and it uses a static property, which seems wrong to me
-                if (wrealm.Realm.Type == RealmType.Realm && wrealm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                if (wrealm.Realm.Type == RealmType.Realm && wrealm.StandardRules.ValueOf(Props.Pvp.World.IsDuelingRealm))
                     duelRealm = wrealm;
             };
 
@@ -695,7 +696,7 @@ namespace ACE.Server.Managers
                 player.Sanctuary = loc.AsLocalPosition();
                 WorldManager.ThreadSafeTeleport(player, loc, false, new Entity.Actions.ActionEventDelegate(() =>
                 {
-                    if (realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                    if (realm.StandardRules.ValueOf(Props.Pvp.World.IsDuelingRealm))
                         DuelRealmHelpers.SetupNewCharacter(player);
                 }));
             }

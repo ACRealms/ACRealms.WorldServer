@@ -733,7 +733,7 @@ namespace ACE.Server.WorldObjects
             }
 
             //Console.WriteLine($"Angle: " + angle);
-            var maxAngle = RealmRuleset.GetProperty(ACE.Entity.Enum.Properties.RealmPropertyFloat.Spellcasting_Max_Angle);
+            var maxAngle = RealmRuleset.GetProperty(Props.Player.Spellcasting.MaxAngle);
 
             if (RecordCast.Enabled)
                 RecordCast.Log($"DoCastSpell(angle={angle} vs. {maxAngle})");
@@ -809,7 +809,7 @@ namespace ACE.Server.WorldObjects
             if (FastTick)
             {
                 
-                if (RealmRuleset.GetProperty(ACE.Entity.Enum.Properties.RealmPropertyFloat.Spellcasting_Max_Angle) > 5.0f && IsWithinAngle(target))
+                if (RealmRuleset.GetProperty(Props.Player.Spellcasting.MaxAngle) > 5.0f && IsWithinAngle(target))
                 {
                     // emulate current gdle TurnTo - doesn't match retail, but some players may prefer this
                     OnMoveComplete_Magic(WeenieError.None);
@@ -870,7 +870,7 @@ namespace ACE.Server.WorldObjects
             var dist = StartPos.Distance(PhysicsObj.Position);
 
             // only PKs affected by these caps?
-            var Windup_MaxMove = RealmRuleset.GetProperty(ACE.Entity.Enum.Properties.RealmPropertyFloat.SpellCastingPvPWindupMaxMove);
+            var Windup_MaxMove = RealmRuleset.GetProperty(Props.Pvp.Spellcasting.WindupMaxMove);
             if (dist > Windup_MaxMove && PlayerKillerStatus != PlayerKillerStatus.NPK)
             {
                 //player.Session.Network.EnqueueSend(new GameEventWeenieError(player.Session, WeenieError.YouHaveMovedTooFar));
@@ -1339,7 +1339,7 @@ namespace ACE.Server.WorldObjects
             {
                 var dist = StartPos.Distance(PhysicsObj.Position);
 
-                var Windup_MaxMove = RealmRuleset.GetProperty(ACE.Entity.Enum.Properties.RealmPropertyFloat.SpellCastingPvPWindupMaxMove);
+                var Windup_MaxMove = RealmRuleset.GetProperty(Props.Pvp.Spellcasting.WindupMaxMove);
 
                 if (dist > Windup_MaxMove && PlayerKillerStatus != PlayerKillerStatus.NPK)
                 {

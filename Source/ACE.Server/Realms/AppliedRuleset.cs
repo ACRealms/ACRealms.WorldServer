@@ -186,7 +186,7 @@ namespace ACE.Server.Realms
         private IEnumerable<AppliedRealmProperty> TakeRandomProperties(ushort amount, RulesetTemplate template)
         {
             LogTrace(() => $"Taking {amount} properties at random");
-            if (PropertiesString.TryGetValue(RealmPropertyString.Description, out var desc))
+            if (PropertiesString.TryGetValue(Props.Core.Realm.Description, out var desc))
                 amount++;
 
             var total = template.PropertiesForRandomization.Count;
@@ -218,7 +218,7 @@ namespace ACE.Server.Realms
                 while (set.Count > amount)
                 {
                     var next = GetRandomProperty(template, Context);
-                    if (next is AppliedRealmProperty<string> s && s.PropertyKey == (ushort)RealmPropertyString.Description)
+                    if (next is AppliedRealmProperty<string> s && s.PropertyKey == (ushort)Props.Core.Realm.Description)
                         continue;
                     LogTrace(Context, () => $"Subtracting {next.Options.Name} from randomization selection");
                     set.Remove(next);
@@ -362,7 +362,7 @@ namespace ACE.Server.Realms
                 list.AddRange(PropertiesInt.Values);
                 list.AddRange(PropertiesInt64.Values);
                 list.AddRange(PropertiesFloat.Values);
-                list.AddRange(PropertiesString.Where(x => x.Key != RealmPropertyString.Description).Select(x => x.Value));
+                list.AddRange(PropertiesString.Where(x => x.Key != Props.Core.Realm.Description).Select(x => x.Value));
                 PropertiesForRandomization = list.AsReadOnly();
                 LogTrace(() => $"Will select {Realm.PropertyCountRandomized.Value} properties at random.");
             }
@@ -408,7 +408,7 @@ namespace ACE.Server.Realms
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyInt), item.Key)}: {item.Value}");
             foreach (var item in PropertiesInt64)
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyInt64), item.Key)}: {item.Value}");
-            foreach (var item in PropertiesString.Where(x => x.Key != RealmPropertyString.Description))
+            foreach (var item in PropertiesString.Where(x => x.Key != Props.Core.Realm.Description))
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyString), item.Key)}: {item.Value}");
 
             sb.AppendLine("\n");
@@ -513,14 +513,14 @@ namespace ACE.Server.Realms
 
         private void BuildChanceTablesIfNecessary()
         {
-            if (PropertiesFloat.ContainsKey(RealmPropertyFloat.CantripDropRate) || GetProperty(RealmPropertyFloat.CantripDropRate) != PropertyManager.GetDouble("cantrip_drop_rate").Item)
+            if (PropertiesFloat.ContainsKey(Props.Loot.DropRates.CantripDropRate) || GetProperty(Props.Loot.DropRates.CantripDropRate) != PropertyManager.GetDouble("cantrip_drop_rate").Item)
             {
                 LogTrace(() => $"CantripDropRate property is present or differs from server property, building custom NumCantrips ChanceTables");
-                _chanceTableNumCantrips = CantripChance.ApplyNumCantripsMod(GetProperty(RealmPropertyFloat.CantripDropRate), false);
+                _chanceTableNumCantrips = CantripChance.ApplyNumCantripsMod(GetProperty(Props.Loot.DropRates.CantripDropRate), false);
             }
 
-            var keys = new (string server_prop, RealmPropertyFloat realm_prop)[] { ("minor_cantrip_drop_rate", RealmPropertyFloat.MinorCantripDropRate), ("major_cantrip_drop_rate", RealmPropertyFloat.MajorCantripDropRate), ("epic_cantrip_drop_rate", RealmPropertyFloat.EpicCantripDropRate),
-                ("legendary_cantrip_drop_rate", RealmPropertyFloat.LegendaryCantripDropRate) };
+            var keys = new (string server_prop, RealmPropertyFloat realm_prop)[] { ("minor_cantrip_drop_rate", Props.Loot.DropRates.MinorCantripDropRate), ("major_cantrip_drop_rate", Props.Loot.DropRates.MajorCantripDropRate), ("epic_cantrip_drop_rate", Props.Loot.DropRates.EpicCantripDropRate),
+                ("legendary_cantrip_drop_rate", Props.Loot.DropRates.LegendaryCantripDropRate) };
             var appliedLevels = keys.Select(keypair => (
                 name: keypair.server_prop,
                 server_prop: PropertyManager.GetDouble(keypair.server_prop).Item,
@@ -641,19 +641,19 @@ namespace ACE.Server.Realms
 
         internal bool ClassicalInstancesActivated(IPlayer player, LocalPosition position)
         {
-            if (!GetProperty(RealmPropertyBool.UseClassicalInstances))
+            if (!GetProperty(Props.Peripheral.ClassicalInstance.Enabled))
                 return false;
 
             if (player.GetProperty(PropertyBool.ClassicalInstancesActive) != true)
             {
-                if (!GetProperty(RealmPropertyBool.ClassicalInstances_IgnoreCharacterProp))
+                if (!GetProperty(Props.Peripheral.ClassicalInstance.IgnoreCharacterProp))
                     return false;
             }
 
-            if (GetProperty(RealmPropertyBool.ClassicalInstances_EnableForAllLandblocks_Dangerous))
+            if (GetProperty(Props.Peripheral.ClassicalInstance.EnableForAllLandblocksDangerous))
                 return true;
 
-            var set = GetProperty(RealmPropertyString.ClassicalInstanceDungeonSet);
+            var set = GetProperty(Props.Peripheral.ClassicalInstance.DungeonSet);
             return RealmManager.Peripherals.DungeonSets.IncludedInSet(position, set);
         }
 
@@ -686,7 +686,7 @@ namespace ACE.Server.Realms
                 }
             }
 
-            if (GetProperty(RealmPropertyBool.ClassicalInstances_ShareWithPlayerAccount))
+            if (GetProperty(Props.Peripheral.ClassicalInstance.ShareWithPlayerAccount))
                 return ShortInstanceIDForClassicalNonEphemeralInstances_PerAccount(player);
             else
                 return ShortInstanceIDForClassicalNonEphemeralInstances_PerCharacter(player);

@@ -9,9 +9,9 @@ public static partial class Props
         public static class Spellcasting
         {
             /// <summary>If you wish for players to glitch around less during powerslides, lower this value</summary>
-            public const RealmPropertyFloatStaging MoveToStateUpdatePositionThreshold = RealmPropertyFloatStaging.Player_Spellcasting_MoveToStateUpdatePositionThreshold;
+            public const RealmPropertyFloat MoveToStateUpdatePositionThreshold = RealmPropertyFloat.Player_Spellcasting_MoveToStateUpdatePositionThreshold;
             /// <summary>The maximum angle a player allowed to face away from the target before releasing a spell.</summary>
-            public const RealmPropertyFloatStaging MaxAngle = RealmPropertyFloatStaging.Player_Spellcasting_MaxAngle;
+            public const RealmPropertyFloat MaxAngle = RealmPropertyFloat.Player_Spellcasting_MaxAngle;
         }
     }
 }

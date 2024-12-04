@@ -8,7 +8,7 @@ using RealmPropertyFloatAttribute = ACE.Entity.Enum.Properties.RealmPropertyPrim
 namespace ACE.Entity.Enum.Properties;
 
 [RequiresPrimaryAttribute<RealmPropertyPrimaryMinMaxAttribute<double>, double>]
-public enum RealmPropertyFloatStaging : ushort
+public enum RealmPropertyFloat : uint
 {
     Undef = 0,
 
@@ -17,10 +17,6 @@ public enum RealmPropertyFloatStaging : ushort
     [Description("Creature Coordination will be multiplied by this amount")]
     [RealmPropertyFloatAttribute(1, 0.01, 100)]
     Creature_Attributes_CoordinationMultiplier,
-
-    [Description("Creature Damage will be multiplied by this amount")]
-    [RealmPropertyFloatAttribute(1, 0.01, 100)]
-    Creature_Attributes_DamageMultiplier,
 
     [Description("Creature Endurance will be multiplied by this amount")]
     [RealmPropertyFloatAttribute(1, 0.01, 100)]
@@ -41,6 +37,18 @@ public enum RealmPropertyFloatStaging : ushort
     [Description("Creature Strength will be multiplied by this amount")]
     [RealmPropertyFloatAttribute(1, 0.01, 100)]
     Creature_Attributes_StrengthMultiplier,
+
+    [Description("Creature Health will be multiplied by this amount")]
+    [RealmPropertyFloatAttribute(1, 0.01, 100)]
+    Creature_Vitals_HealthMultiplier,
+
+    [Description("Creature Mana will be multiplied by this amount")]
+    [RealmPropertyFloatAttribute(1, 0.01, 100)]
+    Creature_Vitals_ManaMultiplier,
+
+    [Description("Creature Stamina will be multiplied by this amount")]
+    [RealmPropertyFloatAttribute(1, 0.01, 100)]
+    Creature_Vitals_StaminaMultiplier,
 
     [Description("Scales the chance for cantrips to drop in each tier. Defaults to 1.0, as per end of retail")]
     [RerollRestrictedTo(RealmPropertyRerollType.landblock)]
@@ -67,10 +75,6 @@ public enum RealmPropertyFloatStaging : ushort
     [RealmPropertyFloatAttribute(1, 0, 100000)]
     Loot_DropRates_MinorCantripDropRate,
 
-    [Description("The maximum distance a player may move during a spellcast without the cast being cancelled with 'Your movement disrupted spell casting!'")]
-    [RealmPropertyFloatAttribute(6, 1, 250)]
-    Player_Pvp_Spellcasting_WindupMaxMove,
-
     [Description("The maximum angle a player allowed to face away from the target before releasing a spell.")]
     [RealmPropertyFloatAttribute(20, 0, 360)]
     Player_Spellcasting_MaxAngle,
@@ -78,4 +82,8 @@ public enum RealmPropertyFloatStaging : ushort
     [Description("If you wish for players to glitch around less during powerslides, lower this value")]
     [RealmPropertyFloatAttribute(1, 0.1, 5)]
     Player_Spellcasting_MoveToStateUpdatePositionThreshold,
+
+    [Description("The maximum distance a player may move during a spellcast without the cast being cancelled with 'Your movement disrupted spell casting!'")]
+    [RealmPropertyFloatAttribute(6, 1, 250)]
+    Pvp_Spellcasting_WindupMaxMove,
 }
