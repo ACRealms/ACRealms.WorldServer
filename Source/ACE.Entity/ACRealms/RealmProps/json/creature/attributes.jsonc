@@ -5,9 +5,20 @@
     {
       "type": "integer",
       "key_suffix": "Added",
-      "min_value": -10000000, "max_value": 10000000,
+      "default": 0,
+      "min_value": -10000, "max_value": 10000,
       "description_format": "All creatures will have this value added to their {short_key} attribute",
       "properties": [ "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self" ]
+    },
+    {
+      "type": "float",
+      "key_suffix": "Multiplier",
+      "description_format": "Creature {short_key} will be multiplied by this amount",
+      "default": 1, "min_value": 0.01, "max_value": 100,
+      "properties": [
+        "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self",
+        "Damage"
+      ]
     }
   ]
 }

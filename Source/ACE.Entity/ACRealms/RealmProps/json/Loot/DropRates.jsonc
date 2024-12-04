@@ -1,0 +1,24 @@
+{
+  "$schema_version": 1,
+  "namespace": "Loot.DropRates",
+  "groups": [
+    {
+      "type": "float",
+      "key_suffix": "CantripDropRate",
+      "default": 1,
+      "min_value": 0, "max_value": 100000,
+      "description_format": "Scales the chance for {{short_key}} cantrips to drop, relative to other cantrip levels in the tier. Defaults to 1.0, as per end of retail",
+      "reroll_restricted_to": "landblock",
+      "properties": [ "Minor", "Major", "Epic", "Legendary" ]
+    }
+  ],
+  "properties": {
+    "CantripDropRate": {
+      "type": "float",
+      "default": 1,
+      "min_value": 0, "max_value": 100000,
+      "description": "Scales the chance for cantrips to drop in each tier. Defaults to 1.0, as per end of retail",
+      "reroll_restricted_to": "landblock"
+    }
+  }
+}

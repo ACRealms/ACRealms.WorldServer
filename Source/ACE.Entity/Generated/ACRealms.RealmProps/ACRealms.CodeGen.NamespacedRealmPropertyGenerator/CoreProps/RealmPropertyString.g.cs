@@ -19,4 +19,6 @@ public enum RealmPropertyStringStaging : ushort
     [Description("For the landblocks matching the name of this dungeon set, classical instances will be enabled for players with the ClassicalInstancesActive boolean property, if the ruleset also has UseClassicalInstances set to true.")]
     [RealmPropertyStringAttribute("default")]
     Peripheral_ClassicalInstance_DungeonSet,
+
+
 }

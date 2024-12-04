@@ -44,6 +44,8 @@ public enum RealmPropertyIntStaging : ushort
     [RealmPropertyIntAttribute(0, -10000000, 10000000)]
     Creature_Attributes_StrengthAdded,
 
+
+
     [Description("Landblocks which have been inactive for this many minutes will be unloaded")]
     [RealmPropertyIntAttribute(5, 1, 1440)]
     Core_Landblock_UnloadInterval,

@@ -31,4 +31,6 @@ public enum RealmPropertyBoolStaging : ushort
     [Description("If enabled, classical instances will be assigned per account instead of per character.  If a player owns a house in a classical instance, they will lose access to it if this is toggled.")]
     [RealmPropertyBoolAttribute(false)]
     Peripheral_ClassicalInstance_ShareWithPlayerAccount,
+
+
 }

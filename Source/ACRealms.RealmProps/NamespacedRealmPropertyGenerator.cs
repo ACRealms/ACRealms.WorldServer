@@ -103,10 +103,24 @@ namespace ACRealms.CodeGen
                 spc.AddSource($"NamespacedProps/{fileName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
             });
 
+
+
             // And for all the properties combined, regardless of namespace, we create the core enums
             // These will be equivalent to the RealmProperty enums which were hand-maintained before ACRealms v2.2
             IncrementalValueProvider<ImmutableArray<ObjPropInfo>> combinedProps =
-                realmPropNamespaces.Collect().Select(static (x, cancellationToken) => x.SelectMany(x => x.ObjProps.Array).ToImmutableArray());
+                realmPropNamespaces.Collect().Select(static (x, cancellationToken) => {
+
+                    // Here we add some undef props so that at least 1 prop of each type is made, and so that we have a value of 0 for the undefined prop
+                    var undefProps = new List<PropType> { PropType.integer, PropType.@string, PropType.boolean, PropType.int64, PropType.@float }.Select(type =>
+                    {
+                        return new ObjPropInfo("__NONE__", "Undef")
+                        {
+                            Description = "",
+                            Type = type
+                        };
+                    });
+                    return x.SelectMany(x => x.ObjProps.Array).Concat(undefProps).ToImmutableArray();
+                });
             var types = ObjPropInfo.PropMap.Select(static kvp => ((PropType propType, string enumType))(kvp.Key, kvp.Value)).ToImmutableArray();
             var typesProvider = combinedProps.SelectMany(static (_, cancellationToken) => ObjPropInfo.PropMap.Values.Distinct());
 
@@ -683,6 +697,8 @@ namespace ACRealms.CodeGen
 
                 var canonicalPropDecls = string.Join(newline, propsOfType.Select(p =>
                 {
+                    if (p.NamespaceRaw == "__NONE__")
+                        return "";
                     var thisAliasedPrimaryAttributeType = p.Type switch
                     {
                         PropType.@enum => "RealmPropertyEnumAttribute",

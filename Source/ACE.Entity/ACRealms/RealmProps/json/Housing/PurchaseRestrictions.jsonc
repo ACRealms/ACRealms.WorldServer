@@ -1,0 +1,18 @@
+{
+  "$schema_version": 1,
+  "namespace": "Housing.PurchaseRestrictions",
+  "groups": [
+    {
+      "type": "boolean",
+      "key_prefix": "Ignore",
+      "default": false,
+      "properties": {
+        "PrimaryInstance": [ "Disables the primary instance restriction from house purchases. ",
+          "This is separate from the home realm restriction. ",
+          "Consider using ClassicalInstances_AllowHousingPurchase instead." ],
+        "HomeRealm": [ "Disables the home realm requirement for house purchases. ",
+          "This configuration should be applied to the realm the house is located in, not the home realm of the player." ]
+      }
+    }
+  ]
+}

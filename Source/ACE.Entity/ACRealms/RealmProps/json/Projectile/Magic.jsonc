@@ -1,0 +1,11 @@
+{
+  "$schema_version": 1,
+  "namespace": "Projectile.Magic",
+  "properties": {
+    "DoubleCollisionCheck": {
+      "type": "boolean",
+      "default": true,
+      "description": "Enables a double collision algorithm for projectile spells. In theory, this makes them harder to dodge."
+    }
+  }
+}

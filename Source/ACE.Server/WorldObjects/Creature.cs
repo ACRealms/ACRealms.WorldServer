@@ -88,7 +88,6 @@ namespace ACE.Server.WorldObjects
 
                             //old syntax
                             ruleset.GetProperty(RealmPropertyInt.CreatureStrengthAdded),
-
                             //new syntax (note the file header has: "using Props = ACRealms.Props.Creature;")
                             //  ruleset.ValueOf(Props.Attributes.StrengthAdded),
 
