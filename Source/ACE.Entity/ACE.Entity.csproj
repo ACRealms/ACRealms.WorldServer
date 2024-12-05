@@ -12,7 +12,7 @@
     <Description>Asheron's Call server emulator</Description>
     <Company>ACEmulator</Company>
     <Version>1.0.0</Version>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <EmitCompilerGeneratedFiles>false</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 
   </PropertyGroup>
@@ -50,7 +50,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ACE.Common\ACE.Common.csproj" />
-    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
@@ -61,13 +60,11 @@
       </None>
     </ItemGroup>
 
-  <ItemGroup>
-    <AdditionalFiles Include="ACRealms\RealmProps\json\**\*.jsonc" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="ACRealms\RealmProps\json-schema\realm-property-schema.json" />
-  </ItemGroup>
+    <ItemGroup>
+      <Reference Include="ACRealms.RealmPropsAssembly">
+        <HintPath>..\lib\RealmPropsAssembly\x64\Debug\net8.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+      </Reference>
+    </ItemGroup>
 
  <!-- <Target Name="CleanSourceGeneratedFiles" BeforeTargets="BeforeBuild" DependsOnTargets="$(BeforeBuildDependsOn)">
     <RemoveDir Directories="$(CompilerGeneratedFilesOutputPath)\ACRealms.RealmProps" />
@@ -77,16 +74,8 @@
     </ItemGroup>
   </Target>-->
 
-  <ItemGroup>
-    <AdditionalFiles Include="ACRealms\RealmProps\json-schema\realm-property-schema.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Generated\" />
-  </ItemGroup>
-
     <Target Name="ExcludeGeneratedFiles" BeforeTargets="CoreCompile">
-        <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != ''">
+        <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != '' And '$(EmitCompilerGeneratedFiles)' == 'true'">
             <!-- Don't include the output from a previous source generator execution into future runs; -->
             <!-- the */** trick here ensures that there's at least one subdirectory, which is our key  -->
             <!-- that it's coming from a source generator as opposed to something that is coming from  -->

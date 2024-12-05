@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Xunit;
 using ACRealms.RealmProps;
-using Gen = ACRealms.RealmProps.NamespacedRealmPropertyGenerator;
+using Gen = ACRealms.CodeGen.NamespacedRealmPropertyGenerator;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;

@@ -36,7 +36,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
         [Fact]
         public void TestServerPropertyFallback()
         {
-            var att = RealmPropertyPrototypes.Float[RealmPropertyFloat.Spellcasting_Max_Angle].PrimaryAttribute;
+            var att = RealmPropertyPrototypes.Float[Props.Player.Spellcasting.MaxAngle].PrimaryAttribute;
             Assert.NotNull(att.DefaultFromServerProperty);
             var serverPropOrig = PropertyManager.GetDouble(att.DefaultFromServerProperty).Item;
 
@@ -48,10 +48,10 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             var realm = RealmManager.GetRealm(1, includeRulesets: false);
             var lb = LandblockHelper.LoadLandblock(realm, 0x8903);
 
-            Assert.Equal(1, lb.RealmRuleset.GetProperty(RealmPropertyFloat.Spellcasting_Max_Angle));
+            Assert.Equal(1, lb.RealmRuleset.GetProperty(Props.Player.Spellcasting.MaxAngle));
 
             PropertyManager.ModifyDouble(att.DefaultFromServerProperty, 2);
-            Assert.Equal(2, lb.RealmRuleset.GetProperty(RealmPropertyFloat.Spellcasting_Max_Angle));
+            Assert.Equal(2, lb.RealmRuleset.GetProperty(Props.Player.Spellcasting.MaxAngle));
 
             PropertyManager.ModifyDouble(att.DefaultFromServerProperty, serverPropOrig);
         }
@@ -149,12 +149,12 @@ namespace ACRealms.Tests.Server.Realms.Compilation
 
             Func<AppliedRuleset, List<AppliedRealmProperty<int>>> filter = (ruleset) =>
                 ruleset.PropertiesInt.Keys.Intersect([
-                    RealmPropertyInt.CreatureStrengthAdded,
-                    RealmPropertyInt.CreatureEnduranceAdded,
-                    RealmPropertyInt.CreatureCoordinationAdded,
-                    RealmPropertyInt.CreatureQuicknessAdded,
-                    RealmPropertyInt.CreatureFocusAdded,
-                    RealmPropertyInt.CreatureSelfAdded])
+                    Props.Creature.Attributes.StrengthAdded,
+                    Props.Creature.Attributes.EnduranceAdded,
+                    Props.Creature.Attributes.CoordinationAdded,
+                    Props.Creature.Attributes.QuicknessAdded,
+                    Props.Creature.Attributes.FocusAdded,
+                    Props.Creature.Attributes.SelfAdded])
                 .Select(k => ruleset.PropertiesInt[k]).ToList();
             Func<AppliedRuleset, List<string>> mapPropNames = (ruleset) => filter(ruleset).Select(x => x.Options.Name).OrderBy(x => x).ToList();
 
@@ -219,7 +219,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             //    File.Delete(filename);
             //}
 
-            Assert.True(player.RealmRuleset.GetProperty(RealmPropertyBool.CanBeHomeworld));
+            Assert.True(player.RealmRuleset.GetProperty(Props.Core.Realm.CanBeHomeworld));
         }
     }
 }

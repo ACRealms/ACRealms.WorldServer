@@ -20,7 +20,7 @@ using ValidationContext = Corvus.Json.ValidationContext;*/
 namespace ACRealms.CodeGen
 {
     // To debug: Test Explorer -> ACRealms.Tests.Tests.RealmPropGenerator -> Debug CanGenerateRealmProps test
-    // Important: Significant changes to this generator's process or algorithm should be reflected in ACRealms.RoslynAnalyzer.ACR20XX_RealmProps where applicable
+    // Important: Significant changes to this generator's process or algorithm should be reflected in ACRealms.Roslyn.Analyzer.ACR20XX_RealmProps where applicable
     //            This allows for more accurate errors to be displayed during compilation
     //
     // The C# model classes in ACRealms.RealmProps.RealmPropModels are generated through a manual script invocation as needed
@@ -38,14 +38,14 @@ namespace ACRealms.CodeGen
 
             // TODO: DELETE FILES THAT AREN'T GENERATED
             IncrementalValuesProvider<AdditionalText> realmPropsDirContext = context.AdditionalTextsProvider
-                .Where(static text => { var sep = Path.DirectorySeparatorChar; return text.Path.Contains($"{sep}RealmProps{sep}json"); });
+                .Where(static text => { var sep = Path.DirectorySeparatorChar; return text.Path.Contains($"{sep}PropDefs{sep}json"); });
 
             /*IncrementalValuesProvider<(string Path, string Contents)> jsonSchemaFiles =
-                realmPropsDirContext.Where(static text => { var sep = Path.DirectorySeparatorChar; return text.Path.Contains($"{sep}RealmProps{sep}json-schema{sep}"); })
+                realmPropsDirContext.Where(static text => { var sep = Path.DirectorySeparatorChar; return text.Path.Contains($"{sep}PropDefs{sep}json-schema{sep}"); })
                 .Select(static (text, cancellationToken) => (text.Path, text.GetText(cancellationToken)!.ToString()));*/
 
             IncrementalValuesProvider<(string Path, string Contents)> realmPropFiles = realmPropsDirContext
-                .Where(static text => { var sep = Path.DirectorySeparatorChar; return text.Path.Contains($"{sep}RealmProps{sep}json{sep}"); })
+                .Where(static text => { var sep = Path.DirectorySeparatorChar; return text.Path.Contains($"{sep}PropDefs{sep}json{sep}"); })
                 .Where(static text => Path.GetExtension(text.Path).Equals(".jsonc", StringComparison.Ordinal))
                 .Select(static (text, cancellationToken) => {
                     try

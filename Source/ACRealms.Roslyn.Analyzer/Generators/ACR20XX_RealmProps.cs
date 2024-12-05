@@ -17,7 +17,7 @@ using JsonObject = Corvus.Json.JsonObject;
 
 // This is not a generator, it is a generator diagnostic
 // The actual generator is in the project ACRealms.RealmsProps
-namespace ACRealms.RoslynAnalyzer.Generators
+namespace ACRealms.Roslyn.Analyzer.Generators
 {
     // https://github.com/dotnet/roslyn/blob/ee941ffa3c753fd3f0760d34ca9bca6ba83ea080/docs/features/incremental-generators.cookbook.md#issue-diagnostics
     // Per Microsoft, we can't emit errors while doing incremental generation without ruining performance, so we need a separate diagnostic for that here
@@ -66,8 +66,8 @@ namespace ACRealms.RoslynAnalyzer.Generators
             context.EnableConcurrentExecution();
             context.RegisterCompilationStartAction(c =>
             {
-                if (c.Compilation.AssemblyName != "ACE.Entity")
-                    return; // make sure its ACE.Entity only, perhaps later we can have assembly attributes to enable this for other assemblies
+                if (c.Compilation.AssemblyName != "ACRealms.RealmProps")
+                    return; // This is designed for only one project
                 SchemaValidationActions(c);
             });
         }
@@ -78,12 +78,12 @@ namespace ACRealms.RoslynAnalyzer.Generators
             {
                 context.RegisterCompilationEndAction(c => c.ReportDiagnostic(Diagnostic.Create(Descriptors[type], location, messageArgs)));
             }
-            if (context.Compilation.AssemblyName != "ACE.Entity")
-                return;
+            if (context.Compilation.AssemblyName != "ACRealms.RealmProps")
+                return; // This is designed for only one project
 
             ImmutableArray<AdditionalText> additionalFiles = context.Options.AdditionalFiles;
             var sep = Path.DirectorySeparatorChar;
-            var pathSuffix = $"ACRealms{sep}RealmProps{sep}json-schema{sep}realm-property-schema.json";
+            var pathSuffix = $"PropDefs{sep}json-schema{sep}realm-property-schema.json";
             AdditionalText? realmPropSchema = additionalFiles.FirstOrDefault(file => file.Path.EndsWith(pathSuffix));
             if (realmPropSchema == null)
             {
@@ -121,7 +121,7 @@ namespace ACRealms.RoslynAnalyzer.Generators
             }
 
             var sep = Path.DirectorySeparatorChar;
-            if (!c.AdditionalFile.Path.Contains($"ACRealms{sep}RealmProps{sep}json{sep}") || !c.AdditionalFile.Path.EndsWith(".jsonc"))
+            if (!c.AdditionalFile.Path.Contains($"PropDefs{sep}json{sep}") || !c.AdditionalFile.Path.EndsWith(".jsonc"))
                 return;
 
             var file = c.AdditionalFile;

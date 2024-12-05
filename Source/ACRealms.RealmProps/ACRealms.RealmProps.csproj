@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Platforms>x64</Platforms>
+    <EmitCompilerGeneratedFiles>false</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+    <BaseOutputPath>..\lib\RealmPropsAssembly</BaseOutputPath>
+    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+    <EnableNETAnalyzers>False</EnableNETAnalyzers>
+    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Deterministic>False</Deterministic>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Deterministic>False</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
+    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.7" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="PropDefs\json\**\*.jsonc" />
+    <Compile Remove="Generated\**" />
+    <EmbeddedResource Remove="Generated\**" />
+    <None Remove="Generated\**" />
+    <None Remove="PropDefs\json-schema\**" />
+    <AdditionalFiles Include="PropDefs\json-schema\realm-property-schema.json" />
+  </ItemGroup>
+
+  <Target Name="ExcludeGeneratedFiles" BeforeTargets="CoreCompile">
+    <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != '' And '$(EmitCompilerGeneratedFiles)' == 'true'">
+      <!-- Don't include the output from a previous source generator execution into future runs; -->
+      <!-- the */** trick here ensures that there's at least one subdirectory, which is our key  -->
+      <!-- that it's coming from a source generator as opposed to something that is coming from  -->
+      <!-- some other tool. -->
+      <Compile Remove="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/*/**/*.g.cs" />
+      <None Include="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/**" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != '' And '$(EmitCompilerGeneratedFiles)' == 'false'">
+      <Compile Remove="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/*/**/*.g.cs" />
+      <None Remove="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/*/**/*.g.cs" />
+    </ItemGroup>
+   </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="mv -fuT $(AssemblyName).dll $(AssemblyName)Assembly.dll&#xD;&#xA;mv -fuT $(AssemblyName).pdb $(AssemblyName)Assembly.pdb&#xD;&#xA;mv -fuT $(AssemblyName).deps.json $(AssemblyName)Assembly.deps.json" WorkingDirectory="$(OutDir)" />
+  </Target>
+</Project>

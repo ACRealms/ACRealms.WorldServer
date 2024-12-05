@@ -84,4 +84,10 @@
       <Folder Include="Helpers\realm-fixtures\coverage\realm\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="ACRealms.RealmPropsAssembly">
+        <HintPath>..\lib\RealmPropsAssembly\x64\Debug\net8.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

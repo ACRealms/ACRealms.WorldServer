@@ -35,6 +35,14 @@
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Deterministic>False</Deterministic>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Deterministic>False</Deterministic>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Realms\reserved_realms\default.jsonc" />
     <None Remove="Realms\reserved_realms\hideout.jsonc" />
@@ -273,6 +281,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="ACRealms.RealmProps">
+      <HintPath>..\lib\RealmPropsAssembly\x64\Debug\net8.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+    </Reference>
     <Reference Include="Lifestoned.DataModel">
       <HintPath>..\lib\Lifestoned.DataModel.dll</HintPath>
     </Reference>

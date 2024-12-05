@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 
-namespace ACRealms.RoslynAnalyzer.Usage
+namespace ACRealms.Roslyn.Analyzer.Usage
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ACR1001_RealmsBinaryWriter_Write_ULong : DiagnosticAnalyzer
