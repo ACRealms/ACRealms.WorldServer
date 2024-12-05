@@ -22,5 +22,6 @@
   "editor.formatOnSave": true,
   "files.autoSaveWorkspaceFilesOnly": true,
   "editor.tabSize": 2,
-  "editor.detectIndentation": false
+  "editor.detectIndentation": false,
+  "json.format.keepLines": true
 }

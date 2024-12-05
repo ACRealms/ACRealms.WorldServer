@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ACRealms.RealmProps\ACRealms.RealmProps.csproj" />
+    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" />
   </ItemGroup>
 
   <!-- Required for running in VS -->

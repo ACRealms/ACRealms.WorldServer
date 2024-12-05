@@ -67,11 +67,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{60DC64
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.JsonSchemaGenerator", "ACRealms.JsonSchemaGenerator\ACRealms.JsonSchemaGenerator.csproj", "{E362FE4E-8F5F-4607-9B5E-6468D3ECB8AD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.RoslynAnalyzer", "ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer.csproj", "{551D86D7-ACC1-479A-99D7-49C69C1C3FC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.Roslyn.Analyzer", "ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj", "{551D86D7-ACC1-479A-99D7-49C69C1C3FC0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.Tests.Benchmarks", "ACRealms.Benchmarks\ACRealms.Tests.Benchmarks.csproj", "{179BB8CD-A356-48F8-8A3E-89B205B7FB9E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.RealmProps", "ACRealms.RealmProps\ACRealms.RealmProps.csproj", "{88DBDBBD-3698-4534-844D-1AA3BD471E0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.Roslyn.RealmProps", "ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj", "{88DBDBBD-3698-4534-844D-1AA3BD471E0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

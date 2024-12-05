@@ -50,8 +50,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ACE.Common\ACE.Common.csproj" />
-    <ProjectReference Include="..\ACRealms.RealmProps\ACRealms.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
     <ItemGroup>
@@ -91,8 +91,8 @@
             <!-- the */** trick here ensures that there's at least one subdirectory, which is our key  -->
             <!-- that it's coming from a source generator as opposed to something that is coming from  -->
             <!-- some other tool. -->
-            <Compile Remove="$(CompilerGeneratedFilesOutputPath)/ACRealms.RealmProps/*/**/*.g.cs" />
-            <None Include="$(CompilerGeneratedFilesOutputPath)/ACRealms.RealmProps/**" />
+            <Compile Remove="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/*/**/*.g.cs" />
+            <None Include="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/**" />
         </ItemGroup>
     </Target>
 </Project>

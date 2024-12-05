@@ -3,26 +3,18 @@
   "$id": "https://realm.ac/schema/v1/realm-schema.json",
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string"
-    },
+    "name": { "type": "string" },
     "type": {
       "description": "Represents a (semi)-permanent world",
       "const": "Realm"
     },
-    "properties": {
-      "$ref": "generated/realm-properties.json"
-    },
-    "parent": {
-      "$ref": "generated/realm-names.json"
-    },
+    "properties": { "$ref": "generated/realm-properties.json" },
+    "parent": { "$ref": "generated/realm-names.json" },
     "apply_rulesets": {
       "type": "array",
       "description": "A list of rulesets to apply unconditionally",
       "uniqueItems": true,
-      "items": {
-        "$ref": "generated/ruleset-names.json"
-      }
+      "items": { "$ref": "generated/ruleset-names.json" }
     },
     "apply_rulesets_random": {
       "type": "array",
@@ -33,18 +25,12 @@
             "type": "array",
             "items": {
               "oneOf": [
-                {
-                  "$ref": "generated/ruleset-names.json"
-                },
-                {
-                  "$ref": "generated/apply-rulesets-random.json"
-                }
+                { "$ref": "generated/ruleset-names.json" },
+                { "$ref": "generated/apply-rulesets-random.json" }
               ]
             }
           },
-          {
-            "$ref": "generated/apply-rulesets-random.json"
-          }
+          { "$ref": "generated/apply-rulesets-random.json" }
         ]
       }
     },
@@ -55,8 +41,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "name",
-    "type"
-  ]
+  "required": [ "name", "type" ]
 }

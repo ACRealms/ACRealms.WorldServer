@@ -269,7 +269,7 @@
     <ProjectReference Include="..\ACE.DatLoader\ACE.DatLoader.csproj" />
     <ProjectReference Include="..\ACE.Entity\ACE.Entity.csproj" />
     <ProjectReference Include="..\ACRealms.JsonSchemaGenerator\ACRealms.JsonSchemaGenerator.csproj" />
-    <ProjectReference Include="..\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
