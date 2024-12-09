@@ -441,8 +441,10 @@ namespace ACE.Database.Models.World
 
                 entity.ToTable("realm_properties_bool");
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 entity.HasIndex(e => e.Type)
                     .HasName("idx_type");
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 entity.Property(e => e.RealmId)
                     .HasColumnName("realm_Id")
@@ -475,8 +477,10 @@ namespace ACE.Database.Models.World
 
                 entity.ToTable("realm_properties_float");
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 entity.HasIndex(e => e.Type)
                     .HasName("idx_type");
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 entity.Property(e => e.RealmId)
                     .HasColumnName("realm_Id")
@@ -515,8 +519,10 @@ namespace ACE.Database.Models.World
 
                 entity.ToTable("realm_properties_int");
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 entity.HasIndex(e => e.Type)
                     .HasName("idx_type");
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 entity.Property(e => e.RealmId)
                     .HasColumnName("realm_Id")
@@ -592,8 +598,10 @@ namespace ACE.Database.Models.World
 
                 entity.ToTable("realm_properties_string");
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 entity.HasIndex(e => e.Type)
                     .HasName("idx_type");
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 entity.Property(e => e.RealmId)
                     .HasColumnName("realm_Id")
@@ -627,8 +635,10 @@ namespace ACE.Database.Models.World
 
                 entity.ToTable("realm_ruleset_links");
 
+#pragma warning disable CS0618 // Type or member is obsolete
                 entity.HasIndex(e => e.LinkedRealmId)
                     .HasName("realm_link_child");
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 entity.Property(e => e.RealmId).HasColumnName("realm_id");
 

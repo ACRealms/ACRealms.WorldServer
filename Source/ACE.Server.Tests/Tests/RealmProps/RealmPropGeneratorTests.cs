@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Xunit;
-using ACRealms.RealmProps;
-using Gen = ACRealms.CodeGen.NamespacedRealmPropertyGenerator;
+using Props = ACRealms.Props;
+//using Gen = ACRealms.Roslyn.RealmProps.CodeGen.NamespacedRealmPropertyGenerator;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
@@ -24,6 +24,7 @@ using System.Threading;
 #nullable enable
 // The main purpose of this is to allow debugging of the ACRealms.RealmProps code generator
 
+/*
 namespace ACRealms.Tests.Tests.RealmPropGenerator
 {
     public interface IGeneratorTestBase
@@ -285,3 +286,4 @@ namespace ACRealms.RealmProps.Generated
         }
     }
 }
+*/

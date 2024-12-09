@@ -34,9 +34,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="ACRealms.RealmPropsAssembly">
-        <HintPath>..\lib\RealmPropsAssembly\x64\Debug\net8.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+      <Reference Include="ACRealms.RealmProps">
+        <HintPath>..\lib\RealmPropsAssembly\x64\$(Configuration)\net9.0\ACRealms.RealmPropsAssembly.dll</HintPath>
       </Reference>
-    </ItemGroup>
-
+    </ItemGroup>    
 </Project>

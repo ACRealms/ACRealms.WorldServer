@@ -1,10 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!--<PropertyGroup Condition="$(Configuration) == 'Debug'">
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration) == 'Release'">
-    <TargetFramework>net9.0</TargetFramework>
-  </PropertyGroup>-->
   <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
     <TargetFrameworks>netstandard2.0;</TargetFrameworks>
   </PropertyGroup>
@@ -12,28 +6,13 @@
     <TargetFrameworks>net9.0;</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
-    <!--<TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>-->
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <!--<IsPackable>false</IsPackable>-->
     <LangVersion>12.0</LangVersion>
-    <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
-    <!-- Avoid ID conflicts with the package project. -->
-    <!--<PackageId>$(MSBuildProjectFile)</PackageId>-->
     <!--<PlatformTarget>x64</PlatformTarget>-->
-    <!--<DefineConstants>$(DefineConstants);BUILDING_SOURCE_GENERATOR</DefineConstants>-->
     <IsRoslynComponent>true</IsRoslynComponent> <!-- Allow for debugging in VS -->
     <NoWarn>$(NoWarn);nullable;NU5128;RS2008;SA0001;RS1041</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Label="NuGet">
-    
-    
-    <!--<DevelopmentDependency>true</DevelopmentDependency>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <IncludeBuildOutput>false</IncludeBuildOutput>-->
   </PropertyGroup>
   <ItemGroup>
     <Using Include="System" />
@@ -63,18 +42,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!-- Corvus Transitives -->      
     <PackageReference Include="System.Text.Json" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="NodaTime" Version="3.2.0" PrivateAssets="all" GeneratePathProperty="true"  />    
-    
-    <!--<PackageReference Include="System.Collections.Immutable" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />-->
-    <!-- If including transitives -->
-    <PackageReference Include="Corvus.UriTemplates" Version="2.2.0" />      
-    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />  
+    <PackageReference Include="NodaTime" Version="3.2.0" PrivateAssets="all" GeneratePathProperty="true" />    
+    <PackageReference Include="Corvus.UriTemplates" Version="2.2.0" PrivateAssets="all" GeneratePathProperty="true" />      
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0"  PrivateAssets="all" GeneratePathProperty="true" />  
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" PrivateAssets="all" GeneratePathProperty="true" />  
     <PackageReference Include="System.IO.Pipelines" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />  
     <PackageReference Include="System.Memory" Version="4.5.5" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="System.Reflection.Metadata" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="System.Text.Encodings.Web" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
@@ -95,8 +71,8 @@
       <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_HashCode)\lib\netstandard2.0\Microsoft.Bcl.HashCode.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_IO_Pipelines)\lib\netstandard2.0\System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />     
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Memory)\lib\netstandard2.0\System.Memory.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Numerics_Vectors)\lib\netstandard2.0\System.Numerics.Vectors.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Reflection_Metadata)\lib\netstandard2.0\System.Reflection.Metadata.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Reflection_Emit_Lightweight)\lib\netstandard2.0\System.Reflection.Emit.Lightweight.dll" IncludeRuntimeDependency="false" />        
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Encoding_CodePages)\lib\netstandard2.0\System.Text.Encoding.CodePages.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Encodings_Web)\lib\netstandard2.0\System.Text.Encodings.Web.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Threading_Tasks_Extensions)\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll" IncludeRuntimeDependency="false" />
@@ -111,29 +87,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-
-  <ItemGroup>
-    <!-- Package the generator in the analyzer directory of the nuget package -->
-   <!-- <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGSystem_Text_Json)\lib\netstandard2.0\System.Text.Json.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
-    <!--<None Include="$(PKGSystem_Collections_Immutable)\lib\netstandard2.0\System.Collections.Immutable.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
-    <!--<None Include="$(PKGNodaTime)\lib\netstandard2.0\NodaTime.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />    
-    <None Include="$(PKGMicrosoft_Bcl_AsyncInterfaces)\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGMicrosoft_Bcl_HashCode)\lib\netstandard2.0\Microsoft.Bcl.HashCode.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGSystem_IO_Pipelines)\lib\netstandard2.0\System.IO.Pipelines.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />    
-    <None Include="$(PKGSystem_Memory)\lib\netstandard2.0\System.Memory.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />    
-    <None Include="$(PKGSystem_Buffers)\lib\netstandard2.0\System.Buffers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGSystem_Numerics_Vectors)\lib\netstandard2.0\System.Numerics.Vectors.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGSystem_Reflection_Metadata)\lib\netstandard2.0\System.Reflection.Metadata.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGSystem_Text_Encoding_CodePages)\lib\netstandard2.0\System.Text.Encoding.CodePages.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGSystem_Text_Encodings_Web)\lib\netstandard2.0\System.Text.Encodings.Web.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGSystem_Threading_Tasks_Extensions)\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGMicrosoft_Extensions_ObjectPool)\lib\netstandard2.0\Microsoft.Extensions.ObjectPool.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGCommunityToolkit_HighPerformance)\lib\netstandard2.0\CommunityToolkit.HighPerformance.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />        -->
-    <!-- Package the props file -->
-   <!-- <None Include="ACRealms.Roslyn.RealmProps.props" Pack="true" PackagePath="build" Visible="false" />-->
-  </ItemGroup>
-
 </Project>
  

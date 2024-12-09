@@ -57,6 +57,8 @@ namespace ACE.Server
 
         public static void ConfigureServicesForLiveEnvironment()
         {
+            var realmPropsAssembly = Assembly.LoadFrom("ACRealms.RealmProps.dll");
+
             var consoleTitle = $"AC Realms - v{ServerBuildInfo.FullVersion}";
             Console.Title = consoleTitle;
 

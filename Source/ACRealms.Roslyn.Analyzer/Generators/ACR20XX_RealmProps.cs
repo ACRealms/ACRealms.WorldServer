@@ -1,4 +1,4 @@
-using ACRealms.RealmProps.IntermediateModels;
+using ACRealms.Roslyn.RealmProps.IntermediateModels;
 using Corvus.Json;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -143,7 +143,7 @@ namespace ACRealms.Roslyn.Analyzer.Generators
             JsonObject realmPropsObj;
             try
             {
-                raw = CodeGen.NamespacedRealmPropertyGenerator.RemoveJsonComments(raw, c.CancellationToken);
+                raw = RealmProps.NamespacedRealmPropertyGenerator.RemoveJsonComments(raw, c.CancellationToken);
                 realmPropsObj = JsonObject.Parse(raw);
             }
             catch (OperationCanceledException) { throw; }

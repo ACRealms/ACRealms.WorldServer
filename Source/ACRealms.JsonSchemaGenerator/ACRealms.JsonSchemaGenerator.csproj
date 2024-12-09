@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <Platforms>x64</Platforms>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -17,9 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="ACRealms.RealmPropsAssembly">
-      <HintPath>..\lib\RealmPropsAssembly\x64\Debug\net8.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+    <Reference Include="ACRealms.RealmProps">
+      <HintPath>..\lib\RealmPropsAssembly\x64\$(Configuration)\net9.0\ACRealms.RealmPropsAssembly.dll</HintPath>
     </Reference>
   </ItemGroup>
-
 </Project>

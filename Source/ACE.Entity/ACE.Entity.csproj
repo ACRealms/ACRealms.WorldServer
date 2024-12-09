@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Platforms>x64</Platforms>
     <Authors>ACEmulator Contributors</Authors>
     <RepositoryType>git</RepositoryType>
@@ -18,39 +18,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    
-    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
-    
-    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="3.1.1" />
-    
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-    
-    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
-    
-    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
-    
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.7" />
-    
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    
-    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
-    
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
-      <!--<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
-    <PackageReference Include="PolySharp" Version="1.15.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
-    <PackageReference Include="System.IO.Pipelines" Version="9.0.0" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     <PackageReference Include="System.Text.Json" Version="9.0.0" />
-    -->
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ACE.Common\ACE.Common.csproj" />
-    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />   
+  </ItemGroup>
+  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=net9.0" />
   </ItemGroup>
 
     <ItemGroup>
@@ -60,28 +39,10 @@
       </None>
     </ItemGroup>
 
+    <!-- Remove this eventually, should only be in ACE.Server -->
     <ItemGroup>
-      <Reference Include="ACRealms.RealmPropsAssembly">
-        <HintPath>..\lib\RealmPropsAssembly\x64\Debug\net8.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+      <Reference Include="ACRealms.RealmProps">
+        <HintPath>..\lib\RealmPropsAssembly\x64\$(Configuration)\net9.0\ACRealms.RealmPropsAssembly.dll</HintPath>
       </Reference>
     </ItemGroup>
-
- <!-- <Target Name="CleanSourceGeneratedFiles" BeforeTargets="BeforeBuild" DependsOnTargets="$(BeforeBuildDependsOn)">
-    <RemoveDir Directories="$(CompilerGeneratedFilesOutputPath)\ACRealms.RealmProps" />
-    <ItemGroup>
-      <Compile Remove="$(CompilerGeneratedFilesOutputPath)\ACRealms.RealmProps\**" />
-      <Content Include="$(CompilerGeneratedFilesOutputPath)\ACRealms.RealmProps\**" />
-    </ItemGroup>
-  </Target>-->
-
-    <Target Name="ExcludeGeneratedFiles" BeforeTargets="CoreCompile">
-        <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != '' And '$(EmitCompilerGeneratedFiles)' == 'true'">
-            <!-- Don't include the output from a previous source generator execution into future runs; -->
-            <!-- the */** trick here ensures that there's at least one subdirectory, which is our key  -->
-            <!-- that it's coming from a source generator as opposed to something that is coming from  -->
-            <!-- some other tool. -->
-            <Compile Remove="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/*/**/*.g.cs" />
-            <None Include="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/**" />
-        </ItemGroup>
-    </Target>
 </Project>

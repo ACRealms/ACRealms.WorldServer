@@ -1,7 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
+  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+    <TargetFrameworks>netstandard2.0;</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
+    <TargetFrameworks>net9.0;</TargetFrameworks>
+  </PropertyGroup>
+   
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <LangVersion>12.0</LangVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
@@ -9,20 +14,28 @@
     <!-- Avoid ID conflicts with the package project. -->
     <PackageId>*$(MSBuildProjectFile)*</PackageId>
     <PlatformTarget>x64</PlatformTarget>
+    <NoWarn>$(NoWarn);nullable;NU5128;RS2008;SA0001</NoWarn>
   </PropertyGroup>
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.IO" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Threading.Tasks" />
+    <Using Include="System.Collections.Generic" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="AnalyzerReleases.Shipped.md" />
   </ItemGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="Corvus.Json.Validator" Version="4.0.12" />-->
-    <PackageReference Include="Corvus.Json.ExtendedTypes" Version="3.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
     <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -40,13 +53,20 @@
 
   <!-- Required for running in VS -->
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="8.0.5" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="System.IO.Pipelines" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.7" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" PrivateAssets="all" GeneratePathProperty="true" />
+      <!-- Corvus Transitives -->
+      <PackageReference Include="System.Text.Json" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="System.IO.Pipelines" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="System.Memory" Version="4.5.5" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="System.Reflection.Metadata" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />      
+      <PackageReference Include="System.Text.Encodings.Web" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" PrivateAssets="all" GeneratePathProperty="true" />      
+      <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.8" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="NodaTime" Version="3.2.0" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.0" PrivateAssets="all" GeneratePathProperty="true" />
+
   </ItemGroup>
     
   <ItemGroup>
@@ -62,13 +82,18 @@
   <Target Name="GetDependencyTargetPaths">
     <ItemGroup>
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Json)\lib\netstandard2.0\System.Text.Json.dll" IncludeRuntimeDependency="false" />
-        <!--Immutable must be the supplied v8, or analyzers will fail <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Collections_Immutable)\lib\netstandard2.0\System.Collections.Immutable.dll" IncludeRuntimeDependency="false" />-->
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_IO_Pipelines)\lib\netstandard2.0\System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Encodings_Web)\lib\netstandard2.0\System.Text.Encodings.Web.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_HashCode)\lib\netstandard2.0\Microsoft.Bcl.HashCode.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGNodaTime)\lib\netstandard2.0\NodaTime.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_AsyncInterfaces)\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Extensions_ObjectPool)\lib\netstandard2.0\Microsoft.Extensions.ObjectPool.dll" IncludeRuntimeDependency="false" />        
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGCommunityToolkit_HighPerformance)\lib\netstandard2.0\CommunityToolkit.HighPerformance.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_HashCode)\lib\netstandard2.0\Microsoft.Bcl.HashCode.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_IO_Pipelines)\lib\netstandard2.0\System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />     
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Memory)\lib\netstandard2.0\System.Memory.dll" IncludeRuntimeDependency="false" />
+      <!--<TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Numerics_Vectors)\lib\netstandard2.0\System.Numerics.Vectors.dll" IncludeRuntimeDependency="false" />-->
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Reflection_Metadata)\lib\netstandard2.0\System.Reflection.Metadata.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Encoding_CodePages)\lib\netstandard2.0\System.Text.Encoding.CodePages.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Encodings_Web)\lib\netstandard2.0\System.Text.Encodings.Web.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Threading_Tasks_Extensions)\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Extensions_ObjectPool)\lib\netstandard2.0\Microsoft.Extensions.ObjectPool.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCommunityToolkit_HighPerformance)\lib\netstandard2.0\CommunityToolkit.HighPerformance.dll" IncludeRuntimeDependency="false" />        
     </ItemGroup>
   </Target>
   <!-- End Section Required for running in VS -->

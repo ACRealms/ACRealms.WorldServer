@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Platforms>x64</Platforms>
   </PropertyGroup>
 
@@ -263,11 +263,8 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="McMaster.NETCore.Plugins" Version="1.4.0" />
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
-    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
-    <PackageReference Include="System.IO.Pipelines" Version="9.0.0" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -277,15 +274,29 @@
     <ProjectReference Include="..\ACE.DatLoader\ACE.DatLoader.csproj" />
     <ProjectReference Include="..\ACE.Entity\ACE.Entity.csproj" />
     <ProjectReference Include="..\ACRealms.JsonSchemaGenerator\ACRealms.JsonSchemaGenerator.csproj" />
-    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
-
+  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />   
+  </ItemGroup>
+  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=net9.0" />
+  </ItemGroup>
+    
   <ItemGroup>
-    <Reference Include="ACRealms.RealmPropsAssembly">
-      <HintPath>..\lib\RealmPropsAssembly\x64\Debug\net8.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+    <!-- We have to add the reference this way (non-project, renamed) to work around a Visual Studio limitation. Otherwise the generated code is not visible in intellisense. -->
+    <Reference Include="ACRealms.RealmProps">
+      <HintPath>..\lib\RealmPropsAssembly\x64\$(Configuration)\net9.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+      <Private>False</Private>
     </Reference>
+
+    <!-- We have to do this so that the assembly is renamed back to the original name so that it can be found automatically at runtime -->
+    <ContentWithTargetPath Include="..\lib\RealmPropsAssembly\x64\$(Configuration)\net9.0\ACRealms.RealmPropsAssembly.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>ACRealms.RealmProps.dll</TargetPath>
+    </ContentWithTargetPath>
+      
     <Reference Include="Lifestoned.DataModel">
-      <HintPath>..\lib\Lifestoned.DataModel.dll</HintPath>
+    <HintPath>..\lib\Lifestoned.DataModel.dll</HintPath>
     </Reference>
   </ItemGroup>
 
