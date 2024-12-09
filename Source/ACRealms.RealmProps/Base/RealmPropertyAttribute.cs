@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
+//using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 
 namespace ACE.Entity.Enum.Properties
@@ -24,7 +24,7 @@ namespace ACE.Entity.Enum.Properties
             Func<string, ushort> getRaw = (n) =>
             {
                 currentFieldName = n;
-                var value = System.Enum.Parse<E>(n);
+                var value = System.Enum.Parse(enumType, n);
                 return (ushort)(object)value;
             };
 
@@ -35,7 +35,7 @@ namespace ACE.Entity.Enum.Properties
                 var protoMap = enumType.GetEnumNames().Where(e => getRaw(e) != 0).Select(n =>
                 {
                     currentFieldName = n;
-                    var value = System.Enum.Parse<E>(n);
+                    var value = (E)System.Enum.Parse(enumType, n);
 
                     var member = enumType.GetMember(n).Single();
                     var attributes = member.GetCustomAttributes<TAttribute>(false).ToArray();
@@ -99,15 +99,37 @@ namespace ACE.Entity.Enum.Properties
     }
 
     public class RealmPropertyPrimaryMinMaxAttribute<TPrimitive> : RealmPropertyPrimaryAttribute<TPrimitive>
-         where TPrimitive : notnull, IComparable<TPrimitive>, IEquatable<TPrimitive>, IMinMaxValue<TPrimitive>, INumber<TPrimitive>, IAdditionOperators<TPrimitive, TPrimitive, TPrimitive>, IMultiplyOperators<TPrimitive, TPrimitive, TPrimitive>
+         where TPrimitive : notnull, IComparable<TPrimitive>, IEquatable<TPrimitive>
     {
         public TPrimitive MinValue { get; }
         public TPrimitive MaxValue { get; }
 
+        static TPrimitive GetMinValue(Type primitiveType)
+        {
+            if (primitiveType == typeof(int))
+                return (TPrimitive)(object)int.MinValue;
+            if (primitiveType == typeof(short))
+                return (TPrimitive)(object)short.MinValue;
+            if (primitiveType == typeof(double))
+                return (TPrimitive)(object)double.MinValue;
+            throw new NotImplementedException();
+        }
+
+        static TPrimitive GetMaxValue(Type primitiveType)
+        {
+            if (primitiveType == typeof(int))
+                return (TPrimitive)(object)int.MaxValue;
+            if (primitiveType == typeof(short))
+                return (TPrimitive)(object)short.MaxValue;
+            if (primitiveType == typeof(double))
+                return (TPrimitive)(object)double.MaxValue;
+            throw new NotImplementedException();
+        }
+
         public RealmPropertyPrimaryMinMaxAttribute(TPrimitive defaultValue)
-            : this(null, defaultValue, TPrimitive.MinValue, TPrimitive.MaxValue) { }
+            : this(null, defaultValue, GetMinValue(typeof(TPrimitive)), GetMaxValue(typeof(TPrimitive))) { }
         public RealmPropertyPrimaryMinMaxAttribute(string defaultFromServerProperty, TPrimitive defaultValue)
-            : this(defaultFromServerProperty, defaultValue, TPrimitive.MinValue, TPrimitive.MaxValue) { }
+            : this(defaultFromServerProperty, defaultValue, GetMinValue(typeof(TPrimitive)), GetMaxValue(typeof(TPrimitive))) { }
 
         public RealmPropertyPrimaryMinMaxAttribute(TPrimitive defaultValue, TPrimitive minValue, TPrimitive maxValue)
             : this(null, defaultValue, minValue, maxValue) { }
@@ -270,8 +292,8 @@ namespace ACE.Entity.Enum.Properties
 
         private static FrozenDictionary<RealmPropertyRerollType?, FrozenSet<RealmPropertyRerollType>> RestrictionMap { get; } = new Func<Dictionary<RealmPropertyRerollType?, FrozenSet<RealmPropertyRerollType>>>(() =>
         {
-            var all = System.Enum.GetValues<RealmPropertyRerollType>().ToFrozenSet();
-            var dict = System.Enum.GetValues<RealmPropertyRerollType>().Select(e =>
+            var all = System.Enum.GetValues(typeof(RealmPropertyRerollType)).Cast<RealmPropertyRerollType>().ToFrozenSet();
+            var dict = System.Enum.GetValues(typeof(RealmPropertyRerollType)).Cast<RealmPropertyRerollType>().Select(e =>
             {
                 RealmPropertyRerollType[] set = e switch
                 {
