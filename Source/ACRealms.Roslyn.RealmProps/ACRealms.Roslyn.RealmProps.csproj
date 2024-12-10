@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
     <TargetFrameworks>netstandard2.0;</TargetFrameworks>
   </PropertyGroup>
@@ -46,7 +46,7 @@
     <PackageReference Include="System.Text.Json" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="NodaTime" Version="3.2.0" PrivateAssets="all" GeneratePathProperty="true" />    
     <PackageReference Include="Corvus.UriTemplates" Version="2.2.0" PrivateAssets="all" GeneratePathProperty="true" />      
-    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0"  PrivateAssets="all" GeneratePathProperty="true" />  
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" PrivateAssets="all" GeneratePathProperty="true" />  
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" PrivateAssets="all" GeneratePathProperty="true" />  
     <PackageReference Include="System.IO.Pipelines" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />  

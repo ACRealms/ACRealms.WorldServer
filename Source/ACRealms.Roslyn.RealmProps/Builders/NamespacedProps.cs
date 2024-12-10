@@ -1,0 +1,26 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ACRealms.Roslyn.RealmProps.Builders
+{
+    // Builds the classes Props.XXX.YYY
+    internal static class NamespacedProps
+    {
+        internal static string GenerateNamespacedPropsSourceCode(NamespaceData data)
+        {
+            try
+            {
+                return $$"""
+            
+            {{data.ToCompilationSource()}}
+            """;
+            }
+            catch (Exception ex)
+            {
+                Helpers.ReThrowWrappedException($"GenerateSourceCode ({data.NamespaceFull})", ex);
+                throw;
+            }
+        }
+    }
+}

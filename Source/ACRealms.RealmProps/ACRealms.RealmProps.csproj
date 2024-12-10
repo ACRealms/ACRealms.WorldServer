@@ -13,21 +13,20 @@
     <EmitCompilerGeneratedFiles>false</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
     <BaseOutputPath>..\lib\RealmPropsAssembly</BaseOutputPath>
-    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
-    <EnableNETAnalyzers>False</EnableNETAnalyzers>
-    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
 
   <!-- YOU MUST TARGET NET STANDARD WHEN BUILDING FROM VS, AND NET9 FROM DOTNET BUILD -->
   <ItemGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
-    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />   
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />        
+    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=net9.0" />        
     <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=net9.0" />
-  </ItemGroup>  
+  </ItemGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="PropDefs\json\**\*.jsonc" />
@@ -55,6 +54,7 @@
   
   </ItemGroup>
 
+  <!-- This only runs if we need to swap to enabling EmitCompilerGeneratedFiles for some reason, but we leave it off for performance reasons -->
   <Target Name="ExcludeGeneratedFiles" BeforeTargets="CoreCompile">
     <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != '' And '$(EmitCompilerGeneratedFiles)' == 'true'">
       <!-- Don't include the output from a previous source generator execution into future runs; -->

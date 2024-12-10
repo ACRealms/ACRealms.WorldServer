@@ -143,13 +143,13 @@ namespace ACRealms.Roslyn.Analyzer.Generators
             JsonObject realmPropsObj;
             try
             {
-                raw = RealmProps.NamespacedRealmPropertyGenerator.RemoveJsonComments(raw, c.CancellationToken);
+                raw = RealmProps.Helpers.RemoveJsonComments(raw, c.CancellationToken);
                 realmPropsObj = JsonObject.Parse(raw);
             }
             catch (OperationCanceledException) { throw; }
             catch (Exception)
             {
-                Report(DescriptorType.FailedToParse, Location.Create(
+                    Report(DescriptorType.FailedToParse, Location.Create(
                         file.Path,
                         TextSpan.FromBounds(1, 1),
                         new LinePositionSpan(
@@ -164,10 +164,12 @@ namespace ACRealms.Roslyn.Analyzer.Generators
             {
                 try
                 {
-                    var ctxOrig = new ValidationContext()
+
+                    var ctxOrig = ValidationContext.ValidContext
                         .UsingResults()
                         .UsingEvaluatedProperties()
                         .UsingEvaluatedItems();
+                    
                     var ctx = ctxOrig.PushSchemaLocation(realmPropSchema.Path);
                     var realmPropsObjParsed = RealmPropertySchema.FromJson(realmPropsObj.AsJsonElement);
                     var validation = realmPropsObjParsed.Validate(ctx, ValidationLevel.Detailed);
@@ -176,8 +178,6 @@ namespace ACRealms.Roslyn.Analyzer.Generators
                     {
                         foreach (var badResult in validation.Results)
                         {
-                          // if (!Debugger.IsAttached)
-                          //    Debugger.Launch();
                             //var loc = badResult.Location.Value;
                             var lineNum = 1;
                             var linePos = 1;
