@@ -1,0 +1,4 @@
+V:\dev\AC\ACRealms\ACRealms.WorldServer\Source\lib\RealmPropsAssembly\x64\Debug\net9.0\lib\netstandard2.0\_._
+V:\dev\AC\ACRealms\ACRealms.WorldServer\Source\lib\RealmPropsAssembly\x64\Debug\net9.0\ACRealms.RealmProps.deps.json
+V:\dev\AC\ACRealms\ACRealms.WorldServer\Source\lib\RealmPropsAssembly\x64\Debug\net9.0\ACRealms.RealmProps.dll
+V:\dev\AC\ACRealms\ACRealms.WorldServer\Source\lib\RealmPropsAssembly\x64\Debug\net9.0\ACRealms.RealmProps.pdb

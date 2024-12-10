@@ -115,7 +115,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
 #pragma warning disable RSEXPERIMENTAL004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         context.RegisterHostOutput(realmPropNamespaces, (ctx, data) =>
         {
-            ctx.AddOutput("Foo", "Bar");
+            ctx.AddOutput($"{Path.GetFileNameWithoutExtension(data.OriginalPath)}.txt", SourceText.From("Bar", Encoding.UTF8));
         });
 #pragma warning restore RSEXPERIMENTAL004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 

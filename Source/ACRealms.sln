@@ -77,6 +77,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.Roslyn.RealmProps", "ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj", "{88DBDBBD-3698-4534-844D-1AA3BD471E0C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACRealms.RealmProps", "ACRealms.RealmProps\ACRealms.RealmProps.csproj", "{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C80D3815-A6C5-4C69-BC03-E619594F1D1C} = {C80D3815-A6C5-4C69-BC03-E619594F1D1C}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACRealms.MSBuild", "ACRealms.MSBuild\ACRealms.MSBuild.csproj", "{C80D3815-A6C5-4C69-BC03-E619594F1D1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -130,6 +135,8 @@ Global
 		{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}.Debug|x64.Build.0 = Debug|x64
 		{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}.Release|x64.ActiveCfg = Release|x64
 		{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}.Release|x64.Build.0 = Release|x64
+		{C80D3815-A6C5-4C69-BC03-E619594F1D1C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C80D3815-A6C5-4C69-BC03-E619594F1D1C}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
