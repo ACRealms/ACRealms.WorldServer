@@ -12,6 +12,7 @@ using System.Xml;
 using System.Linq;
 using System.Collections.Immutable;
 using JsonObject = Corvus.Json.JsonObject;
+using System.Diagnostics;
 /*using Corvus.Json.Validator;
 using JsonObject = Corvus.Json.JsonObject;
 using JsonSchema = Corvus.Json.Validator.JsonSchema;
@@ -106,18 +107,24 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
         {
             if (data != null)
             {
-                string? fileName = string.Join("/", data.NestedClassNames);
-                string? sourceCode = Builders.NamespacedProps.GenerateNamespacedPropsSourceCode(data);
+                string fileName = string.Join("/", data.NestedClassNames);
+                string sourceCode = Builders.NamespacedProps.GenerateNamespacedPropsSourceCode(data);
                 ctx.AddSource($"NamespacedProps/{fileName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
             }
         });
 
-#pragma warning disable RSEXPERIMENTAL004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-        context.RegisterHostOutput(realmPropNamespaces, (ctx, data) =>
+        context.RegisterSourceOutput(realmPropNamespaces, (ctx, data) =>
         {
-            ctx.AddOutput($"{Path.GetFileNameWithoutExtension(data.OriginalPath)}.txt", SourceText.From("Bar", Encoding.UTF8));
+            if (data != null)
+            {
+                string fileName = string.Join("/", data.NestedClassNames);
+                string sourceCode = Builders.NamespaceJsonSchema.GenerateSchemaSourceCode(data);
+                ctx.AddSource($"GeneratedJsonSchema/realm-properties/{fileName}.json", SourceText.From(sourceCode, Encoding.UTF8));
+            }
+
+
+          //  ctx.AddSource($"GeneratedJsonSchema/realm-properties/{fileName}.json", SourceText.From("// Bar", Encoding.UTF8));
         });
-#pragma warning restore RSEXPERIMENTAL004 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
         // And for all the properties combined, regardless of namespace, we create the core enums
         // These will be equivalent to the RealmProperty enums which were hand-maintained before ACRealms v2.2
@@ -143,7 +150,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
             ((string TargetEnumTypeName, ImmutableArray<ObjPropInfo> PropsOfType))(
                 data.TargetEnumTypeName,
                 data.AllProps.Where(p =>
-                    ObjPropInfo.PropMap[p.Type] == data.TargetEnumTypeName
+                    p.TargetEnumTypeName == data.TargetEnumTypeName
                 ).OrderBy(p => p.CoreKey).ToImmutableArray()
             ));
 
@@ -151,7 +158,8 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
         {
             if (data.PropsOfType.IsEmpty)
                 return;
-
+            //if (data.TargetEnumTypeName.Contains("Float") && !Debugger.IsAttached)
+            //    Debugger.Launch();
             string? sourceCode = Builders.CoreRealmProperties.GenerateCoreEnumClass(data.TargetEnumTypeName, data.PropsOfType);
             ctx.AddSource($"CoreProps/{data.TargetEnumTypeName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
         });

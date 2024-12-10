@@ -42,6 +42,7 @@ namespace ACRealms.Roslyn.RealmProps
         public string? RerollRestrictedTo { get; init; }
         public string? ObsoleteReason { get; init; }
         public string? DefaultFromServerProp { get; init; }
+        public string TargetEnumTypeName => PropMap[Type];
 
         public static readonly FrozenDictionary<PropType, string> PropMap = new Dictionary<PropType, string>()
         {
@@ -53,7 +54,19 @@ namespace ACRealms.Roslyn.RealmProps
             { PropType.@enum, "RealmPropertyInt" }
         }.ToFrozenDictionary();
 
-        private string CoreEnumType => PropMap[Type];
+        public static readonly FrozenDictionary<PropType, PrimitiveType> PrimitiveMap = new Dictionary<PropType, PrimitiveType>()
+        {
+            { PropType.@string, PrimitiveType.@string },
+            { PropType.integer, PrimitiveType.@int },
+            { PropType.boolean, PrimitiveType.@bool },
+            { PropType.int64, PrimitiveType.@long },
+            { PropType.@float, PrimitiveType.@double },
+            { PropType.@enum, PrimitiveType.@enum }
+        }.ToFrozenDictionary();
+
+        public string CoreEnumType => PropMap[Type];
+        public PrimitiveType PrimitiveType => PrimitiveMap[Type];
+
         public string ToNamespacedAliasDeclaration(string spacer)
         {
             string? obs = ObsoleteReason != null ? $$"""
@@ -68,9 +81,9 @@ namespace ACRealms.Roslyn.RealmProps
             """;
         }
 
-        private string DefaultLiteral(PrimitiveType valuePrimitiveType)
+        private string GetDefaultLiteral()
         {
-            return valuePrimitiveType switch
+            return PrimitiveType switch
             {
                 PrimitiveType.@bool => "false",
                 PrimitiveType.@double => "0.0",
@@ -82,30 +95,33 @@ namespace ACRealms.Roslyn.RealmProps
             };
         }
 
-        private IEnumerable<string> CorePrimaryAttributeArgs(string canonicalPrimaryAttributeType, PrimitiveType valuePrimitiveType)
+        public string AttributeDefault => Default ?? GetDefaultLiteral();
+        public string AttributeMinValue => MinValue ?? GetDefaultLiteral();
+        public string AttributeMaxValue => MaxValue ?? GetDefaultLiteral(); 
+        private IEnumerable<string> CorePrimaryAttributeArgs(string canonicalPrimaryAttributeType)
         {
             return canonicalPrimaryAttributeType switch
             {
-                "RealmPropertyPrimaryAttribute" => [Default ?? DefaultLiteral(valuePrimitiveType)],
-                "RealmPropertyEnumAttribute" => [Default ?? DefaultLiteral(valuePrimitiveType)],
+                "RealmPropertyPrimaryAttribute" => [AttributeDefault],
+                "RealmPropertyEnumAttribute" => [AttributeDefault],
                 "RealmPropertyPrimaryMinMaxAttribute" => [
-                    Default ?? DefaultLiteral(valuePrimitiveType),
-                    MinValue ?? DefaultLiteral(valuePrimitiveType),
-                    MaxValue ?? DefaultLiteral(valuePrimitiveType)
+                    AttributeDefault,
+                    AttributeMinValue,
+                    AttributeMaxValue
                 ],
                 _ => throw new NotImplementedException($"Missing handler for {canonicalPrimaryAttributeType}")
             };
         }
 
-        private string CorePrimaryAttribute(string aliasedPrimaryAttributeType, string canonicalPrimaryAttributeType, PrimitiveType valuePrimitiveType)
+        private string CorePrimaryAttribute(string aliasedPrimaryAttributeType, string canonicalPrimaryAttributeType)
         {
-            string typeArg = valuePrimitiveType switch
+            string typeArg = PrimitiveType switch
             {
                 PrimitiveType.@enum => $"<{Enum}>",
-                _ => String.Empty
+                _ => string.Empty
             };
 
-            string? primaryArgs = string.Join(", ", CorePrimaryAttributeArgs(canonicalPrimaryAttributeType, valuePrimitiveType));
+            string? primaryArgs = string.Join(", ", CorePrimaryAttributeArgs(canonicalPrimaryAttributeType));
             return
             $$"""
             [{{aliasedPrimaryAttributeType}}{{typeArg}}({{primaryArgs}})]
@@ -114,8 +130,7 @@ namespace ACRealms.Roslyn.RealmProps
 
         public string ToCoreEnumDeclaration(
             string aliasedPrimaryAttributeType,
-            string canonicalPrimaryAttributeType,
-            PrimitiveType valuePrimitiveType)
+            string canonicalPrimaryAttributeType)
         {
             string? obs = ObsoleteReason != null ? $$"""
 
@@ -128,7 +143,7 @@ namespace ACRealms.Roslyn.RealmProps
             return
             $$"""
                 [Description("{{Description}}")]{{obs}}{{rerollRestriction}}
-                {{CorePrimaryAttribute(aliasedPrimaryAttributeType, canonicalPrimaryAttributeType, valuePrimitiveType)}}
+                {{CorePrimaryAttribute(aliasedPrimaryAttributeType, canonicalPrimaryAttributeType)}}
                 {{CoreKey}},
             """;
         }

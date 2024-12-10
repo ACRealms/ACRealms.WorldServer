@@ -5,7 +5,7 @@ using System.Text;
 namespace ACRealms.Roslyn.RealmProps.Builders
 {
     // Builds the classes RealmPropertyInt, RealmPropertyBool, etc
-    internal class CoreRealmProperties
+    internal static class CoreRealmProperties
     {
         internal static string GenerateCoreEnumClass(string targetEnumTypeName, ImmutableArray<ObjPropInfo> propsOfType)
         {
@@ -50,7 +50,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                         PropType.@enum => PrimitiveType.@enum,
                         _ => ValuePrimitiveType
                     };
-                    return p.ToCoreEnumDeclaration(thisAliasedPrimaryAttributeType, thisCanonicalPrimaryAttributeType, thisValuePrimitiveType);
+                    return p.ToCoreEnumDeclaration(thisAliasedPrimaryAttributeType, thisCanonicalPrimaryAttributeType);
                 }));
                 //{{(targetEnumTypeName == "RealmPropertyInt" ? $"using RealmPropertyEnumAttribute = ACE.Entity.Enum.Properties.RealmPropertyEnumAttribute<{ValuePrimitiveType}>;" : "")}}}
 

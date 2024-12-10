@@ -3,20 +3,47 @@
     <TargetFramework>net9.0</TargetFramework>
     <Platforms>x64</Platforms>
     <LangVersion>12.0</LangVersion>      
-    <EmitCompilerGeneratedFiles>false</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <!--<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>-->
     <BaseOutputPath>..\lib\RealmPropsAssembly</BaseOutputPath>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
 
-  <UsingTask TaskName="ACRealms.MSBuild.Tasks.CopyGeneratedJsonSchema"
-             AssemblyFile="..\lib\ACRealms.MSBuild\$(Configuration)\netstandard2.0\ACRealms.MSBuild.dll" />
-  <Target Name="CopyGeneratedJsonSchema" AfterTargets="PostBuildEvent">
-    <CopyGeneratedJsonSchema/>
+  <PropertyGroup>
+    <GeneratedJsonOutputDir>..\..\Content\json-schema\generated\</GeneratedJsonOutputDir>
+  </PropertyGroup>
+    
+  <Target Name="GatherGeneratedJsonSource" AfterTargets="CoreBuild">
+    <PropertyGroup>
+      <GeneratedJsonIntermediateDir>$(IntermediateOutputPath)\generated\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.NamespacedRealmPropertyGenerator\GeneratedJsonSchema\</GeneratedJsonIntermediateDir>
+    </PropertyGroup>
+    <ItemGroup>
+      
+      <GeneratedJsonCsFile Include="$(GeneratedJsonIntermediateDir)**\*.json.cs" />
+    </ItemGroup>
   </Target>
+
+ 
+  <Target Name="ExtractJson" AfterTargets="GatherGeneratedJsonSource" Inputs="@(GeneratedJsonCsFile)" Outputs="$(GeneratedJsonOutputDir)%(GeneratedJsonCsFile.RecursiveDir)%(GeneratedJsonCsFile.Filename)">
+    <ReadLinesFromFile File="%(GeneratedJsonCsFile.FullPath)">
+      <Output TaskParameter="Lines" ItemName="JsonLines" />
+    </ReadLinesFromFile>
+
+    <ItemGroup>
+        <ProcessedJsonLines Include="@(JsonLines)" /> <!-- Separate these so the ordering is preserved -->
+        <ProcessedJsonLines Remove="@(ProcessedJsonLines)" Condition="'%(ProcessedJsonLines.Identity)' == '/*' or '%(ProcessedJsonLines.Identity)' == '*/'" />
+    </ItemGroup>
+
+    <MakeDir Directories="$(GeneratedJsonOutputDir)%(GeneratedJsonCsFile.RecursiveDir)" />
+    <WriteLinesToFile File="$(GeneratedJsonOutputDir)%(GeneratedJsonCsFile.RecursiveDir)%(GeneratedJsonCsFile.Filename)" Lines="@(ProcessedJsonLines)" Overwrite="true" />
+  </Target>
+
+    
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <!--  <Move SourceFiles="$(OutDir)\$(AssemblyName).dll" DestinationFiles=""  -->
     <Exec Command="mv -fuT $(AssemblyName).dll $(AssemblyName)Assembly.dll&#xD;&#xA;mv -fuT $(AssemblyName).pdb $(AssemblyName)Assembly.pdb&#xD;&#xA;mv -fuT $(AssemblyName).deps.json $(AssemblyName)INVALID.deps.json" WorkingDirectory="$(OutDir)" />
   </Target>
    

@@ -18,7 +18,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders
             }
             catch (Exception ex)
             {
-                Helpers.ReThrowWrappedException($"GenerateSourceCode ({data.NamespaceFull})", ex);
+                Helpers.ReThrowWrappedException($"NamespacedProps.GenerateNamespacedPropsSourceCode ({data.NamespaceFull})", ex);
                 throw;
             }
         }
