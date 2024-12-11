@@ -41,20 +41,21 @@ namespace ACE.Server.Command.Handlers
 
         public static bool VerifyAndMergeRealmIndex(ISession session, Dictionary<string, ushort> priorLockedIndex, List<RealmToImport> realmsToImport, out Dictionary<string, ushort> newLockedIndex)
         {
-            var dbRealmsFull = DatabaseManager.World.GetAllRealms(cacheUsage: false);
+            // As of v2.2 this method doesn't provide as much safety, as the realms are not stored in the database. 
+            // var dbRealmsFull = DatabaseManager.World.GetAllRealms(cacheUsage: false);
 
 
-            var dbWorldRealmIds = dbRealmsFull.Where(r => r.Type == (ushort)RealmType.Realm).Select(x => x.Id).ToHashSet();
-            var dbWorldRulesetIds = dbRealmsFull.Where(r => r.Type == (ushort)RealmType.Ruleset).Select(x => x.Id).ToHashSet();
+            // var dbWorldRealmIds = dbRealmsFull.Where(r => r.Type == (ushort)RealmType.Realm).Select(x => x.Id).ToHashSet();
+            // var dbWorldRulesetIds = dbRealmsFull.Where(r => r.Type == (ushort)RealmType.Ruleset).Select(x => x.Id).ToHashSet();
 
-            var dbRealms = dbRealmsFull.ToDictionary(x => x.Name, x => x.Id);
+            // var dbRealms = dbRealmsFull.ToDictionary(x => x.Name, x => x.Id);
             var priorIndexById = priorLockedIndex.ToDictionary(x => x.Value, x => x.Key);
-            var dbRealmsById = dbRealms.ToDictionary(x => x.Value, x => x.Key);
+            // var dbRealmsById = dbRealms.ToDictionary(x => x.Value, x => x.Key);
             newLockedIndex = new Dictionary<string, ushort>(StringComparer.InvariantCultureIgnoreCase);
 
             bool changesDetected = false;
 
-            
+            /*
             foreach (var dbRealmName in dbRealms.Keys)
             {
                 var dbRealmId = dbRealms[dbRealmName];
@@ -85,6 +86,7 @@ namespace ACE.Server.Command.Handlers
                 else
                     newLockedIndex.Add(dbRealmName, priorLockedIndex[dbRealmName]);
             }
+            */
 
             foreach (var priorRealmName in priorLockedIndex.Keys)
             {
@@ -93,10 +95,12 @@ namespace ACE.Server.Command.Handlers
 
                 var priorRealmId = priorLockedIndex[priorRealmName];
 
+                /* 
                 if (dbRealmsById.ContainsKey(priorRealmId))
                     throw new InvalidDataException($"Realm or Ruleset {priorRealmName} exists in DB with ID {dbRealms[priorRealmName]} but defined in index file with id {priorRealmId}");
                 else if (dbRealms.ContainsKey(priorRealmName))
                     throw new InvalidDataException($"Realm or Ruleset {priorRealmName} defined in index file with ID {priorRealmId} but defined in DB with id {dbRealms[priorRealmName]}");
+                */
 
                 CommandHandlerHelper.WriteOutputInfo(session, $"Found new realm {priorRealmName} in index file with self-assigned ID of {priorRealmId}.");
                 newLockedIndex.Add(priorRealmName, priorRealmId);
@@ -108,7 +112,8 @@ namespace ACE.Server.Command.Handlers
             var reservedRealmIdsRaw = reservedRealmIdsByEnum.Select(x => (ushort)x).ToHashSet();
             foreach(var enumVal in reservedRealmIdsByEnum)
             {
-                if (reservedIds.Contains((ushort)enumVal) && !dbRealmsById.ContainsKey((ushort)enumVal))
+                //if (reservedIds.Contains((ushort)enumVal) && !dbRealmsById.ContainsKey((ushort)enumVal))
+                if (reservedIds.Contains((ushort)enumVal))
                     throw new InvalidDataException($"The ID {(ushort)enumVal} is not permitted to be manually added to the index file because there is a system-defined realm {enumVal} with that ID.");
                 reservedIds.Add((ushort)enumVal);
             }
@@ -132,6 +137,8 @@ namespace ACE.Server.Command.Handlers
             }
 
             // Check for missing realms that exist in db
+
+            /*
             var realmNamesDefinedInConfig = realmsToImport.Select(x => x.Realm.Name).ToHashSet(StringComparer.Ordinal);
             foreach (var dbRealmName in dbRealms.Keys)
             {
@@ -142,7 +149,7 @@ namespace ACE.Server.Command.Handlers
                     throw new InvalidDataException($"Expected realm file defining realm with name {dbRealmName} - Deletion of rulesets not implemented yet");
                 }
             }
-
+            */
 
             // Be absolutely sure
             if (!changesDetected)

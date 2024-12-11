@@ -178,7 +178,6 @@ namespace ACE.Server.Managers
             foreach (var realm in RealmsByID.Values)
                 realm.NeedsRefresh = true;
 
-            DatabaseManager.World.ClearRealmCache();
             RealmsByID = FrozenDictionary<ushort, WorldRealm>.Empty;
             RealmsByName = FrozenDictionary<string, WorldRealm>.Empty;
             ReservedRealms = FrozenDictionary<ReservedRealm, WorldRealm>.Empty;
@@ -230,7 +229,7 @@ namespace ACE.Server.Managers
 
             try
             {
-                DatabaseManager.World.ReplaceAllRealms(realmsById);
+                // DatabaseManager.World.ReplaceAllRealms(realmsById);
                 LoadAllRealms(realmsById);
             }
             catch (Exception ex)
@@ -241,9 +240,9 @@ namespace ACE.Server.Managers
             FirstImportCompleted = true;
         }
 
-        private static void LoadAllRealms()
+        private static void LoadAllRealms(Dictionary<ushort, RealmToImport> realms)
         {
-            var realms = DatabaseManager.World.GetAllRealms().ToDictionary(x => x.Id);
+            // var realms = DatabaseManager.World.GetAllRealms().ToDictionary(x => x.Id);
 
             var realmsById = new Dictionary<ushort, WorldRealm>();
             var realmsByName = new Dictionary<string, WorldRealm>(StringComparer.OrdinalIgnoreCase);
@@ -254,7 +253,7 @@ namespace ACE.Server.Managers
             var dependencyContext = new Dictionary<ushort, WorldRealmBase>();
             foreach(var realmid in RealmIDsByTopologicalSort)
             {
-                var erealm = global::ACRealms.Rulesets.DBOld.RealmConverter.ConvertToEntityRealm(realms[realmid], true);
+                var erealm = global::ACRealms.Rulesets.DBOld.RealmConverter.ConvertToEntityRealm(realms[realmid].Realm, true);
                 
                 var ruleset = BuildRuleset(erealm, dependencyContext);
                 var wrealm = new WorldRealm(erealm, ruleset);
