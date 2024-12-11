@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using ACE.Entity.ACRealms;
+using ACRealms;
 using ACRealms.RealmProps;
 using ACRealms.RealmProps.Underlying;
 using ACRealms.Rulesets.Enums;
@@ -87,7 +88,7 @@ namespace ACE.Entity.Models
 
     public abstract class AppliedRealmProperty(RulesetCompilationContext ctx)
     {
-        public ushort PropertyKey { get; protected set; }
+        public int PropertyKey { get; protected set; }
         public RealmPropertyOptions Options { get; init; }
         public Type ValueType => Options.ValueType;
         protected RulesetCompilationContext Context { get; } = ctx;
@@ -153,7 +154,7 @@ namespace ACE.Entity.Models
         /// <param name="propertyKey"></param>
         /// <param name="options"></param>
         /// <param name="traceLog"></param>
-        public AppliedRealmProperty(RulesetCompilationContext ctx, ushort propertyKey, RealmPropertyOptions<TVal> options)
+        public AppliedRealmProperty(RulesetCompilationContext ctx, int propertyKey, RealmPropertyOptions<TVal> options)
             : this(ctx)
         {
             PropertyKey = propertyKey;
@@ -215,7 +216,7 @@ namespace ACE.Entity.Models
         public virtual RealmPropertyPrototypeBase PrototypeBase { get; init; }
         public Type ValueType { get; init; }
         public Type EnumType { get; init; }
-        public ushort EnumValueRaw { get; init; }
+        public int EnumValueRaw { get; init; }
         public string Name { get; init; }
         public string RulesetName { get; init; }
         public bool Locked { get; init; }
@@ -223,7 +224,7 @@ namespace ACE.Entity.Models
         public virtual RealmPropertyRerollType RandomType { get => RealmPropertyRerollType.never; protected init { } }
         public virtual RealmPropertyCompositionType CompositionType { get => RealmPropertyCompositionType.replace; protected init { } }
         private Lazy<string> TemplateDisplayString { get; init; } 
-        protected RealmPropertyOptions(RealmPropertyPrototypeBase prototype, string name, string rulesetName, Type type, Type enumType, ushort enumValue)
+        protected RealmPropertyOptions(RealmPropertyPrototypeBase prototype, string name, string rulesetName, Type type, Type enumType, int enumValue)
         {
             PrototypeBase = prototype;
             ValueType = type;
@@ -253,7 +254,7 @@ namespace ACE.Entity.Models
         public TPrimitive HardDefaultValue { get; private init; }
         public TPrimitive DefaultValue { get; private init; }
 
-        internal RealmPropertyOptions(RealmPropertyPrototype<TPrimitive> prototype, string name, string rulesetName, TPrimitive hardDefaultValue, TPrimitive defaultValue, bool locked, double? probability, Type enumType, ushort enumValue)
+        internal RealmPropertyOptions(RealmPropertyPrototype<TPrimitive> prototype, string name, string rulesetName, TPrimitive hardDefaultValue, TPrimitive defaultValue, bool locked, double? probability, Type enumType, int enumValue)
             : base(prototype, name, rulesetName, typeof(TPrimitive), enumType, enumValue)
         {
             Prototype = prototype;
@@ -288,7 +289,7 @@ namespace ACE.Entity.Models
         public override RealmPropertyRerollType RandomType { get; protected init; }
         public override RealmPropertyCompositionType CompositionType { get; protected init; }
 
-        internal MinMaxRangedRealmPropertyOptions(RealmPropertyPrototype<T> prototype, string name, string rulesetName, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability, Type enumType, ushort enumValue)
+        internal MinMaxRangedRealmPropertyOptions(RealmPropertyPrototype<T> prototype, string name, string rulesetName, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability, Type enumType, int enumValue)
             : base(prototype, name, rulesetName, hardDefaultValue, defaultValue, locked, probability, enumType, enumValue)
         {
             RandomType = RealmPropertyRerollType.never;
@@ -297,7 +298,7 @@ namespace ACE.Entity.Models
 
         internal MinMaxRangedRealmPropertyOptions(RealmPropertyPrototype<T> prototype, string name, string rulesetName, T hardDefaultValue,
             byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked,
-            double? probability, Type enumType, ushort enumValue)
+            double? probability, Type enumType, int enumValue)
             : base(prototype, name, rulesetName, hardDefaultValue, hardDefaultValue, locked, probability, enumType, enumValue)
         {
             RandomType = (RealmPropertyRerollType)randomType;

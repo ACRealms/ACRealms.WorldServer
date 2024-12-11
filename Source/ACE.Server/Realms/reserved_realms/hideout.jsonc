@@ -1,7 +1,7 @@
 {
     "name" : "hideout",
     "type" : "Realm",
-    "properties" : {
-        "Description": "Realm for player hideouts (new housing)"
+    "properties": {
+        "Core": { "Realm": { "Description": "Realm for player hideouts (new housing)" } }
     }
 }

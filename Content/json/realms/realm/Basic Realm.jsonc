@@ -1,0 +1,16 @@
+{
+  "name": "Basic Realm",
+  "type": "Realm",
+  "properties": {
+    "Core": {
+      "Realm": {
+        "CanBeHomeworld": true
+      }
+    },
+    "Creature": {
+      "Vitals": {
+        "StaminaMultiplier": 100
+      }
+    }
+  }
+}

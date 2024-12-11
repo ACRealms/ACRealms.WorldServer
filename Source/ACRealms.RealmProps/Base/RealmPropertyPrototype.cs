@@ -23,11 +23,11 @@ namespace ACRealms.RealmProps
 
     public abstract class RealmPropertyPrototypeBase
     {
-        public ushort RawIdentifier { get; private init; }
+        internal int RawIdentifier { get; private init; }
         private SecondaryDict? SecondaryAttributes { get; init; }
         public string SerializedHardDefaultValue { get; private init; }
 
-        protected internal RealmPropertyPrototypeBase(ushort rawIdentifier, SecondaryDict? secondaryAttributes, string serializedHardDefaultValue)
+        protected internal RealmPropertyPrototypeBase(int rawIdentifier, SecondaryDict? secondaryAttributes, string serializedHardDefaultValue)
         {
             RawIdentifier = rawIdentifier;
             SecondaryAttributes = secondaryAttributes;
@@ -59,7 +59,7 @@ namespace ACRealms.RealmProps
     where TPrimitive : IEquatable<TPrimitive>
     {
         public TPrimitive HardDefaultValue { get; init; }
-        protected internal RealmPropertyPrototype(ushort rawIdentifier, SecondaryDict? secondaryAttributes, TPrimitive hardDefaultValue)
+        protected internal RealmPropertyPrototype(int rawIdentifier, SecondaryDict? secondaryAttributes, TPrimitive hardDefaultValue)
             : base(rawIdentifier, secondaryAttributes, hardDefaultValue?.ToString() ?? "<null>")
         {
             HardDefaultValue = hardDefaultValue ?? default(TPrimitive) ?? (TPrimitive)(object)"";
@@ -73,7 +73,7 @@ namespace ACRealms.RealmProps
         public TEnum EnumVal { get; private init; }
 
         protected internal RealmPropertyPrototype(TEnum enumVal, SecondaryDict? secondaryAttributes, TPrimitive hardDefaultValue)
-            : base((ushort)(object)enumVal, secondaryAttributes, hardDefaultValue)
+            : base(System.Runtime.CompilerServices.Unsafe.As<TEnum, int>(ref enumVal), secondaryAttributes, hardDefaultValue)
         {
             EnumVal = enumVal;
         }

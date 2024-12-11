@@ -20,17 +20,21 @@ namespace ACRealms.RealmProps
             where TAttribute : RealmPropertyPrimaryAttribute<TPrimitive>
         {
             Type enumType = typeof(E);
+            if(!typeof(int).IsAssignableFrom(Enum.GetUnderlyingType(enumType)))
+                throw new ArgumentException($"The type {typeof(E).FullName} was expected to be assignable to a System.Int32, but was not.");
+
             string currentFieldName = string.Empty;
-            Func<string, ushort> getRaw = (n) =>
+            Func<string, int> getRaw = (n) =>
             {
                 currentFieldName = n;
                 var value = System.Enum.Parse<E>(n);
-                return (ushort)(object)value;
+                System.Runtime.CompilerServices.Unsafe.As<E, int>(ref value);
+                return (int)(object)value;
             };
 
             try
             {
-                var primaryAttributeConstraint = enumType.GetCustomAttribute<RequiresPrimaryAttributeAttribute<TPrimitive>>(false);
+                var primaryAttributeConstraint = enumType.GetCustomAttribute<RequiresPrimaryAttributeAttribute<TPrimitive>>(false)!;
 
                 var protoMap = enumType.GetEnumNames().Where(e => getRaw(e) != 0).Select(n =>
                 {
@@ -49,16 +53,16 @@ namespace ACRealms.RealmProps
 
                     var secondaryAttributesRaw = member.GetCustomAttributes<RealmPropertySecondaryAttributeBase>(false).ToArray();
 
-                    FrozenDictionary<Type, RealmPropertySecondaryAttributeBase> secondaryAttributes = null;
+                    FrozenDictionary<Type, RealmPropertySecondaryAttributeBase>? secondaryAttributes = null;
                     if (secondaryAttributesRaw.Length > 0)
                         secondaryAttributes = secondaryAttributesRaw.ToDictionary(att => att.GetType(), att => att).ToFrozenDictionary();
 
-                    var proto = (TProto)Activator.CreateInstance(typeof(TProto), BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.CreateInstance, null, [value, attribute, secondaryAttributes, attribute.DefaultValue], System.Globalization.CultureInfo.InvariantCulture, null);
+                    var proto = (TProto?)Activator.CreateInstance(typeof(TProto), BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.CreateInstance, null, [value, attribute, secondaryAttributes, attribute.DefaultValue], System.Globalization.CultureInfo.InvariantCulture, null);
 
                     return (value, proto);
                 }).ToFrozenDictionary((pair) => pair.value, (pair) => pair.proto);
 
-                return protoMap;
+                return protoMap!;
             }
             catch (Exception ex)
             {
@@ -76,9 +80,9 @@ namespace ACRealms.RealmProps
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
     public abstract class RealmPropertyPrimaryAttributeBase : Attribute
     {
-        public string DefaultFromServerProperty { get; }
+        public string? DefaultFromServerProperty { get; }
 
-        public RealmPropertyPrimaryAttributeBase(string defaultFromServerProperty)
+        public RealmPropertyPrimaryAttributeBase(string? defaultFromServerProperty)
         {
             DefaultFromServerProperty = defaultFromServerProperty;
         }
@@ -89,7 +93,7 @@ namespace ACRealms.RealmProps
     {
         public TPrimitive DefaultValue { get; }
 
-        public RealmPropertyPrimaryAttribute(string defaultFromServerProperty, TPrimitive defaultValue)
+        public RealmPropertyPrimaryAttribute(string? defaultFromServerProperty, TPrimitive defaultValue)
             : base(defaultFromServerProperty)
         {
             DefaultValue = defaultValue;
@@ -106,13 +110,13 @@ namespace ACRealms.RealmProps
 
         public RealmPropertyPrimaryMinMaxAttribute(TPrimitive defaultValue)
             : this(null, defaultValue, TPrimitive.MinValue, TPrimitive.MaxValue) { }
-        public RealmPropertyPrimaryMinMaxAttribute(string defaultFromServerProperty, TPrimitive defaultValue)
+        public RealmPropertyPrimaryMinMaxAttribute(string? defaultFromServerProperty, TPrimitive defaultValue)
             : this(defaultFromServerProperty, defaultValue, TPrimitive.MinValue, TPrimitive.MaxValue) { }
 
         public RealmPropertyPrimaryMinMaxAttribute(TPrimitive defaultValue, TPrimitive minValue, TPrimitive maxValue)
             : this(null, defaultValue, minValue, maxValue) { }
 
-        public RealmPropertyPrimaryMinMaxAttribute(string defaultFromServerProperty, TPrimitive defaultValue, TPrimitive minValue, TPrimitive maxValue)
+        public RealmPropertyPrimaryMinMaxAttribute(string? defaultFromServerProperty, TPrimitive defaultValue, TPrimitive minValue, TPrimitive maxValue)
             : base(defaultFromServerProperty, defaultValue)
         {
             MinValue = minValue;
@@ -154,104 +158,24 @@ namespace ACRealms.RealmProps
         {
         }
     }
-    /*
-    public class RealmPropertyIntAttribute : RealmPropertyPrimaryMinMaxAttribute<int>
-    {
-        public RealmPropertyIntAttribute(int defaultValue, int minValue, int maxValue) : base(defaultValue, minValue, maxValue) { }
-        public RealmPropertyIntAttribute(int defaultValue, int minValue, int maxValue) : base(defaultValue, minValue, maxValue) { }
-
-        public RealmPropertyIntAttribute(string defaultFromServerProperty, int defaultValueFallback, int minValue, int maxValue)
-            : base(defaultFromServerProperty, defaultValueFallback, minValue, maxValue) { }
-    }
-
-    public class RealmPropertyInt64Attribute : RealmPropertyPrimaryAttributeBase
-    {
-        public string DefaultFromServerProperty { get; }
-        public long DefaultValue { get; }
-        public long MinValue { get; }
-        public long MaxValue { get; }
-        public RealmPropertyInt64Attribute(long defaultValue, long minValue = long.MinValue, long maxValue = long.MaxValue)
-        {
-            DefaultValue = defaultValue;
-            MinValue = minValue;
-            MaxValue = maxValue;
-        }
-
-        public RealmPropertyInt64Attribute(string defaultFromServerProperty, long defaultValueFallback, long minValue = long.MinValue, long maxValue = long.MaxValue)
-            : this(defaultValueFallback, minValue, maxValue)
-        {
-            DefaultFromServerProperty = defaultFromServerProperty;
-        }
-    }
-
-    public class RealmPropertyFloatAttribute : RealmPropertyPrimaryAttributeBase
-    {
-        public string DefaultFromServerProperty { get; }
-        public double DefaultValue { get; }
-        public double MinValue { get; }
-        public double MaxValue { get; }
-        public RealmPropertyFloatAttribute(double defaultValue, double minValue = double.MinValue, double maxValue = double.MaxValue)
-        {
-            DefaultValue = defaultValue;
-            MinValue = minValue;
-            MaxValue = maxValue;
-        }
-        public RealmPropertyFloatAttribute(string defaultFromServerProperty, double defaultValueFallback, double minValue = double.MinValue, double maxValue = double.MaxValue)
-            : this(defaultValueFallback, minValue, maxValue)
-        {
-            DefaultFromServerProperty = defaultFromServerProperty;
-        }
-    }
-
-    public class RealmPropertyStringAttribute : RealmPropertyPrimaryAttributeBase
-    {
-        public string DefaultFromServerProperty { get; }
-        public string DefaultValue { get; }
-        public RealmPropertyStringAttribute(string defaultValue)
-        {
-            DefaultValue = defaultValue;
-        }
-        public RealmPropertyStringAttribute(string defaultFromServerProperty, string defaultValue)
-            : this(defaultValue)
-        {
-            DefaultFromServerProperty = defaultFromServerProperty;
-        }
-    }
-
-    public class RealmPropertyBoolAttribute : RealmPropertyPrimaryAttributeBase
-    {
-        public string DefaultFromServerProperty { get; }
-        public bool DefaultValue { get; }
-        public RealmPropertyBoolAttribute(bool defaultValue)
-        {
-            DefaultValue = defaultValue;
-        }
-
-        public RealmPropertyBoolAttribute(string defaultFromServerProperty, bool defaultValue)
-            : this(defaultValue)
-        {
-            DefaultFromServerProperty = defaultFromServerProperty;
-        }
-    }
-    */
 
     [AttributeUsage(AttributeTargets.Enum, AllowMultiple = false, Inherited = false)]
-    public abstract class RequiresPrimaryAttributeAttribute : Attribute
+    public abstract class RequiresPrimaryAttributeAttribute(Type requiredAttributeType) : Attribute
     {
-        public Type RequiredAttributeType { get; protected init; }
+        public Type RequiredAttributeType { get; } = requiredAttributeType;
     }
 
-    public abstract class RequiresPrimaryAttributeAttribute<TPrimitive> : RequiresPrimaryAttributeAttribute
+    public abstract class RequiresPrimaryAttributeAttribute<TPrimitive>(Type requiredAttributeType)
+        : RequiresPrimaryAttributeAttribute(requiredAttributeType)
         where TPrimitive : IEquatable<TPrimitive> { }
 
-    public class RequiresPrimaryAttributeAttribute<TAttribute, TPrimitive> : RequiresPrimaryAttributeAttribute<TPrimitive>
+    public class RequiresPrimaryAttributeAttribute<TAttribute, TPrimitive>
+        : RequiresPrimaryAttributeAttribute<TPrimitive>
         where TAttribute : RealmPropertyPrimaryAttribute<TPrimitive>
         where TPrimitive : IEquatable<TPrimitive>
     {
         public RequiresPrimaryAttributeAttribute()
-        {
-            RequiredAttributeType = typeof(TAttribute);
-        }
+            : base(typeof(TAttribute)) { }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
@@ -268,9 +192,10 @@ namespace ACRealms.RealmProps
             RerollRestriction = restrictedTo;
         }
 
-        private static FrozenDictionary<RealmPropertyRerollType?, FrozenSet<RealmPropertyRerollType>> RestrictionMap { get; } = new Func<Dictionary<RealmPropertyRerollType?, FrozenSet<RealmPropertyRerollType>>>(() =>
+        private static readonly FrozenSet<RealmPropertyRerollType> All = System.Enum.GetValues<RealmPropertyRerollType>().ToFrozenSet();
+
+        private static FrozenDictionary<RealmPropertyRerollType, FrozenSet<RealmPropertyRerollType>> RestrictionMap { get; } = new Func<Dictionary<RealmPropertyRerollType, FrozenSet<RealmPropertyRerollType>>>(() =>
         {
-            var all = System.Enum.GetValues<RealmPropertyRerollType>().ToFrozenSet();
             var dict = System.Enum.GetValues<RealmPropertyRerollType>().Select(e =>
             {
                 RealmPropertyRerollType[] set = e switch
@@ -286,14 +211,13 @@ namespace ACRealms.RealmProps
                     _ => throw new NotImplementedException()
                 };
                 return (key: e, set: set.ToFrozenSet());
-            }).ToDictionary(t => (RealmPropertyRerollType?)t.key, t => t.set);
-            dict[null] = all;
+            }).ToDictionary(t => t.key, t => t.set);
 
             return dict;
         })().ToFrozenDictionary();
 
         public RealmPropertyRerollType ConstrainRerollType(RealmPropertyRerollType source) => IsAllowedRerollType(source, RerollRestriction) ? source : RerollRestriction;
-        public static FrozenSet<RealmPropertyRerollType> GetAllowedRerollTypes(RealmPropertyRerollType? restrictionType) => RestrictionMap[restrictionType];
-        public bool IsAllowedRerollType(RealmPropertyRerollType? restrictionType, RealmPropertyRerollType rerollType) => RestrictionMap[restrictionType].Contains(rerollType);
+        public static FrozenSet<RealmPropertyRerollType> GetAllowedRerollTypes(RealmPropertyRerollType? restrictionType) => restrictionType.HasValue ? RestrictionMap[restrictionType.Value] : All;
+        public bool IsAllowedRerollType(RealmPropertyRerollType? restrictionType, RealmPropertyRerollType rerollType) => GetAllowedRerollTypes(restrictionType).Contains(rerollType);
     }
 }

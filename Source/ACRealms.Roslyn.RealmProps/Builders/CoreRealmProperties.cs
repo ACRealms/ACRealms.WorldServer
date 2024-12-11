@@ -67,7 +67,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders
             namespace ACRealms.RealmProps.Underlying;
 
             [RequiresPrimaryAttribute<{{CanonicalPrimaryAttributeType}}<{{ValuePrimitiveType}}>, {{ValuePrimitiveType}}>]
-            public enum {{targetEnumTypeName}} : uint
+            public enum {{targetEnumTypeName}} : int
             {
                 Undef = 0,
 

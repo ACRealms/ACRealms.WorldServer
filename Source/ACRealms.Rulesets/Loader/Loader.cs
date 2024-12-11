@@ -1,9 +1,52 @@
+using ACRealms.RealmProps;
 using ACRealms.Rulesets.Enums;
+using Newtonsoft.Json.Linq;
+using System.Collections.Immutable;
 
 namespace ACRealms.Rulesets.Loader
 {
     public static class Loader
     {
+        private static void LoadJProperty(DBOld.Realm realm, JProperty prop, bool isLeafNamespace, ImmutableArray<string> namespaceLayers)
+        {
+            if (isLeafNamespace)
+            {
+                foreach (var c in prop.Children<JObject>().Properties())
+                {
+                    var fullns2 = namespaceLayers.Add(c.Name);
+                    var name = string.Join("_", fullns2);
+                    if (c.Value.Type == JTokenType.Object)
+                    {
+                        var pobj = c.Value.ToObject<RealmPropertyJsonModel>();
+                        realm.SetPropertyByName_Complex(name, pobj);
+                    }
+                    else
+                    {
+                        realm.SetPropertyByName(name, c.Value);
+                    }
+                }
+                return;
+            }
+            else
+            {
+                // Go to the next namespace layer downward
+                // TODO: Allow for leaf properties and subcategories to exist side by side in the same namespace
+                foreach(var c in prop.Children<JObject>().Properties())
+                {
+                    var fullns2 = namespaceLayers.Add(c.Name);
+                    LoadJProperty(realm, c, IsLeafNamespace(fullns2), fullns2);
+                }
+            }
+        }
+
+        private static bool IsLeafNamespace(ImmutableArray<string> namespaceLayers)
+        {
+            // After getting namespace prototype built, query it to determine if we are at a leaf
+            var fullName = string.Join(".", namespaceLayers);
+            var ns = Namespaces.ByFullName[fullName];
+            return ns.IsLeaf;
+        }
+
         public static RealmToImport DeserializeRealmJson(string filename, string fileContent)
         {
             var dobj = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(fileContent);
@@ -19,15 +62,7 @@ namespace ACRealms.Rulesets.Loader
             {
                 foreach (var prop in ((Newtonsoft.Json.Linq.JObject)dobj.properties).Properties())
                 {
-                    if (prop.Value.Type == Newtonsoft.Json.Linq.JTokenType.Object)
-                    {
-                        var pobj = prop.Value.ToObject<RealmPropertyJsonModel>();
-                        realm.SetPropertyByName_Complex(prop.Name, pobj);
-                    }
-                    else
-                    {
-                        realm.SetPropertyByName(prop.Name, prop.Value);
-                    }
+                    LoadJProperty(realm, prop, false, [prop.Name]);
                 }
             }
 

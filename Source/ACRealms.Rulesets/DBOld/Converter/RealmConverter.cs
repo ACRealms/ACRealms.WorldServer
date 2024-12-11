@@ -71,7 +71,9 @@ namespace ACRealms.Rulesets.DBOld
             foreach (var value in dbValues)
             {
                 var appliedProperty = value.ConvertRealmProperty();
-                result[(TProp)(object)value.Type] = (AppliedRealmProperty<TVal>)appliedProperty;
+                var t = value.Type;
+                var e = System.Runtime.CompilerServices.Unsafe.As<int, TProp>(ref t);
+                result[e] = (AppliedRealmProperty<TVal>)appliedProperty;
                 realmEntity.AllProperties[appliedProperty.Options.Name] = appliedProperty;
             }
             return result;

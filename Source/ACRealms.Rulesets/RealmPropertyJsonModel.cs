@@ -5,13 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+# nullable enable
 namespace ACRealms.Rulesets
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Property names are directly tied to json document")]
     public class RealmPropertyJsonModel
     {
-        public string value { get; set; }
-        public string low { get; set; }
-        public string high { get; set; }
+        public string? value { get; set; }
+        public string? low { get; set; }
+        public string? high { get; set; }
         public bool? locked { get; set; }
         public double? probability { get; set; }
         public RealmPropertyRerollType? reroll { get; set; }

@@ -10,6 +10,7 @@
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -59,8 +60,11 @@
   <ItemGroup>
     <AdditionalFiles Include="PropDefs\json\**\*.jsonc" />
     <Compile Remove="Generated\**" />
+    <Compile Remove="NewFolder\**" />
     <EmbeddedResource Remove="Generated\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
     <None Remove="Generated\**" />
+    <None Remove="NewFolder\**" />
     <None Remove="PropDefs\json-schema\**" />
     <AdditionalFiles Include="PropDefs\json-schema\realm-property-schema.json" />
   </ItemGroup>
@@ -80,10 +84,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
   </ItemGroup>
 
   <!-- This only runs if we need to swap to enabling EmitCompilerGeneratedFiles for some reason, but we leave it off for performance reasons -->
