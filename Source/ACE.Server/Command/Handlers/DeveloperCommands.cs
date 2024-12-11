@@ -38,6 +38,7 @@ using Position = ACE.Entity.Position;
 using Spell = ACE.Server.Entity.Spell;
 using ACE.Server.Realms;
 using ACE.Entity.Enum.RealmProperties;
+using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.Command.Handlers
 {

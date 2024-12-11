@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace ACE.Database.Models.World
+namespace ACRealms.Rulesets.DBOld
 {
     public partial class RealmRulesetLinks
     {
@@ -14,5 +14,9 @@ namespace ACE.Database.Models.World
 
         public virtual Realm LinkedRealm { get; set; }
         public virtual Realm Realm { get; set; }
+
+
+       // [NotMapped]
+        public string Import_RulesetToApply { get; set; }
     }
 }

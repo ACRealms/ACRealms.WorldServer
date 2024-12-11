@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ACE.Entity.Enum.Properties
+namespace ACRealms.Rulesets.Enums
 {
     public enum RealmRulesetLinkType : ushort
     {

@@ -611,6 +611,7 @@ namespace ACE.Database
             }
         }
 
+        /*
         public virtual Realm GetRealm(ushort id)
         {
             using (var context = ContextFactory.CreateDbContext())
@@ -697,6 +698,6 @@ namespace ACE.Database
                     }
                 });
             }
-        }
+        }*/
     }
 }

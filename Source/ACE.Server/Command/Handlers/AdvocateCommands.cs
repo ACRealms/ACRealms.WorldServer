@@ -8,6 +8,7 @@ using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics.Common;
 using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
+using ACRealms.RealmProps.Enums;
 using System.Collections.Generic;
 
 namespace ACE.Server.Command.Handlers

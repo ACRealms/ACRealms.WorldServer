@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DBOld\NewFolder\**" />
+    <EmbeddedResource Remove="DBOld\NewFolder\**" />
+    <None Remove="DBOld\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+   
+  <ItemGroup>
+    <!-- We have to add the reference this way (non-project, renamed) to work around a Visual Studio limitation. Otherwise the generated code is not visible in intellisense. -->
+    <Reference Include="ACRealms.RealmProps">
+      <HintPath>..\lib\RealmPropsAssembly\x64\$(Configuration)\net9.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+</ItemGroup>
+</Project>

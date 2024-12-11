@@ -32,10 +32,4 @@
         <PackagePath></PackagePath>
       </None>
     </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="ACRealms.RealmProps">
-        <HintPath>..\lib\RealmPropsAssembly\x64\$(Configuration)\net9.0\ACRealms.RealmPropsAssembly.dll</HintPath>
-      </Reference>
-    </ItemGroup>    
 </Project>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACE.Entity.Enum.RealmProperties
+namespace ACRealms.RealmProps.Enums
 {
     
     public enum PlayerInstanceSelectMode : int

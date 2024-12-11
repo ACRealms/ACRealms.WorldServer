@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ACE.Entity.Enum.Properties
+namespace ACRealms.Rulesets.Enums // Belongs in this namespace but must be used in this project
 {
     public enum RealmPropertyRerollType : byte
     {

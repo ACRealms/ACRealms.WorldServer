@@ -16,6 +16,7 @@ using LandblockInstance = ACE.Database.Models.World.LandblockInstance;
 using ACE.Server.Realms;
 using ACE.Common.ACRealms;
 using ACE.Entity.Enum.Properties;
+using ACRealms.Rulesets.Enums;
 
 namespace ACE.Server.Factories
 {

@@ -18,6 +18,9 @@ using System.Drawing.Text;
 using System.Collections.Immutable;
 using ACE.Server.Factories.Entity;
 using ACE.Server.Factories.Tables;
+using ACRealms.RealmProps.Underlying;
+using ACRealms.RealmProps;
+using ACRealms.Rulesets.Enums;
 
 namespace ACE.Server.Realms
 {
@@ -344,7 +347,7 @@ namespace ACE.Server.Realms
 
         public static RulesetTemplate MakeRuleset(RulesetTemplate baseset, Realm subset, RulesetCompilationContext ctx)
         {
-            if (baseset.Realm.Type == ACE.Entity.Enum.RealmType.Ruleset && subset.Type == ACE.Entity.Enum.RealmType.Realm)
+            if (baseset.Realm.Type == RealmType.Ruleset && subset.Type == RealmType.Realm)
                 throw new Exception("Realms may not inherit from rulesets.");
             var ruleset = new RulesetTemplate(subset.Id, baseset.Context.Trace ? baseset.Context : ctx);
             ruleset.LogTrace(() => $"New (parent: {baseset.Realm.Name})");
@@ -697,7 +700,7 @@ namespace ACE.Server.Realms
 
         public uint GetFullInstanceID(ushort shortInstanceID)
         {
-            return ACE.Entity.Position.InstanceIDFromVars(Template.Realm.Id, shortInstanceID, Template.Realm.Type == ACE.Entity.Enum.RealmType.Ruleset);
+            return ACE.Entity.Position.InstanceIDFromVars(Template.Realm.Id, shortInstanceID, Template.Realm.Type == RealmType.Ruleset);
         }
 
         public uint GetDefaultInstanceID(LocalPosition position) => GetFullInstanceID(0);

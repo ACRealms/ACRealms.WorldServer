@@ -82,6 +82,10 @@
   
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
   <!-- This only runs if we need to swap to enabling EmitCompilerGeneratedFiles for some reason, but we leave it off for performance reasons -->
   <Target Name="ExcludeGeneratedFiles" BeforeTargets="CoreCompile">
     <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != '' And '$(EmitCompilerGeneratedFiles)' == 'true'">

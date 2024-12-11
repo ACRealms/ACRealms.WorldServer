@@ -7,6 +7,8 @@ using ACE.Entity.Enum.RealmProperties;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameAction.Actions;
 using ACE.Server.WorldObjects;
+using ACRealms.RealmProps.Enums;
+using ACRealms.Rulesets.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;

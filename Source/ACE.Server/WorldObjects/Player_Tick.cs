@@ -19,6 +19,7 @@ using ACE.Server.Network.Structure;
 using ACE.Server.Physics;
 using ACE.Server.Physics.Common;
 using ACE.Server.Realms;
+using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.WorldObjects
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 
-namespace ACE.Entity.Enum.Properties
+namespace ACRealms.Rulesets.Enums
 {
     public enum ReservedRealm : ushort
     {

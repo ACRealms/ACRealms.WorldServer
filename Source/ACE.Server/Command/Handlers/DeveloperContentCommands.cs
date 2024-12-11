@@ -30,6 +30,7 @@ using log4net;
 using ACE.Database.Adapter;
 using ACE.Server.Realms;
 using ACE.Entity.Enum.RealmProperties;
+using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.Command.Handlers.Processors
 {
@@ -44,8 +45,7 @@ namespace ACE.Server.Command.Handlers.Processors
             Quest,
             Recipe,
             Spell,
-            Weenie,
-            Realm
+            Weenie
         }
 
         public static FileType GetContentType(string[] parameters, ref string param)
@@ -66,8 +66,6 @@ namespace ACE.Server.Command.Handlers.Processors
                     return FileType.Recipe;
                 else if (fileType.StartsWith("weenie"))
                     return FileType.Weenie;
-                else if (fileType.StartsWith("realm"))
-                    return FileType.Realm;
             }
             return FileType.Undefined;
         }
@@ -82,11 +80,6 @@ namespace ACE.Server.Command.Handlers.Processors
             {
                 contentType = GetContentType(parameters, ref param);
 
-                if (contentType == FileType.Realm)
-                {
-                    CommandHandlerHelper.WriteOutputInfo(session, $"Realms may not be imported individually. Use /import-realms instead to fully reload the ruleset and realm files.");
-                    return;
-                }
                 if (contentType == FileType.Undefined)
                 {
                     CommandHandlerHelper.WriteOutputInfo(session, $"Unknown content type '{parameters[1]}'");
@@ -242,11 +235,6 @@ namespace ACE.Server.Command.Handlers.Processors
             {
                 contentType = GetContentType(parameters, ref param);
 
-                if (contentType == FileType.Realm)
-                {
-                    CommandHandlerHelper.WriteOutputInfo(session, $"Realm SQL files are not importable (and it is not recommended to try to do this manually).");
-                    return;
-                }
                 if (contentType == FileType.Undefined)
                 {
                     CommandHandlerHelper.WriteOutputInfo(session, $"Unknown content type '{parameters[1]}'");
@@ -1693,12 +1681,6 @@ namespace ACE.Server.Command.Handlers.Processors
             {
                 contentType = GetContentType(parameters, ref param);
 
-                if (contentType == FileType.Realm)
-                {
-                    CommandHandlerHelper.WriteOutputInfo(session, $"Realms may not be exported to JSON. The raw data can be exported (but not re-imported) with /export-sql realm");
-                    return;
-                }
-
                 if (contentType == FileType.Undefined)
                 {
                     CommandHandlerHelper.WriteOutputInfo(session, $"Unknown content type '{parameters[1]}'");
@@ -1975,10 +1957,6 @@ namespace ACE.Server.Command.Handlers.Processors
 
                 case FileType.Weenie:
                     ExportSQLWeenie(session, param);
-                    break;
-
-                case FileType.Realm:
-                    RealmDataHelpers.ExportSQLRealm(session, param);
                     break;
             }
         }
@@ -2311,8 +2289,6 @@ namespace ACE.Server.Command.Handlers.Processors
                     mode = CacheType.Spell;
                 if (parameters[0].Contains("weenie", StringComparison.OrdinalIgnoreCase))
                     mode = CacheType.Weenie;
-                if (parameters[0].Contains("realm", StringComparison.OrdinalIgnoreCase))
-                    mode = CacheType.Realm;
                 if (parameters[0].Contains("wield", StringComparison.OrdinalIgnoreCase))
                     mode = CacheType.WieldedTreasure;
             }
@@ -2342,12 +2318,6 @@ namespace ACE.Server.Command.Handlers.Processors
                 DatabaseManager.World.ClearWeenieCache();
             }
 
-            if (mode.HasFlag(CacheType.Realm))
-            {
-                CommandHandlerHelper.WriteOutputInfo(session, " Clearing realm cache");
-                DatabaseManager.World.ClearRealmCache();
-            }
-
             if (mode.HasFlag(CacheType.WieldedTreasure))
             {
                
@@ -2365,7 +2335,6 @@ namespace ACE.Server.Command.Handlers.Processors
             Spell           = 0x4,
             Weenie          = 0x8,
             WieldedTreasure = 0x10,
-            Realm           = 0x16,
             All             = 0xFFFF
         };
 
@@ -2424,8 +2393,6 @@ namespace ACE.Server.Command.Handlers.Processors
                         return FileType.Spell;
                     else if (line.Contains("`weenie`"))
                         return FileType.Weenie;
-                    else if (line.Contains("`realm`"))
-                        return FileType.Realm;
                     else
                         break;
                 }

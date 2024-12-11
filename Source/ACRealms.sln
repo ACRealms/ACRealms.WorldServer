@@ -83,6 +83,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACRealms.RealmProps", "ACRe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACRealms.MSBuild", "ACRealms.MSBuild\ACRealms.MSBuild.csproj", "{C80D3815-A6C5-4C69-BC03-E619594F1D1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACRealms.Rulesets", "ACRealms.Rulesets\ACRealms.Rulesets.csproj", "{296E0424-2714-4AA5-9DDC-D758718B2009}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -137,6 +139,9 @@ Global
 		{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}.Release|x64.Build.0 = Release|x64
 		{C80D3815-A6C5-4C69-BC03-E619594F1D1C}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{C80D3815-A6C5-4C69-BC03-E619594F1D1C}.Release|x64.ActiveCfg = Release|Any CPU
+		{296E0424-2714-4AA5-9DDC-D758718B2009}.Debug|x64.ActiveCfg = Debug|x64
+		{296E0424-2714-4AA5-9DDC-D758718B2009}.Debug|x64.Build.0 = Debug|x64
+		{296E0424-2714-4AA5-9DDC-D758718B2009}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

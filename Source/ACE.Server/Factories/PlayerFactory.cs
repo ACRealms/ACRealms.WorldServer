@@ -15,6 +15,7 @@ using ACE.Server.WorldObjects;
 using ACE.Server.Managers;
 using ACE.Server.Realms;
 using ACE.Common.ACRealms;
+using ACRealms.Rulesets.Enums;
 
 namespace ACE.Server.Factories
 {

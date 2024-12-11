@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ACE.Entity.Enum
+namespace ACRealms.Rulesets.Enums
 {
     public enum RealmType : ushort
     {

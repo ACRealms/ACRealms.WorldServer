@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ACE.Entity.Enum.Properties;
+using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.Realms
 {

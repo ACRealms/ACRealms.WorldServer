@@ -274,6 +274,7 @@
     <ProjectReference Include="..\ACE.DatLoader\ACE.DatLoader.csproj" />
     <ProjectReference Include="..\ACE.Entity\ACE.Entity.csproj" />
     <ProjectReference Include="..\ACRealms.JsonSchemaGenerator\ACRealms.JsonSchemaGenerator.csproj" />
+    <ProjectReference Include="..\ACRealms.Rulesets\ACRealms.Rulesets.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
     <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />   

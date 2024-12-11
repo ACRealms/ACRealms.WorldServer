@@ -1,12 +1,12 @@
-using ACE.Database.Adapter;
 using ACE.Entity.ACRealms;
-using ACE.Entity.Enum.Properties;
-using ACE.Entity.Enum.RealmProperties;
 using ACE.Entity.Models;
+using ACRealms.RealmProps;
+using ACRealms.RealmProps.Underlying;
+using ACRealms.Rulesets.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace ACE.Database.Models.World
+namespace ACRealms.Rulesets.DBOld
 {
     public sealed partial class RealmPropertiesFloat : RealmPropertiesBase
     {
@@ -28,6 +28,25 @@ namespace ACE.Database.Models.World
             else
                 prop = new MinMaxRangedRealmPropertyOptions<double>(proto, @enum.ToString(), Realm.Name, att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability, EnumType, Type);
             return new AppliedRealmProperty<double>(RulesetCompilationContext.DefaultShared, Type, prop);
+        }
+
+        public void SetProperties(RealmPropertyJsonModel model)
+        {
+            if (model.value != null)
+                this.Value = double.Parse(model.value);
+            if (model.low != null)
+            {
+                this.RandomLowRange = double.Parse(model.low);
+                this.RandomHighRange = double.Parse(model.high);
+                if (RandomLowRange > RandomHighRange)
+                    throw new Exception("high must be > low");
+                if (!model.reroll.HasValue)
+                    model.reroll = RealmPropertyRerollType.landblock;
+            }
+            this.Locked = model.locked ?? false;
+            this.Probability = model.probability;
+            this.RandomType = (byte)(model.reroll ?? RealmPropertyRerollType.never);
+            this.CompositionType = (byte)model.compose;
         }
     }
 }

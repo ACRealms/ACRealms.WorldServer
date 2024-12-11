@@ -5,6 +5,8 @@ using ACE.Entity.Enum.Properties;
 using ACE.Server.Command.Handlers.Processors;
 using ACE.Server.Managers;
 using ACE.Server.Network;
+using ACRealms.Rulesets.Enums;
+using ACRealms.Rulesets.Loader;
 using log4net;
 using Newtonsoft.Json;
 using System;
@@ -39,12 +41,11 @@ namespace ACE.Server.Command.Handlers
 
         public static bool VerifyAndMergeRealmIndex(ISession session, Dictionary<string, ushort> priorLockedIndex, List<RealmToImport> realmsToImport, out Dictionary<string, ushort> newLockedIndex)
         {
-            // Todo: Refactor to allow for rulesets but not realms to be removed from db
             var dbRealmsFull = DatabaseManager.World.GetAllRealms(cacheUsage: false);
 
 
-            var dbWorldRealmIds = dbRealmsFull.Where(r => r.Type == (ushort)ACE.Entity.Enum.RealmType.Realm).Select(x => x.Id).ToHashSet();
-            var dbWorldRulesetIds = dbRealmsFull.Where(r => r.Type == (ushort)ACE.Entity.Enum.RealmType.Ruleset).Select(x => x.Id).ToHashSet();
+            var dbWorldRealmIds = dbRealmsFull.Where(r => r.Type == (ushort)RealmType.Realm).Select(x => x.Id).ToHashSet();
+            var dbWorldRulesetIds = dbRealmsFull.Where(r => r.Type == (ushort)RealmType.Ruleset).Select(x => x.Id).ToHashSet();
 
             var dbRealms = dbRealmsFull.ToDictionary(x => x.Name, x => x.Id);
             var priorIndexById = priorLockedIndex.ToDictionary(x => x.Value, x => x.Key);
@@ -280,6 +281,7 @@ namespace ACE.Server.Command.Handlers
             return list;
         }
 
+        /*
         public static void ExportSQLRealm(ISession session, string param)
         {
             DirectoryInfo di = DeveloperContentCommands.VerifyContentFolder(session, false);
@@ -339,6 +341,6 @@ namespace ACE.Server.Command.Handlers
             }
 
             CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
-        }
+        }*/
     }
 }

@@ -1,4 +1,4 @@
-using ACE.Entity.Enum.RealmProperties;
+using ACRealms.Rulesets.Enums;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 
-namespace ACE.Entity.Enum.Properties
+namespace ACRealms.RealmProps
 {
     public static class RealmPropertyHelper
     {

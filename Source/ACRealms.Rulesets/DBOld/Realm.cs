@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ACE.Database.Models.World
+namespace ACRealms.Rulesets.DBOld
 {
     public partial class Realm
     {
@@ -29,5 +29,33 @@ namespace ACE.Database.Models.World
         public virtual IList<RealmPropertiesString> RealmPropertiesString { get; set; }
         public virtual IList<RealmRulesetLinks> RealmRulesetLinksLinkedRealm { get; set; }
         public virtual IList<RealmRulesetLinks> RealmRulesetLinksRealm { get; set; }
+
+
+
+        //[NotMapped]
+        public string ParentRealmName { get; set; }
+
+      //  [NotMapped]
+        public Dictionary<ushort, Realm> Descendents = new Dictionary<ushort, Realm>();
+
+        public void SetId(ushort value)
+        {
+            this.Id = value;
+            foreach (var item in RealmPropertiesBool)
+                item.RealmId = value;
+            foreach (var item in RealmPropertiesInt)
+                item.RealmId = value;
+            foreach (var item in RealmPropertiesInt64)
+                item.RealmId = value;
+            foreach (var item in RealmPropertiesString)
+                item.RealmId = value;
+            foreach (var item in RealmPropertiesFloat)
+                item.RealmId = value;
+        }
+
+        public override string ToString()
+        {
+            return $"{Name} ({Id})";
+        }
     }
 }

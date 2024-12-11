@@ -1,19 +1,17 @@
-using ACE.Database.Models.World;
-using ACE.Entity.Enum;
-using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using ACE.Entity.Enum.RealmProperties;
 using System.Collections.Frozen;
+using ACRealms.Rulesets.Enums;
+using ACRealms.RealmProps.Underlying;
 
-namespace ACE.Database.Adapter
+namespace ACRealms.Rulesets.DBOld
 {
     public static class RealmConverter
     {
-        public static ACE.Entity.Models.Realm ConvertToEntityRealm(ACE.Database.Models.World.Realm realm, bool instantiateEmptyCollections = false)
+        public static ACE.Entity.Models.Realm ConvertToEntityRealm(DBOld.Realm realm, bool instantiateEmptyCollections = false)
         {
             var jobs = new List<RealmLinkJob>();
             foreach (var jobtype_group in realm.RealmRulesetLinksRealm.GroupBy(x => x.LinkType))

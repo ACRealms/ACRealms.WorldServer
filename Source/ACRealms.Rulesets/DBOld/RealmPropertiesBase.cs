@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACE.Database.Models.World
+namespace ACRealms.Rulesets.DBOld
 {
     public abstract class RealmPropertiesBase
     {

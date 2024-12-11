@@ -38,11 +38,4 @@
         <PackagePath></PackagePath>
       </None>
     </ItemGroup>
-
-    <!-- Remove this eventually, should only be in ACE.Server -->
-    <ItemGroup>
-      <Reference Include="ACRealms.RealmProps">
-        <HintPath>..\lib\RealmPropsAssembly\x64\$(Configuration)\net9.0\ACRealms.RealmPropsAssembly.dll</HintPath>
-      </Reference>
-    </ItemGroup>
 </Project>

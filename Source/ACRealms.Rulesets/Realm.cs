@@ -5,9 +5,9 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using ACE.Entity.ACRealms;
-using ACE.Entity.Enum;
-using ACE.Entity.Enum.Properties;
-using ACE.Entity.Enum.RealmProperties;
+using ACRealms.RealmProps;
+using ACRealms.RealmProps.Underlying;
+using ACRealms.Rulesets.Enums;
 using static ACE.Entity.ACRealms.RulesetCompilationContext;
 
 namespace ACE.Entity.Models

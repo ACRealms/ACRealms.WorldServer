@@ -14,6 +14,7 @@ using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Realms;
 using ACE.Entity.Enum.RealmProperties;
+using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.WorldObjects
 {

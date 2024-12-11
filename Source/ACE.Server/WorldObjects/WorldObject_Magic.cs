@@ -27,6 +27,8 @@ using ACE.Server.WorldObjects.Managers;
 using ACE.Server.Realms;
 using ACE.Entity.Enum.RealmProperties;
 using ACRealms;
+using ACRealms.RealmProps.Enums;
+using ACRealms.Rulesets.Enums;
 
 namespace ACE.Server.WorldObjects
 {

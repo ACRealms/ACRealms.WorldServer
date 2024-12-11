@@ -31,6 +31,8 @@ using System.Linq;
 using ACRealms.Server.Network.TraceMessages.Messages;
 using ACE.Common.ACRealms;
 using ACE.Server.Managers.ACRealms;
+using ACRealms.RealmProps.Enums;
+using ACRealms.Rulesets.Enums;
 
 namespace ACE.Server.Managers
 {

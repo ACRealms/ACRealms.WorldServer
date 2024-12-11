@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ACRealms;
+using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.Realms
 {

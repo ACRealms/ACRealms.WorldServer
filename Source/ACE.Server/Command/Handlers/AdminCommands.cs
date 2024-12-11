@@ -33,6 +33,7 @@ using ACE.Server.WorldObjects.Entity;
 using Position = ACE.Entity.Position;
 using ACE.Server.Realms;
 using ACE.Entity.Enum.RealmProperties;
+using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.Command.Handlers
 {

@@ -1,4 +1,3 @@
-using ACE.Entity.Enum.Properties;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
@@ -9,9 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 #nullable enable
 
-using SecondaryDict = System.Collections.Frozen.FrozenDictionary<System.Type, ACE.Entity.Enum.Properties.RealmPropertySecondaryAttributeBase>;
+using SecondaryDict = System.Collections.Frozen.FrozenDictionary<System.Type, ACRealms.RealmProps.RealmPropertySecondaryAttributeBase>;
 
-namespace ACE.Entity.Enum.RealmProperties
+namespace ACRealms.RealmProps
 {
     public static class RealmPropertyPrototypes
     {

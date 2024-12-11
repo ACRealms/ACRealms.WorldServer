@@ -3,169 +3,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Collections.Generic;
 using ACE.Entity;
-using ACE.Entity.Enum.Properties;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using ACRealms.RealmProps.Underlying;
+using ACRealms.Rulesets.DBOld;
 
-namespace ACE.Database.Models.World
+namespace ACRealms.Rulesets
 {
-    public class RealmPropertyJsonModel
-    {
-        public string value { get; set; }
-        public string low { get; set; }
-        public string high { get; set; }
-        public bool? locked { get; set; }
-        public double? probability { get; set; }
-        public RealmPropertyRerollType? reroll { get; set; }
-        public RealmPropertyCompositionType compose { get; set; }
+   
 
-        public void ValidateAll()
-        {
-            if ((low == null && high != null) || (low != null && high == null))
-                throw new Exception("Both low and high values must be present if one is present.");
-            if (value == null && low == null)
-                throw new Exception("Either value or low/high range must be provided.");
-            if (value != null && low != null)
-                throw new Exception("If providing a value, may not provide a low/high range.");
-        }
-
-        public void ValidateValuePresent()
-        {
-            if (value == null)
-                throw new Exception("value must be present");
-        }
-    }
-
-    public partial class RealmPropertiesBool
-    {
-        public void SetProperties(RealmPropertyJsonModel model)
-        {
-            model.ValidateValuePresent();
-            this.Value = bool.Parse(model.value);
-            this.Locked = model.locked ?? false;
-            this.Probability = model.probability;
-        }
-    }
-
-    public partial class RealmPropertiesFloat
-    {
-        public void SetProperties(RealmPropertyJsonModel model)
-        {
-            if (model.value != null)
-                this.Value = double.Parse(model.value);
-            if (model.low != null)
-            {
-                this.RandomLowRange = double.Parse(model.low);
-                this.RandomHighRange = double.Parse(model.high);
-                if (RandomLowRange > RandomHighRange)
-                    throw new Exception("high must be > low");
-                if (!model.reroll.HasValue)
-                    model.reroll = RealmPropertyRerollType.landblock;
-            }
-            this.Locked = model.locked ?? false;
-            this.Probability = model.probability;
-            this.RandomType = (byte)(model.reroll ?? RealmPropertyRerollType.never);
-            this.CompositionType = (byte)model.compose;
-        }
-    }
-
-    public partial class RealmPropertiesInt
-    {
-        public void SetProperties(RealmPropertyJsonModel model)
-        {
-            if (model.value != null)
-                this.Value = int.Parse(model.value);
-            if (model.low != null)
-            {
-                this.RandomLowRange = int.Parse(model.low);
-                this.RandomHighRange = int.Parse(model.high);
-                if (RandomLowRange > RandomHighRange)
-                    throw new Exception("high must be > low");
-                if (!model.reroll.HasValue)
-                    model.reroll = RealmPropertyRerollType.landblock;
-            }
-            this.Locked = model.locked ?? false;
-            this.Probability = model.probability;
-            this.RandomType = (byte)(model.reroll ?? RealmPropertyRerollType.never);
-            this.CompositionType = (byte)model.compose;
-        }
-    }
-
-    public partial class RealmPropertiesInt64
-    {
-        public void SetProperties(RealmPropertyJsonModel model)
-        {
-            if (model.value != null)
-                this.Value = long.Parse(model.value);
-            if (model.low != null)
-            {
-                this.RandomLowRange = long.Parse(model.low);
-                this.RandomHighRange = long.Parse(model.high);
-                if (RandomLowRange > RandomHighRange)
-                    throw new Exception("high must be > low");
-                if (!model.reroll.HasValue)
-                    model.reroll = RealmPropertyRerollType.landblock;
-            }
-            this.Locked = model.locked ?? false;
-            this.Probability = model.probability;
-            this.RandomType = (byte)(model.reroll ?? RealmPropertyRerollType.never);
-            this.CompositionType = (byte)model.compose;
-        }
-    }
-
-    public partial class RealmPropertiesString
-    {
-        public void SetProperties(RealmPropertyJsonModel model)
-        {
-            model.ValidateValuePresent();
-            this.Value = model.value;
-            this.Locked = model.locked ?? false;
-            this.Probability = model.probability;
-        }
-    }
-
-    public partial class RealmRulesetLinks
-    {
-        [NotMapped]
-        public string Import_RulesetToApply { get; set; }
-    }
-
-    public partial class Realm
-    {
-        [NotMapped]
-        public string ParentRealmName { get; set; }
-
-        [NotMapped]
-        public Dictionary<ushort, Realm> Descendents = new Dictionary<ushort, Realm>();
-
-        public void SetId(ushort value)
-        {
-            this.Id = value;
-            foreach (var item in RealmPropertiesBool)
-                item.RealmId = value;
-            foreach (var item in RealmPropertiesInt)
-                item.RealmId = value;
-            foreach (var item in RealmPropertiesInt64)
-                item.RealmId = value;
-            foreach (var item in RealmPropertiesString)
-                item.RealmId = value;
-            foreach (var item in RealmPropertiesFloat)
-                item.RealmId = value;
-        }
-
-        public override string ToString()
-        {
-            return $"{Name} ({Id})";
-        }
-    }
-
+    
     public static class RealmExtensions
     {
         // =====================================
         // Get
         // Bool, DID, Float, Int, Int64, String
         // =====================================
-
+        /*
         public static bool? GetProperty(this Realm realm, RealmPropertyBool property)
         {
             return realm.RealmPropertiesBool.FirstOrDefault(x => x.Type == (uint)property)?.Value;
@@ -191,14 +45,14 @@ namespace ACE.Database.Models.World
             return realm.RealmPropertiesString.FirstOrDefault(x => x.Type == (uint)property)?.Value;
         }
 
-
+        */
         // =====================================
         // Set
         // Bool, DID, Float, Int, Int64, String
         // =====================================
 
         //Slower than SetProperty as it has to use reflection
-        public static void SetPropertyByName(this Realm realm, string propertyName, JToken value)
+        public static void SetPropertyByName(this DBOld.Realm realm, string propertyName, JToken value)
         {
             if (Enum.TryParse<RealmPropertyBool>(propertyName, out var boolprop))
                 SetProperty(realm, boolprop, ((bool)value));
@@ -378,7 +232,7 @@ namespace ACE.Database.Models.World
         // Remove
         // Bool, DID, Float, Int, Int64, String
         // =====================================
-
+/*
         public static bool TryRemoveProperty(this Realm realm, RealmPropertyBool property, out RealmPropertiesBool entity)
         {
             entity = realm.RealmPropertiesBool.FirstOrDefault(x => x.Type == (uint)property);
@@ -448,5 +302,6 @@ namespace ACE.Database.Models.World
 
             return false;
         }
+        */
     }
 }
