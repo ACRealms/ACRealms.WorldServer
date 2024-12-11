@@ -74,10 +74,12 @@ namespace ACRealms.Roslyn.RealmProps.Builders
 
             var propertyJsonSchema = new Dictionary<string, object>();
 
-            foreach (var propInt in data.ObjProps.Array.Where(p => p.Type == PropType.integer))
+            var propsOf = (PropType type) => data.ObjProps.Array.Where(p => p.Type == type);
+
+            foreach (var propInt in propsOf(PropType.integer))
             {
                 var propertySchema = new Dictionary<string, object>();
-                var conv = (string s) => int.Parse(s);
+                var conv = static (string s) => int.Parse(s);
 
                 var directValueSchema = new Dictionary<string, object>()
                 {
@@ -140,11 +142,11 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                 propertyJsonSchema.Add(propInt.Key, propertySchema);
             }
 
-            /*
-            foreach (var propLong in propertyDefinitionsInt64)
+            
+            foreach (var propLong in propsOf(PropType.int64))
             {
-                var att = propLong.Value.PrimaryAttribute;
                 var propertySchema = new Dictionary<string, object>();
+                var conv = static (string s) => long.Parse(s);
 
                 var directValueSchema = new Dictionary<string, object>()
                 {
@@ -156,14 +158,13 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                     { "val", new Dictionary<string, object>()
                     {
                         { "type", "integer" },
-                        { "minimum", att.MinValue },
-                        { "maximum", att.MaxValue },
-                        { "default", att.DefaultValue }
+                        { "minimum", conv(propLong.AttributeMinValue) },
+                        { "maximum", conv(propLong.AttributeMaxValue) },
+                        { "default", conv(propLong.AttributeDefault) }
                     } }
                 };
 
-                var descriptionAtt = propLong.Key.GetAttributeOfType<System.ComponentModel.DescriptionAttribute>();
-                propertySchema.Add("description", descriptionAtt?.Description ?? "(no description)");
+                propertySchema.Add("description", propLong.Description);
 
                 propertySchema.Add("definitions", defSchema);
 
@@ -209,10 +210,10 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                 propertyJsonSchema.Add(propLong.Key.ToString(), propertySchema);
             }
 
-            foreach (var propFloat in propertyDefinitionsFloat)
+            foreach (var propFloat in propsOf(PropType.@float))
             {
-                var att = propFloat.Value.PrimaryAttribute;
                 var propertySchema = new Dictionary<string, object>();
+                var conv = static (string s) => double.Parse(s);
 
                 var directValueSchema = new Dictionary<string, object>()
                 {
@@ -224,14 +225,13 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                     { "val", new Dictionary<string, object>()
                     {
                         { "type", "number" },
-                        { "minimum", Math.Round(att.MinValue, 6) },
-                        { "maximum", Math.Round(att.MaxValue, 6) },
-                        { "default", att.DefaultValue }
+                        { "minimum", Math.Round(conv(propFloat.AttributeMinValue), 6) },
+                        { "maximum", Math.Round(conv(propFloat.AttributeMaxValue), 6) },
+                        { "default", conv(propFloat.AttributeDefault) }
                     } }
                 };
 
-                var descriptionAtt = propFloat.Key.GetAttributeOfType<System.ComponentModel.DescriptionAttribute>();
-                propertySchema.Add("description", descriptionAtt?.Description ?? "(no description)");
+                propertySchema.Add("description", propFloat.Description);
 
                 propertySchema.Add("definitions", defSchema);
 
@@ -276,9 +276,8 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                 propertyJsonSchema.Add(propFloat.Key.ToString(), propertySchema);
             }
 
-            foreach (var propString in propertyDefinitionsString)
+            foreach (var propString in propsOf(PropType.@string))
             {
-                var att = propString.Value.PrimaryAttribute;
                 var propertySchema = new Dictionary<string, object>();
 
                 var directValueSchema = new Dictionary<string, object>()
@@ -291,12 +290,11 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                     { "val", new Dictionary<string, object>()
                     {
                         { "type", "string" },
-                        { "default", att.DefaultValue }
+                        { "default", propString.AttributeDefault }
                     } }
                 };
 
-                var descriptionAtt = propString.Key.GetAttributeOfType<System.ComponentModel.DescriptionAttribute>();
-                propertySchema.Add("description", descriptionAtt?.Description ?? "(no description)");
+                propertySchema.Add("description", propString.Description);
 
                 propertySchema.Add("definitions", defSchema);
 
@@ -320,11 +318,10 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                 propertyJsonSchema.Add(propString.Key.ToString(), propertySchema);
             }
 
-            foreach (var propBool in propertyDefinitionsBool)
+            foreach (var propBool in propsOf(PropType.boolean))
             {
-                var att = propBool.Value.PrimaryAttribute;
                 var propertySchema = new Dictionary<string, object>();
-
+                
                 var directValueSchema = new Dictionary<string, object>()
                 {
                     { "$ref", $"#/properties/{propBool.Key}/definitions/val" }
@@ -335,12 +332,11 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                     { "val", new Dictionary<string, object>()
                     {
                         { "type", "boolean" },
-                        { "default", att.DefaultValue }
+                        { "default", propBool.AttributeDefault == "true" }
                     } }
                 };
 
-                var descriptionAtt = propBool.Key.GetAttributeOfType<System.ComponentModel.DescriptionAttribute>();
-                propertySchema.Add("description", descriptionAtt?.Description ?? "(no description)");
+                propertySchema.Add("description", propBool.Description);
 
                 propertySchema.Add("definitions", defSchema);
 
@@ -363,7 +359,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders
 
                 propertyJsonSchema.Add(propBool.Key.ToString(), propertySchema);
             }
-            */
+            
             return propertyJsonSchema;
         }
     }
