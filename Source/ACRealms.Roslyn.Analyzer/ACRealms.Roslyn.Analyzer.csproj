@@ -7,14 +7,16 @@
   </PropertyGroup>
    
   <PropertyGroup>
-    <IsPackable>false</IsPackable>
+    <!--<IsPackable>false</IsPackable>-->
     <LangVersion>12.0</LangVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
     <!-- Avoid ID conflicts with the package project. -->
-    <PackageId>*$(MSBuildProjectFile)*</PackageId>
-    <PlatformTarget>x64</PlatformTarget>
-    <NoWarn>$(NoWarn);nullable;NU5128;RS2008;SA0001</NoWarn>
+    <!--<PackageId>*$(MSBuildProjectFile)*</PackageId>-->
+    <!--<PlatformTarget>x64</PlatformTarget>-->
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <NoWarn>$(NoWarn);nullable;NU5128;RS2008;SA0001;RS1041;MSB3243</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Using Include="System" />
@@ -47,14 +49,18 @@
     <Folder Include="NewFolder\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" />
+  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" SetTargetFramework="TargetFramework=netstandard2.0" />
   </ItemGroup>
-
+  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
+    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" SetTargetFramework="TargetFramework=net9.0" />
+  </ItemGroup>
+    
   <!-- Required for running in VS -->
   <ItemGroup>
       <!-- Corvus Transitives -->
       <PackageReference Include="System.Text.Json" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="Corvus.UriTemplates" Version="2.2.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="System.IO.Pipelines" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="System.Memory" Version="4.5.5" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="System.Reflection.Metadata" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
@@ -66,6 +72,7 @@
       <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.8" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="NodaTime" Version="3.2.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.0" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" PrivateAssets="all" GeneratePathProperty="true" />
 
   </ItemGroup>
     
@@ -81,19 +88,20 @@
 
   <Target Name="GetDependencyTargetPaths">
     <ItemGroup>
+      <!--<TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Numerics_Vectors)\lib\netstandard2.0\System.Numerics.Vectors.dll" IncludeRuntimeDependency="false" />-->        
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Json)\lib\netstandard2.0\System.Text.Json.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGNodaTime)\lib\netstandard2.0\NodaTime.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_AsyncInterfaces)\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_HashCode)\lib\netstandard2.0\Microsoft.Bcl.HashCode.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_IO_Pipelines)\lib\netstandard2.0\System.IO.Pipelines.dll" IncludeRuntimeDependency="false" />     
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Memory)\lib\netstandard2.0\System.Memory.dll" IncludeRuntimeDependency="false" />
-      <!--<TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Numerics_Vectors)\lib\netstandard2.0\System.Numerics.Vectors.dll" IncludeRuntimeDependency="false" />-->
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Reflection_Metadata)\lib\netstandard2.0\System.Reflection.Metadata.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Encoding_CodePages)\lib\netstandard2.0\System.Text.Encoding.CodePages.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Encodings_Web)\lib\netstandard2.0\System.Text.Encodings.Web.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Threading_Tasks_Extensions)\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Extensions_ObjectPool)\lib\netstandard2.0\Microsoft.Extensions.ObjectPool.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGCommunityToolkit_HighPerformance)\lib\netstandard2.0\CommunityToolkit.HighPerformance.dll" IncludeRuntimeDependency="false" />        
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCommunityToolkit_HighPerformance)\lib\netstandard2.0\CommunityToolkit.HighPerformance.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Reflection_Emit_Lightweight)\lib\netstandard2.0\System.Reflection.Emit.Lightweight.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
   <!-- End Section Required for running in VS -->

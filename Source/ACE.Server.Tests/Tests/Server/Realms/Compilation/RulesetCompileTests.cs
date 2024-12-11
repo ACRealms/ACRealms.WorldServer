@@ -1,11 +1,9 @@
-using ACE.Database.Adapter;
-using ACE.Entity.Enum.Properties;
-using ACE.Entity.Enum.RealmProperties;
 using ACE.Entity.Models;
 using ACE.Server.Command.Handlers;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Realms;
+using ACRealms.RealmProps;
 using ACRealms.Tests.Factories;
 using ACRealms.Tests.Fixtures.Network;
 using ACRealms.Tests.Helpers;
