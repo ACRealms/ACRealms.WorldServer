@@ -103,7 +103,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
                 }
             });
 
-        context.RegisterSourceOutput(realmPropNamespaces, (ctx, data) =>
+        context.RegisterSourceOutput(realmPropNamespaces, static (ctx, data) =>
         {
             if (data != null)
             {
@@ -113,7 +113,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
             }
         });
 
-        context.RegisterSourceOutput(realmPropNamespaces, (ctx, data) =>
+        context.RegisterSourceOutput(realmPropNamespaces, static (ctx, data) =>
         {
             if (data != null)
             {
@@ -121,15 +121,27 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
                 string sourceCode = Builders.NamespaceJsonSchema.GenerateSchemaSourceCode(data);
                 ctx.AddSource($"GeneratedJsonSchema/realm-properties/{fileName}.json", SourceText.From(sourceCode, Encoding.UTF8));
             }
+        });
 
 
-          //  ctx.AddSource($"GeneratedJsonSchema/realm-properties/{fileName}.json", SourceText.From("// Bar", Encoding.UTF8));
+        IncrementalValueProvider<ImmutableArray<NamespaceData>> combinedNamespaces = realmPropNamespaces.Where(static (x) => x != null).Collect();
+        var namespaceMetadataForRootSchema = combinedNamespaces.Select(static (allNamespaces, cancellationToken) =>
+        {
+            var namespacePartsTotal = allNamespaces.Select(static x => x.NestedClassNames).ToImmutableArray();
+            return namespacePartsTotal;
+        });
+
+
+        context.RegisterSourceOutput(namespaceMetadataForRootSchema, static (ctx, data) =>
+        {
+            string sourceCode = Builders.RootGeneratedPropsSchema.GenerateCombinedSchemaSourceCode(data);
+            ctx.AddSource($"GeneratedJsonSchema/realm-properties/realm-properties-root.json", SourceText.From(sourceCode, Encoding.UTF8));
         });
 
         // And for all the properties combined, regardless of namespace, we create the core enums
         // These will be equivalent to the RealmProperty enums which were hand-maintained before ACRealms v2.2
         IncrementalValueProvider<ImmutableArray<ObjPropInfo>> combinedProps =
-            realmPropNamespaces.Collect().Select(static (x, cancellationToken) => {
+           combinedNamespaces.Select(static (x, cancellationToken) => {
 
                 // Here we add some undef props so that at least 1 prop of each type is made, and so that we have a value of 0 for the undefined prop
                 IEnumerable<ObjPropInfo> undefProps = new List<PropType> { PropType.integer, PropType.@string, PropType.boolean, PropType.int64, PropType.@float }.Select(type =>
@@ -140,7 +152,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
                         Type = type
                     };
                 });
-                return x.Where(x => x != null).SelectMany(x => x.ObjProps.Array).Concat(undefProps).ToImmutableArray();
+                return x.SelectMany(x => x.ObjProps.Array).Concat(undefProps).ToImmutableArray();
             });
         var types = ObjPropInfo.PropMap.Select(static kvp => ((PropType propType, string enumType))(kvp.Key, kvp.Value)).ToImmutableArray();
         IncrementalValuesProvider<string> typesProvider = combinedProps.SelectMany(static (_, cancellationToken) => ObjPropInfo.PropMap.Values.Distinct());
@@ -154,7 +166,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
                 ).OrderBy(p => p.CoreKey).ToImmutableArray()
             ));
 
-        context.RegisterSourceOutput(corePropsSource, (ctx, data) =>
+        context.RegisterSourceOutput(corePropsSource, static (ctx, data) =>
         {
             if (data.PropsOfType.IsEmpty)
                 return;

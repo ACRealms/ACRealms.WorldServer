@@ -43,7 +43,6 @@
 
     
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-  <!--  <Move SourceFiles="$(OutDir)\$(AssemblyName).dll" DestinationFiles=""  -->
     <Exec Command="mv -fuT $(AssemblyName).dll $(AssemblyName)Assembly.dll&#xD;&#xA;mv -fuT $(AssemblyName).pdb $(AssemblyName)Assembly.pdb&#xD;&#xA;mv -fuT $(AssemblyName).deps.json $(AssemblyName)INVALID.deps.json" WorkingDirectory="$(OutDir)" />
   </Target>
    

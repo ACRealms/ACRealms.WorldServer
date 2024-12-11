@@ -52,7 +52,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders
             for (int i = 0; i < data.NestedClassNames.Length; i++)
                 sb.Append("../");
             var relativeDir = sb.ToString();
-            var optionsBasePath = $"{relativeDir}/options-base.json";
+            var optionsBasePath = $"{relativeDir}options-base.json";
 
             var probabilitySchema = new Dictionary<string, object>()
             {

@@ -8,7 +8,7 @@
       "description": "Represents a (semi)-permanent world",
       "const": "Realm"
     },
-    "properties": { "$ref": "generated/realm-properties.json" },
+    "properties": { "$ref": "generated/realm-properties/realm-properties-root.json" },
     "parent": { "$ref": "generated/realm-names.json" },
     "apply_rulesets": {
       "type": "array",
