@@ -166,7 +166,7 @@ namespace ACRealms.Rulesets
                 result.SetProperties(pobj);
             else
             {
-                var entity = new RealmPropertiesInt64 { RealmId = realm.Id, Type = (ushort)property };
+                var entity = new RealmPropertiesInt64 { RealmId = realm.Id, Type = (ushort)property, Realm = realm };
                 entity.SetProperties(pobj);
                 realm.RealmPropertiesInt64.Add(entity);
             }
@@ -180,7 +180,7 @@ namespace ACRealms.Rulesets
                 result.SetProperties(pobj);
             else
             {
-                var entity = new RealmPropertiesBool { RealmId = realm.Id, Type = (ushort)property };
+                var entity = new RealmPropertiesBool { RealmId = realm.Id, Type = (ushort)property, Realm = realm };
                 entity.SetProperties(pobj);
                 realm.RealmPropertiesBool.Add(entity);
             }
@@ -194,7 +194,7 @@ namespace ACRealms.Rulesets
                 result.SetProperties(pobj);
             else
             {
-                var entity = new RealmPropertiesInt { RealmId = realm.Id, Type = (ushort)property };
+                var entity = new RealmPropertiesInt { RealmId = realm.Id, Type = (ushort)property, Realm = realm };
                 entity.SetProperties(pobj);
                 realm.RealmPropertiesInt.Add(entity);
             }
@@ -208,7 +208,7 @@ namespace ACRealms.Rulesets
                 result.SetProperties(pobj);
             else
             {
-                var entity = new RealmPropertiesString { RealmId = realm.Id, Type = (ushort)property };
+                var entity = new RealmPropertiesString { RealmId = realm.Id, Type = (ushort)property, Realm = realm };
                 entity.SetProperties(pobj);
                 realm.RealmPropertiesString.Add(entity);
             }
@@ -222,7 +222,7 @@ namespace ACRealms.Rulesets
                 result.SetProperties(pobj);
             else
             {
-                var entity = new RealmPropertiesFloat { RealmId = realm.Id, Type = (ushort)property };
+                var entity = new RealmPropertiesFloat { RealmId = realm.Id, Type = (ushort)property, Realm = realm };
                 entity.SetProperties(pobj);
                 realm.RealmPropertiesFloat.Add(entity);
             }

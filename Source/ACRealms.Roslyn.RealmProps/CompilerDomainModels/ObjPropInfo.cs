@@ -100,7 +100,8 @@ namespace ACRealms.Roslyn.RealmProps
         public string AttributeMaxValue => MaxValue ?? GetDefaultLiteral(); 
         private IEnumerable<string> CorePrimaryAttributeArgs(string canonicalPrimaryAttributeType)
         {
-            return canonicalPrimaryAttributeType switch
+            string[] args = DefaultFromServerProp != null ? [$"\"{DefaultFromServerProp}\""] : [];
+            string[] rest = canonicalPrimaryAttributeType switch
             {
                 "RealmPropertyPrimaryAttribute" => [AttributeDefault],
                 "RealmPropertyEnumAttribute" => [AttributeDefault],
@@ -111,6 +112,8 @@ namespace ACRealms.Roslyn.RealmProps
                 ],
                 _ => throw new NotImplementedException($"Missing handler for {canonicalPrimaryAttributeType}")
             };
+        
+            return [.. args, .. rest];
         }
 
         private string CorePrimaryAttribute(string aliasedPrimaryAttributeType, string canonicalPrimaryAttributeType)

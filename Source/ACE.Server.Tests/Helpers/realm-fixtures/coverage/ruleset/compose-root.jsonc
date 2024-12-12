@@ -2,30 +2,38 @@
   "name": "Compose Root",
   "type": "Ruleset",
   "properties": {
-    "Description": "Root composition ruleset",
-    "CreatureStrengthAdded": {
-      "low": 10,
-      "high": 20
+    "Core": {
+      "Realm": {
+        "Description": "Root composition ruleset"
+      }
     },
-    "CreatureEnduranceAdded": {
-      "value": 10
-    },
-    "CreatureCoordinationAdded": {
-      "compose": "add",
-      "value": 10
-    },
-    "CreatureQuicknessAdded": {
-      "compose": "multiply",
-      "value": 10
-    },
-    "CreatureFocusAdded": {
-      "value": 10,
-      "probability": 0,
-      "locked": true
-    },
-    "CreatureSelfAdded": {
-      "value": 10,
-      "locked": true
+    "Creature": {
+      "Attributes": {
+        "StrengthAdded": {
+          "low": 10,
+          "high": 20
+        },
+        "EnduranceAdded": {
+          "value": 10
+        },
+        "CoordinationAdded": {
+          "compose": "add",
+          "value": 10
+        },
+        "QuicknessAdded": {
+          "compose": "multiply",
+          "value": 10
+        },
+        "FocusAdded": {
+          "value": 10,
+          "probability": 0,
+          "locked": true
+        },
+        "SelfAdded": {
+          "value": 10,
+          "locked": true
+        }
+      }
     }
   }
 }
