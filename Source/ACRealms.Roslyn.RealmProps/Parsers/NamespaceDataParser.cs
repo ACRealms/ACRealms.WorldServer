@@ -174,7 +174,7 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
             return result;
         }
 
-        private static string? GetLiteralValue(PropType type, RealmPropertySchema.ObjPropOrGroup? valueSrc, string? enumType = null)
+        private static string? GetLiteralValue(PropType type, JsonAny? valueSrc, string? enumType = null)
         {
             if (!valueSrc.HasValue || valueSrc.Value.IsNullOrUndefined())
                 return null;
@@ -233,14 +233,15 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
 
                 string desc = groupDefaults?.GetDescriptionFromFormat(shortKey, unformattedDesc) ?? unformattedDesc;
                 PropType type = propType == PropType.None ? groupDefaults!.PropType : propType;
+                string? enumType = prop.Enum.GetString() ?? groupDefaults?.Enum;
 
                 return new ObjPropInfo(namespaceRaw, key)
                 {
                     Description = desc!,
                     MinValue = GetNumericValue(propType, prop.MinValue) ?? groupDefaults?.MinValue,
                     MaxValue = GetNumericValue(propType, prop.MaxValue) ?? groupDefaults?.MaxValue,
-                    Default = GetLiteralValue(propType, prop.Default) ?? groupDefaults?.Default,
-                    Enum = prop.Enum.GetString() ?? groupDefaults?.Enum,
+                    Default = GetLiteralValue(propType, prop.Default, enumType) ?? groupDefaults?.Default,
+                    Enum = enumType,
                     DefaultFromServerProp = prop.DefaultFromServerProperty.GetString(),
                     ObsoleteReason = prop.Obsolete.GetString(),
                     RerollRestrictedTo = prop.RerollRestrictedTo.IsNotNullOrUndefined() ? prop.RerollRestrictedTo.AsString.GetString() : null,

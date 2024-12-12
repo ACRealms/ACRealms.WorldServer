@@ -285,12 +285,14 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                     { "$ref", $"#/properties/{propString.Key}/definitions/val" }
                 };
 
+                var defaultval = propString.AttributeDefault;
+
                 var defSchema = new Dictionary<string, object>()
                 {
                     { "val", new Dictionary<string, object>()
                     {
                         { "type", "string" },
-                        { "default", propString.AttributeDefault }
+                        { "default", defaultval.Substring(1, defaultval.Length - 2) }
                     } }
                 };
 
