@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
@@ -10,38 +11,24 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
         {
             try
             {
-                Dictionary<string, object> recursiveDict = [];
-
-                foreach (var namespaceParts in namespaces)
-                {
-                    var current = recursiveDict;
-                    foreach (var key in namespaceParts)
-                    {
-                        if (!current.ContainsKey(key))
-                            current[key] = new Dictionary<string, object>();
-                        current = (Dictionary<string, object>)current[key];
-                    }
-                }
-
-
+                var recursiveDict = Convert2DArrayToDict(namespaces);
                 var propertiesSchema = GetSubSchemaFor(recursiveDict);
 
-                Dictionary<string, object> schema = new Dictionary<string, object>
+                // We must wrap in a comment as the source generator treats the output as a C# file
+                var schema = $$"""
+                /*
                 {
-                    { "$schema",  "http://json-schema.org/draft-07/schema" },
-                    { "$id", "https://realm.ac/schema/v1/generated/realm-properties-root.json" },
-                    { "type", "object" },
-                    { "properties", propertiesSchema },
-                    { "additionalProperties", false }
-                };
+                  "$schema": "http://json-schema.org/draft-07/schema",
+                  "type": "object",
+                  "properties": {
+                  {{propertiesSchema}}
+                  },
+                  "additionalProperties": false
+                }
+                */
+                """;
 
-                var schemaSerialized = JsonSerializer.Serialize(schema, new JsonSerializerOptions { WriteIndented = true });
-
-                return $$"""
-                    /*
-                    {{schemaSerialized}}
-                    */
-                    """;
+                return schema;
             }
             catch (Exception ex)
             {
@@ -50,30 +37,62 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             }
         }
 
-        private static Dictionary<string, object> GetSubSchemaFor(Dictionary<string, object> items, string currentPath = "", string currentKey = "")
+        private static Dictionary<string, object> Convert2DArrayToDict(ImmutableArray<ImmutableArray<string>> namespaces)
+        {
+            var recursiveDict = new Dictionary<string, object>();
+            foreach (var namespaceParts in namespaces)
+            {
+                var current = recursiveDict;
+                foreach (var key in namespaceParts)
+                {
+                    if (!current.ContainsKey(key))
+                        current[key] = new Dictionary<string, object>();
+                    current = (Dictionary<string, object>)current[key];
+                }
+            }
+            return recursiveDict;
+        }
+
+        private static string GetSubSchemaFor(Dictionary<string, object> items, string currentPath = "", string currentKey = "")
         {
             if (items.Values.Count == 0)
-            {
-                Dictionary<string, object> dict = [];
-                dict.Add("$ref", $"{currentPath}.json".Replace("/.json", ".json"));
-                return dict;
+            { 
+                var path = $"{currentPath}.json".Replace("/.json", ".json");
+
+                return $$"""
+                    { "$ref": "{{path}}" }
+                    """;
             }
             else
             {
-                Dictionary<string, object> dictProps = [];
+                StringBuilder innerProps = new StringBuilder();
+
+                string sep = ",";
+                int iter = 1;
                 foreach (var kvp in items)
-                    dictProps.Add(kvp.Key, GetSubSchemaFor((Dictionary<string, object>)kvp.Value, $"{currentPath}{kvp.Key}/", kvp.Key));
+                {
+                    if (iter == items.Count)
+                        sep = "";
+                    var val = GetSubSchemaFor((Dictionary<string, object>)kvp.Value, $"{currentPath}{kvp.Key}/", kvp.Key);
+                    innerProps.Append($$"""
+                      "{{kvp.Key}}": {{val}}{{sep}}
+
+                    """);
+                    iter++;
+                }
 
                 if (currentKey == "")
-                    return dictProps;
+                    return innerProps.ToString();
 
-                Dictionary<string, object> dictObj = new Dictionary<string, object>()
-                {
-                    { "type", "object" },
-                    { "properties", dictProps },
-                    { "additionalProperties", false }
-                };
-                return dictObj;
+                return $$"""
+                    {
+                      "type": "object",
+                      "properties": {
+                        {{innerProps}}
+                      },
+                      "additionalProperties": false
+                    }
+                    """;
             }
         }
     }
