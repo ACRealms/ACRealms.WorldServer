@@ -107,6 +107,43 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <summary>
+        /// Gets the (optional) <c>contexts</c> property.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Foo
+        /// </para>
+        /// </remarks>
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts Contexts
+        {
+            get
+            {
+                if ((this.backing & Backing.JsonElement) != 0)
+                {
+                    if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                    {
+                        return default;
+                    }
+
+                    if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.ContextsUtf8, out JsonElement result))
+                    {
+                        return new(result);
+                    }
+                }
+
+                if ((this.backing & Backing.Object) != 0)
+                {
+                    if (this.objectBacking.TryGetValue(JsonPropertyNames.Contexts, out JsonAny result))
+                    {
+                        return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts>();
+                    }
+                }
+
+                return default;
+            }
+        }
+
+        /// <summary>
         /// Gets the (optional) <c>default</c> property.
         /// </summary>
         /// <remarks>
@@ -457,6 +494,7 @@ public readonly partial struct RealmPropertySchema
         /// Creates an instance of a <see cref="ObjProp"/>.
         /// </summary>
         public static ObjProp Create(
+            in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? contexts = null,
             in Corvus.Json.JsonAny? defaultValue = null,
             in Corvus.Json.JsonString? defaultFromServerProperty = null,
             in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.ValDescription? description = null,
@@ -469,6 +507,11 @@ public readonly partial struct RealmPropertySchema
             in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Propertytype? type = null)
         {
             var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
+
+            if (contexts is not null)
+            {
+                builder.Add(JsonPropertyNames.Contexts, contexts.Value.AsAny);
+            }
 
             if (defaultValue is not null)
             {
@@ -629,6 +672,21 @@ public readonly partial struct RealmPropertySchema
             }
 
             throw new InvalidOperationException();
+        }
+
+        /// <summary>
+        /// Sets the (optional) <c>contexts</c> property.
+        /// </summary>
+        /// <param name="value">The new property value</param>
+        /// <returns>The instance with the property set.</returns>
+        /// <remarks>
+        /// <para>
+        /// Foo
+        /// </para>
+        /// </remarks>
+        public ObjProp WithContexts(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts value)
+        {
+            return this.SetProperty(JsonPropertyNames.Contexts, value);
         }
 
         /// <summary>
@@ -1125,6 +1183,11 @@ public readonly partial struct RealmPropertySchema
         public static class JsonPropertyNames
         {
             /// <summary>
+            /// Gets the JSON property name for <see cref="Contexts"/>.
+            /// </summary>
+            public const string Contexts = "contexts";
+
+            /// <summary>
             /// Gets the JSON property name for <see cref="Default"/>.
             /// </summary>
             public const string Default = "default";
@@ -1173,6 +1236,11 @@ public readonly partial struct RealmPropertySchema
             /// Gets the JSON property name for <see cref="Type"/>.
             /// </summary>
             public const string Type = "type";
+
+            /// <summary>
+            /// Gets the JSON property name for <see cref="Contexts"/>.
+            /// </summary>
+            public static ReadOnlySpan<byte> ContextsUtf8 => "contexts"u8;
 
             /// <summary>
             /// Gets the JSON property name for <see cref="Default"/>.

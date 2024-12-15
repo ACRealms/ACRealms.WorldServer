@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "entities": {
+      "definitions": {
+        "Creature": {
+          "description": "A creature",
+          "const": "Creature"
+        }
+      }
+    },
+    "contextVal": {
+      "type": "string",
+      "oneOf": [
+        { "$ref": "#/definitions/entities/definitions/Creature" }
+      ]
+    },
+    "contextObj": {
+      "type": "object",
+      "properties": {
+        "entity": { "$ref": "#/definitions/contextVal" },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, a context is required when fetching this realm property, or the server will fail to compile.\nOtherwise, scoped property evaluations are skipped when passing a null context.\nUnscoped properties are still evaluated"
+        },
+        "description": {
+          "type": "string",
+          "description": "A description for the context, to be shown in code docs when using the property"
+        }
+      },
+      "required": [ "entity" ],
+      "additionalProperties": false
+    },
+    "contextDecl": {
+      "default": { },
+      "oneOf": [
+        { "$ref": "#/definitions/contextObj" },
+        { "$ref": "#/definitions/contextVal" }
+      ]
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/contextDecl" }
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/definitions/context" },
+    { "type": "array", "items": { "$ref": "#/definitions/context" } }
+  ]
+}

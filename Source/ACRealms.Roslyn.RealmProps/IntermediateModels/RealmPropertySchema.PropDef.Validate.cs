@@ -41,7 +41,7 @@ public readonly partial struct RealmPropertySchema
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/propDef");
+                result = result.PushSchemaLocation("#/definitions/propDef");
             }
 
             result = CorvusValidation.CompositionOneOfValidationHandler(this, result, level);

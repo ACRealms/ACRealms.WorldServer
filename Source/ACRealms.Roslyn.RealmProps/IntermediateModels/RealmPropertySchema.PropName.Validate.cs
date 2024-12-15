@@ -42,12 +42,19 @@ public readonly partial struct RealmPropertySchema
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/propName");
+                result = result.PushSchemaLocation("#/definitions/propName");
             }
 
             JsonValueKind valueKind = this.ValueKind;
 
             result = CorvusValidation.TypeValidationHandler(valueKind, result, level);
+
+            if (level == ValidationLevel.Flag && !result.IsValid)
+            {
+                return result;
+            }
+
+            result = CorvusValidation.FormatValidationHandler(this, valueKind, result, level);
 
             if (level == ValidationLevel.Flag && !result.IsValid)
             {
@@ -103,6 +110,32 @@ public readonly partial struct RealmPropertySchema
                 ValidationLevel level = ValidationLevel.Flag)
             {
                 return Corvus.Json.ValidateWithoutCoreType.TypeString(valueKind, validationContext, level, "type");
+            }
+
+            /// <summary>
+            /// Numeric and string format validation.
+            /// </summary>
+            /// <param name="value">The value to validate.</param>
+            /// <param name="valueKind">The <see cref="JsonValueKind" /> of the value to validate.</param>
+            /// <param name="validationContext">The current validation context.</param>
+            /// <param name="level">The current validation level.</param>
+            /// <returns>The resulting validation context after validation.</returns>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static ValidationContext FormatValidationHandler(
+                in PropName value,
+                JsonValueKind valueKind,
+                in ValidationContext validationContext,
+                ValidationLevel level = ValidationLevel.Flag)
+            {
+                if (level == ValidationLevel.Verbose)
+                {
+                    ValidationContext unknownResult = validationContext;
+                    unknownResult = unknownResult.WithResult(isValid: true, "Validation format - ignored 'Must be formatted as PascalCase' because the format is not recognized.");
+
+                    return unknownResult;
+                }
+
+                return validationContext;
             }
 
             /// <summary>

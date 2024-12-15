@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace ACRealms.Roslyn.RealmProps.Builders
+namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
 {
     internal static class NamespaceJsonSchema
     {
@@ -111,7 +111,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                 propertyJsonSchema.Add(propInt.Key, MakeNumericPropSchema(rerollSchema, propInt, "integer", defaultVal, minVal, maxVal));
             }
 
-            
+
             foreach (var propLong in propsOf(PropType.int64))
             {
                 var defaultVal = long.Parse(propLong.AttributeDefault);
@@ -175,7 +175,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders
             foreach (var propBool in propsOf(PropType.boolean))
             {
                 var propertySchema = new Dictionary<string, object>();
-                
+
                 var directValueSchema = new Dictionary<string, object>()
                 {
                     { "$ref", $"#/properties/{propBool.Key}/definitions/val" }
@@ -213,7 +213,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders
 
                 propertyJsonSchema.Add(propBool.Key.ToString(), propertySchema);
             }
-            
+
             return propertyJsonSchema;
         }
 

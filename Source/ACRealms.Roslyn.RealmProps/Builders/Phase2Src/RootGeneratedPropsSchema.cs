@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ACRealms.Roslyn.RealmProps.Builders
+namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
 {
     internal static class RootGeneratedPropsSchema
     {
@@ -34,7 +34,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                     { "properties", propertiesSchema },
                     { "additionalProperties", false }
                 };
-              
+
                 var schemaSerialized = JsonSerializer.Serialize(schema, new JsonSerializerOptions { WriteIndented = true });
 
                 return $$"""

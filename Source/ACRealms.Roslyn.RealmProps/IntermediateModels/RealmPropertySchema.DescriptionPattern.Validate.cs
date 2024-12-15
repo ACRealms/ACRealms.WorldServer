@@ -42,7 +42,7 @@ public readonly partial struct RealmPropertySchema
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/descriptionPattern");
+                result = result.PushSchemaLocation("#/definitions/descriptionPattern");
             }
 
             JsonValueKind valueKind = this.ValueKind;

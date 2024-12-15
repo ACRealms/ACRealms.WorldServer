@@ -41,7 +41,7 @@ public readonly partial struct RealmPropertySchema
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/group");
+                result = result.PushSchemaLocation("#/definitions/group");
             }
 
             JsonValueKind valueKind = this.ValueKind;
@@ -142,8 +142,8 @@ public readonly partial struct RealmPropertySchema
                     if (level == ValidationLevel.Verbose)
                     {
                         ValidationContext ignoredResult = validationContext;
-                        ignoredResult = ignoredResult.WithResult(isValid: true, "Validation unevaluatedProperties - ignored because the value is not an object", "unevaluatedProperties");
                         ignoredResult = ignoredResult.WithResult(isValid: true, "Validation properties - ignored because the value is not an object", "properties");
+                        ignoredResult = ignoredResult.WithResult(isValid: true, "Validation unevaluatedProperties - ignored because the value is not an object", "unevaluatedProperties");
 
                         return ignoredResult;
                     }

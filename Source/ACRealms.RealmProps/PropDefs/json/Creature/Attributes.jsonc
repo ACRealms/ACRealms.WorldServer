@@ -8,7 +8,14 @@
       "default": 0,
       "min_value": -10000, "max_value": 10000,
       "description_format": "All creatures will have this value added to their {short_key} attribute",
-      "properties": [ "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self" ]
+      "properties": [ "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self" ],
+      "contexts": {
+        "SpawnedCreature": {
+          "required": true,
+          "description": "The creature currently being spawned.",
+          "entity": "Creature"
+        }
+      }
     },
     {
       "type": "float",

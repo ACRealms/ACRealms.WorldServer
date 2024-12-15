@@ -73,7 +73,7 @@ public readonly partial struct RealmPropertySchema
             /// <summary>
             /// Gets the schema location from which this type was generated.
             /// </summary>
-            public static string SchemaLocation { get; } = "https://realm.ac/schema/v1/realm-property-schema.json#/definitions/valDescription/oneOf/0";
+            public static string SchemaLocation { get; } = "#/definitions/valDescription/oneOf/0";
 
             /// <summary>
             /// Gets a Null instance.

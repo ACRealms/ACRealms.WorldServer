@@ -1,8 +1,8 @@
 {
-  "$schema": "http://json-schema.org/draft/2019-09/schema",
-  "$id": "https://realm.ac/schema/v1/realm-property-schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
   "type": "object",
   "definitions": {
+    "contexts": { "$ref": "./contexts.json" },
     "propName": {
       "type": "string",
       "minLength": 2,
@@ -59,7 +59,8 @@
         "default": { "description": "The hard default value for the realm property (ultimate fallback)" },
         "reroll_restricted_to": { "enum": [ "never", "manual", "landblock", "always" ] },
         "obsolete": { "type": "string" },
-        "default_from_server_property": { "type": "string" }
+        "default_from_server_property": { "type": "string" },
+        "contexts": { "$ref": "#/definitions/contexts" }
       },
       "allOf": [
         { "if": { "properties": { "enum": { "minLength": 1 } }, "required": [ "enum" ] },

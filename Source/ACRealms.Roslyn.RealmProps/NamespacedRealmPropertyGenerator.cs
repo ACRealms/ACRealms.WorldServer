@@ -13,6 +13,8 @@ using System.Linq;
 using System.Collections.Immutable;
 using JsonObject = Corvus.Json.JsonObject;
 using System.Diagnostics;
+using ACRealms.Roslyn.RealmProps.Builders.Phase1;
+using ACRealms.Roslyn.RealmProps.Builders.Phase2Src;
 /*using Corvus.Json.Validator;
 using JsonObject = Corvus.Json.JsonObject;
 using JsonSchema = Corvus.Json.Validator.JsonSchema;
@@ -108,7 +110,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
             if (data != null)
             {
                 string fileName = string.Join("/", data.NestedClassNames);
-                string sourceCode = Builders.NamespacedProps.GenerateNamespacedPropsSourceCode(data);
+                string sourceCode = NamespacedProps.GenerateNamespacedPropsSourceCode(data);
                 ctx.AddSource($"NamespacedProps/{fileName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
             }
         });
@@ -118,7 +120,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
             if (data != null)
             {
                 string fileName = string.Join("/", data.NestedClassNames);
-                string sourceCode = Builders.NamespaceJsonSchema.GenerateSchemaSourceCode(data);
+                string sourceCode = NamespaceJsonSchema.GenerateSchemaSourceCode(data);
                 ctx.AddSource($"GeneratedJsonSchema/realm-properties/{fileName}.json", SourceText.From(sourceCode, Encoding.UTF8));
             }
         });
@@ -134,7 +136,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(namespaceMetadataForRootSchema, static (ctx, data) =>
         {
-            string sourceCode = Builders.RootGeneratedPropsSchema.GenerateCombinedSchemaSourceCode(data);
+            string sourceCode = RootGeneratedPropsSchema.GenerateCombinedSchemaSourceCode(data);
             ctx.AddSource($"GeneratedJsonSchema/realm-properties/realm-properties-root.json", SourceText.From(sourceCode, Encoding.UTF8));
         });
 
@@ -172,7 +174,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
                 return;
             //if (data.TargetEnumTypeName.Contains("Float") && !Debugger.IsAttached)
             //    Debugger.Launch();
-            string? sourceCode = Builders.CoreRealmProperties.GenerateCoreEnumClass(data.TargetEnumTypeName, data.PropsOfType);
+            string? sourceCode = Builders.Phase1.CoreRealmProperties.GenerateCoreEnumClass(data.TargetEnumTypeName, data.PropsOfType);
             ctx.AddSource($"CoreProps/{data.TargetEnumTypeName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
         });
     }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ACRealms.Roslyn.RealmProps.Builders
+namespace ACRealms.Roslyn.RealmProps.Builders.Phase1
 {
     // Builds the classes Props.XXX.YYY
     internal static class NamespacedProps

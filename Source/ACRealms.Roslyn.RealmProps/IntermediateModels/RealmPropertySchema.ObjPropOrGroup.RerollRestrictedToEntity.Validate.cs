@@ -46,7 +46,7 @@ public readonly partial struct RealmPropertySchema
                         result = result.UsingStack();
                     }
 
-                    result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/objPropOrGroup/properties/reroll_restricted_to");
+                    result = result.PushSchemaLocation("#/definitions/objPropOrGroup/properties/reroll_restricted_to");
                 }
 
                 result = CorvusValidation.CompositionAnyOfValidationHandler(this, result, level);

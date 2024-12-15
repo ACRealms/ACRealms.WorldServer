@@ -51,7 +51,7 @@ public readonly partial struct RealmPropertySchema
                         result = result.UsingStack();
                     }
 
-                    result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/group/properties/key_suffix");
+                    result = result.PushSchemaLocation("#/definitions/group/properties/key_suffix");
                 }
 
                 JsonValueKind valueKind = this.ValueKind;

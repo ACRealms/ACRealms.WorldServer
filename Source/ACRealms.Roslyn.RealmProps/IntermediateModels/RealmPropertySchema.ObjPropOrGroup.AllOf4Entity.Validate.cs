@@ -46,7 +46,7 @@ public readonly partial struct RealmPropertySchema
                         result = result.UsingStack();
                     }
 
-                    result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/objPropOrGroup/allOf/4");
+                    result = result.PushSchemaLocation("#/definitions/objPropOrGroup/allOf/4");
                 }
 
                 result = CorvusValidation.TernaryIfValidationHandler(this, result, level);

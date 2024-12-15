@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://realm.ac/schema/v1/scope-base.json",
+  "definitions": {
+    "genericAnyValue": { "$anchor": "v" },
+    "comparableForIntellisenseOnly": {
+      "definitions": {
+        "params": {
+          "$anchor": "intellisense.comparable",
+          "type": "object",
+          "properties": {
+            "LessThan": { "$ref": "#v" },
+            "LessThanOrEqual": { "$ref": "#v" },
+            "GreaterThan": { "$ref": "#v" },
+            "GreaterThanOrEqual": { "$ref": "#v" },
+            "NotEqual": { "$ref": "#v" },
+            "Equal": { "$ref": "#v" }
+          }
+        }
+      }
+    },
+    "paramsCommon": {
+      "$anchor": "params.common",
+      "type": "object",
+      "properties": {
+        "foo": { "type": "string" }
+      },
+      "minProperties": 1,
+      "additionalProperties": false,
+      "unevaluatedProperties": false
+    },
+    "paramsFloat": {
+      "definitions": {
+        "val": { "$anchor": "v.float", "type": "number" },
+        "params": {
+          "$anchor": "params.float",
+          "$ref": "#params.common",
+          "patternProperties": { "^(LessThan|LessThanOrEqual|GreaterThan|GreaterThanOrEqual|NotEqual|Equal)$": { "$ref": "#v.float" } },
+          "anyOf": [ { "$ref": "#intellisense.comparable" } ]
+        }
+      },
+      "default": { },
+      "if": { "type": "object" },
+      "then": { "$ref": "#params.float" },
+      "else": { "$ref": "#v.float", "description": "Equal to this value" }
+    },
+    "paramsInt": {
+      "definitions": {
+        "val": { "$anchor": "v.int", "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "params": {
+          "$anchor": "params.int",
+          "$ref": "#params.common",
+          "patternProperties": { "^(LessThan|LessThanOrEqual|GreaterThan|GreaterThanOrEqual|NotEqual|Equal)$": { "$ref": "#v.int" } },
+          "anyOf": [ { "$ref": "#intellisense.comparable" } ]
+        }
+      },
+      "default": { },
+      "if": { "type": "object" },
+      "then": { "$ref": "#params.int" },
+      "else": { "$ref": "#v.int", "description": "Equal to this value" }
+    }
+  }
+}

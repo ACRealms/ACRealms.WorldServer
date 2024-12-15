@@ -41,7 +41,7 @@ public readonly partial struct RealmPropertySchema
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("https://realm.ac/schema/v1/realm-property-schema.json#/definitions/objPropOrGroup");
+                result = result.PushSchemaLocation("#/definitions/objPropOrGroup");
             }
 
             JsonValueKind valueKind = this.ValueKind;
@@ -322,7 +322,28 @@ public readonly partial struct RealmPropertySchema
                 int propertyCount = 0;
                 foreach (JsonObjectProperty property in value.EnumerateObject())
                 {
-                    if (property.NameEquals(JsonPropertyNames.DefaultUtf8, JsonPropertyNames.Default))
+                    if (property.NameEquals(JsonPropertyNames.ContextsUtf8, JsonPropertyNames.Contexts))
+                    {
+                        result = result.WithLocalProperty(propertyCount);
+                        if (level > ValidationLevel.Basic)
+                        {
+                            result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/contexts/$ref/$ref"), JsonPropertyNames.Contexts);
+                        }
+
+                        ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts>().Validate(result.CreateChildContext(), level);
+                        if (level == ValidationLevel.Flag && !propertyResult.IsValid)
+                        {
+                            return propertyResult;
+                        }
+
+                        result = result.MergeResults(propertyResult.IsValid, level, propertyResult);
+
+                        if (level > ValidationLevel.Basic)
+                        {
+                            result = result.PopLocation();
+                        }
+                    }
+                    else if (property.NameEquals(JsonPropertyNames.DefaultUtf8, JsonPropertyNames.Default))
                     {
                         result = result.WithLocalProperty(propertyCount);
                         if (level > ValidationLevel.Basic)

@@ -14,7 +14,6 @@ dotnet tool install --global Corvus.Json.JsonSchema.TypeGeneratorTool
  generatejsonschematypes ACRealms.RealmProps\PropDefs\json-schema\realm-property-schema.json --rootNamespace ACRealms.Roslyn.RealmProps.IntermediateModels --outputPath=ACRealms.Roslyn.RealmProps\IntermediateModels
 
 Also try
-
  generatejsonschematypes ACRealms.RealmProps\PropDefs\json-schema\realm-property-schema.json --rootNamespace ACRealms.Roslyn.RealmProps.IntermediateModels --outputPath=ACRealms.Roslyn.RealmProps\IntermediateModels --useSchema Draft201909
 
 */
