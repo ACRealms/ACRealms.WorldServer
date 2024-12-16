@@ -9,7 +9,9 @@
 
 #nullable enable
 
+using System.Collections;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Corvus.Json;
 using Corvus.Json.Internal;
@@ -24,14 +26,15 @@ public readonly partial struct Contexts
     /// <summary>
     /// Generated from JSON Schema.
     /// </summary>
-    public readonly partial struct ContextObj
-        : IJsonObject<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj>
+    public readonly partial struct ShortContexts
+        : IJsonObject<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts>,
+          IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>
     {
         /// <summary>
         /// Conversion from <see cref="ImmutableList{JsonObjectProperty}"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ContextObj(ImmutableList<JsonObjectProperty> value)
+        public static implicit operator ShortContexts(ImmutableList<JsonObjectProperty> value)
         {
             return new(value);
         }
@@ -40,7 +43,7 @@ public readonly partial struct Contexts
         /// Conversion to <see cref="ImmutableList{JsonObjectProperty}"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ImmutableList<JsonObjectProperty>(ContextObj value)
+        public static implicit operator ImmutableList<JsonObjectProperty>(ShortContexts value)
         {
             return
                 __CorvusObjectHelpers.GetPropertyBacking(value);
@@ -50,7 +53,7 @@ public readonly partial struct Contexts
         /// Conversion from JsonObject.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ContextObj(JsonObject value)
+        public static implicit operator ShortContexts(JsonObject value)
         {
             if (value.HasDotnetBacking && value.ValueKind == JsonValueKind.Object)
             {
@@ -65,18 +68,38 @@ public readonly partial struct Contexts
         /// Conversion to JsonObject.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator JsonObject(ContextObj value)
+        public static implicit operator JsonObject(ShortContexts value)
         {
             return
                 value.AsObject;
         }
 
         /// <inheritdoc/>
-        public Corvus.Json.JsonAny this[in JsonPropertyName name]
+        JsonAny IJsonObject<ShortContexts>.this[in JsonPropertyName name]
         {
             get
             {
-                if (this.TryGetProperty(name, out Corvus.Json.JsonAny result))
+                if (this.TryGetProperty(name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal result))
+                {
+                    return result;
+                }
+
+                throw new InvalidOperationException();
+            }
+        }
+
+        /// <summary>
+        /// Gets the property with the given name.
+        /// </summary>
+        /// <param name="name">The name of the property to retrieve.</param>
+        /// <returns>The value of the property with the given name.</returns>
+        /// <exception cref="IndexOutOfRangeException">The given property was not present on the object.</exception>
+        /// <exception cref="InvalidOperationException">The value is not an object.</exception>
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal this[in JsonPropertyName name]
+        {
+            get
+            {
+                if (this.TryGetProperty(name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal result))
                 {
                     return result;
                 }
@@ -106,165 +129,66 @@ public readonly partial struct Contexts
             }
         }
 
-        /// <summary>
-        /// Gets the (optional) <c>description</c> property.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// A description for the context, to be shown in code docs when using the property
-        /// </para>
-        /// </remarks>
-        public Corvus.Json.JsonString Description
+        /// <inheritdoc/>
+        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>.this[JsonPropertyName key] => this[key];
+
+        /// <inheritdoc/>
+        IEnumerable<JsonPropertyName> IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>.Keys
         {
             get
             {
-                if ((this.backing & Backing.JsonElement) != 0)
+                foreach(var property in this.EnumerateObject())
                 {
-                    if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
-                    {
-                        return default;
-                    }
-
-                    if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DescriptionUtf8, out JsonElement result))
-                    {
-                        return new(result);
-                    }
+                    yield return property.Name;
                 }
-
-                if ((this.backing & Backing.Object) != 0)
-                {
-                    if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
-                    {
-                        return result.As<Corvus.Json.JsonString>();
-                    }
-                }
-
-                return default;
-            }
-        }
-
-        /// <summary>
-        /// Gets the <c>entity</c> property.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// If the instance is valid, this property will not be <see cref="JsonValueKind.Undefined"/>.
-        /// </para>
-        /// </remarks>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal Entity
-        {
-            get
-            {
-                if ((this.backing & Backing.JsonElement) != 0)
-                {
-                    if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
-                    {
-                        return default;
-                    }
-
-                    if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.EntityUtf8, out JsonElement result))
-                    {
-                        return new(result);
-                    }
-                }
-
-                if ((this.backing & Backing.Object) != 0)
-                {
-                    if (this.objectBacking.TryGetValue(JsonPropertyNames.Entity, out JsonAny result))
-                    {
-                        return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>();
-                    }
-                }
-
-                return default;
-            }
-        }
-
-        /// <summary>
-        /// Gets the <c>name</c> property.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// If the instance is valid, this property will not be <see cref="JsonValueKind.Undefined"/>.
-        /// </para>
-        /// <para>
-        /// The name for the context. Used as a parameter name in the method to fetch the realm property from C#
-        /// </para>
-        /// </remarks>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextName Name
-        {
-            get
-            {
-                if ((this.backing & Backing.JsonElement) != 0)
-                {
-                    if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
-                    {
-                        return default;
-                    }
-
-                    if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.NameUtf8, out JsonElement result))
-                    {
-                        return new(result);
-                    }
-                }
-
-                if ((this.backing & Backing.Object) != 0)
-                {
-                    if (this.objectBacking.TryGetValue(JsonPropertyNames.Name, out JsonAny result))
-                    {
-                        return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextName>();
-                    }
-                }
-
-                return default;
-            }
-        }
-
-        /// <summary>
-        /// Gets the (optional) <c>required</c> property.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// If true, a context is required when fetching this realm property.
-        /// </para>
-        /// </remarks>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.RequiredEntity Required
-        {
-            get
-            {
-                if ((this.backing & Backing.JsonElement) != 0)
-                {
-                    if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
-                    {
-                        return default;
-                    }
-
-                    if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.RequiredUtf8, out JsonElement result))
-                    {
-                        return new(result);
-                    }
-                }
-
-                if ((this.backing & Backing.Object) != 0)
-                {
-                    if (this.objectBacking.TryGetValue(JsonPropertyNames.Required, out JsonAny result))
-                    {
-                        return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.RequiredEntity>();
-                    }
-                }
-
-                return default;
             }
         }
 
         /// <inheritdoc/>
-        public static ContextObj FromProperties(IDictionary<JsonPropertyName, JsonAny> source)
+        IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal> IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>.Values
+        {
+            get
+            {
+                foreach(var property in this.EnumerateObject())
+                {
+                    yield return property.Value;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        int IReadOnlyCollection<KeyValuePair<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>>.Count => this.Count;
+
+#if NET8_0_OR_GREATER
+        /// <inheritdoc/>
+        static ShortContexts IJsonObject<ShortContexts>.FromProperties(IDictionary<JsonPropertyName, JsonAny> source)
         {
             return new(source.Select(kvp => new JsonObjectProperty(kvp.Key, kvp.Value)).ToImmutableList());
         }
 
         /// <inheritdoc/>
-        public static ContextObj FromProperties(params (JsonPropertyName Name, JsonAny Value)[] source)
+        static ShortContexts IJsonObject<ShortContexts>.FromProperties(params (JsonPropertyName Name, JsonAny Value)[] source)
+        {
+            return new(source.Select(s => new JsonObjectProperty(s.Name, s.Value)).ToImmutableList());
+        }
+#endif
+
+        /// <summary>
+        /// Creates an instance of the type from the given dictionary of properties.
+        /// </summary>
+        /// <param name="source">The dictionary of properties.</param>
+        /// <returns>An instance of the type initialized from the dictionary of properties.</returns>
+        public static ShortContexts FromProperties(IDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal> source)
+        {
+            return new(source.Select(kvp => new JsonObjectProperty(kvp.Key, kvp.Value.AsAny)).ToImmutableList());
+        }
+
+        /// <summary>
+        /// Creates an instance of the type from the given name/value tuples.
+        /// </summary>
+        /// <param name="source">The name value tuples.</param>
+        /// <returns>An instance of the type initialized from the properties.</returns>
+        public static ShortContexts FromProperties(params (JsonPropertyName Name, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal Value)[] source)
         {
             return new(source.Select(s => new JsonObjectProperty(s.Name, s.Value.AsAny)).ToImmutableList());
         }
@@ -274,35 +198,9 @@ public readonly partial struct Contexts
         /// </summary>
         /// <param name="source">The list of properties.</param>
         /// <returns>An instance of the type initialized from the list of properties.</returns>
-        public static ContextObj FromProperties(ImmutableList<JsonObjectProperty> source)
+        public static ShortContexts FromProperties(ImmutableList<JsonObjectProperty> source)
         {
             return new(source);
-        }
-
-        /// <summary>
-        /// Creates an instance of a <see cref="ContextObj"/>.
-        /// </summary>
-        public static ContextObj Create(
-            in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal entity,
-            in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextName name,
-            in Corvus.Json.JsonString? description = null,
-            in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.RequiredEntity? required = null)
-        {
-            var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
-            builder.Add(JsonPropertyNames.Entity, entity.AsAny);
-            builder.Add(JsonPropertyNames.Name, name.AsAny);
-
-            if (description is not null)
-            {
-                builder.Add(JsonPropertyNames.Description, description.Value.AsAny);
-            }
-
-            if (required is not null)
-            {
-                builder.Add(JsonPropertyNames.Required, required.Value.AsAny);
-            }
-
-            return new(builder.ToImmutable());
         }
 
         /// <inheritdoc/>
@@ -317,7 +215,7 @@ public readonly partial struct Contexts
         }
 
         /// <inheritdoc/>
-        public JsonObjectEnumerator EnumerateObject()
+        JsonObjectEnumerator IJsonObject<ShortContexts>.EnumerateObject()
         {
             if ((this.backing & Backing.JsonElement) != 0)
             {
@@ -331,6 +229,49 @@ public readonly partial struct Contexts
 
             throw new InvalidOperationException();
         }
+
+        /// <summary>
+        /// Enumerate the object.
+        /// </summary>
+        /// <returns>An enumerator for the object.</returns>
+        /// <exception cref="InvalidOperationException">The value is not an object.</exception>
+        public JsonObjectEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal> EnumerateObject()
+        {
+            if ((this.backing & Backing.JsonElement) != 0)
+            {
+                return new(this.jsonElementBacking);
+            }
+
+            if ((this.backing & Backing.Object) != 0)
+            {
+                return new(this.objectBacking);
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        /// <inheritdoc/>
+        IEnumerator<KeyValuePair<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>> IEnumerable<KeyValuePair<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>>.GetEnumerator()
+        {
+            if ((this.backing & Backing.JsonElement) != 0)
+            {
+                return new ReadOnlyDictionaryJsonObjectEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>(this.jsonElementBacking);
+            }
+
+            if ((this.backing & Backing.Object) != 0)
+            {
+                return new ReadOnlyDictionaryJsonObjectEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>(this.objectBacking);
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        /// <inheritdoc/>
+        IEnumerator IEnumerable.GetEnumerator() => this.EnumerateObject();
+
+        bool IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>.ContainsKey(JsonPropertyName key) => this.HasProperty(key);
+
+        bool IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>.TryGetValue(JsonPropertyName key, out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal result) => this.TryGetProperty(key, out result);
 
         /// <inheritdoc/>
         public bool HasProperties()
@@ -413,69 +354,8 @@ public readonly partial struct Contexts
             throw new InvalidOperationException();
         }
 
-        /// <summary>
-        /// Sets the (optional) <c>description</c> property.
-        /// </summary>
-        /// <param name="value">The new property value</param>
-        /// <returns>The instance with the property set.</returns>
-        /// <remarks>
-        /// <para>
-        /// A description for the context, to be shown in code docs when using the property
-        /// </para>
-        /// </remarks>
-        public ContextObj WithDescription(in Corvus.Json.JsonString value)
-        {
-            return this.SetProperty(JsonPropertyNames.Description, value);
-        }
-
-        /// <summary>
-        /// Sets the <c>entity</c> property.
-        /// </summary>
-        /// <param name="value">The new property value</param>
-        /// <returns>The instance with the property set.</returns>
-        public ContextObj WithEntity(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal value)
-        {
-            return this.SetProperty(JsonPropertyNames.Entity, value);
-        }
-
-        /// <summary>
-        /// Sets the <c>name</c> property.
-        /// </summary>
-        /// <param name="value">The new property value</param>
-        /// <returns>The instance with the property set.</returns>
-        /// <remarks>
-        /// <para>
-        /// The name for the context. Used as a parameter name in the method to fetch the realm property from C#
-        /// </para>
-        /// </remarks>
-        public ContextObj WithName(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextName value)
-        {
-            return this.SetProperty(JsonPropertyNames.Name, value);
-        }
-
-        /// <summary>
-        /// Sets the (optional) <c>required</c> property.
-        /// </summary>
-        /// <param name="value">The new property value</param>
-        /// <returns>The instance with the property set.</returns>
-        /// <remarks>
-        /// <para>
-        /// If true, a context is required when fetching this realm property.
-        /// </para>
-        /// </remarks>
-        public ContextObj WithRequired(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.RequiredEntity value)
-        {
-            return this.SetProperty(JsonPropertyNames.Required, value);
-        }
-
-        /// <summary>
-        /// Get a property.
-        /// </summary>
-        /// <param name="name">The name of the property.</param>
-        /// <param name="value">The value of the property.</param>
-        /// <returns><c>True</c> if the property was present.</returns>
-        /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-        public bool TryGetProperty(in JsonPropertyName name, out JsonAny value)
+        /// <inheritdoc />
+        bool IJsonObject<ShortContexts>.TryGetProperty(in JsonPropertyName name, out JsonAny value)
         {
             if ((this.backing & Backing.JsonElement) != 0)
             {
@@ -517,7 +397,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value of the property.</param>
         /// <returns><c>True</c> if the property was present.</returns>
         /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-        public bool TryGetProperty(string name, out JsonAny value)
+        public bool TryGetProperty(in JsonPropertyName name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal value)
         {
             if ((this.backing & Backing.JsonElement) != 0)
             {
@@ -527,7 +407,7 @@ public readonly partial struct Contexts
                     return false;
                 }
 
-                if (this.jsonElementBacking.TryGetProperty(name, out JsonElement element))
+                if (name.TryGetProperty(this.jsonElementBacking, out JsonElement element))
                 {
                     value = new(element);
                     return true;
@@ -541,91 +421,7 @@ public readonly partial struct Contexts
             {
                 if (this.objectBacking.TryGetValue(name, out JsonAny result))
                 {
-                    value = result;
-                    return true;
-                }
-
-                value = default;
-                return false;
-            }
-
-            throw new InvalidOperationException();
-        }
-
-        /// <summary>
-        /// Get a property.
-        /// </summary>
-        /// <param name="name">The name of the property.</param>
-        /// <param name="value">The value of the property.</param>
-        /// <returns><c>True</c> if the property was present.</returns>
-        /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-        public bool TryGetProperty(ReadOnlySpan<char> name, out JsonAny value)
-        {
-            if ((this.backing & Backing.JsonElement) != 0)
-            {
-                if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
-                {
-                    value = default;
-                    return false;
-                }
-
-                if (this.jsonElementBacking.TryGetProperty(name, out JsonElement element))
-                {
-                    value = new(element);
-                    return true;
-                }
-
-                value = default;
-                return false;
-            }
-
-            if ((this.backing & Backing.Object) != 0)
-            {
-                if (this.objectBacking.TryGetValue(name, out JsonAny result))
-                {
-                    value = result;
-                    return true;
-                }
-
-                value = default;
-                return false;
-            }
-
-            throw new InvalidOperationException();
-        }
-
-        /// <summary>
-        /// Get a property.
-        /// </summary>
-        /// <param name="name">The name of the property.</param>
-        /// <param name="value">The value of the property.</param>
-        /// <returns><c>True</c> if the property was present.</returns>
-        /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-        public bool TryGetProperty(ReadOnlySpan<byte> name, out JsonAny value)
-        {
-            if ((this.backing & Backing.JsonElement) != 0)
-            {
-                if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
-                {
-                    value = default;
-                    return false;
-                }
-
-                if (this.jsonElementBacking.TryGetProperty(name, out JsonElement element))
-                {
-                    value = new(element);
-                    return true;
-                }
-
-                value = default;
-                return false;
-            }
-
-            if ((this.backing & Backing.Object) != 0)
-            {
-                if (this.objectBacking.TryGetValue(name, out JsonAny result))
-                {
-                    value = result;
+                    value = ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal.FromAny(result);
                     return true;
                 }
 
@@ -637,8 +433,241 @@ public readonly partial struct Contexts
         }
 
         /// <inheritdoc />
-        public bool TryGetProperty<TValue>(in JsonPropertyName name, out TValue value)
-            where TValue : struct, IJsonValue<TValue>
+        bool IJsonObject<ShortContexts>.TryGetProperty(string name, out JsonAny value)
+        {
+            if ((this.backing & Backing.JsonElement) != 0)
+            {
+                if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                {
+                    value = default;
+                    return false;
+                }
+
+                if (this.jsonElementBacking.TryGetProperty(name, out JsonElement element))
+                {
+                    value = new(element);
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            if ((this.backing & Backing.Object) != 0)
+            {
+                if (this.objectBacking.TryGetValue(name, out JsonAny result))
+                {
+                    value = result;
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        /// <summary>
+        /// Get a property.
+        /// </summary>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="value">The value of the property.</param>
+        /// <returns><c>True</c> if the property was present.</returns>
+        /// <exception cref="InvalidOperationException">The value is not an object.</exception>
+        public bool TryGetProperty(string name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal value)
+        {
+            if ((this.backing & Backing.JsonElement) != 0)
+            {
+                if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                {
+                    value = default;
+                    return false;
+                }
+
+                if (this.jsonElementBacking.TryGetProperty(name, out JsonElement element))
+                {
+                    value = new(element);
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            if ((this.backing & Backing.Object) != 0)
+            {
+                if (this.objectBacking.TryGetValue(name, out JsonAny result))
+                {
+                    value = ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal.FromAny(result);
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        /// <inheritdoc />
+        bool IJsonObject<ShortContexts>.TryGetProperty(ReadOnlySpan<char> name, out JsonAny value)
+        {
+            if ((this.backing & Backing.JsonElement) != 0)
+            {
+                if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                {
+                    value = default;
+                    return false;
+                }
+
+                if (this.jsonElementBacking.TryGetProperty(name, out JsonElement element))
+                {
+                    value = new(element);
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            if ((this.backing & Backing.Object) != 0)
+            {
+                if (this.objectBacking.TryGetValue(name, out JsonAny result))
+                {
+                    value = result;
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        /// <summary>
+        /// Get a property.
+        /// </summary>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="value">The value of the property.</param>
+        /// <returns><c>True</c> if the property was present.</returns>
+        /// <exception cref="InvalidOperationException">The value is not an object.</exception>
+        public bool TryGetProperty(ReadOnlySpan<char> name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal value)
+        {
+            if ((this.backing & Backing.JsonElement) != 0)
+            {
+                if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                {
+                    value = default;
+                    return false;
+                }
+
+                if (this.jsonElementBacking.TryGetProperty(name, out JsonElement element))
+                {
+                    value = new(element);
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            if ((this.backing & Backing.Object) != 0)
+            {
+                if (this.objectBacking.TryGetValue(name, out JsonAny result))
+                {
+                    value = ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal.FromAny(result);
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        /// <inheritdoc />
+        bool IJsonObject<ShortContexts>.TryGetProperty(ReadOnlySpan<byte> name, out JsonAny value)
+        {
+            if ((this.backing & Backing.JsonElement) != 0)
+            {
+                if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                {
+                    value = default;
+                    return false;
+                }
+
+                if (this.jsonElementBacking.TryGetProperty(name, out JsonElement element))
+                {
+                    value = new(element);
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            if ((this.backing & Backing.Object) != 0)
+            {
+                if (this.objectBacking.TryGetValue(name, out JsonAny result))
+                {
+                    value = result;
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        /// <summary>
+        /// Get a property.
+        /// </summary>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="value">The value of the property.</param>
+        /// <returns><c>True</c> if the property was present.</returns>
+        /// <exception cref="InvalidOperationException">The value is not an object.</exception>
+        public bool TryGetProperty(ReadOnlySpan<byte> name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal value)
+        {
+            if ((this.backing & Backing.JsonElement) != 0)
+            {
+                if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                {
+                    value = default;
+                    return false;
+                }
+
+                if (this.jsonElementBacking.TryGetProperty(name, out JsonElement element))
+                {
+                    value = new(element);
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            if ((this.backing & Backing.Object) != 0)
+            {
+                if (this.objectBacking.TryGetValue(name, out JsonAny result))
+                {
+                    value = ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal.FromAny(result);
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        /// <inheritdoc />
+        bool IJsonObject<ShortContexts>.TryGetProperty<TValue>(in JsonPropertyName name, out TValue value)
         {
             if ((this.backing & Backing.JsonElement) != 0)
             {
@@ -683,8 +712,7 @@ public readonly partial struct Contexts
         }
 
         /// <inheritdoc />
-        public bool TryGetProperty<TValue>(string name, out TValue value)
-            where TValue : struct, IJsonValue<TValue>
+        bool IJsonObject<ShortContexts>.TryGetProperty<TValue>(string name, out TValue value)
         {
             if ((this.backing & Backing.JsonElement) != 0)
             {
@@ -729,8 +757,7 @@ public readonly partial struct Contexts
         }
 
         /// <inheritdoc />
-        public bool TryGetProperty<TValue>(ReadOnlySpan<char> name, out TValue value)
-            where TValue : struct, IJsonValue<TValue>
+        bool IJsonObject<ShortContexts>.TryGetProperty<TValue>(ReadOnlySpan<char> name, out TValue value)
         {
             if ((this.backing & Backing.JsonElement) != 0)
             {
@@ -775,8 +802,7 @@ public readonly partial struct Contexts
         }
 
         /// <inheritdoc />
-        public bool TryGetProperty<TValue>(ReadOnlySpan<byte> name, out TValue value)
-            where TValue : struct, IJsonValue<TValue>
+        bool IJsonObject<ShortContexts>.TryGetProperty<TValue>(ReadOnlySpan<byte> name, out TValue value)
         {
             if ((this.backing & Backing.JsonElement) != 0)
             {
@@ -821,80 +847,44 @@ public readonly partial struct Contexts
         }
 
         /// <inheritdoc />
-        public ContextObj SetProperty<TValue>(in JsonPropertyName name, TValue value)
-            where TValue : struct, IJsonValue
+ShortContexts IJsonObject<ShortContexts>.SetProperty<TValue>(in JsonPropertyName name, TValue value)
+        {
+            return new(__CorvusObjectHelpers.GetPropertyBackingWith(this, name, value.AsAny));
+        }
+
+        /// <summary>
+        /// Sets the given property value.
+        /// </summary>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="value">The value of the property.</param>
+        /// <returns>The instance with the property set.</returns>
+        public ShortContexts SetProperty(in JsonPropertyName name, ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal value)
         {
             return new(__CorvusObjectHelpers.GetPropertyBackingWith(this, name, value.AsAny));
         }
 
         /// <inheritdoc />
-        public ContextObj RemoveProperty(in JsonPropertyName name)
+        public ShortContexts RemoveProperty(in JsonPropertyName name)
         {
             return new(__CorvusObjectHelpers.GetPropertyBackingWithout(this, name));
         }
 
         /// <inheritdoc />
-        public ContextObj RemoveProperty(string name)
+        public ShortContexts RemoveProperty(string name)
         {
             return new(__CorvusObjectHelpers.GetPropertyBackingWithout(this, name));
         }
 
         /// <inheritdoc />
-        public ContextObj RemoveProperty(ReadOnlySpan<char> name)
+        public ShortContexts RemoveProperty(ReadOnlySpan<char> name)
         {
             return new(__CorvusObjectHelpers.GetPropertyBackingWithout(this, name));
         }
 
         /// <inheritdoc />
-        public ContextObj RemoveProperty(ReadOnlySpan<byte> name)
+        public ShortContexts RemoveProperty(ReadOnlySpan<byte> name)
         {
             return new(__CorvusObjectHelpers.GetPropertyBackingWithout(this, name));
-        }
-
-        /// <summary>
-        /// Provides UTF8 and string versions of the JSON property names on the object.
-        /// </summary>
-        public static class JsonPropertyNames
-        {
-            /// <summary>
-            /// Gets the JSON property name for <see cref="Description"/>.
-            /// </summary>
-            public const string Description = "description";
-
-            /// <summary>
-            /// Gets the JSON property name for <see cref="Entity"/>.
-            /// </summary>
-            public const string Entity = "entity";
-
-            /// <summary>
-            /// Gets the JSON property name for <see cref="Name"/>.
-            /// </summary>
-            public const string Name = "name";
-
-            /// <summary>
-            /// Gets the JSON property name for <see cref="Required"/>.
-            /// </summary>
-            public const string Required = "required";
-
-            /// <summary>
-            /// Gets the JSON property name for <see cref="Description"/>.
-            /// </summary>
-            public static ReadOnlySpan<byte> DescriptionUtf8 => "description"u8;
-
-            /// <summary>
-            /// Gets the JSON property name for <see cref="Entity"/>.
-            /// </summary>
-            public static ReadOnlySpan<byte> EntityUtf8 => "entity"u8;
-
-            /// <summary>
-            /// Gets the JSON property name for <see cref="Name"/>.
-            /// </summary>
-            public static ReadOnlySpan<byte> NameUtf8 => "name"u8;
-
-            /// <summary>
-            /// Gets the JSON property name for <see cref="Required"/>.
-            /// </summary>
-            public static ReadOnlySpan<byte> RequiredUtf8 => "required"u8;
         }
 
         private static class __CorvusObjectHelpers
@@ -904,7 +894,7 @@ public readonly partial struct Contexts
             /// </summary>
             /// <returns>An immutable list of <see cref="JsonAny"/> built from the object.</returns>
             /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-            public static ImmutableList<JsonObjectProperty> GetPropertyBacking(in ContextObj that)
+            public static ImmutableList<JsonObjectProperty> GetPropertyBacking(in ShortContexts that)
             {
                 if ((that.backing & Backing.Object) != 0)
                 {
@@ -924,7 +914,7 @@ public readonly partial struct Contexts
             /// </summary>
             /// <returns>An immutable list of <see cref="JsonObjectProperty"/>, built from the existing object, without the given property.</returns>
             /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-            public static ImmutableList<JsonObjectProperty> GetPropertyBackingWithout(in ContextObj that, in JsonPropertyName name)
+            public static ImmutableList<JsonObjectProperty> GetPropertyBackingWithout(in ShortContexts that, in JsonPropertyName name)
             {
                 if ((that.backing & Backing.Object) != 0)
                 {
@@ -944,7 +934,7 @@ public readonly partial struct Contexts
             /// </summary>
             /// <returns>An immutable list of <see cref="JsonObjectProperty"/>, built from the existing object, without the given property.</returns>
             /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-            public static ImmutableList<JsonObjectProperty> GetPropertyBackingWithout(in ContextObj that, ReadOnlySpan<char> name)
+            public static ImmutableList<JsonObjectProperty> GetPropertyBackingWithout(in ShortContexts that, ReadOnlySpan<char> name)
             {
                 if ((that.backing & Backing.Object) != 0)
                 {
@@ -964,7 +954,7 @@ public readonly partial struct Contexts
             /// </summary>
             /// <returns>An immutable list of <see cref="JsonObjectProperty"/>, built from the existing object, without the given property.</returns>
             /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-            public static ImmutableList<JsonObjectProperty> GetPropertyBackingWithout(in ContextObj that, ReadOnlySpan<byte> name)
+            public static ImmutableList<JsonObjectProperty> GetPropertyBackingWithout(in ShortContexts that, ReadOnlySpan<byte> name)
             {
                 if ((that.backing & Backing.Object) != 0)
                 {
@@ -984,7 +974,7 @@ public readonly partial struct Contexts
             /// </summary>
             /// <returns>An immutable list of <see cref="JsonObjectProperty"/>, built from the existing object, without the given property.</returns>
             /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-            public static ImmutableList<JsonObjectProperty> GetPropertyBackingWithout(in ContextObj that, string name)
+            public static ImmutableList<JsonObjectProperty> GetPropertyBackingWithout(in ShortContexts that, string name)
             {
                 if ((that.backing & Backing.Object) != 0)
                 {
@@ -1004,7 +994,7 @@ public readonly partial struct Contexts
             /// </summary>
             /// <returns>An immutable list of <see cref="JsonObjectProperty"/>, built from the existing object, with the given property.</returns>
             /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-            public static ImmutableList<JsonObjectProperty> GetPropertyBackingWith(in ContextObj that, in JsonPropertyName name, in JsonAny value)
+            public static ImmutableList<JsonObjectProperty> GetPropertyBackingWith(in ShortContexts that, in JsonPropertyName name, in JsonAny value)
             {
                 if ((that.backing & Backing.Object) != 0)
                 {

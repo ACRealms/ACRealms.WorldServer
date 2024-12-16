@@ -32,19 +32,13 @@ public readonly partial struct Contexts
         /// </summary>
         /// <remarks>
         /// <para>
-        /// If true, a context is required when fetching this realm property, or the server will fail to compile.
-        /// </para>
-        /// <para>
-        /// Otherwise, scoped property evaluations are skipped when passing a null context.
-        /// </para>
-        /// <para>
-        /// Unscoped properties are still evaluated
+        /// If true, a context is required when fetching this realm property.
         /// </para>
         /// <para>
         /// Examples:
         /// <example>
         /// <code>
-        /// false
+        /// true
         /// </code>
         /// </example>
         /// </para>
@@ -107,7 +101,7 @@ public readonly partial struct Contexts
             /// <summary>
             /// Gets the default instance.
             /// </summary>
-            public static RequiredEntity DefaultInstance { get; } = RequiredEntity.ParseValue("false"u8);
+            public static RequiredEntity DefaultInstance { get; } = RequiredEntity.ParseValue("true"u8);
 
             /// <inheritdoc/>
             public JsonAny AsAny

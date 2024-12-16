@@ -78,10 +78,10 @@ public readonly partial struct Contexts
             ValidationContext oneOfChildContext0 = validationContext.CreateChildContext();
             if (level > ValidationLevel.Basic)
             {
-                oneOfChildContext0 = oneOfChildContext0.PushValidationLocationReducedPathModifier(new("#/oneOf/0/$ref"));
+                oneOfChildContext0 = oneOfChildContext0.PushValidationLocationReducedPathModifier(new("#/oneOf/0"));
             }
 
-            ValidationContext oneOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context>().Validate(oneOfChildContext0, level);
+            ValidationContext oneOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity>().Validate(oneOfChildContext0, level);
 
             if (oneOfResult0.IsValid)
             {
@@ -99,10 +99,10 @@ public readonly partial struct Contexts
             ValidationContext oneOfChildContext1 = validationContext.CreateChildContext();
             if (level > ValidationLevel.Basic)
             {
-                oneOfChildContext1 = oneOfChildContext1.PushValidationLocationReducedPathModifier(new("#/oneOf/1"));
+                oneOfChildContext1 = oneOfChildContext1.PushValidationLocationReducedPathModifier(new("#/oneOf/1/$ref"));
             }
 
-            ValidationContext oneOfResult1 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray>().Validate(oneOfChildContext1, level);
+            ValidationContext oneOfResult1 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts>().Validate(oneOfChildContext1, level);
 
             if (oneOfResult1.IsValid)
             {
@@ -114,6 +114,27 @@ public readonly partial struct Contexts
                 if (level >= ValidationLevel.Verbose)
                 {
                     result = result.MergeResults(result.IsValid, level, oneOfResult1);
+                }
+            }
+
+            ValidationContext oneOfChildContext2 = validationContext.CreateChildContext();
+            if (level > ValidationLevel.Basic)
+            {
+                oneOfChildContext2 = oneOfChildContext2.PushValidationLocationReducedPathModifier(new("#/oneOf/2"));
+            }
+
+            ValidationContext oneOfResult2 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray>().Validate(oneOfChildContext2, level);
+
+            if (oneOfResult2.IsValid)
+            {
+                result = result.MergeChildContext(oneOfResult2, level >= ValidationLevel.Verbose);
+                oneOfFoundValid++;
+            }
+            else
+            {
+                if (level >= ValidationLevel.Verbose)
+                {
+                    result = result.MergeResults(result.IsValid, level, oneOfResult2);
                 }
             }
 

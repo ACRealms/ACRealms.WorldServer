@@ -26,6 +26,7 @@ public readonly partial struct Contexts
 {
     private readonly Backing backing;
     private readonly JsonElement jsonElementBacking;
+    private readonly bool boolBacking;
     private readonly ImmutableList<JsonAny> arrayBacking;
     private readonly ImmutableList<JsonObjectProperty> objectBacking;
 
@@ -36,6 +37,7 @@ public readonly partial struct Contexts
     {
         this.jsonElementBacking = default;
         this.backing = Backing.JsonElement;
+        this.boolBacking = default;
         this.arrayBacking = ImmutableList<JsonAny>.Empty;
         this.objectBacking = ImmutableList<JsonObjectProperty>.Empty;
     }
@@ -48,6 +50,7 @@ public readonly partial struct Contexts
     {
         this.jsonElementBacking = value;
         this.backing = Backing.JsonElement;
+        this.boolBacking = default;
         this.arrayBacking = ImmutableList<JsonAny>.Empty;
         this.objectBacking = ImmutableList<JsonObjectProperty>.Empty;
     }
@@ -60,7 +63,21 @@ public readonly partial struct Contexts
     {
         this.backing = Backing.Array;
         this.jsonElementBacking = default;
+        this.boolBacking = default;
         this.arrayBacking = value;
+        this.objectBacking = ImmutableList<JsonObjectProperty>.Empty;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Contexts"/> struct.
+    /// </summary>
+    /// <param name="value">The value from which to construct the instance.</param>
+    public Contexts(bool value)
+    {
+        this.backing = Backing.Bool;
+        this.jsonElementBacking = default;
+        this.boolBacking = value;
+        this.arrayBacking = ImmutableList<JsonAny>.Empty;
         this.objectBacking = ImmutableList<JsonObjectProperty>.Empty;
     }
 
@@ -72,6 +89,7 @@ public readonly partial struct Contexts
     {
         this.backing = Backing.Object;
         this.jsonElementBacking = default;
+        this.boolBacking = default;
         this.arrayBacking = ImmutableList<JsonAny>.Empty;
         this.objectBacking = value;
     }
@@ -106,6 +124,11 @@ public readonly partial struct Contexts
                 return new(this.jsonElementBacking);
             }
 
+            if ((this.backing & Backing.Bool) != 0)
+            {
+                return new(this.boolBacking);
+            }
+
             if ((this.backing & Backing.Array) != 0)
             {
                 return new(this.arrayBacking);
@@ -133,6 +156,11 @@ public readonly partial struct Contexts
             if ((this.backing & Backing.JsonElement) != 0)
             {
                 return this.jsonElementBacking;
+            }
+
+            if ((this.backing & Backing.Bool) != 0)
+            {
+                return JsonValueHelpers.BoolToJsonElement(this.boolBacking);
             }
 
             if ((this.backing & Backing.Array) != 0)
@@ -169,13 +197,18 @@ public readonly partial struct Contexts
     }
 
     /// <inheritdoc/>
-    JsonBoolean IJsonValue.AsBoolean
+    public JsonBoolean AsBoolean
     {
         get
         {
             if ((this.backing & Backing.JsonElement) != 0)
             {
                 return new(this.jsonElementBacking);
+            }
+
+            if ((this.backing & Backing.Bool) != 0)
+            {
+                return new(this.boolBacking);
             }
 
             throw new InvalidOperationException();
@@ -235,46 +268,68 @@ public readonly partial struct Contexts
     }
 
     /// <summary>
-    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context" />.
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts" />.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context AsContext
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts AsShortContexts
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context>();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts>();
         }
     }
 
     /// <summary>
-    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context" />.
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts" />.
     /// </summary>
-    public bool IsContext
+    public bool IsShortContexts
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context>().IsValid();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts>().IsValid();
         }
     }
 
     /// <summary>
-    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray" />.
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity" />.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray AsContextArray
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity AsOneOf0Entity
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray>();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity>();
         }
     }
 
     /// <summary>
-    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray" />.
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity" />.
     /// </summary>
-    public bool IsContextArray
+    public bool IsOneOf0Entity
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray>().IsValid();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity>().IsValid();
+        }
+    }
+
+    /// <summary>
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray" />.
+    /// </summary>
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray AsContextObjArray
+    {
+        get
+        {
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray>();
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray" />.
+    /// </summary>
+    public bool IsContextObjArray
+    {
+        get
+        {
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray>().IsValid();
         }
     }
 
@@ -304,6 +359,11 @@ public readonly partial struct Contexts
             if ((this.backing & Backing.JsonElement) != 0)
             {
                 return this.jsonElementBacking.ValueKind;
+            }
+
+            if ((this.backing & Backing.Bool) != 0)
+            {
+                return this.boolBacking ? JsonValueKind.True : JsonValueKind.False;
             }
 
             if ((this.backing & Backing.Array) != 0)
@@ -339,37 +399,55 @@ public readonly partial struct Contexts
     }
 
     /// <summary>
-    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context"/>.
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context(Contexts value)
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity(Contexts value)
     {
-        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context>();
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity>();
     }
 
     /// <summary>
-    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context"/>.
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static implicit operator Contexts(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context value)
+    public static implicit operator Contexts(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity value)
     {
         return value.As<Contexts>();
     }
 
     /// <summary>
-    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray"/>.
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray(Contexts value)
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts(Contexts value)
     {
-        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray>();
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts>();
     }
 
     /// <summary>
-    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray"/>.
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static implicit operator Contexts(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray value)
+    public static implicit operator Contexts(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts value)
+    {
+        return value.As<Contexts>();
+    }
+
+    /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray(Contexts value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator Contexts(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray value)
     {
         return value.As<Contexts>();
     }
@@ -429,6 +507,8 @@ public readonly partial struct Contexts
 
         return value.ValueKind switch
         {
+            JsonValueKind.True => new(true),
+            JsonValueKind.False => new(false),
             JsonValueKind.Array => new(value.AsArray.AsImmutableList()),
             JsonValueKind.Object => new(value.AsObject.AsPropertyBacking()),
             JsonValueKind.Null => Null,
@@ -436,7 +516,6 @@ public readonly partial struct Contexts
         };
     }
 
-#if NET8_0_OR_GREATER
     /// <summary>
     /// Gets an instance of the JSON value from the provided value.
     /// </summary>
@@ -444,16 +523,22 @@ public readonly partial struct Contexts
     /// <param name="value">The value from which to instantiate the instance.</param>
     /// <returns>An instance of this type, initialized from the provided value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static Contexts IJsonValue<Contexts>.FromBoolean<TValue>(in TValue value)
+    public static Contexts FromBoolean<TValue>(in TValue value)
+        where TValue : struct, IJsonBoolean<TValue>
     {
         if (value.HasJsonElementBacking)
         {
             return new(value.AsJsonElement);
         }
 
-        return Undefined;
+        return value.ValueKind switch
+        {
+            JsonValueKind.True => new(true),
+            JsonValueKind.False => new(false),
+            JsonValueKind.Null => Null,
+            _ => Undefined,
+        };
     }
-#endif
 
 #if NET8_0_OR_GREATER
     /// <summary>
@@ -661,6 +746,11 @@ public readonly partial struct Contexts
             return TTarget.FromJson(this.jsonElementBacking);
         }
 
+        if ((this.backing & Backing.Bool) != 0)
+        {
+            return TTarget.FromBoolean(this.AsBoolean);
+        }
+
         if ((this.backing & Backing.Array) != 0)
         {
             return TTarget.FromArray(this.AsArray);
@@ -738,6 +828,11 @@ public readonly partial struct Contexts
             return !rhs.MoveNext();
         }
 
+        if (thisKind == JsonValueKind.True || thisKind == JsonValueKind.False)
+        {
+            return true;
+        }
+
         if (thisKind == JsonValueKind.Object)
         {
             JsonObject thisObject = this.AsObject;
@@ -789,6 +884,13 @@ public readonly partial struct Contexts
             return;
         }
 
+        if ((this.backing & Backing.Bool) != 0)
+        {
+            writer.WriteBooleanValue(this.boolBacking);
+
+            return;
+        }
+
         if ((this.backing & Backing.Object) != 0)
         {
             JsonValueHelpers.WriteProperties(this.objectBacking, writer);
@@ -832,26 +934,34 @@ public readonly partial struct Contexts
     /// <typeparam name="TIn">The immutable context to pass in to the match function.</typeparam>
     /// <typeparam name="TOut">The result of calling the match function.</typeparam>
     /// <param name="context">The context to pass to the match function.</param>
-    /// <param name="matchContext">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context"/>.</param>
-    /// <param name="matchContextArray">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray"/>.</param>
+    /// <param name="matchOneOf0Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity"/>.</param>
+    /// <param name="matchShortContexts">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts"/>.</param>
+    /// <param name="matchContextObjArray">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray"/>.</param>
     /// <param name="defaultMatch">Match any other value.</param>
     /// <returns>An instance of the value returned by the match function.</returns>
     public TOut Match<TIn, TOut>(
         in TIn context,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context, TIn, TOut> matchContext,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray, TIn, TOut> matchContextArray,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity, TIn, TOut> matchOneOf0Entity,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts, TIn, TOut> matchShortContexts,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray, TIn, TOut> matchContextObjArray,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts, TIn, TOut> defaultMatch)
     {
-        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context matchContextValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context>();
-        if (matchContextValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity matchOneOf0EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity>();
+        if (matchOneOf0EntityValue.IsValid())
         {
-            return matchContext(matchContextValue, context);
+            return matchOneOf0Entity(matchOneOf0EntityValue, context);
         }
 
-        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray matchContextArrayValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray>();
-        if (matchContextArrayValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts matchShortContextsValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts>();
+        if (matchShortContextsValue.IsValid())
         {
-            return matchContextArray(matchContextArrayValue, context);
+            return matchShortContexts(matchShortContextsValue, context);
+        }
+
+        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray matchContextObjArrayValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray>();
+        if (matchContextObjArrayValue.IsValid())
+        {
+            return matchContextObjArray(matchContextObjArrayValue, context);
         }
 
         return defaultMatch(this, context);
@@ -861,49 +971,68 @@ public readonly partial struct Contexts
     /// Matches the value against the composed values, and returns the result of calling the provided match function for the first match found.
     /// </summary>
     /// <typeparam name="TOut">The result of calling the match function.</typeparam>
-    /// <param name="matchContext">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context"/>.</param>
-    /// <param name="matchContextArray">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray"/>.</param>
+    /// <param name="matchOneOf0Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity"/>.</param>
+    /// <param name="matchShortContexts">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts"/>.</param>
+    /// <param name="matchContextObjArray">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray"/>.</param>
     /// <param name="defaultMatch">Match any other value.</param>
     /// <returns>An instance of the value returned by the match function.</returns>
     public TOut Match<TOut>(
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context, TOut> matchContext,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray, TOut> matchContextArray,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity, TOut> matchOneOf0Entity,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts, TOut> matchShortContexts,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray, TOut> matchContextObjArray,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts, TOut> defaultMatch)
     {
-        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context matchContextValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context>();
-        if (matchContextValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity matchOneOf0EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity>();
+        if (matchOneOf0EntityValue.IsValid())
         {
-            return matchContext(matchContextValue);
+            return matchOneOf0Entity(matchOneOf0EntityValue);
         }
 
-        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray matchContextArrayValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray>();
-        if (matchContextArrayValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts matchShortContextsValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts>();
+        if (matchShortContextsValue.IsValid())
         {
-            return matchContextArray(matchContextArrayValue);
+            return matchShortContexts(matchShortContextsValue);
+        }
+
+        ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray matchContextObjArrayValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray>();
+        if (matchContextObjArrayValue.IsValid())
+        {
+            return matchContextObjArray(matchContextObjArrayValue);
         }
 
         return defaultMatch(this);
     }
 
     /// <summary>
-    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context" />.
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts" />.
     /// </summary>
     /// <param name="result">The result of the conversions.</param>
     /// <returns><see langword="true" /> if the conversion was valid.</returns>
-    public bool TryGetAsContext(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context result)
+    public bool TryGetAsShortContexts(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts result)
     {
-        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.Context>();
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ShortContexts>();
         return result.IsValid();
     }
 
     /// <summary>
-    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray" />.
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity" />.
     /// </summary>
     /// <param name="result">The result of the conversions.</param>
     /// <returns><see langword="true" /> if the conversion was valid.</returns>
-    public bool TryGetAsContextArray(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray result)
+    public bool TryGetAsOneOf0Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity result)
     {
-        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextArray>();
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.OneOf0Entity>();
+        return result.IsValid();
+    }
+
+    /// <summary>
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray" />.
+    /// </summary>
+    /// <param name="result">The result of the conversions.</param>
+    /// <returns><see langword="true" /> if the conversion was valid.</returns>
+    public bool TryGetAsContextObjArray(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray result)
+    {
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObjArray>();
         return result.IsValid();
     }
 }

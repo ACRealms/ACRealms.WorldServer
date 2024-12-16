@@ -9,43 +9,52 @@
         }
       }
     },
-    "contextVal": {
+    "entityVal": {
       "type": "string",
       "oneOf": [
         { "$ref": "#/definitions/entities/definitions/Creature" }
       ]
     },
+    "contextName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60,
+      "pattern": "(^[a-z]|[A-Z0-9])[a-z]*$",
+      "description": "The name for the context. Used as a parameter name in the method to fetch the realm property from C#"
+    },
     "contextObj": {
       "type": "object",
       "properties": {
-        "entity": { "$ref": "#/definitions/contextVal" },
+        "name": { "$ref": "#/definitions/contextName" },
+        "entity": { "$ref": "#/definitions/entityVal" },
         "required": {
           "type": "boolean",
-          "default": false,
-          "description": "If true, a context is required when fetching this realm property, or the server will fail to compile.\nOtherwise, scoped property evaluations are skipped when passing a null context.\nUnscoped properties are still evaluated"
+          "default": true,
+          "description": "If true, a context is required when fetching this realm property."
         },
         "description": {
           "type": "string",
           "description": "A description for the context, to be shown in code docs when using the property"
         }
       },
-      "required": [ "entity" ],
+      "required": [ "name", "entity" ],
       "additionalProperties": false
     },
     "contextDecl": {
       "default": { },
       "oneOf": [
         { "$ref": "#/definitions/contextObj" },
-        { "$ref": "#/definitions/contextVal" }
+        { "$ref": "#/definitions/entityVal" }
       ]
     },
-    "context": {
+    "shortContexts": {
       "type": "object",
-      "additionalProperties": { "$ref": "#/definitions/contextDecl" }
+      "additionalProperties": { "$ref": "#/definitions/entityVal" }
     }
   },
   "oneOf": [
-    { "$ref": "#/definitions/context" },
-    { "type": "array", "items": { "$ref": "#/definitions/context" } }
+    { "const": false },
+    { "$ref": "#/definitions/shortContexts" },
+    { "type": "array", "items": { "$ref": "#/definitions/contextObj" } }
   ]
 }

@@ -125,6 +125,7 @@ public readonly partial struct Contexts
                 }
 
                 bool hasSeenEntity = false;
+                bool hasSeenName = false;
 
                 int propertyCount = 0;
                 foreach (JsonObjectProperty property in value.EnumerateObject())
@@ -161,7 +162,29 @@ public readonly partial struct Contexts
                             result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/entity/$ref"), JsonPropertyNames.Entity);
                         }
 
-                        ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextVal>().Validate(result.CreateChildContext(), level);
+                        ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal>().Validate(result.CreateChildContext(), level);
+                        if (level == ValidationLevel.Flag && !propertyResult.IsValid)
+                        {
+                            return propertyResult;
+                        }
+
+                        result = result.MergeResults(propertyResult.IsValid, level, propertyResult);
+
+                        if (level > ValidationLevel.Basic)
+                        {
+                            result = result.PopLocation();
+                        }
+                    }
+                    else if (property.NameEquals(JsonPropertyNames.NameUtf8, JsonPropertyNames.Name))
+                    {
+                        hasSeenName = true;
+                        result = result.WithLocalProperty(propertyCount);
+                        if (level > ValidationLevel.Basic)
+                        {
+                            result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/name/$ref"), JsonPropertyNames.Name);
+                        }
+
+                        ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextName>().Validate(result.CreateChildContext(), level);
                         if (level == ValidationLevel.Flag && !propertyResult.IsValid)
                         {
                             return propertyResult;
@@ -224,7 +247,7 @@ public readonly partial struct Contexts
 
                 if (level > ValidationLevel.Basic)
                 {
-                    result = result.PushValidationLocationReducedPathModifier(new("#/required/0"));
+                    result = result.PushValidationLocationReducedPathModifier(new("#/required/1"));
                 }
 
                 if (!hasSeenEntity)
@@ -241,6 +264,32 @@ public readonly partial struct Contexts
                 else if (level == ValidationLevel.Verbose)
                 {
                     result = result.WithResult(isValid: true, "Validation properties - the required property 'entity' was present.");
+                }
+
+                if (level > ValidationLevel.Basic)
+                {
+                    result = result.PopLocation();
+                }
+
+                if (level > ValidationLevel.Basic)
+                {
+                    result = result.PushValidationLocationReducedPathModifier(new("#/required/0"));
+                }
+
+                if (!hasSeenName)
+                {
+                    if (level >= ValidationLevel.Basic)
+                    {
+                        result = result.WithResult(isValid: false, "Validation properties - the required property 'name' was not present.");
+                    }
+                    else
+                    {
+                        return ValidationContext.InvalidContext;
+                    }
+                }
+                else if (level == ValidationLevel.Verbose)
+                {
+                    result = result.WithResult(isValid: true, "Validation properties - the required property 'name' was present.");
                 }
 
                 if (level > ValidationLevel.Basic)
