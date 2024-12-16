@@ -115,7 +115,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
               "definitions": {
                 "v": { "$anchor": "{{propInfo.Key}}.v", "type": "{{valType}}", "default": {{defaultValLiteral}} },
                 "s": {{scopeDefSchema}},
-                "p": { "$anchor": "{{propInfo.Key}}.p",
+                "p": { "$anchor": "{{propInfo.Key}}.p", "default": { "value": {{defaultValLiteral}} },
                   "allOf": [
                     { "type": "object", "properties": { "value": {{sVal}} }, "required": ["value"] },
                     { {{RefSnippet("#opts.common")}},
@@ -143,7 +143,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
               "definitions": {
                 "v": { "$anchor": "{{propInfo.Key}}.v", "type": "{{valType}}", "minimum": {{min}}, "maximum": {{max}}, "default": {{defaultValLiteral}} },
                 "s": {{scopeDefSchema}},
-                "p": { "$anchor": "{{propInfo.Key}}.p",
+                "p": { "$anchor": "{{propInfo.Key}}.p", "default": { "value": {{defaultValLiteral}} },
                   "allOf": [
                     { "oneOf": [
                       { "type": "object", "properties": { "value": {{sVal}} }, "required": ["value"] },
