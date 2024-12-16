@@ -11,9 +11,9 @@ using System.Threading;
 
 namespace ACRealms.RealmProps
 {
-    public static class RealmPropertyHelper
+    internal static class RealmPropertyHelper
     {
-        public static FrozenDictionary<E, TProto> BuildPrototypes<E, TProto, TPrimitive, TAttribute>()
+        internal static FrozenDictionary<E, TProto> BuildPrototypes<E, TProto, TPrimitive, TAttribute>()
             where E : struct, System.Enum
             where TProto : RealmPropertyPrototype<E, TPrimitive, TAttribute>
             where TPrimitive : IEquatable<TPrimitive>
@@ -78,7 +78,7 @@ namespace ACRealms.RealmProps
     }
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public abstract class RealmPropertyPrimaryAttributeBase : Attribute
+    internal abstract class RealmPropertyPrimaryAttributeBase : Attribute
     {
         public string? DefaultFromServerProperty { get; }
 
@@ -88,7 +88,7 @@ namespace ACRealms.RealmProps
         }
     }
 
-    public class RealmPropertyPrimaryAttribute<TPrimitive> : RealmPropertyPrimaryAttributeBase
+    internal class RealmPropertyPrimaryAttribute<TPrimitive> : RealmPropertyPrimaryAttributeBase
          where TPrimitive : notnull, IEquatable<TPrimitive>
     {
         public TPrimitive DefaultValue { get; }
@@ -102,7 +102,7 @@ namespace ACRealms.RealmProps
         public RealmPropertyPrimaryAttribute(TPrimitive defaultValue) : this(null, defaultValue) { }
     }
 
-    public class RealmPropertyPrimaryMinMaxAttribute<TPrimitive> : RealmPropertyPrimaryAttribute<TPrimitive>
+    internal class RealmPropertyPrimaryMinMaxAttribute<TPrimitive> : RealmPropertyPrimaryAttribute<TPrimitive>
          where TPrimitive : notnull, IComparable<TPrimitive>, IEquatable<TPrimitive>, IMinMaxValue<TPrimitive>, INumber<TPrimitive>, IAdditionOperators<TPrimitive, TPrimitive, TPrimitive>, IMultiplyOperators<TPrimitive, TPrimitive, TPrimitive>
     {
         public TPrimitive MinValue { get; }
@@ -124,7 +124,7 @@ namespace ACRealms.RealmProps
         }
     }
 
-    public class RealmPropertyEnumAttribute<TEnum>
+    internal class RealmPropertyEnumAttribute<TEnum>
         : RealmPropertyPrimaryMinMaxAttribute<int>
         // Must be int for the following reasons:
         // 1. Fast conversion with Unsafe.As requires both types to be the same underlying size in bytes (32 bits for the default enum type)
@@ -160,16 +160,16 @@ namespace ACRealms.RealmProps
     }
 
     [AttributeUsage(AttributeTargets.Enum, AllowMultiple = false, Inherited = false)]
-    public abstract class RequiresPrimaryAttributeAttribute(Type requiredAttributeType) : Attribute
+    internal abstract class RequiresPrimaryAttributeAttribute(Type requiredAttributeType) : Attribute
     {
         public Type RequiredAttributeType { get; } = requiredAttributeType;
     }
 
-    public abstract class RequiresPrimaryAttributeAttribute<TPrimitive>(Type requiredAttributeType)
+    internal abstract class RequiresPrimaryAttributeAttribute<TPrimitive>(Type requiredAttributeType)
         : RequiresPrimaryAttributeAttribute(requiredAttributeType)
         where TPrimitive : IEquatable<TPrimitive> { }
 
-    public class RequiresPrimaryAttributeAttribute<TAttribute, TPrimitive>
+    internal class RequiresPrimaryAttributeAttribute<TAttribute, TPrimitive>
         : RequiresPrimaryAttributeAttribute<TPrimitive>
         where TAttribute : RealmPropertyPrimaryAttribute<TPrimitive>
         where TPrimitive : IEquatable<TPrimitive>
@@ -179,12 +179,12 @@ namespace ACRealms.RealmProps
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public abstract class RealmPropertySecondaryAttributeBase : Attribute
+    internal abstract class RealmPropertySecondaryAttributeBase : Attribute
     {
 
     }
 
-    public class RerollRestrictedToAttribute : RealmPropertySecondaryAttributeBase
+    internal class RerollRestrictedToAttribute : RealmPropertySecondaryAttributeBase
     {
         public RealmPropertyRerollType RerollRestriction { get; }
         public RerollRestrictedToAttribute(RealmPropertyRerollType restrictedTo)

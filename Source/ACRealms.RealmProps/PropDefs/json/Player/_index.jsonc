@@ -1,0 +1,5 @@
+{
+  "$schema_version": 1,
+  "namespace": "Player",
+  "description": "Properties directly affecting player abilities or other traits"
+}

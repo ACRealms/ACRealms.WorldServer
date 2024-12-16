@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace ACE.Server.Command.Handlers
 {
-    public static class RealmDataHelpers
+    internal static class RealmDataHelpers
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 

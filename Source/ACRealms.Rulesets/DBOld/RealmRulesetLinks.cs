@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ACRealms.Rulesets.DBOld
 {
-    public partial class RealmRulesetLinks
+    internal partial class RealmRulesetLinks
     {
         public ushort RealmId { get; set; }
         public ushort Order { get; set; }

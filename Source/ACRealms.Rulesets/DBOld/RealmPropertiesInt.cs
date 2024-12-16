@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace ACRealms.Rulesets.DBOld
 {
-    public sealed partial class RealmPropertiesInt : RealmPropertiesBase
+    internal sealed partial class RealmPropertiesInt : RealmPropertiesBase
     {
         public int? Value { get; set; }
         public int? RandomLowRange { get; set; }

@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Player.Spellcasting",
+  "description": "Properties affecting spellcasting behavior.",
   "properties": {
     "MoveToStateUpdatePositionThreshold": {
       "type": "float",

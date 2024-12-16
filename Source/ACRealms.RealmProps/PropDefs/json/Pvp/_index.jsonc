@@ -1,0 +1,5 @@
+{
+  "$schema_version": 1,
+  "namespace": "Pvp",
+  "description": "Properties affecting PvP (player vs player)"
+}

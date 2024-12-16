@@ -13,7 +13,7 @@ using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.Realms
 {
-    public class WorldRealm(Realm realm, RulesetTemplate rulesetTemplate)
+    internal sealed class WorldRealm(Realm realm, RulesetTemplate rulesetTemplate)
         : WorldRealmBase(realm, (RulesetBase)rulesetTemplate)
     {
         public RulesetTemplate RulesetTemplate { get; } = rulesetTemplate;

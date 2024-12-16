@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 
 namespace ACRealms.Rulesets.Loader
 {
-    public static class Loader
+    internal static class Loader
     {
         private static void LoadJProperty(DBOld.Realm realm, JProperty prop, bool isLeafNamespace, ImmutableArray<string> namespaceLayers)
         {

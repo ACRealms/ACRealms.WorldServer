@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Pvp.Spellcasting",
+  "description": "Properties related to player spellcasting, affecting PvP only",
   "properties": {
     "WindupMaxMove": {
       "type": "float",

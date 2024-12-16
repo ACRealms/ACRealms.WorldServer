@@ -12,7 +12,7 @@ using SecondaryDict = System.Collections.Frozen.FrozenDictionary<System.Type, AC
 
 namespace ACRealms.RealmProps
 {
-    public static class RealmPropertyPrototypes
+    internal static class RealmPropertyPrototypes
     {
         public static FrozenDictionary<RealmPropertyBool, RealmPropertyBoolPrototype> Bool { get; } = RealmPropertyHelper.BuildPrototypes<RealmPropertyBool, RealmPropertyBoolPrototype, bool, RealmPropertyPrimaryAttribute<bool>>();
         public static FrozenDictionary<RealmPropertyInt, RealmPropertyIntPrototype> Int { get; } = RealmPropertyHelper.BuildPrototypes<RealmPropertyInt, RealmPropertyIntPrototype, int, RealmPropertyPrimaryMinMaxAttribute<int>>();
@@ -21,7 +21,7 @@ namespace ACRealms.RealmProps
         public static FrozenDictionary<RealmPropertyString, RealmPropertyStringPrototype> String { get; } = RealmPropertyHelper.BuildPrototypes<RealmPropertyString, RealmPropertyStringPrototype, string, RealmPropertyPrimaryAttribute<string>>();
     }
 
-    public abstract class RealmPropertyPrototypeBase
+    internal abstract class RealmPropertyPrototypeBase
     {
         internal int RawIdentifier { get; private init; }
         private SecondaryDict? SecondaryAttributes { get; init; }
@@ -55,7 +55,7 @@ namespace ACRealms.RealmProps
         }
     }
 
-    public abstract class RealmPropertyPrototype<TPrimitive> : RealmPropertyPrototypeBase
+    internal abstract class RealmPropertyPrototype<TPrimitive> : RealmPropertyPrototypeBase
     where TPrimitive : IEquatable<TPrimitive>
     {
         public TPrimitive HardDefaultValue { get; init; }
@@ -66,7 +66,7 @@ namespace ACRealms.RealmProps
         }
     }
 
-    public abstract class RealmPropertyPrototype<TEnum, TPrimitive> : RealmPropertyPrototype<TPrimitive>
+    internal abstract class RealmPropertyPrototype<TEnum, TPrimitive> : RealmPropertyPrototype<TPrimitive>
     where TEnum : System.Enum
     where TPrimitive : IEquatable<TPrimitive>
     {
@@ -79,7 +79,7 @@ namespace ACRealms.RealmProps
         }
     }
 
-    public abstract class RealmPropertyPrototype<TEnum, TPrimitive, TAttribute> : RealmPropertyPrototype<TEnum, TPrimitive>
+    internal abstract class RealmPropertyPrototype<TEnum, TPrimitive, TAttribute> : RealmPropertyPrototype<TEnum, TPrimitive>
         where TEnum : System.Enum
         where TPrimitive : IEquatable<TPrimitive>
         where TAttribute : RealmPropertyPrimaryAttribute<TPrimitive>
@@ -93,27 +93,27 @@ namespace ACRealms.RealmProps
         }
     }
 
-    public sealed class RealmPropertyIntPrototype : RealmPropertyPrototype<RealmPropertyInt, int, RealmPropertyPrimaryMinMaxAttribute<int>>
+    internal sealed class RealmPropertyIntPrototype : RealmPropertyPrototype<RealmPropertyInt, int, RealmPropertyPrimaryMinMaxAttribute<int>>
     {
         internal RealmPropertyIntPrototype(RealmPropertyInt enumVal, RealmPropertyPrimaryMinMaxAttribute<int> primaryAttribute, SecondaryDict? secondaryAttributes, int hardDefaultValue)
             : base(enumVal, primaryAttribute, secondaryAttributes, hardDefaultValue) { }
     }
-    public sealed class RealmPropertyInt64Prototype : RealmPropertyPrototype<RealmPropertyInt64, long, RealmPropertyPrimaryMinMaxAttribute<long>>
+    internal sealed class RealmPropertyInt64Prototype : RealmPropertyPrototype<RealmPropertyInt64, long, RealmPropertyPrimaryMinMaxAttribute<long>>
     {
         internal RealmPropertyInt64Prototype(RealmPropertyInt64 enumVal, RealmPropertyPrimaryMinMaxAttribute<long> primaryAttribute, SecondaryDict? secondaryAttributes, long hardDefaultValue)
             : base(enumVal, primaryAttribute, secondaryAttributes, hardDefaultValue) { }
     }
-    public sealed class RealmPropertyBoolPrototype : RealmPropertyPrototype<RealmPropertyBool, bool, RealmPropertyPrimaryAttribute<bool>>
+    internal sealed class RealmPropertyBoolPrototype : RealmPropertyPrototype<RealmPropertyBool, bool, RealmPropertyPrimaryAttribute<bool>>
     {
         internal RealmPropertyBoolPrototype(RealmPropertyBool enumVal, RealmPropertyPrimaryAttribute<bool> primaryAttribute, SecondaryDict? secondaryAttributes, bool hardDefaultValue)
             : base(enumVal, primaryAttribute, secondaryAttributes, hardDefaultValue) { }
     }
-    public sealed class RealmPropertyFloatPrototype : RealmPropertyPrototype<RealmPropertyFloat, double, RealmPropertyPrimaryMinMaxAttribute<double>>
+    internal sealed class RealmPropertyFloatPrototype : RealmPropertyPrototype<RealmPropertyFloat, double, RealmPropertyPrimaryMinMaxAttribute<double>>
     {
         internal RealmPropertyFloatPrototype(RealmPropertyFloat enumVal, RealmPropertyPrimaryMinMaxAttribute<double> primaryAttribute, SecondaryDict? secondaryAttributes, double hardDefaultValue)
             : base(enumVal, primaryAttribute, secondaryAttributes, hardDefaultValue) { }
     }
-    public sealed class RealmPropertyStringPrototype : RealmPropertyPrototype<RealmPropertyString, string, RealmPropertyPrimaryAttribute<string>>
+    internal sealed class RealmPropertyStringPrototype : RealmPropertyPrototype<RealmPropertyString, string, RealmPropertyPrimaryAttribute<string>>
     {
         internal RealmPropertyStringPrototype(RealmPropertyString enumVal, RealmPropertyPrimaryAttribute<string> primaryAttribute, SecondaryDict? secondaryAttributes, string hardDefaultValue)
             : base(enumVal, primaryAttribute, secondaryAttributes, hardDefaultValue) { }

@@ -101,7 +101,7 @@ namespace ACE.Server.Realms
             return GetDuelingAreaDrop(RealmManager.DuelRealm, player);
         }
 
-        public static InstancedPosition GetDuelingAreaDrop(WorldRealm realm, IPlayer player)
+        internal static InstancedPosition GetDuelingAreaDrop(WorldRealm realm, IPlayer player)
         {
             return new InstancedPosition(RealmConstants.DuelStagingAreaDrop, realm.StandardRules.GetDefaultInstanceID(player, RealmConstants.DuelStagingAreaDrop));
         }

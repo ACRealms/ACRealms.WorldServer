@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace ACRealms.Rulesets.DBOld
 {
-    public sealed partial class RealmPropertiesString : RealmPropertiesBase
+    internal sealed partial class RealmPropertiesString : RealmPropertiesBase
     {
         public string Value { get; set; }
 

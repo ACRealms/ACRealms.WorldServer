@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Core.Instance",
+  "description": "Properties related to instance selection (don't use unless you know what you're doing)",
   "groups": [
     {
       "type": "enum",

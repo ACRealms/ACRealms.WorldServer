@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Core.RulesetCrafting",
+  "description": "Properties related to ruleset crafting (minimal support for now)",
   "properties": {
     "RulesetStampVendorCategory": {
       "description": "Vendor weenies with a matching PropertyInt.RulesetStampVendorType will include this ruleset as a stamp for sale, to allow players to craft these rulesets for ephemeral instances",

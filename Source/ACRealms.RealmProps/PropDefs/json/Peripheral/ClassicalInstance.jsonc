@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Peripheral.ClassicalInstance",
+  "description": "Properties for classical instances (similar to world of warcraft's instances).",
   "groups": [
     {
       "type": "boolean",

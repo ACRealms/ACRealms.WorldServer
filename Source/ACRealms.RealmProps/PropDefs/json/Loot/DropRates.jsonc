@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Loot.DropRates",
+  "description": "Properties related to loot drop rates",
   "groups": [
     {
       "type": "float",

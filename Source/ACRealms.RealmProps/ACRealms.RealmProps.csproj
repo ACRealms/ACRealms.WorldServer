@@ -15,6 +15,7 @@
 
   <PropertyGroup>
     <GeneratedJsonOutputDir>..\..\Content\json-schema\generated\</GeneratedJsonOutputDir>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
     
   <Target Name="GatherGeneratedJsonSource" AfterTargets="CoreBuild">
@@ -44,7 +45,7 @@
 
     
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="mv -fuT $(AssemblyName).dll $(AssemblyName)Assembly.dll&#xD;&#xA;mv -fuT $(AssemblyName).pdb $(AssemblyName)Assembly.pdb&#xD;&#xA;mv -fuT $(AssemblyName).deps.json $(AssemblyName)INVALID.deps.json" WorkingDirectory="$(OutDir)" />
+    <Exec Command="mv -fuT $(AssemblyName).dll $(AssemblyName)Assembly.dll&#xD;&#xA;mv -fuT $(AssemblyName).pdb $(AssemblyName)Assembly.pdb&#xD;&#xA;mv -fuT $(AssemblyName).xml $(AssemblyName)Assembly.xml&#xD;&#xA;mv -fuT $(AssemblyName).deps.json $(AssemblyName)Assembly.deps.json" WorkingDirectory="$(OutDir)" />
   </Target>
    
   <!-- YOU MUST TARGET NET STANDARD WHEN BUILDING FROM VS, AND NET9 FROM DOTNET BUILD -->
@@ -72,7 +73,7 @@
   <ItemGroup>
    <!--<PackageReference Include="System.Collections.Immutable" Version="9.0.0" />-->
    <!--<PackageReference Include="System.IO.Pipelines" Version="9.0.0" />-->
-   <PackageReference Include="System.Text.Json" Version="9.0.0" />    
+   <!--<PackageReference Include="System.Text.Json" Version="9.0.0" />    -->
    <!--<PackageReference Include="NodaTime" Version="3.2.0" />
    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" />-->
    <!--<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />-->
@@ -105,6 +106,7 @@
   <ItemGroup>
     <DirsToClean Include="$(IntermediateOutputPath)generated" Condition="'$(IntermediateOutputPath)' != ''" />
     <DirsToClean Include="$(GeneratedJsonOutputDir)realm-properties" Condition="'$(GeneratedJsonOutputDir)' != ''" />
+    <DirsToClean Include="$(OutputPath)" Condition="'$(OutputPath)' != ''" />
   </ItemGroup>
   <Target Name="RemoveGeneratedFilesOnClean" AfterTargets="CoreClean">
     <RemoveDir Directories="@(DirsToClean)" />  

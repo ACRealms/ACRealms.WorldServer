@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ACE.Entity.ACRealms
 {
-    public record RulesetCompilationContext
+    internal record RulesetCompilationContext
     {
         private static Random RootRandom = Random.Shared;
         private static int GetNewRootSeed() => RootRandom.Next();

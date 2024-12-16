@@ -93,7 +93,7 @@ namespace ACE.Server.Realms
         /// <summary>
         /// Returns null if it is not a permanent realm
         /// </summary>
-        public WorldRealm WorldRealm
+        internal WorldRealm WorldRealm
         {
             get
             {

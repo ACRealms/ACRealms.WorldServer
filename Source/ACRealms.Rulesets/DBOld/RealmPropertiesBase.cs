@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ACRealms.Rulesets.DBOld
 {
-    public abstract class RealmPropertiesBase
+    internal abstract class RealmPropertiesBase
     {
         public ushort RealmId { get; set; }
         public int Type { get; set; }

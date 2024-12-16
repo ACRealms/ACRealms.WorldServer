@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Projectile.Magic",
+  "description": "Properties related to magic projectiles",
   "properties": {
     "DoubleCollisionCheck": {
       "type": "boolean",

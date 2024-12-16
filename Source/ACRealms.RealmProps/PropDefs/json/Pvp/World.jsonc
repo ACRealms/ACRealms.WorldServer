@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Pvp.World",
+  "description": "Properties related to world settings for PvP",
   "groups": [
     {
       "type": "boolean",

@@ -9,7 +9,7 @@ using ACRealms.RealmProps.Underlying;
 
 namespace ACRealms.Rulesets.DBOld
 {
-    public static class RealmConverter
+    internal static class RealmConverter
     {
         public static ACE.Entity.Models.Realm ConvertToEntityRealm(DBOld.Realm realm, bool instantiateEmptyCollections = false)
         {

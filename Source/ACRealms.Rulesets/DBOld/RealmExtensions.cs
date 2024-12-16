@@ -10,10 +10,10 @@ using ACRealms.Rulesets.DBOld;
 
 namespace ACRealms.Rulesets
 {
-   
 
-    
-    public static class RealmExtensions
+
+
+    internal static class RealmExtensions
     {
         // =====================================
         // Get

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ACRealms.Rulesets.Loader
 {
-    public class RealmToImport
+    internal class RealmToImport
     {
         public required DBOld.Realm Realm { get; set; }
         public required List<DBOld.RealmRulesetLinks> Links { get; set; }

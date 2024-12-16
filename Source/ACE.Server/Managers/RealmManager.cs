@@ -30,7 +30,7 @@ using ACRealms.Rulesets.Loader;
 
 namespace ACE.Server.Managers
 {
-    public static class RealmManager
+    internal static class RealmManager
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 

@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Housing.PurchaseRestrictions",
+  "description": "Properties related to housing purchase restrictions",
   "groups": [
     {
       "type": "boolean",

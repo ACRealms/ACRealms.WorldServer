@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Core.Landblock",
+  "description": "Properties affecting landblock behavior",
   "properties": {
     "UnloadInterval": {
       "description": "Landblocks which have been inactive for this many minutes will be unloaded",

@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Creature.Attributes",
+  "description": "Properties affecting a creature's attributes (Strength, Endurance, Coordination, Quickness, Focus, Self)",
   "groups": [
     {
       "type": "integer",

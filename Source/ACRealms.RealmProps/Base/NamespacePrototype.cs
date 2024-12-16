@@ -9,13 +9,16 @@ using System.Threading.Tasks;
 
 namespace ACRealms.RealmProps
 {
+    /// <summary> Contains metadata about namespaced realm properties </summary>
     public static class Namespaces
     {
         private static readonly Dictionary<string, PropNamespace>? TempBuilder = new();
 
+        /// <summary> Metadata for the root namespace </summary>
         public static PropNamespace Root { get; } = Build();
 
-        public static readonly FrozenDictionary<string, PropNamespace> ByFullName = TempBuilder.ToFrozenDictionary();
+        /// <summary> Flattened dictionary for all namespaces. For example, "Core.Instance" is a key </summary>
+        internal static readonly FrozenDictionary<string, PropNamespace> ByFullName = TempBuilder.ToFrozenDictionary();
         
 
         static Namespaces()
@@ -54,17 +57,32 @@ namespace ACRealms.RealmProps
         }
     }
 
+    /// <summary> Metadata for a namespace, including its sub-namespaces </summary>
     public record PropNamespace
     {
+        /// <summary> Gets the fully-qualified name of the namespace </summary>
         public required string FullName { get; init; }
+
+        /// <summary> Gets the simple name of the namespace. </summary>
         public required string ShortName { get; init; }
+
+        /// <summary> Returns true if the namespace is a leaf node (no sub-namespaces) </summary>
         public required bool IsLeaf { get; init; }
+
+        /// <summary> Returns true if the namespace is the root namespace </summary>
         public required bool IsRoot { get; init; }
+
         internal FrozenDictionary<string, PropNamespace> SubNamespaces { get; }
 
+        /// <summary> Gets the display name of the namespace </summary>
         public string DisplayName => IsRoot ? "<Root>" : FullName;
 
+        /// <summary> Returns the directly-descended namespace with the given ShortName </summary>
+        /// <param name="shortName">The ShortName of the namespace to fetch</param>
+        /// <returns>The directly-descended namespace with the given ShortName</returns>
         public PropNamespace this[string shortName] => SubNamespaces[shortName];
+
+        /// <inheritdoc/>
         public override string ToString() => DisplayName;
 
         internal PropNamespace(FrozenDictionary<string, PropNamespace> subNamespaces)

@@ -21,17 +21,24 @@ using ACE.Server.Factories.Tables;
 using ACRealms.RealmProps.Underlying;
 using ACRealms.RealmProps;
 using ACRealms.Rulesets.Enums;
+using ACRealms.Rulesets.Contexts;
 
 namespace ACE.Server.Realms
 {
-    public abstract class Ruleset(ushort rulesetID, RulesetCompilationContext ctx)
-        : RulesetBase
+    public abstract class Ruleset : RulesetBase
     {
         protected static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        internal Ruleset(ushort rulesetID, RulesetCompilationContext ctx)
+        {
+            RulesetID = rulesetID;
+            Context = ctx;
+        }
+
         protected Random Random => Context.Randomizer;
         public Ruleset ParentRuleset { get; protected set; }
-        public ushort RulesetID { get; } = rulesetID;
-        public RulesetCompilationContext Context { get; init; } = ctx;
+        public ushort RulesetID { get; }
+        internal RulesetCompilationContext Context { get; init; }
 
         internal IDictionary<RealmPropertyBool, AppliedRealmProperty<bool>> PropertiesBool { get; } = new Dictionary<RealmPropertyBool, AppliedRealmProperty<bool>>();
         internal IDictionary<RealmPropertyFloat, AppliedRealmProperty<double>> PropertiesFloat { get; } = new Dictionary<RealmPropertyFloat, AppliedRealmProperty<double>>();
@@ -40,7 +47,7 @@ namespace ACE.Server.Realms
         internal IDictionary<RealmPropertyString, AppliedRealmProperty<string>> PropertiesString { get; } = new Dictionary<RealmPropertyString, AppliedRealmProperty<string>>();
         internal IDictionary<string, AppliedRealmProperty> AllProperties { get; } = new Dictionary<string, AppliedRealmProperty>();
 
-        protected void ApplyRulesetDict<K, V>(
+        protected private void ApplyRulesetDict<K, V>(
             IDictionary<K, AppliedRealmProperty<V>> parent,
             IDictionary<K, AppliedRealmProperty<V>> self,
             bool invertRelationships,
@@ -149,7 +156,7 @@ namespace ACE.Server.Realms
             AllProperties.Add(prop.Options.Name, prop);
         }
 
-        protected void CopyDicts(RulesetTemplate copyFrom)
+        protected private void CopyDicts(RulesetTemplate copyFrom)
         {
             LogTrace(() => "Begin deep clone of properties from template");
             if (copyFrom.Realm.PropertyCountRandomized.HasValue)
@@ -245,7 +252,7 @@ namespace ACE.Server.Realms
             Context.LogDirect($"{(this is RulesetTemplate ? "[T]" : "[R]")}[{RealmManager.GetRealm(RulesetID, includeRulesets: true).Realm.Name}] {message()}");
         }
 
-        public static RulesetCompilationContext MakeDefaultContext(IDictionary<ushort, WorldRealmBase> dependencies = null)
+        internal static RulesetCompilationContext MakeDefaultContext(IDictionary<ushort, WorldRealmBase> dependencies = null)
         {
             dependencies ??= RealmManager.CompilationContextDependencyHandles;
             return RulesetCompilationContext.CreateContext(
@@ -257,7 +264,7 @@ namespace ACE.Server.Realms
     }
 
     //Properties should not be changed after initial composition
-    public class RulesetTemplate(ushort rulesetID, RulesetCompilationContext ctx) : Ruleset(rulesetID, ctx)
+    internal class RulesetTemplate(ushort rulesetID, RulesetCompilationContext ctx) : Ruleset(rulesetID, ctx)
     {
         public Realm Realm { get; protected set; }
         public new RulesetTemplate ParentRuleset
@@ -387,17 +394,27 @@ namespace ACE.Server.Realms
     }
 
     //Properties may be changed freely
-    public partial class AppliedRuleset(RulesetTemplate template, RulesetCompilationContext ctx) : Ruleset(template.RulesetID, ctx)
+    public partial class AppliedRuleset : Ruleset
     {
         public Landblock Landblock { get; set; }
-        public RulesetTemplate Template { get; } = template;
-        public Realm Realm => Template.Realm;
+        internal RulesetTemplate Template { get; }
+        internal Realm Realm => Template.Realm;
         public new AppliedRuleset ParentRuleset
         {
             get { return (AppliedRuleset)base.ParentRuleset; }
             set { base.ParentRuleset = value; }
         }
         public LootGenerationFactory LootGenerationFactory { get; private set; }
+
+        private List<ChanceTable<int>> _chanceTableNumCantrips = null;
+        public List<ChanceTable<int>> ChanceTableNumCantrips => _chanceTableNumCantrips ?? CantripChance.numCantrips;
+        private List<ChanceTable<int>> _chanceTableCantripLevels = null;
+        public List<ChanceTable<int>> ChanceTableCantripLevels => _chanceTableCantripLevels ?? CantripChance.cantripLevels;
+
+        internal AppliedRuleset(RulesetTemplate template, RulesetCompilationContext ctx) : base(template.RulesetID, ctx)
+        {
+            Template = template;
+        }
 
         internal string DebugOutputString()
         {
@@ -506,14 +523,6 @@ namespace ACE.Server.Realms
             LogTrace(() => $"RerollAllRules End");
         }
 
-
-        private List<ChanceTable<int>> _chanceTableNumCantrips = null;
-
-        public List<ChanceTable<int>> ChanceTableNumCantrips => _chanceTableNumCantrips ?? CantripChance.numCantrips;
-        
-        private List<ChanceTable<int>> _chanceTableCantripLevels = null;
-        public List<ChanceTable<int>> ChanceTableCantripLevels => _chanceTableCantripLevels ?? CantripChance.cantripLevels;
-
         private void BuildChanceTablesIfNecessary()
         {
             if (PropertiesFloat.ContainsKey(Props.Loot.DropRates.CantripDropRate) || GetProperty(Props.Loot.DropRates.CantripDropRate) != PropertyManager.GetDouble("cantrip_drop_rate").Item)
@@ -556,7 +565,7 @@ namespace ACE.Server.Realms
         }
 
         public double GetProperty(RealmPropertyFloat prop) => ValueOf(prop);
-        public double ValueOf(RealmPropertyFloat prop)
+        public double ValueOf(RealmPropertyFloat prop, IRealmPropContext ctx = null)
         {
             var att = RealmPropertyPrototypes.Float[prop].PrimaryAttribute;
             if (PropertiesFloat.TryGetValue(prop, out var result))

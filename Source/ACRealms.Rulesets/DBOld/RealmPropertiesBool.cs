@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ACRealms.Rulesets.DBOld
 {
-    public sealed partial class RealmPropertiesBool : RealmPropertiesBase
+    internal sealed partial class RealmPropertiesBool : RealmPropertiesBase
     {
         public bool Value { get; set; }
 

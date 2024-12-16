@@ -13,7 +13,7 @@ using static ACE.Entity.ACRealms.RulesetCompilationContext;
 
 namespace ACE.Entity.Models
 {
-    public class Realm
+    internal class Realm
     {
         public ushort Id { get; set; }
         public string Name { get; set; }
@@ -43,7 +43,7 @@ namespace ACE.Entity.Models
         }
     }
 
-    public class RealmLinkJob
+    internal class RealmLinkJob
     {
         public RealmRulesetLinkType Type { get; }
         public IReadOnlyList<AppliedRealmLink> Links { get; }
@@ -86,7 +86,7 @@ namespace ACE.Entity.Models
         internal string GetLogTrace(string realmName) => $"<- ({Probability.ToString("P2")}) [{realmName}]";
     }
 
-    public abstract class AppliedRealmProperty(RulesetCompilationContext ctx)
+    internal abstract class AppliedRealmProperty(RulesetCompilationContext ctx)
     {
         public int PropertyKey { get; protected set; }
         public RealmPropertyOptions Options { get; init; }
@@ -94,7 +94,7 @@ namespace ACE.Entity.Models
         protected RulesetCompilationContext Context { get; } = ctx;
     }
 
-    public sealed class AppliedRealmProperty<TVal>(RulesetCompilationContext ctx) : AppliedRealmProperty(ctx)
+    internal sealed class AppliedRealmProperty<TVal>(RulesetCompilationContext ctx) : AppliedRealmProperty(ctx)
         where TVal : IEquatable<TVal>
     {
         public new RealmPropertyOptions<TVal> Options { get => (RealmPropertyOptions<TVal>)base.Options; init => base.Options = value; }
@@ -211,9 +211,9 @@ namespace ACE.Entity.Models
     /// <para>Represents the immutable property definition from the ruleset config file </para>
     /// <para>The RulesetName is guaranteed to be linked to the ruleset file where defined</para>
     /// </summary>
-    public abstract record RealmPropertyOptions
+    internal abstract record RealmPropertyOptions
     {
-        public virtual RealmPropertyPrototypeBase PrototypeBase { get; init; }
+        internal virtual RealmPropertyPrototypeBase PrototypeBase { get; init; }
         public Type ValueType { get; init; }
         public Type EnumType { get; init; }
         public int EnumValueRaw { get; init; }
@@ -247,7 +247,7 @@ namespace ACE.Entity.Models
         public abstract string AppliedInfo(string val);
     }
 
-    public record RealmPropertyOptions<TPrimitive> : RealmPropertyOptions
+    internal record RealmPropertyOptions<TPrimitive> : RealmPropertyOptions
         where TPrimitive : IEquatable<TPrimitive>
     {
         public RealmPropertyPrototype<TPrimitive> Prototype { get; private init; }
@@ -280,7 +280,7 @@ namespace ACE.Entity.Models
         public override string AppliedInfo(string val) => $"Value: {val}";
     }
 
-    public record MinMaxRangedRealmPropertyOptions<T> : RealmPropertyOptions<T>
+    internal record MinMaxRangedRealmPropertyOptions<T> : RealmPropertyOptions<T>
         where T : IMinMaxValue<T>, IEquatable<T>, IComparable<T>
     {
         private Func<RulesetCompilationContext, RulesetCompilationContext.IPropertyOperatorsMinMax<T>> Operator { get; init; }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ACE.Entity.ACRealms
 {
-    public abstract class WorldRealmBase(Realm realm, RulesetBase template)
+    internal abstract class WorldRealmBase(Realm realm, RulesetBase template)
     {
         public Realm Realm { get; } = realm;
 

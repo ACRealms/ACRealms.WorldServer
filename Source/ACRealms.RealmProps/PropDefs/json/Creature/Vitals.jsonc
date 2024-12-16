@@ -1,6 +1,7 @@
 {
   "$schema_version": 1,
   "namespace": "Creature.Vitals",
+  "description": "Properties affecting a creature's vitals (Health, Stamina, Mana)",
   "groups": [
     {
       "type": "integer",

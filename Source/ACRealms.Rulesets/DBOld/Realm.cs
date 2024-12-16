@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ACRealms.Rulesets.DBOld
 {
-    public partial class Realm
+    internal partial class Realm
     {
         public Realm()
         {
