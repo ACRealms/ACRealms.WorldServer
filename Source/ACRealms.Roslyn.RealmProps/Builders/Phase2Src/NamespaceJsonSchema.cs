@@ -63,23 +63,23 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
                 string propSchema;
                 if (prop is { Type: PropType.integer })
                 {
-                    var defaultVal = int.Parse(prop.AttributeDefault);
-                    var minVal = int.Parse(prop.AttributeMinValue);
-                    var maxVal = int.Parse(prop.AttributeMaxValue);
+                    var defaultVal = int.Parse(prop.AttributeDefault).ToString();
+                    var minVal = int.Parse(prop.AttributeMinValue).ToString();
+                    var maxVal = int.Parse(prop.AttributeMaxValue).ToString();
                     propSchema = MakeNumericPropSchema(prop, "integer", defaultVal, minVal, maxVal);
                 }
                 else if (prop is { Type: PropType.int64 })
                 {
-                    var defaultVal = long.Parse(prop.AttributeDefault);
-                    var minVal = long.Parse(prop.AttributeMinValue);
-                    var maxVal = long.Parse(prop.AttributeMaxValue);
+                    var defaultVal = long.Parse(prop.AttributeDefault).ToString();
+                    var minVal = long.Parse(prop.AttributeMinValue).ToString();
+                    var maxVal = long.Parse(prop.AttributeMaxValue).ToString();
                     propSchema = MakeNumericPropSchema(prop, "integer", defaultVal, minVal, maxVal);
                 }
                 else if (prop is { Type: PropType.@float })
                 {
-                    var defaultVal = double.Parse(prop.AttributeDefault);
-                    var minVal = Math.Round(double.Parse(prop.AttributeMinValue), 6);
-                    var maxVal = Math.Round(double.Parse(prop.AttributeMaxValue), 6);
+                    var defaultVal = double.Parse(prop.AttributeDefault).ToString();
+                    var minVal = Math.Round(double.Parse(prop.AttributeMinValue), 6).ToString();
+                    var maxVal = Math.Round(double.Parse(prop.AttributeMaxValue), 6).ToString();
                     propSchema = MakeNumericPropSchema(prop, "number", defaultVal, minVal, maxVal);
                 }
                 else if (prop is { Type: PropType.@string })
@@ -131,7 +131,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             """;
         }
 
-        private static string MakeNumericPropSchema(ObjPropInfo propInfo, string valType, object defaultVal, object min, object max)
+        private static string MakeNumericPropSchema(ObjPropInfo propInfo, string valType, string defaultValLiteral, string min, string max)
         {
             var scopeDefSchema = MakeScopeDef(propInfo);
             var sVal = RefLiteral($"#{propInfo.Key}.v");
@@ -141,7 +141,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             {
               "description": "{{propInfo.Description}}",
               "definitions": {
-                "v": { "$anchor": "{{propInfo.Key}}.v", "type": "{{valType}}", "minimum": {{min}}, "maximum": {{max}}, "default": {{defaultVal}} },
+                "v": { "$anchor": "{{propInfo.Key}}.v", "type": "{{valType}}", "minimum": {{min}}, "maximum": {{max}}, "default": {{defaultValLiteral}} },
                 "s": {{scopeDefSchema}},
                 "p": { "$anchor": "{{propInfo.Key}}.p",
                   "allOf": [
