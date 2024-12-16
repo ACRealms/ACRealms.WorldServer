@@ -18,5 +18,10 @@ namespace ACRealms.Roslyn.RealmProps.Builders
                   {{serializedObjectWithoutWrapper}}
                 }
                 """);
+        internal static string RefSnippet(string target) =>
+            $$"""
+            "$ref": "{{target}}"
+            """;
+        internal static string RefLiteral(string target) => $"{{ {RefSnippet(target)} }}";
     }
 }

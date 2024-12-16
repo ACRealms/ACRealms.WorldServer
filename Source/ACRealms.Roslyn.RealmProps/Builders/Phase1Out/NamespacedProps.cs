@@ -12,9 +12,8 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase1
             try
             {
                 return $$"""
-            
-            {{data.ToCompilationSource()}}
-            """;
+                    {{data.ToCompilationSource()}}
+                    """;
             }
             catch (Exception ex)
             {

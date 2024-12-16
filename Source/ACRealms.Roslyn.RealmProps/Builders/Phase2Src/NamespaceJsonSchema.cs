@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
+using static ACRealms.Roslyn.RealmProps.Builders.SerializationHelpers;
 
 namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
 {
@@ -11,14 +8,28 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
         {
             try
             {
-                object schema = MakeNamespaceSchema(data);
-                var schemaSerialized = JsonSerializer.Serialize(schema, new JsonSerializerOptions { WriteIndented = true });
+                var relativeDir = string.Concat(Enumerable.Repeat("../", data.NestedClassNames.Length + 1));
+                var optionsBasePath = $"{relativeDir}options-base.json";
+                var properties = MakePropertySchema(data);
 
-                return $$"""
-                    /*
-                    {{schemaSerialized}}
-                    */
-                    """;
+                // We must wrap in a comment as the source generator treats the output as a C# file
+                return
+                $$"""
+                /*
+                {
+                  "$schema": "http://json-schema.org/draft-07/schema",
+                  "type": "object",
+                  "definitions": {
+                    "opts": { "$anchor": "opts.common", "$ref": "{{optionsBasePath}}#/definitions/commonOpts" },
+                    "reroll": { "$anchor": "opts.reroll", "$ref": "{{optionsBasePath}}#/definitions/reroll" }
+                  },
+                  "properties": {
+                    {{properties}}
+                  },
+                  "additionalProperties": false
+                }
+                */
+                """;
             }
             catch (Exception ex)
             {
@@ -27,268 +38,127 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             }
         }
 
-        private static object MakeNamespaceSchema(NamespaceData data)
+        private static string MakeScopeDef(ObjPropInfo objPropInfo)
         {
-            var properties = MakePropertySchema(data);
-
-            var idShort = data.NamespaceFull.Replace(".", "/");
-            var id = $"https://realm.ac/schema/v1/generated/realm-properties/{idShort}.json";
-
-            var sb = new StringBuilder();
-            for (int i = 0; i < data.NestedClassNames.Length + 1; i++)
-                sb.Append("../");
-            var relativeDir = sb.ToString();
-            var optionsBasePath = $"{relativeDir}options-base.json";
-
-            var definitionsDict = new Dictionary<string, Dictionary<string, object>>()
+            return
+            $$"""
             {
-                { "commonOpts", new Dictionary<string, object> { { "$ref", $"{optionsBasePath}#/definitions/commonOpts" } } }
-            };
-
-            var realmPropertiesSchema = new Dictionary<string, object>()
-            {
-                {   "$schema", "http://json-schema.org/draft-07/schema" },
-                {   "$id", id },
-                {   "type", "object" },
-                {   "minItems", 1 },
-                {   "definitions", definitionsDict },
-                {   "properties", properties },
-                {   "additionalProperties", false }
-            };
-
-            return realmPropertiesSchema;
-        }
-
-        private static Dictionary<string, object> MakeScopeDef(ObjPropInfo objPropInfo)
-        {
-            var dict = new Dictionary<string, object>()
-            {
-                { "type", "object" },
-                { "properties", new Dictionary<string, object>() {
-                    { "compiled_from_meta", new Dictionary<string, object>() {
-                        { "type", "string" } } } }
+              "$anchor": "{{objPropInfo.Key}}.s",
+              "type": "object",
+              "properties": {
+                "fill_me_in": {
+                  "type": "string"
                 }
-            };
-
-            return dict;
+              }
+            }
+            """;
         }
 
-        private static Dictionary<string, object> MakePropertySchema(NamespaceData data)
+        private static string MakePropertySchema(NamespaceData data)
         {
-            var sb = new StringBuilder();
-            for (int i = 0; i < data.NestedClassNames.Length + 1; i++)
-                sb.Append("../");
-            var relativeDir = sb.ToString();
-            var optionsBasePath = $"{relativeDir}options-base.json";
+            List<string> propertyJsonSchema = [];
 
-            var probabilitySchema = new Dictionary<string, object>()
+            foreach (var prop in data.ObjProps.Array)
             {
-                { "$ref", $"{optionsBasePath}#/definitions/probability" }
-            };
+                string propSchema;
+                if (prop is { Type: PropType.integer })
+                {
+                    var defaultVal = int.Parse(prop.AttributeDefault);
+                    var minVal = int.Parse(prop.AttributeMinValue);
+                    var maxVal = int.Parse(prop.AttributeMaxValue);
+                    propSchema = MakeNumericPropSchema(prop, "integer", defaultVal, minVal, maxVal);
+                }
+                else if (prop is { Type: PropType.int64 })
+                {
+                    var defaultVal = long.Parse(prop.AttributeDefault);
+                    var minVal = long.Parse(prop.AttributeMinValue);
+                    var maxVal = long.Parse(prop.AttributeMaxValue);
+                    propSchema = MakeNumericPropSchema(prop, "integer", defaultVal, minVal, maxVal);
+                }
+                else if (prop is { Type: PropType.@float })
+                {
+                    var defaultVal = double.Parse(prop.AttributeDefault);
+                    var minVal = Math.Round(double.Parse(prop.AttributeMinValue), 6);
+                    var maxVal = Math.Round(double.Parse(prop.AttributeMaxValue), 6);
+                    propSchema = MakeNumericPropSchema(prop, "number", defaultVal, minVal, maxVal);
+                }
+                else if (prop is { Type: PropType.@string })
+                {
+                    var defaultVal = prop.AttributeDefault;
+                    propSchema = MakeBasicPropSchema(prop, "string", defaultVal);
+                }
+                else if (prop is { Type: PropType.boolean })
+                {
+                    var defaultVal = prop.AttributeDefault;
+                    propSchema = MakeBasicPropSchema(prop, "boolean", defaultVal);
+                }
+                else
+                    return "";
 
-            var composeSchema = new Dictionary<string, object>()
-            {
-                { "$ref", $"{optionsBasePath}#/definitions/compose" }
-            };
-            var lockedSchema = new Dictionary<string, object>()
-            {
-                { "$ref", $"{optionsBasePath}#/definitions/locked" }
-            };
-            var rerollSchema = new Dictionary<string, object>()
-            {
-                { "$ref", $"{optionsBasePath}#/definitions/reroll" }
-            };
-
-            var propertyJsonSchema = new Dictionary<string, object>();
-
-            var propsOf = (PropType type) => data.ObjProps.Array.Where(p => p.Type == type);
-
-            foreach (var propInt in propsOf(PropType.integer))
-            {
-                var defaultVal = int.Parse(propInt.AttributeDefault);
-                var minVal = int.Parse(propInt.AttributeMinValue);
-                var maxVal = int.Parse(propInt.AttributeMaxValue);
-                propertyJsonSchema.Add(propInt.Key, MakeNumericPropSchema(rerollSchema, propInt, "integer", defaultVal, minVal, maxVal));
+                AddProp(propertyJsonSchema, prop.Key, propSchema);
             }
 
-
-            foreach (var propLong in propsOf(PropType.int64))
-            {
-                var defaultVal = long.Parse(propLong.AttributeDefault);
-                var minVal = long.Parse(propLong.AttributeMinValue);
-                var maxVal = long.Parse(propLong.AttributeMaxValue);
-                propertyJsonSchema.Add(propLong.Key, MakeNumericPropSchema(rerollSchema, propLong, "integer", defaultVal, minVal, maxVal));
-            }
-
-            foreach (var propFloat in propsOf(PropType.@float))
-            {
-                var defaultVal = double.Parse(propFloat.AttributeDefault);
-                var minVal = Math.Round(double.Parse(propFloat.AttributeMinValue), 6);
-                var maxVal = Math.Round(double.Parse(propFloat.AttributeMaxValue), 6);
-                propertyJsonSchema.Add(propFloat.Key, MakeNumericPropSchema(rerollSchema, propFloat, "number", defaultVal, minVal, maxVal));
-            }
-
-            foreach (var propString in propsOf(PropType.@string))
-            {
-                var propertySchema = new Dictionary<string, object>();
-
-                var directValueSchema = new Dictionary<string, object>()
-                {
-                    { "$ref", $"#/properties/{propString.Key}/definitions/val" }
-                };
-
-                var defaultval = propString.AttributeDefault;
-
-                var defSchema = new Dictionary<string, object>()
-                {
-                    { "val", new Dictionary<string, object>()
-                    {
-                        { "type", "string" },
-                        { "default", defaultval.Substring(1, defaultval.Length - 2) }
-                    } }
-                };
-
-                propertySchema.Add("description", propString.Description);
-
-                propertySchema.Add("definitions", defSchema);
-
-                var typeOneSchema = new Dictionary<string, object>()
-                {
-                    { "type", "object" },
-                    { "properties", new Dictionary<string, object>() {
-                        { "value", directValueSchema },
-                        { "probability", probabilitySchema },
-                        { "locked", lockedSchema } } },
-                    { "required", new List<string>() { "value" } },
-                    { "additionalProperties", false }
-                };
-
-
-                propertySchema.Add("oneOf", new List<object>()
-                {
-                    directValueSchema,
-                    typeOneSchema
-                });
-                propertyJsonSchema.Add(propString.Key.ToString(), propertySchema);
-            }
-
-            foreach (var propBool in propsOf(PropType.boolean))
-            {
-                var propertySchema = new Dictionary<string, object>();
-
-                var directValueSchema = new Dictionary<string, object>()
-                {
-                    { "$ref", $"#/properties/{propBool.Key}/definitions/val" }
-                };
-
-                var defSchema = new Dictionary<string, object>()
-                {
-                    { "val", new Dictionary<string, object>()
-                    {
-                        { "type", "boolean" },
-                        { "default", propBool.AttributeDefault == "true" }
-                    } }
-                };
-
-                propertySchema.Add("description", propBool.Description);
-
-                propertySchema.Add("definitions", defSchema);
-
-                var typeOneSchema = new Dictionary<string, object>()
-                {
-                    { "type", "object" },
-                    { "properties", new Dictionary<string, object>() {
-                        { "value", directValueSchema },
-                        { "probability", probabilitySchema },
-                        { "locked", lockedSchema } } },
-                    { "required", new List<string>() { "value" } },
-                    { "additionalProperties", false }
-                };
-
-                propertySchema.Add("oneOf", new List<object>()
-                {
-                    directValueSchema,
-                    typeOneSchema
-                });
-
-                propertyJsonSchema.Add(propBool.Key.ToString(), propertySchema);
-            }
-
-            return propertyJsonSchema;
+            return SerializePropsUnwrapped(propertyJsonSchema);
         }
 
-        private static Dictionary<string, object> MakeNumericPropSchema(Dictionary<string, object> rerollSchema, ObjPropInfo propInfo, string valType, object defaultVal, object min, object max)
+        private static string MakeBasicPropSchema(ObjPropInfo propInfo, string valType, string defaultValLiteral)
         {
-            var conv = static (string s) => double.Parse(s);
             var scopeDefSchema = MakeScopeDef(propInfo);
+            var sVal = $$"""
+                        { "$ref": "#{{propInfo.Key}}.v" }
+                        """;
 
-            var directValueSchema = new Dictionary<string, object>()
-                {
-                    { "$ref", $"#/properties/{propInfo.Key}/definitions/val" }
-                };
-
-            var propDefSchema = new Dictionary<string, object>()
-                {
-                    { "allOf", new Dictionary<string, object>[] {
-                        new Dictionary<string, object> {
-                            { "oneOf", new Dictionary<string, object>[] {
-                                new Dictionary<string, object> {
-                                    { "type", "object" },
-                                    { "properties", new Dictionary<string, object> { { "value", directValueSchema } } },
-                                    { "required", new string[] { "value" } } },
-                                new Dictionary<string, object> {
-                                    { "type", "object" },
-                                    { "properties", new Dictionary<string, object> {
-                                        { "low", directValueSchema },
-                                        { "high", directValueSchema },
-                                        { "reroll", rerollSchema } } },
-                                    { "required", new string[] { "low", "high" } } } } } },
-                        new Dictionary<string, object>
-                        {
-                            { "$ref", "#/definitions/commonOpts" },
-                            { "allOf", new Dictionary<string, object>[] { new Dictionary<string, object> {
-                                { "type", "object" },
-                                { "properties", new Dictionary<string, object> {
-                                    { "scope", new Dictionary<string, object> { { "$ref", $"#/properties/{propInfo.Key}/definitions/scopeDef" } } } } } } } }
-                        } } }
-                };
-
-            var defSchema = new Dictionary<string, object>()
-                {
-                    { "val", new Dictionary<string, object>() {
-                        { "type", valType },
-                        { "minimum", min },
-                        { "maximum", max },
-                        { "default", defaultVal } } },
-                    { "scopeDef", scopeDefSchema },
-                    { "propDef", propDefSchema }
-                };
-
-            var mainOneOfSchema = new Dictionary<string, object>[]
+            return
+            $$"""
             {
-                    directValueSchema,
-                    new Dictionary<string, object> {
-                        { "$ref", $"#/properties/{propInfo.Key}/definitions/propDef" },
-                        { "unevaluatedProperties", false } },
-                    new Dictionary<string, object> {
-                        { "type", "array" },
-                        { "items",  new Dictionary<string, object> {
-                            { "allOf", new object[] { new Dictionary<string, object> { { "$ref", $"#/properties/{propInfo.Key}/definitions/propDef" } } } },
-                            { "required", new string[] { "scope" } },
-                            { "unevaluatedProperties", false } }
-                        },
-                        { "unevaluatedProperties", false }
-                    }
-            };
+              "description": "{{propInfo.Description}}",
+              "definitions": {
+                "v": { "$anchor": "{{propInfo.Key}}.v", "type": "{{valType}}", "default": {{defaultValLiteral}} },
+                "s": {{scopeDefSchema}},
+                "p": { "$anchor": "{{propInfo.Key}}.p",
+                  "allOf": [
+                    { "type": "object", "properties": { "value": {{sVal}} }, "required": ["value"] },
+                    { {{RefSnippet("#opts.common")}},
+                      "allOf": [ { "type": "object", "properties": { "scope": {{ RefLiteral($"#{propInfo.Key}.s") }} } } ] } ]
+                }
+              },
+              "oneOf": [
+                {{sVal}},
+                { {{RefSnippet($"#{propInfo.Key}.p")}}, "unevaluatedProperties": false },
+                { "type": "array", "items": { "allOf": [ {{RefLiteral($"#{propInfo.Key}.p")}} ], "required": ["scope"], "unevaluatedProperties": false } }
+              ]
+            }
+            """;
+        }
 
-            var propertySchema = new Dictionary<string, object>()
-                {
-                    { "description", propInfo.Description },
-                    { "definitions", defSchema },
-                    { "oneOf", mainOneOfSchema }
-                };
-
-            return propertySchema;
+        private static string MakeNumericPropSchema(ObjPropInfo propInfo, string valType, object defaultVal, object min, object max)
+        {
+            var scopeDefSchema = MakeScopeDef(propInfo);
+            var sVal = RefLiteral($"#{propInfo.Key}.v");
+            
+            return
+            $$"""
+            {
+              "description": "{{propInfo.Description}}",
+              "definitions": {
+                "v": { "$anchor": "{{propInfo.Key}}.v", "type": "{{valType}}", "minimum": {{min}}, "maximum": {{max}}, "default": {{defaultVal}} },
+                "s": {{scopeDefSchema}},
+                "p": { "$anchor": "{{propInfo.Key}}.p",
+                  "allOf": [
+                    { "oneOf": [
+                      { "type": "object", "properties": { "value": {{sVal}} }, "required": ["value"] },
+                      { "type": "object", "properties": { "low": {{sVal}}, "high": {{sVal}}, "reroll": {{ RefLiteral("#opts.reroll") }} }, "required": ["low","high"] } ] },
+                    { {{ RefSnippet("#opts.common") }},
+                      "allOf": [ { "type": "object", "properties": { "scope": {{ RefLiteral($"#{propInfo.Key}.s") }} } } ] } ]
+                }
+              },
+              "oneOf": [
+                {{sVal}},
+                { {{ RefSnippet($"#{propInfo.Key}.p") }}, "unevaluatedProperties": false },
+                { "type": "array", "items": { "allOf": [ {{RefLiteral($"#{propInfo.Key}.p") }} ], "required": ["scope"], "unevaluatedProperties": false } }
+              ]  
+            }
+            """;
         }
     }
 }
