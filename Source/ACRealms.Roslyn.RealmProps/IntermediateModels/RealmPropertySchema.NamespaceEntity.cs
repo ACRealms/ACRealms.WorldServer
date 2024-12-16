@@ -20,13 +20,24 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
-public readonly partial struct Contexts
+public readonly partial struct RealmPropertySchema
 {
     /// <summary>
     /// Generated from JSON Schema.
     /// </summary>
-    [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<ContextVal>))]
-    public readonly partial struct ContextVal
+    /// <remarks>
+    /// <para>
+    /// The full namespace name. Use a . as a path separator.
+    /// </para>
+    /// <para>
+    /// For example, Foo.Bar.Baz will create a C# class Props.Foo.Bar.Baz, where Foo is an inner class of Props, and so on.
+    /// </para>
+    /// <para>
+    /// The file path of this document not factor into this.
+    /// </para>
+    /// </remarks>
+    [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<NamespaceEntity>))]
+    public readonly partial struct NamespaceEntity
 
     {
         private readonly Backing backing;
@@ -34,9 +45,9 @@ public readonly partial struct Contexts
         private readonly string stringBacking;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContextVal"/> struct.
+        /// Initializes a new instance of the <see cref="NamespaceEntity"/> struct.
         /// </summary>
-        public ContextVal()
+        public NamespaceEntity()
         {
             this.jsonElementBacking = default;
             this.backing = Backing.JsonElement;
@@ -44,10 +55,10 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContextVal"/> struct.
+        /// Initializes a new instance of the <see cref="NamespaceEntity"/> struct.
         /// </summary>
         /// <param name="value">The value from which to construct the instance.</param>
-        public ContextVal(in JsonElement value)
+        public NamespaceEntity(in JsonElement value)
         {
             this.jsonElementBacking = value;
             this.backing = Backing.JsonElement;
@@ -55,10 +66,10 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContextVal"/> struct.
+        /// Initializes a new instance of the <see cref="NamespaceEntity"/> struct.
         /// </summary>
         /// <param name="value">The value from which to construct the instance.</param>
-        public ContextVal(string value)
+        public NamespaceEntity(string value)
         {
             this.backing = Backing.String;
             this.jsonElementBacking = default;
@@ -68,22 +79,22 @@ public readonly partial struct Contexts
         /// <summary>
         /// Gets the schema location from which this type was generated.
         /// </summary>
-        public static string SchemaLocation { get; } = "contexts.json#/definitions/contextVal";
+        public static string SchemaLocation { get; } = "#/properties/namespace";
 
         /// <summary>
         /// Gets a Null instance.
         /// </summary>
-        public static ContextVal Null { get; } = new(JsonValueHelpers.NullElement);
+        public static NamespaceEntity Null { get; } = new(JsonValueHelpers.NullElement);
 
         /// <summary>
         /// Gets an Undefined instance.
         /// </summary>
-        public static ContextVal Undefined { get; }
+        public static NamespaceEntity Undefined { get; }
 
         /// <summary>
         /// Gets the default instance.
         /// </summary>
-        public static ContextVal DefaultInstance { get; }
+        public static NamespaceEntity DefaultInstance { get; }
 
         /// <inheritdoc/>
         public JsonAny AsAny
@@ -208,28 +219,6 @@ public readonly partial struct Contexts
             }
         }
 
-        /// <summary>
-        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature" />.
-        /// </summary>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature AsACreature
-        {
-            get
-            {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature>();
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature" />.
-        /// </summary>
-        public bool IsACreature
-        {
-            get
-            {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature>().IsValid();
-            }
-        }
-
         /// <inheritdoc/>
         public bool HasJsonElementBacking
         {
@@ -271,36 +260,18 @@ public readonly partial struct Contexts
         /// Conversion from JsonAny.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ContextVal(JsonAny value)
+        public static implicit operator NamespaceEntity(JsonAny value)
         {
-            return value.As<ContextVal>();
+            return value.As<NamespaceEntity>();
         }
 
         /// <summary>
         /// Conversion to JsonAny.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator JsonAny(ContextVal value)
+        public static implicit operator JsonAny(NamespaceEntity value)
         {
             return value.AsAny;
-        }
-
-        /// <summary>
-        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature"/>.
-        /// </summary>
-        /// <param name="value">The value from which to convert.</param>
-        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature(ContextVal value)
-        {
-            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature>();
-        }
-
-        /// <summary>
-        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature"/>.
-        /// </summary>
-        /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ContextVal(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature value)
-        {
-            return value.As<ContextVal>();
         }
 
         /// <summary>
@@ -311,7 +282,7 @@ public readonly partial struct Contexts
         /// <returns>
         /// <c>True</c> if the values are equal.
         /// </returns>
-        public static bool operator ==(in ContextVal left, in ContextVal right)
+        public static bool operator ==(in NamespaceEntity left, in NamespaceEntity right)
         {
             return left.Equals(right);
         }
@@ -324,7 +295,7 @@ public readonly partial struct Contexts
         /// <returns>
         /// <c>True</c> if the values are not equal.
         /// </returns>
-        public static bool operator !=(in ContextVal left, in ContextVal right)
+        public static bool operator !=(in NamespaceEntity left, in NamespaceEntity right)
         {
             return !left.Equals(right);
         }
@@ -338,7 +309,7 @@ public readonly partial struct Contexts
         /// value cannot be constructed from the given instance (e.g. because they have an incompatible .NET backing type).
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ContextVal FromJson(in JsonElement value)
+        public static NamespaceEntity FromJson(in JsonElement value)
         {
             return new(value);
         }
@@ -349,7 +320,7 @@ public readonly partial struct Contexts
         /// <param name="value">The <see cref="JsonAny"/> value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the <see cref="JsonAny"/> value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ContextVal FromAny(in JsonAny value)
+        public static NamespaceEntity FromAny(in JsonAny value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -372,7 +343,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the provided value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static ContextVal IJsonValue<ContextVal>.FromBoolean<TValue>(in TValue value)
+        static NamespaceEntity IJsonValue<NamespaceEntity>.FromBoolean<TValue>(in TValue value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -390,7 +361,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the provided value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ContextVal FromString<TValue>(in TValue value)
+        public static NamespaceEntity FromString<TValue>(in TValue value)
             where TValue : struct, IJsonString<TValue>
         {
             if (value.HasJsonElementBacking)
@@ -414,7 +385,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the provided value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static ContextVal IJsonValue<ContextVal>.FromNumber<TValue>(in TValue value)
+        static NamespaceEntity IJsonValue<NamespaceEntity>.FromNumber<TValue>(in TValue value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -433,7 +404,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the provided value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static ContextVal IJsonValue<ContextVal>.FromObject<TValue>(in TValue value)
+        static NamespaceEntity IJsonValue<NamespaceEntity>.FromObject<TValue>(in TValue value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -452,7 +423,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the provided value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static ContextVal IJsonValue<ContextVal>.FromArray<TValue>(in TValue value)
+        static NamespaceEntity IJsonValue<NamespaceEntity>.FromArray<TValue>(in TValue value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -464,109 +435,109 @@ public readonly partial struct Contexts
 #endif
 
         /// <summary>
-        /// Parses the ContextVal.
+        /// Parses the NamespaceEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
         /// <param name="options">The (optional) JsonDocumentOptions.</param>
-        public static ContextVal Parse(string source, JsonDocumentOptions options = default)
+        public static NamespaceEntity Parse(string source, JsonDocumentOptions options = default)
         {
             using var jsonDocument = JsonDocument.Parse(source, options);
             return new(jsonDocument.RootElement.Clone());
         }
 
         /// <summary>
-        /// Parses the ContextVal.
+        /// Parses the NamespaceEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
         /// <param name="options">The (optional) JsonDocumentOptions.</param>
-        public static ContextVal Parse(Stream source, JsonDocumentOptions options = default)
+        public static NamespaceEntity Parse(Stream source, JsonDocumentOptions options = default)
         {
             using var jsonDocument = JsonDocument.Parse(source, options);
             return new(jsonDocument.RootElement.Clone());
         }
 
         /// <summary>
-        /// Parses the ContextVal.
+        /// Parses the NamespaceEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
         /// <param name="options">The (optional) JsonDocumentOptions.</param>
-        public static ContextVal Parse(ReadOnlyMemory<byte> source, JsonDocumentOptions options = default)
+        public static NamespaceEntity Parse(ReadOnlyMemory<byte> source, JsonDocumentOptions options = default)
         {
             using var jsonDocument = JsonDocument.Parse(source, options);
             return new(jsonDocument.RootElement.Clone());
         }
 
         /// <summary>
-        /// Parses the ContextVal.
+        /// Parses the NamespaceEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
         /// <param name="options">The (optional) JsonDocumentOptions.</param>
-        public static ContextVal Parse(ReadOnlyMemory<char> source, JsonDocumentOptions options = default)
+        public static NamespaceEntity Parse(ReadOnlyMemory<char> source, JsonDocumentOptions options = default)
         {
             using var jsonDocument = JsonDocument.Parse(source, options);
             return new(jsonDocument.RootElement.Clone());
         }
 
         /// <summary>
-        /// Parses the ContextVal.
+        /// Parses the NamespaceEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
         /// <param name="options">The (optional) JsonDocumentOptions.</param>
-        public static ContextVal Parse(ReadOnlySequence<byte> source, JsonDocumentOptions options = default)
+        public static NamespaceEntity Parse(ReadOnlySequence<byte> source, JsonDocumentOptions options = default)
         {
             using var jsonDocument = JsonDocument.Parse(source, options);
             return new(jsonDocument.RootElement.Clone());
         }
 
         /// <summary>
-        /// Parses the ContextVal.
+        /// Parses the NamespaceEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
-        public static ContextVal ParseValue(string source)
+        public static NamespaceEntity ParseValue(string source)
         {
 #if NET8_0_OR_GREATER
-            return IJsonValue<ContextVal>.ParseValue(source);
+            return IJsonValue<NamespaceEntity>.ParseValue(source);
 #else
-            return JsonValueHelpers.ParseValue<ContextVal>(source.AsSpan());
+            return JsonValueHelpers.ParseValue<NamespaceEntity>(source.AsSpan());
 #endif
         }
 
         /// <summary>
-        /// Parses the ContextVal.
+        /// Parses the NamespaceEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
-        public static ContextVal ParseValue(ReadOnlySpan<char> source)
+        public static NamespaceEntity ParseValue(ReadOnlySpan<char> source)
         {
 #if NET8_0_OR_GREATER
-            return IJsonValue<ContextVal>.ParseValue(source);
+            return IJsonValue<NamespaceEntity>.ParseValue(source);
 #else
-            return JsonValueHelpers.ParseValue<ContextVal>(source);
+            return JsonValueHelpers.ParseValue<NamespaceEntity>(source);
 #endif
         }
 
         /// <summary>
-        /// Parses the ContextVal.
+        /// Parses the NamespaceEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
-        public static ContextVal ParseValue(ReadOnlySpan<byte> source)
+        public static NamespaceEntity ParseValue(ReadOnlySpan<byte> source)
         {
 #if NET8_0_OR_GREATER
-            return IJsonValue<ContextVal>.ParseValue(source);
+            return IJsonValue<NamespaceEntity>.ParseValue(source);
 #else
-            return JsonValueHelpers.ParseValue<ContextVal>(source);
+            return JsonValueHelpers.ParseValue<NamespaceEntity>(source);
 #endif
         }
 
         /// <summary>
-        /// Parses the ContextVal.
+        /// Parses the NamespaceEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
-        public static ContextVal ParseValue(ref Utf8JsonReader source)
+        public static NamespaceEntity ParseValue(ref Utf8JsonReader source)
         {
 #if NET8_0_OR_GREATER
-            return IJsonValue<ContextVal>.ParseValue(ref source);
+            return IJsonValue<NamespaceEntity>.ParseValue(ref source);
 #else
-            return JsonValueHelpers.ParseValue<ContextVal>(ref source);
+            return JsonValueHelpers.ParseValue<NamespaceEntity>(ref source);
 #endif
         }
 
@@ -597,7 +568,7 @@ public readonly partial struct Contexts
 
             return TTarget.Undefined;
 #else
-            return this.As<ContextVal, TTarget>();
+            return this.As<NamespaceEntity, TTarget>();
 #endif
         }
 
@@ -605,7 +576,7 @@ public readonly partial struct Contexts
         public override bool Equals(object? obj)
         {
             return
-                (obj is IJsonValue jv && this.Equals(jv.As<ContextVal>())) ||
+                (obj is IJsonValue jv && this.Equals(jv.As<NamespaceEntity>())) ||
                 (obj is null && this.IsNull());
         }
 
@@ -613,7 +584,7 @@ public readonly partial struct Contexts
         public bool Equals<T>(in T other)
             where T : struct, IJsonValue<T>
         {
-            return this.Equals(other.As<ContextVal>());
+            return this.Equals(other.As<NamespaceEntity>());
         }
 
         /// <summary>
@@ -621,7 +592,7 @@ public readonly partial struct Contexts
         /// </summary>
         /// <param name="other">The other item with which to compare.</param>
         /// <returns><see langword="true"/> if the values were equal.</returns>
-        public bool Equals(in ContextVal other)
+        public bool Equals(in NamespaceEntity other)
         {
             JsonValueKind thisKind = this.ValueKind;
             JsonValueKind otherKind = other.ValueKind;
@@ -716,17 +687,6 @@ public readonly partial struct Contexts
         public override string ToString()
         {
             return this.Serialize();
-        }
-
-        /// <summary>
-        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature" />.
-        /// </summary>
-        /// <param name="result">The result of the conversions.</param>
-        /// <returns><see langword="true" /> if the conversion was valid.</returns>
-        public bool TryGetAsACreature(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature result)
-        {
-            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature>();
-            return result.IsValid();
         }
     }
 }

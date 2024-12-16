@@ -162,6 +162,27 @@ public readonly partial struct RealmPropertySchema
                         result = result.PopLocation();
                     }
                 }
+                else if (property.NameEquals(JsonPropertyNames.DescriptionUtf8, JsonPropertyNames.Description))
+                {
+                    result = result.WithLocalProperty(propertyCount);
+                    if (level > ValidationLevel.Basic)
+                    {
+                        result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/description/$ref"), JsonPropertyNames.Description);
+                    }
+
+                    ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPattern>().Validate(result.CreateChildContext(), level);
+                    if (level == ValidationLevel.Flag && !propertyResult.IsValid)
+                    {
+                        return propertyResult;
+                    }
+
+                    result = result.MergeResults(propertyResult.IsValid, level, propertyResult);
+
+                    if (level > ValidationLevel.Basic)
+                    {
+                        result = result.PopLocation();
+                    }
+                }
                 else if (property.NameEquals(JsonPropertyNames.GroupsUtf8, JsonPropertyNames.Groups))
                 {
                     result = result.WithLocalProperty(propertyCount);
@@ -192,7 +213,7 @@ public readonly partial struct RealmPropertySchema
                         result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/namespace"), JsonPropertyNames.Namespace);
                     }
 
-                    ValidationContext propertyResult = property.Value.As<Corvus.Json.JsonString>().Validate(result.CreateChildContext(), level);
+                    ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.NamespaceEntity>().Validate(result.CreateChildContext(), level);
                     if (level == ValidationLevel.Flag && !propertyResult.IsValid)
                     {
                         return propertyResult;

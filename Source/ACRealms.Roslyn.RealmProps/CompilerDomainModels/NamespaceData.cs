@@ -2,22 +2,39 @@ using ACRealms.Roslyn.RealmProps.CompilerDomainModels;
 
 namespace ACRealms.Roslyn.RealmProps
 {
-    record NamespaceData
+    // Trimmed namespace data, not including all properties
+    // This enhances cacheability of the root generated props schema as this record only contains data needed to generate the root schema
+    record NamespaceStub
+    {
+        public ImmutableArray<string> NestedClassNames { get; private init; }
+        public string? Description { get; private init; }
+
+        public NamespaceStub(string namespaceFull, string? description)
+        {
+            Description = description;
+
+            string[]? parts = namespaceFull.Split('.');
+            NestedClassNames = parts.ToImmutableArray();
+        }
+
+        protected NamespaceStub CreateForClone() => new(this);
+    }
+
+    record NamespaceData : NamespaceStub
     {
         public string OriginalPath { get; private init; }
         public ImmutableArrayWrapper<ObjPropInfo> ObjProps { get; private init; }
         public string NamespaceFull { get; private init; }
-        public ImmutableArray<string> NestedClassNames { get; private init; }
-        public NamespaceData(string originalPath, string namespaceFull, ImmutableArrayWrapper<ObjPropInfo> objProps)
+
+        public NamespaceData(string originalPath, string namespaceFull, ImmutableArrayWrapper<ObjPropInfo> objProps, string? description)
+            : base(namespaceFull, description)
         {
             OriginalPath = originalPath;
             NamespaceFull = namespaceFull;
             ObjProps = objProps;
-
-            string[]? parts = namespaceFull.Split('.');
-
-            NestedClassNames = parts.ToImmutableArray();
         }
+
+        public NamespaceStub AsStub() => CreateForClone();
 
         internal string ToCompilationSource()
         {
@@ -26,7 +43,7 @@ namespace ACRealms.Roslyn.RealmProps
 
             
             """;
-            string declSpacer = new string(' ', (NestedClassNames.Length + 1) * 4);
+            string declSpacer = new(' ', (NestedClassNames.Length + 1) * 4);
             IEnumerable<string> declarations = ObjProps.Array.Select(p => p.ToNamespacedAliasDeclaration(declSpacer));
             string declarationsText = string.Join(newline, declarations);
 
@@ -50,13 +67,24 @@ namespace ACRealms.Roslyn.RealmProps
             bool isLast = classNameQueue.Count == 0;
 
             // Could optimize this to not allocate duplicate strings, but I don't think it adds up to much
-            string spacer1 = new string(' ', 4);
-            string spacer2 = new string(' ', 4 * depth);
-            string spacer3 = new string(' ', 4 * (depth > 2 ? (depth - 1) : 1));
-            string spacer4 = new string(' ', isLast ? 4 * depth : 4);
+            string spacer1 = new(' ', 4);
+            string spacer2 = new(' ', 4 * depth);
+            string spacer3 = new(' ', 4 * (depth > 2 ? (depth - 1) : 1));
+
+            string description = string.Empty;
+            if (isLast && Description != null)
+            {
+                description =
+                    $$"""
+                    {{spacer3}}/// <summary>
+                    {{spacer3}}/// {{Description}}
+                    {{spacer3}}/// </summary>
+
+                    """;
+            }
             string decl =
             $$""""
-            {{spacer3}}public static{{(isLast ? " " : " partial ")}}class {{className}}
+            {{description}}{{spacer3}}public static partial class {{className}}
             {{spacer2}}{
             {{(isLast ? $"{declarationsText}" : $"{spacer1}{GetNestedClassDecl(declarationsText, classNameQueue, depth + 1)}")}}
             {{spacer2}}}

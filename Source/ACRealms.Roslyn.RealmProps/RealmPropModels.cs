@@ -1,19 +1,13 @@
 namespace ACRealms;
 
 // https://github.com/corvus-dotnet/corvus.jsonschema?tab=readme-ov-file#getting-started
-// For old version (.net 8) - dotnet tool install --global Corvus.Json.JsonSchema.TypeGeneratorTool --version 3.1.1
-// generatejsonschematypes ACRealms.RealmProps\PropDefs\json-schema\realm-property-schema.json
-/* 
- generatejsonschematypes ACRealms.RealmProps\PropDefs\json-schema\realm-property-schema.json --rootNamespace ACRealms.Roslyn.RealmProps.IntermediateModels --outputPath=ACRealms.Roslyn.RealmProps\IntermediateModels 
-*/
 
-/*
- * For new version:
+/* If editing the schemas in PropDefs/json-schema (but not the prop defs themselves), it is necessary to regenerate the types manually after editing. 
+ * Typically you won't need to touch these files unless contributing to the ACRealms compiler itself.
+ 
 dotnet tool install --global Corvus.Json.JsonSchema.TypeGeneratorTool
 
- generatejsonschematypes ACRealms.RealmProps\PropDefs\json-schema\realm-property-schema.json --rootNamespace ACRealms.Roslyn.RealmProps.IntermediateModels --outputPath=ACRealms.Roslyn.RealmProps\IntermediateModels
-
-Also try
- generatejsonschematypes ACRealms.RealmProps\PropDefs\json-schema\realm-property-schema.json --rootNamespace ACRealms.Roslyn.RealmProps.IntermediateModels --outputPath=ACRealms.Roslyn.RealmProps\IntermediateModels --useSchema Draft201909
+cd .\Source\ACRealms.RealmProps\PropDefs\json-schema
+generatejsonschematypes realm-property-schema.json --rootNamespace ACRealms.Roslyn.RealmProps.IntermediateModels --outputPath=..\..\..\ACRealms.Roslyn.RealmProps\IntermediateModels
 
 */

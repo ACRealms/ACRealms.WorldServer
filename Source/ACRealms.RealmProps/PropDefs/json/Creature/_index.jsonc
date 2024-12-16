@@ -1,0 +1,5 @@
+{
+  "$schema_version": 1,
+  "namespace": "Creature",
+  "description": "Realm properties that affect creatures (Mainly PvE mobs or NPCs)"
+}

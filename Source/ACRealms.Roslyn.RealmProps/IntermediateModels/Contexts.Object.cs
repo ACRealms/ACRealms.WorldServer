@@ -18,11 +18,6 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
-/// <remarks>
-/// <para>
-/// Foo
-/// </para>
-/// </remarks>
 public readonly partial struct Contexts
     : IJsonObject<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts>
 {

@@ -23,11 +23,6 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
-/// <remarks>
-/// <para>
-/// Foo
-/// </para>
-/// </remarks>
 #if NET8_0_OR_GREATER
 [CollectionBuilder(typeof(Contexts), "Create")]
 #endif

@@ -10,7 +10,6 @@
 #nullable enable
 
 using System.Buffers;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Corvus.Json;
@@ -21,46 +20,46 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
-public readonly partial struct Contexts
+public readonly partial struct RealmPropertySchema
 {
     /// <summary>
     /// Generated from JSON Schema.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Examples:
-    /// <example>
-    /// <code>
-    /// { }
-    /// </code>
-    /// </example>
+    /// The full namespace name. Use a . as a path separator.
+    /// </para>
+    /// <para>
+    /// For example, Foo.Bar.Baz will create a C# class Props.Foo.Bar.Baz, where Foo is an inner class of Props, and so on.
+    /// </para>
+    /// <para>
+    /// The file path of this document not factor into this.
     /// </para>
     /// </remarks>
-    public readonly partial struct ContextDecl
+    public readonly partial struct NamespaceEntity
 #if NET8_0_OR_GREATER
-        : IJsonString<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextDecl>,
+        : IJsonString<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.NamespaceEntity>,
           ISpanFormattable
 #else
-        : IJsonString<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextDecl>
+        : IJsonString<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.NamespaceEntity>
 #endif
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContextDecl"/> struct.
+        /// Initializes a new instance of the <see cref="NamespaceEntity"/> struct.
         /// </summary>
         /// <param name="value">The value from which to construct the instance.</param>
-        public ContextDecl(in ReadOnlySpan<char> value)
+        public NamespaceEntity(in ReadOnlySpan<char> value)
         {
             this.backing = Backing.String;
             this.jsonElementBacking = default;
             this.stringBacking = value.ToString();
-            this.objectBacking = ImmutableList<JsonObjectProperty>.Empty;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContextDecl"/> struct.
+        /// Initializes a new instance of the <see cref="NamespaceEntity"/> struct.
         /// </summary>
         /// <param name="value">The value from which to construct the instance.</param>
-        public ContextDecl(in ReadOnlySpan<byte> value)
+        public NamespaceEntity(in ReadOnlySpan<byte> value)
         {
             this.backing = Backing.String;
             this.jsonElementBacking = default;
@@ -79,15 +78,13 @@ public readonly partial struct Contexts
                 ArrayPool<byte>.Shared.Return(bytes);
             }
 #endif
-
-            this.objectBacking = ImmutableList<JsonObjectProperty>.Empty;
         }
 
         /// <summary>
         /// Conversion from <see cref="string"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ContextDecl(string value)
+        public static implicit operator NamespaceEntity(string value)
         {
             return new(value);
         }
@@ -96,7 +93,7 @@ public readonly partial struct Contexts
         /// Conversion from JsonString.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ContextDecl(JsonString value)
+        public static implicit operator NamespaceEntity(JsonString value)
         {
             if (value.HasDotnetBacking && value.ValueKind == JsonValueKind.String)
             {
@@ -111,7 +108,7 @@ public readonly partial struct Contexts
         /// Conversion to JsonString.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator JsonString(ContextDecl value)
+        public static implicit operator JsonString(NamespaceEntity value)
         {
             return
                 value.AsString;
@@ -122,7 +119,7 @@ public readonly partial struct Contexts
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
         /// <exception cref="InvalidOperationException">The value was not a string.</exception>
-        public static explicit operator string(ContextDecl value)
+        public static explicit operator string(NamespaceEntity value)
         {
             if ((value.backing & Backing.JsonElement) != 0)
             {
@@ -143,7 +140,7 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Concatenate 2 JSON values, producing an instance of the string type ContextDecl.
+        /// Concatenate 2 JSON values, producing an instance of the string type NamespaceEntity.
         /// </summary>
         /// <typeparam name="T1">The type of the 1st value.</typeparam>
         /// <typeparam name="T2">The type of the 2nd value.</typeparam>
@@ -151,7 +148,7 @@ public readonly partial struct Contexts
         /// <param name="value1">The 1st value.</param>
         /// <param name="value2">The 2nd value.</param>
         /// <returns>An instance of this string type.</returns>
-        public static ContextDecl Concatenate<T1, T2>(Span<byte> buffer, in T1 value1, in T2 value2)
+        public static NamespaceEntity Concatenate<T1, T2>(Span<byte> buffer, in T1 value1, in T2 value2)
             where T1 : struct, IJsonValue<T1>
             where T2 : struct, IJsonValue<T2>
         {
@@ -160,7 +157,7 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Concatenate 3 JSON values, producing an instance of the string type ContextDecl.
+        /// Concatenate 3 JSON values, producing an instance of the string type NamespaceEntity.
         /// </summary>
         /// <typeparam name="T1">The type of the 1st value.</typeparam>
         /// <typeparam name="T2">The type of the 2nd value.</typeparam>
@@ -170,7 +167,7 @@ public readonly partial struct Contexts
         /// <param name="value2">The 2nd value.</param>
         /// <param name="value3">The 3rd value.</param>
         /// <returns>An instance of this string type.</returns>
-        public static ContextDecl Concatenate<T1, T2, T3>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3)
+        public static NamespaceEntity Concatenate<T1, T2, T3>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3)
             where T1 : struct, IJsonValue<T1>
             where T2 : struct, IJsonValue<T2>
             where T3 : struct, IJsonValue<T3>
@@ -180,7 +177,7 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Concatenate 4 JSON values, producing an instance of the string type ContextDecl.
+        /// Concatenate 4 JSON values, producing an instance of the string type NamespaceEntity.
         /// </summary>
         /// <typeparam name="T1">The type of the 1st value.</typeparam>
         /// <typeparam name="T2">The type of the 2nd value.</typeparam>
@@ -192,7 +189,7 @@ public readonly partial struct Contexts
         /// <param name="value3">The 3rd value.</param>
         /// <param name="value4">The 4th value.</param>
         /// <returns>An instance of this string type.</returns>
-        public static ContextDecl Concatenate<T1, T2, T3, T4>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3, in T4 value4)
+        public static NamespaceEntity Concatenate<T1, T2, T3, T4>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3, in T4 value4)
             where T1 : struct, IJsonValue<T1>
             where T2 : struct, IJsonValue<T2>
             where T3 : struct, IJsonValue<T3>
@@ -203,7 +200,7 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Concatenate 5 JSON values, producing an instance of the string type ContextDecl.
+        /// Concatenate 5 JSON values, producing an instance of the string type NamespaceEntity.
         /// </summary>
         /// <typeparam name="T1">The type of the 1st value.</typeparam>
         /// <typeparam name="T2">The type of the 2nd value.</typeparam>
@@ -217,7 +214,7 @@ public readonly partial struct Contexts
         /// <param name="value4">The 4th value.</param>
         /// <param name="value5">The 5th value.</param>
         /// <returns>An instance of this string type.</returns>
-        public static ContextDecl Concatenate<T1, T2, T3, T4, T5>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3, in T4 value4, in T5 value5)
+        public static NamespaceEntity Concatenate<T1, T2, T3, T4, T5>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3, in T4 value4, in T5 value5)
             where T1 : struct, IJsonValue<T1>
             where T2 : struct, IJsonValue<T2>
             where T3 : struct, IJsonValue<T3>
@@ -229,7 +226,7 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Concatenate 6 JSON values, producing an instance of the string type ContextDecl.
+        /// Concatenate 6 JSON values, producing an instance of the string type NamespaceEntity.
         /// </summary>
         /// <typeparam name="T1">The type of the 1st value.</typeparam>
         /// <typeparam name="T2">The type of the 2nd value.</typeparam>
@@ -245,7 +242,7 @@ public readonly partial struct Contexts
         /// <param name="value5">The 5th value.</param>
         /// <param name="value6">The 6th value.</param>
         /// <returns>An instance of this string type.</returns>
-        public static ContextDecl Concatenate<T1, T2, T3, T4, T5, T6>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3, in T4 value4, in T5 value5, in T6 value6)
+        public static NamespaceEntity Concatenate<T1, T2, T3, T4, T5, T6>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3, in T4 value4, in T5 value5, in T6 value6)
             where T1 : struct, IJsonValue<T1>
             where T2 : struct, IJsonValue<T2>
             where T3 : struct, IJsonValue<T3>
@@ -258,7 +255,7 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Concatenate 7 JSON values, producing an instance of the string type ContextDecl.
+        /// Concatenate 7 JSON values, producing an instance of the string type NamespaceEntity.
         /// </summary>
         /// <typeparam name="T1">The type of the 1st value.</typeparam>
         /// <typeparam name="T2">The type of the 2nd value.</typeparam>
@@ -276,7 +273,7 @@ public readonly partial struct Contexts
         /// <param name="value6">The 6th value.</param>
         /// <param name="value7">The 7th value.</param>
         /// <returns>An instance of this string type.</returns>
-        public static ContextDecl Concatenate<T1, T2, T3, T4, T5, T6, T7>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3, in T4 value4, in T5 value5, in T6 value6, in T7 value7)
+        public static NamespaceEntity Concatenate<T1, T2, T3, T4, T5, T6, T7>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3, in T4 value4, in T5 value5, in T6 value6, in T7 value7)
             where T1 : struct, IJsonValue<T1>
             where T2 : struct, IJsonValue<T2>
             where T3 : struct, IJsonValue<T3>
@@ -290,7 +287,7 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Concatenate 8 JSON values, producing an instance of the string type ContextDecl.
+        /// Concatenate 8 JSON values, producing an instance of the string type NamespaceEntity.
         /// </summary>
         /// <typeparam name="T1">The type of the 1st value.</typeparam>
         /// <typeparam name="T2">The type of the 2nd value.</typeparam>
@@ -310,7 +307,7 @@ public readonly partial struct Contexts
         /// <param name="value7">The 7th value.</param>
         /// <param name="value8">The 8th value.</param>
         /// <returns>An instance of this string type.</returns>
-        public static ContextDecl Concatenate<T1, T2, T3, T4, T5, T6, T7, T8>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3, in T4 value4, in T5 value5, in T6 value6, in T7 value7, in T8 value8)
+        public static NamespaceEntity Concatenate<T1, T2, T3, T4, T5, T6, T7, T8>(Span<byte> buffer, in T1 value1, in T2 value2, in T3 value3, in T4 value4, in T5 value5, in T6 value6, in T7 value7, in T8 value8)
             where T1 : struct, IJsonValue<T1>
             where T2 : struct, IJsonValue<T2>
             where T3 : struct, IJsonValue<T3>

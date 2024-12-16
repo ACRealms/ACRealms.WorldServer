@@ -87,7 +87,12 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
                     var propsWrapper = new CompilerDomainModels.ImmutableArrayWrapper<ObjPropInfo>(array);
                     step++;
 
-                    return new NamespaceData(file.Path, namespaceObj.Namespace.GetString()!, propsWrapper);
+                    return new NamespaceData(
+                        originalPath: file.Path,
+                        namespaceFull: namespaceObj.Namespace.GetString()!,
+                        objProps: propsWrapper,
+                        description: namespaceObj.Description.GetString()
+                    );
                 }
                 catch (Exception ex)
                 {
@@ -117,7 +122,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(realmPropNamespaces, static (ctx, data) =>
         {
-            if (data != null)
+            if (data != null && data.ObjProps.Array.Any())
             {
                 string fileName = string.Join("/", data.NestedClassNames);
                 string sourceCode = NamespaceJsonSchema.GenerateSchemaSourceCode(data);
@@ -129,8 +134,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
         IncrementalValueProvider<ImmutableArray<NamespaceData>> combinedNamespaces = realmPropNamespaces.Where(static (x) => x != null).Collect();
         var namespaceMetadataForRootSchema = combinedNamespaces.Select(static (allNamespaces, cancellationToken) =>
         {
-            var namespacePartsTotal = allNamespaces.Select(static x => x.NestedClassNames).ToImmutableArray();
-            return namespacePartsTotal;
+            return allNamespaces.Select(static x => x.AsStub()).ToImmutableArray();
         });
 
 

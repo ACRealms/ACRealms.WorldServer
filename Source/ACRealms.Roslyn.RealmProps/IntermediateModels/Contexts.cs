@@ -20,11 +20,6 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
-/// <remarks>
-/// <para>
-/// Foo
-/// </para>
-/// </remarks>
 [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<Contexts>))]
 public readonly partial struct Contexts
     : IJsonValue<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts>

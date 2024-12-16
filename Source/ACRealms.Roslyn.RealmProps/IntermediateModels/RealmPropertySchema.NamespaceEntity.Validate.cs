@@ -11,6 +11,7 @@
 
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Corvus.Json;
 
 namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
@@ -18,12 +19,23 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
-public readonly partial struct Contexts
+public readonly partial struct RealmPropertySchema
 {
     /// <summary>
     /// Generated from JSON Schema.
     /// </summary>
-    public readonly partial struct Context
+    /// <remarks>
+    /// <para>
+    /// The full namespace name. Use a . as a path separator.
+    /// </para>
+    /// <para>
+    /// For example, Foo.Bar.Baz will create a C# class Props.Foo.Bar.Baz, where Foo is an inner class of Props, and so on.
+    /// </para>
+    /// <para>
+    /// The file path of this document not factor into this.
+    /// </para>
+    /// </remarks>
+    public readonly partial struct NamespaceEntity
     {
         /// <inheritdoc/>
         public ValidationContext Validate(in ValidationContext validationContext, ValidationLevel level = ValidationLevel.Flag)
@@ -41,14 +53,10 @@ public readonly partial struct Contexts
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("contexts.json#/definitions/context");
+                result = result.PushSchemaLocation("#/properties/namespace");
             }
 
             JsonValueKind valueKind = this.ValueKind;
-            if (!result.IsUsingEvaluatedProperties)
-            {
-                result = result.UsingEvaluatedProperties();
-            }
 
             result = CorvusValidation.TypeValidationHandler(valueKind, result, level);
 
@@ -57,7 +65,7 @@ public readonly partial struct Contexts
                 return result;
             }
 
-            result = CorvusValidation.ObjectValidationHandler(this, valueKind, result, level);
+            result = CorvusValidation.StringValidationHandler(this, valueKind, result, level);
 
             if (level == ValidationLevel.Flag && !result.IsValid)
             {
@@ -78,6 +86,11 @@ public readonly partial struct Contexts
         public static partial class CorvusValidation
         {
             /// <summary>
+            /// A regular expression for the <c>pattern</c> keyword.
+            /// </summary>
+            public static readonly Regex Pattern = CreatePattern();
+
+            /// <summary>
             /// Core type validation.
             /// </summary>
             /// <param name="valueKind">The <see cref="JsonValueKind" /> of the value to validate.</param>
@@ -90,11 +103,11 @@ public readonly partial struct Contexts
                 in ValidationContext validationContext,
                 ValidationLevel level = ValidationLevel.Flag)
             {
-                return Corvus.Json.ValidateWithoutCoreType.TypeObject(valueKind, validationContext, level, "type");
+                return Corvus.Json.ValidateWithoutCoreType.TypeString(valueKind, validationContext, level, "type");
             }
 
             /// <summary>
-            /// Object validation.
+            /// String validation.
             /// </summary>
             /// <param name="value">The value to validate.</param>
             /// <param name="valueKind">The <see cref="JsonValueKind" /> of the value to validate.</param>
@@ -102,19 +115,18 @@ public readonly partial struct Contexts
             /// <param name="level">The current validation level.</param>
             /// <returns>The resulting validation context after validation.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal static ValidationContext ObjectValidationHandler(
-                in Context value,
+            internal static ValidationContext StringValidationHandler(
+                in NamespaceEntity value,
                 JsonValueKind valueKind,
                 in ValidationContext validationContext,
                 ValidationLevel level = ValidationLevel.Flag)
             {
-                ValidationContext result = validationContext;
-                if (valueKind != JsonValueKind.Object)
+                if (valueKind != JsonValueKind.String)
                 {
                     if (level == ValidationLevel.Verbose)
                     {
                         ValidationContext ignoredResult = validationContext;
-                        ignoredResult = ignoredResult.WithResult(isValid: true, "Validation additionalProperties - ignored because the value is not an object", "additionalProperties");
+                        ignoredResult = ignoredResult.WithResult(isValid: true, "Validation pattern - ignored because the value is not a string", "pattern");
 
                         return ignoredResult;
                     }
@@ -122,40 +134,49 @@ public readonly partial struct Contexts
                     return validationContext;
                 }
 
-                int propertyCount = 0;
-                foreach (JsonObjectProperty<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextDecl> property in value.EnumerateObject())
-                {
-                    string? propertyNameAsString = null;
-
-                    if (!result.HasEvaluatedLocalProperty(propertyCount))
-                    {
-                        if (level > ValidationLevel.Basic)
-                        {
-                            string localEvaluatedPropertyName = (propertyNameAsString ??= property.Name.GetString());
-                            result = result.PushValidationLocationReducedPathModifierAndProperty(new JsonReference("#/additionalProperties").AppendUnencodedPropertyNameToFragment(localEvaluatedPropertyName).AppendFragment(new("#/$ref")), localEvaluatedPropertyName);
-                        }
-
-                        ValidationContext propertyResult = property.Value.Validate(result.CreateChildContext(), level);
-                        if (level == ValidationLevel.Flag && !propertyResult.IsValid)
-                        {
-                            return propertyResult;
-                        }
-
-                        result = result.MergeResults(propertyResult.IsValid, level, propertyResult);
-
-                        if (level > ValidationLevel.Basic)
-                        {
-                            result = result.PopLocation();
-                        }
-
-                        result = result.WithLocalProperty(propertyCount);
-                    }
-
-                    propertyCount++;
-                }
+                ValidationContext result = validationContext;
+                value.TryGetValue(StringValidator, new Corvus.Json.Validate.ValidationContextWrapper(result, level), out result);
 
                 return result;
+
+                static bool StringValidator(ReadOnlySpan<char> input, in Corvus.Json.Validate.ValidationContextWrapper context, out ValidationContext result)
+                {
+                    result = context.Context;
+
+                    if (Pattern.IsMatch(input))
+                    {
+                        if (context.Level == ValidationLevel.Verbose)
+                        {
+                            result = result.WithResult(isValid: true, validationLocationReducedPathModifier: new JsonReference("pattern"), $"Validation pattern - {input.ToString()} matched '^[A-Z][a-zA-Z]*(?:\\.[A-Z][a-zA-Z]*)*$'");
+                        }
+                    }
+                    else
+                    {
+                        if (context.Level == ValidationLevel.Flag)
+                        {
+                            result = context.Context.WithResult(isValid: false);
+                            return true;
+                        }
+                        else if (context.Level >= ValidationLevel.Detailed)
+                        {
+                            result = result.WithResult(isValid: false, validationLocationReducedPathModifier: new JsonReference("pattern"), $"Validation pattern - {input.ToString()} did not match '^[A-Z][a-zA-Z]*(?:\\.[A-Z][a-zA-Z]*)*$'");
+                        }
+                        else
+                        {
+                            result = result.WithResult(isValid: false, validationLocationReducedPathModifier: new JsonReference("pattern"), "Validation pattern - The value did not match '^[A-Z][a-zA-Z]*(?:\\.[A-Z][a-zA-Z]*)*$'");
+                        }
+                    }
+
+                    return true;
+                }
             }
+
+#if NET8_0_OR_GREATER && !DYNAMIC_BUILD
+            [GeneratedRegex("^[A-Z][a-zA-Z]*(?:\\.[A-Z][a-zA-Z]*)*$")]
+            private static partial Regex CreatePattern();
+#else
+            private static Regex CreatePattern() => new("^[A-Z][a-zA-Z]*(?:\\.[A-Z][a-zA-Z]*)*$", RegexOptions.Compiled);
+#endif
         }
     }
 }

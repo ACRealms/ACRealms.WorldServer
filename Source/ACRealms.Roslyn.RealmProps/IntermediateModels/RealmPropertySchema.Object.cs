@@ -170,6 +170,43 @@ public readonly partial struct RealmPropertySchema
     }
 
     /// <summary>
+    /// Gets the (optional) <c>description</c> property.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A description for the namespace
+    /// </para>
+    /// </remarks>
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPattern Description
+    {
+        get
+        {
+            if ((this.backing & Backing.JsonElement) != 0)
+            {
+                if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                {
+                    return default;
+                }
+
+                if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DescriptionUtf8, out JsonElement result))
+                {
+                    return new(result);
+                }
+            }
+
+            if ((this.backing & Backing.Object) != 0)
+            {
+                if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
+                {
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPattern>();
+                }
+            }
+
+            return default;
+        }
+    }
+
+    /// <summary>
     /// Gets the (optional) <c>groups</c> property.
     /// </summary>
     /// <remarks>
@@ -213,8 +250,17 @@ public readonly partial struct RealmPropertySchema
     /// <para>
     /// If the instance is valid, this property will not be <see cref="JsonValueKind.Undefined"/>.
     /// </para>
+    /// <para>
+    /// The full namespace name. Use a . as a path separator.
+    /// </para>
+    /// <para>
+    /// For example, Foo.Bar.Baz will create a C# class Props.Foo.Bar.Baz, where Foo is an inner class of Props, and so on.
+    /// </para>
+    /// <para>
+    /// The file path of this document not factor into this.
+    /// </para>
     /// </remarks>
-    public Corvus.Json.JsonString Namespace
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.NamespaceEntity Namespace
     {
         get
         {
@@ -235,7 +281,7 @@ public readonly partial struct RealmPropertySchema
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Namespace, out JsonAny result))
                 {
-                    return result.As<Corvus.Json.JsonString>();
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.NamespaceEntity>();
                 }
             }
 
@@ -301,8 +347,9 @@ public readonly partial struct RealmPropertySchema
     /// Creates an instance of a <see cref="RealmPropertySchema"/>.
     /// </summary>
     public static RealmPropertySchema Create(
-        in Corvus.Json.JsonString namespaceValue,
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.NamespaceEntity namespaceValue,
         in Corvus.Json.JsonNotAny? additionalProperties = null,
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPattern? description = null,
         in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.GroupArray? groups = null,
         in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropList? properties = null)
     {
@@ -313,6 +360,11 @@ public readonly partial struct RealmPropertySchema
         if (additionalProperties is not null)
         {
             builder.Add(JsonPropertyNames.AdditionalProperties, additionalProperties.Value.AsAny);
+        }
+
+        if (description is not null)
+        {
+            builder.Add(JsonPropertyNames.Description, description.Value.AsAny);
         }
 
         if (groups is not null)
@@ -457,6 +509,21 @@ public readonly partial struct RealmPropertySchema
     }
 
     /// <summary>
+    /// Sets the (optional) <c>description</c> property.
+    /// </summary>
+    /// <param name="value">The new property value</param>
+    /// <returns>The instance with the property set.</returns>
+    /// <remarks>
+    /// <para>
+    /// A description for the namespace
+    /// </para>
+    /// </remarks>
+    public RealmPropertySchema WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPattern value)
+    {
+        return this.SetProperty(JsonPropertyNames.Description, value);
+    }
+
+    /// <summary>
     /// Sets the (optional) <c>groups</c> property.
     /// </summary>
     /// <param name="value">The new property value</param>
@@ -476,7 +543,18 @@ public readonly partial struct RealmPropertySchema
     /// </summary>
     /// <param name="value">The new property value</param>
     /// <returns>The instance with the property set.</returns>
-    public RealmPropertySchema WithNamespace(in Corvus.Json.JsonString value)
+    /// <remarks>
+    /// <para>
+    /// The full namespace name. Use a . as a path separator.
+    /// </para>
+    /// <para>
+    /// For example, Foo.Bar.Baz will create a C# class Props.Foo.Bar.Baz, where Foo is an inner class of Props, and so on.
+    /// </para>
+    /// <para>
+    /// The file path of this document not factor into this.
+    /// </para>
+    /// </remarks>
+    public RealmPropertySchema WithNamespace(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.NamespaceEntity value)
     {
         return this.SetProperty(JsonPropertyNames.Namespace, value);
     }
@@ -890,6 +968,11 @@ public readonly partial struct RealmPropertySchema
         public const string AdditionalProperties = "additionalProperties";
 
         /// <summary>
+        /// Gets the JSON property name for <see cref="Description"/>.
+        /// </summary>
+        public const string Description = "description";
+
+        /// <summary>
         /// Gets the JSON property name for <see cref="Groups"/>.
         /// </summary>
         public const string Groups = "groups";
@@ -913,6 +996,11 @@ public readonly partial struct RealmPropertySchema
         /// Gets the JSON property name for <see cref="AdditionalProperties"/>.
         /// </summary>
         public static ReadOnlySpan<byte> AdditionalPropertiesUtf8 => "additionalProperties"u8;
+
+        /// <summary>
+        /// Gets the JSON property name for <see cref="Description"/>.
+        /// </summary>
+        public static ReadOnlySpan<byte> DescriptionUtf8 => "description"u8;
 
         /// <summary>
         /// Gets the JSON property name for <see cref="Groups"/>.

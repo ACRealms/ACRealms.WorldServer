@@ -1,29 +1,30 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+using static ACRealms.Roslyn.RealmProps.Builders.SerializationHelpers;
 
 namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
 {
     internal static class RootGeneratedPropsSchema
     {
-        internal static string GenerateCombinedSchemaSourceCode(ImmutableArray<ImmutableArray<string>> namespaces)
+        class RecursiveNamespaceDict
+        {
+            public Dictionary<string, RecursiveNamespaceDict> Children { get; } = [];
+
+            // If we only define a namespace Foo.Bar.Baz, but not Foo or Foo.Bar, then the entries for Foo and Foo.Bar will not have StubData
+            public NamespaceStub? StubData { get; set; }
+        }
+
+        internal static string GenerateCombinedSchemaSourceCode(ImmutableArray<NamespaceStub> namespaces)
         {
             try
             {
                 var recursiveDict = Convert2DArrayToDict(namespaces);
-                var propertiesSchema = GetSubSchemaFor(recursiveDict);
+                var rootSchema = GetSubSchemaFor(recursiveDict);
 
                 // We must wrap in a comment as the source generator treats the output as a C# file
                 var schema = $$"""
                 /*
                 {
                   "$schema": "http://json-schema.org/draft-07/schema",
-                  "type": "object",
-                  "properties": {
-                  {{propertiesSchema}}
-                  },
-                  "additionalProperties": false
+                  {{rootSchema}}
                 }
                 */
                 """;
@@ -37,62 +38,52 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             }
         }
 
-        private static Dictionary<string, object> Convert2DArrayToDict(ImmutableArray<ImmutableArray<string>> namespaces)
+        private static RecursiveNamespaceDict Convert2DArrayToDict(IEnumerable<NamespaceStub> namespaces)
         {
-            var recursiveDict = new Dictionary<string, object>();
-            foreach (var namespaceParts in namespaces)
+            var recursiveDict = new RecursiveNamespaceDict();
+            foreach (var ns in namespaces)
             {
                 var current = recursiveDict;
-                foreach (var key in namespaceParts)
+                foreach (var key in ns.NestedClassNames)
                 {
-                    if (!current.ContainsKey(key))
-                        current[key] = new Dictionary<string, object>();
-                    current = (Dictionary<string, object>)current[key];
+                    if (!current.Children.ContainsKey(key))
+                        current.Children[key] = new();
+                    current = current.Children[key];
                 }
+
+                // The final substring (separated by a period) of the full namespace string is the one we can decorate with data
+                // If there's no stub, we merely use it as a bridge
+                // It is still recommended to have a stub (_index.json) for each namespace part, for at least a description
+                current.StubData = ns; 
             }
             return recursiveDict;
         }
 
-        private static string GetSubSchemaFor(Dictionary<string, object> items, string currentPath = "", string currentKey = "")
+        private static string GetSubSchemaFor(RecursiveNamespaceDict items, string currentPath = "", string currentKey = "")
         {
-            if (items.Values.Count == 0)
-            { 
-                var path = $"{currentPath}.json".Replace("/.json", ".json");
+            List<string> props = [];
+            if (items.StubData?.Description != null)
+                AddStringProp(props, "description", items.StubData.Description);
 
-                return $$"""
-                    { "$ref": "{{path}}" }
-                    """;
+            if (items.Children.Values.Count == 0)
+            {
+                AddStringProp(props, "$ref", $"{currentPath}.json".Replace("/.json", ".json"));
+                return SerializePropsUnwrapped(props);
             }
             else
             {
-                StringBuilder innerProps = new StringBuilder();
+                List<string> innerProps = [];
 
-                string sep = ",";
-                int iter = 1;
-                foreach (var kvp in items)
+                foreach (var kvp in items.Children)
                 {
-                    if (iter == items.Count)
-                        sep = "";
-                    var val = GetSubSchemaFor((Dictionary<string, object>)kvp.Value, $"{currentPath}{kvp.Key}/", kvp.Key);
-                    innerProps.Append($$"""
-                      "{{kvp.Key}}": {{val}}{{sep}}
-
-                    """);
-                    iter++;
+                    var val = GetSubSchemaFor(kvp.Value, $"{currentPath}{kvp.Key}/", kvp.Key);
+                    AddUnwrappedObjectProp(innerProps, kvp.Key, val);
                 }
 
-                if (currentKey == "")
-                    return innerProps.ToString();
-
-                return $$"""
-                    {
-                      "type": "object",
-                      "properties": {
-                        {{innerProps}}
-                      },
-                      "additionalProperties": false
-                    }
-                    """;
+                AddStringProp(props, "type", "object");
+                AddProp(props, "additionalProperties", "false");
+                AddUnwrappedObjectProp(props, "properties", SerializePropsUnwrapped(innerProps));
+                return SerializePropsUnwrapped(props);
             }
         }
     }

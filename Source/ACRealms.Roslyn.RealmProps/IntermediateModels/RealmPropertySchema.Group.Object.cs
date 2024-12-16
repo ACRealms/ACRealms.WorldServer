@@ -109,11 +109,6 @@ public readonly partial struct RealmPropertySchema
         /// <summary>
         /// Gets the (optional) <c>contexts</c> property.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Foo
-        /// </para>
-        /// </remarks>
         public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts Contexts
         {
             get
@@ -765,11 +760,6 @@ public readonly partial struct RealmPropertySchema
         /// </summary>
         /// <param name="value">The new property value</param>
         /// <returns>The instance with the property set.</returns>
-        /// <remarks>
-        /// <para>
-        /// Foo
-        /// </para>
-        /// </remarks>
         public Group WithContexts(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts value)
         {
             return this.SetProperty(JsonPropertyNames.Contexts, value);
