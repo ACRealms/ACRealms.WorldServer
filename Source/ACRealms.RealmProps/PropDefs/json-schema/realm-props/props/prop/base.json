@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "$comment": "Represents the base schema that is common for both props and groups",
+  "definitions": {
+    "detectedTypes": {
+      "definitions": {
+        "int": { "$anchor": "isType.int", "properties": { "type": { "const": "integer" } }, "required": [ "type" ] },
+        "int64": { "$anchor": "isType.int64", "properties": { "type": { "const": "int64" } }, "required": [ "type" ] },
+        "float": { "$anchor": "isType.float", "properties": { "type": { "const": "float" } }, "required": [ "type" ] },
+        "string": { "$anchor": "isType.string", "properties": { "type": { "const": "string" } }, "required": [ "type" ] },
+        "bool": { "$anchor": "isType.bool", "properties": { "type": { "const": "boolean" } }, "required": [ "type" ] },
+        "enum": { "$anchor": "isType.enum", "properties": { "type": { "const": "enum" } }, "required": [ "type" ] }
+      }
+    },
+    "objPropTypes": {
+      "definitions": {
+        "int": {
+          "$anchor": "objProps.int",
+          "properties": {
+            "default": { "$ref": "../../../components/primitives/val-int.json" },
+            "min_value": { "$ref": "../../../components/primitives/val-int.json" },
+            "max_value": { "$ref": "../../../components/primitives/val-int.json" } } },
+        "int64": {
+          "$anchor": "objProps.int64",
+          "properties": {
+            "default": { "$ref": "../../../components/primitives/val-long.json" },
+            "min_value": { "$ref": "../../../components/primitives/val-long.json" },
+            "max_value": { "$ref": "../../../components/primitives/val-long.json" } } },
+        "float": {
+          "$anchor": "objProps.float",
+          "properties": {
+            "default": { "$ref": "../../../components/primitives/val-float.json" },
+            "min_value": { "$ref": "../../../components/primitives/val-float.json" },
+            "max_value": { "$ref": "../../../components/primitives/val-float.json" } } },
+        "string": { "$anchor": "objProps.string", "properties": { "default": { "$ref": "../../../components/string-multiline-from-array.json" } } },
+        "bool": { "$anchor": "objProps.bool", "properties": { "default": { "$ref": "../../../components/primitives/val-bool.json" } } },
+        "enum": { "$anchor": "objProps.enum", "$ref": "../../../enums.json" }
+      }
+    },
+    "objPropSelection": {
+      "allOf": [
+        { "if": { "$ref": "#isType.enum" }, "then": { "$ref": "#objProps.enum" } },
+        { "if": { "$ref": "#isType.int" }, "then": { "$ref": "#objProps.int" } },
+        { "if": { "$ref": "#isType.int64" }, "then": { "$ref": "#objProps.int64" } },
+        { "if": { "$ref": "#isType.float" }, "then": { "$ref": "#objProps.float" } },
+        { "if": { "$ref": "#isType.bool" }, "then": { "$ref": "#objProps.bool" } },
+        { "if": { "$ref": "#isType.string" }, "then": { "$ref": "#objProps.string" } }
+      ]
+    }
+  },
+  "properties": {
+    "type": { "type": "string", "enum": [ "integer", "boolean", "float", "int64", "string", "enum" ] },
+    "default": { "description": "The hard default value for the realm property (ultimate fallback)" },
+    "reroll_restricted_to": { "enum": [ "never", "manual", "landblock", "always" ] },
+    "obsolete": { "type": "string" },
+    "default_from_server_property": { "type": "string" },
+    "contexts": { "$ref": "../../../contexts.json" }
+  },
+  "allOf": [ { "$ref": "#/definitions/objPropSelection" } ]
+}

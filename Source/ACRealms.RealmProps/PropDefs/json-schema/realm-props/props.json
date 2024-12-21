@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "propertyNames": { "maxLength": 40, "allOf": [ { "$ref": "../components/prop-name-pascal-case.json" } ] },
+  "additionalProperties": { "$ref": "props/prop.json" }
+}

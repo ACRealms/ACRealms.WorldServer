@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "oneOf": [
+    { "$ref": "description/description-pattern.json",
+      "allOf": [ { "$ref": "primitives/string-simple.json" } ] },
+    { "$ref": "description/description-array.json" }
+  ]
+}

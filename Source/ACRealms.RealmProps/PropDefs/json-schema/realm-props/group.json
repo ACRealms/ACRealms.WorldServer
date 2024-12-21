@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "detectedTypes": {
+      "definitions": {
+        "int": { "$anchor": "isType.int", "properties": { "type": { "const": "integer" } }, "required": [ "type" ] },
+        "int64": { "$anchor": "isType.int64", "properties": { "type": { "const": "int64" } }, "required": [ "type" ] },
+        "float": { "$anchor": "isType.float", "properties": { "type": { "const": "float" } }, "required": [ "type" ] },
+        "string": { "$anchor": "isType.string", "properties": { "type": { "const": "string" } }, "required": [ "type" ] },
+        "bool": { "$anchor": "isType.bool", "properties": { "type": { "const": "boolean" } }, "required": [ "type" ] },
+        "enum": { "$anchor": "isType.enum", "properties": { "type": { "const": "enum" } }, "required": [ "type" ] }
+      }
+    },
+    "objPropSelectionFromGroupToProp": {
+      "allOf": [
+        { "if": { "$ref": "#isType.enum" },
+          "then": { "allOf": [ { "properties": { "properties": {
+                    "if": { "type": "object" },
+                    "then": {
+                      "additionalProperties": {
+                        "if": { "type": "object" },
+                        "then": {
+                          "not": { "properties": { "type": { "type": "string" } } },
+                          "allOf": [ { "$ref": "#objProps.enum" } ]
+                        }
+                      }
+                    } } } } ] } },
+        { "if": { "$ref": "#isType.int" },
+          "then": { "allOf": [ { "properties": { "properties": {
+                    "if": { "type": "object" },
+                    "then": {
+                      "allOf": [ { "$ref": "#objProps.enum" } ]
+                    } } } } ] } },
+        { "if": { "$ref": "#isType.int64" },
+          "then": { "allOf": [ { "properties": { "properties": {
+                    "if": { "type": "object" },
+                    "then": {
+                      "allOf": [ { "$ref": "#objProps.enum" } ]
+                    } } } } ] } },
+        { "if": { "$ref": "#isType.float" },
+          "then": { "allOf": [ { "properties": { "properties": {
+                    "if": { "type": "object" },
+                    "then": {
+                      "allOf": [ { "$ref": "#objProps.enum" } ]
+                    } } } } ] } },
+        { "if": { "$ref": "#isType.bool" },
+          "then": { "allOf": [ { "properties": { "properties": {
+                    "if": { "type": "object" },
+                    "then": {
+                      "allOf": [ { "$ref": "#objProps.enum" } ]
+                    } } } } ] } },
+        { "if": { "$ref": "#isType.string" },
+          "then": { "allOf": [ { "properties": { "properties": {
+                    "if": { "type": "object" },
+                    "then": {
+                      "allOf": [ { "$ref": "#objProps.enum" } ]
+                    } } } } ] } }
+      ]
+    }
+  },
+  "properties": {
+    "description_format": { "$ref": "../components/description.json" },
+    "key_prefix": {
+      "$ref": "../components/prop-name-pascal-case-partial.json",
+      "description": "Property names in this group will be prefixed with this value" },
+    "key_suffix": {
+      "$ref": "../components/prop-name-pascal-case-partial.json",
+      "description": "Property names in this group will be suffixed with this value" },
+    "properties": { "oneOf": [
+        { "$ref": "props.json" },
+        { "$ref": "group/array-short-prop-list.json" } ] }
+  },
+  "allOf": [
+    { "$ref": "props/prop/base.json" },
+    {
+      "if": { "properties": { "properties": { "$ref": "props.json" } } },
+      "then": { "$ref": "#/definitions/objPropSelectionFromGroupToProp" },
+      "else": true
+    }
+  ],
+  "unevaluatedProperties": false
+}

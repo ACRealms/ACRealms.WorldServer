@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "oneOf": [
+    {
+      "const": "Same",
+      "description": "The current instance the player was located on"
+    },
+    {
+      "const": "SameIfSameLandblock",
+      "description": "The current instance the player was located on, but only if teleporting within the same landblock.\nFor example, teleport traps that move a player to another location in the same dungeon will need to use this mode"
+    },
+    {
+      "const": "HomeRealm",
+      "description": "Based on the player's home realm"
+    },
+    {
+      "const": "PersonalRealm",
+      "description": "The player's personal realm (Support for this is minimal right now)"
+    },
+    {
+      "const": "RealmDefaultInstanceID",
+      "description": "The current realm's default instance ID"
+    }
+  ]
+}

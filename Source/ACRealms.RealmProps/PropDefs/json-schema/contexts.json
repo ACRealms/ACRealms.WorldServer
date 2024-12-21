@@ -53,7 +53,7 @@
     }
   },
   "oneOf": [
-    { "const": false },
+    { "type": "boolean", "const": false },
     { "$ref": "#/definitions/shortContexts" },
     { "type": "array", "items": { "$ref": "#/definitions/contextObj" } }
   ]
