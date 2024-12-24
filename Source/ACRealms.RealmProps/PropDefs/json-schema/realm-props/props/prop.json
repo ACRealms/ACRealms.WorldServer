@@ -2,65 +2,27 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$comment": "Property definition (long form), belonging under the properties key of a namespace (not within a group)",
   "definitions": {
-    "detectedTypes": {
-      "$comment": "We have to add a separate required: type here or vscode will add the properties to autocomplete prematurely",
-      "definitions": {
-        "int": { "$anchor": "isType.int", "properties": { "type": { "const": "integer" } } },
-        "long": { "$anchor": "isType.long", "properties": { "type": { "const": "long" } } },
-        "float": { "$anchor": "isType.float", "properties": { "type": { "const": "float", "description": "RealmPropertyFloat" } } },
-        "string": { "$anchor": "isType.string", "properties": { "type": { "const": "string" } } },
-        "bool": { "$anchor": "isType.bool", "properties": { "type": { "const": "boolean" } } },
-        "enum": { "$anchor": "isType.enum", "properties": { "type": { "const": "enum" } } }
-      }
-    },
-    "objPropTypes": {
-      "definitions": {
-        "enum": { "$anchor": "objProps.enum", "$ref": "../../enums.json" },
-        "int": {
-          "$anchor": "objProps.int",
-          "allOf": [ { "$ref": "../common/prop-minmax.json" } ],
-          "properties": {
-            "default": { "$ref": "../../components/primitives/val-int.json" },
-            "min_value": { "$ref": "../../components/primitives/val-int.json" },
-            "max_value": { "$ref": "../../components/primitives/val-int.json" } } },
-        "long": {
-          "$anchor": "objProps.long",
-          "allOf": [ { "$ref": "../common/prop-minmax.json" } ],
-          "properties": {
-            "default": { "$ref": "../../components/primitives/val-long.json" },
-            "min_value": { "$ref": "../../components/primitives/val-long.json" },
-            "max_value": { "$ref": "../../components/primitives/val-long.json" } } },
-        "float": {
-          "$anchor": "objProps.float",
-          "allOf": [ { "$ref": "../common/prop-minmax.json" } ],
-          "properties": {
-            "default": { "$ref": "../../components/primitives/val-float.json" },
-            "min_value": { "$ref": "../../components/primitives/val-float.json" },
-            "max_value": { "$ref": "../../components/primitives/val-float.json" } } },
-        "string": { "$anchor": "objProps.string", "properties": { "default": { "$ref": "../../components/string-multiline-from-array.json" } } },
-        "bool": { "$anchor": "objProps.bool", "properties": { "default": { "$ref": "../../components/primitives/val-bool.json" } } }
-      }
-    },
     "objPropSelection": {
       "properties": {
         "description": { "$ref": "../../components/description.json" }
       },
       "allOf": [ {
+          "$comment": "Once we can unit test the schema validation, remove this allOf and see if it still works, then simplify this schema",
           "oneOf": [
-            { "if": { "$ref": "#isType.enum" }, "then": { "$ref": "#objProps.enum" }, "else": false },
-            { "if": { "$ref": "#isType.int" }, "then": { "$ref": "#objProps.int" }, "else": false },
-            { "if": { "$ref": "#isType.long" }, "then": { "$ref": "#objProps.long" }, "else": false },
-            { "if": { "$ref": "#isType.float" }, "then": { "$ref": "#objProps.float" }, "else": false },
-            { "if": { "$ref": "#isType.bool" }, "then": { "$ref": "#objProps.bool" }, "else": false },
-            { "if": { "$ref": "#isType.string" }, "then": { "$ref": "#objProps.string" }, "else": false }
+            { "if": { "$ref": "../common/is-type.json#/definitions/enum" }, "then": { "$ref": "../common/prop-typed.json#objProps.enum" }, "else": false },
+            { "if": { "$ref": "../common/is-type.json#/definitions/int" }, "then": { "$ref": "../common/prop-typed.json#objProps.int" }, "else": false },
+            { "if": { "$ref": "../common/is-type.json#/definitions/long" }, "then": { "$ref": "../common/prop-typed.json#objProps.long" }, "else": false },
+            { "if": { "$ref": "../common/is-type.json#/definitions/float" }, "then": { "$ref": "../common/prop-typed.json#objProps.float" }, "else": false },
+            { "if": { "$ref": "../common/is-type.json#/definitions/bool" }, "then": { "$ref": "../common/prop-typed.json#objProps.bool" }, "else": false },
+            { "if": { "$ref": "../common/is-type.json#/definitions/string" }, "then": { "$ref": "../common/prop-typed.json#objProps.string" }, "else": false }
           ] }
-      ],
-      "unevaluatedProperties": false
+      ]
     }
   },
   "type": "object",
   "default": { },
   "properties": { "type": { "$ref": "../common/attrs/type.json" } },
   "required": [ "type" ],
+  "minProperties": 2,
   "dependencies": { "type": { "$ref": "#/definitions/objPropSelection" } }
 }

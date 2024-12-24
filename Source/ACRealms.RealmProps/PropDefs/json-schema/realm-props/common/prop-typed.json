@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "enum": { "$anchor": "objProps.enum", "$ref": "../../enums.json" },
+    "int": {
+      "$anchor": "objProps.int",
+      "allOf": [ { "$ref": "prop-minmax.json" } ],
+      "properties": {
+        "default": { "$ref": "../../components/primitives/val-int.json" },
+        "min_value": { "$ref": "../../components/primitives/val-int.json" },
+        "max_value": { "$ref": "../../components/primitives/val-int.json" } } },
+    "long": {
+      "$anchor": "objProps.long",
+      "allOf": [ { "$ref": "prop-minmax.json" } ],
+      "properties": {
+        "default": { "$ref": "../../components/primitives/val-long.json" },
+        "min_value": { "$ref": "../../components/primitives/val-long.json" },
+        "max_value": { "$ref": "../../components/primitives/val-long.json" } } },
+    "float": {
+      "$anchor": "objProps.float",
+      "allOf": [ { "$ref": "prop-minmax.json" } ],
+      "properties": {
+        "default": { "$ref": "../../components/primitives/val-float.json" },
+        "min_value": { "$ref": "../../components/primitives/val-float.json" },
+        "max_value": { "$ref": "../../components/primitives/val-float.json" } } },
+    "string": { "$anchor": "objProps.string", "properties": { "default": { "$ref": "../../components/string-multiline-from-array.json" } } },
+    "bool": { "$anchor": "objProps.bool", "properties": { "default": { "$ref": "../../components/primitives/val-bool.json" } } }
+  }
+}

@@ -1,54 +1,26 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
+  "$comment": "A group of property definitions under a single namespace, sharing a common type, and zero or more other common attributes",
   "definitions": {
     "isObject": { "type": "object" },
-    "detectedTypes": {
-      "definitions": {
-        "int": { "$anchor": "isType.int", "properties": { "type": { "const": "integer" } }, "required": [ "type" ] },
-        "long": { "$anchor": "isType.long", "properties": { "type": { "const": "long" } }, "required": [ "type" ] },
-        "float": { "$anchor": "isType.float", "properties": { "type": { "const": "float" } }, "required": [ "type" ] },
-        "string": { "$anchor": "isType.string", "properties": { "type": { "const": "string" } }, "required": [ "type" ] },
-        "bool": { "$anchor": "isType.bool", "properties": { "type": { "const": "boolean" } }, "required": [ "type" ] },
-        "enum": { "$anchor": "isType.enum", "properties": { "type": { "const": "enum" } }, "required": [ "type" ] }
-      }
-    },
     "prop": {
       "definitions": {
-        "not": { "properties": { "type": { "type": "string" } } },
-        "enum": {
-          "not": { "$ref": "#/definitions/prop/definitions/not" },
-          "allOf": [ { "$ref": "props/prop/base.json#objProps.enum" } ]
-        },
-        "int": {
-          "not": { "$ref": "#/definitions/prop/definitions/not" },
-          "allOf": [ { "$ref": "props/prop/base.json#objProps.int" } ]
-        },
-        "long": {
-          "not": { "$ref": "#/definitions/prop/definitions/not" },
-          "allOf": [ { "$ref": "props/prop/base.json#objProps.long" } ]
-        },
-        "float": {
-          "not": { "$ref": "#/definitions/prop/definitions/not" },
-          "allOf": [ { "$ref": "props/prop/base.json#objProps.float" } ]
-        },
-        "string": {
-          "not": { "$ref": "#/definitions/prop/definitions/not" },
-          "allOf": [ { "$ref": "props/prop/base.json#objProps.string" } ]
-        },
-        "bool": {
-          "not": { "$ref": "#/definitions/prop/definitions/not" },
-          "allOf": [ { "$ref": "props/prop/base.json#objProps.bool" } ]
-        }
+        "enum": { "$anchor": "objProps.enum", "$ref": "common/prop-typed.json#objProps.enum" },
+        "int": { "$anchor": "objProps.int", "$ref": "common/prop-typed.json#objProps.int" },
+        "long": { "$anchor": "objProps.long", "$ref": "common/prop-typed.json#objProps.long" },
+        "float": { "$anchor": "objProps.float", "$ref": "common/prop-typed.json#objProps.float" },
+        "string": { "$anchor": "objProps.string", "$ref": "common/prop-typed.json#objProps.string" },
+        "bool": { "$anchor": "objProps.bool", "$ref": "common/prop-typed.json#objProps.bool" }
       }
     },
     "props": {
       "definitions": {
-        "enum": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "#/definitions/prop/definitions/enum" } } } },
-        "int": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "#/definitions/prop/definitions/int" } } } },
-        "long": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "#/definitions/prop/definitions/long" } } } },
-        "float": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "#/definitions/prop/definitions/float" } } } },
-        "string": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "#/definitions/prop/definitions/string" } } } },
-        "bool": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "#/definitions/prop/definitions/bool" } } } }
+        "enum": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/enum" } } } },
+        "int": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/int" } } } },
+        "long": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/long" } } } },
+        "float": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/float" } } } },
+        "string": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/string" } } } },
+        "bool": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/bool" } } } }
       }
     },
     "typed": {
@@ -61,32 +33,51 @@
         "bool": { "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/bool" } } } ] }
       },
       "allOf": [
-        { "if": { "$ref": "#isType.enum" }, "then": { "$ref": "#/definitions/typed/definitions/enum" } },
-        { "if": { "$ref": "#isType.int" }, "then": { "$ref": "#/definitions/typed/definitions/int" } },
-        { "if": { "$ref": "#isType.long" }, "then": { "$ref": "#/definitions/typed/definitions/long" } },
-        { "if": { "$ref": "#isType.float" }, "then": { "$ref": "#/definitions/typed/definitions/float" } },
-        { "if": { "$ref": "#isType.string" }, "then": { "$ref": "#/definitions/typed/definitions/string" } },
-        { "if": { "$ref": "#isType.bool" }, "then": { "$ref": "#/definitions/typed/definitions/bool" } }
+        { "if": { "$ref": "common/is-type.json#/definitions/enum" }, "then": { "$ref": "#/definitions/typed/definitions/enum" } },
+        { "if": { "$ref": "common/is-type.json#/definitions/int" }, "then": { "$ref": "#/definitions/typed/definitions/int" } },
+        { "if": { "$ref": "common/is-type.json#/definitions/long" }, "then": { "$ref": "#/definitions/typed/definitions/long" } },
+        { "if": { "$ref": "common/is-type.json#/definitions/float" }, "then": { "$ref": "#/definitions/typed/definitions/float" } },
+        { "if": { "$ref": "common/is-type.json#/definitions/string" }, "then": { "$ref": "#/definitions/typed/definitions/string" } },
+        { "if": { "$ref": "common/is-type.json#/definitions/bool" }, "then": { "$ref": "#/definitions/typed/definitions/bool" } }
       ]
+    },
+    "groupPropSelection": {
+      "properties": {
+        "description_format": { "$ref": "../components/description.json" },
+        "key_prefix": {
+          "$ref": "common/short-key.json",
+          "description": "Property names in this group will be prefixed with this value" },
+        "key_suffix": {
+          "$ref": "common/short-key.json",
+          "description": "Property names in this group will be suffixed with this value" },
+        "properties": { "oneOf": [
+            { "$ref": "group/props.json" },
+            { "$ref": "group/array-short-prop-list.json" }
+          ] } },
+      "allOf": [
+        { "allOf": [ {
+              "$comment": "Once we can unit test the schema validation, remove this allOf (keep the oneOf) and see if it still works, then simplify all schemas",
+              "oneOf": [
+                { "if": { "$ref": "common/is-type.json#/definitions/enum" }, "then": { "$ref": "common/prop-typed.json#/definitions/enum" }, "else": false },
+                { "if": { "$ref": "common/is-type.json#/definitions/int" }, "then": { "$ref": "common/prop-typed.json#/definitions/int" }, "else": false },
+                { "if": { "$ref": "common/is-type.json#/definitions/long" }, "then": { "$ref": "common/prop-typed.json#/definitions/long" }, "else": false },
+                { "if": { "$ref": "common/is-type.json#/definitions/float" }, "then": { "$ref": "common/prop-typed.json#/definitions/float" }, "else": false },
+                { "if": { "$ref": "common/is-type.json#/definitions/string" }, "then": { "$ref": "common/prop-typed.json#/definitions/string" }, "else": false },
+                { "if": { "$ref": "common/is-type.json#/definitions/bool" }, "then": { "$ref": "common/prop-typed.json#/definitions/bool" }, "else": false }
+              ] }
+          ] },
+        { "if": {
+            "type": "null",
+            "properties": { "properties": { "$ref": "#/definitions/isObject" } }
+          },
+          "then": { "$ref": "#/definitions/typed" } }
+      ],
+      "unevaluatedProperties": false
     }
   },
-  "properties": {
-    "description_format": { "$ref": "../components/description.json" },
-    "key_prefix": {
-      "$ref": "common/short-key.json",
-      "description": "Property names in this group will be prefixed with this value" },
-    "key_suffix": {
-      "$ref": "common/short-key.json",
-      "description": "Property names in this group will be suffixed with this value" },
-    "properties": { "oneOf": [
-        { "$ref": "group/props.json" },
-        { "$ref": "group/array-short-prop-list.json" } 
-        ] }
-  },
-  "allOf": [
-    { "$ref": "common/base.json" },
-    { "if": { "properties": { "properties": { "$ref": "#/definitions/isObject" } } },
-      "then": { "$ref": "#/definitions/typed" } }
-  ],
-  "unevaluatedProperties": false
+  "type": "object",
+  "default": { },
+  "properties": { "type": { "$ref": "../common/attrs/type.json" } },
+  "required": [ "type" ],
+  "dependencies": { "type": { "$ref": "#/definitions/groupPropSelection" } }
 }
