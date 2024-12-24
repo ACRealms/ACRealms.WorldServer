@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "$comment": "Represents the base schema that is common for both props and groups",
+  "properties": {
+    "default": { "description": "The default fallback value for the property, when not defined explicitly by any ruleset" },
+    "obsolete": { "type": "string" },
+    "default_from_server_property": { "type": "string" },
+    "contexts": { "$ref": "../../contexts.json" }
+  }
+}

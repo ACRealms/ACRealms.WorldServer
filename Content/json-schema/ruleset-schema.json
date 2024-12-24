@@ -14,7 +14,7 @@
         { "$ref": "generated/realm-names.json" }
       ]
     },
-    "properties": { "$ref": "generated/realm-properties/realm-properties-root.json" },
+    "properties": { "$ref": "generated/realm-properties/realm-properties-root-temp.json" },
     "apply_rulesets": {
       "type": "array",
       "description": "A list of rulesets to apply unconditionally",

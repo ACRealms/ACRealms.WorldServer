@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$ref": "./string-multiline-from-array.json",
+  "$ref": "../string-multiline-from-array.json",
+  "type": "array",
   "items": {
     "type": "string",
     "minLength": 1,

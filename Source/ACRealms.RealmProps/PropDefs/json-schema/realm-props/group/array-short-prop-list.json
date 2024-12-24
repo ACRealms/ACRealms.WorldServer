@@ -2,5 +2,5 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "type": "array",
   "description": "A list of property names, all inheriting the parameters defined by the group",
-  "items": { "$ref": "../prop-name-pascal-case.json" }
+  "items": { "$ref": "../common/key.json" }
 }
