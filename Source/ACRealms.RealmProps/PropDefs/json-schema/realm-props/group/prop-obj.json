@@ -1,4 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$ref": "../common/prop-base.json"
+  "$ref": "../common/prop-base.json",
+  "description": "An object representing the realm property definition's attributes"
 }

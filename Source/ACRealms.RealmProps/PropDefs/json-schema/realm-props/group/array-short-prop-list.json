@@ -1,6 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
   "type": "array",
-  "description": "A list of property names, all inheriting the parameters defined by the group",
-  "items": { "$ref": "../common/key.json" }
+  "description": "A list of property ShortKeys, all inheriting the parameters defined by the group",
+  "items": {
+    "$ref": "../common/short-key.json",
+    "description": "Property ShortKey, combined with the group's key_prefix and key_suffix (if defined) forms the property name"
+  }
 }

@@ -9,12 +9,12 @@
       "allOf": [ {
           "$comment": "Once we can unit test the schema validation, remove this allOf and see if it still works, then simplify this schema",
           "oneOf": [
-            { "if": { "$ref": "../common/is-type.json#/definitions/enum" }, "then": { "$ref": "../common/prop-typed.json#objProps.enum" }, "else": false },
-            { "if": { "$ref": "../common/is-type.json#/definitions/int" }, "then": { "$ref": "../common/prop-typed.json#objProps.int" }, "else": false },
-            { "if": { "$ref": "../common/is-type.json#/definitions/long" }, "then": { "$ref": "../common/prop-typed.json#objProps.long" }, "else": false },
-            { "if": { "$ref": "../common/is-type.json#/definitions/float" }, "then": { "$ref": "../common/prop-typed.json#objProps.float" }, "else": false },
-            { "if": { "$ref": "../common/is-type.json#/definitions/bool" }, "then": { "$ref": "../common/prop-typed.json#objProps.bool" }, "else": false },
-            { "if": { "$ref": "../common/is-type.json#/definitions/string" }, "then": { "$ref": "../common/prop-typed.json#objProps.string" }, "else": false }
+            { "if": { "$ref": "../common/is-type.json#/definitions/enum" }, "then": { "$ref": "../common/prop-typed.json#/definitions/enum" }, "else": false },
+            { "if": { "$ref": "../common/is-type.json#/definitions/int" }, "then": { "$ref": "../common/prop-typed.json#/definitions/int" }, "else": false },
+            { "if": { "$ref": "../common/is-type.json#/definitions/long" }, "then": { "$ref": "../common/prop-typed.json#/definitions/long" }, "else": false },
+            { "if": { "$ref": "../common/is-type.json#/definitions/float" }, "then": { "$ref": "../common/prop-typed.json#/definitions/float" }, "else": false },
+            { "if": { "$ref": "../common/is-type.json#/definitions/bool" }, "then": { "$ref": "../common/prop-typed.json#/definitions/bool" }, "else": false },
+            { "if": { "$ref": "../common/is-type.json#/definitions/string" }, "then": { "$ref": "../common/prop-typed.json#/definitions/string" }, "else": false }
           ] }
       ]
     }

@@ -3,7 +3,24 @@
   "type": "object",
   "allOf": [ { "$ref": "prop-base.json" } ],
   "properties": {
-    "reroll_restricted_to": { "enum": [ "never", "manual", "landblock", "always" ] },
+    "reroll_restricted_to": {
+      "description": "Restricts the property from randomizing to **At Most** the frequency specified here. For no restrictions, omit this attribute",
+      "type": "string",
+      "oneOf": [
+        {
+          "description": "Disables randomization (uses the default value)",
+          "const": "never"
+        },
+        {
+          "description": "Allows disabling the randomization (choosing 'never' for the realm property's reroll option), or randomizing during landblock load ('landblock' reroll option)",
+          "const": "landblock"
+        },
+        {
+          "description": "Randomization must happen for all fetches for the property (no randomization during landblock load)",
+          "const": "always"
+        }
+      ]
+    },
     "min_value": { "description": "The minimum possible value that can exist for this property." },
     "max_value": { "description": "The maximum possible value that can exist for this property." }
   }

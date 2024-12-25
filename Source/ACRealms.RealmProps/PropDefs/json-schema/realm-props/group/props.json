@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
   "type": "object",
-  "propertyNames": { "$ref": "../common/short-key.json" },
+  "default": { },
+  "propertyNames": { "$ref": "../common/short-key.json", "description": "Realm Property ShortKey" },
   "additionalProperties": { "$ref": "prop.json" }
 }

@@ -2,11 +2,11 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$comment": "Contains schemas to identify the type of a group or property",
   "definitions": {
-    "int": { "properties": { "type": { "const": "integer" } } },
-    "long": { "properties": { "type": { "const": "long" } } },
-    "float": { "properties": { "type": { "const": "float", "description": "RealmPropertyFloat" } } },
-    "string": { "properties": { "type": { "const": "string" } } },
-    "bool": { "properties": { "type": { "const": "boolean" } } },
-    "enum": { "properties": { "type": { "const": "enum" } } }
+    "int": { "properties": { "type": { "const": "integer", "description": "Represents a RealmPropertyInt (integer)" } } },
+    "long": { "properties": { "type": { "const": "long", "description": "Represents a RealmPropertyInt64 (long integer)" } } },
+    "float": { "properties": { "type": { "const": "float", "description": "Represents a RealmPropertyFloat (double)" } } },
+    "string": { "properties": { "type": { "const": "string", "description": "Represents a RealmPropertyString" } } },
+    "bool": { "properties": { "type": { "const": "boolean", "description": "Represents a RealmPropertyBool (true or false)" } } },
+    "enum": { "properties": { "type": { "const": "enum", "description": "Represents a RealmPropertyEnum. Choose the supported enum class with the 'enum' attribute" } } }
   }
 }
