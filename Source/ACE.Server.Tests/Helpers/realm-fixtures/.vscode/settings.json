@@ -1,0 +1,21 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "**/realm/*.jsonc"
+            ],
+            "url": "../../../../Content/json-schema/realm-schema.json"
+        },
+        {
+            "fileMatch": [
+                "**/ruleset/*.jsonc"
+            ],
+            "url": "../../../../Content/json-schema/ruleset-schema.json"
+        }
+    ],
+    "editor.formatOnSave": true,
+    "files.autoSaveWorkspaceFilesOnly": true,
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false,
+    "json.format.keepLines": true
+}
