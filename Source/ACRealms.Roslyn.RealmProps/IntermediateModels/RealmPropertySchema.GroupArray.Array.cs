@@ -39,7 +39,7 @@ public readonly partial struct RealmPropertySchema
 #endif
     public readonly partial struct GroupArray
         : IJsonArray<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.GroupArray>,
-          IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group>
+          IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.Group>
     {
         /// <summary>
         /// Gets an empty array.
@@ -99,7 +99,7 @@ public readonly partial struct RealmPropertySchema
         /// <returns>The item at the given index.</returns>
         /// <exception cref="IndexOutOfRangeException">The index was outside the bounds of the array.</exception>
         /// <exception cref="InvalidOperationException">The value is not an array.</exception>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group this[int index]
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group this[int index]
         {
             get
             {
@@ -127,7 +127,7 @@ public readonly partial struct RealmPropertySchema
                 {
                     try
                     {
-                        return this.arrayBacking[index].As<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group>();
+                        return this.arrayBacking[index].As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group>();
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
@@ -199,7 +199,7 @@ public readonly partial struct RealmPropertySchema
         /// </summary>
         /// <param name="items">The span of items from which to construct the array.</param>
         /// <returns>An instance of the array constructed from the span.</returns>
-        public static GroupArray Create(ReadOnlySpan<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group> items)
+        public static GroupArray Create(ReadOnlySpan<ACRealms.Roslyn.RealmProps.IntermediateModels.Group> items)
         {
             return new([..items]);
         }
@@ -209,7 +209,7 @@ public readonly partial struct RealmPropertySchema
         /// </summary>
         /// <param name="items">The value from which to construct the instance.</param>
         /// <returns>An instance of the array constructed from the value.</returns>
-        public static GroupArray FromItems(params ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group[] items)
+        public static GroupArray FromItems(params ACRealms.Roslyn.RealmProps.IntermediateModels.Group[] items)
         {
             return new([..items]);
         }
@@ -219,7 +219,7 @@ public readonly partial struct RealmPropertySchema
         /// </summary>
         /// <param name="item1">The 1st item in the array.</param>
         /// <returns>An instance of the array constructed from the values.</returns>
-        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item1)
+        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item1)
         {
             return new([item1.AsAny]);
         }
@@ -230,7 +230,7 @@ public readonly partial struct RealmPropertySchema
         /// <param name="item1">The 1st item in the array.</param>
         /// <param name="item2">The 2nd item in the array.</param>
         /// <returns>An instance of the array constructed from the values.</returns>
-        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item2)
+        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item2)
         {
             return new([item1.AsAny, item2.AsAny]);
         }
@@ -242,7 +242,7 @@ public readonly partial struct RealmPropertySchema
         /// <param name="item2">The 2nd item in the array.</param>
         /// <param name="item3">The 3rd item in the array.</param>
         /// <returns>An instance of the array constructed from the values.</returns>
-        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item3)
+        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item3)
         {
             return new([item1.AsAny, item2.AsAny, item3.AsAny]);
         }
@@ -255,7 +255,7 @@ public readonly partial struct RealmPropertySchema
         /// <param name="item3">The 3rd item in the array.</param>
         /// <param name="item4">The 4th item in the array.</param>
         /// <returns>An instance of the array constructed from the values.</returns>
-        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item4)
+        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item4)
         {
             return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny]);
         }
@@ -269,7 +269,7 @@ public readonly partial struct RealmPropertySchema
         /// <param name="item4">The 4th item in the array.</param>
         /// <param name="item5">The 5th item in the array.</param>
         /// <returns>An instance of the array constructed from the values.</returns>
-        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item5)
+        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item5)
         {
             return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny, item5.AsAny]);
         }
@@ -284,7 +284,7 @@ public readonly partial struct RealmPropertySchema
         /// <param name="item5">The 5th item in the array.</param>
         /// <param name="item6">The 6th item in the array.</param>
         /// <returns>An instance of the array constructed from the values.</returns>
-        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item6)
+        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item6)
         {
             return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny, item5.AsAny, item6.AsAny]);
         }
@@ -300,7 +300,7 @@ public readonly partial struct RealmPropertySchema
         /// <param name="item6">The 6th item in the array.</param>
         /// <param name="item7">The 7th item in the array.</param>
         /// <returns>An instance of the array constructed from the values.</returns>
-        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item6, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item7)
+        public static GroupArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item6, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item7)
         {
             return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny, item5.AsAny, item6.AsAny, item7.AsAny]);
         }
@@ -310,7 +310,7 @@ public readonly partial struct RealmPropertySchema
         /// </summary>
         /// <param name="items">The items from which to construct the instance.</param>
         /// <returns>An instance of the array constructed from the items.</returns>
-        public static GroupArray FromRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group> items)
+        public static GroupArray FromRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.Group> items)
         {
             return new([..items]);
         }
@@ -339,13 +339,13 @@ public readonly partial struct RealmPropertySchema
 #endif
 
         /// <inheritdoc/>
-        IEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group> IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group>.GetEnumerator() => this.EnumerateArray();
+        IEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Group> IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.Group>.GetEnumerator() => this.EnumerateArray();
 
         /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator() => this.EnumerateArray();
 
         /// <inheritdoc/>
-        int IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group>.Count => this.GetArrayLength();
+        int IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.Group>.Count => this.GetArrayLength();
 
         /// <inheritdoc/>
         public ImmutableList<JsonAny> AsImmutableList()
@@ -376,7 +376,7 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <inheritdoc/>
-        public JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group> EnumerateArray()
+        public JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Group> EnumerateArray()
         {
             if ((this.backing & Backing.JsonElement) != 0)
             {
@@ -512,7 +512,7 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <inheritdoc/>
-        public GroupArray Add(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item1)
+        public GroupArray Add(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item1)
         {
             ImmutableList<JsonAny>.Builder builder = __CorvusArrayHelpers.GetImmutableListBuilder(this);
             builder.Add(item1.AsAny);
@@ -520,10 +520,10 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <inheritdoc/>
-        public GroupArray Add(params ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group[] items)
+        public GroupArray Add(params ACRealms.Roslyn.RealmProps.IntermediateModels.Group[] items)
         {
             ImmutableList<JsonAny>.Builder builder = __CorvusArrayHelpers.GetImmutableListBuilder(this);
-            foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item in items)
+            foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.Group item in items)
             {
                 builder.Add(item.AsAny);
             }
@@ -532,10 +532,10 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <inheritdoc/>
-        public GroupArray AddRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group> items)
+        public GroupArray AddRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.Group> items)
         {
             ImmutableList<JsonAny>.Builder builder = __CorvusArrayHelpers.GetImmutableListBuilder(this);
-            foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item in items)
+            foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.Group item in items)
             {
                 builder.Add(item.AsAny);
             }
@@ -544,25 +544,25 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <inheritdoc/>
-        public GroupArray Insert(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group item1)
+        public GroupArray Insert(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group item1)
         {
             return new(__CorvusArrayHelpers.GetImmutableListWith(this, index, item1));
         }
 
         /// <inheritdoc/>
-        public GroupArray InsertRange(int index, IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group> items)
+        public GroupArray InsertRange(int index, IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.Group> items)
         {
             return new(__CorvusArrayHelpers.GetImmutableListWith(this, index, items.Select(item => item.AsAny)));
         }
 
         /// <inheritdoc/>
-        public GroupArray Replace(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group oldValue, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group newValue)
+        public GroupArray Replace(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group oldValue, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group newValue)
         {
             return new(__CorvusArrayHelpers.GetImmutableListReplacing(this, oldValue, newValue));
         }
 
         /// <inheritdoc/>
-        public GroupArray SetItem(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group value)
+        public GroupArray SetItem(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.Group value)
         {
             return new(__CorvusArrayHelpers.GetImmutableListSetting(this, index, value));
         }
@@ -586,7 +586,7 @@ public readonly partial struct RealmPropertySchema
         }
 
         /// <inheritdoc/>
-        public GroupArray Remove(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group oldValue)
+        public GroupArray Remove(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group oldValue)
         {
             return new(__CorvusArrayHelpers.GetImmutableListWithout(this, oldValue));
         }

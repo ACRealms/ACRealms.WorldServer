@@ -177,7 +177,7 @@ public readonly partial struct RealmPropertySchema
     /// A description for the namespace
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPattern Description
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionPattern Description
     {
         get
         {
@@ -198,7 +198,7 @@ public readonly partial struct RealmPropertySchema
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
                 {
-                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPattern>();
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionPattern>();
                 }
             }
 
@@ -292,7 +292,7 @@ public readonly partial struct RealmPropertySchema
     /// <summary>
     /// Gets the (optional) <c>properties</c> property.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropList Properties
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.Props Properties
     {
         get
         {
@@ -313,7 +313,7 @@ public readonly partial struct RealmPropertySchema
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Properties, out JsonAny result))
                 {
-                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropList>();
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Props>();
                 }
             }
 
@@ -349,9 +349,9 @@ public readonly partial struct RealmPropertySchema
     public static RealmPropertySchema Create(
         in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.NamespaceEntity namespaceValue,
         in Corvus.Json.JsonNotAny? additionalProperties = null,
-        in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPattern? description = null,
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionPattern? description = null,
         in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.GroupArray? groups = null,
-        in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropList? properties = null)
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.Props? properties = null)
     {
         var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
         builder.Add(JsonPropertyNames.SchemaVersion, ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.SchemaVersionEntity.ConstInstance.AsAny);
@@ -518,7 +518,7 @@ public readonly partial struct RealmPropertySchema
     /// A description for the namespace
     /// </para>
     /// </remarks>
-    public RealmPropertySchema WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPattern value)
+    public RealmPropertySchema WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionPattern value)
     {
         return this.SetProperty(JsonPropertyNames.Description, value);
     }
@@ -564,7 +564,7 @@ public readonly partial struct RealmPropertySchema
     /// </summary>
     /// <param name="value">The new property value</param>
     /// <returns>The instance with the property set.</returns>
-    public RealmPropertySchema WithProperties(in ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropList value)
+    public RealmPropertySchema WithProperties(in ACRealms.Roslyn.RealmProps.IntermediateModels.Props value)
     {
         return this.SetProperty(JsonPropertyNames.Properties, value);
     }

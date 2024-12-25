@@ -170,7 +170,7 @@ public readonly partial struct RealmPropertySchema
                         result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/description/$ref"), JsonPropertyNames.Description);
                     }
 
-                    ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.DescriptionPattern>().Validate(result.CreateChildContext(), level);
+                    ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionPattern>().Validate(result.CreateChildContext(), level);
                     if (level == ValidationLevel.Flag && !propertyResult.IsValid)
                     {
                         return propertyResult;
@@ -234,7 +234,7 @@ public readonly partial struct RealmPropertySchema
                         result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/properties/$ref"), JsonPropertyNames.Properties);
                     }
 
-                    ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.ObjPropList>().Validate(result.CreateChildContext(), level);
+                    ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Props>().Validate(result.CreateChildContext(), level);
                     if (level == ValidationLevel.Flag && !propertyResult.IsValid)
                     {
                         return propertyResult;

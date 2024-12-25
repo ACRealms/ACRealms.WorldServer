@@ -603,8 +603,8 @@ public readonly partial struct RealmPropertySchema
 
             if (thisKind == JsonValueKind.Array)
             {
-                JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group> lhs = this.EnumerateArray();
-                JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group> rhs = other.EnumerateArray();
+                JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Group> lhs = this.EnumerateArray();
+                JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Group> rhs = other.EnumerateArray();
                 while (lhs.MoveNext())
                 {
                     if (!rhs.MoveNext())

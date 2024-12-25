@@ -124,7 +124,7 @@ public readonly partial struct RealmPropertySchema
                 }
 
                 int length = 0;
-                using JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.RealmPropertySchema.Group> arrayEnumerator = value.EnumerateArray();
+                using JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Group> arrayEnumerator = value.EnumerateArray();
                 while (arrayEnumerator.MoveNext())
                 {
                     if (level > ValidationLevel.Basic)

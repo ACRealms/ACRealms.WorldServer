@@ -49,6 +49,15 @@ public readonly partial struct Contexts
                 result = result.PushSchemaLocation("contexts.json#/oneOf/0");
             }
 
+            JsonValueKind valueKind = this.ValueKind;
+
+            result = CorvusValidation.TypeValidationHandler(valueKind, result, level);
+
+            if (level == ValidationLevel.Flag && !result.IsValid)
+            {
+                return result;
+            }
+
             result = CorvusValidation.ConstValidationHandler(this, result, level);
 
             if (level == ValidationLevel.Flag && !result.IsValid)
@@ -80,6 +89,22 @@ public readonly partial struct Contexts
             /// A constant for the <c>const</c> keyword.
             /// </summary>
             public static readonly JsonBoolean Const = JsonBoolean.ParseValue("false");
+
+            /// <summary>
+            /// Core type validation.
+            /// </summary>
+            /// <param name="valueKind">The <see cref="JsonValueKind" /> of the value to validate.</param>
+            /// <param name="validationContext">The current validation context.</param>
+            /// <param name="level">The current validation level.</param>
+            /// <returns>The resulting validation context after validation.</returns>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static ValidationContext TypeValidationHandler(
+                JsonValueKind valueKind,
+                in ValidationContext validationContext,
+                ValidationLevel level = ValidationLevel.Flag)
+            {
+                return Corvus.Json.ValidateWithoutCoreType.TypeBoolean(valueKind, validationContext, level, "type");
+            }
 
             /// <summary>
             /// Constant value validation.
