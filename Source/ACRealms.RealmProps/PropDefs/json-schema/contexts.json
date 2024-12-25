@@ -48,12 +48,14 @@
     },
     "shortContexts": {
       "type": "object",
+      "default": { },
+      "description": "An object where the key is the context name, the value is the entity type as a string. Use the array form for more detailed context definitions",
       "additionalProperties": { "$ref": "#/definitions/entityVal" }
     }
   },
+  "description": "A set of contexts for this property. Each context requires an entity type to pass into the property when fetching it. The entities can be filtered with a scope in the ruleset definitions.",
   "oneOf": [
-    { "type": "boolean", "const": false },
     { "$ref": "#/definitions/shortContexts" },
-    { "type": "array", "items": { "$ref": "#/definitions/contextObj" } }
+    { "type": "array", "default": [ { } ], "items": { "$ref": "#/definitions/contextObj" } }
   ]
 }

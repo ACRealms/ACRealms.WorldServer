@@ -18,11 +18,26 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
+/// <remarks>
+/// <para>
+/// A set of contexts for this property. Each context requires an entity type to pass into the property when fetching it. The entities can be filtered with a scope in the ruleset definitions.
+/// </para>
+/// </remarks>
 public readonly partial struct Contexts
 {
     /// <summary>
     /// Generated from JSON Schema.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Examples:
+    /// <example>
+    /// <code>
+    /// [ { } ]
+    /// </code>
+    /// </example>
+    /// </para>
+    /// </remarks>
     public readonly partial struct ContextObjArray
     {
         /// <inheritdoc/>
@@ -41,7 +56,7 @@ public readonly partial struct Contexts
                     result = result.UsingStack();
                 }
 
-                result = result.PushSchemaLocation("contexts.json#/oneOf/2");
+                result = result.PushSchemaLocation("contexts.json#/oneOf/1");
             }
 
             JsonValueKind valueKind = this.ValueKind;

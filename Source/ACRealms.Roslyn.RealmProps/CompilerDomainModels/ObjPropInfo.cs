@@ -43,6 +43,7 @@ namespace ACRealms.Roslyn.RealmProps
         public string? ObsoleteReason { get; init; }
         public string? DefaultFromServerProp { get; init; }
         public string TargetEnumTypeName => PropMap[Type];
+        public ImmutableArray<PropContext> Contexts { get; init; } = [];
 
         public static readonly FrozenDictionary<PropType, string> PropMap = new Dictionary<PropType, string>()
         {

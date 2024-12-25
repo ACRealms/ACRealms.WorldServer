@@ -1,6 +1,7 @@
 using ACRealms.Roslyn.RealmProps.CompilerDomainModels;
 using ACRealms.Roslyn.RealmProps.IntermediateModels;
 using Corvus.Json;
+using System.ComponentModel.Design;
 
 namespace ACRealms.Roslyn.RealmProps.Parsers
 {
@@ -58,7 +59,8 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
                             Enum = gDefaults.Enum,
                             Type = gDefaults.PropType,
                             ObsoleteReason = gDefaults.ObsoleteReason,
-                            RerollRestrictedTo = gDefaults.RerollRestrictedTo
+                            RerollRestrictedTo = gDefaults.RerollRestrictedTo,
+                            Contexts = gDefaults.Contexts
                         };
                     });
                 }
@@ -230,8 +232,45 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
                 DefaultFromServerProp = propBase.DefaultFromServerProperty?.GetString(),
                 ObsoleteReason = propBase.Obsolete?.GetString(),
                 RerollRestrictedTo = minMax.RerollRestrictedTo?.GetString(),
-                Type = type
+                Type = type,
+                Contexts = GetContexts(propBase.Contexts)
             };
+        }
+
+        private static ImmutableArray<PropContext> GetContexts(Contexts? contexts)
+        {
+            if (!contexts.HasValue)
+                return [];
+            var defaultRequired = false;
+
+            if (contexts.Value.IsContextObjArray)
+            {
+                return contexts.Value.AsContextObjArray.Select(rawCtx =>
+                {
+                    return new PropContext()
+                    {
+                        Description = rawCtx.Description,
+                        Entity = rawCtx.Entity,
+                        Name = rawCtx.Name,
+                        Required = rawCtx.Required?.AsBoolean.GetBoolean() ?? defaultRequired
+                    };
+                }).ToImmutableArray();
+            }
+            else if (contexts.Value.IsShortContexts)
+            {
+                return contexts.Value.AsShortContexts.Select(kvp =>
+                {
+                    return new PropContext()
+                    {
+                        Description = null,
+                        Entity = kvp.Value,
+                        Name = kvp.Key.GetString(),
+                        Required = defaultRequired
+                    };
+                }).ToImmutableArray();
+            }
+            else
+                throw new Exception("Unhandled Context Type");
         }
 
         private static ObjPropInfo GetProp(string namespaceRaw, string shortKey, GroupProp propDef, GroupDefaults groupDefaults)
@@ -253,6 +292,7 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
                     MaxValue = groupDefaults.MaxValue,
                     ObsoleteReason = groupDefaults.ObsoleteReason,
                     RerollRestrictedTo = groupDefaults.RerollRestrictedTo,
+                    Contexts = groupDefaults.Contexts
                 };
             }
             else if (propDef.IsPropObj)
@@ -279,7 +319,8 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
                     DefaultFromServerProp = prop.DefaultFromServerProperty?.GetString(),
                     ObsoleteReason = prop.Obsolete?.GetString(),
                     RerollRestrictedTo = minMax.RerollRestrictedTo?.GetString(),
-                    Type = type
+                    Type = type,
+                    Contexts = [.. groupDefaults.Contexts, .. GetContexts(prop.Contexts)]
                 };
             }
             else

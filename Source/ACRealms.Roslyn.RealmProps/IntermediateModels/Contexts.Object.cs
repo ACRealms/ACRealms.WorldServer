@@ -18,6 +18,11 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
+/// <remarks>
+/// <para>
+/// A set of contexts for this property. Each context requires an entity type to pass into the property when fetching it. The entities can be filtered with a scope in the ruleset definitions.
+/// </para>
+/// </remarks>
 public readonly partial struct Contexts
     : IJsonObject<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts>
 {

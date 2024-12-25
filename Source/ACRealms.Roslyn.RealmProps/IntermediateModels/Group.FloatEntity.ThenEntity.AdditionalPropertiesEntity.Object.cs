@@ -133,6 +133,9 @@ public readonly partial struct Group
                 /// <para>
                 /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
                 /// </para>
+                /// <para>
+                /// A set of contexts for this property. Each context requires an entity type to pass into the property when fetching it. The entities can be filtered with a scope in the ruleset definitions.
+                /// </para>
                 /// </remarks>
                 public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? Contexts
                 {
@@ -710,6 +713,11 @@ public readonly partial struct Group
                 /// </summary>
                 /// <param name="value">The new property value</param>
                 /// <returns>The instance with the property set.</returns>
+                /// <remarks>
+                /// <para>
+                /// A set of contexts for this property. Each context requires an entity type to pass into the property when fetching it. The entities can be filtered with a scope in the ruleset definitions.
+                /// </para>
+                /// </remarks>
                 public AdditionalPropertiesEntity WithContexts(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? value)
                 {
                     return value.HasValue ? this.SetProperty(JsonPropertyNames.Contexts, value.Value) : this.RemoveProperty(JsonPropertyNames.Contexts);

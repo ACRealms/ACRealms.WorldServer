@@ -21,11 +21,26 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
+/// <remarks>
+/// <para>
+/// A set of contexts for this property. Each context requires an entity type to pass into the property when fetching it. The entities can be filtered with a scope in the ruleset definitions.
+/// </para>
+/// </remarks>
 public readonly partial struct Contexts
 {
     /// <summary>
     /// Generated from JSON Schema.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Examples:
+    /// <example>
+    /// <code>
+    /// [ { } ]
+    /// </code>
+    /// </example>
+    /// </para>
+    /// </remarks>
     [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<ContextObjArray>))]
     public readonly partial struct ContextObjArray
 
@@ -69,7 +84,7 @@ public readonly partial struct Contexts
         /// <summary>
         /// Gets the schema location from which this type was generated.
         /// </summary>
-        public static string SchemaLocation { get; } = "contexts.json#/oneOf/2";
+        public static string SchemaLocation { get; } = "contexts.json#/oneOf/1";
 
         /// <summary>
         /// Gets a Null instance.
@@ -84,7 +99,7 @@ public readonly partial struct Contexts
         /// <summary>
         /// Gets the default instance.
         /// </summary>
-        public static ContextObjArray DefaultInstance { get; }
+        public static ContextObjArray DefaultInstance { get; } = ContextObjArray.ParseValue("[ { } ]"u8);
 
         /// <inheritdoc/>
         public JsonAny AsAny

@@ -1,3 +1,4 @@
+using ACRealms.Roslyn.RealmProps.IntermediateModels;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,9 +21,10 @@ namespace ACRealms.Roslyn.RealmProps.CompilerDomainModels
         public string? MaxValue { get; init; }
         public string? Default { get; init; }
         public string? Enum { get; init; }
-        public PropType PropType { get; init; }
+        public required PropType PropType { get; init; }
         public string? ObsoleteReason { get; init; }
         public string? RerollRestrictedTo { get; init; }
+        public ImmutableArray<PropContext> Contexts { get; init; } = [];
 
         private string Format(string shortKey, string? unformattedDescription)
         {
