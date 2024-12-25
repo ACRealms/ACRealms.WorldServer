@@ -103,7 +103,12 @@ public readonly partial struct PropDefExtensionMinMax
     /// <summary>
     /// Gets the (optional) <c>contexts</c> property.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts Contexts
+    /// <remarks>
+    /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// </remarks>
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? Contexts
     {
         get
         {
@@ -116,6 +121,11 @@ public readonly partial struct PropDefExtensionMinMax
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.ContextsUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -124,6 +134,11 @@ public readonly partial struct PropDefExtensionMinMax
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Contexts, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts>();
                 }
             }
@@ -137,10 +152,13 @@ public readonly partial struct PropDefExtensionMinMax
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/>, or <see cref="JsonValueKind.Null"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// The default fallback value for the property, when not defined explicitly by any ruleset
     /// </para>
     /// </remarks>
-    public Corvus.Json.JsonAny Default
+    public Corvus.Json.JsonAny? Default
     {
         get
         {
@@ -153,6 +171,11 @@ public readonly partial struct PropDefExtensionMinMax
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -161,6 +184,11 @@ public readonly partial struct PropDefExtensionMinMax
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Default, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result;
                 }
             }
@@ -174,10 +202,13 @@ public readonly partial struct PropDefExtensionMinMax
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// When the realm property is not defined, fetches this server property key as a default
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity DefaultFromServerProperty
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? DefaultFromServerProperty
     {
         get
         {
@@ -190,6 +221,11 @@ public readonly partial struct PropDefExtensionMinMax
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultFromServerPropertyUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -198,6 +234,11 @@ public readonly partial struct PropDefExtensionMinMax
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.DefaultFromServerProperty, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity>();
                 }
             }
@@ -211,10 +252,13 @@ public readonly partial struct PropDefExtensionMinMax
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/>, or <see cref="JsonValueKind.Null"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// The maximum possible value that can exist for this property.
     /// </para>
     /// </remarks>
-    public Corvus.Json.JsonAny MaxValue
+    public Corvus.Json.JsonAny? MaxValue
     {
         get
         {
@@ -227,6 +271,11 @@ public readonly partial struct PropDefExtensionMinMax
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.MaxValueUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -235,6 +284,11 @@ public readonly partial struct PropDefExtensionMinMax
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.MaxValue, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result;
                 }
             }
@@ -248,10 +302,13 @@ public readonly partial struct PropDefExtensionMinMax
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/>, or <see cref="JsonValueKind.Null"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// The minimum possible value that can exist for this property.
     /// </para>
     /// </remarks>
-    public Corvus.Json.JsonAny MinValue
+    public Corvus.Json.JsonAny? MinValue
     {
         get
         {
@@ -264,6 +321,11 @@ public readonly partial struct PropDefExtensionMinMax
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.MinValueUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -272,6 +334,11 @@ public readonly partial struct PropDefExtensionMinMax
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.MinValue, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result;
                 }
             }
@@ -285,10 +352,13 @@ public readonly partial struct PropDefExtensionMinMax
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity Obsolete
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? Obsolete
     {
         get
         {
@@ -301,6 +371,11 @@ public readonly partial struct PropDefExtensionMinMax
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.ObsoleteUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -309,6 +384,11 @@ public readonly partial struct PropDefExtensionMinMax
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Obsolete, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity>();
                 }
             }
@@ -322,10 +402,13 @@ public readonly partial struct PropDefExtensionMinMax
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// Restricts the property from randomizing to **At Most** the frequency specified here. For no restrictions, omit this attribute
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity RerollRestrictedTo
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity? RerollRestrictedTo
     {
         get
         {
@@ -338,6 +421,11 @@ public readonly partial struct PropDefExtensionMinMax
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.RerollRestrictedToUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -346,6 +434,11 @@ public readonly partial struct PropDefExtensionMinMax
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.RerollRestrictedTo, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity>();
                 }
             }
@@ -541,9 +634,9 @@ public readonly partial struct PropDefExtensionMinMax
     /// </summary>
     /// <param name="value">The new property value</param>
     /// <returns>The instance with the property set.</returns>
-    public PropDefExtensionMinMax WithContexts(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts value)
+    public PropDefExtensionMinMax WithContexts(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? value)
     {
-        return this.SetProperty(JsonPropertyNames.Contexts, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Contexts, value.Value) : this.RemoveProperty(JsonPropertyNames.Contexts);
     }
 
     /// <summary>
@@ -556,9 +649,9 @@ public readonly partial struct PropDefExtensionMinMax
     /// The default fallback value for the property, when not defined explicitly by any ruleset
     /// </para>
     /// </remarks>
-    public PropDefExtensionMinMax WithDefault(in Corvus.Json.JsonAny value)
+    public PropDefExtensionMinMax WithDefault(in Corvus.Json.JsonAny? value)
     {
-        return this.SetProperty(JsonPropertyNames.Default, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Default, value.Value) : this.RemoveProperty(JsonPropertyNames.Default);
     }
 
     /// <summary>
@@ -571,9 +664,9 @@ public readonly partial struct PropDefExtensionMinMax
     /// When the realm property is not defined, fetches this server property key as a default
     /// </para>
     /// </remarks>
-    public PropDefExtensionMinMax WithDefaultFromServerProperty(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity value)
+    public PropDefExtensionMinMax WithDefaultFromServerProperty(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? value)
     {
-        return this.SetProperty(JsonPropertyNames.DefaultFromServerProperty, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.DefaultFromServerProperty, value.Value) : this.RemoveProperty(JsonPropertyNames.DefaultFromServerProperty);
     }
 
     /// <summary>
@@ -586,9 +679,9 @@ public readonly partial struct PropDefExtensionMinMax
     /// The maximum possible value that can exist for this property.
     /// </para>
     /// </remarks>
-    public PropDefExtensionMinMax WithMaxValue(in Corvus.Json.JsonAny value)
+    public PropDefExtensionMinMax WithMaxValue(in Corvus.Json.JsonAny? value)
     {
-        return this.SetProperty(JsonPropertyNames.MaxValue, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.MaxValue, value.Value) : this.RemoveProperty(JsonPropertyNames.MaxValue);
     }
 
     /// <summary>
@@ -601,9 +694,9 @@ public readonly partial struct PropDefExtensionMinMax
     /// The minimum possible value that can exist for this property.
     /// </para>
     /// </remarks>
-    public PropDefExtensionMinMax WithMinValue(in Corvus.Json.JsonAny value)
+    public PropDefExtensionMinMax WithMinValue(in Corvus.Json.JsonAny? value)
     {
-        return this.SetProperty(JsonPropertyNames.MinValue, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.MinValue, value.Value) : this.RemoveProperty(JsonPropertyNames.MinValue);
     }
 
     /// <summary>
@@ -616,9 +709,9 @@ public readonly partial struct PropDefExtensionMinMax
     /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
     /// </para>
     /// </remarks>
-    public PropDefExtensionMinMax WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity value)
+    public PropDefExtensionMinMax WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? value)
     {
-        return this.SetProperty(JsonPropertyNames.Obsolete, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Obsolete, value.Value) : this.RemoveProperty(JsonPropertyNames.Obsolete);
     }
 
     /// <summary>
@@ -631,9 +724,9 @@ public readonly partial struct PropDefExtensionMinMax
     /// Restricts the property from randomizing to **At Most** the frequency specified here. For no restrictions, omit this attribute
     /// </para>
     /// </remarks>
-    public PropDefExtensionMinMax WithRerollRestrictedTo(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity value)
+    public PropDefExtensionMinMax WithRerollRestrictedTo(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity? value)
     {
-        return this.SetProperty(JsonPropertyNames.RerollRestrictedTo, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.RerollRestrictedTo, value.Value) : this.RemoveProperty(JsonPropertyNames.RerollRestrictedTo);
     }
 
     /// <summary>

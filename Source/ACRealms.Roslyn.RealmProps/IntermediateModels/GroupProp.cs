@@ -290,24 +290,24 @@ public readonly partial struct GroupProp
     }
 
     /// <summary>
-    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase" />.
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj" />.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase AsPropBase
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj AsPropObj
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase>();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj>();
         }
     }
 
     /// <summary>
-    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase" />.
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj" />.
     /// </summary>
-    public bool IsPropBase
+    public bool IsPropObj
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase>().IsValid();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj>().IsValid();
         }
     }
 
@@ -377,6 +377,24 @@ public readonly partial struct GroupProp
     }
 
     /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj(GroupProp value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator GroupProp(ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj value)
+    {
+        return value.As<GroupProp>();
+    }
+
+    /// <summary>
     /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
@@ -389,7 +407,25 @@ public readonly partial struct GroupProp
     /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static implicit operator GroupProp(ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase value)
+    public static explicit operator GroupProp(ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase value)
+    {
+        return value.As<GroupProp>();
+    }
+
+    /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs(GroupProp value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator GroupProp(ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs value)
     {
         return value.As<GroupProp>();
     }
@@ -1025,20 +1061,20 @@ public readonly partial struct GroupProp
     /// <typeparam name="TIn">The immutable context to pass in to the match function.</typeparam>
     /// <typeparam name="TOut">The result of calling the match function.</typeparam>
     /// <param name="context">The context to pass to the match function.</param>
-    /// <param name="matchPropBase">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase"/>.</param>
+    /// <param name="matchPropObj">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj"/>.</param>
     /// <param name="matchDescription">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description"/>.</param>
     /// <param name="defaultMatch">Match any other value.</param>
     /// <returns>An instance of the value returned by the match function.</returns>
     public TOut Match<TIn, TOut>(
         in TIn context,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase, TIn, TOut> matchPropBase,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj, TIn, TOut> matchPropObj,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Description, TIn, TOut> matchDescription,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.GroupProp, TIn, TOut> defaultMatch)
     {
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase matchPropBaseValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase>();
-        if (matchPropBaseValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj matchPropObjValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj>();
+        if (matchPropObjValue.IsValid())
         {
-            return matchPropBase(matchPropBaseValue, context);
+            return matchPropObj(matchPropObjValue, context);
         }
 
         ACRealms.Roslyn.RealmProps.IntermediateModels.Description matchDescriptionValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description>();
@@ -1054,19 +1090,19 @@ public readonly partial struct GroupProp
     /// Matches the value against the composed values, and returns the result of calling the provided match function for the first match found.
     /// </summary>
     /// <typeparam name="TOut">The result of calling the match function.</typeparam>
-    /// <param name="matchPropBase">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase"/>.</param>
+    /// <param name="matchPropObj">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj"/>.</param>
     /// <param name="matchDescription">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description"/>.</param>
     /// <param name="defaultMatch">Match any other value.</param>
     /// <returns>An instance of the value returned by the match function.</returns>
     public TOut Match<TOut>(
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase, TOut> matchPropBase,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj, TOut> matchPropObj,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Description, TOut> matchDescription,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.GroupProp, TOut> defaultMatch)
     {
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase matchPropBaseValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase>();
-        if (matchPropBaseValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj matchPropObjValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj>();
+        if (matchPropObjValue.IsValid())
         {
-            return matchPropBase(matchPropBaseValue);
+            return matchPropObj(matchPropObjValue);
         }
 
         ACRealms.Roslyn.RealmProps.IntermediateModels.Description matchDescriptionValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description>();
@@ -1090,13 +1126,13 @@ public readonly partial struct GroupProp
     }
 
     /// <summary>
-    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase" />.
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj" />.
     /// </summary>
     /// <param name="result">The result of the conversions.</param>
     /// <returns><see langword="true" /> if the conversion was valid.</returns>
-    public bool TryGetAsPropBase(out ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase result)
+    public bool TryGetAsPropObj(out ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj result)
     {
-        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase>();
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj>();
         return result.IsValid();
     }
 }

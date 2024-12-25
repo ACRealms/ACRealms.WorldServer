@@ -3,6 +3,8 @@
   "$comment": "Property definitions under a group. Named separately from props.json as the Corvus code generator will not handle name collisions",
   "type": "object",
   "default": { },
-  "propertyNames": { "$ref": "../common/short-key.json", "description": "Realm Property ShortKey" },
-  "additionalProperties": { "$ref": "g-prop.json" }
+  "allOf": [
+    { "$corvusTypeName": "ValidPropertyNames", "propertyNames": { "$ref": "../common/short-key.json", "description": "Realm Property ShortKey" } },
+    { "$corvusTypeName": "Props", "additionalProperties": { "$ref": "g-prop.json" } }
+  ]
 }

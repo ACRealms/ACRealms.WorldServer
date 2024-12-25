@@ -113,7 +113,12 @@ public readonly partial struct UngroupedPropObj
     /// <summary>
     /// Gets the (optional) <c>description</c> property.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.Description Description
+    /// <remarks>
+    /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// </remarks>
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.Description? Description
     {
         get
         {
@@ -126,6 +131,11 @@ public readonly partial struct UngroupedPropObj
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DescriptionUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -134,6 +144,11 @@ public readonly partial struct UngroupedPropObj
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description>();
                 }
             }
@@ -330,9 +345,9 @@ public readonly partial struct UngroupedPropObj
     /// </summary>
     /// <param name="value">The new property value</param>
     /// <returns>The instance with the property set.</returns>
-    public UngroupedPropObj WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.Description value)
+    public UngroupedPropObj WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.Description? value)
     {
-        return this.SetProperty(JsonPropertyNames.Description, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Description, value.Value) : this.RemoveProperty(JsonPropertyNames.Description);
     }
 
     /// <summary>

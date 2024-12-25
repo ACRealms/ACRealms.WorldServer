@@ -103,7 +103,12 @@ public readonly partial struct PropString
     /// <summary>
     /// Gets the (optional) <c>contexts</c> property.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts Contexts
+    /// <remarks>
+    /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// </remarks>
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? Contexts
     {
         get
         {
@@ -116,6 +121,11 @@ public readonly partial struct PropString
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.ContextsUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -124,6 +134,11 @@ public readonly partial struct PropString
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Contexts, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts>();
                 }
             }
@@ -135,7 +150,12 @@ public readonly partial struct PropString
     /// <summary>
     /// Gets the (optional) <c>default</c> property.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.StringMultilineFromArray Default
+    /// <remarks>
+    /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// </remarks>
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.StringMultilineFromArray? Default
     {
         get
         {
@@ -148,6 +168,11 @@ public readonly partial struct PropString
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -156,6 +181,11 @@ public readonly partial struct PropString
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Default, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.StringMultilineFromArray>();
                 }
             }
@@ -169,10 +199,13 @@ public readonly partial struct PropString
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// When the realm property is not defined, fetches this server property key as a default
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity DefaultFromServerProperty
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? DefaultFromServerProperty
     {
         get
         {
@@ -185,6 +218,11 @@ public readonly partial struct PropString
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultFromServerPropertyUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -193,6 +231,11 @@ public readonly partial struct PropString
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.DefaultFromServerProperty, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity>();
                 }
             }
@@ -206,10 +249,13 @@ public readonly partial struct PropString
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity Obsolete
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? Obsolete
     {
         get
         {
@@ -222,6 +268,11 @@ public readonly partial struct PropString
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.ObsoleteUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -230,6 +281,11 @@ public readonly partial struct PropString
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Obsolete, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity>();
                 }
             }
@@ -407,9 +463,9 @@ public readonly partial struct PropString
     /// </summary>
     /// <param name="value">The new property value</param>
     /// <returns>The instance with the property set.</returns>
-    public PropString WithContexts(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts value)
+    public PropString WithContexts(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? value)
     {
-        return this.SetProperty(JsonPropertyNames.Contexts, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Contexts, value.Value) : this.RemoveProperty(JsonPropertyNames.Contexts);
     }
 
     /// <summary>
@@ -417,9 +473,9 @@ public readonly partial struct PropString
     /// </summary>
     /// <param name="value">The new property value</param>
     /// <returns>The instance with the property set.</returns>
-    public PropString WithDefault(in ACRealms.Roslyn.RealmProps.IntermediateModels.StringMultilineFromArray value)
+    public PropString WithDefault(in ACRealms.Roslyn.RealmProps.IntermediateModels.StringMultilineFromArray? value)
     {
-        return this.SetProperty(JsonPropertyNames.Default, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Default, value.Value) : this.RemoveProperty(JsonPropertyNames.Default);
     }
 
     /// <summary>
@@ -432,9 +488,9 @@ public readonly partial struct PropString
     /// When the realm property is not defined, fetches this server property key as a default
     /// </para>
     /// </remarks>
-    public PropString WithDefaultFromServerProperty(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity value)
+    public PropString WithDefaultFromServerProperty(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? value)
     {
-        return this.SetProperty(JsonPropertyNames.DefaultFromServerProperty, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.DefaultFromServerProperty, value.Value) : this.RemoveProperty(JsonPropertyNames.DefaultFromServerProperty);
     }
 
     /// <summary>
@@ -447,9 +503,9 @@ public readonly partial struct PropString
     /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
     /// </para>
     /// </remarks>
-    public PropString WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity value)
+    public PropString WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? value)
     {
-        return this.SetProperty(JsonPropertyNames.Obsolete, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Obsolete, value.Value) : this.RemoveProperty(JsonPropertyNames.Obsolete);
     }
 
     /// <summary>

@@ -134,7 +134,12 @@ public readonly partial struct Group
                     /// <summary>
                     /// Gets the (optional) <c>default</c> property.
                     /// </summary>
-                    public Corvus.Json.JsonAny Default
+                    /// <remarks>
+                    /// <para>
+                    /// If this JSON property is <see cref="JsonValueKind.Undefined"/>, or <see cref="JsonValueKind.Null"/> then the value returned will be <see langword="null" />.
+                    /// </para>
+                    /// </remarks>
+                    public Corvus.Json.JsonAny? Default
                     {
                         get
                         {
@@ -147,6 +152,11 @@ public readonly partial struct Group
 
                                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultUtf8, out JsonElement result))
                                 {
+                                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                    {
+                                        return default;
+                                    }
+
                                     return new(result);
                                 }
                             }
@@ -155,6 +165,11 @@ public readonly partial struct Group
                             {
                                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Default, out JsonAny result))
                                 {
+                                    if (result.IsNullOrUndefined())
+                                    {
+                                        return default;
+                                    }
+
                                     return result;
                                 }
                             }
@@ -166,7 +181,12 @@ public readonly partial struct Group
                     /// <summary>
                     /// Gets the (optional) <c>enum</c> property.
                     /// </summary>
-                    public Corvus.Json.JsonAny EnumValue
+                    /// <remarks>
+                    /// <para>
+                    /// If this JSON property is <see cref="JsonValueKind.Undefined"/>, or <see cref="JsonValueKind.Null"/> then the value returned will be <see langword="null" />.
+                    /// </para>
+                    /// </remarks>
+                    public Corvus.Json.JsonAny? EnumValue
                     {
                         get
                         {
@@ -179,6 +199,11 @@ public readonly partial struct Group
 
                                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.EnumValueUtf8, out JsonElement result))
                                 {
+                                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                    {
+                                        return default;
+                                    }
+
                                     return new(result);
                                 }
                             }
@@ -187,6 +212,11 @@ public readonly partial struct Group
                             {
                                 if (this.objectBacking.TryGetValue(JsonPropertyNames.EnumValue, out JsonAny result))
                                 {
+                                    if (result.IsNullOrUndefined())
+                                    {
+                                        return default;
+                                    }
+
                                     return result;
                                 }
                             }
@@ -350,9 +380,9 @@ public readonly partial struct Group
                     /// </summary>
                     /// <param name="value">The new property value</param>
                     /// <returns>The instance with the property set.</returns>
-                    public Enum WithDefault(in Corvus.Json.JsonAny value)
+                    public Enum WithDefault(in Corvus.Json.JsonAny? value)
                     {
-                        return this.SetProperty(JsonPropertyNames.Default, value);
+                        return value.HasValue ? this.SetProperty(JsonPropertyNames.Default, value.Value) : this.RemoveProperty(JsonPropertyNames.Default);
                     }
 
                     /// <summary>
@@ -360,9 +390,9 @@ public readonly partial struct Group
                     /// </summary>
                     /// <param name="value">The new property value</param>
                     /// <returns>The instance with the property set.</returns>
-                    public Enum WithEnumValue(in Corvus.Json.JsonAny value)
+                    public Enum WithEnumValue(in Corvus.Json.JsonAny? value)
                     {
-                        return this.SetProperty(JsonPropertyNames.EnumValue, value);
+                        return value.HasValue ? this.SetProperty(JsonPropertyNames.EnumValue, value.Value) : this.RemoveProperty(JsonPropertyNames.EnumValue);
                     }
 
                     /// <summary>

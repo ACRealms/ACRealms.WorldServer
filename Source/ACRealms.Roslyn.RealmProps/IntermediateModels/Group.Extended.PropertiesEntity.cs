@@ -378,6 +378,42 @@ public readonly partial struct Group
             }
 
             /// <summary>
+            /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.ValidPropertyNames"/>.
+            /// </summary>
+            /// <param name="value">The value from which to convert.</param>
+            public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.ValidPropertyNames(PropertiesEntity value)
+            {
+                return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.ValidPropertyNames>();
+            }
+
+            /// <summary>
+            /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.ValidPropertyNames"/>.
+            /// </summary>
+            /// <param name="value">The value from which to convert.</param>
+            public static explicit operator PropertiesEntity(ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.ValidPropertyNames value)
+            {
+                return value.As<PropertiesEntity>();
+            }
+
+            /// <summary>
+            /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.Props"/>.
+            /// </summary>
+            /// <param name="value">The value from which to convert.</param>
+            public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.Props(PropertiesEntity value)
+            {
+                return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.Props>();
+            }
+
+            /// <summary>
+            /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.Props"/>.
+            /// </summary>
+            /// <param name="value">The value from which to convert.</param>
+            public static explicit operator PropertiesEntity(ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.Props value)
+            {
+                return value.As<PropertiesEntity>();
+            }
+
+            /// <summary>
             /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.ArrayShortPropList"/>.
             /// </summary>
             /// <param name="value">The value from which to convert.</param>

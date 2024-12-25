@@ -121,6 +121,53 @@ public readonly partial struct UngroupedPropObj
                 }
             }
 
+            /// <summary>
+            /// Gets the (optional) <c>description</c> property.
+            /// </summary>
+            /// <remarks>
+            /// <para>
+            /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+            /// </para>
+            /// </remarks>
+            public ACRealms.Roslyn.RealmProps.IntermediateModels.Description? Description
+            {
+                get
+                {
+                    if ((this.backing & Backing.JsonElement) != 0)
+                    {
+                        if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                        {
+                            return default;
+                        }
+
+                        if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DescriptionUtf8, out JsonElement result))
+                        {
+                            if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                            {
+                                return default;
+                            }
+
+                            return new(result);
+                        }
+                    }
+
+                    if ((this.backing & Backing.Object) != 0)
+                    {
+                        if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
+                        {
+                            if (result.IsNullOrUndefined())
+                            {
+                                return default;
+                            }
+
+                            return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description>();
+                        }
+                    }
+
+                    return default;
+                }
+            }
+
             /// <inheritdoc/>
             public static Typed FromProperties(IDictionary<JsonPropertyName, JsonAny> source)
             {
@@ -141,6 +188,21 @@ public readonly partial struct UngroupedPropObj
             public static Typed FromProperties(ImmutableList<JsonObjectProperty> source)
             {
                 return new(source);
+            }
+
+            /// <summary>
+            /// Creates an instance of a <see cref="Typed"/>.
+            /// </summary>
+            public static Typed Create(in ACRealms.Roslyn.RealmProps.IntermediateModels.Description? description = null)
+            {
+                var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
+
+                if (description is not null)
+                {
+                    builder.Add(JsonPropertyNames.Description, description.Value.AsAny);
+                }
+
+                return new(builder.ToImmutable());
             }
 
             /// <inheritdoc/>
@@ -249,6 +311,16 @@ public readonly partial struct UngroupedPropObj
                 }
 
                 throw new InvalidOperationException();
+            }
+
+            /// <summary>
+            /// Sets the (optional) <c>description</c> property.
+            /// </summary>
+            /// <param name="value">The new property value</param>
+            /// <returns>The instance with the property set.</returns>
+            public Typed WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.Description? value)
+            {
+                return value.HasValue ? this.SetProperty(JsonPropertyNames.Description, value.Value) : this.RemoveProperty(JsonPropertyNames.Description);
             }
 
             /// <summary>
@@ -632,6 +704,22 @@ public readonly partial struct UngroupedPropObj
             public Typed RemoveProperty(ReadOnlySpan<byte> name)
             {
                 return new(__CorvusObjectHelpers.GetPropertyBackingWithout(this, name));
+            }
+
+            /// <summary>
+            /// Provides UTF8 and string versions of the JSON property names on the object.
+            /// </summary>
+            public static class JsonPropertyNames
+            {
+                /// <summary>
+                /// Gets the JSON property name for <see cref="Description"/>.
+                /// </summary>
+                public const string Description = "description";
+
+                /// <summary>
+                /// Gets the JSON property name for <see cref="Description"/>.
+                /// </summary>
+                public static ReadOnlySpan<byte> DescriptionUtf8 => "description"u8;
             }
 
             private static class __CorvusObjectHelpers

@@ -105,10 +105,13 @@ public readonly partial struct TypeIsFloat
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// RealmPropertyFloat
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.TypeIsFloat.TypeEntity Type
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.TypeIsFloat.TypeEntity? Type
     {
         get
         {
@@ -121,6 +124,11 @@ public readonly partial struct TypeIsFloat
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.TypeUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -129,6 +137,11 @@ public readonly partial struct TypeIsFloat
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Type, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.TypeIsFloat.TypeEntity>();
                 }
             }
@@ -292,9 +305,9 @@ public readonly partial struct TypeIsFloat
     /// RealmPropertyFloat
     /// </para>
     /// </remarks>
-    public TypeIsFloat WithType(in ACRealms.Roslyn.RealmProps.IntermediateModels.TypeIsFloat.TypeEntity value)
+    public TypeIsFloat WithType(in ACRealms.Roslyn.RealmProps.IntermediateModels.TypeIsFloat.TypeEntity? value)
     {
-        return this.SetProperty(JsonPropertyNames.Type, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Type, value.Value) : this.RemoveProperty(JsonPropertyNames.Type);
     }
 
     /// <summary>

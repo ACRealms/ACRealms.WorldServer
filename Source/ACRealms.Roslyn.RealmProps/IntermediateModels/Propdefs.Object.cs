@@ -140,7 +140,12 @@ public readonly partial struct PropDefs
     /// <summary>
     /// Gets the (optional) <c>additionalProperties</c> property.
     /// </summary>
-    public Corvus.Json.JsonNotAny AdditionalProperties
+    /// <remarks>
+    /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/>, or <see cref="JsonValueKind.Null"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// </remarks>
+    public Corvus.Json.JsonNotAny? AdditionalProperties
     {
         get
         {
@@ -153,6 +158,11 @@ public readonly partial struct PropDefs
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.AdditionalPropertiesUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -161,6 +171,11 @@ public readonly partial struct PropDefs
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.AdditionalProperties, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<Corvus.Json.JsonNotAny>();
                 }
             }
@@ -174,10 +189,13 @@ public readonly partial struct PropDefs
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// A description for the namespace
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionPattern Description
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionPattern? Description
     {
         get
         {
@@ -190,6 +208,11 @@ public readonly partial struct PropDefs
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DescriptionUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -198,6 +221,11 @@ public readonly partial struct PropDefs
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionPattern>();
                 }
             }
@@ -211,10 +239,13 @@ public readonly partial struct PropDefs
     /// </summary>
     /// <remarks>
     /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// <para>
     /// A group of properties that can share the same set of defaults.
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefs.GroupArray Groups
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefs.GroupArray? Groups
     {
         get
         {
@@ -227,6 +258,11 @@ public readonly partial struct PropDefs
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.GroupsUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -235,6 +271,11 @@ public readonly partial struct PropDefs
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Groups, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefs.GroupArray>();
                 }
             }
@@ -292,7 +333,12 @@ public readonly partial struct PropDefs
     /// <summary>
     /// Gets the (optional) <c>properties</c> property.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.Props Properties
+    /// <remarks>
+    /// <para>
+    /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+    /// </para>
+    /// </remarks>
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.Props? Properties
     {
         get
         {
@@ -305,6 +351,11 @@ public readonly partial struct PropDefs
 
                 if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.PropertiesUtf8, out JsonElement result))
                 {
+                    if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                    {
+                        return default;
+                    }
+
                     return new(result);
                 }
             }
@@ -313,6 +364,11 @@ public readonly partial struct PropDefs
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Properties, out JsonAny result))
                 {
+                    if (result.IsNullOrUndefined())
+                    {
+                        return default;
+                    }
+
                     return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Props>();
                 }
             }
@@ -503,9 +559,9 @@ public readonly partial struct PropDefs
     /// </summary>
     /// <param name="value">The new property value</param>
     /// <returns>The instance with the property set.</returns>
-    public PropDefs WithAdditionalProperties(in Corvus.Json.JsonNotAny value)
+    public PropDefs WithAdditionalProperties(in Corvus.Json.JsonNotAny? value)
     {
-        return this.SetProperty(JsonPropertyNames.AdditionalProperties, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.AdditionalProperties, value.Value) : this.RemoveProperty(JsonPropertyNames.AdditionalProperties);
     }
 
     /// <summary>
@@ -518,9 +574,9 @@ public readonly partial struct PropDefs
     /// A description for the namespace
     /// </para>
     /// </remarks>
-    public PropDefs WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionPattern value)
+    public PropDefs WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionPattern? value)
     {
-        return this.SetProperty(JsonPropertyNames.Description, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Description, value.Value) : this.RemoveProperty(JsonPropertyNames.Description);
     }
 
     /// <summary>
@@ -533,9 +589,9 @@ public readonly partial struct PropDefs
     /// A group of properties that can share the same set of defaults.
     /// </para>
     /// </remarks>
-    public PropDefs WithGroups(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefs.GroupArray value)
+    public PropDefs WithGroups(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefs.GroupArray? value)
     {
-        return this.SetProperty(JsonPropertyNames.Groups, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Groups, value.Value) : this.RemoveProperty(JsonPropertyNames.Groups);
     }
 
     /// <summary>
@@ -564,9 +620,9 @@ public readonly partial struct PropDefs
     /// </summary>
     /// <param name="value">The new property value</param>
     /// <returns>The instance with the property set.</returns>
-    public PropDefs WithProperties(in ACRealms.Roslyn.RealmProps.IntermediateModels.Props value)
+    public PropDefs WithProperties(in ACRealms.Roslyn.RealmProps.IntermediateModels.Props? value)
     {
-        return this.SetProperty(JsonPropertyNames.Properties, value);
+        return value.HasValue ? this.SetProperty(JsonPropertyNames.Properties, value.Value) : this.RemoveProperty(JsonPropertyNames.Properties);
     }
 
     /// <summary>

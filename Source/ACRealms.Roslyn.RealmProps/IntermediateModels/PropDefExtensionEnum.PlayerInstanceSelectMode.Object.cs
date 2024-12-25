@@ -109,7 +109,12 @@ public readonly partial struct PropDefExtensionEnum
         /// <summary>
         /// Gets the (optional) <c>default</c> property.
         /// </summary>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode Default
+        /// <remarks>
+        /// <para>
+        /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+        /// </para>
+        /// </remarks>
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode? Default
         {
             get
             {
@@ -122,6 +127,11 @@ public readonly partial struct PropDefExtensionEnum
 
                     if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultUtf8, out JsonElement result))
                     {
+                        if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                        {
+                            return default;
+                        }
+
                         return new(result);
                     }
                 }
@@ -130,6 +140,11 @@ public readonly partial struct PropDefExtensionEnum
                 {
                     if (this.objectBacking.TryGetValue(JsonPropertyNames.Default, out JsonAny result))
                     {
+                        if (result.IsNullOrUndefined())
+                        {
+                            return default;
+                        }
+
                         return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode>();
                     }
                 }
@@ -143,10 +158,13 @@ public readonly partial struct PropDefExtensionEnum
         /// </summary>
         /// <remarks>
         /// <para>
+        /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+        /// </para>
+        /// <para>
         /// Determines the conversion function from a relative position to an instance position, contextually for a player
         /// </para>
         /// </remarks>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum.PlayerInstanceSelectMode.EnumEntity Enum
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum.PlayerInstanceSelectMode.EnumEntity? Enum
         {
             get
             {
@@ -159,6 +177,11 @@ public readonly partial struct PropDefExtensionEnum
 
                     if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.EnumUtf8, out JsonElement result))
                     {
+                        if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                        {
+                            return default;
+                        }
+
                         return new(result);
                     }
                 }
@@ -167,6 +190,11 @@ public readonly partial struct PropDefExtensionEnum
                 {
                     if (this.objectBacking.TryGetValue(JsonPropertyNames.Enum, out JsonAny result))
                     {
+                        if (result.IsNullOrUndefined())
+                        {
+                            return default;
+                        }
+
                         return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum.PlayerInstanceSelectMode.EnumEntity>();
                     }
                 }
@@ -330,9 +358,9 @@ public readonly partial struct PropDefExtensionEnum
         /// </summary>
         /// <param name="value">The new property value</param>
         /// <returns>The instance with the property set.</returns>
-        public PlayerInstanceSelectMode WithDefault(in ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode value)
+        public PlayerInstanceSelectMode WithDefault(in ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode? value)
         {
-            return this.SetProperty(JsonPropertyNames.Default, value);
+            return value.HasValue ? this.SetProperty(JsonPropertyNames.Default, value.Value) : this.RemoveProperty(JsonPropertyNames.Default);
         }
 
         /// <summary>
@@ -345,9 +373,9 @@ public readonly partial struct PropDefExtensionEnum
         /// Determines the conversion function from a relative position to an instance position, contextually for a player
         /// </para>
         /// </remarks>
-        public PlayerInstanceSelectMode WithEnum(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum.PlayerInstanceSelectMode.EnumEntity value)
+        public PlayerInstanceSelectMode WithEnum(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum.PlayerInstanceSelectMode.EnumEntity? value)
         {
-            return this.SetProperty(JsonPropertyNames.Enum, value);
+            return value.HasValue ? this.SetProperty(JsonPropertyNames.Enum, value.Value) : this.RemoveProperty(JsonPropertyNames.Enum);
         }
 
         /// <summary>

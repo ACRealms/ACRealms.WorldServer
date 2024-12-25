@@ -54,16 +54,7 @@ public readonly partial struct UngroupedPropObj
                 result = result.PushSchemaLocation("realm-props/props/prop.json#/definitions/objPropSelection");
             }
 
-            JsonValueKind valueKind = this.ValueKind;
-
             result = CorvusValidation.CompositionAllOfValidationHandler(this, result, level);
-
-            if (level == ValidationLevel.Flag && !result.IsValid)
-            {
-                return result;
-            }
-
-            result = CorvusValidation.ObjectValidationHandler(this, valueKind, result, level);
 
             if (level == ValidationLevel.Flag && !result.IsValid)
             {
@@ -122,66 +113,6 @@ public readonly partial struct UngroupedPropObj
                 else
                 {
                     result = result.MergeChildContext(allOfResult0, level >= ValidationLevel.Detailed);
-                }
-
-                return result;
-            }
-
-            /// <summary>
-            /// Object validation.
-            /// </summary>
-            /// <param name="value">The value to validate.</param>
-            /// <param name="valueKind">The <see cref="JsonValueKind" /> of the value to validate.</param>
-            /// <param name="validationContext">The current validation context.</param>
-            /// <param name="level">The current validation level.</param>
-            /// <returns>The resulting validation context after validation.</returns>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal static ValidationContext ObjectValidationHandler(
-                in ObjPropSelection value,
-                JsonValueKind valueKind,
-                in ValidationContext validationContext,
-                ValidationLevel level = ValidationLevel.Flag)
-            {
-                ValidationContext result = validationContext;
-                if (valueKind != JsonValueKind.Object)
-                {
-                    if (level == ValidationLevel.Verbose)
-                    {
-                        ValidationContext ignoredResult = validationContext;
-                        ignoredResult = ignoredResult.WithResult(isValid: true, "Validation properties - ignored because the value is not an object", "properties");
-
-                        return ignoredResult;
-                    }
-
-                    return validationContext;
-                }
-
-                int propertyCount = 0;
-                foreach (JsonObjectProperty property in value.EnumerateObject())
-                {
-                    if (property.NameEquals(JsonPropertyNames.DescriptionUtf8, JsonPropertyNames.Description))
-                    {
-                        result = result.WithLocalProperty(propertyCount);
-                        if (level > ValidationLevel.Basic)
-                        {
-                            result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/description/$ref"), JsonPropertyNames.Description);
-                        }
-
-                        ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description>().Validate(result.CreateChildContext(), level);
-                        if (level == ValidationLevel.Flag && !propertyResult.IsValid)
-                        {
-                            return propertyResult;
-                        }
-
-                        result = result.MergeResults(propertyResult.IsValid, level, propertyResult);
-
-                        if (level > ValidationLevel.Basic)
-                        {
-                            result = result.PopLocation();
-                        }
-                    }
-
-                    propertyCount++;
                 }
 
                 return result;

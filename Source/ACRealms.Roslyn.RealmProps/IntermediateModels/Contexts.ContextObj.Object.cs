@@ -111,10 +111,13 @@ public readonly partial struct Contexts
         /// </summary>
         /// <remarks>
         /// <para>
+        /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+        /// </para>
+        /// <para>
         /// A description for the context, to be shown in code docs when using the property
         /// </para>
         /// </remarks>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.DescriptionEntity Description
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.DescriptionEntity? Description
         {
             get
             {
@@ -127,6 +130,11 @@ public readonly partial struct Contexts
 
                     if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DescriptionUtf8, out JsonElement result))
                     {
+                        if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                        {
+                            return default;
+                        }
+
                         return new(result);
                     }
                 }
@@ -135,6 +143,11 @@ public readonly partial struct Contexts
                 {
                     if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
                     {
+                        if (result.IsNullOrUndefined())
+                        {
+                            return default;
+                        }
+
                         return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.DescriptionEntity>();
                     }
                 }
@@ -225,10 +238,13 @@ public readonly partial struct Contexts
         /// </summary>
         /// <remarks>
         /// <para>
+        /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+        /// </para>
+        /// <para>
         /// If true, a context is required when fetching this realm property.
         /// </para>
         /// </remarks>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.RequiredEntity Required
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.RequiredEntity? Required
         {
             get
             {
@@ -241,6 +257,11 @@ public readonly partial struct Contexts
 
                     if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.RequiredUtf8, out JsonElement result))
                     {
+                        if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                        {
+                            return default;
+                        }
+
                         return new(result);
                     }
                 }
@@ -249,6 +270,11 @@ public readonly partial struct Contexts
                 {
                     if (this.objectBacking.TryGetValue(JsonPropertyNames.Required, out JsonAny result))
                     {
+                        if (result.IsNullOrUndefined())
+                        {
+                            return default;
+                        }
+
                         return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.RequiredEntity>();
                     }
                 }
@@ -423,9 +449,9 @@ public readonly partial struct Contexts
         /// A description for the context, to be shown in code docs when using the property
         /// </para>
         /// </remarks>
-        public ContextObj WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.DescriptionEntity value)
+        public ContextObj WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.DescriptionEntity? value)
         {
-            return this.SetProperty(JsonPropertyNames.Description, value);
+            return value.HasValue ? this.SetProperty(JsonPropertyNames.Description, value.Value) : this.RemoveProperty(JsonPropertyNames.Description);
         }
 
         /// <summary>
@@ -463,9 +489,9 @@ public readonly partial struct Contexts
         /// If true, a context is required when fetching this realm property.
         /// </para>
         /// </remarks>
-        public ContextObj WithRequired(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.RequiredEntity value)
+        public ContextObj WithRequired(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.RequiredEntity? value)
         {
-            return this.SetProperty(JsonPropertyNames.Required, value);
+            return value.HasValue ? this.SetProperty(JsonPropertyNames.Required, value.Value) : this.RemoveProperty(JsonPropertyNames.Required);
         }
 
         /// <summary>

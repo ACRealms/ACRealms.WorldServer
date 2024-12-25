@@ -5,12 +5,23 @@
     "propDefsAreLongForm": { "properties": { "properties": { "$ref": "#/definitions/isObject" } } },
     "props": {
       "definitions": {
-        "enum": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propEnum" } } } },
-        "int": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propInt" } } } },
-        "long": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propLong" } } } },
-        "float": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propFloat" } } } },
-        "string": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propString" } } } },
-        "bool": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propBool" } } } }
+        "enum": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": {
+                "allOf": [ { "$ref": "common/prop-typed.json#/definitions/propEnum" }, { "$ref": "group/prop-obj.json" } ], "unevaluatedProperties": false } } } },
+
+        "int": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": {
+                "allOf": [ { "$ref": "common/prop-typed.json#/definitions/propInt" }, { "$ref": "group/prop-obj.json" } ], "unevaluatedProperties": false } } } },
+
+        "long": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": {
+                "allOf": [ { "$ref": "common/prop-typed.json#/definitions/propLong" }, { "$ref": "group/prop-obj.json" } ], "unevaluatedProperties": false } } } },
+
+        "float": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": {
+                "allOf": [ { "$ref": "common/prop-typed.json#/definitions/propFloat" }, { "$ref": "group/prop-obj.json" } ], "unevaluatedProperties": false } } } },
+
+        "string": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": {
+                "allOf": [ { "$ref": "common/prop-typed.json#/definitions/propString" }, { "$ref": "group/prop-obj.json" } ], "unevaluatedProperties": false } } } },
+
+        "bool": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": {
+                "allOf": [ { "$ref": "common/prop-typed.json#/definitions/propBool" }, { "$ref": "group/prop-obj.json" } ], "unevaluatedProperties": false } } } }
       }
     },
     "typedPropDefs": {

@@ -1,5 +1,5 @@
 {
   "$corvusTypeName": "PropDefKeyPart",
   "$ref": "key.json",
-  "maxLength": 30
+  "allOf": [ { "maxLength": 35 } ]
 }

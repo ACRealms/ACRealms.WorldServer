@@ -49,10 +49,6 @@ public readonly partial struct GroupPropsObj
         }
 
         JsonValueKind valueKind = this.ValueKind;
-        if (!result.IsUsingEvaluatedProperties)
-        {
-            result = result.UsingEvaluatedProperties();
-        }
 
         result = CorvusValidation.TypeValidationHandler(valueKind, result, level);
 
@@ -61,7 +57,7 @@ public readonly partial struct GroupPropsObj
             return result;
         }
 
-        result = CorvusValidation.ObjectValidationHandler(this, valueKind, result, level);
+        result = CorvusValidation.CompositionAllOfValidationHandler(this, result, level);
 
         if (level == ValidationLevel.Flag && !result.IsValid)
         {
@@ -98,81 +94,69 @@ public readonly partial struct GroupPropsObj
         }
 
         /// <summary>
-        /// Object validation.
+        /// Composition validation (all-of).
         /// </summary>
         /// <param name="value">The value to validate.</param>
-        /// <param name="valueKind">The <see cref="JsonValueKind" /> of the value to validate.</param>
         /// <param name="validationContext">The current validation context.</param>
         /// <param name="level">The current validation level.</param>
         /// <returns>The resulting validation context after validation.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ValidationContext ObjectValidationHandler(
+        internal static ValidationContext CompositionAllOfValidationHandler(
             in GroupPropsObj value,
-            JsonValueKind valueKind,
             in ValidationContext validationContext,
             ValidationLevel level = ValidationLevel.Flag)
         {
             ValidationContext result = validationContext;
-            if (valueKind != JsonValueKind.Object)
+            ValidationContext childContextBase = result;
+
+            ValidationContext allOfResult0 = childContextBase.CreateChildContext();
+            if (level > ValidationLevel.Basic)
             {
-                if (level == ValidationLevel.Verbose)
-                {
-                    ValidationContext ignoredResult = validationContext;
-                    ignoredResult = ignoredResult.WithResult(isValid: true, "Validation additionalProperties - ignored because the value is not an object", "additionalProperties");
-                    ignoredResult = ignoredResult.WithResult(isValid: true, "Validation propertyNames - ignored because the value is not an object", "propertyNames");
-
-                    return ignoredResult;
-                }
-
-                return validationContext;
+                allOfResult0 = allOfResult0.PushValidationLocationReducedPathModifier(new("#/allOf/0"));
             }
 
-            int propertyCount = 0;
-            foreach (JsonObjectProperty<ACRealms.Roslyn.RealmProps.IntermediateModels.GroupProp> property in value.EnumerateObject())
+            allOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.ValidPropertyNames>().Validate(allOfResult0, level);
+
+            if (!allOfResult0.IsValid)
             {
-                string? propertyNameAsString = null;
-
-                if (level > ValidationLevel.Basic)
+                if (level >= ValidationLevel.Basic)
                 {
-                    result = result.PushValidationLocationReducedPathModifier(new("#/propertyNames/$ref"));
+                    result = result.MergeChildContext(allOfResult0, true).PushValidationLocationProperty("allOf").WithResult(isValid: false, "Validation - allOf failed to validate against the schema.").PopLocation();
                 }
-
-                result = new ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart(propertyNameAsString ??= property.Name.GetString()).Validate(result, level);
-                if (level == ValidationLevel.Flag && !result.IsValid)
+                else
                 {
+                    result = result.MergeChildContext(allOfResult0, false).WithResult(isValid: false);
                     return result;
                 }
+            }
+            else
+            {
+                result = result.MergeChildContext(allOfResult0, level >= ValidationLevel.Detailed);
+            }
 
-                if (level > ValidationLevel.Basic)
+            ValidationContext allOfResult1 = childContextBase.CreateChildContext();
+            if (level > ValidationLevel.Basic)
+            {
+                allOfResult1 = allOfResult1.PushValidationLocationReducedPathModifier(new("#/allOf/1"));
+            }
+
+            allOfResult1 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.GroupPropsObj.Props>().Validate(allOfResult1, level);
+
+            if (!allOfResult1.IsValid)
+            {
+                if (level >= ValidationLevel.Basic)
                 {
-                    result = result.PopLocation();
+                    result = result.MergeChildContext(allOfResult1, true).PushValidationLocationProperty("allOf").WithResult(isValid: false, "Validation - allOf failed to validate against the schema.").PopLocation();
                 }
-
-                if (!result.HasEvaluatedLocalProperty(propertyCount))
+                else
                 {
-                    if (level > ValidationLevel.Basic)
-                    {
-                        string localEvaluatedPropertyName = (propertyNameAsString ??= property.Name.GetString());
-                        result = result.PushValidationLocationReducedPathModifierAndProperty(new JsonReference("#/additionalProperties").AppendUnencodedPropertyNameToFragment(localEvaluatedPropertyName).AppendFragment(new("#/$ref")), localEvaluatedPropertyName);
-                    }
-
-                    ValidationContext propertyResult = property.Value.Validate(result.CreateChildContext(), level);
-                    if (level == ValidationLevel.Flag && !propertyResult.IsValid)
-                    {
-                        return propertyResult;
-                    }
-
-                    result = result.MergeResults(propertyResult.IsValid, level, propertyResult);
-
-                    if (level > ValidationLevel.Basic)
-                    {
-                        result = result.PopLocation();
-                    }
-
-                    result = result.WithLocalProperty(propertyCount);
+                    result = result.MergeChildContext(allOfResult1, false).WithResult(isValid: false);
+                    return result;
                 }
-
-                propertyCount++;
+            }
+            else
+            {
+                result = result.MergeChildContext(allOfResult1, level >= ValidationLevel.Detailed);
             }
 
             return result;

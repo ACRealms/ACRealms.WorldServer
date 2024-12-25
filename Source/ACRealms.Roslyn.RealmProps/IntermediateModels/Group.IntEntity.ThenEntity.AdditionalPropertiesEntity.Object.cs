@@ -129,7 +129,12 @@ public readonly partial struct Group
                 /// <summary>
                 /// Gets the (optional) <c>contexts</c> property.
                 /// </summary>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts Contexts
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// </remarks>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? Contexts
                 {
                     get
                     {
@@ -142,6 +147,11 @@ public readonly partial struct Group
 
                             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.ContextsUtf8, out JsonElement result))
                             {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
                                 return new(result);
                             }
                         }
@@ -150,6 +160,11 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.Contexts, out JsonAny result))
                             {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
                                 return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts>();
                             }
                         }
@@ -161,7 +176,15 @@ public readonly partial struct Group
                 /// <summary>
                 /// Gets the (optional) <c>default</c> property.
                 /// </summary>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt Default
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/>, or <see cref="JsonValueKind.Null"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// <para>
+                /// The default fallback value for the property, when not defined explicitly by any ruleset
+                /// </para>
+                /// </remarks>
+                public Corvus.Json.JsonAny? Default
                 {
                     get
                     {
@@ -174,6 +197,11 @@ public readonly partial struct Group
 
                             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultUtf8, out JsonElement result))
                             {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
                                 return new(result);
                             }
                         }
@@ -182,7 +210,12 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.Default, out JsonAny result))
                             {
-                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt>();
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
+                                return result;
                             }
                         }
 
@@ -195,10 +228,13 @@ public readonly partial struct Group
                 /// </summary>
                 /// <remarks>
                 /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// <para>
                 /// When the realm property is not defined, fetches this server property key as a default
                 /// </para>
                 /// </remarks>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity DefaultFromServerProperty
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? DefaultFromServerProperty
                 {
                     get
                     {
@@ -211,6 +247,11 @@ public readonly partial struct Group
 
                             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultFromServerPropertyUtf8, out JsonElement result))
                             {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
                                 return new(result);
                             }
                         }
@@ -219,7 +260,62 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.DefaultFromServerProperty, out JsonAny result))
                             {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
                                 return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity>();
+                            }
+                        }
+
+                        return default;
+                    }
+                }
+
+                /// <summary>
+                /// Gets the (optional) <c>description</c> property.
+                /// </summary>
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// <para>
+                /// The description of the property, or the short description if the containing group defines description_format
+                /// </para>
+                /// </remarks>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.Description? Description
+                {
+                    get
+                    {
+                        if ((this.backing & Backing.JsonElement) != 0)
+                        {
+                            if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                            {
+                                return default;
+                            }
+
+                            if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DescriptionUtf8, out JsonElement result))
+                            {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
+                                return new(result);
+                            }
+                        }
+
+                        if ((this.backing & Backing.Object) != 0)
+                        {
+                            if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
+                            {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
+                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description>();
                             }
                         }
 
@@ -230,7 +326,12 @@ public readonly partial struct Group
                 /// <summary>
                 /// Gets the (optional) <c>max_value</c> property.
                 /// </summary>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt MaxValue
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// </remarks>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt? MaxValue
                 {
                     get
                     {
@@ -243,6 +344,11 @@ public readonly partial struct Group
 
                             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.MaxValueUtf8, out JsonElement result))
                             {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
                                 return new(result);
                             }
                         }
@@ -251,6 +357,11 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.MaxValue, out JsonAny result))
                             {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
                                 return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt>();
                             }
                         }
@@ -262,7 +373,12 @@ public readonly partial struct Group
                 /// <summary>
                 /// Gets the (optional) <c>min_value</c> property.
                 /// </summary>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt MinValue
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// </remarks>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt? MinValue
                 {
                     get
                     {
@@ -275,6 +391,11 @@ public readonly partial struct Group
 
                             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.MinValueUtf8, out JsonElement result))
                             {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
                                 return new(result);
                             }
                         }
@@ -283,6 +404,11 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.MinValue, out JsonAny result))
                             {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
                                 return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt>();
                             }
                         }
@@ -296,10 +422,13 @@ public readonly partial struct Group
                 /// </summary>
                 /// <remarks>
                 /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// <para>
                 /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
                 /// </para>
                 /// </remarks>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity Obsolete
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? Obsolete
                 {
                     get
                     {
@@ -312,6 +441,11 @@ public readonly partial struct Group
 
                             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.ObsoleteUtf8, out JsonElement result))
                             {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
                                 return new(result);
                             }
                         }
@@ -320,6 +454,11 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.Obsolete, out JsonAny result))
                             {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
                                 return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity>();
                             }
                         }
@@ -333,10 +472,13 @@ public readonly partial struct Group
                 /// </summary>
                 /// <remarks>
                 /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// <para>
                 /// Restricts the property from randomizing to **At Most** the frequency specified here. For no restrictions, omit this attribute
                 /// </para>
                 /// </remarks>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity RerollRestrictedTo
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity? RerollRestrictedTo
                 {
                     get
                     {
@@ -349,6 +491,11 @@ public readonly partial struct Group
 
                             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.RerollRestrictedToUtf8, out JsonElement result))
                             {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
                                 return new(result);
                             }
                         }
@@ -357,6 +504,11 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.RerollRestrictedTo, out JsonAny result))
                             {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
                                 return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity>();
                             }
                         }
@@ -392,8 +544,9 @@ public readonly partial struct Group
                 /// </summary>
                 public static AdditionalPropertiesEntity Create(
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? contexts = null,
-                    in ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt? defaultValue = null,
+                    in Corvus.Json.JsonAny? defaultValue = null,
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? defaultFromServerProperty = null,
+                    in ACRealms.Roslyn.RealmProps.IntermediateModels.Description? description = null,
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt? maxValue = null,
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt? minValue = null,
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? obsolete = null,
@@ -414,6 +567,11 @@ public readonly partial struct Group
                     if (defaultFromServerProperty is not null)
                     {
                         builder.Add(JsonPropertyNames.DefaultFromServerProperty, defaultFromServerProperty.Value.AsAny);
+                    }
+
+                    if (description is not null)
+                    {
+                        builder.Add(JsonPropertyNames.Description, description.Value.AsAny);
                     }
 
                     if (maxValue is not null)
@@ -552,9 +710,9 @@ public readonly partial struct Group
                 /// </summary>
                 /// <param name="value">The new property value</param>
                 /// <returns>The instance with the property set.</returns>
-                public AdditionalPropertiesEntity WithContexts(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts value)
+                public AdditionalPropertiesEntity WithContexts(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? value)
                 {
-                    return this.SetProperty(JsonPropertyNames.Contexts, value);
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.Contexts, value.Value) : this.RemoveProperty(JsonPropertyNames.Contexts);
                 }
 
                 /// <summary>
@@ -562,9 +720,14 @@ public readonly partial struct Group
                 /// </summary>
                 /// <param name="value">The new property value</param>
                 /// <returns>The instance with the property set.</returns>
-                public AdditionalPropertiesEntity WithDefault(in ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt value)
+                /// <remarks>
+                /// <para>
+                /// The default fallback value for the property, when not defined explicitly by any ruleset
+                /// </para>
+                /// </remarks>
+                public AdditionalPropertiesEntity WithDefault(in Corvus.Json.JsonAny? value)
                 {
-                    return this.SetProperty(JsonPropertyNames.Default, value);
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.Default, value.Value) : this.RemoveProperty(JsonPropertyNames.Default);
                 }
 
                 /// <summary>
@@ -577,9 +740,24 @@ public readonly partial struct Group
                 /// When the realm property is not defined, fetches this server property key as a default
                 /// </para>
                 /// </remarks>
-                public AdditionalPropertiesEntity WithDefaultFromServerProperty(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity value)
+                public AdditionalPropertiesEntity WithDefaultFromServerProperty(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? value)
                 {
-                    return this.SetProperty(JsonPropertyNames.DefaultFromServerProperty, value);
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.DefaultFromServerProperty, value.Value) : this.RemoveProperty(JsonPropertyNames.DefaultFromServerProperty);
+                }
+
+                /// <summary>
+                /// Sets the (optional) <c>description</c> property.
+                /// </summary>
+                /// <param name="value">The new property value</param>
+                /// <returns>The instance with the property set.</returns>
+                /// <remarks>
+                /// <para>
+                /// The description of the property, or the short description if the containing group defines description_format
+                /// </para>
+                /// </remarks>
+                public AdditionalPropertiesEntity WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.Description? value)
+                {
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.Description, value.Value) : this.RemoveProperty(JsonPropertyNames.Description);
                 }
 
                 /// <summary>
@@ -587,9 +765,9 @@ public readonly partial struct Group
                 /// </summary>
                 /// <param name="value">The new property value</param>
                 /// <returns>The instance with the property set.</returns>
-                public AdditionalPropertiesEntity WithMaxValue(in ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt value)
+                public AdditionalPropertiesEntity WithMaxValue(in ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt? value)
                 {
-                    return this.SetProperty(JsonPropertyNames.MaxValue, value);
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.MaxValue, value.Value) : this.RemoveProperty(JsonPropertyNames.MaxValue);
                 }
 
                 /// <summary>
@@ -597,9 +775,9 @@ public readonly partial struct Group
                 /// </summary>
                 /// <param name="value">The new property value</param>
                 /// <returns>The instance with the property set.</returns>
-                public AdditionalPropertiesEntity WithMinValue(in ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt value)
+                public AdditionalPropertiesEntity WithMinValue(in ACRealms.Roslyn.RealmProps.IntermediateModels.ValInt? value)
                 {
-                    return this.SetProperty(JsonPropertyNames.MinValue, value);
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.MinValue, value.Value) : this.RemoveProperty(JsonPropertyNames.MinValue);
                 }
 
                 /// <summary>
@@ -612,9 +790,9 @@ public readonly partial struct Group
                 /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
                 /// </para>
                 /// </remarks>
-                public AdditionalPropertiesEntity WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity value)
+                public AdditionalPropertiesEntity WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? value)
                 {
-                    return this.SetProperty(JsonPropertyNames.Obsolete, value);
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.Obsolete, value.Value) : this.RemoveProperty(JsonPropertyNames.Obsolete);
                 }
 
                 /// <summary>
@@ -627,9 +805,9 @@ public readonly partial struct Group
                 /// Restricts the property from randomizing to **At Most** the frequency specified here. For no restrictions, omit this attribute
                 /// </para>
                 /// </remarks>
-                public AdditionalPropertiesEntity WithRerollRestrictedTo(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity value)
+                public AdditionalPropertiesEntity WithRerollRestrictedTo(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity? value)
                 {
-                    return this.SetProperty(JsonPropertyNames.RerollRestrictedTo, value);
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.RerollRestrictedTo, value.Value) : this.RemoveProperty(JsonPropertyNames.RerollRestrictedTo);
                 }
 
                 /// <summary>
@@ -1036,6 +1214,11 @@ public readonly partial struct Group
                     public const string DefaultFromServerProperty = "default_from_server_property";
 
                     /// <summary>
+                    /// Gets the JSON property name for <see cref="Description"/>.
+                    /// </summary>
+                    public const string Description = "description";
+
+                    /// <summary>
                     /// Gets the JSON property name for <see cref="MaxValue"/>.
                     /// </summary>
                     public const string MaxValue = "max_value";
@@ -1069,6 +1252,11 @@ public readonly partial struct Group
                     /// Gets the JSON property name for <see cref="DefaultFromServerProperty"/>.
                     /// </summary>
                     public static ReadOnlySpan<byte> DefaultFromServerPropertyUtf8 => "default_from_server_property"u8;
+
+                    /// <summary>
+                    /// Gets the JSON property name for <see cref="Description"/>.
+                    /// </summary>
+                    public static ReadOnlySpan<byte> DescriptionUtf8 => "description"u8;
 
                     /// <summary>
                     /// Gets the JSON property name for <see cref="MaxValue"/>.

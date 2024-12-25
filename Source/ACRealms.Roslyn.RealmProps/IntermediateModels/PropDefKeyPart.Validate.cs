@@ -38,15 +38,6 @@ public readonly partial struct PropDefKeyPart
             result = result.PushSchemaLocation("realm-props/common/short-key.json");
         }
 
-        JsonValueKind valueKind = this.ValueKind;
-
-        result = CorvusValidation.StringValidationHandler(this, valueKind, result, level);
-
-        if (level == ValidationLevel.Flag && !result.IsValid)
-        {
-            return result;
-        }
-
         result = CorvusValidation.CompositionAllOfValidationHandler(this, result, level);
 
         if (level == ValidationLevel.Flag && !result.IsValid)
@@ -67,77 +58,6 @@ public readonly partial struct PropDefKeyPart
     /// </summary>
     public static partial class CorvusValidation
     {
-        /// <summary>
-        /// A constant for the <c>maxLength</c> keyword.
-        /// </summary>
-        public static readonly long MaxLength = 30;
-
-        /// <summary>
-        /// String validation.
-        /// </summary>
-        /// <param name="value">The value to validate.</param>
-        /// <param name="valueKind">The <see cref="JsonValueKind" /> of the value to validate.</param>
-        /// <param name="validationContext">The current validation context.</param>
-        /// <param name="level">The current validation level.</param>
-        /// <returns>The resulting validation context after validation.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ValidationContext StringValidationHandler(
-            in PropDefKeyPart value,
-            JsonValueKind valueKind,
-            in ValidationContext validationContext,
-            ValidationLevel level = ValidationLevel.Flag)
-        {
-            if (valueKind != JsonValueKind.String)
-            {
-                if (level == ValidationLevel.Verbose)
-                {
-                    ValidationContext ignoredResult = validationContext;
-                    ignoredResult = ignoredResult.WithResult(isValid: true, "Validation maxLength - ignored because the value is not a string", "maxLength");
-
-                    return ignoredResult;
-                }
-
-                return validationContext;
-            }
-
-            ValidationContext result = validationContext;
-            value.AsString.TryGetValue(StringValidator, new Corvus.Json.Validate.ValidationContextWrapper(result, level), out result);
-
-            return result;
-
-            static bool StringValidator(ReadOnlySpan<char> input, in Corvus.Json.Validate.ValidationContextWrapper context, out ValidationContext result)
-            {
-                int length = Corvus.Json.Validate.CountRunes(input);
-                result = context.Context;
-
-                if (length <= MaxLength)
-                {
-                    if (context.Level == ValidationLevel.Verbose)
-                    {
-                        result = result.WithResult(isValid: true, validationLocationReducedPathModifier: new JsonReference("maxLength"), $"Validation maxLength - {input.ToString()} of {length} is less than or equal to {MaxLength}");
-                    }
-                }
-                else
-                {
-                    if (context.Level == ValidationLevel.Flag)
-                    {
-                        result = context.Context.WithResult(isValid: false);
-                        return true;
-                    }
-                    else if (context.Level >= ValidationLevel.Detailed)
-                    {
-                        result = result.WithResult(isValid: false, validationLocationReducedPathModifier: new JsonReference("maxLength"), $"Validation maxLength - {input.ToString()} of {length} is greater than {MaxLength}");
-                    }
-                    else
-                    {
-                        result = result.WithResult(isValid: false, validationLocationReducedPathModifier: new JsonReference("maxLength"), "Validation maxLength - is greater than the required length.");
-                    }
-                }
-
-                return true;
-            }
-        }
-
         /// <summary>
         /// Composition validation (all-of).
         /// </summary>
@@ -177,6 +97,31 @@ public readonly partial struct PropDefKeyPart
             else
             {
                 result = result.MergeChildContext(refResult, level >= ValidationLevel.Detailed);
+            }
+
+            ValidationContext allOfResult0 = childContextBase.CreateChildContext();
+            if (level > ValidationLevel.Basic)
+            {
+                allOfResult0 = allOfResult0.PushValidationLocationReducedPathModifier(new("#/allOf/0"));
+            }
+
+            allOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity>().Validate(allOfResult0, level);
+
+            if (!allOfResult0.IsValid)
+            {
+                if (level >= ValidationLevel.Basic)
+                {
+                    result = result.MergeChildContext(allOfResult0, true).PushValidationLocationProperty("allOf").WithResult(isValid: false, "Validation - allOf failed to validate against the schema.").PopLocation();
+                }
+                else
+                {
+                    result = result.MergeChildContext(allOfResult0, false).WithResult(isValid: false);
+                    return result;
+                }
+            }
+            else
+            {
+                result = result.MergeChildContext(allOfResult0, level >= ValidationLevel.Detailed);
             }
 
             return result;

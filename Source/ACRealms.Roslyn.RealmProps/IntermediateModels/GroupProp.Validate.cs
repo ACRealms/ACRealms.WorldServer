@@ -78,10 +78,10 @@ public readonly partial struct GroupProp
             ValidationContext oneOfChildContext0 = validationContext.CreateChildContext();
             if (level > ValidationLevel.Basic)
             {
-                oneOfChildContext0 = oneOfChildContext0.PushValidationLocationReducedPathModifier(new("#/oneOf/0/$ref/$ref"));
+                oneOfChildContext0 = oneOfChildContext0.PushValidationLocationReducedPathModifier(new("#/oneOf/0/$ref"));
             }
 
-            ValidationContext oneOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase>().Validate(oneOfChildContext0, level);
+            ValidationContext oneOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj>().Validate(oneOfChildContext0, level);
 
             if (oneOfResult0.IsValid)
             {

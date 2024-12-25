@@ -230,28 +230,6 @@ public readonly partial struct Group
                 }
 
                 /// <summary>
-                /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropString" />.
-                /// </summary>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropString AsPropString
-                {
-                    get
-                    {
-                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropString>();
-                    }
-                }
-
-                /// <summary>
-                /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropString" />.
-                /// </summary>
-                public bool IsPropString
-                {
-                    get
-                    {
-                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropString>().IsValid();
-                    }
-                }
-
-                /// <summary>
                 /// Gets the instance as a <see cref="Corvus.Json.JsonObject" />.
                 /// </summary>
                 public Corvus.Json.JsonObject AsJsonObject
@@ -270,6 +248,28 @@ public readonly partial struct Group
                     get
                     {
                         return this.As<Corvus.Json.JsonObject>().IsValid();
+                    }
+                }
+
+                /// <summary>
+                /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity" />.
+                /// </summary>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity AsThenEntity
+                {
+                    get
+                    {
+                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity>();
+                    }
+                }
+
+                /// <summary>
+                /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity" />.
+                /// </summary>
+                public bool IsThenEntity
+                {
+                    get
+                    {
+                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity>().IsValid();
                     }
                 }
 
@@ -748,18 +748,18 @@ public readonly partial struct Group
                 /// <typeparam name="TIn">The immutable context to pass in to the match function.</typeparam>
                 /// <typeparam name="TOut">The result of calling the match function.</typeparam>
                 /// <param name="context">The context to pass to the match function.</param>
-                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsPropString">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropString"/>.</param>
+                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsGroupStringEntityThenEntityAdditionalPropertiesEntityThenEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity"/>.</param>
                 /// <param name="defaultMatch">Default match if the 'if' schema did not match.</param>
                 /// <returns>An instance of the value returned by the match function.</returns>
                 public TOut Match<TIn, TOut>(
                     in TIn context,
-                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropString, TIn, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsPropString,
+                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity, TIn, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsGroupStringEntityThenEntityAdditionalPropertiesEntityThenEntity,
                     Matcher<AdditionalPropertiesEntity, TIn, TOut> defaultMatch)
                 {
                     Corvus.Json.JsonObject ifValue = this.As<Corvus.Json.JsonObject>();
                     if (ifValue.IsValid())
                     {
-                        return matchAcRealmsRoslynRealmPropsIntermediateModelsPropString(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropString>(), context);
+                        return matchAcRealmsRoslynRealmPropsIntermediateModelsGroupStringEntityThenEntityAdditionalPropertiesEntityThenEntity(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity>(), context);
                     }
 
                     return defaultMatch(this, context);
@@ -770,31 +770,20 @@ public readonly partial struct Group
                 /// the 'then' type if the match is successful.
                 /// </summary>
                 /// <typeparam name="TOut">The result of calling the match function.</typeparam>
-                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsPropString">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropString"/>.</param>
+                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsGroupStringEntityThenEntityAdditionalPropertiesEntityThenEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity"/>.</param>
                 /// <param name="defaultMatch">Default match if the 'if' schema did not match.</param>
                 /// <returns>An instance of the value returned by the match function.</returns>
                 public TOut Match<TOut>(
-                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropString, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsPropString,
+                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsGroupStringEntityThenEntityAdditionalPropertiesEntityThenEntity,
                     Matcher<AdditionalPropertiesEntity, TOut> defaultMatch)
                 {
                     Corvus.Json.JsonObject ifValue = this.As<Corvus.Json.JsonObject>();
                     if (ifValue.IsValid())
                     {
-                        return matchAcRealmsRoslynRealmPropsIntermediateModelsPropString(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropString>());
+                        return matchAcRealmsRoslynRealmPropsIntermediateModelsGroupStringEntityThenEntityAdditionalPropertiesEntityThenEntity(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity>());
                     }
 
                     return defaultMatch(this);
-                }
-
-                /// <summary>
-                /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropString" />.
-                /// </summary>
-                /// <param name="result">The result of the conversions.</param>
-                /// <returns><see langword="true" /> if the conversion was valid.</returns>
-                public bool TryGetAsPropString(out ACRealms.Roslyn.RealmProps.IntermediateModels.PropString result)
-                {
-                    result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropString>();
-                    return result.IsValid();
                 }
 
                 /// <summary>
@@ -805,6 +794,17 @@ public readonly partial struct Group
                 public bool TryGetAsJsonObject(out Corvus.Json.JsonObject result)
                 {
                     result = this.As<Corvus.Json.JsonObject>();
+                    return result.IsValid();
+                }
+
+                /// <summary>
+                /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity" />.
+                /// </summary>
+                /// <param name="result">The result of the conversions.</param>
+                /// <returns><see langword="true" /> if the conversion was valid.</returns>
+                public bool TryGetAsThenEntity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity result)
+                {
+                    result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.StringEntity.ThenEntity.AdditionalPropertiesEntity.ThenEntity>();
                     return result.IsValid();
                 }
             }

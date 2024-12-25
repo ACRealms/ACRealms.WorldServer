@@ -21,7 +21,7 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// </summary>
 [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<PropDefKeyPart>))]
 public readonly partial struct PropDefKeyPart
-
+    : IJsonValue<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart>
 {
     private readonly Backing backing;
     private readonly JsonElement jsonElementBacking;
@@ -224,6 +224,28 @@ public readonly partial struct PropDefKeyPart
         }
     }
 
+    /// <summary>
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity" />.
+    /// </summary>
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity AsAllOf0Entity
+    {
+        get
+        {
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity>();
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity" />.
+    /// </summary>
+    public bool IsAllOf0Entity
+    {
+        get
+        {
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity>().IsValid();
+        }
+    }
+
     /// <inheritdoc/>
     public bool HasJsonElementBacking
     {
@@ -293,6 +315,24 @@ public readonly partial struct PropDefKeyPart
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
     public static explicit operator PropDefKeyPart(ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKey value)
+    {
+        return value.As<PropDefKeyPart>();
+    }
+
+    /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity(PropDefKeyPart value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator PropDefKeyPart(ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity value)
     {
         return value.As<PropDefKeyPart>();
     }
@@ -581,7 +621,7 @@ public readonly partial struct PropDefKeyPart
 
         if ((this.backing & Backing.String) != 0)
         {
-            return TTarget.FromString(this);
+            return TTarget.FromString(this.AsString);
         }
 
         if ((this.backing & Backing.Null) != 0)
@@ -720,6 +760,17 @@ public readonly partial struct PropDefKeyPart
     public bool TryGetAsPropDefKey(out ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKey result)
     {
         result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKey>();
+        return result.IsValid();
+    }
+
+    /// <summary>
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity" />.
+    /// </summary>
+    /// <param name="result">The result of the conversions.</param>
+    /// <returns><see langword="true" /> if the conversion was valid.</returns>
+    public bool TryGetAsAllOf0Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity result)
+    {
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart.AllOf0Entity>();
         return result.IsValid();
     }
 }

@@ -134,10 +134,10 @@ public readonly partial struct Group
                         {
                             if (level > ValidationLevel.Basic)
                             {
-                                result = result.PushValidationLocationReducedPathModifier(new("#/then/$ref/$ref"));
+                                result = result.PushValidationLocationReducedPathModifier(new("#/then"));
                             }
 
-                            ValidationContext thenResult = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum>().Validate(validationContext.CreateChildContext(), level);
+                            ValidationContext thenResult = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.EnumEntity.ThenEntity.AdditionalPropertiesEntity.RequiredDefaultAndEnum>().Validate(validationContext.CreateChildContext(), level);
 
                             if (!thenResult.IsValid)
                             {

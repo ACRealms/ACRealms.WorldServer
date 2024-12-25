@@ -127,9 +127,64 @@ public readonly partial struct Group
                 }
 
                 /// <summary>
+                /// Gets the (optional) <c>contexts</c> property.
+                /// </summary>
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// </remarks>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? Contexts
+                {
+                    get
+                    {
+                        if ((this.backing & Backing.JsonElement) != 0)
+                        {
+                            if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                            {
+                                return default;
+                            }
+
+                            if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.ContextsUtf8, out JsonElement result))
+                            {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
+                                return new(result);
+                            }
+                        }
+
+                        if ((this.backing & Backing.Object) != 0)
+                        {
+                            if (this.objectBacking.TryGetValue(JsonPropertyNames.Contexts, out JsonAny result))
+                            {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
+                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts>();
+                            }
+                        }
+
+                        return default;
+                    }
+                }
+
+                /// <summary>
                 /// Gets the (optional) <c>default</c> property.
                 /// </summary>
-                public Corvus.Json.JsonAny Default
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/>, or <see cref="JsonValueKind.Null"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// <para>
+                /// The default fallback value for the property, when not defined explicitly by any ruleset
+                /// </para>
+                /// </remarks>
+                public Corvus.Json.JsonAny? Default
                 {
                     get
                     {
@@ -142,6 +197,11 @@ public readonly partial struct Group
 
                             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultUtf8, out JsonElement result))
                             {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
                                 return new(result);
                             }
                         }
@@ -150,7 +210,112 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.Default, out JsonAny result))
                             {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
                                 return result;
+                            }
+                        }
+
+                        return default;
+                    }
+                }
+
+                /// <summary>
+                /// Gets the (optional) <c>default_from_server_property</c> property.
+                /// </summary>
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// <para>
+                /// When the realm property is not defined, fetches this server property key as a default
+                /// </para>
+                /// </remarks>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? DefaultFromServerProperty
+                {
+                    get
+                    {
+                        if ((this.backing & Backing.JsonElement) != 0)
+                        {
+                            if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                            {
+                                return default;
+                            }
+
+                            if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DefaultFromServerPropertyUtf8, out JsonElement result))
+                            {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
+                                return new(result);
+                            }
+                        }
+
+                        if ((this.backing & Backing.Object) != 0)
+                        {
+                            if (this.objectBacking.TryGetValue(JsonPropertyNames.DefaultFromServerProperty, out JsonAny result))
+                            {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
+                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity>();
+                            }
+                        }
+
+                        return default;
+                    }
+                }
+
+                /// <summary>
+                /// Gets the (optional) <c>description</c> property.
+                /// </summary>
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// <para>
+                /// The description of the property, or the short description if the containing group defines description_format
+                /// </para>
+                /// </remarks>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.Description? Description
+                {
+                    get
+                    {
+                        if ((this.backing & Backing.JsonElement) != 0)
+                        {
+                            if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                            {
+                                return default;
+                            }
+
+                            if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.DescriptionUtf8, out JsonElement result))
+                            {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
+                                return new(result);
+                            }
+                        }
+
+                        if ((this.backing & Backing.Object) != 0)
+                        {
+                            if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
+                            {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
+                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description>();
                             }
                         }
 
@@ -161,7 +326,12 @@ public readonly partial struct Group
                 /// <summary>
                 /// Gets the (optional) <c>enum</c> property.
                 /// </summary>
-                public Corvus.Json.JsonAny Enum
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/>, or <see cref="JsonValueKind.Null"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// </remarks>
+                public Corvus.Json.JsonAny? Enum
                 {
                     get
                     {
@@ -174,6 +344,11 @@ public readonly partial struct Group
 
                             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.EnumUtf8, out JsonElement result))
                             {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
                                 return new(result);
                             }
                         }
@@ -182,7 +357,62 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.Enum, out JsonAny result))
                             {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
                                 return result;
+                            }
+                        }
+
+                        return default;
+                    }
+                }
+
+                /// <summary>
+                /// Gets the (optional) <c>obsolete</c> property.
+                /// </summary>
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// <para>
+                /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
+                /// </para>
+                /// </remarks>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? Obsolete
+                {
+                    get
+                    {
+                        if ((this.backing & Backing.JsonElement) != 0)
+                        {
+                            if (this.jsonElementBacking.ValueKind != JsonValueKind.Object)
+                            {
+                                return default;
+                            }
+
+                            if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.ObsoleteUtf8, out JsonElement result))
+                            {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
+                                return new(result);
+                            }
+                        }
+
+                        if ((this.backing & Backing.Object) != 0)
+                        {
+                            if (this.objectBacking.TryGetValue(JsonPropertyNames.Obsolete, out JsonAny result))
+                            {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
+                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity>();
                             }
                         }
 
@@ -215,18 +445,44 @@ public readonly partial struct Group
                 /// <summary>
                 /// Creates an instance of a <see cref="AdditionalPropertiesEntity"/>.
                 /// </summary>
-                public static AdditionalPropertiesEntity Create(in Corvus.Json.JsonAny? defaultValue = null, in Corvus.Json.JsonAny? enumValue = null)
+                public static AdditionalPropertiesEntity Create(
+                    in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? contexts = null,
+                    in Corvus.Json.JsonAny? defaultValue = null,
+                    in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? defaultFromServerProperty = null,
+                    in ACRealms.Roslyn.RealmProps.IntermediateModels.Description? description = null,
+                    in Corvus.Json.JsonAny? enumValue = null,
+                    in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? obsolete = null)
                 {
                     var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
+
+                    if (contexts is not null)
+                    {
+                        builder.Add(JsonPropertyNames.Contexts, contexts.Value.AsAny);
+                    }
 
                     if (defaultValue is not null)
                     {
                         builder.Add(JsonPropertyNames.Default, defaultValue.Value.AsAny);
                     }
 
+                    if (defaultFromServerProperty is not null)
+                    {
+                        builder.Add(JsonPropertyNames.DefaultFromServerProperty, defaultFromServerProperty.Value.AsAny);
+                    }
+
+                    if (description is not null)
+                    {
+                        builder.Add(JsonPropertyNames.Description, description.Value.AsAny);
+                    }
+
                     if (enumValue is not null)
                     {
                         builder.Add(JsonPropertyNames.Enum, enumValue.Value.AsAny);
+                    }
+
+                    if (obsolete is not null)
+                    {
+                        builder.Add(JsonPropertyNames.Obsolete, obsolete.Value.AsAny);
                     }
 
                     return new(builder.ToImmutable());
@@ -341,13 +597,58 @@ public readonly partial struct Group
                 }
 
                 /// <summary>
+                /// Sets the (optional) <c>contexts</c> property.
+                /// </summary>
+                /// <param name="value">The new property value</param>
+                /// <returns>The instance with the property set.</returns>
+                public AdditionalPropertiesEntity WithContexts(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? value)
+                {
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.Contexts, value.Value) : this.RemoveProperty(JsonPropertyNames.Contexts);
+                }
+
+                /// <summary>
                 /// Sets the (optional) <c>default</c> property.
                 /// </summary>
                 /// <param name="value">The new property value</param>
                 /// <returns>The instance with the property set.</returns>
-                public AdditionalPropertiesEntity WithDefault(in Corvus.Json.JsonAny value)
+                /// <remarks>
+                /// <para>
+                /// The default fallback value for the property, when not defined explicitly by any ruleset
+                /// </para>
+                /// </remarks>
+                public AdditionalPropertiesEntity WithDefault(in Corvus.Json.JsonAny? value)
                 {
-                    return this.SetProperty(JsonPropertyNames.Default, value);
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.Default, value.Value) : this.RemoveProperty(JsonPropertyNames.Default);
+                }
+
+                /// <summary>
+                /// Sets the (optional) <c>default_from_server_property</c> property.
+                /// </summary>
+                /// <param name="value">The new property value</param>
+                /// <returns>The instance with the property set.</returns>
+                /// <remarks>
+                /// <para>
+                /// When the realm property is not defined, fetches this server property key as a default
+                /// </para>
+                /// </remarks>
+                public AdditionalPropertiesEntity WithDefaultFromServerProperty(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? value)
+                {
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.DefaultFromServerProperty, value.Value) : this.RemoveProperty(JsonPropertyNames.DefaultFromServerProperty);
+                }
+
+                /// <summary>
+                /// Sets the (optional) <c>description</c> property.
+                /// </summary>
+                /// <param name="value">The new property value</param>
+                /// <returns>The instance with the property set.</returns>
+                /// <remarks>
+                /// <para>
+                /// The description of the property, or the short description if the containing group defines description_format
+                /// </para>
+                /// </remarks>
+                public AdditionalPropertiesEntity WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.Description? value)
+                {
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.Description, value.Value) : this.RemoveProperty(JsonPropertyNames.Description);
                 }
 
                 /// <summary>
@@ -355,9 +656,24 @@ public readonly partial struct Group
                 /// </summary>
                 /// <param name="value">The new property value</param>
                 /// <returns>The instance with the property set.</returns>
-                public AdditionalPropertiesEntity WithEnum(in Corvus.Json.JsonAny value)
+                public AdditionalPropertiesEntity WithEnum(in Corvus.Json.JsonAny? value)
                 {
-                    return this.SetProperty(JsonPropertyNames.Enum, value);
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.Enum, value.Value) : this.RemoveProperty(JsonPropertyNames.Enum);
+                }
+
+                /// <summary>
+                /// Sets the (optional) <c>obsolete</c> property.
+                /// </summary>
+                /// <param name="value">The new property value</param>
+                /// <returns>The instance with the property set.</returns>
+                /// <remarks>
+                /// <para>
+                /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
+                /// </para>
+                /// </remarks>
+                public AdditionalPropertiesEntity WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? value)
+                {
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.Obsolete, value.Value) : this.RemoveProperty(JsonPropertyNames.Obsolete);
                 }
 
                 /// <summary>
@@ -749,9 +1065,24 @@ public readonly partial struct Group
                 public static class JsonPropertyNames
                 {
                     /// <summary>
+                    /// Gets the JSON property name for <see cref="Contexts"/>.
+                    /// </summary>
+                    public const string Contexts = "contexts";
+
+                    /// <summary>
                     /// Gets the JSON property name for <see cref="Default"/>.
                     /// </summary>
                     public const string Default = "default";
+
+                    /// <summary>
+                    /// Gets the JSON property name for <see cref="DefaultFromServerProperty"/>.
+                    /// </summary>
+                    public const string DefaultFromServerProperty = "default_from_server_property";
+
+                    /// <summary>
+                    /// Gets the JSON property name for <see cref="Description"/>.
+                    /// </summary>
+                    public const string Description = "description";
 
                     /// <summary>
                     /// Gets the JSON property name for <see cref="Enum"/>.
@@ -759,14 +1090,39 @@ public readonly partial struct Group
                     public const string Enum = "enum";
 
                     /// <summary>
+                    /// Gets the JSON property name for <see cref="Obsolete"/>.
+                    /// </summary>
+                    public const string Obsolete = "obsolete";
+
+                    /// <summary>
+                    /// Gets the JSON property name for <see cref="Contexts"/>.
+                    /// </summary>
+                    public static ReadOnlySpan<byte> ContextsUtf8 => "contexts"u8;
+
+                    /// <summary>
                     /// Gets the JSON property name for <see cref="Default"/>.
                     /// </summary>
                     public static ReadOnlySpan<byte> DefaultUtf8 => "default"u8;
 
                     /// <summary>
+                    /// Gets the JSON property name for <see cref="DefaultFromServerProperty"/>.
+                    /// </summary>
+                    public static ReadOnlySpan<byte> DefaultFromServerPropertyUtf8 => "default_from_server_property"u8;
+
+                    /// <summary>
+                    /// Gets the JSON property name for <see cref="Description"/>.
+                    /// </summary>
+                    public static ReadOnlySpan<byte> DescriptionUtf8 => "description"u8;
+
+                    /// <summary>
                     /// Gets the JSON property name for <see cref="Enum"/>.
                     /// </summary>
                     public static ReadOnlySpan<byte> EnumUtf8 => "enum"u8;
+
+                    /// <summary>
+                    /// Gets the JSON property name for <see cref="Obsolete"/>.
+                    /// </summary>
+                    public static ReadOnlySpan<byte> ObsoleteUtf8 => "obsolete"u8;
                 }
 
                 private static class __CorvusObjectHelpers

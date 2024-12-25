@@ -129,7 +129,12 @@ public readonly partial struct Group
                 /// <summary>
                 /// Gets the (optional) <c>properties</c> property.
                 /// </summary>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.IntEntity Properties
+                /// <remarks>
+                /// <para>
+                /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
+                /// </para>
+                /// </remarks>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.IntEntity? Properties
                 {
                     get
                     {
@@ -142,6 +147,11 @@ public readonly partial struct Group
 
                             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.PropertiesUtf8, out JsonElement result))
                             {
+                                if (result.ValueKind == JsonValueKind.Null || result.ValueKind == JsonValueKind.Undefined)
+                                {
+                                    return default;
+                                }
+
                                 return new(result);
                             }
                         }
@@ -150,6 +160,11 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.Properties, out JsonAny result))
                             {
+                                if (result.IsNullOrUndefined())
+                                {
+                                    return default;
+                                }
+
                                 return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.IntEntity>();
                             }
                         }
@@ -308,9 +323,9 @@ public readonly partial struct Group
                 /// </summary>
                 /// <param name="value">The new property value</param>
                 /// <returns>The instance with the property set.</returns>
-                public AllOf0Entity WithProperties(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group.IntEntity value)
+                public AllOf0Entity WithProperties(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group.IntEntity? value)
                 {
-                    return this.SetProperty(JsonPropertyNames.Properties, value);
+                    return value.HasValue ? this.SetProperty(JsonPropertyNames.Properties, value.Value) : this.RemoveProperty(JsonPropertyNames.Properties);
                 }
 
                 /// <summary>

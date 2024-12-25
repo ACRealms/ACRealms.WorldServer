@@ -38,7 +38,7 @@ public readonly partial struct UngroupedPropObj
     /// </summary>
     [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<ObjPropSelection>))]
     public readonly partial struct ObjPropSelection
-
+        : IJsonValue<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection>
     {
         private readonly Backing backing;
         private readonly JsonElement jsonElementBacking;
@@ -706,7 +706,7 @@ public readonly partial struct UngroupedPropObj
 
             if ((this.backing & Backing.Object) != 0)
             {
-                return TTarget.FromObject(this);
+                return TTarget.FromObject(this.AsObject);
             }
 
             if ((this.backing & Backing.Null) != 0)
