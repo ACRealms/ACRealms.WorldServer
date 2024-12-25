@@ -81,7 +81,7 @@
   },
   "type": "object",
   "default": { },
-  "properties": { "type": { "$ref": "../common/attrs/type.json" } },
+  "properties": { "type": { "$ref": "common/attrs/type.json" } },
   "required": [ "type" ],
   "minProperties": 2,
   "dependencies": { "type": { "$ref": "#/definitions/groupPropSelection" } }
