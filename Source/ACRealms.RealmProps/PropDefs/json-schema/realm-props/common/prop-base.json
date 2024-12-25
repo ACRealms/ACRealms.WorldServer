@@ -1,5 +1,4 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
   "type": "object",
   "$comment": "Represents the base schema that is common for both props and groups",
   "default": { },

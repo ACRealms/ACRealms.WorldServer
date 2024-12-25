@@ -1,23 +1,27 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
   "oneOf": [
     {
+      "$corvusTypeName": "Same",
       "const": "Same",
       "description": "The current instance the player was located on"
     },
     {
+      "$corvusTypeName": "SameIfSameLandblock",
       "const": "SameIfSameLandblock",
       "description": "The current instance the player was located on, but only if teleporting within the same landblock.\nFor example, teleport traps that move a player to another location in the same dungeon will need to use this mode"
     },
     {
+      "$corvusTypeName": "HomeRealm",
       "const": "HomeRealm",
       "description": "Based on the player's home realm"
     },
     {
+      "$corvusTypeName": "PersonalRealm",
       "const": "PersonalRealm",
       "description": "The player's personal realm (Support for this is minimal right now)"
     },
     {
+      "$corvusTypeName": "RealmDefaultInstanceID",
       "const": "RealmDefaultInstanceID",
       "description": "The current realm's default instance ID"
     }

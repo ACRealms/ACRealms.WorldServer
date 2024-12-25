@@ -114,7 +114,7 @@ public readonly partial struct Contexts
         /// A description for the context, to be shown in code docs when using the property
         /// </para>
         /// </remarks>
-        public Corvus.Json.JsonString Description
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.DescriptionEntity Description
         {
             get
             {
@@ -135,7 +135,7 @@ public readonly partial struct Contexts
                 {
                     if (this.objectBacking.TryGetValue(JsonPropertyNames.Description, out JsonAny result))
                     {
-                        return result.As<Corvus.Json.JsonString>();
+                        return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.DescriptionEntity>();
                     }
                 }
 
@@ -285,7 +285,7 @@ public readonly partial struct Contexts
         public static ContextObj Create(
             in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal entity,
             in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextName name,
-            in Corvus.Json.JsonString? description = null,
+            in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.DescriptionEntity? description = null,
             in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.RequiredEntity? required = null)
         {
             var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
@@ -423,7 +423,7 @@ public readonly partial struct Contexts
         /// A description for the context, to be shown in code docs when using the property
         /// </para>
         /// </remarks>
-        public ContextObj WithDescription(in Corvus.Json.JsonString value)
+        public ContextObj WithDescription(in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.DescriptionEntity value)
         {
             return this.SetProperty(JsonPropertyNames.Description, value);
         }

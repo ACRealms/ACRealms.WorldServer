@@ -96,7 +96,7 @@ public readonly partial struct Group
                     allOfResult0 = allOfResult0.PushValidationLocationReducedPathModifier(new("#/allOf/0"));
                 }
 
-                allOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity>().Validate(allOfResult0, level);
+                allOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum>().Validate(allOfResult0, level);
 
                 if (!allOfResult0.IsValid)
                 {
@@ -121,7 +121,7 @@ public readonly partial struct Group
                     allOfResult1 = allOfResult1.PushValidationLocationReducedPathModifier(new("#/allOf/1"));
                 }
 
-                allOfResult1 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity>().Validate(allOfResult1, level);
+                allOfResult1 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt>().Validate(allOfResult1, level);
 
                 if (!allOfResult1.IsValid)
                 {
@@ -146,7 +146,7 @@ public readonly partial struct Group
                     allOfResult2 = allOfResult2.PushValidationLocationReducedPathModifier(new("#/allOf/2"));
                 }
 
-                allOfResult2 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity>().Validate(allOfResult2, level);
+                allOfResult2 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong>().Validate(allOfResult2, level);
 
                 if (!allOfResult2.IsValid)
                 {
@@ -171,7 +171,7 @@ public readonly partial struct Group
                     allOfResult3 = allOfResult3.PushValidationLocationReducedPathModifier(new("#/allOf/3"));
                 }
 
-                allOfResult3 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity>().Validate(allOfResult3, level);
+                allOfResult3 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat>().Validate(allOfResult3, level);
 
                 if (!allOfResult3.IsValid)
                 {
@@ -196,7 +196,7 @@ public readonly partial struct Group
                     allOfResult4 = allOfResult4.PushValidationLocationReducedPathModifier(new("#/allOf/4"));
                 }
 
-                allOfResult4 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity>().Validate(allOfResult4, level);
+                allOfResult4 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString>().Validate(allOfResult4, level);
 
                 if (!allOfResult4.IsValid)
                 {
@@ -221,7 +221,7 @@ public readonly partial struct Group
                     allOfResult5 = allOfResult5.PushValidationLocationReducedPathModifier(new("#/allOf/5"));
                 }
 
-                allOfResult5 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity>().Validate(allOfResult5, level);
+                allOfResult5 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool>().Validate(allOfResult5, level);
 
                 if (!allOfResult5.IsValid)
                 {

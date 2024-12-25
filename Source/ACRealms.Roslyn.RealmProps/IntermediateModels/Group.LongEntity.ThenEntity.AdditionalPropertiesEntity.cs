@@ -230,24 +230,24 @@ public readonly partial struct Group
                 }
 
                 /// <summary>
-                /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Long" />.
+                /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong" />.
                 /// </summary>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.Long AsLong
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong AsPropLong
                 {
                     get
                     {
-                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Long>();
+                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong>();
                     }
                 }
 
                 /// <summary>
-                /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Long" />.
+                /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong" />.
                 /// </summary>
-                public bool IsLong
+                public bool IsPropLong
                 {
                     get
                     {
-                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Long>().IsValid();
+                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong>().IsValid();
                     }
                 }
 
@@ -748,18 +748,18 @@ public readonly partial struct Group
                 /// <typeparam name="TIn">The immutable context to pass in to the match function.</typeparam>
                 /// <typeparam name="TOut">The result of calling the match function.</typeparam>
                 /// <param name="context">The context to pass to the match function.</param>
-                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsLong">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Long"/>.</param>
+                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsPropLong">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong"/>.</param>
                 /// <param name="defaultMatch">Default match if the 'if' schema did not match.</param>
                 /// <returns>An instance of the value returned by the match function.</returns>
                 public TOut Match<TIn, TOut>(
                     in TIn context,
-                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Long, TIn, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsLong,
+                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong, TIn, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsPropLong,
                     Matcher<AdditionalPropertiesEntity, TIn, TOut> defaultMatch)
                 {
                     Corvus.Json.JsonObject ifValue = this.As<Corvus.Json.JsonObject>();
                     if (ifValue.IsValid())
                     {
-                        return matchAcRealmsRoslynRealmPropsIntermediateModelsLong(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Long>(), context);
+                        return matchAcRealmsRoslynRealmPropsIntermediateModelsPropLong(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong>(), context);
                     }
 
                     return defaultMatch(this, context);
@@ -770,30 +770,30 @@ public readonly partial struct Group
                 /// the 'then' type if the match is successful.
                 /// </summary>
                 /// <typeparam name="TOut">The result of calling the match function.</typeparam>
-                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsLong">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Long"/>.</param>
+                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsPropLong">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong"/>.</param>
                 /// <param name="defaultMatch">Default match if the 'if' schema did not match.</param>
                 /// <returns>An instance of the value returned by the match function.</returns>
                 public TOut Match<TOut>(
-                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Long, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsLong,
+                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsPropLong,
                     Matcher<AdditionalPropertiesEntity, TOut> defaultMatch)
                 {
                     Corvus.Json.JsonObject ifValue = this.As<Corvus.Json.JsonObject>();
                     if (ifValue.IsValid())
                     {
-                        return matchAcRealmsRoslynRealmPropsIntermediateModelsLong(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Long>());
+                        return matchAcRealmsRoslynRealmPropsIntermediateModelsPropLong(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong>());
                     }
 
                     return defaultMatch(this);
                 }
 
                 /// <summary>
-                /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Long" />.
+                /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong" />.
                 /// </summary>
                 /// <param name="result">The result of the conversions.</param>
                 /// <returns><see langword="true" /> if the conversion was valid.</returns>
-                public bool TryGetAsLong(out ACRealms.Roslyn.RealmProps.IntermediateModels.Long result)
+                public bool TryGetAsPropLong(out ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong result)
                 {
-                    result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Long>();
+                    result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropLong>();
                     return result.IsValid();
                 }
 

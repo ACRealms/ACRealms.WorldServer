@@ -155,7 +155,7 @@ public readonly partial struct Group
     /// Property names in this group will be treated as ShortKeys, then prefixed with this value to determine the final realm property name
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey KeyPrefix
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart KeyPrefix
     {
         get
         {
@@ -176,7 +176,7 @@ public readonly partial struct Group
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.KeyPrefix, out JsonAny result))
                 {
-                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey>();
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart>();
                 }
             }
 
@@ -192,7 +192,7 @@ public readonly partial struct Group
     /// Property names in this group will be treated as ShortKeys, then suffixed with this value to determine the final realm property name
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey KeySuffix
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart KeySuffix
     {
         get
         {
@@ -213,7 +213,7 @@ public readonly partial struct Group
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.KeySuffix, out JsonAny result))
                 {
-                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey>();
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart>();
                 }
             }
 
@@ -224,7 +224,7 @@ public readonly partial struct Group
     /// <summary>
     /// Gets the (optional) <c>properties</c> property.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.GroupPropSelection.PropertiesEntity Properties
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.PropertiesEntity Properties
     {
         get
         {
@@ -245,7 +245,7 @@ public readonly partial struct Group
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Properties, out JsonAny result))
                 {
-                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.GroupPropSelection.PropertiesEntity>();
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.PropertiesEntity>();
                 }
             }
 
@@ -318,9 +318,9 @@ public readonly partial struct Group
     public static Group Create(
         in ACRealms.Roslyn.RealmProps.IntermediateModels.Type type,
         in ACRealms.Roslyn.RealmProps.IntermediateModels.Description? descriptionFormat = null,
-        in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey? keyPrefix = null,
-        in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey? keySuffix = null,
-        in ACRealms.Roslyn.RealmProps.IntermediateModels.Group.GroupPropSelection.PropertiesEntity? properties = null)
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart? keyPrefix = null,
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart? keySuffix = null,
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.PropertiesEntity? properties = null)
     {
         var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
         builder.Add(JsonPropertyNames.Type, type.AsAny);
@@ -481,7 +481,7 @@ public readonly partial struct Group
     /// Property names in this group will be treated as ShortKeys, then prefixed with this value to determine the final realm property name
     /// </para>
     /// </remarks>
-    public Group WithKeyPrefix(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey value)
+    public Group WithKeyPrefix(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart value)
     {
         return this.SetProperty(JsonPropertyNames.KeyPrefix, value);
     }
@@ -496,7 +496,7 @@ public readonly partial struct Group
     /// Property names in this group will be treated as ShortKeys, then suffixed with this value to determine the final realm property name
     /// </para>
     /// </remarks>
-    public Group WithKeySuffix(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey value)
+    public Group WithKeySuffix(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart value)
     {
         return this.SetProperty(JsonPropertyNames.KeySuffix, value);
     }
@@ -506,7 +506,7 @@ public readonly partial struct Group
     /// </summary>
     /// <param name="value">The new property value</param>
     /// <returns>The instance with the property set.</returns>
-    public Group WithProperties(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group.GroupPropSelection.PropertiesEntity value)
+    public Group WithProperties(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.PropertiesEntity value)
     {
         return this.SetProperty(JsonPropertyNames.Properties, value);
     }
@@ -905,11 +905,11 @@ public readonly partial struct Group
     }
 
     /// <summary>
-    /// Tries to get the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.GroupPropSelection"/>, if the <see cref="Type"/> property is present.
+    /// Tries to get the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended"/>, if the <see cref="Type"/> property is present.
     /// </summary>
-    /// <param name="result">The value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.GroupPropSelection" />.</param>.
+    /// <param name="result">The value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended" />.</param>.
     /// <returns><see langword="true" /> if the property was present, and the instance matches the dependent schema.</returns>
-    public bool TryAsDependentSchemaForType(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.GroupPropSelection result)
+    public bool TryAsDependentSchemaForType(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended result)
     {
         if ((this.backing & Backing.JsonElement) != 0)
         {
@@ -921,7 +921,7 @@ public readonly partial struct Group
 
             if (this.jsonElementBacking.TryGetProperty(JsonPropertyNames.TypeUtf8, out _))
             {
-                result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.GroupPropSelection>();
+                result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended>();
                 return result.IsValid();
             }
         }
@@ -930,7 +930,7 @@ public readonly partial struct Group
         {
             if (this.objectBacking.TryGetValue(JsonPropertyNames.Type, out _))
             {
-                result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.GroupPropSelection>();
+                result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended>();
                 return result.IsValid();
             }
         }

@@ -235,24 +235,24 @@ public readonly partial struct Description
     }
 
     /// <summary>
-    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity" />.
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm" />.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity AsOneOf0Entity
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm AsStringForm
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity>();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm>();
         }
     }
 
     /// <summary>
-    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity" />.
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm" />.
     /// </summary>
-    public bool IsOneOf0Entity
+    public bool IsStringForm
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity>().IsValid();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm>().IsValid();
         }
     }
 
@@ -339,19 +339,19 @@ public readonly partial struct Description
     }
 
     /// <summary>
-    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity"/>.
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity(Description value)
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm(Description value)
     {
-        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity>();
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm>();
     }
 
     /// <summary>
-    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity"/>.
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static implicit operator Description(ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity value)
+    public static implicit operator Description(ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm value)
     {
         return value.As<Description>();
     }
@@ -906,20 +906,20 @@ public readonly partial struct Description
     /// <typeparam name="TIn">The immutable context to pass in to the match function.</typeparam>
     /// <typeparam name="TOut">The result of calling the match function.</typeparam>
     /// <param name="context">The context to pass to the match function.</param>
-    /// <param name="matchOneOf0Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity"/>.</param>
+    /// <param name="matchStringForm">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm"/>.</param>
     /// <param name="matchDescriptionArray">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray"/>.</param>
     /// <param name="defaultMatch">Match any other value.</param>
     /// <returns>An instance of the value returned by the match function.</returns>
     public TOut Match<TIn, TOut>(
         in TIn context,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity, TIn, TOut> matchOneOf0Entity,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm, TIn, TOut> matchStringForm,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray, TIn, TOut> matchDescriptionArray,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Description, TIn, TOut> defaultMatch)
     {
-        ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity matchOneOf0EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity>();
-        if (matchOneOf0EntityValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm matchStringFormValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm>();
+        if (matchStringFormValue.IsValid())
         {
-            return matchOneOf0Entity(matchOneOf0EntityValue, context);
+            return matchStringForm(matchStringFormValue, context);
         }
 
         ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray matchDescriptionArrayValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray>();
@@ -935,19 +935,19 @@ public readonly partial struct Description
     /// Matches the value against the composed values, and returns the result of calling the provided match function for the first match found.
     /// </summary>
     /// <typeparam name="TOut">The result of calling the match function.</typeparam>
-    /// <param name="matchOneOf0Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity"/>.</param>
+    /// <param name="matchStringForm">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm"/>.</param>
     /// <param name="matchDescriptionArray">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray"/>.</param>
     /// <param name="defaultMatch">Match any other value.</param>
     /// <returns>An instance of the value returned by the match function.</returns>
     public TOut Match<TOut>(
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity, TOut> matchOneOf0Entity,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm, TOut> matchStringForm,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray, TOut> matchDescriptionArray,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Description, TOut> defaultMatch)
     {
-        ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity matchOneOf0EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity>();
-        if (matchOneOf0EntityValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm matchStringFormValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm>();
+        if (matchStringFormValue.IsValid())
         {
-            return matchOneOf0Entity(matchOneOf0EntityValue);
+            return matchStringForm(matchStringFormValue);
         }
 
         ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray matchDescriptionArrayValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray>();
@@ -960,13 +960,13 @@ public readonly partial struct Description
     }
 
     /// <summary>
-    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity" />.
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm" />.
     /// </summary>
     /// <param name="result">The result of the conversions.</param>
     /// <returns><see langword="true" /> if the conversion was valid.</returns>
-    public bool TryGetAsOneOf0Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity result)
+    public bool TryGetAsStringForm(out ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm result)
     {
-        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity>();
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm>();
         return result.IsValid();
     }
 

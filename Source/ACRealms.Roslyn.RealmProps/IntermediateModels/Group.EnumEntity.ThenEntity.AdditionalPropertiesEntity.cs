@@ -230,24 +230,24 @@ public readonly partial struct Group
                 }
 
                 /// <summary>
-                /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Enums" />.
+                /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum" />.
                 /// </summary>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.Enums AsEnums
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum AsPropDefExtensionEnum
                 {
                     get
                     {
-                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Enums>();
+                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum>();
                     }
                 }
 
                 /// <summary>
-                /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Enums" />.
+                /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum" />.
                 /// </summary>
-                public bool IsEnums
+                public bool IsPropDefExtensionEnum
                 {
                     get
                     {
-                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Enums>().IsValid();
+                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum>().IsValid();
                     }
                 }
 
@@ -748,18 +748,18 @@ public readonly partial struct Group
                 /// <typeparam name="TIn">The immutable context to pass in to the match function.</typeparam>
                 /// <typeparam name="TOut">The result of calling the match function.</typeparam>
                 /// <param name="context">The context to pass to the match function.</param>
-                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsEnums">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Enums"/>.</param>
+                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsPropDefExtensionEnum">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum"/>.</param>
                 /// <param name="defaultMatch">Default match if the 'if' schema did not match.</param>
                 /// <returns>An instance of the value returned by the match function.</returns>
                 public TOut Match<TIn, TOut>(
                     in TIn context,
-                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Enums, TIn, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsEnums,
+                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum, TIn, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsPropDefExtensionEnum,
                     Matcher<AdditionalPropertiesEntity, TIn, TOut> defaultMatch)
                 {
                     Corvus.Json.JsonObject ifValue = this.As<Corvus.Json.JsonObject>();
                     if (ifValue.IsValid())
                     {
-                        return matchAcRealmsRoslynRealmPropsIntermediateModelsEnums(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Enums>(), context);
+                        return matchAcRealmsRoslynRealmPropsIntermediateModelsPropDefExtensionEnum(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum>(), context);
                     }
 
                     return defaultMatch(this, context);
@@ -770,30 +770,30 @@ public readonly partial struct Group
                 /// the 'then' type if the match is successful.
                 /// </summary>
                 /// <typeparam name="TOut">The result of calling the match function.</typeparam>
-                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsEnums">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Enums"/>.</param>
+                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsPropDefExtensionEnum">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum"/>.</param>
                 /// <param name="defaultMatch">Default match if the 'if' schema did not match.</param>
                 /// <returns>An instance of the value returned by the match function.</returns>
                 public TOut Match<TOut>(
-                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Enums, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsEnums,
+                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsPropDefExtensionEnum,
                     Matcher<AdditionalPropertiesEntity, TOut> defaultMatch)
                 {
                     Corvus.Json.JsonObject ifValue = this.As<Corvus.Json.JsonObject>();
                     if (ifValue.IsValid())
                     {
-                        return matchAcRealmsRoslynRealmPropsIntermediateModelsEnums(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Enums>());
+                        return matchAcRealmsRoslynRealmPropsIntermediateModelsPropDefExtensionEnum(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum>());
                     }
 
                     return defaultMatch(this);
                 }
 
                 /// <summary>
-                /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Enums" />.
+                /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum" />.
                 /// </summary>
                 /// <param name="result">The result of the conversions.</param>
                 /// <returns><see langword="true" /> if the conversion was valid.</returns>
-                public bool TryGetAsEnums(out ACRealms.Roslyn.RealmProps.IntermediateModels.Enums result)
+                public bool TryGetAsPropDefExtensionEnum(out ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum result)
                 {
-                    result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Enums>();
+                    result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionEnum>();
                     return result.IsValid();
                 }
 

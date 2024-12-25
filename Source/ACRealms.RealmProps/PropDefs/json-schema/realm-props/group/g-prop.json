@@ -1,0 +1,8 @@
+{
+  "$corvusTypeName": "GroupProp",
+  "oneOf": [
+    { "$ref": "prop-obj.json" },
+    { "$ref": "../../components/description.json",
+      "description": "The description of the property, or the short description if the containing group defines description_format" }
+  ]
+}

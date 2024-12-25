@@ -33,7 +33,7 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 #endif
 public readonly partial struct ArrayShortPropList
     : IJsonArray<ACRealms.Roslyn.RealmProps.IntermediateModels.ArrayShortPropList>,
-      IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey>
+      IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart>
 {
     /// <summary>
     /// Gets an empty array.
@@ -93,7 +93,7 @@ public readonly partial struct ArrayShortPropList
     /// <returns>The item at the given index.</returns>
     /// <exception cref="IndexOutOfRangeException">The index was outside the bounds of the array.</exception>
     /// <exception cref="InvalidOperationException">The value is not an array.</exception>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey this[int index]
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart this[int index]
     {
         get
         {
@@ -121,7 +121,7 @@ public readonly partial struct ArrayShortPropList
             {
                 try
                 {
-                    return this.arrayBacking[index].As<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey>();
+                    return this.arrayBacking[index].As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart>();
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
@@ -193,7 +193,7 @@ public readonly partial struct ArrayShortPropList
     /// </summary>
     /// <param name="items">The span of items from which to construct the array.</param>
     /// <returns>An instance of the array constructed from the span.</returns>
-    public static ArrayShortPropList Create(ReadOnlySpan<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey> items)
+    public static ArrayShortPropList Create(ReadOnlySpan<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart> items)
     {
         return new([..items]);
     }
@@ -203,7 +203,7 @@ public readonly partial struct ArrayShortPropList
     /// </summary>
     /// <param name="items">The value from which to construct the instance.</param>
     /// <returns>An instance of the array constructed from the value.</returns>
-    public static ArrayShortPropList FromItems(params ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey[] items)
+    public static ArrayShortPropList FromItems(params ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart[] items)
     {
         return new([..items]);
     }
@@ -213,7 +213,7 @@ public readonly partial struct ArrayShortPropList
     /// </summary>
     /// <param name="item1">The 1st item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item1)
+    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item1)
     {
         return new([item1.AsAny]);
     }
@@ -224,7 +224,7 @@ public readonly partial struct ArrayShortPropList
     /// <param name="item1">The 1st item in the array.</param>
     /// <param name="item2">The 2nd item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item2)
+    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item2)
     {
         return new([item1.AsAny, item2.AsAny]);
     }
@@ -236,7 +236,7 @@ public readonly partial struct ArrayShortPropList
     /// <param name="item2">The 2nd item in the array.</param>
     /// <param name="item3">The 3rd item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item3)
+    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item3)
     {
         return new([item1.AsAny, item2.AsAny, item3.AsAny]);
     }
@@ -249,7 +249,7 @@ public readonly partial struct ArrayShortPropList
     /// <param name="item3">The 3rd item in the array.</param>
     /// <param name="item4">The 4th item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item4)
+    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item4)
     {
         return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny]);
     }
@@ -263,7 +263,7 @@ public readonly partial struct ArrayShortPropList
     /// <param name="item4">The 4th item in the array.</param>
     /// <param name="item5">The 5th item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item5)
+    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item5)
     {
         return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny, item5.AsAny]);
     }
@@ -278,7 +278,7 @@ public readonly partial struct ArrayShortPropList
     /// <param name="item5">The 5th item in the array.</param>
     /// <param name="item6">The 6th item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item6)
+    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item6)
     {
         return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny, item5.AsAny, item6.AsAny]);
     }
@@ -294,7 +294,7 @@ public readonly partial struct ArrayShortPropList
     /// <param name="item6">The 6th item in the array.</param>
     /// <param name="item7">The 7th item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item6, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item7)
+    public static ArrayShortPropList FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item6, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item7)
     {
         return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny, item5.AsAny, item6.AsAny, item7.AsAny]);
     }
@@ -304,7 +304,7 @@ public readonly partial struct ArrayShortPropList
     /// </summary>
     /// <param name="items">The items from which to construct the instance.</param>
     /// <returns>An instance of the array constructed from the items.</returns>
-    public static ArrayShortPropList FromRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey> items)
+    public static ArrayShortPropList FromRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart> items)
     {
         return new([..items]);
     }
@@ -333,13 +333,13 @@ public readonly partial struct ArrayShortPropList
 #endif
 
     /// <inheritdoc/>
-    IEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey> IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey>.GetEnumerator() => this.EnumerateArray();
+    IEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart> IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart>.GetEnumerator() => this.EnumerateArray();
 
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => this.EnumerateArray();
 
     /// <inheritdoc/>
-    int IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey>.Count => this.GetArrayLength();
+    int IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart>.Count => this.GetArrayLength();
 
     /// <inheritdoc/>
     public ImmutableList<JsonAny> AsImmutableList()
@@ -370,7 +370,7 @@ public readonly partial struct ArrayShortPropList
     }
 
     /// <inheritdoc/>
-    public JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey> EnumerateArray()
+    public JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart> EnumerateArray()
     {
         if ((this.backing & Backing.JsonElement) != 0)
         {
@@ -506,7 +506,7 @@ public readonly partial struct ArrayShortPropList
     }
 
     /// <inheritdoc/>
-    public ArrayShortPropList Add(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item1)
+    public ArrayShortPropList Add(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item1)
     {
         ImmutableList<JsonAny>.Builder builder = __CorvusArrayHelpers.GetImmutableListBuilder(this);
         builder.Add(item1.AsAny);
@@ -514,10 +514,10 @@ public readonly partial struct ArrayShortPropList
     }
 
     /// <inheritdoc/>
-    public ArrayShortPropList Add(params ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey[] items)
+    public ArrayShortPropList Add(params ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart[] items)
     {
         ImmutableList<JsonAny>.Builder builder = __CorvusArrayHelpers.GetImmutableListBuilder(this);
-        foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item in items)
+        foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item in items)
         {
             builder.Add(item.AsAny);
         }
@@ -526,10 +526,10 @@ public readonly partial struct ArrayShortPropList
     }
 
     /// <inheritdoc/>
-    public ArrayShortPropList AddRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey> items)
+    public ArrayShortPropList AddRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart> items)
     {
         ImmutableList<JsonAny>.Builder builder = __CorvusArrayHelpers.GetImmutableListBuilder(this);
-        foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item in items)
+        foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item in items)
         {
             builder.Add(item.AsAny);
         }
@@ -538,25 +538,25 @@ public readonly partial struct ArrayShortPropList
     }
 
     /// <inheritdoc/>
-    public ArrayShortPropList Insert(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey item1)
+    public ArrayShortPropList Insert(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart item1)
     {
         return new(__CorvusArrayHelpers.GetImmutableListWith(this, index, item1));
     }
 
     /// <inheritdoc/>
-    public ArrayShortPropList InsertRange(int index, IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey> items)
+    public ArrayShortPropList InsertRange(int index, IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart> items)
     {
         return new(__CorvusArrayHelpers.GetImmutableListWith(this, index, items.Select(item => item.AsAny)));
     }
 
     /// <inheritdoc/>
-    public ArrayShortPropList Replace(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey oldValue, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey newValue)
+    public ArrayShortPropList Replace(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart oldValue, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart newValue)
     {
         return new(__CorvusArrayHelpers.GetImmutableListReplacing(this, oldValue, newValue));
     }
 
     /// <inheritdoc/>
-    public ArrayShortPropList SetItem(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey value)
+    public ArrayShortPropList SetItem(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart value)
     {
         return new(__CorvusArrayHelpers.GetImmutableListSetting(this, index, value));
     }
@@ -580,7 +580,7 @@ public readonly partial struct ArrayShortPropList
     }
 
     /// <inheritdoc/>
-    public ArrayShortPropList Remove(in ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey oldValue)
+    public ArrayShortPropList Remove(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart oldValue)
     {
         return new(__CorvusArrayHelpers.GetImmutableListWithout(this, oldValue));
     }

@@ -187,7 +187,7 @@ public readonly partial struct PropBase
     /// When the realm property is not defined, fetches this server property key as a default
     /// </para>
     /// </remarks>
-    public Corvus.Json.JsonString DefaultFromServerProperty
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity DefaultFromServerProperty
     {
         get
         {
@@ -208,7 +208,7 @@ public readonly partial struct PropBase
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.DefaultFromServerProperty, out JsonAny result))
                 {
-                    return result.As<Corvus.Json.JsonString>();
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity>();
                 }
             }
 
@@ -224,7 +224,7 @@ public readonly partial struct PropBase
     /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
     /// </para>
     /// </remarks>
-    public Corvus.Json.JsonString Obsolete
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity Obsolete
     {
         get
         {
@@ -245,7 +245,7 @@ public readonly partial struct PropBase
             {
                 if (this.objectBacking.TryGetValue(JsonPropertyNames.Obsolete, out JsonAny result))
                 {
-                    return result.As<Corvus.Json.JsonString>();
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity>();
                 }
             }
 
@@ -281,8 +281,8 @@ public readonly partial struct PropBase
     public static PropBase Create(
         in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? contexts = null,
         in Corvus.Json.JsonAny? defaultValue = null,
-        in Corvus.Json.JsonString? defaultFromServerProperty = null,
-        in Corvus.Json.JsonString? obsolete = null)
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? defaultFromServerProperty = null,
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? obsolete = null)
     {
         var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
 
@@ -452,7 +452,7 @@ public readonly partial struct PropBase
     /// When the realm property is not defined, fetches this server property key as a default
     /// </para>
     /// </remarks>
-    public PropBase WithDefaultFromServerProperty(in Corvus.Json.JsonString value)
+    public PropBase WithDefaultFromServerProperty(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity value)
     {
         return this.SetProperty(JsonPropertyNames.DefaultFromServerProperty, value);
     }
@@ -467,7 +467,7 @@ public readonly partial struct PropBase
     /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
     /// </para>
     /// </remarks>
-    public PropBase WithObsolete(in Corvus.Json.JsonString value)
+    public PropBase WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity value)
     {
         return this.SetProperty(JsonPropertyNames.Obsolete, value);
     }

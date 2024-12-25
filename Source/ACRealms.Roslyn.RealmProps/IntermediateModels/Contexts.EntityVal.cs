@@ -209,24 +209,24 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature" />.
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity" />.
         /// </summary>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature AsACreature
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity AsCreatureEntity
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature>();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity>();
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature" />.
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity" />.
         /// </summary>
-        public bool IsACreature
+        public bool IsCreatureEntity
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature>().IsValid();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity>().IsValid();
             }
         }
 
@@ -286,19 +286,19 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature"/>.
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature(EntityVal value)
+        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity(EntityVal value)
         {
-            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature>();
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity>();
         }
 
         /// <summary>
-        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature"/>.
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator EntityVal(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature value)
+        public static implicit operator EntityVal(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity value)
         {
             return value.As<EntityVal>();
         }
@@ -719,13 +719,13 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature" />.
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity" />.
         /// </summary>
         /// <param name="result">The result of the conversions.</param>
         /// <returns><see langword="true" /> if the conversion was valid.</returns>
-        public bool TryGetAsACreature(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature result)
+        public bool TryGetAsCreatureEntity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity result)
         {
-            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ACreature>();
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.CreatureEntity>();
             return result.IsValid();
         }
     }

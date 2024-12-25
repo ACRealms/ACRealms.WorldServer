@@ -20,16 +20,6 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
-/// <remarks>
-/// <para>
-/// Examples:
-/// <example>
-/// <code>
-/// { }
-/// </code>
-/// </example>
-/// </para>
-/// </remarks>
 [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<Props>))]
 public readonly partial struct Props
 
@@ -73,7 +63,7 @@ public readonly partial struct Props
     /// <summary>
     /// Gets the schema location from which this type was generated.
     /// </summary>
-    public static string SchemaLocation { get; } = "realm-props/group/props.json";
+    public static string SchemaLocation { get; } = "realm-props/props.json";
 
     /// <summary>
     /// Gets a Null instance.
@@ -88,7 +78,7 @@ public readonly partial struct Props
     /// <summary>
     /// Gets the default instance.
     /// </summary>
-    public static Props DefaultInstance { get; } = Props.ParseValue("{ }"u8);
+    public static Props DefaultInstance { get; }
 
     /// <inheritdoc/>
     public JsonAny AsAny
@@ -603,9 +593,9 @@ public readonly partial struct Props
         if (thisKind == JsonValueKind.Object)
         {
             int count = 0;
-            foreach (JsonObjectProperty<ACRealms.Roslyn.RealmProps.IntermediateModels.Prop> property in this.EnumerateObject())
+            foreach (JsonObjectProperty<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj> property in this.EnumerateObject())
             {
-                if (!other.TryGetProperty(property.Name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Prop value) || !property.Value.Equals(value))
+                if (!other.TryGetProperty(property.Name, out ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj value) || !property.Value.Equals(value))
                 {
                     return false;
                 }
@@ -614,7 +604,7 @@ public readonly partial struct Props
             }
 
             int otherCount = 0;
-            foreach (JsonObjectProperty<ACRealms.Roslyn.RealmProps.IntermediateModels.Prop> otherProperty in other.EnumerateObject())
+            foreach (JsonObjectProperty<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj> otherProperty in other.EnumerateObject())
             {
                 otherCount++;
                 if (otherCount > count)

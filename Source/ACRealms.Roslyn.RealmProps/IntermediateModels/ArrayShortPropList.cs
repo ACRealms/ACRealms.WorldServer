@@ -597,8 +597,8 @@ public readonly partial struct ArrayShortPropList
 
         if (thisKind == JsonValueKind.Array)
         {
-            JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey> lhs = this.EnumerateArray();
-            JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey> rhs = other.EnumerateArray();
+            JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart> lhs = this.EnumerateArray();
+            JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKeyPart> rhs = other.EnumerateArray();
             while (lhs.MoveNext())
             {
                 if (!rhs.MoveNext())

@@ -668,8 +668,8 @@ public readonly partial struct DescriptionArray
 
         if (thisKind == JsonValueKind.Array)
         {
-            JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity> lhs = this.EnumerateArray();
-            JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity> rhs = other.EnumerateArray();
+            JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line> lhs = this.EnumerateArray();
+            JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line> rhs = other.EnumerateArray();
             while (lhs.MoveNext())
             {
                 if (!rhs.MoveNext())

@@ -164,7 +164,7 @@ public readonly partial struct DescriptionArray
             }
 
             int length = 0;
-            using JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity> arrayEnumerator = value.EnumerateArray();
+            using JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line> arrayEnumerator = value.EnumerateArray();
             while (arrayEnumerator.MoveNext())
             {
                 if (level > ValidationLevel.Basic)

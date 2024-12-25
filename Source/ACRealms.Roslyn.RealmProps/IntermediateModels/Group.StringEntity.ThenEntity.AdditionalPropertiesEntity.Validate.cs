@@ -137,7 +137,7 @@ public readonly partial struct Group
                                 result = result.PushValidationLocationReducedPathModifier(new("#/then/$ref"));
                             }
 
-                            ValidationContext thenResult = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.String>().Validate(validationContext.CreateChildContext(), level);
+                            ValidationContext thenResult = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropString>().Validate(validationContext.CreateChildContext(), level);
 
                             if (!thenResult.IsValid)
                             {

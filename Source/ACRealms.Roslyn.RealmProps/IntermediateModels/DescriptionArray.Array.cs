@@ -28,7 +28,7 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 #endif
 public readonly partial struct DescriptionArray
     : IJsonArray<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray>,
-      IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity>
+      IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line>
 {
     /// <summary>
     /// Gets an empty array.
@@ -88,7 +88,7 @@ public readonly partial struct DescriptionArray
     /// <returns>The item at the given index.</returns>
     /// <exception cref="IndexOutOfRangeException">The index was outside the bounds of the array.</exception>
     /// <exception cref="InvalidOperationException">The value is not an array.</exception>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity this[int index]
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line this[int index]
     {
         get
         {
@@ -116,7 +116,7 @@ public readonly partial struct DescriptionArray
             {
                 try
                 {
-                    return this.arrayBacking[index].As<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity>();
+                    return this.arrayBacking[index].As<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line>();
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
@@ -188,7 +188,7 @@ public readonly partial struct DescriptionArray
     /// </summary>
     /// <param name="items">The span of items from which to construct the array.</param>
     /// <returns>An instance of the array constructed from the span.</returns>
-    public static DescriptionArray Create(ReadOnlySpan<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity> items)
+    public static DescriptionArray Create(ReadOnlySpan<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line> items)
     {
         return new([..items]);
     }
@@ -198,7 +198,7 @@ public readonly partial struct DescriptionArray
     /// </summary>
     /// <param name="items">The value from which to construct the instance.</param>
     /// <returns>An instance of the array constructed from the value.</returns>
-    public static DescriptionArray FromItems(params ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity[] items)
+    public static DescriptionArray FromItems(params ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line[] items)
     {
         return new([..items]);
     }
@@ -208,7 +208,7 @@ public readonly partial struct DescriptionArray
     /// </summary>
     /// <param name="item1">The 1st item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item1)
+    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item1)
     {
         return new([item1.AsAny]);
     }
@@ -219,7 +219,7 @@ public readonly partial struct DescriptionArray
     /// <param name="item1">The 1st item in the array.</param>
     /// <param name="item2">The 2nd item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item2)
+    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item2)
     {
         return new([item1.AsAny, item2.AsAny]);
     }
@@ -231,7 +231,7 @@ public readonly partial struct DescriptionArray
     /// <param name="item2">The 2nd item in the array.</param>
     /// <param name="item3">The 3rd item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item3)
+    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item3)
     {
         return new([item1.AsAny, item2.AsAny, item3.AsAny]);
     }
@@ -244,7 +244,7 @@ public readonly partial struct DescriptionArray
     /// <param name="item3">The 3rd item in the array.</param>
     /// <param name="item4">The 4th item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item4)
+    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item4)
     {
         return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny]);
     }
@@ -258,7 +258,7 @@ public readonly partial struct DescriptionArray
     /// <param name="item4">The 4th item in the array.</param>
     /// <param name="item5">The 5th item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item5)
+    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item5)
     {
         return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny, item5.AsAny]);
     }
@@ -273,7 +273,7 @@ public readonly partial struct DescriptionArray
     /// <param name="item5">The 5th item in the array.</param>
     /// <param name="item6">The 6th item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item6)
+    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item6)
     {
         return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny, item5.AsAny, item6.AsAny]);
     }
@@ -289,7 +289,7 @@ public readonly partial struct DescriptionArray
     /// <param name="item6">The 6th item in the array.</param>
     /// <param name="item7">The 7th item in the array.</param>
     /// <returns>An instance of the array constructed from the values.</returns>
-    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item6, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item7)
+    public static DescriptionArray FromItems(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item1, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item2, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item3, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item4, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item5, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item6, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item7)
     {
         return new([item1.AsAny, item2.AsAny, item3.AsAny, item4.AsAny, item5.AsAny, item6.AsAny, item7.AsAny]);
     }
@@ -299,7 +299,7 @@ public readonly partial struct DescriptionArray
     /// </summary>
     /// <param name="items">The items from which to construct the instance.</param>
     /// <returns>An instance of the array constructed from the items.</returns>
-    public static DescriptionArray FromRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity> items)
+    public static DescriptionArray FromRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line> items)
     {
         return new([..items]);
     }
@@ -328,13 +328,13 @@ public readonly partial struct DescriptionArray
 #endif
 
     /// <inheritdoc/>
-    IEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity> IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity>.GetEnumerator() => this.EnumerateArray();
+    IEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line> IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line>.GetEnumerator() => this.EnumerateArray();
 
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => this.EnumerateArray();
 
     /// <inheritdoc/>
-    int IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity>.Count => this.GetArrayLength();
+    int IReadOnlyCollection<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line>.Count => this.GetArrayLength();
 
     /// <inheritdoc/>
     public ImmutableList<JsonAny> AsImmutableList()
@@ -365,7 +365,7 @@ public readonly partial struct DescriptionArray
     }
 
     /// <inheritdoc/>
-    public JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity> EnumerateArray()
+    public JsonArrayEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line> EnumerateArray()
     {
         if ((this.backing & Backing.JsonElement) != 0)
         {
@@ -501,7 +501,7 @@ public readonly partial struct DescriptionArray
     }
 
     /// <inheritdoc/>
-    public DescriptionArray Add(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item1)
+    public DescriptionArray Add(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item1)
     {
         ImmutableList<JsonAny>.Builder builder = __CorvusArrayHelpers.GetImmutableListBuilder(this);
         builder.Add(item1.AsAny);
@@ -509,10 +509,10 @@ public readonly partial struct DescriptionArray
     }
 
     /// <inheritdoc/>
-    public DescriptionArray Add(params ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity[] items)
+    public DescriptionArray Add(params ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line[] items)
     {
         ImmutableList<JsonAny>.Builder builder = __CorvusArrayHelpers.GetImmutableListBuilder(this);
-        foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item in items)
+        foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item in items)
         {
             builder.Add(item.AsAny);
         }
@@ -521,10 +521,10 @@ public readonly partial struct DescriptionArray
     }
 
     /// <inheritdoc/>
-    public DescriptionArray AddRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity> items)
+    public DescriptionArray AddRange(IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line> items)
     {
         ImmutableList<JsonAny>.Builder builder = __CorvusArrayHelpers.GetImmutableListBuilder(this);
-        foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item in items)
+        foreach (ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item in items)
         {
             builder.Add(item.AsAny);
         }
@@ -533,25 +533,25 @@ public readonly partial struct DescriptionArray
     }
 
     /// <inheritdoc/>
-    public DescriptionArray Insert(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity item1)
+    public DescriptionArray Insert(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line item1)
     {
         return new(__CorvusArrayHelpers.GetImmutableListWith(this, index, item1));
     }
 
     /// <inheritdoc/>
-    public DescriptionArray InsertRange(int index, IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity> items)
+    public DescriptionArray InsertRange(int index, IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line> items)
     {
         return new(__CorvusArrayHelpers.GetImmutableListWith(this, index, items.Select(item => item.AsAny)));
     }
 
     /// <inheritdoc/>
-    public DescriptionArray Replace(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity oldValue, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity newValue)
+    public DescriptionArray Replace(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line oldValue, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line newValue)
     {
         return new(__CorvusArrayHelpers.GetImmutableListReplacing(this, oldValue, newValue));
     }
 
     /// <inheritdoc/>
-    public DescriptionArray SetItem(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity value)
+    public DescriptionArray SetItem(int index, in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line value)
     {
         return new(__CorvusArrayHelpers.GetImmutableListSetting(this, index, value));
     }
@@ -575,7 +575,7 @@ public readonly partial struct DescriptionArray
     }
 
     /// <inheritdoc/>
-    public DescriptionArray Remove(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.ItemsEntity oldValue)
+    public DescriptionArray Remove(in ACRealms.Roslyn.RealmProps.IntermediateModels.DescriptionArray.Line oldValue)
     {
         return new(__CorvusArrayHelpers.GetImmutableListWithout(this, oldValue));
     }

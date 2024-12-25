@@ -81,7 +81,7 @@ public readonly partial struct Description
                 oneOfChildContext0 = oneOfChildContext0.PushValidationLocationReducedPathModifier(new("#/oneOf/0"));
             }
 
-            ValidationContext oneOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.OneOf0Entity>().Validate(oneOfChildContext0, level);
+            ValidationContext oneOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Description.StringForm>().Validate(oneOfChildContext0, level);
 
             if (oneOfResult0.IsValid)
             {

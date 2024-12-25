@@ -106,7 +106,7 @@ public readonly partial struct StringMultilineFromArray
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
     /// <exception cref="InvalidOperationException">The value was not a string.</exception>
-    public static explicit operator string(StringMultilineFromArray value)
+    public static implicit operator string(StringMultilineFromArray value)
     {
         if ((value.backing & Backing.JsonElement) != 0)
         {

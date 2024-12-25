@@ -142,7 +142,7 @@ public readonly partial struct Group
                         result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/dependencies/$ref/type"), "type");
                     }
 
-                    ValidationContext dependenciesResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.GroupPropSelection>().Validate(result.CreateChildContext(), level);
+                    ValidationContext dependenciesResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended>().Validate(result.CreateChildContext(), level);
                     if (level == ValidationLevel.Flag && !dependenciesResult0.IsValid)
                     {
                         return ValidationContext.InvalidContext;

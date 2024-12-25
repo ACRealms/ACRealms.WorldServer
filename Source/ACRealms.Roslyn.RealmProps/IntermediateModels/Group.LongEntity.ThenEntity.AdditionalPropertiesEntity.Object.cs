@@ -198,7 +198,7 @@ public readonly partial struct Group
                 /// When the realm property is not defined, fetches this server property key as a default
                 /// </para>
                 /// </remarks>
-                public Corvus.Json.JsonString DefaultFromServerProperty
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity DefaultFromServerProperty
                 {
                     get
                     {
@@ -219,7 +219,7 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.DefaultFromServerProperty, out JsonAny result))
                             {
-                                return result.As<Corvus.Json.JsonString>();
+                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity>();
                             }
                         }
 
@@ -299,7 +299,7 @@ public readonly partial struct Group
                 /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
                 /// </para>
                 /// </remarks>
-                public Corvus.Json.JsonString Obsolete
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity Obsolete
                 {
                     get
                     {
@@ -320,7 +320,7 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.Obsolete, out JsonAny result))
                             {
-                                return result.As<Corvus.Json.JsonString>();
+                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity>();
                             }
                         }
 
@@ -336,7 +336,7 @@ public readonly partial struct Group
                 /// Restricts the property from randomizing to **At Most** the frequency specified here. For no restrictions, omit this attribute
                 /// </para>
                 /// </remarks>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropMinmax.RerollRestrictedToEntity RerollRestrictedTo
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity RerollRestrictedTo
                 {
                     get
                     {
@@ -357,7 +357,7 @@ public readonly partial struct Group
                         {
                             if (this.objectBacking.TryGetValue(JsonPropertyNames.RerollRestrictedTo, out JsonAny result))
                             {
-                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropMinmax.RerollRestrictedToEntity>();
+                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity>();
                             }
                         }
 
@@ -393,11 +393,11 @@ public readonly partial struct Group
                 public static AdditionalPropertiesEntity Create(
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? contexts = null,
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.ValLong? defaultValue = null,
-                    in Corvus.Json.JsonString? defaultFromServerProperty = null,
+                    in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? defaultFromServerProperty = null,
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.ValLong? maxValue = null,
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.ValLong? minValue = null,
-                    in Corvus.Json.JsonString? obsolete = null,
-                    in ACRealms.Roslyn.RealmProps.IntermediateModels.PropMinmax.RerollRestrictedToEntity? rerollRestrictedTo = null)
+                    in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? obsolete = null,
+                    in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity? rerollRestrictedTo = null)
                 {
                     var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
 
@@ -577,7 +577,7 @@ public readonly partial struct Group
                 /// When the realm property is not defined, fetches this server property key as a default
                 /// </para>
                 /// </remarks>
-                public AdditionalPropertiesEntity WithDefaultFromServerProperty(in Corvus.Json.JsonString value)
+                public AdditionalPropertiesEntity WithDefaultFromServerProperty(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity value)
                 {
                     return this.SetProperty(JsonPropertyNames.DefaultFromServerProperty, value);
                 }
@@ -612,7 +612,7 @@ public readonly partial struct Group
                 /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
                 /// </para>
                 /// </remarks>
-                public AdditionalPropertiesEntity WithObsolete(in Corvus.Json.JsonString value)
+                public AdditionalPropertiesEntity WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity value)
                 {
                     return this.SetProperty(JsonPropertyNames.Obsolete, value);
                 }
@@ -627,7 +627,7 @@ public readonly partial struct Group
                 /// Restricts the property from randomizing to **At Most** the frequency specified here. For no restrictions, omit this attribute
                 /// </para>
                 /// </remarks>
-                public AdditionalPropertiesEntity WithRerollRestrictedTo(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropMinmax.RerollRestrictedToEntity value)
+                public AdditionalPropertiesEntity WithRerollRestrictedTo(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefExtensionMinMax.RerollRestrictedToEntity value)
                 {
                     return this.SetProperty(JsonPropertyNames.RerollRestrictedTo, value);
                 }

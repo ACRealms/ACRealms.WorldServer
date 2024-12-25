@@ -1,0 +1,5 @@
+{
+  "$schema": "https://corvus-oss.org/json-schema/2020-12/schema",
+  "$comment": "We define the meta-schema explicitly here, and only here, because vscode cannot recognize the above meta-schema. So we use .vscode/settings.json to set the meta-schema that vscode can recognize. Then validating will use the corvus dialect, which allows us to use custom class names for the IntermediateModels",
+  "$ref": "propdefs.json"
+}

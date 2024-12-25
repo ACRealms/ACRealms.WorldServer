@@ -220,134 +220,134 @@ public readonly partial struct Group
         }
 
         /// <summary>
-        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity" />.
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum" />.
         /// </summary>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity AsAllOf0Entity
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum AsMaybeEnum
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity>();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum>();
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity" />.
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum" />.
         /// </summary>
-        public bool IsAllOf0Entity
+        public bool IsMaybeEnum
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity>().IsValid();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum>().IsValid();
             }
         }
 
         /// <summary>
-        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity" />.
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt" />.
         /// </summary>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity AsAllOf1Entity
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt AsMaybeInt
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity>();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt>();
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity" />.
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt" />.
         /// </summary>
-        public bool IsAllOf1Entity
+        public bool IsMaybeInt
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity>().IsValid();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt>().IsValid();
             }
         }
 
         /// <summary>
-        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity" />.
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong" />.
         /// </summary>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity AsAllOf2Entity
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong AsMaybeLong
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity>();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong>();
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity" />.
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong" />.
         /// </summary>
-        public bool IsAllOf2Entity
+        public bool IsMaybeLong
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity>().IsValid();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong>().IsValid();
             }
         }
 
         /// <summary>
-        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity" />.
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat" />.
         /// </summary>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity AsAllOf3Entity
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat AsMaybeFloat
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity>();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat>();
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity" />.
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat" />.
         /// </summary>
-        public bool IsAllOf3Entity
+        public bool IsMaybeFloat
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity>().IsValid();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat>().IsValid();
             }
         }
 
         /// <summary>
-        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity" />.
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString" />.
         /// </summary>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity AsAllOf4Entity
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString AsMaybeString
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity>();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString>();
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity" />.
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString" />.
         /// </summary>
-        public bool IsAllOf4Entity
+        public bool IsMaybeString
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity>().IsValid();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString>().IsValid();
             }
         }
 
         /// <summary>
-        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity" />.
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool" />.
         /// </summary>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity AsAllOf5Entity
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool AsMaybeBool
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity>();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool>();
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity" />.
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool" />.
         /// </summary>
-        public bool IsAllOf5Entity
+        public bool IsMaybeBool
         {
             get
             {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity>().IsValid();
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool>().IsValid();
             }
         }
 
@@ -407,109 +407,109 @@ public readonly partial struct Group
         }
 
         /// <summary>
-        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity"/>.
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity(TypedPropDefs value)
+        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum(TypedPropDefs value)
         {
-            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity>();
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum>();
         }
 
         /// <summary>
-        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity"/>.
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity value)
-        {
-            return value.As<TypedPropDefs>();
-        }
-
-        /// <summary>
-        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity"/>.
-        /// </summary>
-        /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity(TypedPropDefs value)
-        {
-            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity>();
-        }
-
-        /// <summary>
-        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity"/>.
-        /// </summary>
-        /// <param name="value">The value from which to convert.</param>
-        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity value)
+        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum value)
         {
             return value.As<TypedPropDefs>();
         }
 
         /// <summary>
-        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity"/>.
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity(TypedPropDefs value)
+        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt(TypedPropDefs value)
         {
-            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity>();
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt>();
         }
 
         /// <summary>
-        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity"/>.
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity value)
-        {
-            return value.As<TypedPropDefs>();
-        }
-
-        /// <summary>
-        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity"/>.
-        /// </summary>
-        /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity(TypedPropDefs value)
-        {
-            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity>();
-        }
-
-        /// <summary>
-        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity"/>.
-        /// </summary>
-        /// <param name="value">The value from which to convert.</param>
-        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity value)
+        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt value)
         {
             return value.As<TypedPropDefs>();
         }
 
         /// <summary>
-        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity"/>.
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity(TypedPropDefs value)
+        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong(TypedPropDefs value)
         {
-            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity>();
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong>();
         }
 
         /// <summary>
-        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity"/>.
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity value)
+        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong value)
         {
             return value.As<TypedPropDefs>();
         }
 
         /// <summary>
-        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity"/>.
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity(TypedPropDefs value)
+        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat(TypedPropDefs value)
         {
-            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity>();
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat>();
         }
 
         /// <summary>
-        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity"/>.
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat"/>.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity value)
+        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat value)
+        {
+            return value.As<TypedPropDefs>();
+        }
+
+        /// <summary>
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString(TypedPropDefs value)
+        {
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString>();
+        }
+
+        /// <summary>
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString value)
+        {
+            return value.As<TypedPropDefs>();
+        }
+
+        /// <summary>
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool(TypedPropDefs value)
+        {
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool>();
+        }
+
+        /// <summary>
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool value)
         {
             return value.As<TypedPropDefs>();
         }
@@ -933,58 +933,58 @@ public readonly partial struct Group
         /// <typeparam name="TIn">The immutable context to pass in to the match function.</typeparam>
         /// <typeparam name="TOut">The result of calling the match function.</typeparam>
         /// <param name="context">The context to pass to the match function.</param>
-        /// <param name="matchAllOf0Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity"/>.</param>
-        /// <param name="matchAllOf1Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity"/>.</param>
-        /// <param name="matchAllOf2Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity"/>.</param>
-        /// <param name="matchAllOf3Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity"/>.</param>
-        /// <param name="matchAllOf4Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity"/>.</param>
-        /// <param name="matchAllOf5Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity"/>.</param>
+        /// <param name="matchMaybeEnum">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum"/>.</param>
+        /// <param name="matchMaybeInt">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt"/>.</param>
+        /// <param name="matchMaybeLong">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong"/>.</param>
+        /// <param name="matchMaybeFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat"/>.</param>
+        /// <param name="matchMaybeString">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString"/>.</param>
+        /// <param name="matchMaybeBool">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool"/>.</param>
         /// <param name="defaultMatch">Match any other value.</param>
         /// <returns>An instance of the value returned by the match function.</returns>
         public TOut Match<TIn, TOut>(
             in TIn context,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity, TIn, TOut> matchAllOf0Entity,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity, TIn, TOut> matchAllOf1Entity,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity, TIn, TOut> matchAllOf2Entity,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity, TIn, TOut> matchAllOf3Entity,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity, TIn, TOut> matchAllOf4Entity,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity, TIn, TOut> matchAllOf5Entity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum, TIn, TOut> matchMaybeEnum,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt, TIn, TOut> matchMaybeInt,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong, TIn, TOut> matchMaybeLong,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat, TIn, TOut> matchMaybeFloat,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString, TIn, TOut> matchMaybeString,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool, TIn, TOut> matchMaybeBool,
             Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs, TIn, TOut> defaultMatch)
         {
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity matchAllOf0EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity>();
-            if (matchAllOf0EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum matchMaybeEnumValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum>();
+            if (matchMaybeEnumValue.IsValid())
             {
-                return matchAllOf0Entity(matchAllOf0EntityValue, context);
+                return matchMaybeEnum(matchMaybeEnumValue, context);
             }
 
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity matchAllOf1EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity>();
-            if (matchAllOf1EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt matchMaybeIntValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt>();
+            if (matchMaybeIntValue.IsValid())
             {
-                return matchAllOf1Entity(matchAllOf1EntityValue, context);
+                return matchMaybeInt(matchMaybeIntValue, context);
             }
 
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity matchAllOf2EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity>();
-            if (matchAllOf2EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong matchMaybeLongValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong>();
+            if (matchMaybeLongValue.IsValid())
             {
-                return matchAllOf2Entity(matchAllOf2EntityValue, context);
+                return matchMaybeLong(matchMaybeLongValue, context);
             }
 
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity matchAllOf3EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity>();
-            if (matchAllOf3EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat matchMaybeFloatValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat>();
+            if (matchMaybeFloatValue.IsValid())
             {
-                return matchAllOf3Entity(matchAllOf3EntityValue, context);
+                return matchMaybeFloat(matchMaybeFloatValue, context);
             }
 
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity matchAllOf4EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity>();
-            if (matchAllOf4EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString matchMaybeStringValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString>();
+            if (matchMaybeStringValue.IsValid())
             {
-                return matchAllOf4Entity(matchAllOf4EntityValue, context);
+                return matchMaybeString(matchMaybeStringValue, context);
             }
 
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity matchAllOf5EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity>();
-            if (matchAllOf5EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool matchMaybeBoolValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool>();
+            if (matchMaybeBoolValue.IsValid())
             {
-                return matchAllOf5Entity(matchAllOf5EntityValue, context);
+                return matchMaybeBool(matchMaybeBoolValue, context);
             }
 
             return defaultMatch(this, context);
@@ -994,125 +994,125 @@ public readonly partial struct Group
         /// Matches the value against the composed values, and returns the result of calling the provided match function for the first match found.
         /// </summary>
         /// <typeparam name="TOut">The result of calling the match function.</typeparam>
-        /// <param name="matchAllOf0Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity"/>.</param>
-        /// <param name="matchAllOf1Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity"/>.</param>
-        /// <param name="matchAllOf2Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity"/>.</param>
-        /// <param name="matchAllOf3Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity"/>.</param>
-        /// <param name="matchAllOf4Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity"/>.</param>
-        /// <param name="matchAllOf5Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity"/>.</param>
+        /// <param name="matchMaybeEnum">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum"/>.</param>
+        /// <param name="matchMaybeInt">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt"/>.</param>
+        /// <param name="matchMaybeLong">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong"/>.</param>
+        /// <param name="matchMaybeFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat"/>.</param>
+        /// <param name="matchMaybeString">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString"/>.</param>
+        /// <param name="matchMaybeBool">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool"/>.</param>
         /// <param name="defaultMatch">Match any other value.</param>
         /// <returns>An instance of the value returned by the match function.</returns>
         public TOut Match<TOut>(
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity, TOut> matchAllOf0Entity,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity, TOut> matchAllOf1Entity,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity, TOut> matchAllOf2Entity,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity, TOut> matchAllOf3Entity,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity, TOut> matchAllOf4Entity,
-            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity, TOut> matchAllOf5Entity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum, TOut> matchMaybeEnum,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt, TOut> matchMaybeInt,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong, TOut> matchMaybeLong,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat, TOut> matchMaybeFloat,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString, TOut> matchMaybeString,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool, TOut> matchMaybeBool,
             Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs, TOut> defaultMatch)
         {
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity matchAllOf0EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity>();
-            if (matchAllOf0EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum matchMaybeEnumValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum>();
+            if (matchMaybeEnumValue.IsValid())
             {
-                return matchAllOf0Entity(matchAllOf0EntityValue);
+                return matchMaybeEnum(matchMaybeEnumValue);
             }
 
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity matchAllOf1EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity>();
-            if (matchAllOf1EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt matchMaybeIntValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt>();
+            if (matchMaybeIntValue.IsValid())
             {
-                return matchAllOf1Entity(matchAllOf1EntityValue);
+                return matchMaybeInt(matchMaybeIntValue);
             }
 
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity matchAllOf2EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity>();
-            if (matchAllOf2EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong matchMaybeLongValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong>();
+            if (matchMaybeLongValue.IsValid())
             {
-                return matchAllOf2Entity(matchAllOf2EntityValue);
+                return matchMaybeLong(matchMaybeLongValue);
             }
 
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity matchAllOf3EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity>();
-            if (matchAllOf3EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat matchMaybeFloatValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat>();
+            if (matchMaybeFloatValue.IsValid())
             {
-                return matchAllOf3Entity(matchAllOf3EntityValue);
+                return matchMaybeFloat(matchMaybeFloatValue);
             }
 
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity matchAllOf4EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity>();
-            if (matchAllOf4EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString matchMaybeStringValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString>();
+            if (matchMaybeStringValue.IsValid())
             {
-                return matchAllOf4Entity(matchAllOf4EntityValue);
+                return matchMaybeString(matchMaybeStringValue);
             }
 
-            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity matchAllOf5EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity>();
-            if (matchAllOf5EntityValue.IsValid())
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool matchMaybeBoolValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool>();
+            if (matchMaybeBoolValue.IsValid())
             {
-                return matchAllOf5Entity(matchAllOf5EntityValue);
+                return matchMaybeBool(matchMaybeBoolValue);
             }
 
             return defaultMatch(this);
         }
 
         /// <summary>
-        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity" />.
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum" />.
         /// </summary>
         /// <param name="result">The result of the conversions.</param>
         /// <returns><see langword="true" /> if the conversion was valid.</returns>
-        public bool TryGetAsAllOf0Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity result)
+        public bool TryGetAsMaybeEnum(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum result)
         {
-            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf0Entity>();
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum>();
             return result.IsValid();
         }
 
         /// <summary>
-        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity" />.
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt" />.
         /// </summary>
         /// <param name="result">The result of the conversions.</param>
         /// <returns><see langword="true" /> if the conversion was valid.</returns>
-        public bool TryGetAsAllOf1Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity result)
+        public bool TryGetAsMaybeInt(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt result)
         {
-            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf1Entity>();
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeInt>();
             return result.IsValid();
         }
 
         /// <summary>
-        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity" />.
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong" />.
         /// </summary>
         /// <param name="result">The result of the conversions.</param>
         /// <returns><see langword="true" /> if the conversion was valid.</returns>
-        public bool TryGetAsAllOf2Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity result)
+        public bool TryGetAsMaybeLong(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong result)
         {
-            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf2Entity>();
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeLong>();
             return result.IsValid();
         }
 
         /// <summary>
-        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity" />.
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat" />.
         /// </summary>
         /// <param name="result">The result of the conversions.</param>
         /// <returns><see langword="true" /> if the conversion was valid.</returns>
-        public bool TryGetAsAllOf3Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity result)
+        public bool TryGetAsMaybeFloat(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat result)
         {
-            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf3Entity>();
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat>();
             return result.IsValid();
         }
 
         /// <summary>
-        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity" />.
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString" />.
         /// </summary>
         /// <param name="result">The result of the conversions.</param>
         /// <returns><see langword="true" /> if the conversion was valid.</returns>
-        public bool TryGetAsAllOf4Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity result)
+        public bool TryGetAsMaybeString(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString result)
         {
-            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf4Entity>();
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString>();
             return result.IsValid();
         }
 
         /// <summary>
-        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity" />.
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool" />.
         /// </summary>
         /// <param name="result">The result of the conversions.</param>
         /// <returns><see langword="true" /> if the conversion was valid.</returns>
-        public bool TryGetAsAllOf5Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity result)
+        public bool TryGetAsMaybeBool(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool result)
         {
-            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.AllOf5Entity>();
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool>();
             return result.IsValid();
         }
     }

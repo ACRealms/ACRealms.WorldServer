@@ -175,7 +175,7 @@ public readonly partial struct PropBase
                         result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/default_from_server_property"), JsonPropertyNames.DefaultFromServerProperty);
                     }
 
-                    ValidationContext propertyResult = property.Value.As<Corvus.Json.JsonString>().Validate(result.CreateChildContext(), level);
+                    ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity>().Validate(result.CreateChildContext(), level);
                     if (level == ValidationLevel.Flag && !propertyResult.IsValid)
                     {
                         return propertyResult;
@@ -196,7 +196,7 @@ public readonly partial struct PropBase
                         result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/obsolete"), JsonPropertyNames.Obsolete);
                     }
 
-                    ValidationContext propertyResult = property.Value.As<Corvus.Json.JsonString>().Validate(result.CreateChildContext(), level);
+                    ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity>().Validate(result.CreateChildContext(), level);
                     if (level == ValidationLevel.Flag && !propertyResult.IsValid)
                     {
                         return propertyResult;

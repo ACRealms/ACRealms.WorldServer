@@ -140,7 +140,7 @@ public readonly partial struct Contexts
                             result = result.PushValidationLocationReducedPathModifierAndProperty(new("#/properties/description"), JsonPropertyNames.Description);
                         }
 
-                        ValidationContext propertyResult = property.Value.As<Corvus.Json.JsonString>().Validate(result.CreateChildContext(), level);
+                        ValidationContext propertyResult = property.Value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.ContextObj.DescriptionEntity>().Validate(result.CreateChildContext(), level);
                         if (level == ValidationLevel.Flag && !propertyResult.IsValid)
                         {
                             return propertyResult;

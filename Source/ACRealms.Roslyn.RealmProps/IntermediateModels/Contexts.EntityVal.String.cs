@@ -108,7 +108,7 @@ public readonly partial struct Contexts
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
         /// <exception cref="InvalidOperationException">The value was not a string.</exception>
-        public static explicit operator string(EntityVal value)
+        public static implicit operator string(EntityVal value)
         {
             if ((value.backing & Backing.JsonElement) != 0)
             {

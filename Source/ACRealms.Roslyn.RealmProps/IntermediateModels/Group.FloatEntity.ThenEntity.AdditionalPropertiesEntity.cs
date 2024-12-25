@@ -230,24 +230,24 @@ public readonly partial struct Group
                 }
 
                 /// <summary>
-                /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Float" />.
+                /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat" />.
                 /// </summary>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.Float AsFloat
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat AsPropFloat
                 {
                     get
                     {
-                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Float>();
+                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat>();
                     }
                 }
 
                 /// <summary>
-                /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Float" />.
+                /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat" />.
                 /// </summary>
-                public bool IsFloat
+                public bool IsPropFloat
                 {
                     get
                     {
-                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Float>().IsValid();
+                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat>().IsValid();
                     }
                 }
 
@@ -748,18 +748,18 @@ public readonly partial struct Group
                 /// <typeparam name="TIn">The immutable context to pass in to the match function.</typeparam>
                 /// <typeparam name="TOut">The result of calling the match function.</typeparam>
                 /// <param name="context">The context to pass to the match function.</param>
-                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Float"/>.</param>
+                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsPropFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat"/>.</param>
                 /// <param name="defaultMatch">Default match if the 'if' schema did not match.</param>
                 /// <returns>An instance of the value returned by the match function.</returns>
                 public TOut Match<TIn, TOut>(
                     in TIn context,
-                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Float, TIn, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsFloat,
+                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat, TIn, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsPropFloat,
                     Matcher<AdditionalPropertiesEntity, TIn, TOut> defaultMatch)
                 {
                     Corvus.Json.JsonObject ifValue = this.As<Corvus.Json.JsonObject>();
                     if (ifValue.IsValid())
                     {
-                        return matchAcRealmsRoslynRealmPropsIntermediateModelsFloat(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Float>(), context);
+                        return matchAcRealmsRoslynRealmPropsIntermediateModelsPropFloat(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat>(), context);
                     }
 
                     return defaultMatch(this, context);
@@ -770,30 +770,30 @@ public readonly partial struct Group
                 /// the 'then' type if the match is successful.
                 /// </summary>
                 /// <typeparam name="TOut">The result of calling the match function.</typeparam>
-                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Float"/>.</param>
+                /// <param name="matchAcRealmsRoslynRealmPropsIntermediateModelsPropFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat"/>.</param>
                 /// <param name="defaultMatch">Default match if the 'if' schema did not match.</param>
                 /// <returns>An instance of the value returned by the match function.</returns>
                 public TOut Match<TOut>(
-                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Float, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsFloat,
+                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat, TOut> matchAcRealmsRoslynRealmPropsIntermediateModelsPropFloat,
                     Matcher<AdditionalPropertiesEntity, TOut> defaultMatch)
                 {
                     Corvus.Json.JsonObject ifValue = this.As<Corvus.Json.JsonObject>();
                     if (ifValue.IsValid())
                     {
-                        return matchAcRealmsRoslynRealmPropsIntermediateModelsFloat(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Float>());
+                        return matchAcRealmsRoslynRealmPropsIntermediateModelsPropFloat(this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat>());
                     }
 
                     return defaultMatch(this);
                 }
 
                 /// <summary>
-                /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Float" />.
+                /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat" />.
                 /// </summary>
                 /// <param name="result">The result of the conversions.</param>
                 /// <returns><see langword="true" /> if the conversion was valid.</returns>
-                public bool TryGetAsFloat(out ACRealms.Roslyn.RealmProps.IntermediateModels.Float result)
+                public bool TryGetAsPropFloat(out ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat result)
                 {
-                    result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Float>();
+                    result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropFloat>();
                     return result.IsValid();
                 }
 

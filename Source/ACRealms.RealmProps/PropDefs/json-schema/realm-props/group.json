@@ -1,48 +1,38 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
   "$comment": "A group of property definitions under a single namespace, sharing a common type, and zero or more other common attributes",
   "definitions": {
     "isObject": { "type": "object" },
     "propDefsAreLongForm": { "properties": { "properties": { "$ref": "#/definitions/isObject" } } },
-    "prop": {
-      "definitions": {
-        "enum": { "$ref": "common/prop-typed.json#objProps.enum" },
-        "int": { "$ref": "common/prop-typed.json#objProps.int" },
-        "long": { "$ref": "common/prop-typed.json#objProps.long" },
-        "float": { "$ref": "common/prop-typed.json#objProps.float" },
-        "string": { "$ref": "common/prop-typed.json#objProps.string" },
-        "bool": { "$ref": "common/prop-typed.json#objProps.bool" }
-      }
-    },
     "props": {
       "definitions": {
-        "enum": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/enum" } } } },
-        "int": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/int" } } } },
-        "long": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/long" } } } },
-        "float": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/float" } } } },
-        "string": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/string" } } } },
-        "bool": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/bool" } } } }
+        "enum": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propEnum" } } } },
+        "int": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propInt" } } } },
+        "long": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propLong" } } } },
+        "float": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propFloat" } } } },
+        "string": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propString" } } } },
+        "bool": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": { "$ref": "common/prop-typed.json#/definitions/propBool" } } } }
       }
     },
     "typedPropDefs": {
       "definitions": {
-        "enum": { "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/enum" } } } ] },
-        "int": { "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/int" } } } ] },
-        "long": { "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/long" } } } ] },
-        "float": { "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/float" } } } ] },
-        "string": { "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/string" } } } ] },
-        "bool": { "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/bool" } } } ] }
+        "enum": { "$corvusTypeName": "ExtendedAsEnum", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/enum" } } } ] },
+        "int": { "$corvusTypeName": "ExtendedAsInt", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/int" } } } ] },
+        "long": { "$corvusTypeName": "ExtendedAsLong", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/long" } } } ] },
+        "float": { "$corvusTypeName": "ExtendedAsFloat", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/float" } } } ] },
+        "string": { "$corvusTypeName": "ExtendedAsString", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/string" } } } ] },
+        "bool": { "$corvusTypeName": "ExtendedAsBool", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/bool" } } } ] }
       },
       "allOf": [
-        { "if": { "$ref": "common/is-type.json#/definitions/enum" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/enum" } },
-        { "if": { "$ref": "common/is-type.json#/definitions/int" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/int" } },
-        { "if": { "$ref": "common/is-type.json#/definitions/long" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/long" } },
-        { "if": { "$ref": "common/is-type.json#/definitions/float" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/float" } },
-        { "if": { "$ref": "common/is-type.json#/definitions/string" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/string" } },
-        { "if": { "$ref": "common/is-type.json#/definitions/bool" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/bool" } }
+        { "$corvusTypeName": "MaybeEnum", "if": { "$ref": "common/is-type.json#/definitions/typeIsEnum" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/enum" } },
+        { "$corvusTypeName": "MaybeInt", "if": { "$ref": "common/is-type.json#/definitions/typeIsInteger" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/int" } },
+        { "$corvusTypeName": "MaybeLong", "if": { "$ref": "common/is-type.json#/definitions/typeIsLong" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/long" } },
+        { "$corvusTypeName": "MaybeFloat", "if": { "$ref": "common/is-type.json#/definitions/typeIsFloat" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/float" } },
+        { "$corvusTypeName": "MaybeString", "if": { "$ref": "common/is-type.json#/definitions/typeIsString" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/string" } },
+        { "$corvusTypeName": "MaybeBool", "if": { "$ref": "common/is-type.json#/definitions/typeIsBoolean" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/bool" } }
       ]
     },
     "groupPropSelection": {
+      "$corvusTypeName": "Extended",
       "properties": {
         "description_format": {
           "$ref": "../components/description.json",
@@ -55,24 +45,27 @@
           "description": "Property names in this group will be treated as ShortKeys, then suffixed with this value to determine the final realm property name",
           "$ref": "common/short-key.json" },
         "properties": { "oneOf": [
-            { "$ref": "group/props.json" },
+            { "$ref": "group/g-props.json" },
             { "$ref": "group/array-short-prop-list.json" }
           ] } },
       "allOf": [
         {
+          "$corvusTypeName": "GroupAttrs",
           "$comment": "Applies the type-specific schema to the group itself (not the PropDefs)",
           "allOf": [ {
+              "$corvusTypeName": "Typed",
               "$comment": "Once we can unit test the schema validation, remove this allOf (keep the oneOf) and see if it still works, then simplify all schemas",
               "oneOf": [
-                { "if": { "$ref": "common/is-type.json#/definitions/enum" }, "then": { "$ref": "common/prop-typed.json#/definitions/enum" }, "else": false },
-                { "if": { "$ref": "common/is-type.json#/definitions/int" }, "then": { "$ref": "common/prop-typed.json#/definitions/int" }, "else": false },
-                { "if": { "$ref": "common/is-type.json#/definitions/long" }, "then": { "$ref": "common/prop-typed.json#/definitions/long" }, "else": false },
-                { "if": { "$ref": "common/is-type.json#/definitions/float" }, "then": { "$ref": "common/prop-typed.json#/definitions/float" }, "else": false },
-                { "if": { "$ref": "common/is-type.json#/definitions/string" }, "then": { "$ref": "common/prop-typed.json#/definitions/string" }, "else": false },
-                { "if": { "$ref": "common/is-type.json#/definitions/bool" }, "then": { "$ref": "common/prop-typed.json#/definitions/bool" }, "else": false }
+                { "$corvusTypeName": "Enum", "if": { "$ref": "common/is-type.json#/definitions/typeIsEnum" }, "then": { "$ref": "common/prop-typed.json#/definitions/propEnum" }, "else": false },
+                { "$corvusTypeName": "Int", "if": { "$ref": "common/is-type.json#/definitions/typeIsInteger" }, "then": { "$ref": "common/prop-typed.json#/definitions/propInt" }, "else": false },
+                { "$corvusTypeName": "Long", "if": { "$ref": "common/is-type.json#/definitions/typeIsLong" }, "then": { "$ref": "common/prop-typed.json#/definitions/propLong" }, "else": false },
+                { "$corvusTypeName": "Float", "if": { "$ref": "common/is-type.json#/definitions/typeIsFloat" }, "then": { "$ref": "common/prop-typed.json#/definitions/propFloat" }, "else": false },
+                { "$corvusTypeName": "String", "if": { "$ref": "common/is-type.json#/definitions/typeIsString" }, "then": { "$ref": "common/prop-typed.json#/definitions/propString" }, "else": false },
+                { "$corvusTypeName": "Bool", "if": { "$ref": "common/is-type.json#/definitions/typeIsBoolean" }, "then": { "$ref": "common/prop-typed.json#/definitions/propBool" }, "else": false }
               ] }
           ] },
-        { "$comment": "Detects which type our group is, then apply the type-specific schema to PropDefs defined for the group. Doesn't apply if the PropDefs are the short-form (shortkey array)",
+        { "$corvusTypeName": "PropAttrs",
+          "$comment": "Detects which type our group is, then apply the type-specific schema to PropDefs defined for the group. Doesn't apply if the PropDefs are the short-form (shortkey array)",
           "if": { "$ref": "#/definitions/propDefsAreLongForm" },
           "then": { "$ref": "#/definitions/typedPropDefs" } }
       ],

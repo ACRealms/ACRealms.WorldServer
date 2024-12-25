@@ -102,7 +102,7 @@ public readonly partial struct DescriptionPattern
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
     /// <exception cref="InvalidOperationException">The value was not a string.</exception>
-    public static explicit operator string(DescriptionPattern value)
+    public static implicit operator string(DescriptionPattern value)
     {
         if ((value.backing & Backing.JsonElement) != 0)
         {

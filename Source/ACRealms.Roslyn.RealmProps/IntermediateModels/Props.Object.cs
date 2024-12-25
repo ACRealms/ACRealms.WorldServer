@@ -20,19 +20,9 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
-/// <remarks>
-/// <para>
-/// Examples:
-/// <example>
-/// <code>
-/// { }
-/// </code>
-/// </example>
-/// </para>
-/// </remarks>
 public readonly partial struct Props
     : IJsonObject<ACRealms.Roslyn.RealmProps.IntermediateModels.Props>,
-      IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>
+      IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>
 {
     /// <summary>
     /// Conversion from <see cref="ImmutableList{JsonObjectProperty}"/>.
@@ -83,7 +73,7 @@ public readonly partial struct Props
     {
         get
         {
-            if (this.TryGetProperty(name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Prop result))
+            if (this.TryGetProperty(name, out ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj result))
             {
                 return result;
             }
@@ -99,11 +89,11 @@ public readonly partial struct Props
     /// <returns>The value of the property with the given name.</returns>
     /// <exception cref="IndexOutOfRangeException">The given property was not present on the object.</exception>
     /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.Prop this[in JsonPropertyName name]
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj this[in JsonPropertyName name]
     {
         get
         {
-            if (this.TryGetProperty(name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Prop result))
+            if (this.TryGetProperty(name, out ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj result))
             {
                 return result;
             }
@@ -134,10 +124,10 @@ public readonly partial struct Props
     }
 
     /// <inheritdoc/>
-    ACRealms.Roslyn.RealmProps.IntermediateModels.Prop IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>.this[JsonPropertyName key] => this[key];
+    ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>.this[JsonPropertyName key] => this[key];
 
     /// <inheritdoc/>
-    IEnumerable<JsonPropertyName> IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>.Keys
+    IEnumerable<JsonPropertyName> IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>.Keys
     {
         get
         {
@@ -149,7 +139,7 @@ public readonly partial struct Props
     }
 
     /// <inheritdoc/>
-    IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.Prop> IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>.Values
+    IEnumerable<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj> IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>.Values
     {
         get
         {
@@ -161,7 +151,7 @@ public readonly partial struct Props
     }
 
     /// <inheritdoc/>
-    int IReadOnlyCollection<KeyValuePair<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>>.Count => this.Count;
+    int IReadOnlyCollection<KeyValuePair<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>>.Count => this.Count;
 
 #if NET8_0_OR_GREATER
     /// <inheritdoc/>
@@ -182,7 +172,7 @@ public readonly partial struct Props
     /// </summary>
     /// <param name="source">The dictionary of properties.</param>
     /// <returns>An instance of the type initialized from the dictionary of properties.</returns>
-    public static Props FromProperties(IDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop> source)
+    public static Props FromProperties(IDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj> source)
     {
         return new(source.Select(kvp => new JsonObjectProperty(kvp.Key, kvp.Value.AsAny)).ToImmutableList());
     }
@@ -192,7 +182,7 @@ public readonly partial struct Props
     /// </summary>
     /// <param name="source">The name value tuples.</param>
     /// <returns>An instance of the type initialized from the properties.</returns>
-    public static Props FromProperties(params (JsonPropertyName Name, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop Value)[] source)
+    public static Props FromProperties(params (JsonPropertyName Name, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj Value)[] source)
     {
         return new(source.Select(s => new JsonObjectProperty(s.Name, s.Value.AsAny)).ToImmutableList());
     }
@@ -239,7 +229,7 @@ public readonly partial struct Props
     /// </summary>
     /// <returns>An enumerator for the object.</returns>
     /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-    public JsonObjectEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Prop> EnumerateObject()
+    public JsonObjectEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj> EnumerateObject()
     {
         if ((this.backing & Backing.JsonElement) != 0)
         {
@@ -255,16 +245,16 @@ public readonly partial struct Props
     }
 
     /// <inheritdoc/>
-    IEnumerator<KeyValuePair<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>> IEnumerable<KeyValuePair<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>>.GetEnumerator()
+    IEnumerator<KeyValuePair<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>> IEnumerable<KeyValuePair<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>>.GetEnumerator()
     {
         if ((this.backing & Backing.JsonElement) != 0)
         {
-            return new ReadOnlyDictionaryJsonObjectEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>(this.jsonElementBacking);
+            return new ReadOnlyDictionaryJsonObjectEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>(this.jsonElementBacking);
         }
 
         if ((this.backing & Backing.Object) != 0)
         {
-            return new ReadOnlyDictionaryJsonObjectEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>(this.objectBacking);
+            return new ReadOnlyDictionaryJsonObjectEnumerator<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>(this.objectBacking);
         }
 
         throw new InvalidOperationException();
@@ -273,9 +263,9 @@ public readonly partial struct Props
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => this.EnumerateObject();
 
-    bool IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>.ContainsKey(JsonPropertyName key) => this.HasProperty(key);
+    bool IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>.ContainsKey(JsonPropertyName key) => this.HasProperty(key);
 
-    bool IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop>.TryGetValue(JsonPropertyName key, out ACRealms.Roslyn.RealmProps.IntermediateModels.Prop result) => this.TryGetProperty(key, out result);
+    bool IReadOnlyDictionary<JsonPropertyName, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj>.TryGetValue(JsonPropertyName key, out ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj result) => this.TryGetProperty(key, out result);
 
     /// <inheritdoc/>
     public bool HasProperties()
@@ -401,7 +391,7 @@ public readonly partial struct Props
     /// <param name="value">The value of the property.</param>
     /// <returns><c>True</c> if the property was present.</returns>
     /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-    public bool TryGetProperty(in JsonPropertyName name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Prop value)
+    public bool TryGetProperty(in JsonPropertyName name, out ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj value)
     {
         if ((this.backing & Backing.JsonElement) != 0)
         {
@@ -425,7 +415,7 @@ public readonly partial struct Props
         {
             if (this.objectBacking.TryGetValue(name, out JsonAny result))
             {
-                value = ACRealms.Roslyn.RealmProps.IntermediateModels.Prop.FromAny(result);
+                value = ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.FromAny(result);
                 return true;
             }
 
@@ -479,7 +469,7 @@ public readonly partial struct Props
     /// <param name="value">The value of the property.</param>
     /// <returns><c>True</c> if the property was present.</returns>
     /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-    public bool TryGetProperty(string name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Prop value)
+    public bool TryGetProperty(string name, out ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj value)
     {
         if ((this.backing & Backing.JsonElement) != 0)
         {
@@ -503,7 +493,7 @@ public readonly partial struct Props
         {
             if (this.objectBacking.TryGetValue(name, out JsonAny result))
             {
-                value = ACRealms.Roslyn.RealmProps.IntermediateModels.Prop.FromAny(result);
+                value = ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.FromAny(result);
                 return true;
             }
 
@@ -557,7 +547,7 @@ public readonly partial struct Props
     /// <param name="value">The value of the property.</param>
     /// <returns><c>True</c> if the property was present.</returns>
     /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-    public bool TryGetProperty(ReadOnlySpan<char> name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Prop value)
+    public bool TryGetProperty(ReadOnlySpan<char> name, out ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj value)
     {
         if ((this.backing & Backing.JsonElement) != 0)
         {
@@ -581,7 +571,7 @@ public readonly partial struct Props
         {
             if (this.objectBacking.TryGetValue(name, out JsonAny result))
             {
-                value = ACRealms.Roslyn.RealmProps.IntermediateModels.Prop.FromAny(result);
+                value = ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.FromAny(result);
                 return true;
             }
 
@@ -635,7 +625,7 @@ public readonly partial struct Props
     /// <param name="value">The value of the property.</param>
     /// <returns><c>True</c> if the property was present.</returns>
     /// <exception cref="InvalidOperationException">The value is not an object.</exception>
-    public bool TryGetProperty(ReadOnlySpan<byte> name, out ACRealms.Roslyn.RealmProps.IntermediateModels.Prop value)
+    public bool TryGetProperty(ReadOnlySpan<byte> name, out ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj value)
     {
         if ((this.backing & Backing.JsonElement) != 0)
         {
@@ -659,7 +649,7 @@ public readonly partial struct Props
         {
             if (this.objectBacking.TryGetValue(name, out JsonAny result))
             {
-                value = ACRealms.Roslyn.RealmProps.IntermediateModels.Prop.FromAny(result);
+                value = ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.FromAny(result);
                 return true;
             }
 
@@ -862,7 +852,7 @@ Props IJsonObject<Props>.SetProperty<TValue>(in JsonPropertyName name, TValue va
     /// <param name="name">The name of the property.</param>
     /// <param name="value">The value of the property.</param>
     /// <returns>The instance with the property set.</returns>
-    public Props SetProperty(in JsonPropertyName name, ACRealms.Roslyn.RealmProps.IntermediateModels.Prop value)
+    public Props SetProperty(in JsonPropertyName name, ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj value)
     {
         return new(__CorvusObjectHelpers.GetPropertyBackingWith(this, name, value.AsAny));
     }

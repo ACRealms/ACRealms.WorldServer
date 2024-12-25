@@ -17,16 +17,6 @@ namespace ACRealms.Roslyn.RealmProps.IntermediateModels;
 /// <summary>
 /// Generated from JSON Schema.
 /// </summary>
-/// <remarks>
-/// <para>
-/// Examples:
-/// <example>
-/// <code>
-/// { }
-/// </code>
-/// </example>
-/// </para>
-/// </remarks>
 public readonly partial struct Props
 {
     /// <inheritdoc/>
@@ -45,7 +35,7 @@ public readonly partial struct Props
                 result = result.UsingStack();
             }
 
-            result = result.PushSchemaLocation("realm-props/group/props.json");
+            result = result.PushSchemaLocation("realm-props/props.json");
         }
 
         JsonValueKind valueKind = this.ValueKind;
@@ -128,7 +118,7 @@ public readonly partial struct Props
             }
 
             int propertyCount = 0;
-            foreach (JsonObjectProperty<ACRealms.Roslyn.RealmProps.IntermediateModels.Prop> property in value.EnumerateObject())
+            foreach (JsonObjectProperty<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj> property in value.EnumerateObject())
             {
                 string? propertyNameAsString = null;
 
@@ -137,7 +127,7 @@ public readonly partial struct Props
                     result = result.PushValidationLocationReducedPathModifier(new("#/propertyNames/$ref"));
                 }
 
-                result = new ACRealms.Roslyn.RealmProps.IntermediateModels.ShortKey(propertyNameAsString ??= property.Name.GetString()).Validate(result, level);
+                result = new ACRealms.Roslyn.RealmProps.IntermediateModels.PropDefKey(propertyNameAsString ??= property.Name.GetString()).Validate(result, level);
                 if (level == ValidationLevel.Flag && !result.IsValid)
                 {
                     return result;

@@ -81,7 +81,7 @@ public readonly partial struct PlayerInstanceSelectMode
                 oneOfChildContext0 = oneOfChildContext0.PushValidationLocationReducedPathModifier(new("#/oneOf/0"));
             }
 
-            ValidationContext oneOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn>().Validate(oneOfChildContext0, level);
+            ValidationContext oneOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same>().Validate(oneOfChildContext0, level);
 
             if (oneOfResult0.IsValid)
             {
@@ -102,7 +102,7 @@ public readonly partial struct PlayerInstanceSelectMode
                 oneOfChildContext1 = oneOfChildContext1.PushValidationLocationReducedPathModifier(new("#/oneOf/1"));
             }
 
-            ValidationContext oneOfResult1 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity>().Validate(oneOfChildContext1, level);
+            ValidationContext oneOfResult1 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock>().Validate(oneOfChildContext1, level);
 
             if (oneOfResult1.IsValid)
             {
@@ -123,7 +123,7 @@ public readonly partial struct PlayerInstanceSelectMode
                 oneOfChildContext2 = oneOfChildContext2.PushValidationLocationReducedPathModifier(new("#/oneOf/2"));
             }
 
-            ValidationContext oneOfResult2 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm>().Validate(oneOfChildContext2, level);
+            ValidationContext oneOfResult2 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm>().Validate(oneOfChildContext2, level);
 
             if (oneOfResult2.IsValid)
             {
@@ -144,7 +144,7 @@ public readonly partial struct PlayerInstanceSelectMode
                 oneOfChildContext3 = oneOfChildContext3.PushValidationLocationReducedPathModifier(new("#/oneOf/3"));
             }
 
-            ValidationContext oneOfResult3 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity>().Validate(oneOfChildContext3, level);
+            ValidationContext oneOfResult3 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm>().Validate(oneOfChildContext3, level);
 
             if (oneOfResult3.IsValid)
             {
@@ -165,7 +165,7 @@ public readonly partial struct PlayerInstanceSelectMode
                 oneOfChildContext4 = oneOfChildContext4.PushValidationLocationReducedPathModifier(new("#/oneOf/4"));
             }
 
-            ValidationContext oneOfResult4 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId>().Validate(oneOfChildContext4, level);
+            ValidationContext oneOfResult4 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId>().Validate(oneOfChildContext4, level);
 
             if (oneOfResult4.IsValid)
             {

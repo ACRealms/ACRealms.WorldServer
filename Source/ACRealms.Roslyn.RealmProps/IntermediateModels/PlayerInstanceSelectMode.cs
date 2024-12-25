@@ -203,112 +203,112 @@ public readonly partial struct PlayerInstanceSelectMode
     }
 
     /// <summary>
-    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn" />.
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same" />.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn AsTheCurrentInstanceThePlayerWasLocatedOn
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same AsSame
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn>();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same>();
         }
     }
 
     /// <summary>
-    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn" />.
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same" />.
     /// </summary>
-    public bool IsTheCurrentInstanceThePlayerWasLocatedOn
+    public bool IsSame
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn>().IsValid();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same>().IsValid();
         }
     }
 
     /// <summary>
-    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity" />.
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock" />.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity AsOneOf1Entity
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock AsSameIfSameLandblock
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity>();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock>();
         }
     }
 
     /// <summary>
-    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity" />.
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock" />.
     /// </summary>
-    public bool IsOneOf1Entity
+    public bool IsSameIfSameLandblock
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity>().IsValid();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock>().IsValid();
         }
     }
 
     /// <summary>
-    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm" />.
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm" />.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm AsBasedOnThePlayerSHomeRealm
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm AsHomeRealm
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm>();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm>();
         }
     }
 
     /// <summary>
-    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm" />.
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm" />.
     /// </summary>
-    public bool IsBasedOnThePlayerSHomeRealm
+    public bool IsHomeRealm
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm>().IsValid();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm>().IsValid();
         }
     }
 
     /// <summary>
-    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity" />.
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm" />.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity AsOneOf3Entity
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm AsPersonalRealm
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity>();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm>();
         }
     }
 
     /// <summary>
-    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity" />.
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm" />.
     /// </summary>
-    public bool IsOneOf3Entity
+    public bool IsPersonalRealm
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity>().IsValid();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm>().IsValid();
         }
     }
 
     /// <summary>
-    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId" />.
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId" />.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId AsTheCurrentRealmSDefaultInstanceId
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId AsRealmDefaultInstanceId
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId>();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId>();
         }
     }
 
     /// <summary>
-    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId" />.
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId" />.
     /// </summary>
-    public bool IsTheCurrentRealmSDefaultInstanceId
+    public bool IsRealmDefaultInstanceId
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId>().IsValid();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId>().IsValid();
         }
     }
 
@@ -368,91 +368,91 @@ public readonly partial struct PlayerInstanceSelectMode
     }
 
     /// <summary>
-    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn"/>.
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn(PlayerInstanceSelectMode value)
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same(PlayerInstanceSelectMode value)
     {
-        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn>();
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same>();
     }
 
     /// <summary>
-    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn"/>.
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static implicit operator PlayerInstanceSelectMode(ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn value)
-    {
-        return value.As<PlayerInstanceSelectMode>();
-    }
-
-    /// <summary>
-    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity"/>.
-    /// </summary>
-    /// <param name="value">The value from which to convert.</param>
-    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity(PlayerInstanceSelectMode value)
-    {
-        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity>();
-    }
-
-    /// <summary>
-    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity"/>.
-    /// </summary>
-    /// <param name="value">The value from which to convert.</param>
-    public static implicit operator PlayerInstanceSelectMode(ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity value)
+    public static implicit operator PlayerInstanceSelectMode(ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same value)
     {
         return value.As<PlayerInstanceSelectMode>();
     }
 
     /// <summary>
-    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm"/>.
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm(PlayerInstanceSelectMode value)
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock(PlayerInstanceSelectMode value)
     {
-        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm>();
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock>();
     }
 
     /// <summary>
-    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm"/>.
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static implicit operator PlayerInstanceSelectMode(ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm value)
-    {
-        return value.As<PlayerInstanceSelectMode>();
-    }
-
-    /// <summary>
-    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity"/>.
-    /// </summary>
-    /// <param name="value">The value from which to convert.</param>
-    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity(PlayerInstanceSelectMode value)
-    {
-        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity>();
-    }
-
-    /// <summary>
-    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity"/>.
-    /// </summary>
-    /// <param name="value">The value from which to convert.</param>
-    public static implicit operator PlayerInstanceSelectMode(ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity value)
+    public static implicit operator PlayerInstanceSelectMode(ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock value)
     {
         return value.As<PlayerInstanceSelectMode>();
     }
 
     /// <summary>
-    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId"/>.
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId(PlayerInstanceSelectMode value)
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm(PlayerInstanceSelectMode value)
     {
-        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId>();
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm>();
     }
 
     /// <summary>
-    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId"/>.
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
-    public static implicit operator PlayerInstanceSelectMode(ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId value)
+    public static implicit operator PlayerInstanceSelectMode(ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm value)
+    {
+        return value.As<PlayerInstanceSelectMode>();
+    }
+
+    /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm(PlayerInstanceSelectMode value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator PlayerInstanceSelectMode(ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm value)
+    {
+        return value.As<PlayerInstanceSelectMode>();
+    }
+
+    /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId(PlayerInstanceSelectMode value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator PlayerInstanceSelectMode(ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId value)
     {
         return value.As<PlayerInstanceSelectMode>();
     }
@@ -878,50 +878,50 @@ public readonly partial struct PlayerInstanceSelectMode
     /// <typeparam name="TIn">The immutable context to pass in to the match function.</typeparam>
     /// <typeparam name="TOut">The result of calling the match function.</typeparam>
     /// <param name="context">The context to pass to the match function.</param>
-    /// <param name="matchTheCurrentInstanceThePlayerWasLocatedOn">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn"/>.</param>
-    /// <param name="matchOneOf1Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity"/>.</param>
-    /// <param name="matchBasedOnThePlayerSHomeRealm">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm"/>.</param>
-    /// <param name="matchOneOf3Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity"/>.</param>
-    /// <param name="matchTheCurrentRealmSDefaultInstanceId">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId"/>.</param>
+    /// <param name="matchSame">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same"/>.</param>
+    /// <param name="matchSameIfSameLandblock">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock"/>.</param>
+    /// <param name="matchHomeRealm">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm"/>.</param>
+    /// <param name="matchPersonalRealm">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm"/>.</param>
+    /// <param name="matchRealmDefaultInstanceId">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId"/>.</param>
     /// <param name="defaultMatch">Match any other value.</param>
     /// <returns>An instance of the value returned by the match function.</returns>
     public TOut Match<TIn, TOut>(
         in TIn context,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn, TIn, TOut> matchTheCurrentInstanceThePlayerWasLocatedOn,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity, TIn, TOut> matchOneOf1Entity,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm, TIn, TOut> matchBasedOnThePlayerSHomeRealm,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity, TIn, TOut> matchOneOf3Entity,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId, TIn, TOut> matchTheCurrentRealmSDefaultInstanceId,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same, TIn, TOut> matchSame,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock, TIn, TOut> matchSameIfSameLandblock,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm, TIn, TOut> matchHomeRealm,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm, TIn, TOut> matchPersonalRealm,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId, TIn, TOut> matchRealmDefaultInstanceId,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode, TIn, TOut> defaultMatch)
     {
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn matchTheCurrentInstanceThePlayerWasLocatedOnValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn>();
-        if (matchTheCurrentInstanceThePlayerWasLocatedOnValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same matchSameValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same>();
+        if (matchSameValue.IsValid())
         {
-            return matchTheCurrentInstanceThePlayerWasLocatedOn(matchTheCurrentInstanceThePlayerWasLocatedOnValue, context);
+            return matchSame(matchSameValue, context);
         }
 
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity matchOneOf1EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity>();
-        if (matchOneOf1EntityValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock matchSameIfSameLandblockValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock>();
+        if (matchSameIfSameLandblockValue.IsValid())
         {
-            return matchOneOf1Entity(matchOneOf1EntityValue, context);
+            return matchSameIfSameLandblock(matchSameIfSameLandblockValue, context);
         }
 
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm matchBasedOnThePlayerSHomeRealmValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm>();
-        if (matchBasedOnThePlayerSHomeRealmValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm matchHomeRealmValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm>();
+        if (matchHomeRealmValue.IsValid())
         {
-            return matchBasedOnThePlayerSHomeRealm(matchBasedOnThePlayerSHomeRealmValue, context);
+            return matchHomeRealm(matchHomeRealmValue, context);
         }
 
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity matchOneOf3EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity>();
-        if (matchOneOf3EntityValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm matchPersonalRealmValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm>();
+        if (matchPersonalRealmValue.IsValid())
         {
-            return matchOneOf3Entity(matchOneOf3EntityValue, context);
+            return matchPersonalRealm(matchPersonalRealmValue, context);
         }
 
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId matchTheCurrentRealmSDefaultInstanceIdValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId>();
-        if (matchTheCurrentRealmSDefaultInstanceIdValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId matchRealmDefaultInstanceIdValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId>();
+        if (matchRealmDefaultInstanceIdValue.IsValid())
         {
-            return matchTheCurrentRealmSDefaultInstanceId(matchTheCurrentRealmSDefaultInstanceIdValue, context);
+            return matchRealmDefaultInstanceId(matchRealmDefaultInstanceIdValue, context);
         }
 
         return defaultMatch(this, context);
@@ -931,106 +931,106 @@ public readonly partial struct PlayerInstanceSelectMode
     /// Matches the value against the composed values, and returns the result of calling the provided match function for the first match found.
     /// </summary>
     /// <typeparam name="TOut">The result of calling the match function.</typeparam>
-    /// <param name="matchTheCurrentInstanceThePlayerWasLocatedOn">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn"/>.</param>
-    /// <param name="matchOneOf1Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity"/>.</param>
-    /// <param name="matchBasedOnThePlayerSHomeRealm">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm"/>.</param>
-    /// <param name="matchOneOf3Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity"/>.</param>
-    /// <param name="matchTheCurrentRealmSDefaultInstanceId">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId"/>.</param>
+    /// <param name="matchSame">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same"/>.</param>
+    /// <param name="matchSameIfSameLandblock">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock"/>.</param>
+    /// <param name="matchHomeRealm">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm"/>.</param>
+    /// <param name="matchPersonalRealm">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm"/>.</param>
+    /// <param name="matchRealmDefaultInstanceId">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId"/>.</param>
     /// <param name="defaultMatch">Match any other value.</param>
     /// <returns>An instance of the value returned by the match function.</returns>
     public TOut Match<TOut>(
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn, TOut> matchTheCurrentInstanceThePlayerWasLocatedOn,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity, TOut> matchOneOf1Entity,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm, TOut> matchBasedOnThePlayerSHomeRealm,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity, TOut> matchOneOf3Entity,
-        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId, TOut> matchTheCurrentRealmSDefaultInstanceId,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same, TOut> matchSame,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock, TOut> matchSameIfSameLandblock,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm, TOut> matchHomeRealm,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm, TOut> matchPersonalRealm,
+        Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId, TOut> matchRealmDefaultInstanceId,
         Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode, TOut> defaultMatch)
     {
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn matchTheCurrentInstanceThePlayerWasLocatedOnValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn>();
-        if (matchTheCurrentInstanceThePlayerWasLocatedOnValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same matchSameValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same>();
+        if (matchSameValue.IsValid())
         {
-            return matchTheCurrentInstanceThePlayerWasLocatedOn(matchTheCurrentInstanceThePlayerWasLocatedOnValue);
+            return matchSame(matchSameValue);
         }
 
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity matchOneOf1EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity>();
-        if (matchOneOf1EntityValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock matchSameIfSameLandblockValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock>();
+        if (matchSameIfSameLandblockValue.IsValid())
         {
-            return matchOneOf1Entity(matchOneOf1EntityValue);
+            return matchSameIfSameLandblock(matchSameIfSameLandblockValue);
         }
 
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm matchBasedOnThePlayerSHomeRealmValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm>();
-        if (matchBasedOnThePlayerSHomeRealmValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm matchHomeRealmValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm>();
+        if (matchHomeRealmValue.IsValid())
         {
-            return matchBasedOnThePlayerSHomeRealm(matchBasedOnThePlayerSHomeRealmValue);
+            return matchHomeRealm(matchHomeRealmValue);
         }
 
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity matchOneOf3EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity>();
-        if (matchOneOf3EntityValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm matchPersonalRealmValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm>();
+        if (matchPersonalRealmValue.IsValid())
         {
-            return matchOneOf3Entity(matchOneOf3EntityValue);
+            return matchPersonalRealm(matchPersonalRealmValue);
         }
 
-        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId matchTheCurrentRealmSDefaultInstanceIdValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId>();
-        if (matchTheCurrentRealmSDefaultInstanceIdValue.IsValid())
+        ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId matchRealmDefaultInstanceIdValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId>();
+        if (matchRealmDefaultInstanceIdValue.IsValid())
         {
-            return matchTheCurrentRealmSDefaultInstanceId(matchTheCurrentRealmSDefaultInstanceIdValue);
+            return matchRealmDefaultInstanceId(matchRealmDefaultInstanceIdValue);
         }
 
         return defaultMatch(this);
     }
 
     /// <summary>
-    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn" />.
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same" />.
     /// </summary>
     /// <param name="result">The result of the conversions.</param>
     /// <returns><see langword="true" /> if the conversion was valid.</returns>
-    public bool TryGetAsTheCurrentInstanceThePlayerWasLocatedOn(out ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn result)
+    public bool TryGetAsSame(out ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same result)
     {
-        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentInstanceThePlayerWasLocatedOn>();
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.Same>();
         return result.IsValid();
     }
 
     /// <summary>
-    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity" />.
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock" />.
     /// </summary>
     /// <param name="result">The result of the conversions.</param>
     /// <returns><see langword="true" /> if the conversion was valid.</returns>
-    public bool TryGetAsOneOf1Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity result)
+    public bool TryGetAsSameIfSameLandblock(out ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock result)
     {
-        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf1Entity>();
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.SameIfSameLandblock>();
         return result.IsValid();
     }
 
     /// <summary>
-    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm" />.
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm" />.
     /// </summary>
     /// <param name="result">The result of the conversions.</param>
     /// <returns><see langword="true" /> if the conversion was valid.</returns>
-    public bool TryGetAsBasedOnThePlayerSHomeRealm(out ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm result)
+    public bool TryGetAsHomeRealm(out ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm result)
     {
-        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.BasedOnThePlayerSHomeRealm>();
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.HomeRealm>();
         return result.IsValid();
     }
 
     /// <summary>
-    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity" />.
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm" />.
     /// </summary>
     /// <param name="result">The result of the conversions.</param>
     /// <returns><see langword="true" /> if the conversion was valid.</returns>
-    public bool TryGetAsOneOf3Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity result)
+    public bool TryGetAsPersonalRealm(out ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm result)
     {
-        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.OneOf3Entity>();
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.PersonalRealm>();
         return result.IsValid();
     }
 
     /// <summary>
-    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId" />.
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId" />.
     /// </summary>
     /// <param name="result">The result of the conversions.</param>
     /// <returns><see langword="true" /> if the conversion was valid.</returns>
-    public bool TryGetAsTheCurrentRealmSDefaultInstanceId(out ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId result)
+    public bool TryGetAsRealmDefaultInstanceId(out ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId result)
     {
-        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.TheCurrentRealmSDefaultInstanceId>();
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PlayerInstanceSelectMode.RealmDefaultInstanceId>();
         return result.IsValid();
     }
 }
