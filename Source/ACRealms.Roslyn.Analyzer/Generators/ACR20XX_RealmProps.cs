@@ -74,46 +74,14 @@ namespace ACRealms.Roslyn.Analyzer.Generators
 
         private void SchemaValidationActions(CompilationStartAnalysisContext context)
         {
-            void Report(DescriptorType type, Location? location = null, object?[]? messageArgs = null)
-            {
-                context.RegisterCompilationEndAction(c => c.ReportDiagnostic(Diagnostic.Create(Descriptors[type], location, messageArgs)));
-            }
             if (context.Compilation.AssemblyName != "ACRealms.RealmProps")
                 return; // This is designed for only one project
 
-            ImmutableArray<AdditionalText> additionalFiles = context.Options.AdditionalFiles;
-            var sep = Path.DirectorySeparatorChar;
-            var pathSuffix = $"PropDefs{sep}json-schema{sep}realm-property-schema.json";
-            AdditionalText? realmPropSchema = additionalFiles.FirstOrDefault(file => file.Path.EndsWith(pathSuffix));
-            if (realmPropSchema == null)
-            {
-                Report(DescriptorType.MissingSchema, null, [pathSuffix]);
-                return;
-            }
-
-            var schemaText = realmPropSchema!.GetText(context.CancellationToken);
-            if (schemaText == null)
-            {
-                Report(DescriptorType.FailedToParse, null, [pathSuffix]);
-                return;
-            }
-
-            JsonObject schema;
-            try
-            {
-                schema = JsonObject.Parse(schemaText.ToString());
-            }
-            catch (Exception)
-            {
-                Report(DescriptorType.FailedToParse, null, [pathSuffix]);
-                return;
-            }
-
-            context.RegisterAdditionalFileAction(c => FileValidationActions(c, realmPropSchema));
+            context.RegisterAdditionalFileAction(c => FileValidationActions(c));
         }
 
 
-        private void FileValidationActions(AdditionalFileAnalysisContext c, AdditionalText realmPropSchema)
+        private void FileValidationActions(AdditionalFileAnalysisContext c)
         {
             void Report(DescriptorType type, Location? location = null, object?[]? messageArgs = null)
             {
@@ -170,9 +138,9 @@ namespace ACRealms.Roslyn.Analyzer.Generators
                         .UsingEvaluatedProperties()
                         .UsingEvaluatedItems();
                     
-                    var ctx = ctxOrig.PushSchemaLocation(realmPropSchema.Path);
-                    var realmPropsObjParsed = RealmPropertySchema.FromJson(realmPropsObj.AsJsonElement);
-                    var validation = realmPropsObjParsed.Validate(ctx, ValidationLevel.Detailed);
+                    //var ctx = ctxOrig.PushSchemaLocation(realmPropSchema.Path);
+                    var realmPropsObjParsed = PropDefs.FromJson(realmPropsObj.AsJsonElement);
+                    var validation = realmPropsObjParsed.Validate(ctxOrig, ValidationLevel.Detailed);
 
                     if (!validation.IsValid)
                     {

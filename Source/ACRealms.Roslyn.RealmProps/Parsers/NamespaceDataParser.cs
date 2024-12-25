@@ -6,10 +6,10 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
 {
     internal static class NamespaceDataParser
     {
-        internal static IEnumerable<ObjPropInfo> GetProps(string namespaceRaw, RealmPropertySchema schema)
+        internal static IEnumerable<ObjPropInfo> GetProps(string namespaceRaw, PropDefs schema)
             => GetProps(namespaceRaw, schema.Properties).Concat(GetProps(namespaceRaw, schema.Groups));
 
-        private static IEnumerable<ObjPropInfo> GetProps(string namespaceRaw, RealmPropertySchema.GroupArray? groupsDefinition)
+        private static IEnumerable<ObjPropInfo> GetProps(string namespaceRaw, PropDefs.GroupArray? groupsDefinition)
         {
             if (groupsDefinition is null)
                 return [];
@@ -17,26 +17,34 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
                 return [];
             return groupsDefinition.Value.SelectMany(group =>
             {
-                PropType gPropType = PropType.None;
-                if (group.Type.IsNotNullOrUndefined())
-                    Enum.TryParse(group.Type.AsString.GetString()!, false, out gPropType);
+                if (!group.Properties.HasValue)
+                    return [];
 
-                var gDefaults = new GroupDefaults(group.DescriptionFormat.GetString())
+                PropType gPropType = PropType.None;
+                var groupExt = group.As<Group.Extended>();
+
+                if (!Enum.TryParse(group.Type.AsString.GetString()!, false, out gPropType))
+                    throw new Exception("Missing required type for group");
+
+                var groupMinMax = groupExt.As<PropDefExtensionMinMax>();
+                var groupEnum = groupExt.As<Group.Extended.GroupAttrs.Typed.Enum>();
+
+                var gDefaults = new GroupDefaults(group.DescriptionFormat?.GetString())
                 {
-                    KeyPrefix = group.KeyPrefix.IsNullOrUndefined() ? string.Empty : group.KeyPrefix.AsString.GetString()!,
-                    KeySuffix = group.KeySuffix.IsNullOrUndefined() ? string.Empty : group.KeySuffix.AsString.GetString()!,
-                    MinValue = GetNumericValue(gPropType, group.MinValue),
-                    MaxValue = GetNumericValue(gPropType, group.MaxValue),
-                    Default = GetLiteralValue(gPropType, group.Default, group.Enum.AsString.GetString()),
-                    Enum = group.Enum.GetString(),
+                    KeyPrefix = group.KeyPrefix?.GetString() ?? string.Empty,
+                    KeySuffix = group.KeySuffix?.GetString() ?? string.Empty,
+                    MinValue = GetNumericValue(gPropType, groupMinMax.MinValue),
+                    MaxValue = GetNumericValue(gPropType, groupMinMax.MaxValue),
+                    Default = GetLiteralValue(gPropType, groupMinMax.Default, groupEnum.EnumValue?.AsString.GetString()),
+                    Enum = groupEnum.EnumValue?.AsString.GetString(),
                     PropType = gPropType,
-                    RerollRestrictedTo = group.RerollRestrictedTo.IsNotNullOrUndefined() ? group.RerollRestrictedTo.AsString.GetString() : null
+                    RerollRestrictedTo = groupMinMax.RerollRestrictedTo?.GetString()
                 };
 
-                RealmPropertySchema.ObjPropListForGroup props = group.Properties;
-                if (props.IsArrayShortPropListForGroup)
+                var props = group.Properties.Value;
+                if (props.IsArrayShortPropList)
                 {
-                    return props.AsArrayShortPropListForGroup.Select(shortKeyNode =>
+                    return props.AsArrayShortPropList.Select(shortKeyNode =>
                     {
                         string shortKey = shortKeyNode.GetString()!;
                         string key = $"{gDefaults.KeyPrefix}{shortKey}{gDefaults.KeySuffix}";
@@ -54,14 +62,14 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
                         };
                     });
                 }
-                else if (props.IsObjPropList)
+                else if (props.IsGroupPropsObj)
                 {
-                    return props.AsObjPropList.Select(kvp =>
+                    return props.AsGroupPropsObj.Select(kvp =>
                     {
                         string shortKey = kvp.Key.GetString();
                         string key = $"{gDefaults.KeyPrefix}{shortKey}{gDefaults.KeySuffix}";
-
-                        return GetProp(namespaceRaw, shortKey, kvp.Value, gDefaults);
+                        var groupProp = kvp.Value;
+                        return GetProp(namespaceRaw, shortKey, groupProp, gDefaults);
                     });
                 }
                 else
@@ -69,14 +77,14 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
             });
         }
 
-        private static IEnumerable<ObjPropInfo> GetProps(string namespaceRaw, RealmPropertySchema.ObjPropList? propertiesDefinition)
+        private static IEnumerable<ObjPropInfo> GetProps(string namespaceRaw, Props? propertiesDefinition)
         {
             if (!propertiesDefinition.HasValue || propertiesDefinition.Value.IsNullOrUndefined())
                 return [];
             return propertiesDefinition.Value.Select(kvp => GetProp(namespaceRaw, kvp.Key.GetString(), kvp.Value));
         }
 
-        private static string GetUnformattedDescription(RealmPropertySchema.DescriptionArray descriptionArray)
+        private static string GetUnformattedDescription(DescriptionArray descriptionArray)
         {
             // This needs to eventually be handled with fixed line widths and proper wrapping
             string newline = $$"""
@@ -85,26 +93,26 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
             return string.Join(newline, descriptionArray.Select(x => x.AsString.GetString()!));
         }
 
-        private static string? GetUnformattedDescription(RealmPropertySchema.ValDescription? descriptionDef)
+        private static string? GetUnformattedDescription(Description? descriptionDef)
         {
             if (!descriptionDef.HasValue || descriptionDef.Value.IsNullOrUndefined())
                 return null;
-            if (descriptionDef.Value.AsString.GetString() is string d)
-                return d;
-            if (descriptionDef.Value.IsOneOf0Entity)
+            var desc = descriptionDef.Value;
+            if (desc.IsStringForm)
             {
-                RealmPropertySchema.ValDescription.OneOf0Entity def = descriptionDef.Value.AsOneOf0Entity;
-                if (def.IsValStringSimple)
+                var def = descriptionDef.Value.AsStringForm;
+                return def.AsString.GetString();
+                /*if (def.IsValStringSimple)
                     return def.AsValStringSimple.AsString.GetString();
                 if (def.IsDescriptionPattern)
-                    return def.AsDescriptionPattern.AsString.GetString();
+                    return def.AsDescriptionPattern.AsString.GetString();*/
             }
-            if (descriptionDef.Value.IsDescriptionArray)
-                return GetUnformattedDescription(descriptionDef.Value.AsDescriptionArray);
+            if (desc.IsDescriptionArray)
+                return GetUnformattedDescription(desc.AsDescriptionArray);
             throw new ArgumentException("Unhandled description type in schema");
         }
 
-        private static string GetFullDescription(string shortKey, RealmPropertySchema.ValDescription? descriptionDef, GroupDefaults? groupDefaults)
+        private static string GetFullDescription(string shortKey, Description? descriptionDef, GroupDefaults? groupDefaults)
         {
             string? unformattedDescription = GetUnformattedDescription(descriptionDef);
             if (unformattedDescription == null)
@@ -119,7 +127,7 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
             return groupDefaults!.GetDescriptionFromFormat(shortKey, unformattedDescription);
         }
 
-        private static string? GetNumericValue(PropType type, RealmPropertySchema.ValFloat? numericValueSrc)
+        private static string? GetNumericValue(PropType type, ValFloat? numericValueSrc)
         {
             if (!numericValueSrc.HasValue || numericValueSrc.Value.IsNullOrUndefined())
                 return null;
@@ -180,13 +188,13 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
                 return null;
             string? s = valueSrc.Value.ValueKind switch
             {
-                System.Text.Json.JsonValueKind.Undefined => null,
-                System.Text.Json.JsonValueKind.True => "true",
-                System.Text.Json.JsonValueKind.Null => "null",
-                System.Text.Json.JsonValueKind.Number => valueSrc.Value.ToString(),
-                System.Text.Json.JsonValueKind.False => "false",
-                System.Text.Json.JsonValueKind.String => valueSrc.Value.ToString(),
-                System.Text.Json.JsonValueKind.Array => type switch
+                JsonValueKind.Undefined => null,
+                JsonValueKind.True => "true",
+                JsonValueKind.Null => "null",
+                JsonValueKind.Number => valueSrc.Value.ToString(),
+                JsonValueKind.False => "false",
+                JsonValueKind.String => valueSrc.Value.ToString(),
+                JsonValueKind.Array => type switch
                 {
                     PropType.@string => string.Join("", valueSrc.Value.AsAny.AsArray.Select(s => s.AsString.GetString())),
                     _ => throw new ArgumentException("unexpected array")
@@ -196,20 +204,43 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
             return GetSanitizedLiteralValue(type, s!, enumType);
         }
 
-        private static ObjPropInfo GetProp(string namespaceRaw, string shortKey, RealmPropertySchema.PropDef propDef, GroupDefaults? groupDefaults = null)
+        private static ObjPropInfo GetProp(string namespaceRaw, string key, UngroupedPropObj prop)
         {
-            string key;
-            if (groupDefaults == null)
-                key = shortKey;
-            else
-                key = $"{groupDefaults.KeyPrefix}{shortKey}{groupDefaults.KeySuffix}";
+            PropType type = PropType.None;
 
-            if (propDef.IsValDescription)
+            if (!Enum.TryParse(prop.Type.GetString()!, false, out type))
+                throw new Exception("Missing required type for property");
+            var extended = prop.As<UngroupedPropObj.ObjPropSelection.Typed>();
+            var propBase = prop.As<PropBase>();
+
+            string description = GetUnformattedDescription(prop.Description) ?? "No description";
+
+            var propAsEnum = extended.As<PropDefExtensionEnum>();
+            string? enumType = type == PropType.@enum ? propAsEnum.Enum.AsString.GetString() : null;
+
+            var minMax = extended.As<PropDefExtensionMinMax>();
+
+            return new ObjPropInfo(namespaceRaw, key)
             {
-                if (groupDefaults == null)
-                    throw new ArgumentException("Prop from string short description definition only allowed within a group!");
+                Description = description,
+                MinValue = GetNumericValue(type, minMax.MinValue),
+                MaxValue = GetNumericValue(type, minMax.MaxValue),
+                Default = GetLiteralValue(type, propBase.Default, enumType),
+                Enum = enumType,
+                DefaultFromServerProp = propBase.DefaultFromServerProperty?.GetString(),
+                ObsoleteReason = propBase.Obsolete?.GetString(),
+                RerollRestrictedTo = minMax.RerollRestrictedTo?.GetString(),
+                Type = type
+            };
+        }
 
-                string? description = GetUnformattedDescription(propDef.AsValDescription);
+        private static ObjPropInfo GetProp(string namespaceRaw, string shortKey, GroupProp propDef, GroupDefaults groupDefaults)
+        {
+            string key = $"{groupDefaults.KeyPrefix}{shortKey}{groupDefaults.KeySuffix}";
+
+            if (propDef.IsDescription)
+            {
+                string? description = GetUnformattedDescription(propDef.AsDescription);
                 description = groupDefaults.GetDescriptionFromFormat(shortKey, description);
 
                 return new ObjPropInfo(namespaceRaw, key)
@@ -224,27 +255,30 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
                     RerollRestrictedTo = groupDefaults.RerollRestrictedTo,
                 };
             }
-            else if (propDef.IsObjProp)
+            else if (propDef.IsPropObj)
             {
-                RealmPropertySchema.ObjProp prop = propDef.AsObjProp;
-                Enum.TryParse(prop.Type.GetString()!, false, out PropType propType);
+                var prop = propDef.AsPropObj;
 
-                string? unformattedDesc = GetUnformattedDescription(prop.Description);
+                PropType type = groupDefaults.PropType;
 
+                string? unformattedDesc = GetUnformattedDescription(prop.AsExtendedUntypedAttrs.Description);
                 string desc = groupDefaults?.GetDescriptionFromFormat(shortKey, unformattedDesc) ?? unformattedDesc;
-                PropType type = propType == PropType.None ? groupDefaults!.PropType : propType;
-                string? enumType = prop.Enum.GetString() ?? groupDefaults?.Enum;
+
+                var propAsEnum = prop.As<PropDefExtensionEnum>();
+                string? enumType = type == PropType.@enum ? propAsEnum.Enum.AsString.GetString() : null;
+
+                var minMax = prop.As<PropDefExtensionMinMax>();
 
                 return new ObjPropInfo(namespaceRaw, key)
                 {
                     Description = desc!,
-                    MinValue = GetNumericValue(propType, prop.MinValue) ?? groupDefaults?.MinValue,
-                    MaxValue = GetNumericValue(propType, prop.MaxValue) ?? groupDefaults?.MaxValue,
-                    Default = GetLiteralValue(propType, prop.Default, enumType) ?? groupDefaults?.Default,
+                    MinValue = GetNumericValue(type, minMax.MinValue) ?? groupDefaults.MinValue,
+                    MaxValue = GetNumericValue(type, minMax.MaxValue) ?? groupDefaults.MaxValue,
+                    Default = GetLiteralValue(type, prop.Default, enumType) ?? groupDefaults.Default,
                     Enum = enumType,
-                    DefaultFromServerProp = prop.DefaultFromServerProperty.GetString(),
-                    ObsoleteReason = prop.Obsolete.GetString(),
-                    RerollRestrictedTo = prop.RerollRestrictedTo.IsNotNullOrUndefined() ? prop.RerollRestrictedTo.AsString.GetString() : null,
+                    DefaultFromServerProp = prop.DefaultFromServerProperty?.GetString(),
+                    ObsoleteReason = prop.Obsolete?.GetString(),
+                    RerollRestrictedTo = minMax.RerollRestrictedTo?.GetString(),
                     Type = type
                 };
             }

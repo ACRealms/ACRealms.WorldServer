@@ -67,7 +67,6 @@
     <None Remove="Generated\**" />
     <None Remove="NewFolder\**" />
     <None Remove="PropDefs\json-schema\**" />
-    <AdditionalFiles Include="PropDefs\json-schema\realm-property-schema.json" />
   </ItemGroup>
 
   <ItemGroup>

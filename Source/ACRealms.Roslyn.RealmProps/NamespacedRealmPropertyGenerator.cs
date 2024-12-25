@@ -73,7 +73,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
                     step++;
 
                     // RealmPropertySchema is a class, and not cache-safe so we shouldn't return it. Convert to NamespaceData record
-                    var namespaceObj = RealmPropertySchema.FromJson(jObject.AsJsonElement);
+                    var namespaceObj = PropDefs.FromJson(jObject.AsJsonElement);
                     step++;
 
                     string namespaceRaw = namespaceObj.Namespace.GetString()!;
@@ -91,7 +91,7 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
                         originalPath: file.Path,
                         namespaceFull: namespaceObj.Namespace.GetString()!,
                         objProps: propsWrapper,
-                        description: namespaceObj.Description.GetString()
+                        description: namespaceObj.Description?.GetString()
                     );
                 }
                 catch (Exception ex)

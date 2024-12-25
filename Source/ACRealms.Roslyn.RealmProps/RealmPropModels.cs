@@ -8,5 +8,5 @@ namespace ACRealms;
 dotnet tool install --global Corvus.Json.JsonSchema.TypeGeneratorTool
 
 cd .\Source\ACRealms.RealmProps\PropDefs\json-schema
-generatejsonschematypes root.json --rootNamespace ACRealms.Roslyn.RealmProps.IntermediateModels --outputPath=..\..\..\ACRealms.Roslyn.RealmProps\IntermediateModels --disableNamingHeuristic DocumentationNameHeuristic --useImplicitOperatorString true
+generatejsonschematypes root.json --rootNamespace ACRealms.Roslyn.RealmProps.IntermediateModels --outputPath=..\..\..\ACRealms.Roslyn.RealmProps\IntermediateModels --disableNamingHeuristic DocumentationNameHeuristic --useImplicitOperatorString true --optionalAsNullable=NullOrUndefined
 */
