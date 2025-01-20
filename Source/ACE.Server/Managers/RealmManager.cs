@@ -27,6 +27,7 @@ using System.Collections.Frozen;
 using ACRealms;
 using ACRealms.Rulesets.Enums;
 using ACRealms.Rulesets.Loader;
+using ACRealms.Rulesets;
 
 namespace ACE.Server.Managers
 {
@@ -151,7 +152,7 @@ namespace ACE.Server.Managers
             return null;
         }
 
-        internal static RulesetTemplate BuildRuleset(ACE.Entity.Models.Realm realm,
+        internal static RulesetTemplate BuildRuleset(Realm realm,
             IDictionary<ushort, WorldRealmBase> dependencies,
             RulesetCompilationContext ctx = null)
         {
@@ -208,7 +209,7 @@ namespace ACE.Server.Managers
             return GetRealm(player.EphemeralRealmExitTo?.RealmID ?? player.HomeRealm);*/
         }
 
-        internal static Landblock GetNewEphemeralLandblock(ACE.Entity.LandblockId physicalLandblockId, Player owner, List<ACE.Entity.Models.Realm> realmTemplates)
+        internal static Landblock GetNewEphemeralLandblock(ACE.Entity.LandblockId physicalLandblockId, Player owner, List<Realm> realmTemplates)
         {
             EphemeralRealm ephemeralRealm;
 

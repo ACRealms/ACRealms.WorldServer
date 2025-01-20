@@ -21,7 +21,7 @@ using ACE.Server.Factories.Tables;
 using ACRealms.RealmProps.Underlying;
 using ACRealms.RealmProps;
 using ACRealms.Rulesets.Enums;
-using ACRealms.Rulesets.Contexts;
+using ACRealms.Rulesets;
 
 namespace ACE.Server.Realms
 {
@@ -273,7 +273,7 @@ namespace ACE.Server.Realms
             set { base.ParentRuleset = value; }
         }
 
-        internal IReadOnlyList<AppliedRealmProperty> PropertiesForRandomization { get; set; }
+        internal IReadOnlyList<ITemplatedRealmProperty> PropertiesForRandomization { get; set; }
         internal IReadOnlyList<RealmLinkJob> Jobs { get; private set; }
 
         /// <summary>
@@ -309,25 +309,25 @@ namespace ACE.Server.Realms
             Realm = entity;
             foreach (var kv in entity.PropertiesBool)
             {
-                var prop = !trace ? kv.Value : new AppliedRealmProperty<bool>(Context, kv.Value, null);
+                var prop = !trace ? kv.Value : new TemplatedRealmPropertyGroup<bool>(Context, kv.Value, null);
                 PropertiesBool.Add(kv.Key, prop);
                 AllProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesFloat)
             {
-                var prop = !trace ? kv.Value : new AppliedRealmProperty<double>(Context, kv.Value, null);
+                var prop = !trace ? kv.Value : new AppliedRealmPropertyGroup<double>(Context, kv.Value, null);
                 PropertiesFloat.Add(kv.Key, prop);
                 AllProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesInt)
             {
-                var prop = !trace ? kv.Value : new AppliedRealmProperty<int>(Context, kv.Value, null);
+                var prop = !trace ? kv.Value : new AppliedRealmPropertyGroup<int>(Context, kv.Value, null);
                 PropertiesInt.Add(kv.Key, prop);
                 AllProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesInt64)
             {
-                var prop = !trace ? kv.Value : new AppliedRealmProperty<long>(Context, kv.Value, null);
+                var prop = !trace ? kv.Value : new AppliedRealmPropertyGroup<long>(Context, kv.Value, null);
                 PropertiesInt64.Add(kv.Key, prop);
                 AllProperties.Add(prop.Options.Name, prop);
             }
@@ -394,11 +394,11 @@ namespace ACE.Server.Realms
     }
 
     //Properties may be changed freely
-    public partial class AppliedRuleset : Ruleset
+    public partial class AppliedRuleset : Ruleset, IAppliedRuleset
     {
         public Landblock Landblock { get; set; }
         internal RulesetTemplate Template { get; }
-        internal Realm Realm => Template.Realm;
+        internal ACRealms.Rulesets.Realm Realm => Template.Realm;
         public new AppliedRuleset ParentRuleset
         {
             get { return (AppliedRuleset)base.ParentRuleset; }
@@ -554,8 +554,9 @@ namespace ACE.Server.Realms
         }
 
         public bool GetProperty(RealmPropertyBool prop) => ValueOf(prop);
-        public bool ValueOf(RealmPropertyBool prop)
+        public bool ValueOf(RealmPropertyBool prop, params IReadOnlyCollection<(string, IRealmPropContext)> ctx)
         {
+            //TODO: Move these to rulesets, use inversion of control
             var att = RealmPropertyPrototypes.Bool[prop].PrimaryAttribute;
             if (PropertiesBool.TryGetValue(prop, out var value))
                 return value.Value;
@@ -565,7 +566,7 @@ namespace ACE.Server.Realms
         }
 
         public double GetProperty(RealmPropertyFloat prop) => ValueOf(prop);
-        public double ValueOf(RealmPropertyFloat prop, IRealmPropContext ctx = null)
+        public double ValueOf(RealmPropertyFloat prop, params IReadOnlyCollection<(string, IRealmPropContext)> ctx)
         {
             var att = RealmPropertyPrototypes.Float[prop].PrimaryAttribute;
             if (PropertiesFloat.TryGetValue(prop, out var result))
@@ -584,9 +585,12 @@ namespace ACE.Server.Realms
         }
 
         public int GetProperty(RealmPropertyInt prop) => ValueOf(prop);
-        public int ValueOf(RealmPropertyInt prop)
+        public int ValueOf(RealmPropertyInt prop, params IReadOnlyCollection<(string, IRealmPropContext)> ctx)
         {
-            var att = RealmPropertyPrototypes.Int[prop].PrimaryAttribute;
+            var proto = RealmPropertyPrototypes.Int[prop];
+            // Evaluate ctx vs scopes
+
+            var att = proto.PrimaryAttribute;
             if (PropertiesInt.TryGetValue(prop, out var result))
             {
                 var val = result.Value;
@@ -611,7 +615,7 @@ namespace ACE.Server.Realms
         }
 
         public long GetProperty(RealmPropertyInt64 prop) => ValueOf(prop);
-        public long ValueOf(RealmPropertyInt64 prop)
+        public long ValueOf(RealmPropertyInt64 prop, params IReadOnlyCollection<(string, IRealmPropContext)> ctx)
         {
             var att = RealmPropertyPrototypes.Int64[prop].PrimaryAttribute;
             if (PropertiesInt64.TryGetValue(prop, out var result))
@@ -630,7 +634,7 @@ namespace ACE.Server.Realms
         }
 
         public string GetProperty(RealmPropertyString prop) => ValueOf(prop);
-        public string ValueOf(RealmPropertyString prop)
+        public string ValueOf(RealmPropertyString prop, params IReadOnlyCollection<(string, IRealmPropContext)> ctx)
         {
             var att = RealmPropertyPrototypes.String[prop].PrimaryAttribute;
             if (PropertiesString.TryGetValue(prop, out var result))

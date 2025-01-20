@@ -6,8 +6,14 @@
     "int": { "$anchor": "int", "$ref": "../scope-base.json#/definitions/paramsInt" }
   },
   "properties": {
-    "Name": { "type": "string" },
-    "Level": { "$ref": "#int" }
+    "Name": {
+      "type": "string",
+      "description": "The creature's name"
+    },
+    "Level": {
+      "$ref": "#int",
+      "description": "The creature's level"
+    }
   },
   "minItems": 1,
   "additionalProperties": false

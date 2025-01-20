@@ -1,0 +1,21 @@
+{
+  "name": "Basic Realm 2",
+  "type": "Realm",
+  "properties": {
+    "Core": {
+      "Realm": {
+        "Description": {
+          "value": "No Description",
+          "compose": "replace"
+        }
+      },
+      "Landblock": {
+        "UnloadInterval": {
+          "low": 1,
+          "high": 5,
+          "compose": "add"
+        }
+      }
+    }
+  }
+}

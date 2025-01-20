@@ -11,7 +11,8 @@
       "description_format": "All creatures will have this value added to their {short_key} attribute",
       "properties": [ "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self" ],
       "contexts": [ {
-          "name": "creatureBeingSpawned",
+          "name": "SpawnedCreature",
+          "description": "The creature being spawned",
           "entity": "Creature"
         } ]
     },
@@ -21,7 +22,7 @@
       "description_format": "Creature {short_key} will be multiplied by this amount",
       "default": 1, "min_value": 0.01, "max_value": 100,
       "contexts": {
-        "creatureBeingSpawned": "Creature"
+        "SpawnedCreature": "Creature"
       },
       "properties": [
         "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self"

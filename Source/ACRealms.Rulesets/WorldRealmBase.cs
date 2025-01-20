@@ -1,11 +1,11 @@
-using ACE.Entity.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ACRealms;
 
-namespace ACE.Entity.ACRealms
+namespace ACRealms.Rulesets
 {
     internal abstract class WorldRealmBase(Realm realm, RulesetBase template)
     {

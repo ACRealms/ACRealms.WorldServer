@@ -1,5 +1,3 @@
-using ACE.Entity.ACRealms;
-using ACE.Entity.Models;
 using ACRealms.RealmProps;
 using ACRealms.RealmProps.Underlying;
 using System;
@@ -14,14 +12,14 @@ namespace ACRealms.Rulesets.DBOld
 
         static Type EnumType = typeof(RealmPropertyBool);
 
-        public override AppliedRealmProperty<bool> ConvertRealmProperty()
+        public override TemplatedRealmProperty<bool> ConvertRealmProperty(RealmPropertyGroupOptions group, RealmPropertyScopeOptions scope)
         {
             var @enum = (RealmPropertyBool)Type;
             
             var proto = RealmPropertyPrototypes.Bool[@enum];
             var att = proto.PrimaryAttribute;
-            var prop = new RealmPropertyOptions<bool>(proto, @enum.ToString(), Realm.Name, att.DefaultValue, Value, Locked, Probability, EnumType, Type);
-            return new AppliedRealmProperty<bool>(RulesetCompilationContext.DefaultShared, Type, prop);
+            var prop = new RealmPropertyOptions<bool>(group, @enum.ToString(), Realm.Name, att.DefaultValue, Value, Locked, Probability, EnumType, Type, scope);
+            return new TemplatedRealmProperty<bool>(RulesetCompilationContext.DefaultShared, Type, prop);
         }
         public void SetProperties(RealmPropertyJsonModel model)
         {

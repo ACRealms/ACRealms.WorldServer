@@ -79,6 +79,7 @@ namespace ACE.Server.WorldObjects
                         (int)Biota.PropertiesAttribute2nd[PropertyAttribute2nd.MaxHealth].InitLevel,
                         ruleset.ValueOf(Props.Creature.Vitals.HealthAdded),
                         ruleset.GetProperty(Props.Creature.Vitals.HealthMultiplier));
+                    //Props.Creature.Vitals.HealthMultiplier.Value(ruleset, this);
                 }
 
                 if (Biota?.PropertiesAttribute?.ContainsKey(PropertyAttribute.Strength) == true)

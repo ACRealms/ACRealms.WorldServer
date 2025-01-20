@@ -13,8 +13,8 @@ using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.Realms
 {
-    internal sealed class WorldRealm(Realm realm, RulesetTemplate rulesetTemplate)
-        : WorldRealmBase(realm, (RulesetBase)rulesetTemplate)
+    internal sealed class WorldRealm(ACRealms.Rulesets.Realm realm, RulesetTemplate rulesetTemplate)
+        : ACRealms.Rulesets.WorldRealmBase(realm, (RulesetBase)rulesetTemplate)
     {
         public RulesetTemplate RulesetTemplate { get; } = rulesetTemplate;
         public AppliedRuleset StandardRules { get; } = AppliedRuleset.MakeRerolledRuleset(rulesetTemplate, rulesetTemplate.Context);
@@ -24,7 +24,7 @@ namespace ACE.Server.Realms
 
         internal InstancedPosition DefaultStartingLocation(Player player)
         {
-
+           // Props.Creature.Attributes.CoordinationMultiplier.
             if (StandardRules.GetProperty(Props.Pvp.World.IsDuelingRealm))
             {
                 //Adventurer's Haven

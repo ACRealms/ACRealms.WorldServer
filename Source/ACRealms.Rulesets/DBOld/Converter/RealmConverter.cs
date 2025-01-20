@@ -1,4 +1,3 @@
-using ACE.Entity.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,12 +5,14 @@ using System.Linq;
 using System.Collections.Frozen;
 using ACRealms.Rulesets.Enums;
 using ACRealms.RealmProps.Underlying;
+using System.ComponentModel.DataAnnotations;
+using System.Collections.Immutable;
 
 namespace ACRealms.Rulesets.DBOld
 {
     internal static class RealmConverter
     {
-        public static ACE.Entity.Models.Realm ConvertToEntityRealm(DBOld.Realm realm, bool instantiateEmptyCollections = false)
+        public static Rulesets.Realm ConvertToEntityRealm(DBOld.Realm realm, bool instantiateEmptyCollections = false)
         {
             var jobs = new List<RealmLinkJob>();
             foreach (var jobtype_group in realm.RealmRulesetLinksRealm.GroupBy(x => x.LinkType))
@@ -36,14 +37,14 @@ namespace ACRealms.Rulesets.DBOld
                 }
             }
 
-            var result = new ACE.Entity.Models.Realm(jobs);
+            var result = new Rulesets.Realm(jobs);
 
             result.Id = realm.Id;
             result.Name = realm.Name;
             result.Type = (RealmType)realm.Type;
             result.ParentRealmID = realm.ParentRealmId;
             result.PropertyCountRandomized = realm.PropertyCountRandomized;
-            result.AllProperties = new Dictionary<string, AppliedRealmProperty>();
+            result.AllProperties = new Dictionary<string, TemplatedRealmPropertyGroup>();
 
             if (realm.RealmPropertiesBool != null && (instantiateEmptyCollections || realm.RealmPropertiesBool.Count > 0))
                 result.PropertiesBool = MakePropertyDict<RealmPropertyBool, bool>(realm.RealmPropertiesBool, result);
@@ -63,20 +64,58 @@ namespace ACRealms.Rulesets.DBOld
             return result;
         }
 
-        private static IDictionary<TProp, AppliedRealmProperty<TVal>> MakePropertyDict<TProp, TVal>(IEnumerable<RealmPropertiesBase> dbValues, ACE.Entity.Models.Realm realmEntity)
+        internal class StagedTemplatePropGroup<TVal>
+            where TVal : IEquatable<TVal>
+        {
+            internal readonly List<TemplatedRealmProperty<TVal>> Props = [];
+            internal string Name;
+            internal RealmPropertyGroupOptions GroupOptions;
+        }
+
+        private static IDictionary<TProp, TemplatedRealmPropertyGroup<TVal>> MakePropertyDict<TProp, TVal>(IEnumerable<RealmPropertiesBase> dbValues, Rulesets.Realm realmEntity)
             where TProp : Enum
             where TVal : IEquatable<TVal>
         {
-            var result = new Dictionary<TProp, AppliedRealmProperty<TVal>>(dbValues.Count());
+            var result = new Dictionary<TProp, StagedTemplatePropGroup<TVal>>();
             foreach (var value in dbValues)
             {
-                var appliedProperty = value.ConvertRealmProperty();
+                // We can have multiple properties in a ruleset now with the same key.
+                // Group each property definition together, differing by scope
+
                 var t = value.Type;
                 var e = System.Runtime.CompilerServices.Unsafe.As<int, TProp>(ref t);
-                result[e] = (AppliedRealmProperty<TVal>)appliedProperty;
-                realmEntity.AllProperties[appliedProperty.Options.Name] = appliedProperty;
+                bool isNewGroup = false;
+                if (!result.TryGetValue(e, out var group))
+                {
+                    group = new StagedTemplatePropGroup<TVal>();
+                    result[e] = group;
+                    isNewGroup = true;
+                }
+
+                var scope = value.ConvertScopeOptions();
+                if (isNewGroup)
+                    group.GroupOptions = value.ConvertGroupOptions();
+
+                var templateProperty = value.ConvertRealmProperty(group.GroupOptions, scope);
+
+                if (isNewGroup)
+                    group.Name = templateProperty.Options.Name;
+
+                //realmEntity.AllProperties[templateProperty.Options.Name] = templateProperty;
+
+                var prop = (TemplatedRealmProperty<TVal>)templateProperty;
+                group.Props.Add(prop);
             }
-            return result;
+            var groupResult = result.ToFrozenDictionary(propsForGroup => propsForGroup.Key, propsForGroup =>
+                new TemplatedRealmPropertyGroup<TVal>() {
+                    Name = propsForGroup.Value.Name,
+                    Properties = [.. propsForGroup.Value.Props]
+                });
+            foreach(var item in groupResult)
+            {
+                realmEntity.AllProperties[item.Value.Name] = item.Value;
+            }
+            return groupResult;
         }
     }
 }

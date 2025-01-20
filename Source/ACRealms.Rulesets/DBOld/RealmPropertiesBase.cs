@@ -1,4 +1,3 @@
-using ACE.Entity.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +14,15 @@ namespace ACRealms.Rulesets.DBOld
         public double? Probability { get; set; }
         public virtual Realm Realm { get; set; }
 
-        public abstract AppliedRealmProperty ConvertRealmProperty();
+        internal RealmPropertyScopeOptions ConvertScopeOptions()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal RealmPropertyGroupOptions ConvertGroupOptions()
+        {
+            throw new NotImplementedException();
+        }
+        public abstract ITemplatedRealmProperty ConvertRealmProperty(RealmPropertyGroupOptions groupOptions, RealmPropertyScopeOptions scopeOptions);
     }
 }

@@ -4,14 +4,13 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using ACE.Entity.ACRealms;
 using ACRealms;
 using ACRealms.RealmProps;
 using ACRealms.RealmProps.Underlying;
 using ACRealms.Rulesets.Enums;
-using static ACE.Entity.ACRealms.RulesetCompilationContext;
+using static ACRealms.Rulesets.RulesetCompilationContext;
 
-namespace ACE.Entity.Models
+namespace ACRealms.Rulesets
 {
     internal class Realm
     {
@@ -21,12 +20,12 @@ namespace ACE.Entity.Models
         public ushort? ParentRealmID { get; set; }
         public ushort? PropertyCountRandomized { get; set; }
 
-        public IDictionary<RealmPropertyBool, AppliedRealmProperty<bool>> PropertiesBool { get; set; }
-        public IDictionary<RealmPropertyFloat, AppliedRealmProperty<double>> PropertiesFloat { get; set; }
-        public IDictionary<RealmPropertyInt, AppliedRealmProperty<int>> PropertiesInt { get; set; }
-        public IDictionary<RealmPropertyInt64, AppliedRealmProperty<long>> PropertiesInt64 { get; set; }
-        public IDictionary<RealmPropertyString, AppliedRealmProperty<string>> PropertiesString { get; set; }
-        public IDictionary<string, AppliedRealmProperty> AllProperties { get; set; }
+        public IDictionary<RealmPropertyBool, TemplatedRealmPropertyGroup<bool>> PropertiesBool { get; set; }
+        public IDictionary<RealmPropertyFloat, TemplatedRealmPropertyGroup<double>> PropertiesFloat { get; set; }
+        public IDictionary<RealmPropertyInt, TemplatedRealmPropertyGroup<int>> PropertiesInt { get; set; }
+        public IDictionary<RealmPropertyInt64, TemplatedRealmPropertyGroup<long>> PropertiesInt64 { get; set; }
+        public IDictionary<RealmPropertyString, TemplatedRealmPropertyGroup<string>> PropertiesString { get; set; }
+        public IDictionary<string, TemplatedRealmPropertyGroup> AllProperties { get; set; }
 
         public bool NeedsRefresh { get; set; }
 
@@ -86,23 +85,73 @@ namespace ACE.Entity.Models
         internal string GetLogTrace(string realmName) => $"<- ({Probability.ToString("P2")}) [{realmName}]";
     }
 
-    internal abstract class AppliedRealmProperty(RulesetCompilationContext ctx)
+    internal interface IAppliedRealmProperty
+    {
+        public int PropertyKey { get; }
+        public RealmPropertyOptions Options { get; }
+        public Type ValueType { get; }
+    }
+
+    internal interface IAppliedRealmProperty<TVal>
+    {
+    }
+
+
+    internal abstract class AppliedRealmProperty(RulesetCompilationContext ctx) : IAppliedRealmProperty
     {
         public int PropertyKey { get; protected set; }
         public RealmPropertyOptions Options { get; init; }
         public Type ValueType => Options.ValueType;
         protected RulesetCompilationContext Context { get; } = ctx;
     }
-
-    internal sealed class AppliedRealmProperty<TVal>(RulesetCompilationContext ctx) : AppliedRealmProperty(ctx)
+    internal abstract class AppliedRealmProperty<TVal>(RulesetCompilationContext ctx) : AppliedRealmProperty(ctx), IAppliedRealmProperty<TVal>
         where TVal : IEquatable<TVal>
     {
         public new RealmPropertyOptions<TVal> Options { get => (RealmPropertyOptions<TVal>)base.Options; init => base.Options = value; }
-        public AppliedRealmProperty<TVal> Parent { get; }
+
+
+        protected void LogTrace(Func<string> message)
+        {
+            if (!Context.Trace)
+                return;
+            Context.LogDirect($"   [P][{Options.Name}] (Def:{Options.RulesetName}) {message()}");
+        }
+
+
+        public override string ToString() => Options.AppliedInfo("<Deferred Load>");
+    }
+
+    internal interface ITemplatedRealmProperty : IAppliedRealmProperty
+    {
+
+    }
+
+    internal sealed class TemplatedRealmProperty<TVal>(RulesetCompilationContext ctx) : AppliedRealmProperty<TVal>(ctx), ITemplatedRealmProperty, IAppliedRealmProperty<TVal>
+        where TVal : IEquatable<TVal>
+    {
+        /// <summary>
+        /// Constructor for realm property from database
+        /// </summary>
+        /// <param name="propertyKey"></param>
+        /// <param name="options"></param>
+        /// <param name="traceLog"></param>
+        public TemplatedRealmProperty(RulesetCompilationContext ctx, int propertyKey, RealmPropertyOptions<TVal> options)
+            : this(ctx)
+        {
+            PropertyKey = propertyKey;
+            Options = options;
+        }
+    }
+
+    internal sealed class ActiveRealmProperty<TVal>(RulesetCompilationContext ctx) : AppliedRealmProperty<TVal>(ctx)
+        where TVal : IEquatable<TVal>
+    {
+        public required ActiveRealmPropertyGroup<TVal> Group { get; init; }
+        public ActiveRealmPropertyGroup<TVal> Parent => Group.Parent;
 
         private TVal _value;
         private bool rolledOnce = false;
-        public TVal Value
+        internal TVal Value
         {
             get
             {
@@ -113,17 +162,32 @@ namespace ACE.Entity.Models
             private set => _value = value;
         }
 
-        private void LogTrace(Func<string> message)
+        internal bool TryEval(IReadOnlyCollection<(string, IRealmPropContext)> ctx, out TVal value)
         {
-            if (!Context.Trace)
-                return;
-            Context.LogDirect($"   [P][{Options.Name}] (Def:{Options.RulesetName}) {message()}");
+            if (ScopeMatch(ctx))
+            {
+                value = Value;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        private bool ScopeMatch(IReadOnlyCollection<(string, IRealmPropContext)> ctx)
+        {
+            return false;
+            foreach (var (key, val) in ctx)
+            {
+
+            }
         }
 
         //Clone
-        public AppliedRealmProperty(RulesetCompilationContext ctx, AppliedRealmProperty<TVal> prop, AppliedRealmProperty<TVal> parent = null)
-            : this(ctx, prop.PropertyKey, prop.Options)
+        public ActiveRealmProperty(RulesetCompilationContext ctx, AppliedRealmProperty<TVal> prop, ActiveRealmPropertyGroup<TVal> parent = null)
+            : this(ctx)
         {
+            PropertyKey = prop.PropertyKey;
+            Options = prop.Options;
             LogTrace(() => $"Cloning from template. CompositionType: {Options.CompositionType}");
 
             if (Options.CompositionType != RealmPropertyCompositionType.replace)
@@ -131,12 +195,12 @@ namespace ACE.Entity.Models
                 if (parent != null)
                 {
                     LogTrace(() => $"Setting parent (explicitly passed): {parent.Options.RulesetName}");
-                    Parent = new AppliedRealmProperty<TVal>(ctx, parent, null);
+                    Parent = new ActiveRealmProperty<TVal>(ctx, parent, null);
                 }
                 else if (prop.Parent != null)
                 {
                     LogTrace(() => $"Setting parent (from template parent): {prop.Parent.Options.RulesetName}");
-                    Parent = new AppliedRealmProperty<TVal>(ctx, prop.Parent, null);
+                    Parent = new ActiveRealmProperty<TVal>(ctx, prop.Parent, null);
                 }
             }
             else
@@ -148,18 +212,6 @@ namespace ACE.Entity.Models
             }
         }
 
-        /// <summary>
-        /// Constructor for realm property from database
-        /// </summary>
-        /// <param name="propertyKey"></param>
-        /// <param name="options"></param>
-        /// <param name="traceLog"></param>
-        public AppliedRealmProperty(RulesetCompilationContext ctx, int propertyKey, RealmPropertyOptions<TVal> options)
-            : this(ctx)
-        {
-            PropertyKey = propertyKey;
-            Options = options;
-        }
 
         private string GetAppliedParentChain(StringBuilder sb = null)
         {
@@ -170,7 +222,7 @@ namespace ACE.Entity.Models
             return direct ? sb.ToString() : null;
         }
 
-        public void RollValue(bool direct = true)
+        public TVal RollValue(bool direct = true)
         {
             TVal composedFromValue;
             if (Parent != null)
@@ -178,8 +230,8 @@ namespace ACE.Entity.Models
                 if (direct)
                     LogTrace(() => GetAppliedParentChain());
 
-                Parent.RollValue(false);
-                composedFromValue = Parent.Value;
+                composedFromValue = Parent.RollValue(false);
+                //composedFromValue = Parent.Value;
             }
             else
             {
@@ -207,13 +259,24 @@ namespace ACE.Entity.Models
         }
     }
 
+    internal abstract record RealmPropertyGroupOptions
+    {
+        internal virtual RealmPropertyPrototypeBase PrototypeBase { get; init; }
+    }
+
+    internal record RealmPropertyGroupOptions<TVal> : RealmPropertyGroupOptions
+        where TVal : IEquatable<TVal>
+    {
+        public RealmPropertyPrototype<TVal> Prototype { get; private init; }
+    }
+
     /// <summary>
     /// <para>Represents the immutable property definition from the ruleset config file </para>
     /// <para>The RulesetName is guaranteed to be linked to the ruleset file where defined</para>
     /// </summary>
     internal abstract record RealmPropertyOptions
     {
-        internal virtual RealmPropertyPrototypeBase PrototypeBase { get; init; }
+        public RealmPropertyGroupOptions GroupOptionsBase { get; init; }
         public Type ValueType { get; init; }
         public Type EnumType { get; init; }
         public int EnumValueRaw { get; init; }
@@ -223,16 +286,19 @@ namespace ACE.Entity.Models
         public double Probability { get; init; }
         public virtual RealmPropertyRerollType RandomType { get => RealmPropertyRerollType.never; protected init { } }
         public virtual RealmPropertyCompositionType CompositionType { get => RealmPropertyCompositionType.replace; protected init { } }
-        private Lazy<string> TemplateDisplayString { get; init; } 
-        protected RealmPropertyOptions(RealmPropertyPrototypeBase prototype, string name, string rulesetName, Type type, Type enumType, int enumValue)
+        public RealmPropertyScopeOptions Scope { get; init; }
+        private Lazy<string> TemplateDisplayString { get; init; }
+        //protected RealmPropertyOptions(RealmPropertyPrototypeBase prototype, string name, string rulesetName, Type type, Type enumType, int enumValue, RealmPropertyScopeOptions scopeOptions)
+        protected RealmPropertyOptions(RealmPropertyGroupOptions groupOptions, string name, string rulesetName, Type type, Type enumType, int enumValue, RealmPropertyScopeOptions scopeOptions)
         {
-            PrototypeBase = prototype;
+            GroupOptionsBase = groupOptions;
             ValueType = type;
             EnumType = enumType;
             Name = name;
             RulesetName = rulesetName;
             EnumValueRaw = enumValue;
             TemplateDisplayString = new Lazy<string>(TemplateInfo, System.Threading.LazyThreadSafetyMode.PublicationOnly);
+            Scope = scopeOptions;
         }
 
         protected void Log(RulesetCompilationContext ctx, Func<string> message)
@@ -250,14 +316,18 @@ namespace ACE.Entity.Models
     internal record RealmPropertyOptions<TPrimitive> : RealmPropertyOptions
         where TPrimitive : IEquatable<TPrimitive>
     {
-        public RealmPropertyPrototype<TPrimitive> Prototype { get; private init; }
+        public RealmPropertyPrototype<TPrimitive> Prototype => GroupOptions.Prototype;
         public TPrimitive HardDefaultValue { get; private init; }
         public TPrimitive DefaultValue { get; private init; }
+        public RealmPropertyGroupOptions<TPrimitive> GroupOptions { get; init; }
 
-        internal RealmPropertyOptions(RealmPropertyPrototype<TPrimitive> prototype, string name, string rulesetName, TPrimitive hardDefaultValue, TPrimitive defaultValue, bool locked, double? probability, Type enumType, int enumValue)
-            : base(prototype, name, rulesetName, typeof(TPrimitive), enumType, enumValue)
+        //internal RealmPropertyOptions(RealmPropertyPrototype<TPrimitive> prototype, string name, string rulesetName,
+        internal RealmPropertyOptions(RealmPropertyGroupOptions groupOptions, string name, string rulesetName,
+            TPrimitive hardDefaultValue, TPrimitive defaultValue, bool locked, double? probability, Type enumType, int enumValue,
+            RealmPropertyScopeOptions scopeOptions)
+            : base(groupOptions, name, rulesetName, typeof(TPrimitive), enumType, enumValue, scopeOptions)
         {
-            Prototype = prototype;
+            GroupOptions = (RealmPropertyGroupOptions<TPrimitive>)groupOptions;
             Locked = locked;
             Probability = probability ?? 1.0;
             DefaultValue = defaultValue;
@@ -289,20 +359,23 @@ namespace ACE.Entity.Models
         public override RealmPropertyRerollType RandomType { get; protected init; }
         public override RealmPropertyCompositionType CompositionType { get; protected init; }
 
-        internal MinMaxRangedRealmPropertyOptions(RealmPropertyPrototype<T> prototype, string name, string rulesetName, T hardDefaultValue, T defaultValue, byte compositionType, bool locked, double? probability, Type enumType, int enumValue)
-            : base(prototype, name, rulesetName, hardDefaultValue, defaultValue, locked, probability, enumType, enumValue)
+        internal MinMaxRangedRealmPropertyOptions(RealmPropertyGroupOptions group, string name, string rulesetName, T hardDefaultValue, T defaultValue,
+            byte compositionType, bool locked, double? probability, Type enumType, int enumValue,
+            RealmPropertyScopeOptions scopeOptions)
+            : base(group, name, rulesetName, hardDefaultValue, defaultValue, locked, probability, enumType, enumValue, scopeOptions)
         {
             RandomType = RealmPropertyRerollType.never;
             CompositionType = (RealmPropertyCompositionType)compositionType;
         }
 
-        internal MinMaxRangedRealmPropertyOptions(RealmPropertyPrototype<T> prototype, string name, string rulesetName, T hardDefaultValue,
+        internal MinMaxRangedRealmPropertyOptions(RealmPropertyGroupOptions group, string name, string rulesetName, T hardDefaultValue,
             byte compositionType, byte randomType, T randomLowRange, T randomHighRange, bool locked,
-            double? probability, Type enumType, int enumValue)
-            : base(prototype, name, rulesetName, hardDefaultValue, hardDefaultValue, locked, probability, enumType, enumValue)
+            double? probability, Type enumType, int enumValue,
+            RealmPropertyScopeOptions scopeOptions)
+            : base(group, name, rulesetName, hardDefaultValue, hardDefaultValue, locked, probability, enumType, enumValue, scopeOptions)
         {
             RandomType = (RealmPropertyRerollType)randomType;
-            if (prototype.TryGetSecondaryValue<RerollRestrictedToAttribute, RealmPropertyRerollType>((att) => att.ConstrainRerollType(RandomType), out RealmPropertyRerollType modifiedRerollType))
+            if (group.PrototypeBase.TryGetSecondaryValue<RerollRestrictedToAttribute, RealmPropertyRerollType>((att) => att.ConstrainRerollType(RandomType), out RealmPropertyRerollType modifiedRerollType))
                 RandomType = modifiedRerollType;
 
             if (typeof(T) == typeof(double))

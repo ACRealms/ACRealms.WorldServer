@@ -4,9 +4,10 @@
   "description": "Properties related to ruleset crafting (minimal support for now)",
   "properties": {
     "RulesetStampVendorCategory": {
+      "type": "integer",
       "description": "Vendor weenies with a matching PropertyInt.RulesetStampVendorType will include this ruleset as a stamp for sale, to allow players to craft these rulesets for ephemeral instances",
       "obsolete": "This will be changed to a string",
-      "type": "integer",
+
       "default": 0,
       "min_value": 0,
       "max_value": 65535

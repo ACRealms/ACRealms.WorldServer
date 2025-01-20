@@ -10,7 +10,8 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             {
                 var relativeDir = string.Concat(Enumerable.Repeat("../", data.NestedClassNames.Length + 1));
                 var optionsBasePath = $"{relativeDir}options-base.json";
-                var properties = MakePropertySchema(data);
+                var entitiesBasePath = $"{relativeDir}entities/";
+                var properties = MakePropertySchema(data, entitiesBasePath);
 
                 // We must wrap in a comment as the source generator treats the output as a C# file
                 return
@@ -38,23 +39,30 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             }
         }
 
-        private static string MakeScopeDef(ObjPropInfo objPropInfo)
+        private static string MakeScopeDef(ObjPropInfo objPropInfo, string entitiesBasePath)
         {
+            List<string> props = [];
+            foreach (var ctx in objPropInfo.Contexts)
+            {
+                List<string> propBuilder = [];
+                AddStringProp(propBuilder, "$ref", $"{entitiesBasePath}{ctx.Entity}.json");
+                if (ctx.Description != null)
+                    AddStringProp(propBuilder, "description", ctx.Description);
+                AddUnwrappedObjectProp(props, ctx.Name, SerializePropsUnwrapped(propBuilder));
+            }
+            var propsSchemaBody = SerializePropsUnwrapped(props);
             return
             $$"""
             {
-              "$anchor": "{{objPropInfo.Key}}.s",
-              "type": "object",
+              "$anchor": "{{objPropInfo.Key}}.s", "type": "object", "additionalProperties": false,
               "properties": {
-                "fill_me_in": {
-                  "type": "string"
-                }
+                {{propsSchemaBody}}
               }
             }
             """;
         }
 
-        private static string MakePropertySchema(NamespaceData data)
+        private static string MakePropertySchema(NamespaceData data, string entitiesBasePath)
         {
             List<string> propertyJsonSchema = [];
 
@@ -66,31 +74,31 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
                     var defaultVal = int.Parse(prop.AttributeDefault).ToString();
                     var minVal = int.Parse(prop.AttributeMinValue).ToString();
                     var maxVal = int.Parse(prop.AttributeMaxValue).ToString();
-                    propSchema = MakeNumericPropSchema(prop, "integer", defaultVal, minVal, maxVal);
+                    propSchema = MakeNumericPropSchema(prop, "integer", defaultVal, minVal, maxVal, entitiesBasePath);
                 }
                 else if (prop is { Type: PropType.int64 })
                 {
                     var defaultVal = long.Parse(prop.AttributeDefault).ToString();
                     var minVal = long.Parse(prop.AttributeMinValue).ToString();
                     var maxVal = long.Parse(prop.AttributeMaxValue).ToString();
-                    propSchema = MakeNumericPropSchema(prop, "integer", defaultVal, minVal, maxVal);
+                    propSchema = MakeNumericPropSchema(prop, "integer", defaultVal, minVal, maxVal, entitiesBasePath);
                 }
                 else if (prop is { Type: PropType.@float })
                 {
                     var defaultVal = double.Parse(prop.AttributeDefault).ToString();
                     var minVal = Math.Round(double.Parse(prop.AttributeMinValue), 6).ToString();
                     var maxVal = Math.Round(double.Parse(prop.AttributeMaxValue), 6).ToString();
-                    propSchema = MakeNumericPropSchema(prop, "number", defaultVal, minVal, maxVal);
+                    propSchema = MakeNumericPropSchema(prop, "number", defaultVal, minVal, maxVal, entitiesBasePath);
                 }
                 else if (prop is { Type: PropType.@string })
                 {
                     var defaultVal = prop.AttributeDefault;
-                    propSchema = MakeBasicPropSchema(prop, "string", defaultVal);
+                    propSchema = MakeBasicPropSchema(prop, "string", defaultVal, entitiesBasePath);
                 }
                 else if (prop is { Type: PropType.boolean })
                 {
                     var defaultVal = prop.AttributeDefault;
-                    propSchema = MakeBasicPropSchema(prop, "boolean", defaultVal);
+                    propSchema = MakeBasicPropSchema(prop, "boolean", defaultVal, entitiesBasePath);
                 }
                 else
                     return "";
@@ -101,9 +109,9 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             return SerializePropsUnwrapped(propertyJsonSchema);
         }
 
-        private static string MakeBasicPropSchema(ObjPropInfo propInfo, string valType, string defaultValLiteral)
+        private static string MakeBasicPropSchema(ObjPropInfo propInfo, string valType, string defaultValLiteral, string entitiesBasePath)
         {
-            var scopeDefSchema = MakeScopeDef(propInfo);
+            var scopeDefSchema = MakeScopeDef(propInfo, entitiesBasePath);
             var sVal = $$"""
                         { "$ref": "#{{propInfo.Key}}.v" }
                         """;
@@ -131,9 +139,9 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             """;
         }
 
-        private static string MakeNumericPropSchema(ObjPropInfo propInfo, string valType, string defaultValLiteral, string min, string max)
+        private static string MakeNumericPropSchema(ObjPropInfo propInfo, string valType, string defaultValLiteral, string min, string max, string entitiesBasePath)
         {
-            var scopeDefSchema = MakeScopeDef(propInfo);
+            var scopeDefSchema = MakeScopeDef(propInfo, entitiesBasePath);
             var sVal = RefLiteral($"#{propInfo.Key}.v");
             
             return

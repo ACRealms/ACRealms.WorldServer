@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Collections.Generic;
-using ACE.Entity;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using ACRealms.RealmProps.Underlying;
@@ -68,7 +67,7 @@ namespace ACRealms.Rulesets
                 throw new Exception("Realm property not found: " + propertyName);
         }
 
-        public static void SetProperty(this Realm realm, RealmPropertyBool property, bool value)
+        public static void SetProperty(this DBOld.Realm realm, RealmPropertyBool property, bool value)
         {
             var result = realm.RealmPropertiesBool.FirstOrDefault(x => x.Type == (uint)property);
 
@@ -82,7 +81,7 @@ namespace ACRealms.Rulesets
             }
         }
 
-        public static void SetProperty(this Realm realm, RealmPropertyFloat property, double value)
+        public static void SetProperty(this DBOld.Realm realm, RealmPropertyFloat property, double value)
         {
             var result = realm.RealmPropertiesFloat.FirstOrDefault(x => x.Type == (ushort)property);
 
@@ -96,7 +95,7 @@ namespace ACRealms.Rulesets
             }
         }
 
-        public static void SetProperty(this Realm realm, RealmPropertyInt property, int value)
+        public static void SetProperty(this DBOld.Realm realm, RealmPropertyInt property, int value)
         {
             var result = realm.RealmPropertiesInt.FirstOrDefault(x => x.Type == (uint)property);
 
@@ -110,7 +109,7 @@ namespace ACRealms.Rulesets
             }
         }
 
-        public static void SetProperty(this Realm realm, RealmPropertyInt64 property, long value)
+        public static void SetProperty(this DBOld.Realm realm, RealmPropertyInt64 property, long value)
         {
             var result = realm.RealmPropertiesInt64.FirstOrDefault(x => x.Type == (uint)property);
 
@@ -124,7 +123,7 @@ namespace ACRealms.Rulesets
             }
         }
 
-        public static void SetProperty(this Realm realm, RealmPropertyString property, string value)
+        public static void SetProperty(this DBOld.Realm realm, RealmPropertyString property, string value)
         {
             var result = realm.RealmPropertiesString.FirstOrDefault(x => x.Type == (uint)property);
 
@@ -139,7 +138,7 @@ namespace ACRealms.Rulesets
         }
 
         
-        public static void SetPropertyByName_Complex(this Realm realm, string propertyName, RealmPropertyJsonModel pobj)
+        public static void SetPropertyByName_Complex(this DBOld.Realm realm, string propertyName, RealmPropertyJsonModel pobj)
         {
             pobj.ValidateAll();
 
@@ -158,7 +157,7 @@ namespace ACRealms.Rulesets
         }
         
         
-        private static void SetProperty_Complex(Realm realm, RealmPropertyInt64 property, RealmPropertyJsonModel pobj)
+        private static void SetProperty_Complex(DBOld.Realm realm, RealmPropertyInt64 property, RealmPropertyJsonModel pobj)
         {
             var result = realm.RealmPropertiesInt64.FirstOrDefault(x => x.Type == (ushort)property);
 
@@ -172,7 +171,7 @@ namespace ACRealms.Rulesets
             }
         }
 
-        private static void SetProperty_Complex(Realm realm, RealmPropertyBool property, RealmPropertyJsonModel pobj)
+        private static void SetProperty_Complex(DBOld.Realm realm, RealmPropertyBool property, RealmPropertyJsonModel pobj)
         {
             var result = realm.RealmPropertiesBool.FirstOrDefault(x => x.Type == (ushort)property);
 
@@ -186,7 +185,7 @@ namespace ACRealms.Rulesets
             }
         }
 
-        private static void SetProperty_Complex(Realm realm, RealmPropertyInt property, RealmPropertyJsonModel pobj)
+        private static void SetProperty_Complex(DBOld.Realm realm, RealmPropertyInt property, RealmPropertyJsonModel pobj)
         {
             var result = realm.RealmPropertiesInt.FirstOrDefault(x => x.Type == (ushort)property);
 
@@ -200,7 +199,7 @@ namespace ACRealms.Rulesets
             }
         }
 
-        private static void SetProperty_Complex(Realm realm, RealmPropertyString property, RealmPropertyJsonModel pobj)
+        private static void SetProperty_Complex(DBOld.Realm realm, RealmPropertyString property, RealmPropertyJsonModel pobj)
         {
             var result = realm.RealmPropertiesString.FirstOrDefault(x => x.Type == (ushort)property);
 
@@ -214,7 +213,7 @@ namespace ACRealms.Rulesets
             }
         }
 
-        private static void SetProperty_Complex(Realm realm, RealmPropertyFloat property, RealmPropertyJsonModel pobj)
+        private static void SetProperty_Complex(DBOld.Realm realm, RealmPropertyFloat property, RealmPropertyJsonModel pobj)
         {
             var result = realm.RealmPropertiesFloat.FirstOrDefault(x => x.Type == (ushort)property);
 

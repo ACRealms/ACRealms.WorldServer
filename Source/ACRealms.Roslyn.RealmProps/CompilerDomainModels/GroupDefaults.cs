@@ -24,7 +24,7 @@ namespace ACRealms.Roslyn.RealmProps.CompilerDomainModels
         public required PropType PropType { get; init; }
         public string? ObsoleteReason { get; init; }
         public string? RerollRestrictedTo { get; init; }
-        public ImmutableArray<PropContext> Contexts { get; init; } = [];
+        public required ImmutableArray<PropContext> Contexts { get; init; } = [];
 
         private string Format(string shortKey, string? unformattedDescription)
         {

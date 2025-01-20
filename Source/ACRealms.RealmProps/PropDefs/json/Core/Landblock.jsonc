@@ -2,13 +2,25 @@
   "$schema_version": 1,
   "namespace": "Core.Landblock",
   "description": "Properties affecting landblock behavior",
-  "properties": {
-    "UnloadInterval": {
-      "description": "Landblocks which have been inactive for this many minutes will be unloaded",
+  "groups": [
+    {
       "type": "integer",
-      "default": 5,
-      "min_value": 1,
-      "max_value": 1440
+      "properties": {
+        "UnloadInterval": {
+          "description": "Landblocks which have been inactive for this many minutes will be unloaded",
+          "default": 5,
+          "min_value": 1,
+          "max_value": 1440,
+          "contexts": [
+            {
+              "required": true,
+              "entity": "Creature",
+              "description": "Foo",
+              "name": "Foo"
+            }
+          ]
+        }
+      }
     }
-  }
+  ]
 }

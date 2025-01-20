@@ -9,9 +9,13 @@
           "$anchor": "intellisense.comparable",
           "type": "object",
           "properties": {
-            "LessThan": { "$ref": "#v" },
+            "LessThan": {
+              "$ref": "#v",
+              "description": "Matches on numeric properties lower than this value" },
             "LessThanOrEqual": { "$ref": "#v" },
-            "GreaterThan": { "$ref": "#v" },
+            "GreaterThan": {
+              "$ref": "#v",
+              "description": "Matches on numeric properties greater than this value" },
             "GreaterThanOrEqual": { "$ref": "#v" },
             "NotEqual": { "$ref": "#v" },
             "Equal": { "$ref": "#v" }

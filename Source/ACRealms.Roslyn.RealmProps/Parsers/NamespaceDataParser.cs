@@ -29,6 +29,7 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
 
                 var groupMinMax = groupExt.As<PropDefExtensionMinMax>();
                 var groupEnum = groupExt.As<Group.Extended.GroupAttrs.Typed.Enum>();
+                var groupBase = groupExt.As<PropBase>();
 
                 var gDefaults = new GroupDefaults(group.DescriptionFormat?.GetString())
                 {
@@ -39,7 +40,8 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
                     Default = GetLiteralValue(gPropType, groupMinMax.Default, groupEnum.EnumValue?.AsString.GetString()),
                     Enum = groupEnum.EnumValue?.AsString.GetString(),
                     PropType = gPropType,
-                    RerollRestrictedTo = groupMinMax.RerollRestrictedTo?.GetString()
+                    RerollRestrictedTo = groupMinMax.RerollRestrictedTo?.GetString(),
+                    Contexts = GetContexts(groupBase.Contexts)
                 };
 
                 var props = group.Properties.Value;
