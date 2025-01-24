@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 #nullable enable
@@ -19,17 +20,34 @@ namespace ACRealms.RealmProps
         public static FrozenDictionary<RealmPropertyInt64, RealmPropertyInt64Prototype> Int64 { get; } = RealmPropertyHelper.BuildPrototypes<RealmPropertyInt64, RealmPropertyInt64Prototype, long, RealmPropertyPrimaryMinMaxAttribute<long>>();
         public static FrozenDictionary<RealmPropertyFloat, RealmPropertyFloatPrototype> Float { get; } = RealmPropertyHelper.BuildPrototypes<RealmPropertyFloat, RealmPropertyFloatPrototype, double, RealmPropertyPrimaryMinMaxAttribute<double>>();
         public static FrozenDictionary<RealmPropertyString, RealmPropertyStringPrototype> String { get; } = RealmPropertyHelper.BuildPrototypes<RealmPropertyString, RealmPropertyStringPrototype, string, RealmPropertyPrimaryAttribute<string>>();
+
+        internal static RealmPropertyPrototypeBase GetPrototypeHandle<TProp>(TProp prop)
+            where TProp : Enum
+        {
+            RealmPropertyPrototypeBase result = prop switch
+            {
+                RealmPropertyBool => Bool[Unsafe.BitCast<TProp, RealmPropertyBool>(prop)],
+                RealmPropertyInt => Int[Unsafe.BitCast<TProp, RealmPropertyInt>(prop)],
+                RealmPropertyInt64 => Int64[Unsafe.BitCast<TProp, RealmPropertyInt64>(prop)],
+                RealmPropertyFloat => Float[Unsafe.BitCast<TProp, RealmPropertyFloat>(prop)],
+                RealmPropertyString => String[Unsafe.BitCast<TProp, RealmPropertyString>(prop)],
+                _ => throw new InvalidOperationException("Unexpected canonical prop handle")
+            };
+            return result;
+        }
     }
 
     internal abstract class RealmPropertyPrototypeBase
     {
         internal int RawIdentifier { get; private init; }
+        internal RealmPropertyPrimaryAttributeBase PrimaryAttributeBase { get; private init; }
         private SecondaryDict? SecondaryAttributes { get; init; }
         public string SerializedHardDefaultValue { get; private init; }
 
-        protected internal RealmPropertyPrototypeBase(int rawIdentifier, SecondaryDict? secondaryAttributes, string serializedHardDefaultValue)
+        protected internal RealmPropertyPrototypeBase(int rawIdentifier, RealmPropertyPrimaryAttributeBase primaryAttrBase, SecondaryDict? secondaryAttributes, string serializedHardDefaultValue)
         {
             RawIdentifier = rawIdentifier;
+            PrimaryAttributeBase = primaryAttrBase;
             SecondaryAttributes = secondaryAttributes;
             SerializedHardDefaultValue = serializedHardDefaultValue;
         }
@@ -59,8 +77,8 @@ namespace ACRealms.RealmProps
     where TPrimitive : IEquatable<TPrimitive>
     {
         public TPrimitive HardDefaultValue { get; init; }
-        protected internal RealmPropertyPrototype(int rawIdentifier, SecondaryDict? secondaryAttributes, TPrimitive hardDefaultValue)
-            : base(rawIdentifier, secondaryAttributes, hardDefaultValue?.ToString() ?? "<null>")
+        protected internal RealmPropertyPrototype(int rawIdentifier, RealmPropertyPrimaryAttributeBase primaryAttrBase, SecondaryDict? secondaryAttributes, TPrimitive hardDefaultValue)
+            : base(rawIdentifier, primaryAttrBase, secondaryAttributes, hardDefaultValue?.ToString() ?? "<null>")
         {
             HardDefaultValue = hardDefaultValue ?? default(TPrimitive) ?? (TPrimitive)(object)"";
         }
@@ -72,8 +90,8 @@ namespace ACRealms.RealmProps
     {
         public TEnum EnumVal { get; private init; }
 
-        protected internal RealmPropertyPrototype(TEnum enumVal, SecondaryDict? secondaryAttributes, TPrimitive hardDefaultValue)
-            : base(System.Runtime.CompilerServices.Unsafe.As<TEnum, int>(ref enumVal), secondaryAttributes, hardDefaultValue)
+        protected internal RealmPropertyPrototype(TEnum enumVal, RealmPropertyPrimaryAttributeBase primaryAttrBase, SecondaryDict? secondaryAttributes, TPrimitive hardDefaultValue)
+            : base(System.Runtime.CompilerServices.Unsafe.As<TEnum, int>(ref enumVal), primaryAttrBase, secondaryAttributes, hardDefaultValue)
         {
             EnumVal = enumVal;
         }
@@ -87,7 +105,7 @@ namespace ACRealms.RealmProps
         public TAttribute PrimaryAttribute { get; private init; }
 
         protected internal RealmPropertyPrototype(TEnum enumVal, TAttribute primaryAttribute, SecondaryDict? secondaryAttributes, TPrimitive hardDefaultValue)
-            : base(enumVal, secondaryAttributes, hardDefaultValue)
+            : base(enumVal, (RealmPropertyPrimaryAttributeBase)primaryAttribute, secondaryAttributes, hardDefaultValue)
         {
             PrimaryAttribute = primaryAttribute;
         }

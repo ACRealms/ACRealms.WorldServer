@@ -10,12 +10,9 @@ namespace ACRealms.Rulesets.DBOld
         public string Value { get; set; }
 
         static Type EnumType = typeof(RealmPropertyString);
-        public override TemplatedRealmProperty<string> ConvertRealmProperty(RealmPropertyGroupOptions group, RealmPropertyScopeOptions scope)
+        public override TemplatedRealmProperty<string> ConvertRealmProperty<TVal>(RealmPropertyGroupOptions<TVal> group, RealmPropertyScopeOptions scope)
         {
-            var @enum = (RealmPropertyString)Type;
-            var proto = RealmPropertyPrototypes.String[@enum];
-            var att = proto.PrimaryAttribute;
-            var prop = new RealmPropertyOptions<string>(group, @enum.ToString(), Realm.Name, att.DefaultValue, Value, Locked, Probability, EnumType, Type, scope);
+            var prop = new RealmPropertyOptions<string>(group, Value, Locked, Probability, EnumType, Type, scope);
             return new TemplatedRealmProperty<string>(RulesetCompilationContext.DefaultShared, Type, prop);
         }
 

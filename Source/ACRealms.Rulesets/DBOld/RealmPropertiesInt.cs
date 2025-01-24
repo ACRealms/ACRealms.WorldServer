@@ -3,6 +3,8 @@ using ACRealms.RealmProps.Underlying;
 using ACRealms.Rulesets.Enums;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace ACRealms.Rulesets.DBOld
 {
@@ -15,16 +17,16 @@ namespace ACRealms.Rulesets.DBOld
         public byte CompositionType { get; set; }
 
         static Type EnumType = typeof(RealmPropertyInt);
-        public override TemplatedRealmProperty<int> ConvertRealmProperty(RealmPropertyGroupOptions group, RealmPropertyScopeOptions scope)
+        public override TemplatedRealmProperty<int> ConvertRealmProperty<TVal>(RealmPropertyGroupOptions<TVal> group, RealmPropertyScopeOptions scope)
         {
-            var @enum = (RealmPropertyInt)Type;
-            var proto = RealmPropertyPrototypes.Int[@enum];
-            var att = proto.PrimaryAttribute;
             RealmPropertyOptions<int> prop;
             if (Value.HasValue)
-                prop = new RealmPropertyOptions<int>(group, @enum.ToString(), Realm.Name, att.DefaultValue, Value.Value, Locked, Probability, EnumType, Type, scope);
+                prop = new RealmPropertyOptions<int>(group, Value.Value, Locked, Probability, EnumType, Type, scope);
             else
-                prop = new MinMaxRangedRealmPropertyOptions<int>(group, @enum.ToString(), Realm.Name, att.DefaultValue, CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability, EnumType, Type, scope);
+            {
+                var @default = group.HardDefaultValue;
+                prop = new MinMaxRangedRealmPropertyOptions<int>(group, Unsafe.As<TVal, int>(ref @default), CompositionType, RandomType, RandomLowRange.Value, RandomHighRange.Value, Locked, Probability, EnumType, Type, scope);
+            }
             return new TemplatedRealmProperty<int>(RulesetCompilationContext.DefaultShared, Type, prop);
         }
 

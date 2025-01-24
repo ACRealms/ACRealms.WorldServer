@@ -10,6 +10,8 @@ namespace ACRealms.Rulesets
 {
     internal class RealmPropertyScopeOptions
     {
-        readonly FrozenDictionary<string, IRealmPropertyScope> Scopes;
+        public required FrozenDictionary<string, IRealmPropertyScope> Scopes { get; init; }
+
+        public bool GlobalScope => Scopes.Count == 0;
     }
 }

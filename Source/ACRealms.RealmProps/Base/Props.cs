@@ -13,7 +13,8 @@ public static partial class Props
         {
             public static int StrengthAdded2(IAppliedRuleset ruleset, IRealmPropContext SpawnedCreature)
             {
-                return ruleset.ValueOf(RealmPropertyInt.Creature_Attributes_StrengthAdded, ("SpawnedCreature", SpawnedCreature));
+                return 0;
+               // return ruleset.ValueOf(RealmPropertyInt.Creature_Attributes_StrengthAdded, ("SpawnedCreature", SpawnedCreature));
             }
         }
     }

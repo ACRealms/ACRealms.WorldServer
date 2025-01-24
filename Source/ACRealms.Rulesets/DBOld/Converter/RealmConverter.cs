@@ -69,7 +69,13 @@ namespace ACRealms.Rulesets.DBOld
         {
             internal readonly List<TemplatedRealmProperty<TVal>> Props = [];
             internal string Name;
-            internal RealmPropertyGroupOptions GroupOptions;
+            internal RealmPropertyGroupOptions<TVal> GroupOptions;
+            internal readonly int PropKey;
+
+            internal StagedTemplatePropGroup(int propKey)
+            {
+                PropKey = propKey;
+            }
         }
 
         private static IDictionary<TProp, TemplatedRealmPropertyGroup<TVal>> MakePropertyDict<TProp, TVal>(IEnumerable<RealmPropertiesBase> dbValues, Rulesets.Realm realmEntity)
@@ -87,19 +93,19 @@ namespace ACRealms.Rulesets.DBOld
                 bool isNewGroup = false;
                 if (!result.TryGetValue(e, out var group))
                 {
-                    group = new StagedTemplatePropGroup<TVal>();
+                    group = new StagedTemplatePropGroup<TVal>(t);
                     result[e] = group;
                     isNewGroup = true;
                 }
 
                 var scope = value.ConvertScopeOptions();
                 if (isNewGroup)
-                    group.GroupOptions = value.ConvertGroupOptions();
+                    group.GroupOptions = value.ConvertGroupOptions<TVal, TProp>(e);
 
                 var templateProperty = value.ConvertRealmProperty(group.GroupOptions, scope);
 
                 if (isNewGroup)
-                    group.Name = templateProperty.Options.Name;
+                    group.Name = templateProperty.Options.GroupOptionsBase.Name;
 
                 //realmEntity.AllProperties[templateProperty.Options.Name] = templateProperty;
 
@@ -107,8 +113,7 @@ namespace ACRealms.Rulesets.DBOld
                 group.Props.Add(prop);
             }
             var groupResult = result.ToFrozenDictionary(propsForGroup => propsForGroup.Key, propsForGroup =>
-                new TemplatedRealmPropertyGroup<TVal>() {
-                    Name = propsForGroup.Value.Name,
+                new TemplatedRealmPropertyGroup<TVal>(propsForGroup.Value.Name, propsForGroup.Value.PropKey) {
                     Properties = [.. propsForGroup.Value.Props]
                 });
             foreach(var item in groupResult)
