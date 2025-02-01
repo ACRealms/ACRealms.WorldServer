@@ -1,3 +1,4 @@
+using ACRealms.RealmProps.Underlying;
 using ACRealms.Rulesets.Enums;
 
 # nullable enable
@@ -13,7 +14,7 @@ namespace ACRealms.Rulesets
         public double? probability { get; set; }
         public RealmPropertyRerollType? reroll { get; set; }
         public RealmPropertyCompositionType compose { get; set; }
-        public Dictionary<string, Dictionary<string, object>> scope { get; set; }
+        public Dictionary<string, object>? scope { get; set; }
         public void ValidateAll()
         {
             if ((low == null && high != null) || (low != null && high == null))

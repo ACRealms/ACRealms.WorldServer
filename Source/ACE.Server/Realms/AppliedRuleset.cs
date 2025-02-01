@@ -47,104 +47,6 @@ namespace ACE.Server.Realms
         internal abstract IDictionary<RealmPropertyString, IRealmPropertyGroup<string>> PropertiesString { get; } //= new Dictionary<RealmPropertyString, IRealmPropertyGroup<string>>();
         internal abstract IDictionary<string, IRealmPropertyGroup> AllProperties { get; } //= new Dictionary<string, IRealmPropertyGroup>();
 
-        protected private void ApplyRulesetDict<K, V>(
-            IDictionary<K, ActiveRealmPropertyGroup<V>> parent,
-            IDictionary<K, ActiveRealmPropertyGroup<V>> self,
-            bool invertRelationships,
-            RulesetCompilationContext ctx)
-            where V : IEquatable<V>
-            where K : Enum
-        {
-            //If invertRelationships is true, we are prioritizing the sub dictionary for the purposes of lock, and prioritizing the parent for the purposes of replace.
-            //Add and multiply operations can be applied independent of the ordering so they are not affected. 
-
-            //Add all parent items to sub. But if it is already in sub, then calculate using the special composition rules
-            foreach (var pair in parent)
-            {
-                var propName = pair.Value.Options.Name;
-
-                LogTrace(ctx, () => "Begin single property compilation", pair.Value);
-                var parentprop = pair.Value;
-                if (!self.ContainsKey(pair.Key))
-                {
-                    LogTrace(ctx, () => $"No property def, using parent '{parentprop.Options.RulesetName}'", pair.Value);
-                    //Just add the parent's reference, as we already previously imprinted the parent from its template for this purpose
-                    self[pair.Key] = parentprop;
-                    AllProperties[propName] = parentprop;
-                    continue;
-                }
-
-                if (!invertRelationships && parentprop.TrueForAll(o => o.Locked))
-                {
-                    LogTrace(ctx, () => $"No property def, using parent '{parentprop.Options.RulesetName}'", pair.Value);
-
-                    //Use parent's property as it is locked
-                    self[pair.Key] = parentprop;
-                    AllProperties[propName] = parentprop;
-                    continue;
-                }
-                else if (invertRelationships && self[pair.Key].TrueForAll(o => o.Locked))
-                {
-                    LogTrace(ctx, () => $"Locked: Discarding parent '{parentprop.Options.RulesetName}'", pair.Value);
-                    continue;
-                }
-
-                //Replace
-                if (!invertRelationships)
-                {
-                    var group = self[pair.Key];
-                    if (group.TryGetCommonOption(opts => opts.CompositionType, out var result) && result == RealmPropertyCompositionType.replace)
-                    {
-                        LogTrace(ctx, () => $"Replace: Discarding parent '{parentprop.Options.RulesetName}'", pair.Value);
-                        //No need to do anything here since we are replacing the parent
-                        continue;
-                    }
-                }
-                else if (invertRelationships)
-                {
-                    var group = parentprop;
-                    if (group.TryGetCommonOption(opts => opts.CompositionType, out var result) && result == RealmPropertyCompositionType.replace)
-                    {
-                        LogTrace(ctx, () => $"Replace: using parent from invertRelationships: '{parentprop.Options.RulesetName}'", pair.Value);
-                        self[pair.Key] = parentprop;
-                        AllProperties[propName] = parentprop;
-                        continue;
-                    }
-                }
-
-                //Apply composition rules
-                if (!invertRelationships)
-                {
-                    LogTrace(ctx, () => $"Cloning new composed property with parent {parentprop.Options.RulesetName}", pair.Value);
-                    var newAllocatedProp = new ActiveRealmPropertyGroup<V>(ctx, self[pair.Key], parentprop);
-                    self[pair.Key] = newAllocatedProp;
-                    AllProperties[propName] = newAllocatedProp;
-                }
-                else
-                {
-                    LogTrace(ctx, () => $"InvertedRel: cloning new property from '{parentprop.Options.RulesetName}' with parent '{self[pair.Key].Options.RulesetName}'", pair.Value);
-                    var newAllocatedProp = new ActiveRealmPropertyGroup<V>(ctx, parentprop, self[pair.Key]);
-                    self[pair.Key] = newAllocatedProp; //ensure parent chain is kept
-                    AllProperties[propName] = newAllocatedProp;
-                }
-
-                LogTrace(ctx, () => "End single property compilation", pair.Value);
-            }
-        }
-
-        private static void LogTrace(RulesetCompilationContext ctx, Func<string> message)
-        {
-            if (!ctx.Trace)
-                return;
-            ctx.LogDirect($"   [C] {message()}");
-        }
-            
-        private static void LogTrace(RulesetCompilationContext ctx, Func<string> message, ActiveRealmPropertyGroup property)
-        {
-            if (!ctx.Trace)
-                return;
-            ctx.LogDirect($"   [C][{property.Options.Name}] (Def:{property.Options.RulesetName}) {message()}");
-        }
 
 
         private protected static TemplatedRealmPropertyGroup GetRandomProperty(RulesetTemplate template, RulesetCompilationContext ctx)
@@ -154,6 +56,13 @@ namespace ACE.Server.Realms
             var selectedProp = template.PropertiesForRandomization[ctx.Randomizer.Next(template.PropertiesForRandomization.Count - 1)];
 
             return selectedProp;
+        }
+
+        private static void LogTrace(RulesetCompilationContext ctx, Func<string> message)
+        {
+            if (!ctx.Trace)
+                return;
+            ctx.LogDirect($"   [C] {message()}");
         }
 
         protected virtual void LogTrace(IEnumerable<string> messages)
@@ -196,7 +105,7 @@ namespace ACE.Server.Realms
         internal IReadOnlyList<RealmLinkJob> Jobs { get; private set; }
 
         internal readonly Dictionary<RealmPropertyBool, TemplatedRealmPropertyGroup<bool>> _propertiesBool = new Dictionary<RealmPropertyBool, TemplatedRealmPropertyGroup<bool>>();
-        internal override IDictionary<RealmPropertyBool, IRealmPropertyGroup<bool>> PropertiesBool => (IDictionary<RealmPropertyBool, IRealmPropertyGroup<bool>>)_propertiesBool;
+        internal override IDictionary<RealmPropertyBool, IRealmPropertyGroup<bool>> PropertiesBool => (IDictionary<RealmPropertyBool, IRealmPropertyGroup<bool>>)_propertiesBool.Cast<IRealmPropertyGroup<bool>>();
 
         internal readonly Dictionary<RealmPropertyFloat, TemplatedRealmPropertyGroup<double>> _propertiesFloat = new Dictionary<RealmPropertyFloat, TemplatedRealmPropertyGroup<double>>();
         internal override IDictionary<RealmPropertyFloat, IRealmPropertyGroup<double>> PropertiesFloat => (IDictionary<RealmPropertyFloat, IRealmPropertyGroup<double>>)_propertiesFloat;
@@ -251,42 +160,42 @@ namespace ACE.Server.Realms
             foreach (var kv in entity.PropertiesBool)
             {
                 var prop = !trace ? kv.Value : new TemplatedRealmPropertyGroup<bool>(Context, kv.Value, null);
-                PropertiesBool.Add(kv.Key, prop);
-                AllProperties.Add(prop.Options.Name, prop);
+                _propertiesBool.Add(kv.Key, prop);
+                _allProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesFloat)
             {
                 var prop = !trace ? kv.Value : new TemplatedRealmPropertyGroup<double>(Context, kv.Value, null);
-                PropertiesFloat.Add(kv.Key, prop);
-                AllProperties.Add(prop.Options.Name, prop);
+                _propertiesFloat.Add(kv.Key, prop);
+                _allProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesInt)
             {
                 var prop = !trace ? kv.Value : new TemplatedRealmPropertyGroup<int>(Context, kv.Value, null);
-                PropertiesInt.Add(kv.Key, prop);
-                AllProperties.Add(prop.Options.Name, prop);
+                _propertiesInt.Add(kv.Key, prop);
+                _allProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesInt64)
             {
                 var prop = !trace ? kv.Value : new TemplatedRealmPropertyGroup<long>(Context, kv.Value, null);
-                PropertiesInt64.Add(kv.Key, prop);
-                AllProperties.Add(prop.Options.Name, prop);
+                _propertiesInt64.Add(kv.Key, prop);
+                _allProperties.Add(prop.Options.Name, prop);
             }
             foreach (var kv in entity.PropertiesString)
             {
                 var prop = !trace ? kv.Value : new TemplatedRealmPropertyGroup<string>(Context, kv.Value, null);
-                PropertiesString.Add(kv.Key, prop);
-                AllProperties.Add(prop.Options.Name, prop);
+                _propertiesString.Add(kv.Key, prop);
+                _allProperties.Add(prop.Options.Name, prop);
             }
 
-            Debug.Assert(entity.AllProperties.Count == AllProperties.Count);
+            Debug.Assert(entity.AllProperties.Count == _allProperties.Count);
 
             Jobs = entity.Jobs;
             if (trace)
             {
                 foreach(var job in Jobs)
                     LogTrace(job.GetLogTraceMessages(Context.Dependencies));
-                foreach(var kv in AllProperties)
+                foreach(var kv in _allProperties)
                     LogTrace(() => $"Loaded uncomposed property {kv.Key} as {kv.Value}");
             }
            
@@ -308,20 +217,20 @@ namespace ACE.Server.Realms
         {
             if (Realm.PropertyCountRandomized.HasValue)
             {
-                var list = new List<IRealmPropertyGroup>();
+                var list = new List<TemplatedRealmPropertyGroup>();
                 // TODO: We should be able to make this more efficient eventually, and not use separate AddRange for each. Use AllProperties instead
                 // Instead of hard coding on the description, AllProperties should provide (without downcasting) a means
                 // to access to the base prototype, specifically the (to be implemented) attribute for allowing randomization
                 // An example is that PropertiesString.Description does not allow this, but we were just hardcoding,
                 // which would require a downcast to check unless we either do the above, or include more of the base metadata in the new base group classes. 
-                list.AddRange(PropertiesBool.Values);
-                list.AddRange(PropertiesInt.Values);
-                list.AddRange(PropertiesInt64.Values);
-                list.AddRange(PropertiesFloat.Values);
-                list.AddRange(PropertiesString.Where(x => x.Key != Props.Core.Realm.Description).Select(x => x.Value));
+                list.AddRange(_propertiesBool.Values);
+                list.AddRange(_propertiesInt.Values);
+                list.AddRange(_propertiesInt64.Values);
+                list.AddRange(_propertiesFloat.Values);
+                list.AddRange(_propertiesString.Where(x => x.Key != Props.Core.Realm.Description).Select(x => x.Value));
 
                 // This may be a slight performance inefficiency. TODO: Can we easily do this without an extra list?
-                PropertiesForRandomization = list.Cast<TemplatedRealmPropertyGroup>().ToList().AsReadOnly();
+                PropertiesForRandomization = list.AsReadOnly();
                 LogTrace(() => $"Will select {Realm.PropertyCountRandomized.Value} properties at random.");
             }
         }
@@ -391,15 +300,15 @@ namespace ACE.Server.Realms
         {
             var sb = new StringBuilder();
 
-            foreach (var item in PropertiesBool)
+            foreach (var item in _propertiesBool)
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyBool), item.Key)}: {item.Value}");
-            foreach (var item in PropertiesFloat)
+            foreach (var item in _propertiesFloat)
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyFloat), item.Key)}: {item.Value}");
-            foreach (var item in PropertiesInt)
+            foreach (var item in _propertiesInt)
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyInt), item.Key)}: {item.Value}");
-            foreach (var item in PropertiesInt64)
+            foreach (var item in _propertiesInt64)
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyInt64), item.Key)}: {item.Value}");
-            foreach (var item in PropertiesString.Where(x => x.Key != Props.Core.Realm.Description))
+            foreach (var item in _propertiesString.Where(x => x.Key != Props.Core.Realm.Description))
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyString), item.Key)}: {item.Value}");
 
             sb.AppendLine("\n");
@@ -452,7 +361,7 @@ namespace ACE.Server.Realms
                 while (set.Count < amount)
                 {
                     var selectedProp = GetRandomProperty(template, Context);
-                    LogTrace(() => $"Cherry-picking {((IRealmPropertyGroup)selectedProp).Options.Name} from randomization list");
+                    LogTrace(() => $"Cherry-picking {((IRealmPropertyGroup)selectedProp).OptionsBase.Name} from randomization list");
                     set.Add(selectedProp);
                 }
                 return set;
@@ -474,7 +383,7 @@ namespace ACE.Server.Realms
                     var next = GetRandomProperty(template, Context);
                     if (next is TemplatedRealmPropertyGroup<string> s && s.PropertyKey == (ushort)Props.Core.Realm.Description)
                         continue;
-                    LogTrace(() => $"Subtracting {((IRealmPropertyGroup)next).Options.Name} from randomization selection");
+                    LogTrace(() => $"Subtracting {((IRealmPropertyGroup)next).OptionsBase.Name} from randomization selection");
                     set.Remove(next);
                 }
                 return set;
@@ -487,7 +396,7 @@ namespace ACE.Server.Realms
             where TVal : IEquatable<TVal>
         {
             dict.Add(key, prop);
-            AllProperties.Add(prop.Options.Name, prop);
+            _allProperties.Add(prop.Options.Name, prop);
         }
 
         // During init only
@@ -569,6 +478,98 @@ namespace ACE.Server.Realms
             LogTrace(() => $"FinishCompose (parent: {parentTemplate.Realm.Name}, invertRules: {invertRules})");
         }
 
+        private void ApplyRulesetDict<K, V>(
+            IDictionary<K, ActiveRealmPropertyGroup<V>> parent,
+            IDictionary<K, ActiveRealmPropertyGroup<V>> self,
+            bool invertRelationships,
+            RulesetCompilationContext ctx)
+            where V : IEquatable<V>
+            where K : Enum
+        {
+            //If invertRelationships is true, we are prioritizing the sub dictionary for the purposes of lock, and prioritizing the parent for the purposes of replace.
+            //Add and multiply operations can be applied independent of the ordering so they are not affected. 
+
+            //Add all parent items to sub. But if it is already in sub, then calculate using the special composition rules
+            foreach (var pair in parent)
+            {
+                var propName = pair.Value.Options.Name;
+
+                LogTrace(ctx, () => "Begin single property compilation", pair.Value);
+                var parentprop = pair.Value;
+                if (!self.ContainsKey(pair.Key))
+                {
+                    LogTrace(ctx, () => $"No property def, using parent '{parentprop.Options.RulesetName}'", pair.Value);
+                    //Just add the parent's reference, as we already previously imprinted the parent from its template for this purpose
+                    self[pair.Key] = parentprop;
+                    _allProperties[propName] = parentprop;
+                    continue;
+                }
+
+                if (!invertRelationships && parentprop.TrueForAll(o => o.Locked))
+                {
+                    LogTrace(ctx, () => $"No property def, using parent '{parentprop.Options.RulesetName}'", pair.Value);
+
+                    //Use parent's property as it is locked
+                    self[pair.Key] = parentprop;
+                    _allProperties[propName] = parentprop;
+                    continue;
+                }
+                else if (invertRelationships && self[pair.Key].TrueForAll(o => o.Locked))
+                {
+                    LogTrace(ctx, () => $"Locked: Discarding parent '{parentprop.Options.RulesetName}'", pair.Value);
+                    continue;
+                }
+
+                //Replace
+                if (!invertRelationships)
+                {
+                    var group = self[pair.Key];
+                    if (group.TryGetCommonOption(opts => opts.CompositionType, out var result) && result == RealmPropertyCompositionType.replace)
+                    {
+                        LogTrace(ctx, () => $"Replace: Discarding parent '{parentprop.Options.RulesetName}'", pair.Value);
+                        //No need to do anything here since we are replacing the parent
+                        continue;
+                    }
+                }
+                else if (invertRelationships)
+                {
+                    var group = parentprop;
+                    if (group.TryGetCommonOption(opts => opts.CompositionType, out var result) && result == RealmPropertyCompositionType.replace)
+                    {
+                        LogTrace(ctx, () => $"Replace: using parent from invertRelationships: '{parentprop.Options.RulesetName}'", pair.Value);
+                        self[pair.Key] = parentprop;
+                        _allProperties[propName] = parentprop;
+                        continue;
+                    }
+                }
+
+                //Apply composition rules
+                if (!invertRelationships)
+                {
+                    LogTrace(ctx, () => $"Cloning new composed property with parent {parentprop.Options.RulesetName}", pair.Value);
+                    var newAllocatedProp = new ActiveRealmPropertyGroup<V>(ctx, self[pair.Key], parentprop);
+                    self[pair.Key] = newAllocatedProp;
+                    _allProperties[propName] = newAllocatedProp;
+                }
+                else
+                {
+                    LogTrace(ctx, () => $"InvertedRel: cloning new property from '{parentprop.Options.RulesetName}' with parent '{self[pair.Key].Options.RulesetName}'", pair.Value);
+                    var newAllocatedProp = new ActiveRealmPropertyGroup<V>(ctx, parentprop, self[pair.Key]);
+                    self[pair.Key] = newAllocatedProp; //ensure parent chain is kept
+                    _allProperties[propName] = newAllocatedProp;
+                }
+
+                LogTrace(ctx, () => "End single property compilation", pair.Value);
+            }
+        }
+
+        private static void LogTrace(RulesetCompilationContext ctx, Func<string> message, ActiveRealmPropertyGroup property)
+        {
+            if (!ctx.Trace)
+                return;
+            ctx.LogDirect($"   [C][{property.OptionsBase.Name}] (Def:{property.OptionsBase.RulesetName}) {message()}");
+        }
+
         private void RerollAllRules()
         {
             LogTrace(() => $"RerollAllRules Begin");
@@ -588,7 +589,7 @@ namespace ACE.Server.Realms
 
         private void BuildChanceTablesIfNecessary()
         {
-            if (PropertiesFloat.ContainsKey(Props.Loot.DropRates.CantripDropRate) || GetProperty(Props.Loot.DropRates.CantripDropRate) != PropertyManager.GetDouble("cantrip_drop_rate").Item)
+            if (_propertiesFloat.ContainsKey(Props.Loot.DropRates.CantripDropRate) || GetProperty(Props.Loot.DropRates.CantripDropRate) != PropertyManager.GetDouble("cantrip_drop_rate").Item)
             {
                 LogTrace(() => $"CantripDropRate property is present or differs from server property, building custom NumCantrips ChanceTables");
                 _chanceTableNumCantrips = CantripChance.ApplyNumCantripsMod(GetProperty(Props.Loot.DropRates.CantripDropRate), false);
@@ -599,7 +600,7 @@ namespace ACE.Server.Realms
             var appliedLevels = keys.Select(keypair => (
                 name: keypair.server_prop,
                 server_prop: PropertyManager.GetDouble(keypair.server_prop).Item,
-                realm_prop: PropertiesFloat.ContainsKey(keypair.realm_prop) ? (double?)GetProperty(keypair.realm_prop) : null,
+                realm_prop: _propertiesFloat.ContainsKey(keypair.realm_prop) ? (double?)GetProperty(keypair.realm_prop) : null,
                 realm_prop_with_fallback: GetProperty(keypair.realm_prop)
             )).ToArray();
             var mapping = appliedLevels.ToDictionary(x => x.name, x => x.realm_prop_with_fallback);

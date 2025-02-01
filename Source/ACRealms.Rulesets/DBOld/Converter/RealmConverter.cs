@@ -7,6 +7,7 @@ using ACRealms.Rulesets.Enums;
 using ACRealms.RealmProps.Underlying;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Immutable;
+using System.Numerics;
 
 namespace ACRealms.Rulesets.DBOld
 {
@@ -41,7 +42,7 @@ namespace ACRealms.Rulesets.DBOld
 
             result.Id = realm.Id;
             result.Name = realm.Name;
-            result.Type = (RealmType)realm.Type;
+            result.Type = realm.Type;
             result.ParentRealmID = realm.ParentRealmId;
             result.PropertyCountRandomized = realm.PropertyCountRandomized;
             result.AllProperties = new Dictionary<string, TemplatedRealmPropertyGroup>();
@@ -78,12 +79,12 @@ namespace ACRealms.Rulesets.DBOld
             }
         }
 
-        private static IDictionary<TProp, TemplatedRealmPropertyGroup<TVal>> MakePropertyDict<TProp, TVal>(IEnumerable<RealmPropertiesBase> dbValues, Rulesets.Realm realmEntity)
+        private static IDictionary<TProp, TemplatedRealmPropertyGroup<TPrim>> MakePropertyDict<TProp, TPrim>(IEnumerable<RealmPropertiesBase> dbValues, Rulesets.Realm realmEntity)
             where TProp : Enum
-            where TVal : IEquatable<TVal>
+            where TPrim : IParsable<TPrim>, IComparable<TPrim>, IEquatable<TPrim>
         {
-            var result = new Dictionary<TProp, StagedTemplatePropGroup<TVal>>();
-            foreach (var value in dbValues)
+            var result = new Dictionary<TProp, StagedTemplatePropGroup<TPrim>>();
+            foreach (var value in dbValues.Cast<RealmPropertiesBase<TProp, TPrim>>())
             {
                 // We can have multiple properties in a ruleset now with the same key.
                 // Group each property definition together, differing by scope
@@ -93,14 +94,14 @@ namespace ACRealms.Rulesets.DBOld
                 bool isNewGroup = false;
                 if (!result.TryGetValue(e, out var group))
                 {
-                    group = new StagedTemplatePropGroup<TVal>(t);
+                    group = new StagedTemplatePropGroup<TPrim>(t);
                     result[e] = group;
                     isNewGroup = true;
                 }
 
                 var scope = value.ConvertScopeOptions();
                 if (isNewGroup)
-                    group.GroupOptions = value.ConvertGroupOptions<TVal, TProp>(e);
+                    group.GroupOptions = value.ConvertGroupOptions<TPrim, TProp>(e);
 
                 var templateProperty = value.ConvertRealmProperty(group.GroupOptions, scope);
 
@@ -109,17 +110,14 @@ namespace ACRealms.Rulesets.DBOld
 
                 //realmEntity.AllProperties[templateProperty.Options.Name] = templateProperty;
 
-                var prop = (TemplatedRealmProperty<TVal>)templateProperty;
+                var prop = (TemplatedRealmProperty<TPrim>)templateProperty;
                 group.Props.Add(prop);
             }
             var groupResult = result.ToFrozenDictionary(propsForGroup => propsForGroup.Key, propsForGroup =>
-                new TemplatedRealmPropertyGroup<TVal>(propsForGroup.Value.Name, propsForGroup.Value.PropKey) {
-                    Properties = [.. propsForGroup.Value.Props]
-                });
+                new TemplatedRealmPropertyGroup<TPrim>(propsForGroup.Value.GroupOptions, propsForGroup.Value.PropKey) { Properties = [.. propsForGroup.Value.Props] });
+                
             foreach(var item in groupResult)
-            {
                 realmEntity.AllProperties[item.Value.Name] = item.Value;
-            }
             return groupResult;
         }
     }

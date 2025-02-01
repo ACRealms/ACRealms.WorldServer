@@ -20,6 +20,12 @@ namespace ACRealms.Rulesets.Loader
                         var pobj = c.Value.ToObject<RealmPropertyJsonModel>();
                         realm.SetPropertyByName_Complex(name, pobj);
                     }
+                    else if (c.Value.Type == JTokenType.Array)
+                    {
+                        var pgobj = c.Value.ToObject<RealmPropertyJsonModel[]>();
+                        foreach (var pobj in pgobj)
+                            realm.SetPropertyByName_Complex(name, pobj);
+                    }
                     else
                     {
                         realm.SetPropertyByName(name, c.Value);
@@ -52,7 +58,7 @@ namespace ACRealms.Rulesets.Loader
             var dobj = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(fileContent);
             DBOld.Realm realm = new DBOld.Realm();
             realm.Name = dobj.name.Value;
-            realm.Type = (ushort)Enum.Parse(typeof(RealmType), dobj.type.Value);
+            realm.Type = Enum.Parse<RealmType>(dobj.type.Value);
             realm.PropertyCountRandomized = (ushort?)dobj.properties_random_count?.Value;
 
             if (dobj.parent != null)

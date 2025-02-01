@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 
 namespace ACRealms.Rulesets
 {
-    internal abstract record TemplatedRealmPropertyGroup(string name, int propKey)
+    internal abstract record TemplatedRealmPropertyGroup(RealmPropertyGroupOptions OptionsBase, int propKey)
         : IRealmPropertyGroup
     {
         internal RulesetCompilationContext CompilationContext { get; init; }
-        public string Name { get; init; } = name;
+        public string Name => OptionsBase.Name;
         public int PropertyKey { get; } = propKey;
-
-        public RealmPropertyGroupOptions Options { get; }
     }
 
     /// <summary>
@@ -22,31 +20,25 @@ namespace ACRealms.Rulesets
     /// There will be more than one item in this collection if multiple scopes are defined for a ruleset with the same property key
     /// TODO: Try to get more deduplicateddata in here instead of ActiveRealmPropertyGroup, to improve performance
     /// </summary>
-    internal record TemplatedRealmPropertyGroup<TVal> : TemplatedRealmPropertyGroup, IRealmPropertyGroup<TVal>
+    internal record TemplatedRealmPropertyGroup<TVal>(RealmPropertyGroupOptions<TVal> Options, int propKey) : TemplatedRealmPropertyGroup(Options, propKey), IRealmPropertyGroup<TVal>
         where TVal : IEquatable<TVal>
     {
-        IEnumerable<IAppliedRealmProperty<TVal>> IRealmPropertyGroup<TVal>.Properties { get; }
         public ImmutableList<TemplatedRealmProperty<TVal>> Properties { get; internal init; }
-        public new RealmPropertyGroupOptions<TVal> Options { get; private init; }
+        public RealmPropertyGroupOptions<TVal> Options => (RealmPropertyGroupOptions<TVal>)OptionsBase;
+
         IRealmPropertyGroup<TVal> IRealmPropertyGroup<TVal>.Parent { get; }
         public TemplatedRealmPropertyGroup<TVal> Parent { get; private init; }
 
-        public TemplatedRealmPropertyGroup(RulesetCompilationContext compilationContext, string name, int propKey, RealmPropertyGroupOptions<TVal> opts)
-            : base(name, propKey)
+        public TemplatedRealmPropertyGroup(RulesetCompilationContext compilationContext, RealmPropertyGroupOptions<TVal> Options, int propKey)
+            : this(Options, propKey)
         {
             CompilationContext = compilationContext;
-            Options = opts;
         }
 
         public TemplatedRealmPropertyGroup(RulesetCompilationContext compilationContext, TemplatedRealmPropertyGroup<TVal> cloneFrom, TemplatedRealmPropertyGroup<TVal> parent)
-            : this(compilationContext, cloneFrom.Name, cloneFrom.PropertyKey, cloneFrom.Options)
+            : this(compilationContext, cloneFrom.Options, cloneFrom.PropertyKey)
         {
-        }
-
-        internal TemplatedRealmPropertyGroup(string name, int propKey)
-            : base(name, propKey)
-        {
-
+            Parent = parent;
         }
     }
 }

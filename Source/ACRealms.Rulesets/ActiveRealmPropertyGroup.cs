@@ -11,15 +11,14 @@ namespace ACRealms.Rulesets
 {
     internal interface IRealmPropertyGroup
     {
-        RealmPropertyGroupOptions Options { get; }
+        RealmPropertyGroupOptions OptionsBase { get; }
     }
 
     internal interface IRealmPropertyGroup<TVal> : IRealmPropertyGroup
         where TVal : IEquatable<TVal>
     {
         int PropertyKey { get; }
-        new RealmPropertyGroupOptions<TVal> Options { get; }
-        IEnumerable<IAppliedRealmProperty<TVal>> Properties { get; }
+        RealmPropertyGroupOptions<TVal> Options { get; }
         IRealmPropertyGroup<TVal> Parent { get; }
     }
 
@@ -27,7 +26,7 @@ namespace ACRealms.Rulesets
     {
         protected RulesetCompilationContext Context { get; } = ctx;
         public int PropertyKey { get; } = propertyKey;
-        public virtual RealmPropertyGroupOptions Options { get; init; }
+        public RealmPropertyGroupOptions OptionsBase { get; init; }
     }
 
     /// <summary>
@@ -37,13 +36,19 @@ namespace ACRealms.Rulesets
     internal record ActiveRealmPropertyGroup<TVal>(RulesetCompilationContext ctx, int propertyKey) : ActiveRealmPropertyGroup(ctx, propertyKey), IRealmPropertyGroup<TVal>
         where TVal : IEquatable<TVal>
     {
-        IEnumerable<IAppliedRealmProperty<TVal>> IRealmPropertyGroup<TVal>.Properties { get; }
         IEnumerable<ActiveRealmProperty<TVal>> Properties { get; init; }
-        IEnumerable<ActiveRealmProperty<TVal>> EffectiveProperties => Properties.TakeWhile(p => !p.Options.Scope.GlobalScope).Take(1);
+
+        /// <summary>
+        /// Gets properties, excluding properties that are impossible to eval and can be safely pruned
+        /// </summary>
+        IEnumerable<ActiveRealmProperty<TVal>> EffectiveProperties =>
+            Properties.TakeWhile(p => !p.Options.Scope.GlobalScope)
+                      .Concat(Properties.SkipWhile(p => !p.Options.Scope.GlobalScope).Take(1));
+
         IRealmPropertyGroup<TVal> IRealmPropertyGroup<TVal>.Parent { get; }
         public ActiveRealmPropertyGroup<TVal> Parent { get; }
 
-        public override RealmPropertyGroupOptions<TVal> Options => (RealmPropertyGroupOptions<TVal>)base.Options;
+        public RealmPropertyGroupOptions<TVal> Options => (RealmPropertyGroupOptions<TVal>)OptionsBase;
         public bool ContainsAtLeast1GlobalScope => Properties.Any(x => x.Options.Scope.GlobalScope);
         public bool ContainsOnlyGlobalScope => Properties.First().Options.Scope.GlobalScope;
         protected void LogTrace(Func<string> message)
@@ -57,8 +62,16 @@ namespace ACRealms.Rulesets
         public ActiveRealmPropertyGroup(RulesetCompilationContext ctx, IRealmPropertyGroup<TVal> prop, IRealmPropertyGroup<TVal> parent = null)
             : this(ctx, prop.PropertyKey)
         {
-            Options = prop.Options;
-            Properties = prop.Properties.Select(p => new ActiveRealmProperty<TVal>(ctx)
+            OptionsBase = prop.Options;
+            IEnumerable<AppliedRealmProperty<TVal>> properties;
+            if (prop is ActiveRealmPropertyGroup<TVal> p)
+                properties = p.Properties;
+            else if (prop is TemplatedRealmPropertyGroup<TVal> p2)
+                properties = p2.Properties;
+            else
+                throw new NotImplementedException();
+
+            Properties = properties.Select(p => new ActiveRealmProperty<TVal>(ctx)
             {
                 Group = this,
                 Options = p.Options,

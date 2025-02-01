@@ -380,7 +380,7 @@ namespace ACE.Server.Managers
                     throw new InvalidDataException($"A circular dependency was detected when attempting to import realm {realmToCheck.Id}.");
 
                 realmsChecked.Add(realmToCheck.Id);
-                foreach (var realm in realmToCheck.Descendents.Values)
+                foreach (var realm in realmToCheck.Descendants.Values)
                     realmsToCheck.Enqueue(realm);
             }
 

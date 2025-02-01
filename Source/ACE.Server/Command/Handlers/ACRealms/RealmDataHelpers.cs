@@ -23,7 +23,7 @@ namespace ACE.Server.Command.Handlers
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static List<RealmToImport> ImportJsonRealmsFolder(ISession session, string json_folder)
+        internal static List<RealmToImport> ImportJsonRealmsFolder(ISession session, string json_folder)
         {
             var sep = Path.DirectorySeparatorChar;
             var json_folder_realm = $"{json_folder}{sep}realm{sep}";
@@ -39,7 +39,7 @@ namespace ACE.Server.Command.Handlers
             return list;
         }
 
-        public static bool VerifyAndMergeRealmIndex(ISession session, Dictionary<string, ushort> priorLockedIndex, List<RealmToImport> realmsToImport, out Dictionary<string, ushort> newLockedIndex)
+        internal static bool VerifyAndMergeRealmIndex(ISession session, Dictionary<string, ushort> priorLockedIndex, List<RealmToImport> realmsToImport, out Dictionary<string, ushort> newLockedIndex)
         {
             // As of v2.2 this method doesn't provide as much safety, as the realms are not stored in the database. 
             // var dbRealmsFull = DatabaseManager.World.GetAllRealms(cacheUsage: false);
@@ -166,7 +166,7 @@ namespace ACE.Server.Command.Handlers
             return changesDetected;
         }
 
-        public static void ImportJsonRealmsIndex(ISession session, string realmsIndexJsonFile, List<RealmToImport> realms)
+        internal static void ImportJsonRealmsIndex(ISession session, string realmsIndexJsonFile, List<RealmToImport> realms)
         {
             Dictionary<string, RealmToImport> realmsDict = null;
             try
@@ -239,7 +239,7 @@ namespace ACE.Server.Command.Handlers
                         continue;
 
                     var parentImportItem = realmsById[importItem.Realm.ParentRealmId.Value];
-                    parentImportItem.Realm.Descendents.Add(importItem.Realm.Id, importItem.Realm);
+                    parentImportItem.Realm.Descendants.Add(importItem.Realm.Id, importItem.Realm);
                 }
             }
             catch (Exception ex)
@@ -264,7 +264,7 @@ namespace ACE.Server.Command.Handlers
             }
         }
 
-        public static List<RealmToImport> ImportJsonRealmsFromSubFolder(ISession session, string json_folder)
+        internal static List<RealmToImport> ImportJsonRealmsFromSubFolder(ISession session, string json_folder)
         {
             var di = new DirectoryInfo(json_folder);
 
