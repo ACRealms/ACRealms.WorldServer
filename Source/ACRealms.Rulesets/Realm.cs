@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using ACRealms;
 using ACRealms.RealmProps;
 using ACRealms.RealmProps.Underlying;
+using ACRealms.Rulesets.Contexts;
 using ACRealms.Rulesets.Enums;
 using static ACRealms.Rulesets.RulesetCompilationContext;
 
@@ -224,11 +225,26 @@ namespace ACRealms.Rulesets
 
         private bool ScopeMatch(IReadOnlyCollection<(string, IRealmPropContext)> ctx)
         {
-            return false;
-            foreach (var (key, val) in ctx)
+            var scopeDefs = this.Options.Scope.Scopes;
+            return ctx.All(c => 
             {
+                var (contextParamKey, contextValBase) = c;
 
-            }
+                if (!scopeDefs.TryGetValue(contextParamKey, out var scopeDefBase))
+                    return true; // Scope wasn't narrowed on this entity
+
+                var contextVal = (IRealmPropContext<TVal>)contextValBase;
+                //throw new NotImplementedException();
+                return contextVal.Match(scopeDefBase);
+              /* var scope = scopeDefs[key];
+                foreach (var (propKey, criteria) in scope)
+                {
+                    c.
+                    Contexts.IRealmPropertyScope c = criteria;
+                }
+                return false;*/
+            });
+            throw new NotImplementedException();
         }
 
         
@@ -269,11 +285,11 @@ namespace ACRealms.Rulesets
         internal RealmPropertyPrototype<TVal> Prototype { get; private init; }
         internal TVal HardDefaultValue { get; private init; }
 
-        internal RealmPropertyGroupOptions(RealmPropertyPrototypeBase prototype, string rulesetName, string propKey, TVal hardDefaultValue)
+        internal RealmPropertyGroupOptions(RealmPropertyPrototype<TVal> prototype, string rulesetName, string propKey, TVal hardDefaultValue)
             : base(prototype, rulesetName, propKey)
         {
             HardDefaultValue = hardDefaultValue;
-            Prototype = (RealmPropertyPrototype<TVal>)prototype;
+            Prototype = prototype;
         }
     }
 

@@ -89,12 +89,15 @@ namespace ACE.Server.WorldObjects
                             (int)Biota.PropertiesAttribute[PropertyAttribute.Strength].InitLevel,
 
                             //old syntax
-                            ruleset.GetProperty(Props.Creature.Attributes.StrengthAdded),
+                            //ruleset.GetProperty(Props.Creature.Attributes.StrengthAdded),
                             //new syntax (note the file header has: "using Props = ACRealms.Props.Creature;")
-                            //  ruleset.ValueOf(Props.Attributes.StrengthAdded),
+                            Props.Creature.Attributes.StrengthAdded2(ruleset, this),
+                            //Props.Creature.Attributes.StrengthAdded
+
+                            //ruleset.ValueOf(Props.Creature.Attributes.StrengthAdded, 
 
                             // Or without the using alias: ruleset.ValueOf(Props.Creature.Attributes.StrengthAdded)
-                            
+
                             ruleset.GetProperty(Props.Creature.Attributes.StrengthMultiplier)
                         );
                 }

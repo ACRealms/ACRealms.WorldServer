@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace ACRealms.Roslyn.RealmProps
@@ -140,14 +141,37 @@ namespace ACRealms.Roslyn.RealmProps
 
                 [Obsolete("{{ObsoleteReason}}")]
             """ : "";
+
             string? rerollRestriction = RerollRestrictedTo != null ? $$"""
 
                 [RerollRestrictedTo(RealmPropertyRerollType.{{RerollRestrictedTo}})]
             """ : "";
+
+            StringBuilder sbCtxs = new();
+            int count = 0;
+            string newline = """
+
+            """;
+
+            foreach (var ctx in Contexts)
+            {
+                count++;
+                string scopedAttributeType = EntityToContextEntityMapping.GetScopedAttributeType(ctx.Entity);
+                var decl =
+                $$"""
+                    [ScopedWith<{{scopedAttributeType}}>("{{ctx.Name}}", required: {{(ctx.Required ? "true" : "false")}}, entity: "{{ctx.Entity}}", "{{ctx.Description}}")]{{(count == Contexts.Length ? newline : "")}}
+                """;
+                sbCtxs.Append(decl);
+            }
+            string contextDecls = Contexts.IsEmpty ? "" : $$"""
+
+            {{sbCtxs}}
+            """;
+
             return
             $$"""
                 [Description("{{Description}}")]{{obs}}{{rerollRestriction}}
-                {{CorePrimaryAttribute(aliasedPrimaryAttributeType, canonicalPrimaryAttributeType)}}
+                {{CorePrimaryAttribute(aliasedPrimaryAttributeType, canonicalPrimaryAttributeType)}}{{contextDecls}}
                 {{CoreKey}},
             """;
         }

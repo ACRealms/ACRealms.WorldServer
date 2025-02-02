@@ -28,6 +28,7 @@ using ACRealms;
 using ACRealms.Rulesets.Enums;
 using ACRealms.Rulesets.Loader;
 using ACRealms.Rulesets;
+using System.Runtime.CompilerServices;
 
 namespace ACE.Server.Managers
 {
@@ -64,8 +65,10 @@ namespace ACE.Server.Managers
         public static WorldRealm ServerDefaultRealm => DefaultRealmConfigured ?? DefaultRealmFallback;
         public static AppliedRuleset ServerDefaultRuleset => ServerDefaultRealm.StandardRules;
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void Initialize(bool liveEnvironment = true)
         {
+            global::ACRealms.RealmProps.RealmPropertyPrototypes.InitializeContextMappings(System.Reflection.Assembly.GetExecutingAssembly());
             SetupReservedRealms();
 
             //Import-realms

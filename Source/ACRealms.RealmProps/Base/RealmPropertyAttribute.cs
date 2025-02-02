@@ -1,3 +1,4 @@
+using ACRealms.RealmProps.Contexts;
 using ACRealms.Rulesets.Enums;
 using System;
 using System.Collections.Frozen;
@@ -20,7 +21,7 @@ namespace ACRealms.RealmProps
             where TAttribute : RealmPropertyPrimaryAttribute<TPrimitive>
         {
             Type enumType = typeof(E);
-            if(!typeof(int).IsAssignableFrom(Enum.GetUnderlyingType(enumType)))
+            if (!typeof(int).IsAssignableFrom(Enum.GetUnderlyingType(enumType)))
                 throw new ArgumentException($"The type {typeof(E).FullName} was expected to be assignable to a System.Int32, but was not.");
 
             string currentFieldName = string.Empty;
@@ -34,7 +35,7 @@ namespace ACRealms.RealmProps
 
             try
             {
-                var primaryAttributeConstraint = enumType.GetCustomAttribute<RequiresPrimaryAttributeAttribute<TPrimitive>>(false)!;
+                var primaryAttributeConstraint = enumType.GetCustomAttribute<Prototypes.RequiresPrimaryAttributeAttribute<TPrimitive>>(false)!;
 
                 var protoMap = enumType.GetEnumNames().Where(e => getRaw(e) != 0).Select(n =>
                 {
@@ -57,7 +58,17 @@ namespace ACRealms.RealmProps
                     if (secondaryAttributesRaw.Length > 0)
                         secondaryAttributes = secondaryAttributesRaw.ToDictionary(att => att.GetType(), att => att).ToFrozenDictionary();
 
-                    var proto = (TProto?)Activator.CreateInstance(typeof(TProto), BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.CreateInstance, null, [value, attribute, secondaryAttributes, attribute.DefaultValue], System.Globalization.CultureInfo.InvariantCulture, null);
+                    var scopedWithAttributes = member.GetCustomAttributes<ScopedWithAttribute>(true);
+
+                    // We use reflection here to force explicit constructor usage, though there's possibly a better way to do this.
+                    var proto = (TProto?)Activator.CreateInstance(
+                        typeof(TProto),
+                        BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.CreateInstance,
+                        binder: null,
+                        args: [currentFieldName, value, attribute, secondaryAttributes, attribute.DefaultValue, scopedWithAttributes],
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        activationAttributes: null
+                    );
 
                     return (value, proto);
                 }).ToFrozenDictionary((pair) => pair.value, (pair) => pair.proto);
@@ -77,25 +88,22 @@ namespace ACRealms.RealmProps
         }
     }
 
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    internal abstract class RealmPropertyPrimaryAttributeBase : Attribute
-    {
-        public string? DefaultFromServerProperty { get; }
 
-        public RealmPropertyPrimaryAttributeBase(string? defaultFromServerProperty)
-        {
-            DefaultFromServerProperty = defaultFromServerProperty;
-        }
+
+    internal interface IRealmPropertyPrimaryAttribute
+    {
+        string? DefaultFromServerProperty { get; }
     }
 
-    internal class RealmPropertyPrimaryAttribute<TPrimitive> : RealmPropertyPrimaryAttributeBase
+    internal class RealmPropertyPrimaryAttribute<TPrimitive> : Prototypes.PropertyPrimaryAttribute<TPrimitive>, IRealmPropertyPrimaryAttribute
          where TPrimitive : notnull, IEquatable<TPrimitive>
     {
+        public string? DefaultFromServerProperty { get; }
         public TPrimitive DefaultValue { get; }
 
         public RealmPropertyPrimaryAttribute(string? defaultFromServerProperty, TPrimitive defaultValue)
-            : base(defaultFromServerProperty)
         {
+            DefaultFromServerProperty = defaultFromServerProperty;
             DefaultValue = defaultValue;
         }
 
@@ -130,7 +138,7 @@ namespace ACRealms.RealmProps
         // 1. Fast conversion with Unsafe.As requires both types to be the same underlying size in bytes (32 bits for the default enum type)
         // 2. Compatibility with the underlying RealmPropertyInt requires a range that doesn't exceed RealmPropertyInt's range (which is that of a signed int32)
          where TEnum : struct, System.Enum
-        
+
     {
         private static readonly Dictionary<Type, (int min, int max)> EnumMinMaxCache = [];
 
@@ -159,24 +167,9 @@ namespace ACRealms.RealmProps
         }
     }
 
-    [AttributeUsage(AttributeTargets.Enum, AllowMultiple = false, Inherited = false)]
-    internal abstract class RequiresPrimaryAttributeAttribute(Type requiredAttributeType) : Attribute
-    {
-        public Type RequiredAttributeType { get; } = requiredAttributeType;
-    }
 
-    internal abstract class RequiresPrimaryAttributeAttribute<TPrimitive>(Type requiredAttributeType)
-        : RequiresPrimaryAttributeAttribute(requiredAttributeType)
-        where TPrimitive : IEquatable<TPrimitive> { }
 
-    internal class RequiresPrimaryAttributeAttribute<TAttribute, TPrimitive>
-        : RequiresPrimaryAttributeAttribute<TPrimitive>
-        where TAttribute : RealmPropertyPrimaryAttribute<TPrimitive>
-        where TPrimitive : IEquatable<TPrimitive>
-    {
-        public RequiresPrimaryAttributeAttribute()
-            : base(typeof(TAttribute)) { }
-    }
+
 
     [AttributeUsage(AttributeTargets.Field)]
     internal abstract class RealmPropertySecondaryAttributeBase : Attribute
@@ -219,5 +212,96 @@ namespace ACRealms.RealmProps
         public RealmPropertyRerollType ConstrainRerollType(RealmPropertyRerollType source) => IsAllowedRerollType(source, RerollRestriction) ? source : RerollRestriction;
         public static FrozenSet<RealmPropertyRerollType> GetAllowedRerollTypes(RealmPropertyRerollType? restrictionType) => restrictionType.HasValue ? RestrictionMap[restrictionType.Value] : All;
         public bool IsAllowedRerollType(RealmPropertyRerollType? restrictionType, RealmPropertyRerollType rerollType) => GetAllowedRerollTypes(restrictionType).Contains(rerollType);
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    internal abstract class ScopedWithAttribute : Attribute, IScopedWithAttribute
+    {
+        public string Name { get; }
+        public bool Required { get; }
+        public string Entity { get; }
+        public string Description { get; }
+
+        public ScopedWithAttribute(string name, bool required, string entity, string description)
+        {
+            Name = name;
+            Required = required;
+            Entity = entity;
+            Description = description;
+        }
+    }
+
+    internal interface IScopedWithAttribute
+    {
+        string Name { get; }
+        bool Required { get; }
+        string Entity { get; }
+        string Description { get; }
+    }
+    internal interface IScopedWithAttribute<out T> : IScopedWithAttribute
+        where T : IContextEntity
+    {
+        Lazy<Type> EntityType { get; }
+
+        //static virtual bool RespondsTo(string key) => T.RespondsTo(key);
+
+
+        /// <summary>
+        /// Warning, this method is somewhat slow, using reflection, and should only be called during ruleset warming (RealmConverter)
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        bool RespondsTo(string key);
+        Type TypeOfProperty(string key);
+        //virtual Type TypeOfProperty(string key) => T.TypeOfProperty(key);
+    }
+
+    internal sealed class ScopedWithAttribute<T> : ScopedWithAttribute, IScopedWithAttribute<T> where T : IContextEntity
+    {
+        public Lazy<Type> EntityType { get; } = new Lazy<Type>(() => typeof(T), true);
+        internal ScopedWithAttribute(string name, bool required, string entity, string description)
+            : base(name, required, entity, description)
+        {
+        }
+
+        public bool RespondsTo(string key)
+        {
+            try
+            {
+                return T.RespondsTo(key);
+            }
+            catch (NotImplementedException)
+            {
+                if (EntityType == null)
+                    throw;
+
+                var entityType = EntityType.Value;
+                if (!RealmPropertyPrototypes.ContextMappings.TryGetValue(entityType, out var secondType))
+                    throw;
+
+                var method = secondType.GetMethod("RespondsTo", BindingFlags.Static | BindingFlags.Public, [typeof(string)]);
+                return (bool)method!.Invoke(null, [key])!;
+            }
+        }
+
+        public Type TypeOfProperty(string key)
+        {
+            try
+            {
+                return T.TypeOfProperty(key);
+            }
+            catch (NotImplementedException)
+            {
+                if (EntityType == null)
+                    throw;
+
+                var entityType = EntityType.Value;
+                if (!RealmPropertyPrototypes.ContextMappings.TryGetValue(entityType, out var secondType))
+                    throw;
+
+                var method = secondType.GetMethod("TypeOfProperty", BindingFlags.Static | BindingFlags.Public, [typeof(string)]);
+                return (Type)method!.Invoke(null, [key])!;
+            }
+        }
     }
 }

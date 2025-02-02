@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using ACE.Entity.ACRealms;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 
@@ -11,7 +11,8 @@ namespace ACE.Entity.Models
     /// We do this to conserve memory in ACE.Server
     /// Be sure to check for null first.
     /// </summary>
-    public interface IWeenie
+    public interface IWeenie<T> : global::ACRealms.Prototypes.IEntityPropertyResolver
+        where T : IWeenie<T>
     {
         uint WeenieClassId { get; set; }
         WeenieType WeenieType { get; set; }
@@ -47,5 +48,7 @@ namespace ACE.Entity.Models
         // Properties for books
         PropertiesBook PropertiesBook { get; set; }
         IList<PropertiesBookPageData> PropertiesBookPageData { get; set; }
+
+        static sealed BiotaPropertyPrototype Prototype(string key) => BiotaPropertyPrototypes.GetPrototype(key);
     }
 }

@@ -1,7 +1,12 @@
+using System.Collections;
 using System.Collections.Frozen;
+using System.Collections.Immutable;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using ACRealms.RealmProps;
+using ACRealms.RealmProps.Contexts;
 using ACRealms.RealmProps.Underlying;
+using ACRealms.Rulesets.Contexts;
 using JObject = Newtonsoft.Json.Linq.JObject;
 
 namespace ACRealms.Rulesets.DBOld
@@ -22,7 +27,7 @@ namespace ACRealms.Rulesets.DBOld
             where TVal : IEquatable<TVal>
             where TProp : Enum
         {
-            var proto = RealmPropertyPrototypes.GetPrototypeHandle(prop);
+            var proto = RealmPropertyPrototypes.GetPrototypeHandle<TProp, TVal>(prop);
             var type = Type;
             var @enum = Unsafe.As<int, TProp>(ref type);
             var propName = @enum.ToString();
@@ -45,36 +50,127 @@ namespace ACRealms.Rulesets.DBOld
 
         internal abstract TemplatedRealmProperty<TPrim> ConvertRealmProperty(RealmPropertyGroupOptions<TPrim> group, RealmPropertyScopeOptions scope);
 
+        static readonly IReadOnlyDictionary<string, Type> PredicateMap = new Func<FrozenDictionary<string, Type>>(() =>
+        {
+            var dict = new Dictionary<string, Type>()
+            {
+                { "Equal", typeof(Contexts.Predicates.Equal<>) }
+            };
+            return dict.ToFrozenDictionary();
+        })();
+
         internal override RealmPropertyScopeOptions ConvertScopeOptions()
         {
             if (RawScope == null || RawScope.Count == 0)
                 return RealmPropertyScopeOptions.Empty;
-            foreach (var kvp in RawScope)
+
+            var prototype = RealmPropertyPrototypes.GetPrototypeHandle<TEnum, TPrim>(EnumValue);
+            var contextsOut = new Dictionary<string, FrozenDictionary<string, IRealmPropertyScope>>();
+
+            foreach (var contextKvp in RawScope)
             {
-                var scopeParam = kvp.Key;
-                var scopeValue = kvp.Value;
+                var scopeParam = contextKvp.Key;
+                var scopePropsOut = new Dictionary<string, IRealmPropertyScope>();
+
+
+                if (!prototype.Contexts.ContainsKey(scopeParam))
+                    throw new InvalidDataException($"Scope '{scopeParam}' is not allowed for property '{prototype.CanonicalName}'");
+                IScopedWithAttribute<IContextEntity> context = (IScopedWithAttribute<IContextEntity>)prototype.Contexts[scopeParam];
+
+                var scopeValue = contextKvp.Value;
                 if (scopeValue is JObject)
                 {
                     var scopeObjectDefinition = ((JObject)scopeValue).ToObject<Dictionary<string, object>>();
+
+                    //Attempt to force predicate data into span for cheaper rule evaluation
                     foreach (var scopeEntityPropKvp in scopeObjectDefinition)
                     {
                         var scopeEntityPropKey = scopeEntityPropKvp.Key;
+
+
+                        if (!context.RespondsTo(scopeEntityPropKey))
+                            throw new NotImplementedException($"Invalid context! A key ({scopeEntityPropKey}) was attempted to be referenced in a scope ({scopeParam}) referencing entity type {context.Entity}");
+                        var ctxPropType = context.TypeOfProperty(scopeEntityPropKey);
+
+                        var isNullable = ctxPropType.IsGenericType && ctxPropType.GetGenericTypeDefinition() == typeof(Nullable<>);
+                        Type valType = isNullable ? ctxPropType.GenericTypeArguments[0] : ctxPropType;
+
                         var scopeEntityPropMatcherCriteria = scopeEntityPropKvp.Value;
+                        var dictType = typeof(Dictionary<,>).MakeGenericType(typeof(string), valType);
+
                         if (scopeEntityPropMatcherCriteria is JObject)
                         {
-                            var criteria = ((JObject)scopeEntityPropMatcherCriteria).ToObject<Dictionary<string, object>>();
-                            var handle = RealmPropertyPrototypes.GetPrototypeHandle(EnumValue);
-                            
-                            // Get EnumType of this, load prototype to get context entity info, then assign criteria
+                            var criteriaBase = (System.Collections.IDictionary)((JObject)scopeEntityPropMatcherCriteria).ToObject(dictType);
+                            var predicatesBase = criteriaBase.Keys.Cast<string>().Select(predicateTypeKey =>
+                            {
+                                if (!PredicateMap.TryGetValue(predicateTypeKey, out var predicateGenericType))
+                                {
+                                    throw new NotImplementedException(
+                                        $"Missing predicate type for scoped property {prototype.CanonicalName}, scope {scopeParam}, criterion {predicateTypeKey}. Check PredicateMap for missing entries.");
+                                }
+                                var predicateArg = criteriaBase[predicateTypeKey];
+
+                                var predicateType = predicateGenericType.MakeGenericType(valType);
+                                var predicate = (Contexts.IPredicate)Activator.CreateInstance(
+                                    predicateType,
+                                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.CreateInstance,
+                                    binder: null,
+                                    args: [predicateArg],
+                                    System.Globalization.CultureInfo.InvariantCulture,
+                                    activationAttributes: null
+                                );
+                                return predicate;
+                            });
+                            var predicateMostDerivedCommonType = typeof(IPredicate<>).MakeGenericType(valType);
+                            var castMethod = typeof(Enumerable).GetMethod("Cast", BindingFlags.Static | BindingFlags.Public);
+                            var castMethodUsable = castMethod.MakeGenericMethod(predicateMostDerivedCommonType);
+                            var predicates = castMethodUsable.Invoke(null, [predicatesBase]);
+
+                            var predicateInterface = typeof(IPredicate<>).MakeGenericType(valType);
+                            var enumerableInterface = typeof(IEnumerable<>).MakeGenericType(predicateInterface);
+                            //predicates.ToImmutableArray().AsSpan
+                            var aryConvs = typeof(ImmutableArray)
+                                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                                .Where(m =>
+                                    m.Name == "ToImmutableArray" &&
+                                    m.IsGenericMethod &&
+                                    m.ContainsGenericParameters &&
+                                    m.GetGenericArguments().FirstOrDefault()?.Name == "TSource" &&
+                                    m.GetParameters().FirstOrDefault()?.Name == "items"
+                                );
+                            var aryConv = aryConvs.Single();
+
+                            var aryConvUsable = aryConv.MakeGenericMethod([predicateInterface]);
+                            var immutableArray = (IList)aryConvUsable.Invoke(null, [predicates]);
+
+                            var scopeOpsType = typeof(Contexts.RealmPropertyScopeOps<>).MakeGenericType(valType);
+
+                            var ary = (ImmutableArray<IPredicate<int>>)immutableArray;
+                            new Contexts.RealmPropertyScopeOps<int>(ary);
+
+                            var createMethod = scopeOpsType.GetMethod("Create", BindingFlags.Static | BindingFlags.NonPublic);
+                            var scopeOps = createMethod.Invoke(null, [immutableArray]);
+
+                            var scopeOutType = typeof(RealmPropertyEntityPropScope<,>).MakeGenericType(scopeOpsType, valType);
+                            var scopeOut = (IRealmPropertyScope)Activator.CreateInstance(
+                                scopeOutType,
+                                BindingFlags.Public | BindingFlags.Instance | BindingFlags.CreateInstance,
+                                binder: null,
+                                args: [scopeEntityPropKey, scopeOps],
+                                System.Globalization.CultureInfo.InvariantCulture,
+                                activationAttributes: null
+                            );
+
+                            scopePropsOut.Add(scopeEntityPropKey, scopeOut);
                         }
                     }
-                    var a = 1;
+                    contextsOut.Add(scopeParam, scopePropsOut.ToFrozenDictionary());
                 }
                 else
                     throw new NotImplementedException();
-                var b = 1;
             }
-            throw new NotImplementedException();
+            var outp = contextsOut.ToFrozenDictionary();
+            return new RealmPropertyScopeOptions() { Scopes = outp };
         }
     }
 

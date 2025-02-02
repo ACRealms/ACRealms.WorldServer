@@ -11,7 +11,7 @@ namespace ACE.Entity.Models
     /// We do this to conserve memory in ACE.Server
     /// Be sure to check for null first.
     /// </summary>
-    public class Biota : IWeenie
+    public class Biota : IWeenie<Biota>
     {
         public ulong Id { get; set; }
         public uint WeenieClassId { get; set; }
@@ -53,5 +53,8 @@ namespace ACE.Entity.Models
         public IDictionary<ulong /* Character ID */, PropertiesAllegiance> PropertiesAllegiance { get; set; }
         public ICollection<PropertiesEnchantmentRegistry> PropertiesEnchantmentRegistry { get; set; }
         public IDictionary<ulong /* Player GUID */, bool /* Storage */> HousePermissions { get; set; }
+
+        public static bool RespondsTo(string key) => IWeenie<Biota>.Prototype(key) != null;
+        public static Type TypeOfProperty(string key) => IWeenie<Biota>.Prototype(key)?.ValueType;
     }
 }

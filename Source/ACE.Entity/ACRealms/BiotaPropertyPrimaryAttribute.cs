@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACRealms.Rulesets.Contexts
+namespace ACRealms.Prototypes
 {
-    internal class CreatureScope : IRealmPropertyScope
+    internal class BiotaPropertyPrimaryAttribute<TPrimitive> : PropertyPrimaryAttribute<TPrimitive>
     {
     }
 }

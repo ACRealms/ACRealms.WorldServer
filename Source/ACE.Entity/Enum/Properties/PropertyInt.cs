@@ -4,6 +4,7 @@ using System.Globalization;
 
 namespace ACE.Entity.Enum.Properties
 {
+    [global::ACRealms.Prototypes.RequiresPrimaryAttribute<global::ACRealms.Prototypes.BiotaPropertyPrimaryAttribute<int>, int>]
     public enum PropertyInt : ushort
     {
         // properties marked as ServerOnly are properties we never saw in PCAPs, from here:

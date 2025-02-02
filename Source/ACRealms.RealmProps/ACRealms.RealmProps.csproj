@@ -69,15 +69,6 @@
     <None Remove="PropDefs\json-schema\**" />
   </ItemGroup>
 
-  <ItemGroup>
-   <!--<PackageReference Include="System.Collections.Immutable" Version="9.0.0" />-->
-   <!--<PackageReference Include="System.IO.Pipelines" Version="9.0.0" />-->
-   <!--<PackageReference Include="System.Text.Json" Version="9.0.0" />    -->
-   <!--<PackageReference Include="NodaTime" Version="3.2.0" />
-   <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" />-->
-   <!--<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />-->
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
@@ -106,6 +97,10 @@
     <DirsToClean Include="$(IntermediateOutputPath)generated" Condition="'$(IntermediateOutputPath)' != ''" />
     <DirsToClean Include="$(GeneratedJsonOutputDir)realm-properties" Condition="'$(GeneratedJsonOutputDir)' != ''" />
     <DirsToClean Include="$(OutputPath)" Condition="'$(OutputPath)' != ''" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ACE.Common\ACE.Common.csproj" />
   </ItemGroup>
   <Target Name="RemoveGeneratedFilesOnClean" AfterTargets="CoreClean">
     <RemoveDir Directories="@(DirsToClean)" />  
