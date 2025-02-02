@@ -362,10 +362,6 @@
       <None Include="..\..\Database\Custom\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Custom\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Realms\Constants\" />
-  </ItemGroup>
-
     <!--
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="" Condition="'$(OS)' == 'Windows_NT'" />
