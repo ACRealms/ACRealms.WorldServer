@@ -4,12 +4,11 @@
   "description": "Properties affecting a creature's attributes (Strength, Endurance, Coordination, Quickness, Focus, Self)",
   "groups": [
     {
-      "type": "integer",
-      "key_suffix": "Added",
-      "default": 0,
-      "min_value": -10000, "max_value": 10000,
-      "description_format": "All creatures will have this value added to their {short_key} attribute",
       "properties": [ "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self" ],
+      "key_suffix": "Added",
+      "description_format": "All creatures will have this value added to their {short_key} attribute",
+      "type": "integer",
+      "default": 0, "min_value": -10000, "max_value": 10000,
       "contexts": [ {
           "name": "SpawnedCreature",
           "description": "The creature being spawned",
@@ -17,16 +16,16 @@
         } ]
     },
     {
-      "type": "float",
+      "properties": [ "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self" ],
       "key_suffix": "Multiplier",
       "description_format": "Creature {short_key} will be multiplied by this amount",
+      "type": "float",
       "default": 1, "min_value": 0.01, "max_value": 100,
-      "contexts": {
-        "SpawnedCreature": "WorldObject"
-      },
-      "properties": [
-        "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self"
-      ]
+      "contexts": [ {
+          "name": "SpawnedCreature",
+          "description": "The creature being spawned",
+          "entity": "WorldObject"
+        } ]
     }
   ]
 }
