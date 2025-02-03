@@ -50,6 +50,20 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\ACE.Entity\Enum\Properties\**\PropertyString.cs">
+      <Link>ACE.Entity\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\ACE.Entity\Enum\Properties\**\PropertyBool.cs">
+      <Link>ACE.Entity\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\ACE.Entity\Enum\Properties\**\PropertyInt64.cs">
+      <Link>ACE.Entity\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\ACE.Entity\Enum\Properties\**\PropertyFloat.cs">
+      <Link>ACE.Entity\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <PrivateAssets>all</PrivateAssets>
       <!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->

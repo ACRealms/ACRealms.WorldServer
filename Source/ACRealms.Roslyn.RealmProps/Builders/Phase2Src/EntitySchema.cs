@@ -10,7 +10,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
         {
             @int,
             @long,
-            @double,
+            @float,
             @string,
             @bool
         }
@@ -18,6 +18,10 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
         internal static readonly FrozenDictionary<Primitive, Type> PrimitiveTypeMap = new Dictionary<Primitive, Type>()
         {
             { Primitive.@int, typeof(PropertyInt) },
+            { Primitive.@long, typeof(PropertyInt64) },
+            { Primitive.@float, typeof(PropertyFloat) },
+            { Primitive.@bool, typeof(PropertyBool) },
+            { Primitive.@string, typeof(PropertyString) },
         }.ToFrozenDictionary();
 
         internal static string GenerateEntitySchemaSourceCode(string entityType)
@@ -59,7 +63,11 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
                   "type": "object",
                   "definitions": {
                     "base": { "$ref": "../../scope-base.json#" },
-                    "int": { "$anchor": "int", "$ref": "../../scope-base.json#/definitions/paramsInt" }
+                    "int": { "$anchor": "int", "$ref": "../../scope-base.json#/definitions/paramsInt" },
+                    "long": { "$anchor": "long", "$ref": "../../scope-base.json#/definitions/paramsLong" },
+                    "float": { "$anchor": "float", "$ref": "../../scope-base.json#/definitions/paramsFloat" },
+                    "bool": { "$anchor": "bool", "$ref": "../../scope-base.json#/definitions/paramsBool" },
+                    "string": { "$anchor": "string", "$ref": "../../scope-base.json#/definitions/paramsString" }
                   },
                   "anyOf": [
                   {{schemas}}
