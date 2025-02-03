@@ -6,9 +6,6 @@ using System.Collections.Immutable;
 
 namespace ACE.Entity.Enum.Properties
 {
-    public class CloneAttribute : Attribute { }
-
-
     /// <summary>
     /// Static selection of client enums that are [Ephemeral]<para />
     /// These are properties that aren't saved to the shard.

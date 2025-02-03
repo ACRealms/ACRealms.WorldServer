@@ -14,6 +14,7 @@ namespace ACE.Entity.Enum.Properties
         Self         = 6
     }
 
+    /*
     public static class PropertyAttributeExtensions
     {
         public static string GetDescription(this PropertyAttribute prop)
@@ -21,5 +22,5 @@ namespace ACE.Entity.Enum.Properties
             var description = prop.GetAttributeOfType<DescriptionAttribute>();
             return description?.Description ?? prop.ToString();
         }
-    }
+    }*/
 }
