@@ -14,7 +14,7 @@ namespace ACRealms.Tests.Helpers
         /// Gets a new landblock instance every time. 
         /// </summary>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static ACE.Server.Entity.Landblock LoadLandblock(ACE.Server.Realms.WorldRealm realm, ushort landblockId)
+        internal static ACE.Server.Entity.Landblock LoadLandblock(ACE.Server.Realms.WorldRealm realm, ushort landblockId)
         {
             var lbid = new ACE.Entity.LandblockId(landblockId);
             uint iid;

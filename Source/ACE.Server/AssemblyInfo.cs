@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("ACRealms.Tests")]
 [assembly:InternalsVisibleTo("ACRealms.Tests.Benchmarks")]
 
 public static class AssemblyInfo
