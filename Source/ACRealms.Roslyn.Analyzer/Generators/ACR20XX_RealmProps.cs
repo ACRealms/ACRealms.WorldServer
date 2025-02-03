@@ -54,7 +54,7 @@ namespace ACRealms.Roslyn.Analyzer.Generators
         {
             { DescriptorType.MissingSchema, new IntermediateDescriptor() { MessageFormat = "Missing JSON Schema file {0}" } },
             { DescriptorType.FailedToParse, new IntermediateDescriptor() { MessageFormat = "Failed to parse JSON for file {0}" } },
-            { DescriptorType.JSONValidation, new IntermediateDescriptor() { MessageFormat = "Validation Error: {0} (Opening in vscode may give more accurate errors)" } },
+            { DescriptorType.JSONValidation, new IntermediateDescriptor() { MessageFormat = "Validation Error: {0} (Opening in vscode may give more accurate errors - If no errors, and schemas were updated recently, see ACRealms.Roslyn.RealmProps\\RealmPropModels.cs for regeneration instructions)" } },
             { DescriptorType.Deserialization, new IntermediateDescriptor() { MessageFormat = "(Likely ACRealms bug, please report) - Failed to deserialize valid JSON: {0}" } }
         }.ToFrozenDictionary(kvp => kvp.Key, kvp => kvp.Value.ToDescriptor(kvp.Key));
 
