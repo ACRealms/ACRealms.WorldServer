@@ -13,7 +13,7 @@
       "contexts": [ {
           "name": "SpawnedCreature",
           "description": "The creature being spawned",
-          "entity": "Creature"
+          "entity": "WorldObject"
         } ]
     },
     {
@@ -22,7 +22,7 @@
       "description_format": "Creature {short_key} will be multiplied by this amount",
       "default": 1, "min_value": 0.01, "max_value": 100,
       "contexts": {
-        "SpawnedCreature": "Creature"
+        "SpawnedCreature": "WorldObject"
       },
       "properties": [
         "Strength", "Endurance", "Coordination", "Quickness", "Focus", "Self"

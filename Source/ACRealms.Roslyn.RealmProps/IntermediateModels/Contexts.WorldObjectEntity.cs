@@ -30,8 +30,13 @@ public readonly partial struct Contexts
     /// <summary>
     /// Generated from JSON Schema.
     /// </summary>
-    [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<EntityVal>))]
-    public readonly partial struct EntityVal
+    /// <remarks>
+    /// <para>
+    /// Any WorldObject
+    /// </para>
+    /// </remarks>
+    [System.Text.Json.Serialization.JsonConverter(typeof(Corvus.Json.Internal.JsonValueConverter<WorldObjectEntity>))]
+    public readonly partial struct WorldObjectEntity
 
     {
         private readonly Backing backing;
@@ -39,20 +44,10 @@ public readonly partial struct Contexts
         private readonly string stringBacking;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EntityVal"/> struct.
-        /// </summary>
-        public EntityVal()
-        {
-            this.jsonElementBacking = default;
-            this.backing = Backing.JsonElement;
-            this.stringBacking = string.Empty;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EntityVal"/> struct.
+        /// Initializes a new instance of the <see cref="WorldObjectEntity"/> struct.
         /// </summary>
         /// <param name="value">The value from which to construct the instance.</param>
-        public EntityVal(in JsonElement value)
+        public WorldObjectEntity(in JsonElement value)
         {
             this.jsonElementBacking = value;
             this.backing = Backing.JsonElement;
@@ -60,10 +55,10 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EntityVal"/> struct.
+        /// Initializes a new instance of the <see cref="WorldObjectEntity"/> struct.
         /// </summary>
         /// <param name="value">The value from which to construct the instance.</param>
-        public EntityVal(string value)
+        public WorldObjectEntity(string value)
         {
             this.backing = Backing.String;
             this.jsonElementBacking = default;
@@ -73,22 +68,22 @@ public readonly partial struct Contexts
         /// <summary>
         /// Gets the schema location from which this type was generated.
         /// </summary>
-        public static string SchemaLocation { get; } = "contexts.json#/definitions/entityVal";
+        public static string SchemaLocation { get; } = "contexts.json#/definitions/entities/definitions/WorldObject";
 
         /// <summary>
         /// Gets a Null instance.
         /// </summary>
-        public static EntityVal Null { get; } = new(JsonValueHelpers.NullElement);
+        public static WorldObjectEntity Null { get; } = new(JsonValueHelpers.NullElement);
 
         /// <summary>
         /// Gets an Undefined instance.
         /// </summary>
-        public static EntityVal Undefined { get; }
+        public static WorldObjectEntity Undefined { get; }
 
         /// <summary>
         /// Gets the default instance.
         /// </summary>
-        public static EntityVal DefaultInstance { get; }
+        public static WorldObjectEntity DefaultInstance { get; }
 
         /// <inheritdoc/>
         public JsonAny AsAny
@@ -213,28 +208,6 @@ public readonly partial struct Contexts
             }
         }
 
-        /// <summary>
-        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity" />.
-        /// </summary>
-        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity AsWorldObjectEntity
-        {
-            get
-            {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity>();
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity" />.
-        /// </summary>
-        public bool IsWorldObjectEntity
-        {
-            get
-            {
-                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity>().IsValid();
-            }
-        }
-
         /// <inheritdoc/>
         public bool HasJsonElementBacking
         {
@@ -276,36 +249,18 @@ public readonly partial struct Contexts
         /// Conversion from JsonAny.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator EntityVal(JsonAny value)
+        public static implicit operator WorldObjectEntity(JsonAny value)
         {
-            return value.As<EntityVal>();
+            return value.As<WorldObjectEntity>();
         }
 
         /// <summary>
         /// Conversion to JsonAny.
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
-        public static implicit operator JsonAny(EntityVal value)
+        public static implicit operator JsonAny(WorldObjectEntity value)
         {
             return value.AsAny;
-        }
-
-        /// <summary>
-        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity"/>.
-        /// </summary>
-        /// <param name="value">The value from which to convert.</param>
-        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity(EntityVal value)
-        {
-            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity>();
-        }
-
-        /// <summary>
-        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity"/>.
-        /// </summary>
-        /// <param name="value">The value from which to convert.</param>
-        public static implicit operator EntityVal(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity value)
-        {
-            return value.As<EntityVal>();
         }
 
         /// <summary>
@@ -316,7 +271,7 @@ public readonly partial struct Contexts
         /// <returns>
         /// <c>True</c> if the values are equal.
         /// </returns>
-        public static bool operator ==(in EntityVal left, in EntityVal right)
+        public static bool operator ==(in WorldObjectEntity left, in WorldObjectEntity right)
         {
             return left.Equals(right);
         }
@@ -329,7 +284,7 @@ public readonly partial struct Contexts
         /// <returns>
         /// <c>True</c> if the values are not equal.
         /// </returns>
-        public static bool operator !=(in EntityVal left, in EntityVal right)
+        public static bool operator !=(in WorldObjectEntity left, in WorldObjectEntity right)
         {
             return !left.Equals(right);
         }
@@ -343,7 +298,7 @@ public readonly partial struct Contexts
         /// value cannot be constructed from the given instance (e.g. because they have an incompatible .NET backing type).
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static EntityVal FromJson(in JsonElement value)
+        public static WorldObjectEntity FromJson(in JsonElement value)
         {
             return new(value);
         }
@@ -354,7 +309,7 @@ public readonly partial struct Contexts
         /// <param name="value">The <see cref="JsonAny"/> value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the <see cref="JsonAny"/> value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static EntityVal FromAny(in JsonAny value)
+        public static WorldObjectEntity FromAny(in JsonAny value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -377,7 +332,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the provided value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static EntityVal IJsonValue<EntityVal>.FromBoolean<TValue>(in TValue value)
+        static WorldObjectEntity IJsonValue<WorldObjectEntity>.FromBoolean<TValue>(in TValue value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -395,7 +350,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the provided value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static EntityVal FromString<TValue>(in TValue value)
+        public static WorldObjectEntity FromString<TValue>(in TValue value)
             where TValue : struct, IJsonString<TValue>
         {
             if (value.HasJsonElementBacking)
@@ -419,7 +374,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the provided value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static EntityVal IJsonValue<EntityVal>.FromNumber<TValue>(in TValue value)
+        static WorldObjectEntity IJsonValue<WorldObjectEntity>.FromNumber<TValue>(in TValue value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -438,7 +393,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the provided value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static EntityVal IJsonValue<EntityVal>.FromObject<TValue>(in TValue value)
+        static WorldObjectEntity IJsonValue<WorldObjectEntity>.FromObject<TValue>(in TValue value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -457,7 +412,7 @@ public readonly partial struct Contexts
         /// <param name="value">The value from which to instantiate the instance.</param>
         /// <returns>An instance of this type, initialized from the provided value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static EntityVal IJsonValue<EntityVal>.FromArray<TValue>(in TValue value)
+        static WorldObjectEntity IJsonValue<WorldObjectEntity>.FromArray<TValue>(in TValue value)
         {
             if (value.HasJsonElementBacking)
             {
@@ -469,109 +424,109 @@ public readonly partial struct Contexts
 #endif
 
         /// <summary>
-        /// Parses the EntityVal.
+        /// Parses the WorldObjectEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
         /// <param name="options">The (optional) JsonDocumentOptions.</param>
-        public static EntityVal Parse(string source, JsonDocumentOptions options = default)
+        public static WorldObjectEntity Parse(string source, JsonDocumentOptions options = default)
         {
             using var jsonDocument = JsonDocument.Parse(source, options);
             return new(jsonDocument.RootElement.Clone());
         }
 
         /// <summary>
-        /// Parses the EntityVal.
+        /// Parses the WorldObjectEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
         /// <param name="options">The (optional) JsonDocumentOptions.</param>
-        public static EntityVal Parse(Stream source, JsonDocumentOptions options = default)
+        public static WorldObjectEntity Parse(Stream source, JsonDocumentOptions options = default)
         {
             using var jsonDocument = JsonDocument.Parse(source, options);
             return new(jsonDocument.RootElement.Clone());
         }
 
         /// <summary>
-        /// Parses the EntityVal.
+        /// Parses the WorldObjectEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
         /// <param name="options">The (optional) JsonDocumentOptions.</param>
-        public static EntityVal Parse(ReadOnlyMemory<byte> source, JsonDocumentOptions options = default)
+        public static WorldObjectEntity Parse(ReadOnlyMemory<byte> source, JsonDocumentOptions options = default)
         {
             using var jsonDocument = JsonDocument.Parse(source, options);
             return new(jsonDocument.RootElement.Clone());
         }
 
         /// <summary>
-        /// Parses the EntityVal.
+        /// Parses the WorldObjectEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
         /// <param name="options">The (optional) JsonDocumentOptions.</param>
-        public static EntityVal Parse(ReadOnlyMemory<char> source, JsonDocumentOptions options = default)
+        public static WorldObjectEntity Parse(ReadOnlyMemory<char> source, JsonDocumentOptions options = default)
         {
             using var jsonDocument = JsonDocument.Parse(source, options);
             return new(jsonDocument.RootElement.Clone());
         }
 
         /// <summary>
-        /// Parses the EntityVal.
+        /// Parses the WorldObjectEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
         /// <param name="options">The (optional) JsonDocumentOptions.</param>
-        public static EntityVal Parse(ReadOnlySequence<byte> source, JsonDocumentOptions options = default)
+        public static WorldObjectEntity Parse(ReadOnlySequence<byte> source, JsonDocumentOptions options = default)
         {
             using var jsonDocument = JsonDocument.Parse(source, options);
             return new(jsonDocument.RootElement.Clone());
         }
 
         /// <summary>
-        /// Parses the EntityVal.
+        /// Parses the WorldObjectEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
-        public static EntityVal ParseValue(string source)
+        public static WorldObjectEntity ParseValue(string source)
         {
 #if NET8_0_OR_GREATER
-            return IJsonValue<EntityVal>.ParseValue(source);
+            return IJsonValue<WorldObjectEntity>.ParseValue(source);
 #else
-            return JsonValueHelpers.ParseValue<EntityVal>(source.AsSpan());
+            return JsonValueHelpers.ParseValue<WorldObjectEntity>(source.AsSpan());
 #endif
         }
 
         /// <summary>
-        /// Parses the EntityVal.
+        /// Parses the WorldObjectEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
-        public static EntityVal ParseValue(ReadOnlySpan<char> source)
+        public static WorldObjectEntity ParseValue(ReadOnlySpan<char> source)
         {
 #if NET8_0_OR_GREATER
-            return IJsonValue<EntityVal>.ParseValue(source);
+            return IJsonValue<WorldObjectEntity>.ParseValue(source);
 #else
-            return JsonValueHelpers.ParseValue<EntityVal>(source);
+            return JsonValueHelpers.ParseValue<WorldObjectEntity>(source);
 #endif
         }
 
         /// <summary>
-        /// Parses the EntityVal.
+        /// Parses the WorldObjectEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
-        public static EntityVal ParseValue(ReadOnlySpan<byte> source)
+        public static WorldObjectEntity ParseValue(ReadOnlySpan<byte> source)
         {
 #if NET8_0_OR_GREATER
-            return IJsonValue<EntityVal>.ParseValue(source);
+            return IJsonValue<WorldObjectEntity>.ParseValue(source);
 #else
-            return JsonValueHelpers.ParseValue<EntityVal>(source);
+            return JsonValueHelpers.ParseValue<WorldObjectEntity>(source);
 #endif
         }
 
         /// <summary>
-        /// Parses the EntityVal.
+        /// Parses the WorldObjectEntity.
         /// </summary>
         /// <param name="source">The source of the JSON string to parse.</param>
-        public static EntityVal ParseValue(ref Utf8JsonReader source)
+        public static WorldObjectEntity ParseValue(ref Utf8JsonReader source)
         {
 #if NET8_0_OR_GREATER
-            return IJsonValue<EntityVal>.ParseValue(ref source);
+            return IJsonValue<WorldObjectEntity>.ParseValue(ref source);
 #else
-            return JsonValueHelpers.ParseValue<EntityVal>(ref source);
+            return JsonValueHelpers.ParseValue<WorldObjectEntity>(ref source);
 #endif
         }
 
@@ -602,7 +557,7 @@ public readonly partial struct Contexts
 
             return TTarget.Undefined;
 #else
-            return this.As<EntityVal, TTarget>();
+            return this.As<WorldObjectEntity, TTarget>();
 #endif
         }
 
@@ -610,7 +565,7 @@ public readonly partial struct Contexts
         public override bool Equals(object? obj)
         {
             return
-                (obj is IJsonValue jv && this.Equals(jv.As<EntityVal>())) ||
+                (obj is IJsonValue jv && this.Equals(jv.As<WorldObjectEntity>())) ||
                 (obj is null && this.IsNull());
         }
 
@@ -618,7 +573,7 @@ public readonly partial struct Contexts
         public bool Equals<T>(in T other)
             where T : struct, IJsonValue<T>
         {
-            return this.Equals(other.As<EntityVal>());
+            return this.Equals(other.As<WorldObjectEntity>());
         }
 
         /// <summary>
@@ -626,7 +581,7 @@ public readonly partial struct Contexts
         /// </summary>
         /// <param name="other">The other item with which to compare.</param>
         /// <returns><see langword="true"/> if the values were equal.</returns>
-        public bool Equals(in EntityVal other)
+        public bool Equals(in WorldObjectEntity other)
         {
             JsonValueKind thisKind = this.ValueKind;
             JsonValueKind otherKind = other.ValueKind;
@@ -721,17 +676,6 @@ public readonly partial struct Contexts
         public override string ToString()
         {
             return this.Serialize();
-        }
-
-        /// <summary>
-        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity" />.
-        /// </summary>
-        /// <param name="result">The result of the conversions.</param>
-        /// <returns><see langword="true" /> if the conversion was valid.</returns>
-        public bool TryGetAsWorldObjectEntity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity result)
-        {
-            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity>();
-            return result.IsValid();
         }
     }
 }

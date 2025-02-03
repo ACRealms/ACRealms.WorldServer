@@ -2,16 +2,16 @@
   "definitions": {
     "entities": {
       "definitions": {
-        "Creature": {
-          "description": "A creature",
-          "const": "Creature"
+        "WorldObject": {
+          "description": "Any WorldObject",
+          "const": "WorldObject"
         }
       }
     },
     "entityVal": {
       "type": "string",
       "oneOf": [
-        { "$ref": "#/definitions/entities/definitions/Creature" }
+        { "$ref": "#/definitions/entities/definitions/WorldObject" }
       ]
     },
     "contextName": {
