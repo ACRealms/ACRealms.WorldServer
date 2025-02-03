@@ -18,7 +18,7 @@ namespace ACRealms
     /// </summary>
     public interface IRealmPropContext<T> : IRealmPropContext
     {
-        TVal? FetchContextProperty<TVal>(string name) where TVal : struct;
+        TVal? FetchContextProperty<TVal>(string name);
     }
 }
 
@@ -27,7 +27,6 @@ namespace ACRealms.RealmProps.Contexts
     public interface IContextEntity : IResolvableContext
     {
         sealed bool Match<T>(FrozenDictionary<string, IRealmPropertyScope> propsToMatch)
-            where T : struct
         {
             return propsToMatch.Values.Cast<RealmPropertyEntityPropScope<IRealmPropertyScopeOps<T>, T>>().All(predicates =>
             {
@@ -36,7 +35,7 @@ namespace ACRealms.RealmProps.Contexts
             });
         }
 
-        T? FetchContextProperty<T>(string key) where T : struct;
+        T? FetchContextProperty<T>(string key);
 
         /// <summary>
         /// Returns true if the given key can be used to fetch a value during scoped rule evaluation
@@ -109,7 +108,6 @@ namespace ACRealms.RealmProps.Contexts
         }
 
         public TVal? FetchContextProperty<TVal>(string name)
-            where TVal : struct
         {
             throw new NotImplementedException();
         }

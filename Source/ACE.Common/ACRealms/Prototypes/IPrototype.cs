@@ -12,20 +12,18 @@ namespace ACRealms.Prototypes
         abstract object Fetch(IResolvableContext entity);// => throw new NotImplementedException();
     }
 
-    public interface IPrototype<TVal> : IPrototype where TVal : struct
+    public interface IPrototype<TVal> : IPrototype
     {
         TVal? Fetch(IResolvableContext entity);
         virtual object FetchSlow(IResolvableContext entity) => Fetch(entity);
     }
 
     public interface IPrototype<TEnum, TVal> : IPrototype<TVal>
-        where TVal : struct
         where TEnum : Enum
     {
     }
 
     public interface IPrototype<TEnum, TVal, TEntity, TProtos> : IPrototype<TEnum, TVal>
-        where TVal : struct
         where TEnum : Enum
         where TEntity : class, IResolvableContext
         where TProtos : IPrototypes<IPrototype<TEnum, TVal, TEntity, TProtos>>

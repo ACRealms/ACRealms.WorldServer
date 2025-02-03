@@ -57,13 +57,8 @@ namespace ACRealms
         public IEnumerable<TKey> Keys { get { return _dictionary.Keys; } }
 
         public bool TryGetValue(TKey key, out TValue value)
-        {
-            TValue v;
-            var result = _dictionary.TryGetValue(key, out v);
-            value = v;
-            return result;
-        }
-
+            => _dictionary.TryGetValue(key, out value);
+      
         public IEnumerable<TValue> Values { get { return _dictionary.Values.Cast<TValue>(); } }
 
         public TValue this[TKey key] { get { return _dictionary[key]; } }
@@ -87,12 +82,12 @@ namespace ACRealms
 
     public interface IDictionaryConvertibleKey<TUnderlyingKey>
     {
-        object FetchWithUnderlying(TUnderlyingKey key);
+        bool TryFetchWithUnderlying(TUnderlyingKey key, out object result);
     }
 
     public interface IDictionaryConvertibleKey<TRealKey, TUnderlyingKey, out TValue> : IDictionaryConvertibleKey<TUnderlyingKey>
     {
-        TValue FetchWithUnderlying(TUnderlyingKey key);
+        TValue TryTypedFetchWithUnderlying(TUnderlyingKey key, out bool success);
     }
 
     public class CovariantReadOnlyDictionaryPolyKey<TRealKey, TUnderlyingKey, TValue>
@@ -107,14 +102,17 @@ namespace ACRealms
                 throw new InvalidOperationException("TRealKey's underlying type must be equal to TConvertibleKey");
         }
 
-        public TValue FetchWithUnderlying(TUnderlyingKey key)
-        {
-            return this[Unsafe.As<TUnderlyingKey, TRealKey>(ref key)];
+        public TValue TryTypedFetchWithUnderlying(TUnderlyingKey key, out bool result)
+        { 
+            var fetchResult = TryGetValue(Unsafe.As<TUnderlyingKey, TRealKey>(ref key), out var tResult);
+            result = fetchResult;
+            return tResult;
         }
 
-        object IDictionaryConvertibleKey<TUnderlyingKey>.FetchWithUnderlying(TUnderlyingKey key)
-        {
-            return FetchWithUnderlying(key);
+        bool IDictionaryConvertibleKey<TUnderlyingKey>.TryFetchWithUnderlying(TUnderlyingKey key, out object result)
+        { 
+            result = TryTypedFetchWithUnderlying(key, out bool fetchResult);
+            return fetchResult;
         }
     }
 }

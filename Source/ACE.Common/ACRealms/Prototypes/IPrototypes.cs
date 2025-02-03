@@ -11,7 +11,7 @@ namespace ACRealms.Prototypes
         ICovariantReadOnlyDictionary<string, IPrototype> AllPrototypes { get; }
         static IPrototypes Instance { get; }
         IPrototype GetPrototype(string key);
-        IPrototype<TVal> GetPrototype<TVal>(string key) where TVal : struct => (IPrototype<TVal>)GetPrototype(key);
+        IPrototype<TVal> GetPrototype<TVal>(string key) => (IPrototype<TVal>)GetPrototype(key);
     }
 
     public interface IPrototypes<in TPrototype> : IPrototypes

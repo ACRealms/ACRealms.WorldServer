@@ -150,9 +150,6 @@ namespace ACRealms.Rulesets.DBOld
 
                             var scopeOpsType = typeof(Contexts.RealmPropertyScopeOps<>).MakeGenericType(valType);
 
-                            var ary = (ImmutableArray<IPredicate<int>>)immutableArray;
-                            new Contexts.RealmPropertyScopeOps<int>(ary);
-
                             var createMethod = scopeOpsType.GetMethod("Create", BindingFlags.Static | BindingFlags.NonPublic);
                             var scopeOps = createMethod.Invoke(null, [immutableArray]);
 

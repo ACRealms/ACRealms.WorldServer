@@ -40,7 +40,6 @@ namespace ACE.Server.WorldObjects
         }
 
         public TVal? FetchContextProperty<TVal>(string name)
-            where TVal : struct
         {
             return Biota.FetchContextProperty<TVal>(name);
         }

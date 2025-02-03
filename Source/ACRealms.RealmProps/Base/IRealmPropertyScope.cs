@@ -24,7 +24,6 @@ namespace ACRealms.Rulesets.Contexts
     // This holds the scope filter criteria for a single entity property on a single ruleset property
     internal class RealmPropertyEntityPropScope<TOps, TVal> : IRealmPropertyScope
         where TOps : IRealmPropertyScopeOps<TVal>
-        where TVal : struct
     {
         public string Key { get; } // the name of the property on the entity corresponding to RespondsTo
 
@@ -54,7 +53,6 @@ namespace ACRealms.Rulesets.Contexts
 
     public interface IPredicate { }
     public interface IPredicate<T> : IPredicate
-        where T : struct
     {
         T? Value { get; init; }
 
@@ -64,39 +62,40 @@ namespace ACRealms.Rulesets.Contexts
     public static class Predicates
     {
         public readonly record struct Equal<T>(T? Value) : IPredicate<T>
-            where T : struct, IEquatable<T>
+            where T : IEquatable<T>
         {
             public bool Match(T? valueToTest) => Value.Equals(valueToTest);
         }
 
         public readonly record struct NotEqual<T>(T? Value) : IPredicate<T>
-            where T : struct, IEquatable<T>
+            where T : IEquatable<T>
         {
             public bool Match(T? valueToTest) => !Value.Equals(valueToTest);
         }
 
         public readonly record struct GreaterThan<T>(T? Value) : IPredicate<T>
-            where T : struct, IComparable<T>
+            where T : IComparable<T>
         {
-            public bool Match(T? valueToTest) => valueToTest.HasValue && valueToTest.Value.CompareTo(Value!.Value) > 0;
+            public bool Match(T? valueToTest) => valueToTest != null && valueToTest.CompareTo(Value) > 0;
         }
 
         public readonly record struct GreaterThanOrEqual<T>(T? Value) : IPredicate<T>
-            where T : struct, IComparable<T>
+            where T : IComparable<T>
         {
-            public bool Match(T? valueToTest) => valueToTest.HasValue && valueToTest.Value.CompareTo(Value!.Value) >= 0;
+            public bool Match(T? valueToTest) =>
+                valueToTest != null && valueToTest.CompareTo(Value) >= 0;
         }
 
         public readonly record struct LessThan<T>(T? Value) : IPredicate<T>
-            where T : struct, IComparable<T>
+            where T : IComparable<T>
         {
-            public bool Match(T? valueToTest) => valueToTest.HasValue && valueToTest.Value.CompareTo(Value!.Value) < 0;
+            public bool Match(T? valueToTest) => valueToTest != null && valueToTest.CompareTo(Value) < 0;
         }
 
         public readonly record struct LessThanOrEqual<T>(T? Value) : IPredicate<T>
-            where T : struct, IComparable<T>
+            where T : IComparable<T>
         {
-            public bool Match(T? valueToTest) => valueToTest.HasValue && valueToTest.Value.CompareTo(Value!.Value) <= 0;
+            public bool Match(T? valueToTest) => valueToTest != null && valueToTest.CompareTo(Value) <= 0;
         }
     }
 
@@ -107,7 +106,6 @@ namespace ACRealms.Rulesets.Contexts
     public interface IRealmPropertyScopeOps<T> : IRealmPropertyScopeOps { }
 
     public readonly struct RealmPropertyScopeOps<TVal> : IRealmPropertyScopeOps<TVal>
-        where TVal : struct
     {
         public ImmutableArray<IPredicate<TVal>> PredicatesTyped { get; }
 
