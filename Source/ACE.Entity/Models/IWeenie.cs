@@ -49,6 +49,6 @@ namespace ACE.Entity.Models
         PropertiesBook PropertiesBook { get; set; }
         IList<PropertiesBookPageData> PropertiesBookPageData { get; set; }
 
-        static sealed BiotaPropertyPrototype Prototype(string key) => BiotaPropertyPrototypes.GetPrototype(key);
+        static sealed BiotaPropertyPrototype Prototype(string key) => (BiotaPropertyPrototype)BiotaPropertyPrototypes.Instance.GetPrototype(key);
     }
 }

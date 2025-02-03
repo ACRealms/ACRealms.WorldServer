@@ -1,3 +1,4 @@
+using ACRealms.RealmProps.Contexts;
 using System;
 
 namespace ACRealms;
@@ -11,10 +12,9 @@ public static partial class Props
     {
         public static partial class Attributes
         {
-            public static int StrengthAdded2(IAppliedRuleset ruleset, IRealmPropContext SpawnedCreature)
+            public static int StrengthAdded2(IAppliedRuleset ruleset, ICanonicalContextEntity SpawnedCreature)
             {
-                return 0;
-               // return ruleset.ValueOf(RealmPropertyInt.Creature_Attributes_StrengthAdded, ("SpawnedCreature", SpawnedCreature));
+                return ruleset.ValueOf(ACRealms.Props.Creature.Attributes.StrengthAdded, ("SpawnedCreature", SpawnedCreature));
             }
         }
     }

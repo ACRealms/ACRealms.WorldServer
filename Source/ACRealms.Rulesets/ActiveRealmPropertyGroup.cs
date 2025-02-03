@@ -115,7 +115,7 @@ namespace ACRealms.Rulesets
         /// <param name="worldCtx"></param>
         /// <param name="val"></param>
         /// <returns>True if the property was successfully evaluated</returns>
-        internal bool TryEval(IReadOnlyCollection<(string, IRealmPropContext)> worldCtx, out TVal val)
+        internal bool TryEval(IReadOnlyCollection<(string, RealmProps.Contexts.ICanonicalContextEntity)> worldCtx, out TVal val)
         {
             return EvalImpl(worldCtx, out val, direct: true);
         }
@@ -154,7 +154,7 @@ namespace ACRealms.Rulesets
             return true;
         }
 
-        private bool EvalImpl(IReadOnlyCollection<(string, IRealmPropContext)> worldCtx, out TVal val, bool direct = true, bool scopelessPreEval = false)
+        private bool EvalImpl(IReadOnlyCollection<(string, RealmProps.Contexts.ICanonicalContextEntity)> worldCtx, out TVal val, bool direct = true, bool scopelessPreEval = false)
         {
             if (scopelessPreEval)
             {
@@ -184,7 +184,7 @@ namespace ACRealms.Rulesets
             }
         }
 
-        internal TVal Eval(IReadOnlyCollection<(string, IRealmPropContext)> worldCtx, bool direct = true, bool scopelessPreEval = false)
+        internal TVal Eval(IReadOnlyCollection<(string, RealmProps.Contexts.ICanonicalContextEntity)> worldCtx, bool direct = true, bool scopelessPreEval = false)
         {
             EvalImpl(worldCtx, out var val, direct: direct, scopelessPreEval: scopelessPreEval);
             return val;

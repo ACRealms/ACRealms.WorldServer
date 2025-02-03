@@ -1,3 +1,4 @@
+using ACRealms.Prototypes;
 using ACRealms.RealmProps;
 using ACRealms.RealmProps.Contexts;
 using ACRealms.Rulesets.Contexts;
@@ -10,39 +11,33 @@ using System.Threading.Tasks;
 
 namespace ACRealms
 {
-    public interface IRealmPropContext
-    {
-
-    }
+    public interface IRealmPropContext { }
 
     /// <summary>
     /// An object representing either an entity, or a boxed, non-null object or ValueType
     /// </summary>
     public interface IRealmPropContext<T> : IRealmPropContext
     {
-        // This should probably be improved, it may be an inefficient implementation, but leave it for now
-        sealed bool Match(FrozenDictionary<string, IRealmPropertyScope> propsToMatch)
-        {
-            return propsToMatch.Values.Cast<RealmPropertyEntityPropScope<IRealmPropertyScopeOps<T>, T>>().All(predicates =>
-            {
-                var propVal = FetchContextProperty(predicates.Key);
-                return predicates.Ops.Predicates.All(p => p.Match(propVal));
-            });
-        }
-
-        T FetchContextProperty(string name);
-
-        //static abstract bool RespondsTo(string key);
-        //static virtual bool RespondsTo(string key) => false;
-
-
+        TVal? FetchContextProperty<TVal>(string name) where TVal : struct;
     }
 }
 
 namespace ACRealms.RealmProps.Contexts
 {
-    public interface IContextEntity
+    public interface IContextEntity : IResolvableContext
     {
+        sealed bool Match<T>(FrozenDictionary<string, IRealmPropertyScope> propsToMatch)
+            where T : struct
+        {
+            return propsToMatch.Values.Cast<RealmPropertyEntityPropScope<IRealmPropertyScopeOps<T>, T>>().All(predicates =>
+            {
+                var propVal = FetchContextProperty<T>(predicates.Key);
+                return predicates.OpsTyped.PredicatesTyped.All(p => p.Match(propVal));
+            });
+        }
+
+        T? FetchContextProperty<T>(string key) where T : struct;
+
         /// <summary>
         /// Returns true if the given key can be used to fetch a value during scoped rule evaluation
         /// </summary>
@@ -59,10 +54,12 @@ namespace ACRealms.RealmProps.Contexts
         static virtual Type TypeOfProperty(string key) => throw new NotImplementedException();
     }
 
-    public interface ICanonicalContextEntity { }
-    public interface ICanonicalContextEntity<T, U> : ICanonicalContextEntity
-        where T : IContextEntity
-        where U : class, ICanonicalContextEntity<T, U>
+    public interface ICanonicalContextEntity : IContextEntity
+    {
+    }
+    public interface ICanonicalContextEntity<TEntityIOCInterface, TEntity> : ICanonicalContextEntity, IRealmPropContext<TEntityIOCInterface>
+        where TEntityIOCInterface : IContextEntity
+        where TEntity : class, ICanonicalContextEntity<TEntityIOCInterface, TEntity>
     {
         /// <summary>
         /// Returns true if the given key can be used to fetch a value during scoped rule evaluation
@@ -110,53 +107,14 @@ namespace ACRealms.RealmProps.Contexts
                 throw new InvalidOperationException("Only the 'Value' key is supported for this class");
             return this;
         }
+
+        public TVal? FetchContextProperty<TVal>(string name)
+            where TVal : struct
+        {
+            throw new NotImplementedException();
+        }
     }
     internal abstract record Entity : ContextType { }
     internal record Entity<T> : Entity { }
     internal record DynamicEntity : Entity<dynamic> { }
-    internal static class Entities
-    {
-        internal record Creature : Entity { }
-    }
-
-
-    /*
-    internal abstract record RealmPropContext
-    {
-        internal RealmPropContext FromAttribute<CtxType>(ScopedWithAttribute<CtxType> attribute)
-            where CtxType : RealmProps.Contexts.ContextType
-        {
-            return attribute.Entity switch
-            {
-                "Float" => new RealmPropContextWithScalar<float>(),
-                "Creature" => new RealmPropContextWithEntity<IWorldObjectContextEntity>(),
-                _ => throw new NotImplementedException()
-            };
-        }
-    }
-
-    internal abstract record RealmPropContextWithEntity : RealmPropContext
-    {
-    }
-
-    internal record RealmPropContextWithEntity<TEntity> : RealmPropContextWithEntity
-    {
-    }
-
-    internal abstract record RealmPropContextWithScalar : RealmPropContext
-    {
-    }
-
-    internal record RealmPropContextWithScalar<TVal> : RealmPropContextWithScalar
-    {
-    }
-
-    internal interface IRealmPropContext<TEntity>
-    {
-    }
-
-    internal interface IRealmPropScalarContext<TValue> : IRealmPropContext
-    {
-    }
-    */
 }

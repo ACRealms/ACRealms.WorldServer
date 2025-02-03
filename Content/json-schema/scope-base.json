@@ -26,9 +26,6 @@
     "paramsCommon": {
       "$anchor": "params.common",
       "type": "object",
-      "properties": {
-        "foo": { "type": "string" }
-      },
       "minProperties": 1,
       "additionalProperties": false,
       "unevaluatedProperties": false

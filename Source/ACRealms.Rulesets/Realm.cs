@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using ACRealms;
 using ACRealms.RealmProps;
+using ACRealms.RealmProps.Contexts;
 using ACRealms.RealmProps.Underlying;
 using ACRealms.Rulesets.Contexts;
 using ACRealms.Rulesets.Enums;
@@ -175,9 +176,9 @@ namespace ACRealms.Rulesets
         private bool rolledOnce = false;
         private TVal Value { get; set; }
 
-        private TVal DoEval(IReadOnlyCollection<(string, IRealmPropContext)> worldCtx, bool direct = true, bool scopelessPreEval = false)
+        private TVal DoEval(IReadOnlyCollection<(string, RealmProps.Contexts.ICanonicalContextEntity)> worldCtx, bool direct = true, bool scopelessPreEval = false)
         {
-            if (Options.RandomType != RealmPropertyRerollType.always)
+            if (rolledOnce && Options.RandomType != RealmPropertyRerollType.always)
                 return Value;
 
             TVal composedFromValue;
@@ -212,7 +213,7 @@ namespace ACRealms.Rulesets
             return val;
         }
 
-        internal bool TryEval(IReadOnlyCollection<(string, IRealmPropContext)> worldCtx, out TVal value, bool scopelessPreEval = false)
+        internal bool TryEval(IReadOnlyCollection<(string, RealmProps.Contexts.ICanonicalContextEntity)> worldCtx, out TVal value, bool scopelessPreEval = false)
         {
             if (scopelessPreEval || ScopeMatch(worldCtx))
             {
@@ -223,33 +224,26 @@ namespace ACRealms.Rulesets
             return false;
         }
 
-        private bool ScopeMatch(IReadOnlyCollection<(string, IRealmPropContext)> ctx)
+        private bool ScopeMatch(IReadOnlyCollection<(string, RealmProps.Contexts.ICanonicalContextEntity)> ctx)
         {
             var scopeDefs = this.Options.Scope.Scopes;
-            return ctx.All(c => 
+            return ctx.All(thisCtx => 
             {
-                var (contextParamKey, contextValBase) = c;
-
+                (string contextParamKey, ICanonicalContextEntity contextEntityBase) = thisCtx;
+                var entityProtos = contextEntityBase.Prototypes;
+                
                 if (!scopeDefs.TryGetValue(contextParamKey, out var scopeDefBase))
                     return true; // Scope wasn't narrowed on this entity
-
-                var contextVal = (IRealmPropContext<TVal>)contextValBase;
-                //throw new NotImplementedException();
-                return contextVal.Match(scopeDefBase);
-              /* var scope = scopeDefs[key];
-                foreach (var (propKey, criteria) in scope)
+                foreach(var (scopePropKey, scopeValUntyped) in scopeDefBase)
                 {
-                    c.
-                    Contexts.IRealmPropertyScope c = criteria;
+                    var proto = entityProtos.AllPrototypes[scopePropKey];
+                    var val = proto.Fetch(contextEntityBase);
+                    if (!scopeValUntyped.Match(val))
+                        return false;
                 }
-                return false;*/
+                return true;
             });
-            throw new NotImplementedException();
         }
-
-        
-
-
 
         public override string ToString()
         {

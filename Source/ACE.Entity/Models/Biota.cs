@@ -1,8 +1,12 @@
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
-
+using System.Net.Http.Headers;
+using ACE.Entity.ACRealms;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
+using ACRealms;
+using ACRealms.Prototypes;
 
 namespace ACE.Entity.Models
 {
@@ -11,7 +15,7 @@ namespace ACE.Entity.Models
     /// We do this to conserve memory in ACE.Server
     /// Be sure to check for null first.
     /// </summary>
-    public class Biota : IWeenie<Biota>
+    public class Biota : IWeenie<Biota>, IResolvableContext<BiotaPropertyPrototypes, Biota>
     {
         public ulong Id { get; set; }
         public uint WeenieClassId { get; set; }
@@ -22,6 +26,8 @@ namespace ACE.Entity.Models
         public IDictionary<PropertyFloat, double> PropertiesFloat { get; set; }
         public IDictionary<PropertyInstanceId, ulong> PropertiesIID { get; set; }
         public IDictionary<PropertyInt, int> PropertiesInt { get; set; }
+        public IDictionaryConvertibleKey<ushort> CovariantPropertiesInt =>
+            new CovariantReadOnlyDictionaryPolyKey<PropertyInt, ushort, int>(PropertiesInt?.AsReadOnly());
         public IDictionary<PropertyInt64, long> PropertiesInt64 { get; set; }
         public IDictionary<PropertyString, string> PropertiesString { get; set; }
 
@@ -54,7 +60,29 @@ namespace ACE.Entity.Models
         public ICollection<PropertiesEnchantmentRegistry> PropertiesEnchantmentRegistry { get; set; }
         public IDictionary<ulong /* Player GUID */, bool /* Storage */> HousePermissions { get; set; }
 
+        public IPrototypes Prototypes => BiotaPropertyPrototypes.Instance;
+        public Biota UnderlyingContext => this;
+
         public static bool RespondsTo(string key) => IWeenie<Biota>.Prototype(key) != null;
         public static Type TypeOfProperty(string key) => IWeenie<Biota>.Prototype(key)?.ValueType;
+
+        static readonly FrozenDictionary<Type, Func<Biota, IDictionaryConvertibleKey<ushort>>> Dicts = new Dictionary<Type, Func<Biota, IDictionaryConvertibleKey<ushort>>>()
+        {
+            { typeof(int?), (b) => b.CovariantPropertiesInt }
+
+        }.ToFrozenDictionary();
+
+        internal TVal? FetchContextProperty<TVal>(string name) where TVal : struct
+        {
+            var proto = Prototypes.GetPrototype<TVal>(name);
+            return proto.Fetch(this);
+        }
+
+        internal TVal? Fetch<TEnum, TVal>(ushort key)
+        {
+            var dict = Dicts[typeof(TVal)](this);
+            var result = dict.FetchWithUnderlying(key);
+            return (TVal)result;
+        }
     }
 }

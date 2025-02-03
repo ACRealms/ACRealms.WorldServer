@@ -20,7 +20,11 @@
 
   <PropertyGroup>
     <RealmPropsLibDir>..\lib\RealmPropsAssembly\$(PlatformTarget)\$(Configuration)\$(TargetFramework)\</RealmPropsLibDir>      
-  </PropertyGroup>    
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ACE.Common\ACE.Common.csproj" />
+  </ItemGroup>    
   <ItemGroup>
     <!-- We have to add the reference this way (non-project, renamed) to work around a Visual Studio limitation. Otherwise the generated code is not visible in intellisense. -->
     <Reference Include="ACRealms.RealmProps">
