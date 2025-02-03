@@ -3,7 +3,7 @@
     <TargetFrameworks>netstandard2.0;</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
-    <TargetFrameworks>net9.0;</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;</TargetFrameworks>
   </PropertyGroup>
    
   <PropertyGroup>
@@ -53,7 +53,7 @@
     <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" SetTargetFramework="TargetFramework=netstandard2.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
-    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" SetTargetFramework="TargetFramework=net9.0" />
+    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" SetTargetFramework="TargetFramework=netstandard2.0" />
   </ItemGroup>
     
   <!-- Required for running in VS -->
@@ -63,13 +63,13 @@
       <PackageReference Include="Corvus.UriTemplates" Version="2.2.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="System.IO.Pipelines" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="System.Memory" Version="4.5.5" PrivateAssets="all" GeneratePathProperty="true" />
-      <PackageReference Include="System.Reflection.Metadata" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="System.Reflection.Metadata" Version="8.0.1" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />      
       <PackageReference Include="System.Text.Encodings.Web" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" PrivateAssets="all" GeneratePathProperty="true" />      
       <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" PrivateAssets="all" GeneratePathProperty="true" />
-      <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.8" PrivateAssets="all" GeneratePathProperty="true" />
+      <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.11" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="NodaTime" Version="3.2.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" PrivateAssets="all" GeneratePathProperty="true" />

@@ -86,7 +86,7 @@
 
     <ItemGroup>
       <Reference Include="ACRealms.RealmProps">
-        <HintPath>..\lib\RealmPropsAssembly\x64\$(Configuration)\net9.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+        <HintPath>..\lib\RealmPropsAssembly\x64\$(Configuration)\netstandard2.0\ACRealms.RealmPropsAssembly.dll</HintPath>
       </Reference>
     </ItemGroup>    
 
