@@ -68,6 +68,36 @@ namespace ACRealms.Rulesets.Contexts
         {
             public bool Match(T? valueToTest) => Value.Equals(valueToTest);
         }
+
+        public readonly record struct NotEqual<T>(T? Value) : IPredicate<T>
+            where T : struct, IEquatable<T>
+        {
+            public bool Match(T? valueToTest) => !Value.Equals(valueToTest);
+        }
+
+        public readonly record struct GreaterThan<T>(T? Value) : IPredicate<T>
+            where T : struct, IComparable<T>
+        {
+            public bool Match(T? valueToTest) => valueToTest.HasValue && valueToTest.Value.CompareTo(Value!.Value) > 0;
+        }
+
+        public readonly record struct GreaterThanOrEqual<T>(T? Value) : IPredicate<T>
+            where T : struct, IComparable<T>
+        {
+            public bool Match(T? valueToTest) => valueToTest.HasValue && valueToTest.Value.CompareTo(Value!.Value) >= 0;
+        }
+
+        public readonly record struct LessThan<T>(T? Value) : IPredicate<T>
+            where T : struct, IComparable<T>
+        {
+            public bool Match(T? valueToTest) => valueToTest.HasValue && valueToTest.Value.CompareTo(Value!.Value) < 0;
+        }
+
+        public readonly record struct LessThanOrEqual<T>(T? Value) : IPredicate<T>
+            where T : struct, IComparable<T>
+        {
+            public bool Match(T? valueToTest) => valueToTest.HasValue && valueToTest.Value.CompareTo(Value!.Value) <= 0;
+        }
     }
 
     public interface IRealmPropertyScopeOps

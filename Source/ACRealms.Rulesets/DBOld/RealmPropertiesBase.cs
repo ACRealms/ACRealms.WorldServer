@@ -54,7 +54,12 @@ namespace ACRealms.Rulesets.DBOld
         {
             var dict = new Dictionary<string, Type>()
             {
-                { "Equal", typeof(Contexts.Predicates.Equal<>) }
+                { "Equal", typeof(Contexts.Predicates.Equal<>) },
+                { "NotEqual", typeof(Contexts.Predicates.NotEqual<>) },
+                { "GreaterThan", typeof(Contexts.Predicates.GreaterThan<>) },
+                { "GreaterThanOrEqual", typeof(Contexts.Predicates.GreaterThanOrEqual<>) },
+                { "LessThan", typeof(Contexts.Predicates.LessThan<>) },
+                { "LessThanOrEqual", typeof(Contexts.Predicates.LessThanOrEqual<>) }
             };
             return dict.ToFrozenDictionary();
         })();
