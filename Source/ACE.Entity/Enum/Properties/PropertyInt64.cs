@@ -33,6 +33,7 @@ namespace ACE.Entity.Enum.Properties
         VerifyXp              = 9003
     }
 
+    /*
     public static class PropertyInt64Extensions
     {
         public static string GetDescription(this PropertyInt64 prop)
@@ -41,4 +42,5 @@ namespace ACE.Entity.Enum.Properties
             return description?.Description ?? prop.ToString();
         }
     }
+    */
 }

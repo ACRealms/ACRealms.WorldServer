@@ -104,6 +104,7 @@ namespace ACE.Entity.Enum.Properties
         SummonTargetRuleset             = 42000,
     }
 
+    /*
     public static class PropertyStringExtensions
     {
         public static string GetDescription(this PropertyString prop)
@@ -111,5 +112,5 @@ namespace ACE.Entity.Enum.Properties
             var description = prop.GetAttributeOfType<DescriptionAttribute>();
             return description?.Description ?? prop.ToString();
         }
-    }
+    }*/
 }

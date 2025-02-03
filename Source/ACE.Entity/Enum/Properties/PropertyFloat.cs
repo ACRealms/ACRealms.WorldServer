@@ -219,6 +219,7 @@ namespace ACE.Entity.Enum.Properties
         PCAPRecordeOmegaZ              = 8018
     }
 
+    /*
     public static class PropertyFloatExtensions
     {
         public static string GetDescription(this PropertyFloat prop)
@@ -227,4 +228,5 @@ namespace ACE.Entity.Enum.Properties
             return description?.Description ?? prop.ToString();
         }
     }
+    */
 }
