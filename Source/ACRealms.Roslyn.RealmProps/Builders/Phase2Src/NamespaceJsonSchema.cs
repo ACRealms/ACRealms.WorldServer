@@ -10,7 +10,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             {
                 var relativeDir = string.Concat(Enumerable.Repeat("../", data.NestedClassNames.Length + 1));
                 var optionsBasePath = $"{relativeDir}options-base.json";
-                var entitiesBasePath = $"{relativeDir}entities/";
+                var entitiesBasePath = $"{relativeDir}generated/entities/";
                 var properties = MakePropertySchema(data, entitiesBasePath);
 
                 // We must wrap in a comment as the source generator treats the output as a C# file

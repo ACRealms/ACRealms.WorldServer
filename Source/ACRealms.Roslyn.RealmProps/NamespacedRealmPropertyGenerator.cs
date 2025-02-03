@@ -181,5 +181,13 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
             string? sourceCode = Builders.Phase1.CoreRealmProperties.GenerateCoreEnumClass(data.TargetEnumTypeName, data.PropsOfType);
             ctx.AddSource($"CoreProps/{data.TargetEnumTypeName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
         });
+
+
+        IncrementalValuesProvider<string> entities = combinedProps.SelectMany(static (_, cancellationToken) => EntityToContextEntityMapping.BuildEntityList());
+        context.RegisterSourceOutput(entities, static (ctx, entityType) =>
+        {
+            string sourceCode = EntitySchema.GenerateEntitySchemaSourceCode(entityType);
+            ctx.AddSource($"GeneratedJsonSchema/entities/{entityType}.json", SourceText.From(sourceCode, Encoding.UTF8));
+        });
     }
 }

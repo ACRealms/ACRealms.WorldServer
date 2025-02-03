@@ -33,6 +33,23 @@
     <Compile Remove="..\..\..\Corvus.JsonSchema\Solutions\Corvus.Json.JsonReference\Corvus.Json\**\NullableAttributes.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\ACE.Entity\Enum\Properties\**\PropertyInt.cs">
+      <Link>ACE.Entity\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\ACE.Entity\Enum\Properties\**\*Attribute.cs">
+      <Link>ACE.Entity\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\ACE.Common\Extensions\PropertyInfoExtensions.cs">
+      <Link>ACE.Common\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\ACE.Common\ACRealms\Prototypes\RequiresPrimaryAttributeAttribute.cs">
+      <Link>ACE.Common\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\ACE.Entity\ACRealms\BiotaPropertyPrimaryAttribute.cs">
+      <Link>ACE.Entity\%(RecursiveDir)\%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <PrivateAssets>all</PrivateAssets>
       <!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->

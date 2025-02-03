@@ -5,16 +5,24 @@
     "base": { "$ref": "../scope-base.json#" },
     "int": { "$anchor": "int", "$ref": "../scope-base.json#/definitions/paramsInt" }
   },
-  "properties": {
-    "Name": {
-      "type": "string",
-      "description": "The creature's name"
+  "anyOf": [
+    {
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "The creature's name"
+        }
+      }
     },
-    "Level": {
-      "$ref": "#int",
-      "description": "The creature's level"
+    {
+      "properties": {
+        "Level": {
+          "$ref": "#int",
+          "description": "The creature's level"
+        }
+      }
     }
-  },
+  ],
   "minItems": 1,
-  "additionalProperties": false
+  "unevaluatedProperties": false
 }
