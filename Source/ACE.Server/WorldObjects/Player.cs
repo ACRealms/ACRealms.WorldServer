@@ -380,7 +380,7 @@ namespace ACE.Server.WorldObjects
                 hotspot.OnCollideObject(this);
             else if (target is SpellProjectile spellProjectile)
             {
-                if (this.RealmRuleset.GetProperty(Props.Projectile.Magic.DoubleCollisionCheck))
+                if (Props.Projectile.Magic.DoubleCollisionCheck(RealmRuleset))
                 {
                     spellProjectile.OnCollideObject(this);
                 }

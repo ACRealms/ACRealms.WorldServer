@@ -228,7 +228,7 @@ namespace ACE.Server.Realms
                 list.AddRange(_propertiesInt.Values);
                 list.AddRange(_propertiesInt64.Values);
                 list.AddRange(_propertiesFloat.Values);
-                list.AddRange(_propertiesString.Where(x => x.Key != Props.Core.Realm.Description).Select(x => x.Value));
+                list.AddRange(_propertiesString.Where(x => x.Key != RealmPropertyString.Core_Realm_Description).Select(x => x.Value));
 
                 // This may be a slight performance inefficiency. TODO: Can we easily do this without an extra list?
                 PropertiesForRandomization = list.AsReadOnly();
@@ -309,7 +309,7 @@ namespace ACE.Server.Realms
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyInt), item.Key)}: {item.Value}");
             foreach (var item in _propertiesInt64)
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyInt64), item.Key)}: {item.Value}");
-            foreach (var item in _propertiesString.Where(x => x.Key != Props.Core.Realm.Description))
+            foreach (var item in _propertiesString.Where(x => x.Key != RealmPropertyString.Core_Realm_Description))
                 sb.AppendLine($"{Enum.GetName(typeof(RealmPropertyString), item.Key)}: {item.Value}");
 
             sb.AppendLine("\n");
@@ -350,7 +350,7 @@ namespace ACE.Server.Realms
         private IEnumerable<TemplatedRealmPropertyGroup> TakeRandomProperties(ushort amount, RulesetTemplate template)
         {
             LogTrace(() => $"Taking {amount} properties at random");
-            if (template._propertiesString.TryGetValue(Props.Core.Realm.Description, out var desc))
+            if (template._propertiesString.TryGetValue(RealmPropertyString.Core_Realm_Description, out var desc))
                 amount++;
 
             var total = template.PropertiesForRandomization.Count;
@@ -382,7 +382,7 @@ namespace ACE.Server.Realms
                 while (set.Count > amount)
                 {
                     var next = GetRandomProperty(template, Context);
-                    if (next is TemplatedRealmPropertyGroup<string> s && s.PropertyKey == (ushort)Props.Core.Realm.Description)
+                    if (next is TemplatedRealmPropertyGroup<string> s && s.PropertyKey == (int)RealmPropertyString.Core_Realm_Description)
                         continue;
                     LogTrace(() => $"Subtracting {((IRealmPropertyGroup)next).OptionsBase.Name} from randomization selection");
                     set.Remove(next);
@@ -590,14 +590,17 @@ namespace ACE.Server.Realms
 
         private void BuildChanceTablesIfNecessary()
         {
-            if (_propertiesFloat.ContainsKey(Props.Loot.DropRates.CantripDropRate) || GetProperty(Props.Loot.DropRates.CantripDropRate) != PropertyManager.GetDouble("cantrip_drop_rate").Item)
+            if (_propertiesFloat.ContainsKey(RealmPropertyFloat.Loot_DropRates_CantripDropRate) || Props.Loot.DropRates.CantripDropRate(this) != PropertyManager.GetDouble("cantrip_drop_rate").Item)
             {
                 LogTrace(() => $"CantripDropRate property is present or differs from server property, building custom NumCantrips ChanceTables");
-                _chanceTableNumCantrips = CantripChance.ApplyNumCantripsMod(GetProperty(Props.Loot.DropRates.CantripDropRate), false);
+                _chanceTableNumCantrips = CantripChance.ApplyNumCantripsMod(Props.Loot.DropRates.CantripDropRate(this), false);
             }
 
-            var keys = new (string server_prop, RealmPropertyFloat realm_prop)[] { ("minor_cantrip_drop_rate", Props.Loot.DropRates.MinorCantripDropRate), ("major_cantrip_drop_rate", Props.Loot.DropRates.MajorCantripDropRate), ("epic_cantrip_drop_rate", Props.Loot.DropRates.EpicCantripDropRate),
-                ("legendary_cantrip_drop_rate", Props.Loot.DropRates.LegendaryCantripDropRate) };
+            var keys = new (string server_prop, RealmPropertyFloat realm_prop)[] {
+                ("minor_cantrip_drop_rate", RealmPropertyFloat.Loot_DropRates_MinorCantripDropRate),
+                ("major_cantrip_drop_rate", RealmPropertyFloat.Loot_DropRates_MajorCantripDropRate),
+                ("epic_cantrip_drop_rate", RealmPropertyFloat.Loot_DropRates_EpicCantripDropRate),
+                ("legendary_cantrip_drop_rate", RealmPropertyFloat.Loot_DropRates_LegendaryCantripDropRate) };
             var appliedLevels = keys.Select(keypair => (
                 name: keypair.server_prop,
                 server_prop: PropertyManager.GetDouble(keypair.server_prop).Item,
@@ -721,19 +724,19 @@ namespace ACE.Server.Realms
 
         internal bool ClassicalInstancesActivated(IPlayer player, LocalPosition position)
         {
-            if (!GetProperty(Props.Peripheral.ClassicalInstance.Enabled))
+            if (!Props.Peripheral.ClassicalInstance.Enabled(this))
                 return false;
 
             if (player.GetProperty(PropertyBool.ClassicalInstancesActive) != true)
             {
-                if (!GetProperty(Props.Peripheral.ClassicalInstance.IgnoreCharacterProp))
+                if (!Props.Peripheral.ClassicalInstance.IgnoreCharacterProp(this))
                     return false;
             }
 
-            if (GetProperty(Props.Peripheral.ClassicalInstance.EnableForAllLandblocksDangerous))
+            if (Props.Peripheral.ClassicalInstance.EnableForAllLandblocksDangerous(this))
                 return true;
 
-            var set = GetProperty(Props.Peripheral.ClassicalInstance.DungeonSet);
+            var set = Props.Peripheral.ClassicalInstance.DungeonSet(this);
             return RealmManager.Peripherals.DungeonSets.IncludedInSet(position, set);
         }
 
@@ -766,7 +769,7 @@ namespace ACE.Server.Realms
                 }
             }
 
-            if (GetProperty(Props.Peripheral.ClassicalInstance.ShareWithPlayerAccount))
+            if (Props.Peripheral.ClassicalInstance.ShareWithPlayerAccount(this))
                 return ShortInstanceIDForClassicalNonEphemeralInstances_PerAccount(player);
             else
                 return ShortInstanceIDForClassicalNonEphemeralInstances_PerCharacter(player);

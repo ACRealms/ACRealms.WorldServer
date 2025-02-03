@@ -213,8 +213,8 @@ namespace ACE.Server.WorldObjects
 
             // update vitae
             // players who died in a PKLite fight do not accrue vitae
-            var duelRealm = RealmManager.GetRealm(HomeRealm, includeRulesets: false)?.StandardRules?.GetProperty(Props.Pvp.World.IsDuelingRealm) == true ||
-                RealmRuleset?.GetProperty(Props.Pvp.World.IsDuelingRealm) == true;
+            var homeRuleset = RealmManager.GetRealm(HomeRealm, includeRulesets: false).StandardRules;
+            var duelRealm = Props.Pvp.World.IsDuelingRealm(homeRuleset) || Props.Pvp.World.IsDuelingRealm(RealmRuleset);
             if (!duelRealm && !IsPKLiteDeath(topDamager))
                 InflictVitaePenalty();
 
@@ -987,7 +987,7 @@ namespace ACE.Server.WorldObjects
             if (MinimumTimeSincePk == null || (PropertyManager.GetBool("pk_server_safe_training_academy").Item && RecallsDisabled))
                 return;
 
-            if (PkLevel == PKLevel.NPK && !RealmRuleset.GetProperty(Props.Pvp.World.IsPkOnly) && !PropertyManager.GetBool("pkl_server").Item)
+            if (PkLevel == PKLevel.NPK && !Props.Pvp.World.IsPkOnly(RealmRuleset) && !PropertyManager.GetBool("pkl_server").Item)
             {
                 MinimumTimeSincePk = null;
                 return;
@@ -1003,7 +1003,7 @@ namespace ACE.Server.WorldObjects
             var werror = WeenieError.None;
             var pkLevel = PkLevel;
 
-            if (RealmRuleset.GetProperty(Props.Pvp.World.IsPkOnly))
+            if (Props.Pvp.World.IsPkOnly(RealmRuleset))
                 pkLevel = PKLevel.PK;
             else if (PropertyManager.GetBool("pkl_server").Item)
                 pkLevel = PKLevel.PKLite;

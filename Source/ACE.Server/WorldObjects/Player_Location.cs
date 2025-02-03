@@ -85,7 +85,7 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToHouse()
         {
-            var recallsDisabled = !RealmRuleset.GetProperty(Props.Core.Realm.HasRecalls);
+            var recallsDisabled = !Props.Core.Realm.HasRecalls(RealmRuleset);
             if (recallsDisabled)
                 return;
 
@@ -160,7 +160,7 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToHideout()
         {
-            var recallsDisabled = !RealmRuleset.GetProperty(Props.Core.Realm.HasRecalls);
+            var recallsDisabled = !Props.Core.Realm.HasRecalls(RealmRuleset);
             if (recallsDisabled)
                 return;
 
@@ -223,7 +223,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void HandleActionTeleToLifestone()
         {
-            var recallsDisabled = !RealmRuleset.GetProperty(Props.Core.Realm.HasRecalls);
+            var recallsDisabled = !Props.Core.Realm.HasRecalls(RealmRuleset);
             if (recallsDisabled)
                 return;
 
@@ -294,7 +294,7 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToMarketPlace()
         {
-            var recallsDisabled = !RealmRuleset.GetProperty(Props.Core.Realm.HasRecalls);
+            var recallsDisabled = !Props.Core.Realm.HasRecalls(RealmRuleset);
             if (recallsDisabled)
                 return;
             if (IsOlthoiPlayer)
@@ -364,7 +364,7 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionRecallAllegianceHometown()
         {
-            var recallsDisabled = !RealmRuleset.GetProperty(Props.Core.Realm.HasRecalls);
+            var recallsDisabled = !Props.Core.Realm.HasRecalls(RealmRuleset);
             if (recallsDisabled)
                 return;
             //Console.WriteLine($"{Name}.HandleActionRecallAllegianceHometown()");
@@ -460,7 +460,7 @@ namespace ACE.Server.WorldObjects
         /// </summary>
         public void HandleActionTeleToMansion()
         {
-            var recallsDisabled = !RealmRuleset.GetProperty(Props.Core.Realm.HasRecalls);
+            var recallsDisabled = !Props.Core.Realm.HasRecalls(RealmRuleset);
             if (recallsDisabled)
                 return;
             //Console.WriteLine($"{Name}.HandleActionTeleToMansion()");
@@ -584,7 +584,7 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToPkArena()
         {
-            var recallsDisabled = !RealmRuleset.GetProperty(Props.Core.Realm.HasRecalls);
+            var recallsDisabled = !Props.Core.Realm.HasRecalls(RealmRuleset);
             if (recallsDisabled)
                 return;
             //Console.WriteLine($"{Name}.HandleActionTeleToPkArena()");
@@ -665,7 +665,7 @@ namespace ACE.Server.WorldObjects
 
         public void HandleActionTeleToPklArena()
         {
-            var recallsDisabled = !RealmRuleset.GetProperty(Props.Core.Realm.HasRecalls);
+            var recallsDisabled = !Props.Core.Realm.HasRecalls(RealmRuleset);
             if (recallsDisabled)
                 return;
             //Console.WriteLine($"{Name}.HandleActionTeleToPkLiteArena()");
@@ -875,7 +875,7 @@ namespace ACE.Server.WorldObjects
                     pk = true;
             }
 
-            if (newRealm.StandardRules.GetProperty(Props.Pvp.World.IsPkOnly))
+            if (Props.Pvp.World.IsPkOnly(newRealm.StandardRules))
                 pk = true;
 
             PlayerKillerStatus = pk ? PlayerKillerStatus.PK : PlayerKillerStatus.NPK;
@@ -976,7 +976,7 @@ namespace ACE.Server.WorldObjects
                     case ReservedRealm.hideout:
                         if (shortInstanceId != Account.AccountId)
                             return false;
-                        if (!homerealm.StandardRules.GetProperty(Props.Core.Realm.HideoutEnabled))
+                        if (!Props.Core.Realm.HideoutEnabled(homerealm.StandardRules))
                             return false;
                         return new ushort[] { 0x7308, 0x7309 }.Contains((ushort)newPosition.LandblockShort); //Ulgrims only, todo: add other landblocks
                     default:
@@ -1004,8 +1004,8 @@ namespace ACE.Server.WorldObjects
             }
             else
             {
-                if (homerealm.StandardRules.GetProperty(Props.Core.Realm.CanInteractWithNeutralZone) == true &&
-                    destrealm.StandardRules.GetProperty(Props.Core.Realm.IsNeutralZone) == true)
+                if (Props.Core.Realm.CanInteractWithNeutralZone(homerealm.StandardRules) &&
+                    Props.Core.Realm.IsNeutralZone(destrealm.StandardRules))
                     return true;
             }
             

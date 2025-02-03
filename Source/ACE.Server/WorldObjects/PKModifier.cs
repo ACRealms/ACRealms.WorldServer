@@ -59,7 +59,7 @@ namespace ACE.Server.WorldObjects
                 return new ActivationResult(false);
             }
 
-            if (player.PkLevel > PKLevel.PK || player.RealmRuleset.GetProperty(Props.Pvp.World.IsPkOnly) || PropertyManager.GetBool("pkl_server").Item)
+            if (player.PkLevel > PKLevel.PK || Props.Pvp.World.IsPkOnly(player.RealmRuleset) || PropertyManager.GetBool("pkl_server").Item)
             {
                 if (!string.IsNullOrWhiteSpace(GetProperty(PropertyString.UsePkServerError)))
                     player.Session.Network.EnqueueSend(new GameMessageSystemChat(GetProperty(PropertyString.UsePkServerError), ChatMessageType.Broadcast));

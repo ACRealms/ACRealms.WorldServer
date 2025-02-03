@@ -131,7 +131,7 @@ namespace ACE.Server.Entity
         /// <summary>
         /// Landblocks which have been inactive for this many seconds will be unloaded
         /// </summary>
-        public TimeSpan UnloadInterval => TimeSpan.FromMinutes(RealmRuleset.GetProperty(Props.Core.Landblock.UnloadInterval));
+        public TimeSpan UnloadInterval => TimeSpan.FromMinutes(Props.Core.Landblock.UnloadInterval(RealmRuleset));
 
 
         /// <summary>
@@ -1507,7 +1507,7 @@ Please report this to the ACRealms developer.");
             {
                 get
                 {
-                    return Landblock.InnerRealmInfo != null && Landblock.RealmRuleset.GetProperty(Props.Pvp.World.IsDuelingRealm);
+                    return Landblock.InnerRealmInfo != null && Props.Pvp.World.IsDuelingRealm(Landblock.RealmRuleset);
                 }
             }
 
@@ -1515,7 +1515,7 @@ Please report this to the ACRealms developer.");
             {
                 get
                 {
-                    return Landblock.RealmRuleset != null && Landblock.RealmRuleset.GetProperty(Props.Pvp.World.IsPkOnly);
+                    return Landblock.RealmRuleset != null && Props.Pvp.World.IsPkOnly(Landblock.RealmRuleset);
                 }
             }
         }

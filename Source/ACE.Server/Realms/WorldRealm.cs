@@ -25,7 +25,7 @@ namespace ACE.Server.Realms
         internal InstancedPosition DefaultStartingLocation(Player player)
         {
            // Props.Creature.Attributes.CoordinationMultiplier.
-            if (StandardRules.GetProperty(Props.Pvp.World.IsDuelingRealm))
+            if (Props.Pvp.World.IsDuelingRealm(StandardRules))
             {
                 //Adventurer's Haven
                 //0x01AC0118[29.684622 - 30.072382 0.010000] - 0.027857 0.999612 0.000000 0.000000
@@ -40,7 +40,7 @@ namespace ACE.Server.Realms
 
         internal bool IsWhitelistedLandblock(ushort landblock)
         {
-            if (StandardRules.GetProperty(Props.Pvp.World.IsDuelingRealm))
+            if (Props.Pvp.World.IsDuelingRealm(StandardRules))
                 return RealmConstants.DuelLandblocks.Contains(landblock);
             return true;
         }

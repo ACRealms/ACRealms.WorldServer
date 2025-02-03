@@ -138,11 +138,11 @@ namespace ACE.Server.WorldObjects
                     log.Error("Weenie not found: realm-selector-token" + Environment.NewLine + Environment.StackTrace);
                 else
                 {
-                    foreach (var realm in RealmManager.Realms.Where(x => x.StandardRules.GetProperty(Props.Core.Realm.CanBeHomeworld)))
+                    foreach (var realm in RealmManager.Realms.Where(x => Props.Core.Realm.CanBeHomeworld(x.StandardRules)))
                     {
                         WorldObject wo = WorldObjectFactory.CreateNewWorldObject(weenie.WeenieClassId, RealmRuleset);
                         wo.Name = realm.Realm.Name;
-                        wo.Use = realm.StandardRules.GetProperty(Props.Core.Realm.Description);
+                        wo.Use = Props.Core.Realm.Description(realm.StandardRules);
                         wo.LongDesc = realm.StandardRules.DebugOutputString();
                         wo.ItemType = ItemType.Service;
                         wo.SetProperty(PropertyInt.HomeRealm, realm.Realm.Id);
@@ -164,12 +164,12 @@ namespace ACE.Server.WorldObjects
                         log.Error("Weenie not found: realm-ruleset-stamp" + Environment.NewLine + Environment.StackTrace);
                     else
                     {
-                        var rulesets = RealmManager.Rulesets.Where(x => x.StandardRules.GetProperty(Props.Core.RulesetCrafting.RulesetStampVendorCategory) == rulesetVendorType);
+                        var rulesets = RealmManager.Rulesets.Where(x => Props.Core.RulesetCrafting.RulesetStampVendorCategory(x.StandardRules) == rulesetVendorType);
                         foreach (var ruleset in rulesets)
                         {
                             WorldObject wo = WorldObjectFactory.CreateNewWorldObject(weenie.WeenieClassId, RealmRuleset);
                             wo.Name = ruleset.Realm.Name;
-                            wo.Use = ruleset.StandardRules.GetProperty(Props.Core.Realm.Description);
+                            wo.Use = Props.Core.Realm.Description(ruleset.StandardRules);
                             wo.LongDesc = ruleset.StandardRules.DebugOutputString();
                             wo.SetProperty(PropertyInt.HomeRealm, ruleset.Realm.Id);
                             wo.ContainerId = Guid.Full;

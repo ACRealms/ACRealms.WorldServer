@@ -409,7 +409,7 @@ namespace ACE.Server.WorldObjects
         {
             get
             {
-                return TimeSpan.FromSeconds(RealmRuleset.GetProperty(Props.Player.Spellcasting.MoveToStateUpdatePositionThreshold));
+                return TimeSpan.FromSeconds(Props.Player.Spellcasting.MoveToStateUpdatePositionThreshold(RealmRuleset));
             }
         }
 

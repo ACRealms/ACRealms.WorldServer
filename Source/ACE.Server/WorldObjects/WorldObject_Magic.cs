@@ -1303,7 +1303,7 @@ namespace ACE.Server.WorldObjects
                     return false;
                 }
 
-                if (summoner.RealmRuleset.GetProperty(Props.Pvp.World.IsDuelingRealm))
+                if (Props.Pvp.World.IsDuelingRealm(summoner.RealmRuleset))
                     doEphemeralInstance = true;
 
                 if (doEphemeralInstance)
@@ -1318,7 +1318,7 @@ namespace ACE.Server.WorldObjects
                     forceInstanceId = landblock.Instance;
 
                     // If the ruleset dictates that the landblock is to be unloaded if empty for less time than the portal is active for, we need to shorten this portal's duration
-                    var maxPortalTime = Math.Min(portalLifetime, TimeSpan.FromMinutes(0.5 + landblock.RealmRuleset.GetProperty(Props.Core.Landblock.UnloadInterval)).TotalSeconds);
+                    var maxPortalTime = Math.Min(portalLifetime, TimeSpan.FromMinutes(0.5 + Props.Core.Landblock.UnloadInterval(landblock.RealmRuleset)).TotalSeconds);
                     if (portalLifetime > maxPortalTime)
                     {
                         summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"The portal duration has been reduced from {portalLifetime} to {maxPortalTime} seconds due to the ruleset's limit on inactive landblock lifespans!", ChatMessageType.Magic));

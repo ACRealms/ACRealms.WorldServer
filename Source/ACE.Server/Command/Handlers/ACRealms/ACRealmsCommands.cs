@@ -87,7 +87,7 @@ namespace ACE.Server.Command.Handlers
         {
             if (session?.Player?.HomeRealm == null)
                 return;
-            if (!Managers.RealmManager.GetRealm(session.Player.HomeRealm, includeRulesets: false).StandardRules.ValueOf(Props.Core.Realm.HideoutEnabled))
+            if (!Props.Core.Realm.HideoutEnabled(Managers.RealmManager.GetRealm(session.Player.HomeRealm, includeRulesets: false).StandardRules))
             {
                 session.Network.EnqueueSend(new GameMessageSystemChat($"Your home realm has not enabled hideouts.", ChatMessageType.Broadcast));
                 return;
@@ -104,7 +104,7 @@ namespace ACE.Server.Command.Handlers
             var player = session.Player;
             var realm = RealmManager.GetRealm(player.HomeRealm, includeRulesets: false);
             if (realm == null) return;
-            if (!realm.StandardRules.GetProperty(Props.Pvp.World.IsDuelingRealm)) return;
+            if (!Props.Pvp.World.IsDuelingRealm(realm.StandardRules)) return;
             var ts = player.GetProperty(PropertyInt.LastRebuffTimestamp);
             if (ts != null)
             {

@@ -13,7 +13,10 @@ using System.Threading.Tasks;
 
 namespace ACE.Server.WorldObjects
 {
-    public partial class WorldObject : ACRealms.RealmProps.Contexts.ICanonicalContextEntity<IWorldObjectContextEntity, WorldObject>, ACRealms.Prototypes.IResolvableContext<BiotaPropertyPrototypes, ACE.Entity.Models.Biota>
+    public partial class WorldObject :
+        ACRealms.RealmProps.Contexts.ICanonicalContextEntity<IWorldObjectContextEntity, WorldObject>,
+        ACRealms.Prototypes.IResolvableContext<BiotaPropertyPrototypes, ACE.Entity.Models.Biota>,
+        IWorldObjectContextEntity
     {
         public IPrototypes Prototypes => Biota.Prototypes;
 
