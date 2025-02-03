@@ -619,7 +619,7 @@ namespace ACE.Server.Realms
         }
 
         public bool GetProperty(RealmPropertyBool prop) => ValueOf(prop);
-        public bool ValueOf(RealmPropertyBool prop, params IReadOnlyCollection<(string, ICanonicalContextEntity)> ctx)
+        public bool ValueOf(RealmPropertyBool prop, params IReadOnlyCollection<ValueTuple<string, ICanonicalContextEntity>> ctx)
         {
             var att = RealmPropertyPrototypes.Bool[prop].PrimaryAttribute;
             if (_propertiesBool.TryGetValue(prop, out var value))
@@ -630,7 +630,7 @@ namespace ACE.Server.Realms
         }
 
         public double GetProperty(RealmPropertyFloat prop) => ValueOf(prop);
-        public double ValueOf(RealmPropertyFloat prop, params IReadOnlyCollection<(string, ICanonicalContextEntity)> ctx)
+        public double ValueOf(RealmPropertyFloat prop, params IReadOnlyCollection<ValueTuple<string, ICanonicalContextEntity>> ctx)
         {
             var att = RealmPropertyPrototypes.Float[prop].PrimaryAttribute;
             if (_propertiesFloat.TryGetValue(prop, out var value))
@@ -649,7 +649,7 @@ namespace ACE.Server.Realms
         }
 
         public int GetProperty(RealmPropertyInt prop) => ValueOf(prop);
-        public int ValueOf(RealmPropertyInt prop, params IReadOnlyCollection<(string, ICanonicalContextEntity)> ctx)
+        public int ValueOf(RealmPropertyInt prop, params IReadOnlyCollection<ValueTuple<string, ICanonicalContextEntity>> ctx)
         {
             var proto = RealmPropertyPrototypes.Int[prop];
             // Evaluate ctx vs scopes
@@ -679,7 +679,7 @@ namespace ACE.Server.Realms
         }
 
         public long GetProperty(RealmPropertyInt64 prop) => ValueOf(prop);
-        public long ValueOf(RealmPropertyInt64 prop, params IReadOnlyCollection<(string, ICanonicalContextEntity)> ctx)
+        public long ValueOf(RealmPropertyInt64 prop, params IReadOnlyCollection<ValueTuple<string, ICanonicalContextEntity>> ctx)
         {
             var att = RealmPropertyPrototypes.Int64[prop].PrimaryAttribute;
             if (_propertiesInt64.TryGetValue(prop, out var value))
@@ -698,7 +698,7 @@ namespace ACE.Server.Realms
         }
 
         public string GetProperty(RealmPropertyString prop) => ValueOf(prop);
-        public string ValueOf(RealmPropertyString prop, params IReadOnlyCollection<(string, ICanonicalContextEntity)> ctx)
+        public string ValueOf(RealmPropertyString prop, params IReadOnlyCollection<ValueTuple<string, ICanonicalContextEntity>> ctx)
         {
             var att = RealmPropertyPrototypes.String[prop].PrimaryAttribute;
             if (_propertiesString.TryGetValue(prop, out var value))

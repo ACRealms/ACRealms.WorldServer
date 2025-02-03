@@ -12,9 +12,10 @@ public static partial class Props
     {
         public static partial class Attributes
         {
-            public static int StrengthAdded2(IAppliedRuleset ruleset, ICanonicalContextEntity SpawnedCreature)
+            public static int StrengthAdded2(IAppliedRuleset ruleset, IWorldObjectContextEntity SpawnedCreature)
             {
-                return ruleset.ValueOf(ACRealms.Props.Creature.Attributes.StrengthAdded, ("SpawnedCreature", SpawnedCreature));
+                return ACRealms.Props.Creature.Attributes.StrengthAdded(ruleset, SpawnedCreature);
+                //return ruleset.ValueOf(ACRealms.Props.Creature.Attributes.StrengthAdded, ("SpawnedCreature", SpawnedCreature));
             }
         }
     }

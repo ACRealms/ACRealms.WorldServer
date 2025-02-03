@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -68,6 +69,11 @@ namespace ACRealms.Roslyn.RealmProps
 
         public string CoreEnumType => PropMap[Type];
         public PrimitiveType PrimitiveType => PrimitiveMap[Type];
+        public string PropTypeDecl => PrimitiveType switch
+        {
+            PrimitiveType.@enum => Enum,
+            _ => PrimitiveType.ToString()
+        };
 
         public string ToNamespacedAliasDeclaration(string spacer)
         {
@@ -76,12 +82,42 @@ namespace ACRealms.Roslyn.RealmProps
             {{spacer}}[System.Obsolete("{{ObsoleteReason}}")]
             """ : "";
 
-            return
+            var ctxs = Contexts
+                .OrderByDescending(static x => x.Required)
+                .Select<PropContext, (PropContext ctx, string ctxType)>(
+                    ctx => (ctx, EntityToContextEntityMapping.GetScopedAttributeType(ctx.Entity)))
+                .ToImmutableArray();
+            IEnumerable<string> declArgsCollection = ["IAppliedRuleset ruleset", .. ctxs.Select(x => 
+            {
+                var decl = $"{x.ctxType} {x.ctx.Name}";
+                if (!x.ctx.Required)
+                    decl += " = null";
+                return decl;
+            })];
+            var declArgs = string.Join(", ", declArgsCollection);
+
+            IEnumerable<string> invokeArgsCollection = [$"{CoreEnumType}.{CoreKey}", .. ctxs.Select(x => $"(\"{x.ctx.Name}\", {x.ctx.Name})")];
+            var invokeArgs = string.Join(", ", invokeArgsCollection);
+
+            var returnCast = Type == PropType.@enum ? $"({PropTypeDecl})" : string.Empty;
+            /*return
             $$"""
             {{spacer}}/// <summary>{{Description}}</summary>{{obs}}
             {{spacer}}public const {{CoreEnumType}} {{Key}} = {{CoreEnumType}}.{{CoreKey}};
+            """;*/
+            return
+            $$"""
+            {{spacer}}public static {{PropTypeDecl}} {{Key}}({{declArgs}})
+            {{spacer}}  => {{returnCast}}ruleset.ValueOf({{invokeArgs}});
+
             """;
-        }
+            /*
+            public static int StrengthAdded2(IAppliedRuleset ruleset, ICanonicalContextEntity SpawnedCreature)
+            {
+                return ruleset.ValueOf(ACRealms.Props.Creature.Attributes.StrengthAdded, ("SpawnedCreature", SpawnedCreature));
+            }
+            */
+            }
 
         private string GetDefaultLiteral()
         {

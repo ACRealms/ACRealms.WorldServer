@@ -83,7 +83,7 @@ namespace ACRealms.RealmProps.Contexts
 
     }
 
-    public interface IWorldObjectContextEntity : IContextEntity
+    public interface IWorldObjectContextEntity : IContextEntity, ICanonicalContextEntity
     {
         
     }
