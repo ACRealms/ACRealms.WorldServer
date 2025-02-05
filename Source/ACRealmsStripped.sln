@@ -52,10 +52,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACRealms.RealmProps", "ACRealms.RealmProps\ACRealms.RealmProps.csproj", "{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACE.Common", "ACE.Common\ACE.Common.csproj", "{70F5A6F8-924A-430D-AAC0-52FF00186291}"
-	ProjectSection(ProjectDependencies) = postProject
-		{88DBDBBD-3698-4534-844D-1AA3BD471E0C} = {88DBDBBD-3698-4534-844D-1AA3BD471E0C}
-		{BA9D15D3-DEA2-4C03-B481-1D5394842BCF} = {BA9D15D3-DEA2-4C03-B481-1D5394842BCF}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
