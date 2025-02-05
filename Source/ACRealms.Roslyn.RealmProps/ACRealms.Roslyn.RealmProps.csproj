@@ -4,7 +4,7 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <LangVersion>12.0</LangVersion>
+    <LangVersion>13.0</LangVersion>
     <!--<PlatformTarget>x64</PlatformTarget>-->
     <IsRoslynComponent>true</IsRoslynComponent> <!-- Allow for debugging in VS -->
     <NoWarn>$(NoWarn);nullable;NU5128;RS2008;SA0001;RS1041</NoWarn>

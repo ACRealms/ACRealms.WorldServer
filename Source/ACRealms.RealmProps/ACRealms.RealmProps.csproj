@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Platforms>x64</Platforms>
-    <LangVersion>13.0</LangVersion>      
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <!--<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>-->
     <BaseOutputPath>..\lib\RealmPropsAssembly</BaseOutputPath>
