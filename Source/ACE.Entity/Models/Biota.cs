@@ -22,25 +22,66 @@ namespace ACE.Entity.Models
         public uint WeenieClassId { get; set; }
         public WeenieType WeenieType { get; set; }
 
-        public IDictionary<PropertyBool, bool> PropertiesBool { get; set; }
+        IDictionary<PropertyBool, bool> propertiesBool;
+        public IDictionary<PropertyBool, bool> PropertiesBool
+        {
+            get => propertiesBool;
+            set
+            {
+                propertiesBool = value;
+                CovariantPropertiesBool = new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyBool, ushort, bool>(value.AsReadOnly());
+            }
+        }
         public IDictionary<PropertyDataId, uint> PropertiesDID { get; set; }
-        public IDictionary<PropertyFloat, double> PropertiesFloat { get; set; }
-        public IDictionary<PropertyInstanceId, ulong> PropertiesIID { get; set; }
-        public IDictionary<PropertyInt, int> PropertiesInt { get; set; }
-        public IDictionary<PropertyInt64, long> PropertiesInt64 { get; set; }
-        public IDictionary<PropertyString, string> PropertiesString { get; set; }
 
-        // TODO: Fix these, they are inefficient (unnecessary?), still proof of concept
-        public IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesInt =>
-            new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyInt, ushort, int>(PropertiesInt?.AsReadOnly());
-        public IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesInt64 =>
-            new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyInt64, ushort, long>(PropertiesInt64?.AsReadOnly());
-        public IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesFloat =>
-            new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyFloat, ushort, double>(PropertiesFloat?.AsReadOnly());
-        public IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesBool =>
-            new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyBool, ushort, bool>(PropertiesBool?.AsReadOnly());
-        public IDictionaryConvertibleKeyObjectValue<ushort> CovariantPropertiesString =>
-            new CovariantReadOnlyDictionaryPolyKeyObjectValue<PropertyString, ushort, string>(PropertiesString?.AsReadOnly());
+        IDictionary<PropertyFloat, double> propertiesFloat;
+        public IDictionary<PropertyFloat, double> PropertiesFloat
+        {
+            get => propertiesFloat;
+            set
+            {
+                propertiesFloat = value;
+                CovariantPropertiesFloat = new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyFloat, ushort, double>(value.AsReadOnly());
+            }
+        }
+        public IDictionary<PropertyInstanceId, ulong> PropertiesIID { get; set; }
+
+        IDictionary<PropertyInt, int> propertiesInt;
+        public IDictionary<PropertyInt, int> PropertiesInt
+        {
+            get => propertiesInt;
+            set
+            {
+                propertiesInt = value;
+                CovariantPropertiesInt = new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyInt, ushort, int>(value.AsReadOnly());
+            }
+        }
+        IDictionary<PropertyInt64, long> propertiesInt64;
+        public IDictionary<PropertyInt64, long> PropertiesInt64
+        {
+            get => propertiesInt64;
+            set
+            {
+                propertiesInt64 = value;
+                CovariantPropertiesInt64 = new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyInt64, ushort, long>(value.AsReadOnly());
+            }
+        }
+        IDictionary<PropertyString, string> propertiesString;
+        public IDictionary<PropertyString, string> PropertiesString
+        {
+            get => propertiesString;
+            set
+            {
+                propertiesString = value;
+                CovariantPropertiesString = new CovariantReadOnlyDictionaryPolyKeyObjectValue<PropertyString, ushort, string>(value.AsReadOnly());
+            }
+        }
+
+        private IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesInt { get; set; }
+        private IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesInt64 { get; set; }
+        private IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesFloat { get; set; }
+        private IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesBool { get; set; }
+        private IDictionaryConvertibleKeyObjectValue<ushort> CovariantPropertiesString { get; set; }
         public IDictionary<PositionType, PropertiesPosition> PropertiesPosition { get; set; }
 
         public IDictionary<int, float /* probability */> PropertiesSpellBook { get; set; }
@@ -93,12 +134,22 @@ namespace ACE.Entity.Models
         bool IResolvableContext.TryFetchValue(IPrototype prototype, out ValueType result)// Type valueType, ValueType key, out ValueType result)
         {
             var dict = ValueDicts[prototype.ValueType](this);
+            if (dict == null)
+            {
+                result = null;
+                return false;
+            }
             return dict.TryFetchValueWithUnderlying((ushort)prototype.UntypedRawKey, out result);
         }
 
         bool IResolvableContext.TryFetchObject(IPrototype prototype, out object result)
         {
             var dict = ObjectDicts[prototype.ValueType](this);
+            if (dict == null)
+            {
+                result = null;
+                return false;
+            }
             return dict.TryFetchObjectWithUnderlying((ushort)prototype.UntypedRawKey, out result);
         }
         #endregion IResolvableContext
