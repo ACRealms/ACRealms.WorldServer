@@ -125,8 +125,12 @@
           "anyOf": [ { "$ref": "#intellisense.equatable" } ]
         }
       },
-      "type": "boolean",
       "anyOf": [
+        {
+          "type": "object",
+          "$ref": "#params.bool",
+          "default": { }
+        },
         {
           "default": false,
           "const": false
