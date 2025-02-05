@@ -57,6 +57,7 @@ namespace ACRealms.Roslyn.RealmProps
 
             namespace ACRealms;
 
+            /// <summary>All realm properties are evaluated through this root type</summary>
             public static partial class Props
             {
             {{nestedClassDecl}}

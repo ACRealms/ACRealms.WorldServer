@@ -100,23 +100,14 @@ namespace ACRealms.Roslyn.RealmProps
             var invokeArgs = string.Join(", ", invokeArgsCollection);
 
             var returnCast = Type == PropType.@enum ? $"({PropTypeDecl})" : string.Empty;
-            /*return
-            $$"""
-            {{spacer}}/// <summary>{{Description}}</summary>{{obs}}
-            {{spacer}}public const {{CoreEnumType}} {{Key}} = {{CoreEnumType}}.{{CoreKey}};
-            """;*/
+
             return
             $$"""
+            {{spacer}}/// <summary>{{Description}}</summary>
             {{spacer}}public static {{PropTypeDecl}} {{Key}}({{declArgs}})
             {{spacer}}  => {{returnCast}}ruleset.ValueOf({{invokeArgs}});
 
             """;
-            /*
-            public static int StrengthAdded2(IAppliedRuleset ruleset, ICanonicalContextEntity SpawnedCreature)
-            {
-                return ruleset.ValueOf(ACRealms.Props.Creature.Attributes.StrengthAdded, ("SpawnedCreature", SpawnedCreature));
-            }
-            */
             }
 
         private string GetDefaultLiteral()

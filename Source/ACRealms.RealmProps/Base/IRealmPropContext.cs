@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace ACRealms.RealmProps.Contexts
 {
+    /// <summary>
+    /// Base interface for ScopedWithAttribute
+    /// </summary>
     public interface IContextEntity : IResolvableContext
     {
         /// <summary>
@@ -28,28 +31,26 @@ namespace ACRealms.RealmProps.Contexts
         static virtual Type? TypeOfProperty(string key) => null;
     }
 
+    /// <summary>
+    /// Maps a proxy entity interface to the actual entity type. Base interface
+    /// </summary>
     public interface ICanonicalContextEntity : IContextEntity { }
+
+    /// <summary>
+    /// Maps a proxy entity interface to the actual entity type
+    /// </summary>
+    /// <typeparam name="TEntityIOCInterface"></typeparam>
+    /// <typeparam name="TEntity"></typeparam>
     public interface ICanonicalContextEntity<TEntityIOCInterface, TEntity>
         : ICanonicalContextEntity, IResolvableContext
         where TEntityIOCInterface : IContextEntity
         where TEntity : class, ICanonicalContextEntity<TEntityIOCInterface, TEntity>
     {
-        /// <summary>
-        /// Returns true if the given key can be used to fetch a value during scoped rule evaluation
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        static abstract bool RespondsTo(string key);// => throw new NotImplementedException();
-
-        /// <summary>
-        /// Given the key, returns the type returned by a property.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        static abstract Type TypeOfProperty(string key);// => throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// A proxy interface for the WorldObject type, which is visible to the base library
+    /// </summary>
     public interface IWorldObjectContextEntity : IContextEntity, ICanonicalContextEntity { }
 
     internal abstract record ContextType { }
@@ -60,7 +61,7 @@ namespace ACRealms.RealmProps.Contexts
 
         public IResolvableContext UnderlyingContext => throw new NotImplementedException();
 
-        internal T Value { get; }
+        internal required T Value { get; init; }
 
         public static bool RespondsTo(string key) => key == "Value";
 

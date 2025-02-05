@@ -106,7 +106,7 @@ namespace ACE.Server.Realms
         internal IReadOnlyList<RealmLinkJob> Jobs { get; private set; }
 
         internal readonly Dictionary<RealmPropertyBool, TemplatedRealmPropertyGroup<bool>> _propertiesBool = new Dictionary<RealmPropertyBool, TemplatedRealmPropertyGroup<bool>>();
-        internal override IDictionary<RealmPropertyBool, IRealmPropertyGroup<bool>> PropertiesBool => (IDictionary<RealmPropertyBool, IRealmPropertyGroup<bool>>)_propertiesBool.Cast<IRealmPropertyGroup<bool>>();
+        internal override IDictionary<RealmPropertyBool, IRealmPropertyGroup<bool>> PropertiesBool => (IDictionary<RealmPropertyBool, IRealmPropertyGroup<bool>>)_propertiesBool;
 
         internal readonly Dictionary<RealmPropertyFloat, TemplatedRealmPropertyGroup<double>> _propertiesFloat = new Dictionary<RealmPropertyFloat, TemplatedRealmPropertyGroup<double>>();
         internal override IDictionary<RealmPropertyFloat, IRealmPropertyGroup<double>> PropertiesFloat => (IDictionary<RealmPropertyFloat, IRealmPropertyGroup<double>>)_propertiesFloat;
@@ -245,11 +245,6 @@ namespace ACE.Server.Realms
         }
 
         internal RulesetTemplate RebuildTemplateWithContext(RulesetCompilationContext ctx) => new(this, RulesetID, ctx);
-
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
     }
 
     //Properties may be changed freely

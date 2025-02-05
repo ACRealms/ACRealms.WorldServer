@@ -66,8 +66,8 @@ namespace ACRealms.Rulesets.Contexts
         public override bool MatchValue(ValueType val) => Ops.Match((TVal)val);
     }
 
-    public interface IPredicate { }
-    public interface IPredicate<T> : IPredicate
+    internal interface IPredicate { }
+    internal interface IPredicate<T> : IPredicate
     {
         T Value { get; init; }
 
@@ -76,7 +76,7 @@ namespace ACRealms.Rulesets.Contexts
         bool MatchNull();
     }
 
-    public static class Predicates
+    internal static class Predicates
     {
         public readonly record struct Equal<T>(T Value) : IPredicate<T>
             where T : IEquatable<T>
@@ -142,8 +142,8 @@ namespace ACRealms.Rulesets.Contexts
         }
     }
 
-    public interface IRealmPropertyScopeOps { }
-    public interface IRealmPropertyScopeOps<T> : IRealmPropertyScopeOps { }
+    internal interface IRealmPropertyScopeOps { }
+    internal interface IRealmPropertyScopeOps<T> : IRealmPropertyScopeOps { }
 
     internal readonly record struct RealmPropertyScopeOps<TVal> : IRealmPropertyScopeOps<TVal>
     {
