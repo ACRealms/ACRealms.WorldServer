@@ -48,14 +48,9 @@
     <Exec Command="mv -fuT $(AssemblyName).dll $(AssemblyName)Assembly.dll&#xD;&#xA;mv -fuT $(AssemblyName).pdb $(AssemblyName)Assembly.pdb&#xD;&#xA;mv -fuT $(AssemblyName).xml $(AssemblyName)Assembly.xml&#xD;&#xA;mv -fuT $(AssemblyName).deps.json $(AssemblyName)Assembly.deps.json" WorkingDirectory="$(OutDir)" />
   </Target>
    
-  <!-- YOU MUST TARGET NET STANDARD WHEN BUILDING FROM VS, AND NET9 FROM DOTNET BUILD -->
-  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+  <ItemGroup>
     <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />        
     <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
-    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=net9.0" />        
-    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=net9.0" />
   </ItemGroup>
 
   <ItemGroup>

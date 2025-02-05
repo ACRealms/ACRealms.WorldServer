@@ -1,12 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
-    <TargetFrameworks>netstandard2.0;</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
-    <TargetFrameworks>net9.0;</TargetFrameworks>
-  </PropertyGroup>
-   
   <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;</TargetFrameworks>
     <!--<IsPackable>false</IsPackable>-->
     <LangVersion>12.0</LangVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
@@ -49,11 +43,8 @@
     <Folder Include="NewFolder\" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+  <ItemGroup>
     <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" SetTargetFramework="TargetFramework=netstandard2.0" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
-    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" SetTargetFramework="TargetFramework=net9.0" />
   </ItemGroup>
     
   <!-- Required for running in VS -->

@@ -25,11 +25,8 @@
     <ProjectReference Include="..\ACE.Common\ACE.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+  <ItemGroup>
     <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />   
-  </ItemGroup>
-  <ItemGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
-    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=net9.0" />
   </ItemGroup>
 
     <ItemGroup>
