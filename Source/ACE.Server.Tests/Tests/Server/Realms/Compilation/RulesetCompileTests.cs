@@ -147,15 +147,15 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             var seed = int.Parse(msg.Split(":")[1]);
             Assert.Equal(player.RealmRuleset.Context.RandomSeed, seed);
 
-            Func<AppliedRuleset, List<IRealmPropertyGroup<int>>> filter = (ruleset) =>
-                ruleset.PropertiesInt.Keys.Intersect([
+            Func<AppliedRuleset, List<ActiveRealmPropertyGroup<int>>> filter = (ruleset) =>
+                ruleset._propertiesInt.Keys.Intersect([
                     RealmPropertyInt.Creature_Attributes_StrengthAdded,
                     RealmPropertyInt.Creature_Attributes_EnduranceAdded,
                     RealmPropertyInt.Creature_Attributes_CoordinationAdded,
                     RealmPropertyInt.Creature_Attributes_QuicknessAdded,
                     RealmPropertyInt.Creature_Attributes_FocusAdded,
                     RealmPropertyInt.Creature_Attributes_SelfAdded])
-                .Select(k => ruleset.PropertiesInt[k]).ToList();
+                .Select(k => ruleset._propertiesInt[k]).ToList();
             Func<AppliedRuleset, List<string>> mapPropNames = (ruleset) => filter(ruleset).Select(x => x.Options.Name).OrderBy(x => x).ToList();
 
             var ruleset = player.RealmRuleset;

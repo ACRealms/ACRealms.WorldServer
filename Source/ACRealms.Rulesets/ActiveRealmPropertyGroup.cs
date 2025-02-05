@@ -159,7 +159,7 @@ namespace ACRealms.Rulesets
             if (scopelessPreEval)
             {
                 foreach (var prop in Properties)
-                    prop.TryEval(null, out _, true);
+                    prop.TryEval([], out _, true);
                 val = default;
                 return true;
             }
