@@ -30,15 +30,14 @@ namespace ACRealms.RealmProps.Contexts
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        static virtual bool RespondsTo(string key) => throw new NotImplementedException();
+        static virtual bool RespondsTo(string key) => false;
 
         /// <summary>
         /// Given the key, returns the type returned by a property.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        static virtual Type TypeOfProperty(string key) => throw new NotImplementedException();
+        static virtual Type? TypeOfProperty(string key) => null;
     }
 
     public interface ICanonicalContextEntity : IContextEntity { }

@@ -243,17 +243,13 @@ namespace ACRealms.RealmProps
     {
         Lazy<Type> EntityType { get; }
 
-        //static virtual bool RespondsTo(string key) => T.RespondsTo(key);
-
-
         /// <summary>
         /// Warning, this method is somewhat slow, using reflection, and should only be called during ruleset warming (RealmConverter)
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
         bool RespondsTo(string key);
-        Type TypeOfProperty(string key);
-        //virtual Type TypeOfProperty(string key) => T.TypeOfProperty(key);
+        Type? TypeOfProperty(string key);
     }
 
     internal sealed class ScopedWithAttribute<T> : ScopedWithAttribute, IScopedWithAttribute<T> where T : IContextEntity
@@ -266,42 +262,33 @@ namespace ACRealms.RealmProps
 
         public bool RespondsTo(string key)
         {
-            try
-            {
-                return T.RespondsTo(key);
-            }
-            catch (NotImplementedException)
-            {
-                if (EntityType == null)
-                    throw;
+            if (T.RespondsTo(key))
+                return true;
 
-                var entityType = EntityType.Value;
-                if (!RealmPropertyPrototypes.ContextMappings.TryGetValue(entityType, out var secondType))
-                    throw;
+            if (EntityType == null)
+                return false;
 
-                var method = secondType.GetMethod("RespondsTo", BindingFlags.Static | BindingFlags.Public, [typeof(string)]);
-                return (bool)method!.Invoke(null, [key])!;
-            }
+            var entityType = EntityType.Value;
+            if (!RealmPropertyPrototypes.ContextMappings.TryGetValue(entityType, out var secondType))
+                return false;
+
+            var method = secondType.GetMethod("RespondsTo", BindingFlags.Static | BindingFlags.Public, [typeof(string)]);
+            return (bool)method!.Invoke(null, [key])!;
         }
 
-        public Type TypeOfProperty(string key)
+        public Type? TypeOfProperty(string key)
         {
-            try
-            {
-                return T.TypeOfProperty(key);
-            }
-            catch (NotImplementedException)
-            {
-                if (EntityType == null)
-                    throw;
+            var type = T.TypeOfProperty(key);
 
-                var entityType = EntityType.Value;
-                if (!RealmPropertyPrototypes.ContextMappings.TryGetValue(entityType, out var secondType))
-                    throw;
+            if (EntityType == null)
+                return null;
 
-                var method = secondType.GetMethod("TypeOfProperty", BindingFlags.Static | BindingFlags.Public, [typeof(string)]);
-                return (Type)method!.Invoke(null, [key])!;
-            }
+            var entityType = EntityType.Value;
+            if (!RealmPropertyPrototypes.ContextMappings.TryGetValue(entityType, out var secondType))
+                return null;
+
+            var method = secondType.GetMethod("TypeOfProperty", BindingFlags.Static | BindingFlags.Public, [typeof(string)]);
+            return (Type)method!.Invoke(null, [key])!;
         }
     }
 }
