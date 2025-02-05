@@ -23,7 +23,7 @@ namespace ACRealms.Rulesets
     internal record TemplatedRealmPropertyGroup<TVal>(RealmPropertyGroupOptions<TVal> Options, int propKey) : TemplatedRealmPropertyGroup(Options, propKey), IRealmPropertyGroup<TVal>
         where TVal : IEquatable<TVal>
     {
-        public ImmutableList<TemplatedRealmProperty<TVal>> Properties { get; internal init; }
+        public ImmutableArray<TemplatedRealmProperty<TVal>> Properties { get; internal init; }
         public RealmPropertyGroupOptions<TVal> Options => (RealmPropertyGroupOptions<TVal>)OptionsBase;
 
         IRealmPropertyGroup<TVal> IRealmPropertyGroup<TVal>.Parent { get; }
@@ -39,6 +39,7 @@ namespace ACRealms.Rulesets
             : this(compilationContext, cloneFrom.Options, cloneFrom.PropertyKey)
         {
             Parent = parent;
+            Properties = cloneFrom.Properties.Select(p => new TemplatedRealmProperty<TVal>(compilationContext, cloneFrom.PropertyKey, p.Options)).ToImmutableArray();
         }
     }
 }
