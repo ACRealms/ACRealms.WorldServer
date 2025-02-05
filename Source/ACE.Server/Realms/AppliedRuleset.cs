@@ -140,10 +140,6 @@ namespace ACE.Server.Realms
             LogTrace(() => $"Completed template initialization");
         }
 
-
-        
-
-
         public static RulesetTemplate MakeTopLevelRuleset(Realm entity, RulesetCompilationContext ctx)
         {
             var ruleset = new RulesetTemplate(entity.Id, ctx);

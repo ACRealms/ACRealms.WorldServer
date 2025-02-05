@@ -9,18 +9,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACRealms
-{
-    public interface IRealmPropContext { }
-
-    /// <summary>
-    /// An object representing either an entity, or a boxed, non-null object or ValueType
-    /// </summary>
-    public interface IRealmPropContext<T> : IRealmPropContext
-    {
-    }
-}
-
 namespace ACRealms.RealmProps.Contexts
 {
     public interface IContextEntity : IResolvableContext
@@ -42,7 +30,7 @@ namespace ACRealms.RealmProps.Contexts
 
     public interface ICanonicalContextEntity : IContextEntity { }
     public interface ICanonicalContextEntity<TEntityIOCInterface, TEntity>
-        : ICanonicalContextEntity, IRealmPropContext<TEntityIOCInterface>, IResolvableContext
+        : ICanonicalContextEntity, IResolvableContext
         where TEntityIOCInterface : IContextEntity
         where TEntity : class, ICanonicalContextEntity<TEntityIOCInterface, TEntity>
     {
@@ -62,16 +50,16 @@ namespace ACRealms.RealmProps.Contexts
         static abstract Type TypeOfProperty(string key);// => throw new NotImplementedException();
     }
 
-    public interface IContextEntity<T> : IRealmPropContext<T> where T : class { }
     public interface IWorldObjectContextEntity : IContextEntity, ICanonicalContextEntity { }
-    public interface IWorldObjectContextEntity<T> : IWorldObjectContextEntity, IContextEntity<T>
-        where T : class, IWorldObjectContextEntity<T> { }
-
 
     internal abstract record ContextType { }
     internal abstract record Val : ContextType { }
-    internal record Val<T> : Val, IContextEntity<Val<T>>
+    internal record Val<T> : Val, IContextEntity
     {
+        public IPrototypes Prototypes => throw new NotImplementedException();
+
+        public IResolvableContext UnderlyingContext => throw new NotImplementedException();
+
         internal T Value { get; }
 
         public static bool RespondsTo(string key) => key == "Value";
@@ -84,6 +72,17 @@ namespace ACRealms.RealmProps.Contexts
         }
 
         public TVal? FetchContextProperty<TVal>(string name)
+        {
+            throw new NotImplementedException();
+
+        }
+
+        public bool TryFetchObject(IPrototype prototype, out object result)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryFetchValue(IPrototype prototype, out ValueType result)
         {
             throw new NotImplementedException();
         }
