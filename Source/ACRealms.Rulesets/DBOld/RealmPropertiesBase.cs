@@ -83,96 +83,127 @@ namespace ACRealms.Rulesets.DBOld
                 IScopedWithAttribute<IContextEntity> context = (IScopedWithAttribute<IContextEntity>)prototype.Contexts[scopeParam];
 
                 var scopeValue = contextKvp.Value;
-                if (scopeValue is JObject)
+                if (!(scopeValue is JObject))
+                    throw new InvalidDataException("Scope must be an object");
+
+                var scopeObjectDefinition = ((JObject)scopeValue).ToObject<Dictionary<string, object>>();
+
+                //Attempt to force predicate data into span for cheaper rule evaluation
+                foreach (var scopeEntityPropKvp in scopeObjectDefinition)
                 {
-                    var scopeObjectDefinition = ((JObject)scopeValue).ToObject<Dictionary<string, object>>();
+                    var scopeEntityPropKey = scopeEntityPropKvp.Key;
+                    var compiledScope = MakeScope(prototype, scopeParam, context, scopeEntityPropKvp);
 
-                    //Attempt to force predicate data into span for cheaper rule evaluation
-                    foreach (var scopeEntityPropKvp in scopeObjectDefinition)
-                    {
-                        var scopeEntityPropKey = scopeEntityPropKvp.Key;
-
-
-                        if (!context.RespondsTo(scopeEntityPropKey))
-                            throw new NotImplementedException($"Invalid context! A key ({scopeEntityPropKey}) was attempted to be referenced in a scope ({scopeParam}) referencing entity type {context.Entity}");
-                        var ctxPropType = context.TypeOfProperty(scopeEntityPropKey);
-
-                        var isNullable = ctxPropType.IsGenericType && ctxPropType.GetGenericTypeDefinition() == typeof(Nullable<>);
-                        Type valType = isNullable ? ctxPropType.GenericTypeArguments[0] : ctxPropType;
-
-                        var scopeEntityPropMatcherCriteria = scopeEntityPropKvp.Value;
-                        var dictType = typeof(Dictionary<,>).MakeGenericType(typeof(string), valType);
-
-                        if (scopeEntityPropMatcherCriteria is JObject)
-                        {
-                            var criteriaBase = (System.Collections.IDictionary)((JObject)scopeEntityPropMatcherCriteria).ToObject(dictType);
-                            var predicatesBase = criteriaBase.Keys.Cast<string>().Select(predicateTypeKey =>
-                            {
-                                if (!PredicateMap.TryGetValue(predicateTypeKey, out var predicateGenericType))
-                                {
-                                    throw new NotImplementedException(
-                                        $"Missing predicate type for scoped property {prototype.CanonicalName}, scope {scopeParam}, criterion {predicateTypeKey}. Check PredicateMap for missing entries.");
-                                }
-                                var predicateArg = criteriaBase[predicateTypeKey];
-
-                                var predicateType = predicateGenericType.MakeGenericType(valType);
-                                var predicate = (Contexts.IPredicate)Activator.CreateInstance(
-                                    predicateType,
-                                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.CreateInstance,
-                                    binder: null,
-                                    args: [predicateArg],
-                                    System.Globalization.CultureInfo.InvariantCulture,
-                                    activationAttributes: null
-                                );
-                                return predicate;
-                            });
-                            var predicateMostDerivedCommonType = typeof(IPredicate<>).MakeGenericType(valType);
-                            var castMethod = typeof(Enumerable).GetMethod("Cast", BindingFlags.Static | BindingFlags.Public);
-                            var castMethodUsable = castMethod.MakeGenericMethod(predicateMostDerivedCommonType);
-                            var predicates = castMethodUsable.Invoke(null, [predicatesBase]);
-
-                            var predicateInterface = typeof(IPredicate<>).MakeGenericType(valType);
-                            var enumerableInterface = typeof(IEnumerable<>).MakeGenericType(predicateInterface);
-                            //predicates.ToImmutableArray().AsSpan
-                            var aryConvs = typeof(ImmutableArray)
-                                .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                                .Where(m =>
-                                    m.Name == "ToImmutableArray" &&
-                                    m.IsGenericMethod &&
-                                    m.ContainsGenericParameters &&
-                                    m.GetGenericArguments().FirstOrDefault()?.Name == "TSource" &&
-                                    m.GetParameters().FirstOrDefault()?.Name == "items"
-                                );
-                            var aryConv = aryConvs.Single();
-
-                            var aryConvUsable = aryConv.MakeGenericMethod([predicateInterface]);
-                            var immutableArray = (IList)aryConvUsable.Invoke(null, [predicates]);
-
-                            var scopeOpsType = typeof(Contexts.RealmPropertyScopeOps<>).MakeGenericType(valType);
-
-                            var createMethod = scopeOpsType.GetMethod("Create", BindingFlags.Static | BindingFlags.NonPublic);
-                            var scopeOps = createMethod.Invoke(null, [immutableArray]);
-
-                            var scopeOutType = typeof(RealmPropertyEntityPropScope<,>).MakeGenericType(scopeOpsType, valType);
-                            var scopeOut = (IRealmPropertyScope)Activator.CreateInstance(
-                                scopeOutType,
-                                BindingFlags.Public | BindingFlags.Instance | BindingFlags.CreateInstance,
-                                binder: null,
-                                args: [scopeEntityPropKey, scopeOps],
-                                System.Globalization.CultureInfo.InvariantCulture,
-                                activationAttributes: null
-                            );
-
-                            scopePropsOut.Add(scopeEntityPropKey, scopeOut);
-                        }
-                    }
-                    contextsOut.Add(scopeParam, scopePropsOut.ToFrozenDictionary());
+                    scopePropsOut.Add(scopeEntityPropKey, compiledScope);
                 }
-                else
-                    throw new NotImplementedException();
+                contextsOut.Add(scopeParam, scopePropsOut.ToFrozenDictionary());
             }
             var outp = contextsOut.ToFrozenDictionary();
             return new RealmPropertyScopeOptions() { Scopes = outp };
+
+            static IRealmPropertyScope MakeScope(RealmPropertyPrototype<TEnum, TPrim> prototype, string scopeParam, IScopedWithAttribute<IContextEntity> context, KeyValuePair<string, object> scopeEntityPropKvp)
+            {
+                var scopeEntityPropKey = scopeEntityPropKvp.Key;
+
+                if (!context.RespondsTo(scopeEntityPropKey))
+                    throw new NotImplementedException($"Invalid context! A key ({scopeEntityPropKey}) was attempted to be referenced in a scope ({scopeParam}) referencing entity type {context.Entity}");
+                var ctxPropType = context.TypeOfProperty(scopeEntityPropKey);
+
+                var isNullable = ctxPropType.IsGenericType && ctxPropType.GetGenericTypeDefinition() == typeof(Nullable<>);
+                Type valType = isNullable ? ctxPropType.GenericTypeArguments[0] : ctxPropType;
+                
+
+                var scopeEntityPropMatcherCriteria = scopeEntityPropKvp.Value;
+                var dictType = typeof(Dictionary<,>).MakeGenericType(typeof(string), valType);
+
+                IDictionary criteriaBase;
+                if (scopeEntityPropMatcherCriteria is JObject)
+                    criteriaBase = (IDictionary)((JObject)scopeEntityPropMatcherCriteria).ToObject(dictType);
+                else // Scope defined with a direct value
+                {
+                    // Downcast is required for int entity props scopes matched in short-form, as they are deserialized as long
+                    if (valType == typeof(int) && scopeEntityPropMatcherCriteria.GetType() == typeof(long))
+                    {
+                        var longScope = (long)scopeEntityPropMatcherCriteria;
+                        if (longScope > int.MaxValue || longScope < int.MinValue)
+                            throw new InvalidDataException($"Scope param {scopeParam}.{scopeEntityPropKey} is out of range for System.Int32.");
+                        scopeEntityPropMatcherCriteria = Convert.ToInt32(scopeEntityPropMatcherCriteria);
+                    }
+                    criteriaBase = new Dictionary<string, object>() { { "Equal", scopeEntityPropMatcherCriteria } };
+                }
+
+                var predicatesBase = criteriaBase.Keys.Cast<string>().Select(predicateTypeKey =>
+                {
+                    return CompilePredicate(predicateTypeKey, prototype, scopeParam, valType, criteriaBase);
+
+                    static IPredicate CompilePredicate(string predicateTypeKey, RealmPropertyPrototype<TEnum, TPrim> prototype, string scopeParam, Type valType, IDictionary criteriaBase)
+                    {
+                        if (!PredicateMap.TryGetValue(predicateTypeKey, out var predicateGenericType))
+                        {
+                            throw new NotImplementedException(
+                                $"Missing predicate type for scoped property {prototype.CanonicalName}, scope {scopeParam}, criterion {predicateTypeKey}. Check PredicateMap for missing entries.");
+                        }
+                        var predicateArg = criteriaBase[predicateTypeKey];
+
+                        var predicateType = predicateGenericType.MakeGenericType(valType);
+                        var predicate = (IPredicate)Activator.CreateInstance(
+                            predicateType,
+                            BindingFlags.Public | BindingFlags.Instance | BindingFlags.CreateInstance,
+                            binder: null,
+                            args: [predicateArg],
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            activationAttributes: null
+                        );
+                        return predicate;
+                    }
+                });
+                return MakeScope_Inner(scopeEntityPropKey, valType, predicatesBase);
+
+                static IRealmPropertyScope MakeScope_Inner(string scopeEntityPropKey, Type valType, IEnumerable<IPredicate> predicatesBase)
+                {
+                    var predicateMostDerivedCommonType = typeof(IPredicate<>).MakeGenericType(valType);
+                    var castMethod = typeof(Enumerable).GetMethod("Cast", BindingFlags.Static | BindingFlags.Public);
+                    var castMethodUsable = castMethod.MakeGenericMethod(predicateMostDerivedCommonType);
+                    var predicates = castMethodUsable.Invoke(null, [predicatesBase]);
+
+                    var predicateInterface = typeof(IPredicate<>).MakeGenericType(valType);
+                    var enumerableInterface = typeof(IEnumerable<>).MakeGenericType(predicateInterface);
+                    var aryConvs = typeof(ImmutableArray)
+                        .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                        .Where(m =>
+                            m.Name == "ToImmutableArray" &&
+                            m.IsGenericMethod &&
+                            m.ContainsGenericParameters &&
+                            m.GetGenericArguments().FirstOrDefault()?.Name == "TSource" &&
+                            m.GetParameters().FirstOrDefault()?.Name == "items"
+                        );
+                    var aryConv = aryConvs.Single();
+
+                    var aryConvUsable = aryConv.MakeGenericMethod([predicateInterface]);
+                    var immutableArray = (IList)aryConvUsable.Invoke(null, [predicates]);
+
+                    var scopeOpsType = typeof(RealmPropertyScopeOps<>).MakeGenericType(valType);
+
+                    var createMethod = scopeOpsType.GetMethod("Create", BindingFlags.Static | BindingFlags.NonPublic);
+                    var scopeOps = createMethod.Invoke(null, [immutableArray]);
+
+                    Type scopeOutType;
+                    if (valType.IsClass)
+                        scopeOutType = typeof(RealmPropertyEntityObjectPropScope<,>).MakeGenericType(scopeOpsType, valType);
+                    else
+                        scopeOutType = typeof(RealmPropertyEntityValuePropScope<,>).MakeGenericType(scopeOpsType, valType);
+
+                    var scopeOut = (IRealmPropertyScope)Activator.CreateInstance(
+                        scopeOutType,
+                        BindingFlags.Public | BindingFlags.Instance | BindingFlags.CreateInstance,
+                        binder: null,
+                        args: [scopeEntityPropKey, scopeOps],
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        activationAttributes: null
+                    );
+                    return scopeOut;
+                }
+            }
         }
     }
 

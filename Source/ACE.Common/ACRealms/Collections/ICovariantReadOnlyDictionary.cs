@@ -84,6 +84,15 @@ namespace ACRealms
     {
         bool TryFetchWithUnderlying(TUnderlyingKey key, out object result);
     }
+    public interface IDictionaryConvertibleKeyStructValue<TUnderlyingKey>
+    {
+        bool TryFetchValueWithUnderlying(TUnderlyingKey key, out ValueType result);
+    }
+
+    public interface IDictionaryConvertibleKeyObjectValue<TUnderlyingKey>
+    {
+        bool TryFetchObjectWithUnderlying(TUnderlyingKey key, out object result);
+    }
 
     public interface IDictionaryConvertibleKey<TRealKey, TUnderlyingKey, out TValue> : IDictionaryConvertibleKey<TUnderlyingKey>
     {
@@ -111,6 +120,34 @@ namespace ACRealms
 
         bool IDictionaryConvertibleKey<TUnderlyingKey>.TryFetchWithUnderlying(TUnderlyingKey key, out object result)
         { 
+            result = TryTypedFetchWithUnderlying(key, out bool fetchResult);
+            return fetchResult;
+        }
+    }
+
+    public class CovariantReadOnlyDictionaryPolyKeyStructValue<TRealKey, TUnderlyingKey, TValue>
+        : CovariantReadOnlyDictionaryPolyKey<TRealKey, TUnderlyingKey, TValue>, IDictionaryConvertibleKeyStructValue<TUnderlyingKey>
+        where TRealKey : Enum
+        where TValue : struct
+    {
+        public CovariantReadOnlyDictionaryPolyKeyStructValue(IReadOnlyDictionary<TRealKey, TValue> dictionary) : base(dictionary) { }
+
+        bool IDictionaryConvertibleKeyStructValue<TUnderlyingKey>.TryFetchValueWithUnderlying(TUnderlyingKey key, out ValueType result)
+        {
+            result = TryTypedFetchWithUnderlying(key, out bool fetchResult);
+            return fetchResult;
+        }
+    }
+
+    public class CovariantReadOnlyDictionaryPolyKeyObjectValue<TRealKey, TUnderlyingKey, TValue>
+    : CovariantReadOnlyDictionaryPolyKey<TRealKey, TUnderlyingKey, TValue>, IDictionaryConvertibleKeyObjectValue<TUnderlyingKey>
+        where TRealKey : Enum
+        where TValue : class
+    {
+        public CovariantReadOnlyDictionaryPolyKeyObjectValue(IReadOnlyDictionary<TRealKey, TValue> dictionary) : base(dictionary) { }
+
+        bool IDictionaryConvertibleKeyObjectValue<TUnderlyingKey>.TryFetchObjectWithUnderlying(TUnderlyingKey key, out object result)
+        {
             result = TryTypedFetchWithUnderlying(key, out bool fetchResult);
             return fetchResult;
         }

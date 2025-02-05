@@ -18,17 +18,14 @@ namespace ACE.Server.WorldObjects
         ACRealms.Prototypes.IResolvableContext<BiotaPropertyPrototypes, ACE.Entity.Models.Biota>,
         IWorldObjectContextEntity
     {
-        public IPrototypes Prototypes => Biota.Prototypes;
-
-        public ACE.Entity.Models.Biota UnderlyingContext => Biota;
+        public IPrototypes Prototypes => UnderlyingContext.Prototypes;
+        public IResolvableContext UnderlyingContext => Biota;
 
         public static bool RespondsTo(string key)
         {
             if (ACE.Entity.Models.Biota.RespondsTo(key))
                 return true;
-
-            // Whitelisted properties for WorldObject? Stick with just Biota for now
-            return key == "Level";
+            return false; // TODO: Expand system for WorldObject props via an interface
         }
 
         public static Type TypeOfProperty(string key)
@@ -39,12 +36,12 @@ namespace ACE.Server.WorldObjects
             return null;
         }
 
-        public TVal? FetchContextProperty<TVal>(string name)
+        bool IResolvableContext.TryFetchObject(IPrototype prototype, out object result)
         {
-            return Biota.FetchContextProperty<TVal>(name);
+            throw new NotImplementedException();
         }
 
-        public bool Match(FrozenDictionary<string, IRealmPropertyScope> propsToMatch)
+        bool IResolvableContext.TryFetchValue(IPrototype prototype, out ValueType result)
         {
             throw new NotImplementedException();
         }

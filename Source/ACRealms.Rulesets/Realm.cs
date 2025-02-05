@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using ACRealms;
+using ACRealms.Prototypes;
 using ACRealms.RealmProps;
 using ACRealms.RealmProps.Contexts;
 using ACRealms.RealmProps.Underlying;
@@ -230,16 +231,37 @@ namespace ACRealms.Rulesets
             return ctx.All(thisCtx => 
             {
                 (string contextParamKey, ICanonicalContextEntity contextEntityBase) = thisCtx;
-                var entityProtos = contextEntityBase.Prototypes;
+
                 
                 if (!scopeDefs.TryGetValue(contextParamKey, out var scopeDefBase))
                     return true; // Scope wasn't narrowed on this entity
                 foreach(var (scopePropKey, scopeValUntyped) in scopeDefBase)
                 {
+                    // TODO: Handle possibility of prototypes being different depending on key (i.e. biota vs player)
+                    var entityProtos = contextEntityBase.Prototypes;
                     var proto = entityProtos.AllPrototypes[scopePropKey];
-                    var val = proto.Fetch(contextEntityBase);
-                    if (!scopeValUntyped.Match(val))
-                        return false;
+                    if (proto is IValuePrototype vProto)
+                    {
+                        if (vProto.TryFetchValue(contextEntityBase, out ValueType val))
+                        {
+                            if (!scopeValUntyped.MatchValue(val))
+                                return false;
+                        }
+                        else if (!scopeValUntyped.MatchNull())
+                            return false;
+                    }
+                    else if (proto is IObjectPrototype refProto)
+                    {
+                        if (refProto.TryFetchObject(contextEntityBase, out object val))
+                        {
+                            if (!scopeValUntyped.MatchObject(val))
+                                return false;
+                        }
+                        else if (!scopeValUntyped.MatchNull())
+                            return false;
+                    }
+                    else
+                        throw new InvalidCastException("Prototype was neither IObjectPrototype or IValuePrototype");
                 }
                 return true;
             });

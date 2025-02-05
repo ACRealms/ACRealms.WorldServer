@@ -2,6 +2,7 @@ using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using ACE.Entity.ACRealms;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
@@ -30,16 +31,16 @@ namespace ACE.Entity.Models
         public IDictionary<PropertyString, string> PropertiesString { get; set; }
 
         // TODO: Fix these, they are inefficient (unnecessary?), still proof of concept
-        public IDictionaryConvertibleKey<ushort> CovariantPropertiesInt =>
-            new CovariantReadOnlyDictionaryPolyKey<PropertyInt, ushort, int>(PropertiesInt?.AsReadOnly());
-        public IDictionaryConvertibleKey<ushort> CovariantPropertiesInt64 =>
-            new CovariantReadOnlyDictionaryPolyKey<PropertyInt64, ushort, long>(PropertiesInt64?.AsReadOnly());
-        public IDictionaryConvertibleKey<ushort> CovariantPropertiesFloat =>
-            new CovariantReadOnlyDictionaryPolyKey<PropertyFloat, ushort, double>(PropertiesFloat?.AsReadOnly());
-        public IDictionaryConvertibleKey<ushort> CovariantPropertiesBool =>
-            new CovariantReadOnlyDictionaryPolyKey<PropertyBool, ushort, bool>(PropertiesBool?.AsReadOnly());
-        public IDictionaryConvertibleKey<ushort> CovariantPropertiesString =>
-            new CovariantReadOnlyDictionaryPolyKey<PropertyString, ushort, string>(PropertiesString?.AsReadOnly());
+        public IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesInt =>
+            new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyInt, ushort, int>(PropertiesInt?.AsReadOnly());
+        public IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesInt64 =>
+            new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyInt64, ushort, long>(PropertiesInt64?.AsReadOnly());
+        public IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesFloat =>
+            new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyFloat, ushort, double>(PropertiesFloat?.AsReadOnly());
+        public IDictionaryConvertibleKeyStructValue<ushort> CovariantPropertiesBool =>
+            new CovariantReadOnlyDictionaryPolyKeyStructValue<PropertyBool, ushort, bool>(PropertiesBool?.AsReadOnly());
+        public IDictionaryConvertibleKeyObjectValue<ushort> CovariantPropertiesString =>
+            new CovariantReadOnlyDictionaryPolyKeyObjectValue<PropertyString, ushort, string>(PropertiesString?.AsReadOnly());
         public IDictionary<PositionType, PropertiesPosition> PropertiesPosition { get; set; }
 
         public IDictionary<int, float /* probability */> PropertiesSpellBook { get; set; }
@@ -69,33 +70,37 @@ namespace ACE.Entity.Models
         public ICollection<PropertiesEnchantmentRegistry> PropertiesEnchantmentRegistry { get; set; }
         public IDictionary<ulong /* Player GUID */, bool /* Storage */> HousePermissions { get; set; }
 
-        public IPrototypes Prototypes => BiotaPropertyPrototypes.Instance;
-        public Biota UnderlyingContext => this;
-
         public static bool RespondsTo(string key) => IWeenie<Biota>.Prototype(key) != null;
         public static Type TypeOfProperty(string key) => IWeenie<Biota>.Prototype(key)?.ValueType;
 
-        static readonly FrozenDictionary<Type, Func<Biota, IDictionaryConvertibleKey<ushort>>> Dicts = new Dictionary<Type, Func<Biota, IDictionaryConvertibleKey<ushort>>>()
+        static readonly FrozenDictionary<Type, Func<Biota, IDictionaryConvertibleKeyStructValue<ushort>>> ValueDicts = new Dictionary<Type, Func<Biota, IDictionaryConvertibleKeyStructValue<ushort>>>()
         {
-            { typeof(int?), (b) => b.CovariantPropertiesInt },
-            { typeof(long?), (b) => b.CovariantPropertiesInt64 },
-            { typeof(double?), (b) => b.CovariantPropertiesFloat },
-            { typeof(bool?), (b) => b.CovariantPropertiesBool },
-            { typeof(string), (b) => b.CovariantPropertiesString }
-
+            { typeof(int), static (b) => b.CovariantPropertiesInt },
+            { typeof(long), static (b) => b.CovariantPropertiesInt64 },
+            { typeof(double), static (b) => b.CovariantPropertiesFloat },
+            { typeof(bool), static (b) => b.CovariantPropertiesBool },
         }.ToFrozenDictionary();
 
-        internal TVal? FetchContextProperty<TVal>(string name)
+        static readonly FrozenDictionary<Type, Func<Biota, IDictionaryConvertibleKeyObjectValue<ushort>>> ObjectDicts = new Dictionary<Type, Func<Biota, IDictionaryConvertibleKeyObjectValue<ushort>>>()
         {
-            var proto = Prototypes.GetPrototype<TVal>(name);
-            return proto.Fetch(this);
+            { typeof(string), static (b) => b.CovariantPropertiesString }
+        }.ToFrozenDictionary();
+
+
+        #region IResolvableContext
+        IPrototypes IResolvableContext.Prototypes => BiotaPropertyPrototypes.Instance;
+        IResolvableContext IResolvableContext.UnderlyingContext => this;
+        bool IResolvableContext.TryFetchValue(IPrototype prototype, out ValueType result)// Type valueType, ValueType key, out ValueType result)
+        {
+            var dict = ValueDicts[prototype.ValueType](this);
+            return dict.TryFetchValueWithUnderlying((ushort)prototype.UntypedRawKey, out result);
         }
 
-        internal TVal? Fetch<TEnum, TVal>(ushort key)
+        bool IResolvableContext.TryFetchObject(IPrototype prototype, out object result)
         {
-            var dict = Dicts[typeof(TVal)](this);
-            var fetchResult = dict.TryFetchWithUnderlying(key, out var result);
-            return (TVal)result;
+            var dict = ObjectDicts[prototype.ValueType](this);
+            return dict.TryFetchObjectWithUnderlying((ushort)prototype.UntypedRawKey, out result);
         }
+        #endregion IResolvableContext
     }
 }

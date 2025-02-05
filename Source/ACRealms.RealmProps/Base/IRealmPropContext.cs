@@ -18,7 +18,6 @@ namespace ACRealms
     /// </summary>
     public interface IRealmPropContext<T> : IRealmPropContext
     {
-        TVal? FetchContextProperty<TVal>(string name);
     }
 }
 
@@ -26,17 +25,6 @@ namespace ACRealms.RealmProps.Contexts
 {
     public interface IContextEntity : IResolvableContext
     {
-        sealed bool Match<T>(FrozenDictionary<string, IRealmPropertyScope> propsToMatch)
-        {
-            return propsToMatch.Values.Cast<RealmPropertyEntityPropScope<IRealmPropertyScopeOps<T>, T>>().All(predicates =>
-            {
-                var propVal = FetchContextProperty<T>(predicates.Key);
-                return predicates.OpsTyped.PredicatesTyped.All(p => p.Match(propVal));
-            });
-        }
-
-        T? FetchContextProperty<T>(string key);
-
         /// <summary>
         /// Returns true if the given key can be used to fetch a value during scoped rule evaluation
         /// </summary>
@@ -53,10 +41,9 @@ namespace ACRealms.RealmProps.Contexts
         static virtual Type TypeOfProperty(string key) => throw new NotImplementedException();
     }
 
-    public interface ICanonicalContextEntity : IContextEntity
-    {
-    }
-    public interface ICanonicalContextEntity<TEntityIOCInterface, TEntity> : ICanonicalContextEntity, IRealmPropContext<TEntityIOCInterface>
+    public interface ICanonicalContextEntity : IContextEntity { }
+    public interface ICanonicalContextEntity<TEntityIOCInterface, TEntity>
+        : ICanonicalContextEntity, IRealmPropContext<TEntityIOCInterface>, IResolvableContext
         where TEntityIOCInterface : IContextEntity
         where TEntity : class, ICanonicalContextEntity<TEntityIOCInterface, TEntity>
     {
@@ -76,20 +63,10 @@ namespace ACRealms.RealmProps.Contexts
         static abstract Type TypeOfProperty(string key);// => throw new NotImplementedException();
     }
 
-    public interface IContextEntity<T> : IRealmPropContext<T>
-        where T : class
-    {
-
-    }
-
-    public interface IWorldObjectContextEntity : IContextEntity, ICanonicalContextEntity
-    {
-        
-    }
+    public interface IContextEntity<T> : IRealmPropContext<T> where T : class { }
+    public interface IWorldObjectContextEntity : IContextEntity, ICanonicalContextEntity { }
     public interface IWorldObjectContextEntity<T> : IWorldObjectContextEntity, IContextEntity<T>
-        where T : class, IWorldObjectContextEntity<T>
-    {
-    }
+        where T : class, IWorldObjectContextEntity<T> { }
 
 
     internal abstract record ContextType { }
@@ -112,7 +89,4 @@ namespace ACRealms.RealmProps.Contexts
             throw new NotImplementedException();
         }
     }
-    internal abstract record Entity : ContextType { }
-    internal record Entity<T> : Entity { }
-    internal record DynamicEntity : Entity<dynamic> { }
 }
