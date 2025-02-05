@@ -58,7 +58,7 @@ namespace ACE.Server.WorldObjects
             if (position != null)
             {
                 if (position is LocalPosition p)
-                    position = p.AsInstancedPosition(this, RealmRuleset.RecallInstanceSelectMode);
+                    position = p.AsInstancedPosition(this, Props.Core.Instance.RecallInstanceSelectMode(RealmRuleset));
 
                 var teleportDest = new InstancedPosition((InstancedPosition)position);
                 teleportDest = teleportDest = AdjustDungeon(teleportDest);
