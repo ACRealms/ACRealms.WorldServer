@@ -1,11 +1,11 @@
-using ACE.Database.Adapter;
-using ACE.Entity.Enum.Properties;
-using ACE.Entity.Enum.RealmProperties;
 using ACE.Entity.Models;
 using ACE.Server.Command.Handlers;
 using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Realms;
+using ACRealms.RealmProps;
+using ACRealms.RealmProps.Underlying;
+using ACRealms.Rulesets;
 using ACRealms.Tests.Factories;
 using ACRealms.Tests.Fixtures.Network;
 using ACRealms.Tests.Helpers;
@@ -36,7 +36,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
         [Fact]
         public void TestServerPropertyFallback()
         {
-            var att = RealmPropertyPrototypes.Float[RealmPropertyFloat.Spellcasting_Max_Angle].PrimaryAttribute;
+            var att = RealmPropertyPrototypes.Float[RealmPropertyFloat.Player_Spellcasting_MaxAngle].PrimaryAttribute;
             Assert.NotNull(att.DefaultFromServerProperty);
             var serverPropOrig = PropertyManager.GetDouble(att.DefaultFromServerProperty).Item;
 
@@ -48,10 +48,10 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             var realm = RealmManager.GetRealm(1, includeRulesets: false);
             var lb = LandblockHelper.LoadLandblock(realm, 0x8903);
 
-            Assert.Equal(1, lb.RealmRuleset.GetProperty(RealmPropertyFloat.Spellcasting_Max_Angle));
+            Assert.Equal(1, Props.Player.Spellcasting.MaxAngle(lb.RealmRuleset));
 
             PropertyManager.ModifyDouble(att.DefaultFromServerProperty, 2);
-            Assert.Equal(2, lb.RealmRuleset.GetProperty(RealmPropertyFloat.Spellcasting_Max_Angle));
+            Assert.Equal(2, Props.Player.Spellcasting.MaxAngle(lb.RealmRuleset));
 
             PropertyManager.ModifyDouble(att.DefaultFromServerProperty, serverPropOrig);
         }
@@ -147,15 +147,15 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             var seed = int.Parse(msg.Split(":")[1]);
             Assert.Equal(player.RealmRuleset.Context.RandomSeed, seed);
 
-            Func<AppliedRuleset, List<AppliedRealmProperty<int>>> filter = (ruleset) =>
-                ruleset.PropertiesInt.Keys.Intersect([
-                    RealmPropertyInt.CreatureStrengthAdded,
-                    RealmPropertyInt.CreatureEnduranceAdded,
-                    RealmPropertyInt.CreatureCoordinationAdded,
-                    RealmPropertyInt.CreatureQuicknessAdded,
-                    RealmPropertyInt.CreatureFocusAdded,
-                    RealmPropertyInt.CreatureSelfAdded])
-                .Select(k => ruleset.PropertiesInt[k]).ToList();
+            Func<AppliedRuleset, List<ActiveRealmPropertyGroup<int>>> filter = (ruleset) =>
+                ruleset._propertiesInt.Keys.Intersect([
+                    RealmPropertyInt.Creature_Attributes_StrengthAdded,
+                    RealmPropertyInt.Creature_Attributes_EnduranceAdded,
+                    RealmPropertyInt.Creature_Attributes_CoordinationAdded,
+                    RealmPropertyInt.Creature_Attributes_QuicknessAdded,
+                    RealmPropertyInt.Creature_Attributes_FocusAdded,
+                    RealmPropertyInt.Creature_Attributes_SelfAdded])
+                .Select(k => ruleset._propertiesInt[k]).ToList();
             Func<AppliedRuleset, List<string>> mapPropNames = (ruleset) => filter(ruleset).Select(x => x.Options.Name).OrderBy(x => x).ToList();
 
             var ruleset = player.RealmRuleset;
@@ -219,7 +219,7 @@ namespace ACRealms.Tests.Server.Realms.Compilation
             //    File.Delete(filename);
             //}
 
-            Assert.True(player.RealmRuleset.GetProperty(RealmPropertyBool.CanBeHomeworld));
+            Assert.True(Props.Core.Realm.CanBeHomeworld(player.RealmRuleset));
         }
     }
 }

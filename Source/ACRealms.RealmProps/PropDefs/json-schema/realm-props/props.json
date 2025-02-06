@@ -1,0 +1,5 @@
+{
+  "type": "object",
+  "propertyNames": { "$ref": "common/key.json" },
+  "additionalProperties": { "$ref": "props/prop.json" }
+}

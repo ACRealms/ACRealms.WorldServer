@@ -16,6 +16,7 @@ using ACE.Server.WorldObjects.Entity;
 
 using Position = ACE.Entity.Position;
 using ACE.Server.Realms;
+using ACRealms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -74,8 +75,10 @@ namespace ACE.Server.WorldObjects
                 if (Biota?.PropertiesAttribute2nd?.ContainsKey(PropertyAttribute2nd.MaxHealth) == true)
                 {
                     Biota.PropertiesAttribute2nd[PropertyAttribute2nd.MaxHealth].InitLevel =
-                        (uint)((double)Biota.PropertiesAttribute2nd[PropertyAttribute2nd.MaxHealth].InitLevel *
-                        ruleset.GetProperty(RealmPropertyFloat.CreatureSpawnHPMultiplier));
+                        ClampStat(
+                        (int)Biota.PropertiesAttribute2nd[PropertyAttribute2nd.MaxHealth].InitLevel,
+                        Props.Creature.Vitals.HealthAdded(ruleset),
+                        Props.Creature.Vitals.HealthMultiplier(ruleset));
                 }
 
                 if (Biota?.PropertiesAttribute?.ContainsKey(PropertyAttribute.Strength) == true)
@@ -83,8 +86,8 @@ namespace ACE.Server.WorldObjects
                     Biota.PropertiesAttribute[PropertyAttribute.Strength].InitLevel =
                         ClampStat(
                             (int)Biota.PropertiesAttribute[PropertyAttribute.Strength].InitLevel,
-                            ruleset.GetProperty(RealmPropertyInt.CreatureStrengthAdded),
-                            ruleset.GetProperty(RealmPropertyFloat.CreatureStrengthMultiplier)
+                            Props.Creature.Attributes.StrengthAdded(ruleset, this),
+                            Props.Creature.Attributes.StrengthMultiplier(ruleset, this)
                         );
                 }
 
@@ -93,8 +96,8 @@ namespace ACE.Server.WorldObjects
                     Biota.PropertiesAttribute[PropertyAttribute.Endurance].InitLevel =
                     ClampStat(
                         (int)Biota.PropertiesAttribute[PropertyAttribute.Endurance].InitLevel,
-                        ruleset.GetProperty(RealmPropertyInt.CreatureEnduranceAdded),
-                        ruleset.GetProperty(RealmPropertyFloat.CreatureEnduranceMultiplier)
+                        Props.Creature.Attributes.EnduranceAdded(ruleset, this),
+                        Props.Creature.Attributes.EnduranceMultiplier(ruleset, this)
                     );
                 }
 
@@ -103,8 +106,8 @@ namespace ACE.Server.WorldObjects
                     Biota.PropertiesAttribute[PropertyAttribute.Coordination].InitLevel =
                     ClampStat(
                         (int)Biota.PropertiesAttribute[PropertyAttribute.Coordination].InitLevel,
-                        ruleset.GetProperty(RealmPropertyInt.CreatureCoordinationAdded),
-                        ruleset.GetProperty(RealmPropertyFloat.CreatureCoordinationMultiplier)
+                        Props.Creature.Attributes.CoordinationAdded(ruleset, this),
+                        Props.Creature.Attributes.CoordinationMultiplier(ruleset, this)
                     );
                 }
 
@@ -113,8 +116,8 @@ namespace ACE.Server.WorldObjects
                     Biota.PropertiesAttribute[PropertyAttribute.Quickness].InitLevel =
                     ClampStat(
                         (int)Biota.PropertiesAttribute[PropertyAttribute.Quickness].InitLevel,
-                        ruleset.GetProperty(RealmPropertyInt.CreatureQuicknessAdded),
-                        ruleset.GetProperty(RealmPropertyFloat.CreatureQuicknessMultiplier)
+                        Props.Creature.Attributes.QuicknessAdded(ruleset, this),
+                        Props.Creature.Attributes.QuicknessMultiplier(ruleset, this)
                     );
                 }
 
@@ -123,8 +126,8 @@ namespace ACE.Server.WorldObjects
                     Biota.PropertiesAttribute[PropertyAttribute.Focus].InitLevel =
                     ClampStat(
                         (int)Biota.PropertiesAttribute[PropertyAttribute.Focus].InitLevel,
-                        ruleset.GetProperty(RealmPropertyInt.CreatureFocusAdded),
-                        ruleset.GetProperty(RealmPropertyFloat.CreatureFocusMultiplier)
+                        Props.Creature.Attributes.FocusAdded(ruleset, this),
+                        Props.Creature.Attributes.FocusMultiplier(ruleset, this)
                     );
                 }
 
@@ -133,8 +136,8 @@ namespace ACE.Server.WorldObjects
                     Biota.PropertiesAttribute[PropertyAttribute.Self].InitLevel =
                     ClampStat(
                         (int)Biota.PropertiesAttribute[PropertyAttribute.Self].InitLevel,
-                        ruleset.GetProperty(RealmPropertyInt.CreatureSelfAdded),
-                        ruleset.GetProperty(RealmPropertyFloat.CreatureSelfMultiplier)
+                        Props.Creature.Attributes.SelfAdded(ruleset, this),
+                        Props.Creature.Attributes.SelfMultiplier(ruleset, this)
                     );
                 }
             }

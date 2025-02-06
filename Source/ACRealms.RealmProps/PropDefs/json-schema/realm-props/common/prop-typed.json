@@ -1,0 +1,31 @@
+{
+  "definitions": {
+    "propEnum": { "$anchor": "objProps.enum", "$ref": "../../enums.json" },
+    "propInt": {
+      "allOf": [ { "$ref": "prop-minmax.json" } ],
+      "properties": {
+        "default": { "$ref": "../../components/primitives/val-int.json" },
+        "min_value": { "$ref": "../../components/primitives/val-int.json" },
+        "max_value": { "$ref": "../../components/primitives/val-int.json" } } },
+    "propLong": {
+      "allOf": [ { "$ref": "prop-minmax.json" } ],
+      "properties": {
+        "default": { "$ref": "../../components/primitives/val-long.json" },
+        "min_value": { "$ref": "../../components/primitives/val-long.json" },
+        "max_value": { "$ref": "../../components/primitives/val-long.json" } } },
+    "propFloat": {
+      "allOf": [ { "$ref": "prop-minmax.json" } ],
+      "properties": {
+        "default": { "$ref": "../../components/primitives/val-float.json" },
+        "min_value": { "$ref": "../../components/primitives/val-float.json" },
+        "max_value": { "$ref": "../../components/primitives/val-float.json" } } },
+    "propString": {
+      "allOf": [ { "$ref": "prop-base.json" } ],
+      "properties": { "default": { "$ref": "../../components/string-multiline-from-array.json" } }
+    },
+    "propBool": {
+      "allOf": [ { "$ref": "prop-base.json" } ],
+      "properties": { "default": { "$ref": "../../components/primitives/val-bool.json" } }
+    }
+  }
+}

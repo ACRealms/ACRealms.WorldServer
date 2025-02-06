@@ -30,6 +30,7 @@ using Position = ACE.Entity.Position;
 using ACE.Server.Realms;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Entity.ACRealms;
+using ACRealms;
 
 namespace ACE.Server.Entity
 {
@@ -59,7 +60,7 @@ namespace ACE.Server.Entity
         public RealmShortcuts RealmHelpers { get; }
 
         //Will be null if its a standard realm landblock - I.e. the default for a realm and not with an added ruleset applied
-        public EphemeralRealm InnerRealmInfo { get; set; }
+        internal EphemeralRealm InnerRealmInfo { get; set; }
         public ulong LongId
         {
             get => (ulong)Instance << 32 | Id.Raw;
@@ -130,7 +131,7 @@ namespace ACE.Server.Entity
         /// <summary>
         /// Landblocks which have been inactive for this many seconds will be unloaded
         /// </summary>
-        public TimeSpan UnloadInterval => TimeSpan.FromMinutes(RealmRuleset.GetProperty(RealmPropertyInt.LandblockUnloadInterval));
+        public TimeSpan UnloadInterval => TimeSpan.FromMinutes(Props.Core.Landblock.UnloadInterval(RealmRuleset));
 
 
         /// <summary>
@@ -197,7 +198,7 @@ namespace ACE.Server.Entity
             PhysicsLandblock = new Physics.Common.Landblock(cellLandblock, instance);
         }
 
-        public void Init(EphemeralRealm ephemeralRealm, bool reload = false, bool wait = false)
+        internal void Init(EphemeralRealm ephemeralRealm, bool reload = false, bool wait = false)
         {
             if (Instance == 0 && !ACE.Entity.ACRealms.RealmsFromACESetupHelper.UnsafeInstanceIDTemporarilyAllowed)
                 log.Error("Error: Loading Landblock with Instance ID = 0");
@@ -1490,7 +1491,7 @@ Please report this to the ACRealms developer.");
             }
         }
 
-        public WorldRealm WorldRealm => WorldRealmID.HasValue ? RealmManager.GetRealm(WorldRealmID, includeRulesets: true) : null;
+        internal WorldRealm WorldRealm => WorldRealmID.HasValue ? RealmManager.GetRealm(WorldRealmID, includeRulesets: true) : null;
         public bool IsPrimaryForWorldRealm => ShortInstanceID == 0;
         public bool IsHomeInstanceForPlayer(Player player) => IsPrimaryForWorldRealm && player.HomeRealm == WorldRealmID;
 
@@ -1506,7 +1507,7 @@ Please report this to the ACRealms developer.");
             {
                 get
                 {
-                    return Landblock.InnerRealmInfo != null && Landblock.RealmRuleset.GetProperty(RealmPropertyBool.IsDuelingRealm);
+                    return Landblock.InnerRealmInfo != null && Props.Pvp.World.IsDuelingRealm(Landblock.RealmRuleset);
                 }
             }
 
@@ -1514,7 +1515,7 @@ Please report this to the ACRealms developer.");
             {
                 get
                 {
-                    return Landblock.RealmRuleset != null && Landblock.RealmRuleset.GetProperty(RealmPropertyBool.IsPKOnly);
+                    return Landblock.RealmRuleset != null && Props.Pvp.World.IsPkOnly(Landblock.RealmRuleset);
                 }
             }
         }

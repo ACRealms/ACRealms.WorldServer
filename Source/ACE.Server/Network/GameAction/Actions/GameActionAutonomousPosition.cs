@@ -4,6 +4,7 @@ using ACE.Entity;
 using ACE.Entity.Enum.RealmProperties;
 using ACE.Server.Entity;
 using ACE.Server.Realms;
+using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.Network.GameAction.Actions
 {

@@ -1,0 +1,12 @@
+{
+  "$ref": "../string-multiline-from-array.json",
+  "$corvusTypeName": "DescriptionArray",
+  "type": "array",
+  "items": {
+    "$corvusTypeName": "Line",
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 200,
+    "allOf": [ { "$ref": "description-pattern.json" } ]
+  }
+}

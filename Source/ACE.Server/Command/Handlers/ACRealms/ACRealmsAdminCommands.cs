@@ -6,6 +6,7 @@ using ACE.Server.Entity;
 using ACE.Server.Managers;
 using ACE.Server.Network;
 using ACE.Server.Realms;
+using ACRealms.Rulesets.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

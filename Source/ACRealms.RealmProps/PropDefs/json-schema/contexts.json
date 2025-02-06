@@ -1,0 +1,61 @@
+{
+  "definitions": {
+    "entities": {
+      "definitions": {
+        "WorldObject": {
+          "description": "Any WorldObject",
+          "const": "WorldObject"
+        }
+      }
+    },
+    "entityVal": {
+      "type": "string",
+      "oneOf": [
+        { "$ref": "#/definitions/entities/definitions/WorldObject" }
+      ]
+    },
+    "contextName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60,
+      "pattern": "(^[a-z]|[A-Z0-9])[a-z]*$",
+      "description": "The name for the context. Used as a parameter name in the method to fetch the realm property from C#"
+    },
+    "contextObj": {
+      "type": "object",
+      "properties": {
+        "name": { "$ref": "#/definitions/contextName" },
+        "entity": { "$ref": "#/definitions/entityVal" },
+        "required": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, a context is required when fetching this realm property."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description for the context, to be shown in code docs when using the property"
+        }
+      },
+      "required": [ "name", "entity" ],
+      "additionalProperties": false
+    },
+    "contextDecl": {
+      "default": { },
+      "oneOf": [
+        { "$ref": "#/definitions/contextObj" },
+        { "$ref": "#/definitions/entityVal" }
+      ]
+    },
+    "shortContexts": {
+      "type": "object",
+      "default": { },
+      "description": "An object where the key is the context name, the value is the entity type as a string. Use the array form for more detailed context definitions",
+      "additionalProperties": { "$ref": "#/definitions/entityVal" }
+    }
+  },
+  "description": "A set of contexts for this property. Each context requires an entity type to pass into the property when fetching it. The entities can be filtered with a scope in the ruleset definitions.",
+  "oneOf": [
+    { "$ref": "#/definitions/shortContexts" },
+    { "type": "array", "default": [ { } ], "items": { "$ref": "#/definitions/contextObj" } }
+  ]
+}

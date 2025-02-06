@@ -11,7 +11,7 @@ namespace ACE.Entity.Models
     /// We do this to conserve memory in ACE.Server
     /// Be sure to check for null first.
     /// </summary>
-    public class Weenie : IWeenie
+    public class Weenie : IWeenie<Weenie>
     {
         public uint WeenieClassId { get; set; }
         public string ClassName { get; set; }
@@ -48,6 +48,9 @@ namespace ACE.Entity.Models
         // Properties for books
         public PropertiesBook PropertiesBook { get; set; }
         public IList<PropertiesBookPageData> PropertiesBookPageData { get; set; }
+
+        static bool global::ACRealms.Prototypes.IEntityPropertyResolver.RespondsTo(string key) => Biota.RespondsTo(key);
+        static Type global::ACRealms.Prototypes.IEntityPropertyResolver.TypeOfProperty(string key) => IWeenie<Biota>.Prototype(key)?.ValueType;
 
         public bool CanReferenceCommonProperties
         {

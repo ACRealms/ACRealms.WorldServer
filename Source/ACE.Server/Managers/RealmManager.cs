@@ -24,10 +24,15 @@ using System.Configuration;
 using ACE.Entity;
 using ACE.Server.Realms.Peripherals;
 using System.Collections.Frozen;
+using ACRealms;
+using ACRealms.Rulesets.Enums;
+using ACRealms.Rulesets.Loader;
+using ACRealms.Rulesets;
+using System.Runtime.CompilerServices;
 
 namespace ACE.Server.Managers
 {
-    public static class RealmManager
+    internal static class RealmManager
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -60,8 +65,10 @@ namespace ACE.Server.Managers
         public static WorldRealm ServerDefaultRealm => DefaultRealmConfigured ?? DefaultRealmFallback;
         public static AppliedRuleset ServerDefaultRuleset => ServerDefaultRealm.StandardRules;
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void Initialize(bool liveEnvironment = true)
         {
+            global::ACRealms.RealmProps.RealmPropertyPrototypes.InitializeContextMappings(System.Reflection.Assembly.GetExecutingAssembly());
             SetupReservedRealms();
 
             //Import-realms
@@ -148,7 +155,7 @@ namespace ACE.Server.Managers
             return null;
         }
 
-        internal static RulesetTemplate BuildRuleset(ACE.Entity.Models.Realm realm,
+        internal static RulesetTemplate BuildRuleset(Realm realm,
             IDictionary<ushort, WorldRealmBase> dependencies,
             RulesetCompilationContext ctx = null)
         {
@@ -175,7 +182,6 @@ namespace ACE.Server.Managers
             foreach (var realm in RealmsByID.Values)
                 realm.NeedsRefresh = true;
 
-            DatabaseManager.World.ClearRealmCache();
             RealmsByID = FrozenDictionary<ushort, WorldRealm>.Empty;
             RealmsByName = FrozenDictionary<string, WorldRealm>.Empty;
             ReservedRealms = FrozenDictionary<ReservedRealm, WorldRealm>.Empty;
@@ -206,7 +212,7 @@ namespace ACE.Server.Managers
             return GetRealm(player.EphemeralRealmExitTo?.RealmID ?? player.HomeRealm);*/
         }
 
-        internal static Landblock GetNewEphemeralLandblock(ACE.Entity.LandblockId physicalLandblockId, Player owner, List<ACE.Entity.Models.Realm> realmTemplates)
+        internal static Landblock GetNewEphemeralLandblock(ACE.Entity.LandblockId physicalLandblockId, Player owner, List<Realm> realmTemplates)
         {
             EphemeralRealm ephemeralRealm;
 
@@ -227,8 +233,8 @@ namespace ACE.Server.Managers
 
             try
             {
-                DatabaseManager.World.ReplaceAllRealms(realmsById);
-                LoadAllRealms();
+                // DatabaseManager.World.ReplaceAllRealms(realmsById);
+                LoadAllRealms(realmsById);
             }
             catch (Exception ex)
             {
@@ -238,9 +244,9 @@ namespace ACE.Server.Managers
             FirstImportCompleted = true;
         }
 
-        private static void LoadAllRealms()
+        private static void LoadAllRealms(Dictionary<ushort, RealmToImport> realms)
         {
-            var realms = DatabaseManager.World.GetAllRealms().ToDictionary(x => x.Id);
+            // var realms = DatabaseManager.World.GetAllRealms().ToDictionary(x => x.Id);
 
             var realmsById = new Dictionary<ushort, WorldRealm>();
             var realmsByName = new Dictionary<string, WorldRealm>(StringComparer.OrdinalIgnoreCase);
@@ -251,7 +257,7 @@ namespace ACE.Server.Managers
             var dependencyContext = new Dictionary<ushort, WorldRealmBase>();
             foreach(var realmid in RealmIDsByTopologicalSort)
             {
-                var erealm = RealmConverter.ConvertToEntityRealm(realms[realmid], true);
+                var erealm = global::ACRealms.Rulesets.DBOld.RealmConverter.ConvertToEntityRealm(realms[realmid].Realm, true);
                 
                 var ruleset = BuildRuleset(erealm, dependencyContext);
                 var wrealm = new WorldRealm(erealm, ruleset);
@@ -266,7 +272,7 @@ namespace ACE.Server.Managers
                 }
 
                 // Needs improvement: Only one realm can be set to the dueling realm and it uses a static property, which seems wrong to me
-                if (wrealm.Realm.Type == RealmType.Realm && wrealm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                if (wrealm.Realm.Type == RealmType.Realm && Props.Pvp.World.IsDuelingRealm(wrealm.StandardRules))
                     duelRealm = wrealm;
             };
 
@@ -363,7 +369,7 @@ namespace ACE.Server.Managers
             }
 
             //Check for circular dependencies - from top to bottom of tree
-            Queue<Database.Models.World.Realm> realmsToCheck = new Queue<Database.Models.World.Realm>();
+            Queue<global::ACRealms.Rulesets.DBOld.Realm> realmsToCheck = new Queue<global::ACRealms.Rulesets.DBOld.Realm>();
             foreach (var importItem in newRealmsByName.Values)
             {
                 if (importItem.Realm.ParentRealmId == null)
@@ -377,7 +383,7 @@ namespace ACE.Server.Managers
                     throw new InvalidDataException($"A circular dependency was detected when attempting to import realm {realmToCheck.Id}.");
 
                 realmsChecked.Add(realmToCheck.Id);
-                foreach (var realm in realmToCheck.Descendents.Values)
+                foreach (var realm in realmToCheck.Descendants.Values)
                     realmsToCheck.Enqueue(realm);
             }
 
@@ -458,129 +464,8 @@ namespace ACE.Server.Managers
 
         internal static RealmToImport DeserializeRealmJson(Network.ISession session, string filename, string fileContent)
         {
-            var dobj = JsonConvert.DeserializeObject<dynamic>(fileContent);
-            Database.Models.World.Realm realm = new Database.Models.World.Realm();
-            realm.Name = dobj.name.Value;
-            realm.Type = (ushort)Enum.Parse(typeof(RealmType), dobj.type.Value);
-            realm.PropertyCountRandomized = (ushort?)dobj.properties_random_count?.Value;
-
-            if (dobj.parent != null)
-                realm.ParentRealmName = dobj.parent.Value;
-
-            if (dobj.properties != null)
-            {
-                foreach (var prop in ((Newtonsoft.Json.Linq.JObject)dobj.properties).Properties())
-                {
-                    if (prop.Value.Type == Newtonsoft.Json.Linq.JTokenType.Object)
-                    {
-                        var pobj = prop.Value.ToObject<RealmPropertyJsonModel>();
-                        realm.SetPropertyByName_Complex(prop.Name, pobj);
-                    }
-                    else
-                    {
-                        realm.SetPropertyByName(prop.Name, prop.Value);
-                    }
-                }
-            }
-
-            var links = new List<RealmRulesetLinks>();
-            ushort order = 0;
-            if (dobj.apply_rulesets is Newtonsoft.Json.Linq.JArray apply_rulesets)
-            {
-                foreach (var apply_ruleset in apply_rulesets)
-                {
-                    var name = (string)apply_ruleset;
-                    var link = new RealmRulesetLinks();
-                    link.Import_RulesetToApply = name;
-                    link.Realm = realm;
-                    link.Order = ++order;
-                    link.LinkType = (ushort)RealmRulesetLinkType.apply_after_inherit;
-                    links.Add(link);
-                }
-            }
-
-            if (dobj.apply_rulesets_random is Newtonsoft.Json.Linq.JArray apply_rulesets_random)
-            {
-                byte probabilitygroup = 0;
-                foreach (var apply_ruleset in apply_rulesets_random)
-                {
-                    probabilitygroup++;
-                    List<(string Key, double? Value)> list = new List<(string Key, double? Value)>();
-                    if (apply_ruleset is Newtonsoft.Json.Linq.JArray)
-                    {
-                        foreach (var apply_ruleset_item in apply_ruleset)
-                        {
-                            var x = (Newtonsoft.Json.Linq.JProperty)apply_ruleset_item.ToList()[0];
-                            if (x.Value.Type == Newtonsoft.Json.Linq.JTokenType.Float)
-                                list.Add((x.Name, (double)x.Value));
-                            else if (x.Value.Type == Newtonsoft.Json.Linq.JTokenType.String && ((string)x.Value).ToLower() == "auto")
-                                list.Add((x.Name, null));
-                            else
-                                throw new Exception($"apply_rulesets_random in {filename} for item {x.Name} has an invalid value. Must be a number between 0 and 1, or \"auto\"");
-                        }
-                    }
-                    else
-                    {
-                        var apply_ruleset_item = apply_ruleset;
-                        var x = (Newtonsoft.Json.Linq.JProperty)apply_ruleset_item.ToList()[0];
-                        if (x.Value.Type == Newtonsoft.Json.Linq.JTokenType.Float)
-                            list.Add((x.Name, (double)x.Value));
-                        else if (x.Value.Type == Newtonsoft.Json.Linq.JTokenType.String && ((string)x.Value).ToLower() == "auto")
-                            list.Add((x.Name, null));
-                        else
-                            throw new Exception($"apply_rulesets_random in {filename} for item {x.Name} has an invalid value. Must be a number between 0 and 1, or \"auto\"");
-                    }
-                    //var dict = apply_ruleset.ToObject<Dictionary<string, double?>>();
-                    // var list = dict.ToList().Select(x => (x.Key, x.Value)).ToList();
-
-                    //Ensure that all probabilities go up in order
-                    double current = 0;
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        if (list[i].Value.HasValue && list[i].Value <= current)
-                            throw new Exception($"apply_rulesets_random in {filename} for item {list[i].Key} must have a value greater than the previous item (or greater than 0 if the first item).");
-                        current = list[i].Value ?? current;
-                    }
-                    //Fill in missing values by applying a gradual increase to the next non null value
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        var p = list[i].Value;
-                        if (p == null)
-                        {
-                            double min = i == 0 ? 0 : list[i - 1].Value.Value;
-                            int numToFill = 0;
-                            double? max = null;
-                            for (int j = i + 1; j < list.Count && max == null; j++, numToFill++)
-                                max = list[j].Value;
-                            if (max == null)
-                                max = 1.0;
-                            double delta = (max.Value - min) / (numToFill + 1);
-                            for (int n = 0; n < numToFill; n++, i++)
-                                list[i] = i == 0 ? (list[i].Key, delta) : (list[i].Key, list[i - 1].Value + delta);
-                            if (numToFill == 0)
-                                list[i] = (list[i].Key, max);
-                        }
-                    }
-                    foreach (var item in list)
-                    {
-                        var link = new RealmRulesetLinks();
-                        link.Realm = realm;
-                        link.Order = ++order;
-                        link.ProbabilityGroup = probabilitygroup;
-                        link.Probability = item.Value.Value;
-                        link.LinkType = (ushort)RealmRulesetLinkType.apply_after_inherit;
-                        link.Import_RulesetToApply = item.Key;
-                        links.Add(link);
-                    }
-                }
-            }
-            return new RealmToImport()
-            {
-                Realm = realm,
-                Links = links
-            };
-            // Command.Handlers.CommandHandlerHelper.WriteOutputError(session, $"Error importing json file {filename}. Exception: {ex.Message}.");
-            //return null;
+            return global::ACRealms.Rulesets.Loader.Loader.DeserializeRealmJson(filename, fileContent);
+            
         }
 
         public static bool TryParseReservedRealm(ushort realmId, out ReservedRealm? reservedRealm)
@@ -695,7 +580,7 @@ namespace ACE.Server.Managers
                 player.Sanctuary = loc.AsLocalPosition();
                 WorldManager.ThreadSafeTeleport(player, loc, false, new Entity.Actions.ActionEventDelegate(() =>
                 {
-                    if (realm.StandardRules.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                    if (Props.Pvp.World.IsDuelingRealm(realm.StandardRules))
                         DuelRealmHelpers.SetupNewCharacter(player);
                 }));
             }

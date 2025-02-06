@@ -507,7 +507,7 @@ namespace ACE.Server.Managers
         /// <summary>
         /// Returns a reference to a landblock, loading the landblock if not already active
         /// </summary>
-        public static Landblock GetLandblock(LandblockId landblockId, uint instance, EphemeralRealm ephemeralRealm, bool loadAdjacents, bool permaload = false, bool wait = false)
+        internal static Landblock GetLandblock(LandblockId landblockId, uint instance, EphemeralRealm ephemeralRealm, bool loadAdjacents, bool permaload = false, bool wait = false)
         {
             if (loadAdjacents && ephemeralRealm != null)
             {

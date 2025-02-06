@@ -198,7 +198,7 @@ namespace ACE.Server.Managers
             item.SetProperty(PropertyString.Name, $"Imbued {originalItem.Name}");
             item.SetProperty(PropertyInt.MaxStackSize, 1);
             item.SetProperty(PropertyString.LongDesc,
-            $"Rulesets Applied:\n{realm.Realm.Name} - {realm.StandardRules.GetProperty(RealmPropertyString.Description)}");
+            $"Rulesets Applied:\n{realm.Realm.Name} - {Props.Core.Realm.Description(realm.StandardRules)}");
             return item;
         }
 
@@ -207,7 +207,7 @@ namespace ACE.Server.Managers
             item.SetProperty(PropertyInt.SummonTargetRealm2, realm.Realm.Id);
             item.SetProperty(PropertyDataId.IconOverlay, 0x06006C21);
             item.SetProperty(PropertyString.LongDesc,
-            $"{item.GetProperty(PropertyString.LongDesc) ?? ""}\n\n{realm.Realm.Name} - {realm.StandardRules.GetProperty(RealmPropertyString.Description)}");
+            $"{item.GetProperty(PropertyString.LongDesc) ?? ""}\n\n{realm.Realm.Name} - {Props.Core.Realm.Description(realm.StandardRules)}");
         }
 
         private static void DoApplyRulesetStamp3(WorldObject item, WorldRealm realm)
@@ -215,7 +215,7 @@ namespace ACE.Server.Managers
             item.SetProperty(PropertyInt.SummonTargetRealm3, realm.Realm.Id);
             item.SetProperty(PropertyDataId.IconOverlay, 0x06006C22);
             item.SetProperty(PropertyString.LongDesc,
-            $"{item.GetProperty(PropertyString.LongDesc) ?? ""}\n\n{realm.Realm.Name} - {realm.StandardRules.GetProperty(RealmPropertyString.Description)}");
+            $"{item.GetProperty(PropertyString.LongDesc) ?? ""}\n\n{realm.Realm.Name} - {Props.Core.Realm.Description(realm.StandardRules)}");
         }
 
         public static bool HasDifficulty(Recipe recipe)

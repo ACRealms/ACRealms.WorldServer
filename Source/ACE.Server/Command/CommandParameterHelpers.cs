@@ -6,7 +6,7 @@ using ACE.Server.Managers;
 using ACE.Server.Network;
 using ACE.Server.Realms;
 using ACE.Server.WorldObjects;
-
+using ACRealms.RealmProps.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

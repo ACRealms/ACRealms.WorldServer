@@ -1,0 +1,41 @@
+{
+  "name": "Basic Realm",
+  "type": "Realm",
+  "properties": {
+    "Creature": {
+      "Attributes": {
+        "StrengthAdded":
+        [
+          {
+            "value": 1000,
+            "compose": "add",
+            "scope": {
+              // Match on first 
+              "SpawnedCreature": {
+                "Name": "Tusker Guard",
+                "Level": {
+                  "GreaterThan": 10
+                }
+              }
+            }
+          },
+          {
+            "value": 1000,
+            "compose": "add",
+            "scope": {
+              "SpawnedCreature": {
+                //     "GreaterThanOrEqual": 80,
+                //"LessThan": 90
+              }
+            }
+          }
+        ]
+        /*"StrengthMultiplier": {
+          "compose": "multiply",
+          "probability": 0.01,
+          "value": 10
+        }*/
+      }
+    }
+  }
+}

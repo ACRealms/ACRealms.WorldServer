@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "$corvusTypeName": "PropDefExtensionEnum",
+  "definitions": {
+    "PlayerInstanceSelectMode": {
+      "$anchor": "schemas.PlayerInstanceSelectMode",
+      "properties": {
+        "enum": {
+          "const": "PlayerInstanceSelectMode",
+          "description": "Determines the conversion function from a relative position to an instance position, contextually for a player"
+        },
+        "default": { "$ref": "enums/PlayerInstanceSelectMode.json" }
+      }
+    },
+    "enumProp": {
+      "oneOf": [
+        { "$ref": "#schemas.PlayerInstanceSelectMode" }
+      ]
+    }
+  },
+  "oneOf": [
+    { "$ref": "#schemas.PlayerInstanceSelectMode" }
+  ],
+  "required": [ "enum", "default" ]
+}

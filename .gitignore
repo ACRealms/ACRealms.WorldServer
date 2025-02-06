@@ -26,7 +26,6 @@ bld/
 
 # Visual Studio / Visual Studio Code
 .vs/
-.vscode/
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
@@ -313,3 +312,4 @@ Content/json-schema/generated/
 /Content/json/weenies
 /UntrackedContent
 /Docs/.obsidian
+/Source/ACE.Entity/ACRealms/RealmProps/Generated/

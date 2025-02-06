@@ -1,0 +1,6 @@
+{
+  "$comment": "list of string fragments to be concatenated together to allow json string to be broken up into multiple lines in the editor",
+  "type": "array", "maxItems": 320,
+  "default": [ ],
+  "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+}

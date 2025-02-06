@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace ACE.Server.Command
 {
@@ -6,5 +6,6 @@ namespace ACE.Server.Command
     {
         public Delegate Handler { get; set; }
         public CommandHandlerAttribute Attribute { get; set; }
+
     }
 }

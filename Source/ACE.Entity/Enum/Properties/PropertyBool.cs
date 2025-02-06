@@ -226,6 +226,7 @@ namespace ACE.Entity.Enum.Properties
         ClassicalInstancesActive = 42005
     }
 
+    /*
     public static class PropertyBoolExtensions
     {
         public static string GetDescription(this PropertyBool prop)
@@ -234,4 +235,5 @@ namespace ACE.Entity.Enum.Properties
             return description?.Description ?? prop.ToString();
         }
     }
+    */
 }

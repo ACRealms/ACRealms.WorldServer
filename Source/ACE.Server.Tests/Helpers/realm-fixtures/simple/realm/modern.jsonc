@@ -1,10 +1,14 @@
 {
-    "name": "Modern Realm",
-    "type": "Realm",
-    "properties": {
+  "name": "Modern Realm",
+  "type": "Realm",
+  "properties": {
+    "Core": {
+      "Realm": {
         "Description": "The Customized Realm with the latest and greatest features.",
         "CanBeHomeworld": true,
         "CanInteractWithNeutralZone": true,
         "HideoutEnabled": true
+      }
     }
+  }
 }

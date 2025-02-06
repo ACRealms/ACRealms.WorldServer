@@ -1,0 +1,14 @@
+{
+  "$schema_version": 1,
+  "namespace": "Pvp.Spellcasting",
+  "description": "Properties related to player spellcasting, affecting PvP only",
+  "properties": {
+    "WindupMaxMove": {
+      "type": "float",
+      "description": "The maximum distance a player may move during a spellcast without the cast being cancelled with 'Your movement disrupted spell casting!'",
+      "default": 6,
+      "min_value": 1,
+      "max_value": 250
+    }
+  }
+}

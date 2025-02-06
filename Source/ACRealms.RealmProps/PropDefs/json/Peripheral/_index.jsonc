@@ -1,0 +1,5 @@
+{
+  "$schema_version": 1,
+  "namespace": "Peripheral",
+  "description": "Properties related to extended features supplied with AC Realms (excluding core features) but not related to any features of standard Asheron's Call or ACE"
+}

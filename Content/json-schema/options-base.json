@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://realm.ac/schema/v1/generated/options-base.json",
+  "type": "object",
+  "minItems": 1,
+  "definitions": {
+    "reroll": {
+      "description": "landblock: Reroll once during landblock load; always: Reroll each time the property is accessed by game logic; Never: use the default value",
+      "default": "landblock",
+      "enum": [ "landblock", "always", "never" ]
+    },
+    "probability": {
+      "type": "number",
+      "description": "The probability of this property taking effect or being composed",
+      "default": 1, "minimum": 0, "maximum": 1
+    },
+    "compose": {
+      "description": "add, multiply, or replace the previously composed ruleset property",
+      "default": "replace",
+      "enum": [ "add", "multiply", "replace" ]
+    },
+    "locked": {
+      "type": "boolean",
+      "description": "If true, the value may not be further modified by other rulesets or sub-realms",
+      "default": false
+    },
+    "commonOpts": {
+      "type": "object",
+      "properties": {
+        "probability": { "$ref": "#/definitions/probability" },
+        "compose": { "$ref": "#/definitions/compose" },
+        "locked": { "$ref": "#/definitions/locked" }
+      }
+    }
+  }
+}

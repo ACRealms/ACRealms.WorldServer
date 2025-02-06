@@ -19,6 +19,7 @@ using ACE.Server.Network.Structure;
 using ACE.Server.Physics;
 using ACE.Server.Physics.Common;
 using ACE.Server.Realms;
+using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.WorldObjects
 {
@@ -408,7 +409,7 @@ namespace ACE.Server.WorldObjects
         {
             get
             {
-                return TimeSpan.FromSeconds(RealmRuleset.GetProperty(RealmPropertyFloat.SpellCasting_MoveToState_UpdatePosition_Threshold));
+                return TimeSpan.FromSeconds(Props.Player.Spellcasting.MoveToStateUpdatePositionThreshold(RealmRuleset));
             }
         }
 

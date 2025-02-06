@@ -22,6 +22,7 @@ namespace ACE.DatLoader
             Buffer = ReadDat(stream, offset, size, blockSize);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2022:Avoid inexact read with 'Stream.Read'", Justification = "<Pending>")]
         private static byte[] ReadDat(FileStream stream, uint offset, uint size, uint blockSize)
         {
             var buffer = new byte[size];
@@ -53,6 +54,7 @@ namespace ACE.DatLoader
             return buffer;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2022:Avoid inexact read with 'Stream.Read'", Justification = "<Pending>")]
         private static uint GetNextAddress(FileStream stream, int relOffset)
         {
             // The location of the start of the next sector is the first four bytes of the current sector. This should be 0x00000000 if no next sector.

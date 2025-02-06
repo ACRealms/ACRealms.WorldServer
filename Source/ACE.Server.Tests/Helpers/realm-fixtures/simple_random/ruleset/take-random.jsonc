@@ -3,37 +3,41 @@
   "type": "Ruleset",
   "properties_random_count": 3,
   "properties": {
-    "CreatureStrengthAdded": {
-      "low": 10,
-      "high": 20,
-      "compose": "add"
-    },
-    "CreatureEnduranceAdded": {
-      "low": 10,
-      "high": 20,
-      "compose": "add"
-    },
-    "CreatureCoordinationAdded": {
-      "low": 10,
-      "high": 20,
-      "compose": "add"
-    },
-    "CreatureQuicknessAdded": {
-      "low": 10,
-      "high": 20,
-      "compose": "add"
-    },
-    "CreatureFocusAdded": {
-      "low": 10,
-      "high": 20,
-      "probability": 0.5,
-      "compose": "add"
-    },
-    "CreatureSelfAdded": {
-      "low": 10,
-      "high": 20,
-      "locked": true,
-      "compose": "add"
+    "Creature": {
+      "Attributes": {
+        "StrengthAdded": {
+          "low": 10,
+          "high": 20,
+          "compose": "add"
+        },
+        "EnduranceAdded": {
+          "low": 10,
+          "high": 20,
+          "compose": "add"
+        },
+        "CoordinationAdded": {
+          "low": 10,
+          "high": 20,
+          "compose": "add"
+        },
+        "QuicknessAdded": {
+          "low": 10,
+          "high": 20,
+          "compose": "add"
+        },
+        "FocusAdded": {
+          "low": 10,
+          "high": 20,
+          "probability": 0.5,
+          "compose": "add"
+        },
+        "SelfAdded": {
+          "low": 10,
+          "high": 20,
+          "locked": true,
+          "compose": "add"
+        }
+      }
     }
   }
 }

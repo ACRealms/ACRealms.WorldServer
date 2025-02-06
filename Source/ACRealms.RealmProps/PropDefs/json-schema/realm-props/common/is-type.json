@@ -1,0 +1,11 @@
+{
+  "$comment": "Contains schemas to identify the type of a group or property",
+  "definitions": {
+    "typeIsInteger": { "properties": { "type": { "const": "integer", "description": "RealmPropertyInt" } } },
+    "typeIsLong": { "properties": { "type": { "const": "long", "description": "RealmPropertyInt64" } } },
+    "typeIsFloat": { "properties": { "type": { "const": "float", "description": "RealmPropertyFloat" } } },
+    "typeIsString": { "properties": { "type": { "const": "string", "description": "RealmPropertyString" } } },
+    "typeIsBoolean": { "properties": { "type": { "const": "boolean", "description": "RealmPropertyBool" } } },
+    "typeIsEnum": { "properties": { "type": { "const": "enum", "description": "RealmPropertyEnum" } } }
+  }
+}

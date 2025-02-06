@@ -26,6 +26,9 @@ using ACE.Server.Physics.Extensions;
 using ACE.Server.WorldObjects.Managers;
 using ACE.Server.Realms;
 using ACE.Entity.Enum.RealmProperties;
+using ACRealms;
+using ACRealms.RealmProps.Enums;
+using ACRealms.Rulesets.Enums;
 
 namespace ACE.Server.WorldObjects
 {
@@ -1162,7 +1165,7 @@ namespace ACE.Server.WorldObjects
                     portalRecall.AddDelaySeconds(2.0f);  // 2 second delay
                     portalRecall.AddAction(targetPlayer, () =>
                     {
-                        var teleportDest = portal.Destination.AsInstancedPosition(targetPlayer, targetPlayer.RealmRuleset.RecallInstanceSelectMode);
+                        var teleportDest = portal.Destination.AsInstancedPosition(targetPlayer, Props.Core.Instance.RecallInstanceSelectMode(targetPlayer.RealmRuleset));
                         teleportDest = AdjustDungeon(teleportDest);
 
                         targetPlayer.Teleport(teleportDest);
@@ -1300,7 +1303,7 @@ namespace ACE.Server.WorldObjects
                     return false;
                 }
 
-                if (summoner.RealmRuleset.GetProperty(RealmPropertyBool.IsDuelingRealm))
+                if (Props.Pvp.World.IsDuelingRealm(summoner.RealmRuleset))
                     doEphemeralInstance = true;
 
                 if (doEphemeralInstance)
@@ -1315,7 +1318,7 @@ namespace ACE.Server.WorldObjects
                     forceInstanceId = landblock.Instance;
 
                     // If the ruleset dictates that the landblock is to be unloaded if empty for less time than the portal is active for, we need to shorten this portal's duration
-                    var maxPortalTime = Math.Min(portalLifetime, TimeSpan.FromMinutes(0.5 + landblock.RealmRuleset.GetProperty(RealmPropertyInt.LandblockUnloadInterval)).TotalSeconds);
+                    var maxPortalTime = Math.Min(portalLifetime, TimeSpan.FromMinutes(0.5 + Props.Core.Landblock.UnloadInterval(landblock.RealmRuleset)).TotalSeconds);
                     if (portalLifetime > maxPortalTime)
                     {
                         summoner.Session.Network.EnqueueSend(new GameMessageSystemChat($"The portal duration has been reduced from {portalLifetime} to {maxPortalTime} seconds due to the ruleset's limit on inactive landblock lifespans!", ChatMessageType.Magic));

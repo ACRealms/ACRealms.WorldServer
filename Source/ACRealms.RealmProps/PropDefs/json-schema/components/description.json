@@ -1,0 +1,9 @@
+{
+  "$corvusTypeName": "Description",
+  "oneOf": [
+    { "$corvusTypeName": "StringForm",
+      "$ref": "description/description-pattern.json",
+      "allOf": [ { "$ref": "primitives/val-string-simple.json" } ] },
+    { "$ref": "description/description-array.json" }
+  ]
+}

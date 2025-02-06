@@ -4,33 +4,41 @@
   "parent": "Compose Root",
   "properties_random_count": 0,
   "properties": {
-    "Description": "Take random 1",
-    "CreatureStrengthAdded": {
-      "low": 10,
-      "high": 20,
-      "compose": "multiply"
+    "Core": {
+      "Realm": {
+        "Description": "Take random 1"
+      }
     },
-    "CreatureEnduranceAdded": {
-      "value": 10,
-      "compose": "multiply"
-    },
-    "CreatureCoordinationAdded": {
-      "value": 10,
-      "compose": "multiply"
-    },
-    "CreatureQuicknessAdded": {
-      "compose": "multiply",
-      "value": 10
-    },
-    "CreatureFocusAdded": {
-      "value": 10,
-      "probability": 0,
-      "compose": "multiply"
-    },
-    "CreatureSelfAdded": {
-      "value": 10,
-      "locked": true,
-      "compose": "multiply"
+    "Creature": {
+      "Attributes": {
+        "StrengthAdded": {
+          "low": 10,
+          "high": 20,
+          "compose": "multiply"
+        },
+        "EnduranceAdded": {
+          "value": 10,
+          "compose": "multiply"
+        },
+        "CoordinationAdded": {
+          "value": 10,
+          "compose": "multiply"
+        },
+        "QuicknessAdded": {
+          "compose": "multiply",
+          "value": 10
+        },
+        "FocusAdded": {
+          "value": 10,
+          "probability": 0,
+          "compose": "multiply"
+        },
+        "SelfAdded": {
+          "value": 10,
+          "locked": true,
+          "compose": "multiply"
+        }
+      }
     }
   }
 }

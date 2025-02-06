@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://realm.ac/schema/v1/scope-base.json",
+  "definitions": {
+    "genericAnyValue": { "$anchor": "v" },
+    "comparableForIntellisenseOnly": {
+      "definitions": {
+        "params": {
+          "$anchor": "intellisense.comparable",
+          "type": "object",
+          "properties": {
+            "LessThan": {
+              "$ref": "#v",
+              "description": "Matches on comparable properties lower than this value" },
+            "LessThanOrEqual": { "$ref": "#v" },
+            "GreaterThan": {
+              "$ref": "#v",
+              "description": "Matches on comparable properties greater than this value" },
+            "GreaterThanOrEqual": { "$ref": "#v" },
+            "NotEqual": { "$ref": "#v" },
+            "Equal": { "$ref": "#v" }
+          }
+        }
+      }
+    },
+    "equatableForIntellisenseOnly": {
+      "definitions": {
+        "params": {
+          "$anchor": "intellisense.equatable",
+          "type": "object",
+          "properties": {
+            "NotEqual": { "$ref": "#v" },
+            "Equal": { "$ref": "#v" }
+          }
+        }
+      }
+    },
+    "paramsCommon": {
+      "$anchor": "params.common",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "unevaluatedProperties": false
+    },
+    "paramsFloat": {
+      "definitions": {
+        "val": { "$anchor": "v.float", "type": "number" },
+        "params": {
+          "$anchor": "params.float",
+          "$ref": "#params.common",
+          "patternProperties": { "^(LessThan|LessThanOrEqual|GreaterThan|GreaterThanOrEqual|NotEqual|Equal)$": { "$ref": "#v.float" } },
+          "anyOf": [ { "$ref": "#intellisense.comparable" } ]
+        }
+      },
+      "default": { },
+      "if": { "type": "object" },
+      "then": { "$ref": "#params.float" },
+      "else": { "$ref": "#v.float", "description": "Equal to this value" }
+    },
+    "paramsInt": {
+      "definitions": {
+        "val": { "$anchor": "v.int", "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "params": {
+          "$anchor": "params.int",
+          "$ref": "#params.common",
+          "patternProperties": { "^(LessThan|LessThanOrEqual|GreaterThan|GreaterThanOrEqual|NotEqual|Equal)$": { "$ref": "#v.int" } },
+          "anyOf": [ { "$ref": "#intellisense.comparable" } ]
+        }
+      },
+      "default": { },
+      "if": { "type": "object" },
+      "then": { "$ref": "#params.int" },
+      "else": { "$ref": "#v.int", "description": "Equal to this value" }
+    },
+    "paramsLong": {
+      "definitions": {
+        "val": { "$anchor": "v.long", "type": "integer", "minimum": -9223372036854775808, "maximum": 9223372036854775807 },
+        "params": {
+          "$anchor": "params.long",
+          "$ref": "#params.common",
+          "patternProperties": { "^(LessThan|LessThanOrEqual|GreaterThan|GreaterThanOrEqual|NotEqual|Equal)$": { "$ref": "#v.long" } },
+          "anyOf": [ { "$ref": "#intellisense.comparable" } ]
+        }
+      },
+      "default": { },
+      "if": { "type": "object" },
+      "then": { "$ref": "#params.long" },
+      "else": { "$ref": "#v.long", "description": "Equal to this value" }
+    },
+    "paramsString": {
+      "definitions": {
+        "val": { "$anchor": "v.string", "type": "string", "maxLength": 1000 },
+        "params": {
+          "$anchor": "params.string",
+          "$ref": "#params.common",
+          "default": { },
+          "patternProperties": { "^(LessThan|LessThanOrEqual|GreaterThan|GreaterThanOrEqual|NotEqual|Equal)$": { "$ref": "#v.string" } },
+          "anyOf": [ { "$ref": "#intellisense.comparable" } ]
+        }
+      },
+      "anyOf": [
+        {
+          "type": "object",
+          "$ref": "#params.string",
+          "default": { }
+        },
+        {
+          "$ref": "#v.string",
+          "description": "Equal to this value",
+          "default": ""
+        }
+      ],
+      "default": { },
+      "if": { "type": "object" },
+      "then": { "$ref": "#params.string" },
+      "else": { "$ref": "#v.string", "description": "Equal to this value" }
+    },
+    "paramsBool": {
+      "definitions": {
+        "val": { "$anchor": "v.bool", "type": "boolean" },
+        "params": {
+          "$anchor": "params.bool",
+          "$ref": "#params.common",
+          "patternProperties": { "^(NotEqual|Equal)$": { "$ref": "#v.bool" } },
+          "anyOf": [ { "$ref": "#intellisense.equatable" } ]
+        }
+      },
+      "anyOf": [
+        {
+          "type": "object",
+          "$ref": "#params.bool",
+          "default": { }
+        },
+        {
+          "default": false,
+          "const": false
+        },
+        {
+          "default": true,
+          "const": true
+        }
+      ],
+      "if": { "type": "object" },
+      "then": { "$ref": "#params.bool" },
+      "else": { "$ref": "#v.bool", "description": "Equal to this value" }
+    }
+  }
+}

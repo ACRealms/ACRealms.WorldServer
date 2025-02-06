@@ -5,6 +5,8 @@ using ACE.Entity.Enum.Properties;
 using ACE.Server.Command.Handlers.Processors;
 using ACE.Server.Managers;
 using ACE.Server.Network;
+using ACRealms.Rulesets.Enums;
+using ACRealms.Rulesets.Loader;
 using log4net;
 using Newtonsoft.Json;
 using System;
@@ -17,11 +19,11 @@ using System.Threading.Tasks;
 
 namespace ACE.Server.Command.Handlers
 {
-    public static class RealmDataHelpers
+    internal static class RealmDataHelpers
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static List<RealmToImport> ImportJsonRealmsFolder(ISession session, string json_folder)
+        internal static List<RealmToImport> ImportJsonRealmsFolder(ISession session, string json_folder)
         {
             var sep = Path.DirectorySeparatorChar;
             var json_folder_realm = $"{json_folder}{sep}realm{sep}";
@@ -37,23 +39,23 @@ namespace ACE.Server.Command.Handlers
             return list;
         }
 
-        public static bool VerifyAndMergeRealmIndex(ISession session, Dictionary<string, ushort> priorLockedIndex, List<RealmToImport> realmsToImport, out Dictionary<string, ushort> newLockedIndex)
+        internal static bool VerifyAndMergeRealmIndex(ISession session, Dictionary<string, ushort> priorLockedIndex, List<RealmToImport> realmsToImport, out Dictionary<string, ushort> newLockedIndex)
         {
-            // Todo: Refactor to allow for rulesets but not realms to be removed from db
-            var dbRealmsFull = DatabaseManager.World.GetAllRealms(cacheUsage: false);
+            // As of v2.2 this method doesn't provide as much safety, as the realms are not stored in the database. 
+            // var dbRealmsFull = DatabaseManager.World.GetAllRealms(cacheUsage: false);
 
 
-            var dbWorldRealmIds = dbRealmsFull.Where(r => r.Type == (ushort)ACE.Entity.Enum.RealmType.Realm).Select(x => x.Id).ToHashSet();
-            var dbWorldRulesetIds = dbRealmsFull.Where(r => r.Type == (ushort)ACE.Entity.Enum.RealmType.Ruleset).Select(x => x.Id).ToHashSet();
+            // var dbWorldRealmIds = dbRealmsFull.Where(r => r.Type == (ushort)RealmType.Realm).Select(x => x.Id).ToHashSet();
+            // var dbWorldRulesetIds = dbRealmsFull.Where(r => r.Type == (ushort)RealmType.Ruleset).Select(x => x.Id).ToHashSet();
 
-            var dbRealms = dbRealmsFull.ToDictionary(x => x.Name, x => x.Id);
+            // var dbRealms = dbRealmsFull.ToDictionary(x => x.Name, x => x.Id);
             var priorIndexById = priorLockedIndex.ToDictionary(x => x.Value, x => x.Key);
-            var dbRealmsById = dbRealms.ToDictionary(x => x.Value, x => x.Key);
+            // var dbRealmsById = dbRealms.ToDictionary(x => x.Value, x => x.Key);
             newLockedIndex = new Dictionary<string, ushort>(StringComparer.InvariantCultureIgnoreCase);
 
             bool changesDetected = false;
 
-            
+            /*
             foreach (var dbRealmName in dbRealms.Keys)
             {
                 var dbRealmId = dbRealms[dbRealmName];
@@ -84,6 +86,7 @@ namespace ACE.Server.Command.Handlers
                 else
                     newLockedIndex.Add(dbRealmName, priorLockedIndex[dbRealmName]);
             }
+            */
 
             foreach (var priorRealmName in priorLockedIndex.Keys)
             {
@@ -92,10 +95,12 @@ namespace ACE.Server.Command.Handlers
 
                 var priorRealmId = priorLockedIndex[priorRealmName];
 
+                /* 
                 if (dbRealmsById.ContainsKey(priorRealmId))
                     throw new InvalidDataException($"Realm or Ruleset {priorRealmName} exists in DB with ID {dbRealms[priorRealmName]} but defined in index file with id {priorRealmId}");
                 else if (dbRealms.ContainsKey(priorRealmName))
                     throw new InvalidDataException($"Realm or Ruleset {priorRealmName} defined in index file with ID {priorRealmId} but defined in DB with id {dbRealms[priorRealmName]}");
+                */
 
                 CommandHandlerHelper.WriteOutputInfo(session, $"Found new realm {priorRealmName} in index file with self-assigned ID of {priorRealmId}.");
                 newLockedIndex.Add(priorRealmName, priorRealmId);
@@ -107,7 +112,8 @@ namespace ACE.Server.Command.Handlers
             var reservedRealmIdsRaw = reservedRealmIdsByEnum.Select(x => (ushort)x).ToHashSet();
             foreach(var enumVal in reservedRealmIdsByEnum)
             {
-                if (reservedIds.Contains((ushort)enumVal) && !dbRealmsById.ContainsKey((ushort)enumVal))
+                //if (reservedIds.Contains((ushort)enumVal) && !dbRealmsById.ContainsKey((ushort)enumVal))
+                if (reservedIds.Contains((ushort)enumVal))
                     throw new InvalidDataException($"The ID {(ushort)enumVal} is not permitted to be manually added to the index file because there is a system-defined realm {enumVal} with that ID.");
                 reservedIds.Add((ushort)enumVal);
             }
@@ -131,6 +137,8 @@ namespace ACE.Server.Command.Handlers
             }
 
             // Check for missing realms that exist in db
+
+            /*
             var realmNamesDefinedInConfig = realmsToImport.Select(x => x.Realm.Name).ToHashSet(StringComparer.Ordinal);
             foreach (var dbRealmName in dbRealms.Keys)
             {
@@ -141,7 +149,7 @@ namespace ACE.Server.Command.Handlers
                     throw new InvalidDataException($"Expected realm file defining realm with name {dbRealmName} - Deletion of rulesets not implemented yet");
                 }
             }
-
+            */
 
             // Be absolutely sure
             if (!changesDetected)
@@ -158,7 +166,7 @@ namespace ACE.Server.Command.Handlers
             return changesDetected;
         }
 
-        public static void ImportJsonRealmsIndex(ISession session, string realmsIndexJsonFile, List<RealmToImport> realms)
+        internal static void ImportJsonRealmsIndex(ISession session, string realmsIndexJsonFile, List<RealmToImport> realms)
         {
             Dictionary<string, RealmToImport> realmsDict = null;
             try
@@ -231,7 +239,7 @@ namespace ACE.Server.Command.Handlers
                         continue;
 
                     var parentImportItem = realmsById[importItem.Realm.ParentRealmId.Value];
-                    parentImportItem.Realm.Descendents.Add(importItem.Realm.Id, importItem.Realm);
+                    parentImportItem.Realm.Descendants.Add(importItem.Realm.Id, importItem.Realm);
                 }
             }
             catch (Exception ex)
@@ -256,7 +264,7 @@ namespace ACE.Server.Command.Handlers
             }
         }
 
-        public static List<RealmToImport> ImportJsonRealmsFromSubFolder(ISession session, string json_folder)
+        internal static List<RealmToImport> ImportJsonRealmsFromSubFolder(ISession session, string json_folder)
         {
             var di = new DirectoryInfo(json_folder);
 
@@ -280,6 +288,7 @@ namespace ACE.Server.Command.Handlers
             return list;
         }
 
+        /*
         public static void ExportSQLRealm(ISession session, string param)
         {
             DirectoryInfo di = DeveloperContentCommands.VerifyContentFolder(session, false);
@@ -339,6 +348,6 @@ namespace ACE.Server.Command.Handlers
             }
 
             CommandHandlerHelper.WriteOutputInfo(session, $"Exported {sql_folder}{sql_filename}");
-        }
+        }*/
     }
 }

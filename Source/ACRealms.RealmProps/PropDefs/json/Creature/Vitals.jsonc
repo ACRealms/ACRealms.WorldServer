@@ -1,0 +1,22 @@
+{
+  "$schema_version": 1,
+  "namespace": "Creature.Vitals",
+  "description": "Properties affecting a creature's vitals (Health, Stamina, Mana)",
+  "groups": [
+    {
+      "type": "integer",
+      "key_suffix": "Added",
+      "default": 0,
+      "min_value": -10000, "max_value": 10000,
+      "description_format": "All creatures will have this value added to their {short_key} vital",
+      "properties": [ "Health", "Stamina", "Mana" ]
+    },
+    {
+      "type": "float",
+      "key_suffix": "Multiplier",
+      "description_format": "Creature {short_key} will be multiplied by this amount",
+      "default": 1, "min_value": 0.01, "max_value": 100,
+      "properties": [ "Health", "Stamina", "Mana" ]
+    }
+  ]
+}

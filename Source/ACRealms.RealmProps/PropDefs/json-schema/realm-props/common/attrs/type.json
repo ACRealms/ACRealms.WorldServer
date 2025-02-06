@@ -1,0 +1,4 @@
+{
+  "type": "string",
+  "enum": [ "integer", "boolean", "float", "long", "string", "enum" ]
+}

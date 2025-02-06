@@ -14,6 +14,7 @@ using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Realms;
 using ACE.Entity.Enum.RealmProperties;
+using ACRealms.RealmProps.Enums;
 
 namespace ACE.Server.WorldObjects
 {
@@ -278,7 +279,7 @@ namespace ACE.Server.WorldObjects
 #if DEBUG
             // player.Session.Network.EnqueueSend(new GameMessageSystemChat("Portal sending player to destination", ChatMessageType.System));
 #endif
-            var portalDest = Destination.AsInstancedPosition(player, player.RealmRuleset.PortalInstanceSelectMode);
+            var portalDest = Destination.AsInstancedPosition(player, Props.Core.Instance.PortalInstanceSelectMode(player.RealmRuleset));
             if (IsEphemeralRealmPortal)
             {
                 if (EphemeralRealmPortalInstanceID.HasValue)

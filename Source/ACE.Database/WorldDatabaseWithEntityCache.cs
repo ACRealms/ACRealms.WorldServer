@@ -1113,7 +1113,7 @@ namespace ACE.Database
         // =====================================
         // Realm
         // =====================================
-
+        /*
         private readonly Dictionary<ushort, Realm> realmCache = new Dictionary<ushort, Realm>();
 
         public override Realm GetRealm(ushort realmId)
@@ -1181,7 +1181,7 @@ namespace ACE.Database
                 ClearRealmCache();
             }
         }
-
+        */
         public void ClearWieldedTreasureCache()
         {
             cachedWieldedTreasure.Clear();

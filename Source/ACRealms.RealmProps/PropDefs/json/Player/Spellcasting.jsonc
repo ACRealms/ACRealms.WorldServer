@@ -1,0 +1,22 @@
+{
+  "$schema_version": 1,
+  "namespace": "Player.Spellcasting",
+  "description": "Properties affecting spellcasting behavior.",
+  "properties": {
+    "MoveToStateUpdatePositionThreshold": {
+      "type": "float",
+      "description": "If you wish for players to glitch around less during powerslides, lower this value",
+      "default": 1,
+      "min_value": 0.1,
+      "max_value": 5
+    },
+    "MaxAngle": {
+      "type": "float",
+      "description": "The maximum angle a player allowed to face away from the target before releasing a spell.", // Defaults to server property 'spellcast_max_angle' if not defined in a ruleset",
+      "default_from_server_property": "spellcast_max_angle",
+      "default": 20,
+      "min_value": 0,
+      "max_value": 360
+    }
+  }
+}

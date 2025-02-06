@@ -1,0 +1,18 @@
+{
+  "$schema_version": 1,
+  "namespace": "Core.Instance",
+  "description": "Properties related to instance selection (don't use unless you know what you're doing)",
+  "groups": [
+    {
+      "type": "enum",
+      "enum": "PlayerInstanceSelectMode",
+      "key_suffix": "InstanceSelectMode",
+      "default": "HomeRealm",
+      "description_format": "When {short_description}, determines which mode to use to select the realm or instance.",
+      "properties": {
+        "Recall": "recalling",
+        "Portal": "using a portal"
+      }
+    }
+  ]
+}

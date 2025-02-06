@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "$comment": "Represents the base schema that is common for both props and groups",
+  "default": { },
+  "properties": {
+    "default": {
+      "$comment": "Untyped default (description common for all types), type to be filled in by prop-typed schema",
+      "description": "The default fallback value for the property, when not defined explicitly by any ruleset"
+    },
+    "obsolete": {
+      "type": "string",
+      "description": "If set, the property will be marked obsolete, with this string value specifying the reason or additional context"
+    },
+    "contexts": { "$ref": "../../contexts.json" },
+    "default_from_server_property": {
+      "type": "string",
+      "description": "When the realm property is not defined, fetches this server property key as a default"
+    }
+  }
+}

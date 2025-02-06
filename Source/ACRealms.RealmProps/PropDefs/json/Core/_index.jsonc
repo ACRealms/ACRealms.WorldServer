@@ -1,0 +1,5 @@
+{
+  "$schema_version": 1,
+  "namespace": "Core",
+  "description": "Emulator and realm core functionality"
+}

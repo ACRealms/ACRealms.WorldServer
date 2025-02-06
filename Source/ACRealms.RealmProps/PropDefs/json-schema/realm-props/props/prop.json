@@ -1,0 +1,31 @@
+{
+  "$comment": "Property definition (long form), belonging under the properties key of a namespace (not within a group)",
+  "$corvusTypeName": "UngroupedPropObj",
+  "definitions": {
+    "objPropSelection": {
+      "allOf": [ {
+          "$corvusTypeName": "Typed",
+          "$comment": "Once we can unit test the schema validation, remove this allOf and see if it still works, then simplify this schema",
+          "properties": {
+            "description": { "$ref": "../../components/description.json" }
+          },
+          "oneOf": [
+            { "$corvusTypeName": "Enum", "if": { "$ref": "../common/is-type.json#/definitions/typeIsEnum" }, "then": { "$ref": "../common/prop-typed.json#/definitions/propEnum" }, "else": false },
+            { "$corvusTypeName": "Int", "if": { "$ref": "../common/is-type.json#/definitions/typeIsInteger" }, "then": { "$ref": "../common/prop-typed.json#/definitions/propInt" }, "else": false },
+            { "$corvusTypeName": "Long", "if": { "$ref": "../common/is-type.json#/definitions/typeIsLong" }, "then": { "$ref": "../common/prop-typed.json#/definitions/propLong" }, "else": false },
+            { "$corvusTypeName": "Float", "if": { "$ref": "../common/is-type.json#/definitions/typeIsFloat" }, "then": { "$ref": "../common/prop-typed.json#/definitions/propFloat" }, "else": false },
+            { "$corvusTypeName": "Bool", "if": { "$ref": "../common/is-type.json#/definitions/typeIsBoolean" }, "then": { "$ref": "../common/prop-typed.json#/definitions/propBool" }, "else": false },
+            { "$corvusTypeName": "String", "if": { "$ref": "../common/is-type.json#/definitions/typeIsString" }, "then": { "$ref": "../common/prop-typed.json#/definitions/propString" }, "else": false }
+          ],
+          "unevaluatedProperties": false
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "default": { },
+  "properties": { "type": { "$ref": "../common/attrs/type.json" } },
+  "required": [ "type" ],
+  "minProperties": 2,
+  "dependencies": { "type": { "$ref": "#/definitions/objPropSelection" } }
+}

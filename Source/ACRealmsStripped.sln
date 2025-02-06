@@ -1,0 +1,81 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root items", "root items", "{1BA67CED-4F8D-433A-90E1-9871DD6A31EF}"
+	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
+		..\.gitattributes = ..\.gitattributes
+		..\.gitignore = ..\.gitignore
+		..\appveyor.yml = ..\appveyor.yml
+		..\changelog.md = ..\changelog.md
+		..\CODE_OF_CONDUCT.md = ..\CODE_OF_CONDUCT.md
+		..\Git 101.md = ..\Git 101.md
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppVeyor", "AppVeyor", "{27B511EF-7B73-4345-AF4D-9C44DB478080}"
+	ProjectSection(SolutionItems) = preProject
+		..\AppVeyor\AppVeyorAfterCompile.bat = ..\AppVeyor\AppVeyorAfterCompile.bat
+		..\AppVeyor\AppVeyorAfterDeploy.bat = ..\AppVeyor\AppVeyorAfterDeploy.bat
+		..\AppVeyor\AppVeyorBeforeCompile.bat = ..\AppVeyor\AppVeyorBeforeCompile.bat
+		..\AppVeyor\AppVeyorBeforePackage.bat = ..\AppVeyor\AppVeyorBeforePackage.bat
+		..\AppVeyor\AppVeyorTestScript.bat = ..\AppVeyor\AppVeyorTestScript.bat
+		..\AppVeyor\Config.js = ..\AppVeyor\Config.js
+		..\AppVeyor\DownloadACEWorld.bat = ..\AppVeyor\DownloadACEWorld.bat
+		..\AppVeyor\launcher_config.json = ..\AppVeyor\launcher_config.json
+		..\AppVeyor\MySqlInstall.bat = ..\AppVeyor\MySqlInstall.bat
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4B0075B4-AC3B-4A20-901E-8D8F3C8C65CF}"
+	ProjectSection(SolutionItems) = preProject
+		.vsconfig = .vsconfig
+		finecodecoverage-settings.xml = finecodecoverage-settings.xml
+		global.json = global.json
+		Settings.StyleCop = Settings.StyleCop
+		test.runsettings = test.runsettings
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{60DC64AE-6588-4FCA-955A-76F4512749BD}"
+	ProjectSection(SolutionItems) = preProject
+		..\docker-compose.arm64 = ..\docker-compose.arm64
+		..\docker-compose.yml = ..\docker-compose.yml
+		..\docker.env = ..\docker.env
+		..\Dockerfile = ..\Dockerfile
+		..\Dockerfile.arm64 = ..\Dockerfile.arm64
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ACRealms.Roslyn.RealmProps", "ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj", "{88DBDBBD-3698-4534-844D-1AA3BD471E0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACRealms.RealmProps", "ACRealms.RealmProps\ACRealms.RealmProps.csproj", "{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACE.Common", "ACE.Common\ACE.Common.csproj", "{70F5A6F8-924A-430D-AAC0-52FF00186291}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88DBDBBD-3698-4534-844D-1AA3BD471E0C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{88DBDBBD-3698-4534-844D-1AA3BD471E0C}.Debug|x64.Build.0 = Debug|Any CPU
+		{88DBDBBD-3698-4534-844D-1AA3BD471E0C}.Release|x64.ActiveCfg = Release|Any CPU
+		{88DBDBBD-3698-4534-844D-1AA3BD471E0C}.Release|x64.Build.0 = Release|Any CPU
+		{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}.Debug|x64.ActiveCfg = Debug|x64
+		{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}.Debug|x64.Build.0 = Debug|x64
+		{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}.Release|x64.ActiveCfg = Release|x64
+		{BA9D15D3-DEA2-4C03-B481-1D5394842BCF}.Release|x64.Build.0 = Release|x64
+		{70F5A6F8-924A-430D-AAC0-52FF00186291}.Debug|x64.ActiveCfg = Debug|x64
+		{70F5A6F8-924A-430D-AAC0-52FF00186291}.Debug|x64.Build.0 = Debug|x64
+		{70F5A6F8-924A-430D-AAC0-52FF00186291}.Release|x64.ActiveCfg = Release|x64
+		{70F5A6F8-924A-430D-AAC0-52FF00186291}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {39EA6A8F-01CB-4F9D-8505-0A5E4B0E2AB0}
+	EndGlobalSection
+EndGlobal

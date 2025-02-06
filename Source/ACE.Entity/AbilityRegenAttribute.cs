@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace ACE.Entity
 {
@@ -9,6 +9,7 @@ namespace ACE.Entity
         // FIXME(ddevec): Make based off stats?
         public AbilityRegenAttribute(double rate)
         {
+
             Rate = rate;
         }
     }

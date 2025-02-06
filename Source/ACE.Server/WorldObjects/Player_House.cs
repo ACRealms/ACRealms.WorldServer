@@ -34,9 +34,9 @@ namespace ACE.Server.WorldObjects
             {
                 if (IsInPrimaryInstance)
                     return false;
-                if (RealmRuleset.GetProperty(RealmPropertyBool.Housing_DisablePrimaryInstancePurchaseRestriction))
+                if (Props.Housing.PurchaseRestrictions.IgnorePrimaryInstance(RealmRuleset))
                     return false;
-                if (RealmRuleset.GetProperty(RealmPropertyBool.ClassicalInstances_AllowHousingPurchase) && IsInOwnedClassicalInstance)
+                if (Props.Peripheral.ClassicalInstance.AllowHousingPurchase(RealmRuleset) && IsInOwnedClassicalInstance)
                     return false;
                 return true;
             }
@@ -52,7 +52,7 @@ namespace ACE.Server.WorldObjects
                 return;
             }
 
-            if (!RealmRuleset.GetProperty(RealmPropertyBool.Housing_DisableHomeRealmPurchaseRestriction) && !IsInHomeRealm)
+            if (!Props.Housing.PurchaseRestrictions.IgnoreHomeRealm(RealmRuleset) && !IsInHomeRealm)
             {
                 Session.Network.EnqueueSend(new GameMessageSystemChat("You may not purchase housing in this realm.", ChatMessageType.Broadcast));
                 log.Info($"[HOUSE] {Name}.HandleActionBuyHouse(): Failed pre-purchase requirement - Realm Restricted");

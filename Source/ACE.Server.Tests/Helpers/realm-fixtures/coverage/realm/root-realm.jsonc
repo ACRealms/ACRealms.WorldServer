@@ -2,9 +2,13 @@
   "name": "Root Realm",
   "type": "Realm",
   "properties": {
-    "Description": "Root Realm.",
-    "CanBeHomeworld": true,
-    "CanInteractWithNeutralZone": false,
-    "HideoutEnabled": true
+    "Core": {
+      "Realm": {
+        "Description": "Root Realm.",
+        "CanBeHomeworld": true,
+        "CanInteractWithNeutralZone": false,
+        "HideoutEnabled": true
+      }
+    }
   }
 }

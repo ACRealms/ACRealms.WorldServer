@@ -1,0 +1,101 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Platforms>x64</Platforms>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <!--<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>-->
+    <BaseOutputPath>..\lib\RealmPropsAssembly</BaseOutputPath>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratedJsonOutputDir>..\..\Content\json-schema\generated\</GeneratedJsonOutputDir>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+    
+  <Target Name="GatherGeneratedJsonSource" AfterTargets="CoreBuild">
+    <PropertyGroup>
+      <GeneratedJsonIntermediateDir>$(IntermediateOutputPath)\generated\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.NamespacedRealmPropertyGenerator\GeneratedJsonSchema\</GeneratedJsonIntermediateDir>
+    </PropertyGroup>
+    <ItemGroup>
+      
+      <GeneratedJsonCsFile Include="$(GeneratedJsonIntermediateDir)**\*.json.cs" />
+    </ItemGroup>
+  </Target>
+
+ 
+  <Target Name="ExtractJson" AfterTargets="GatherGeneratedJsonSource" Inputs="@(GeneratedJsonCsFile)" Outputs="$(GeneratedJsonOutputDir)%(GeneratedJsonCsFile.RecursiveDir)%(GeneratedJsonCsFile.Filename)">
+    <ReadLinesFromFile File="%(GeneratedJsonCsFile.FullPath)">
+      <Output TaskParameter="Lines" ItemName="JsonLines" />
+    </ReadLinesFromFile>
+
+    <ItemGroup>
+        <ProcessedJsonLines Include="@(JsonLines)" /> <!-- Separate these so the ordering is preserved -->
+        <ProcessedJsonLines Remove="@(ProcessedJsonLines)" Condition="'%(ProcessedJsonLines.Identity)' == '/*' or '%(ProcessedJsonLines.Identity)' == '*/'" />
+    </ItemGroup>
+
+    <MakeDir Directories="$(GeneratedJsonOutputDir)%(GeneratedJsonCsFile.RecursiveDir)" />
+    <WriteLinesToFile File="$(GeneratedJsonOutputDir)%(GeneratedJsonCsFile.RecursiveDir)%(GeneratedJsonCsFile.Filename)" Lines="@(ProcessedJsonLines)" Overwrite="true" />
+  </Target>
+
+    
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="mv -fuT $(AssemblyName).dll $(AssemblyName)Assembly.dll&#xD;&#xA;mv -fuT $(AssemblyName).pdb $(AssemblyName)Assembly.pdb&#xD;&#xA;mv -fuT $(AssemblyName).xml $(AssemblyName)Assembly.xml&#xD;&#xA;mv -fuT $(AssemblyName).deps.json $(AssemblyName)Assembly.deps.json" WorkingDirectory="$(OutDir)" />
+  </Target>
+   
+  <ItemGroup>
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />        
+    <ProjectReference Include="..\ACRealms.Roslyn.RealmProps\ACRealms.Roslyn.RealmProps.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="PropDefs\json\**\*.jsonc" />
+    <Compile Remove="Generated\**" />
+    <Compile Remove="NewFolder\**" />
+    <EmbeddedResource Remove="Generated\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="Generated\**" />
+    <None Remove="NewFolder\**" />
+    <None Remove="PropDefs\json-schema\**" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="PolySharp" Version="1.15.0">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  
+  </ItemGroup>
+
+  <!-- This only runs if we need to swap to enabling EmitCompilerGeneratedFiles for some reason, but we leave it off for performance reasons -->
+  <Target Name="ExcludeGeneratedFiles" BeforeTargets="CoreCompile">
+    <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != '' And '$(EmitCompilerGeneratedFiles)' == 'true'">
+      <!-- Don't include the output from a previous source generator execution into future runs; -->
+      <!-- the */** trick here ensures that there's at least one subdirectory, which is our key  -->
+      <!-- that it's coming from a source generator as opposed to something that is coming from  -->
+      <!-- some other tool. -->
+      <Compile Remove="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/*/**/*.g.cs" />
+      <None Include="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/**" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(CompilerGeneratedFilesOutputPath)' != '' And '$(EmitCompilerGeneratedFiles)' == 'false'">
+      <Compile Remove="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/*/**/*.g.cs" />
+      <None Remove="$(CompilerGeneratedFilesOutputPath)/ACRealms.Roslyn.RealmProps/*/**/*.g.cs" />
+    </ItemGroup>
+   </Target>
+
+  <ItemGroup>
+    <DirsToClean Include="$(IntermediateOutputPath)generated" Condition="'$(IntermediateOutputPath)' != ''" />
+    <DirsToClean Include="$(GeneratedJsonOutputDir)realm-properties" Condition="'$(GeneratedJsonOutputDir)' != ''" />
+    <DirsToClean Include="$(OutputPath)" Condition="'$(OutputPath)' != ''" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ACE.Common\ACE.Common.csproj" />
+  </ItemGroup>
+  <Target Name="RemoveGeneratedFilesOnClean" AfterTargets="CoreClean">
+    <RemoveDir Directories="@(DirsToClean)" />  
+  </Target>
+</Project>

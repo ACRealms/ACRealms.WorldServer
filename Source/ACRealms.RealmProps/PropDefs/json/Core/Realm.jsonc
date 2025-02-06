@@ -1,0 +1,31 @@
+{
+  "$schema_version": 1,
+  "namespace": "Core.Realm",
+  "description": "Meta-properties for a realm as a whole",
+  "groups": [
+    {
+      "type": "boolean",
+      "default": false,
+      "properties": {
+        "CanBeHomeworld": "If true, realm will be listed as available from the realm selector (Blaine)",
+        "HideoutEnabled": "Allows players to use the /hideout command to teleport to a personal instanced hideout",
+        "IsNeutralZone": "If true, any player with a home realm with the property 'CanInteractWithNeutralZone' may travel to this realm",
+        "CanInteractWithNeutralZone": "Players with a homeworld of this realm may enter the neutral zone if true"
+      }
+    },
+    {
+      "type": "boolean",
+      "default": true,
+      "properties": {
+        "HasRecalls": "Enables the console commands for recalling to various locations (marketplace, house, etc)"
+      }
+    }
+  ],
+  "properties": {
+    "Description": {
+      "description": "A description of the ruleset.",
+      "type": "string",
+      "default": "No Description"
+    }
+  }
+}

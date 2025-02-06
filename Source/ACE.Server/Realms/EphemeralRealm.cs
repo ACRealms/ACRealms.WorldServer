@@ -1,6 +1,7 @@
 using ACE.Entity.Models;
 using ACE.Server.Managers;
 using ACE.Server.WorldObjects;
+using ACRealms.Rulesets;
 using System;
 using System.Collections.Generic;
 
@@ -9,7 +10,7 @@ namespace ACE.Server.Realms
     /// <summary>
     /// Represents a temporary realm created on a landblock by landblock basis (such as an 'instance' in the traditional sense)
     /// </summary>
-    public class EphemeralRealm
+    internal class EphemeralRealm
     {
         public Player Owner { get; set; }
         public List<Player> AllowedPlayers { get; } = new List<Player>();

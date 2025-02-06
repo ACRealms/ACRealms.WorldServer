@@ -1,0 +1,7 @@
+{
+  "$comment": "A string that can be represented as an array of strings (to be concatenated and separated by new lines) or a string literal",
+  "oneOf": [
+    { "$ref": "primitives/val-string-simple.json" },
+    { "$ref": "string-split-array.json" }
+  ]
+}

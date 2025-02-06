@@ -1,0 +1,22 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "json/**/*.jsonc"
+      ],
+      "url": "./json-schema/propdefs.json"
+    },
+    {
+      "fileMatch": [
+        "json-schema/**/*.json"
+      ],
+      "url": "http://json-schema.org/draft-07/schema"
+    }
+  ],
+  "editor.formatOnSave": true,
+  "files.autoSaveWorkspaceFilesOnly": true,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "json.format.keepLines": true,
+  "json.schemaDownload.enable": false
+}

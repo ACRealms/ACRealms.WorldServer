@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Platforms>x64</Platforms>
   </PropertyGroup>
 
@@ -26,12 +26,21 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>Asheron's Call server emulator</Description>
     <Company>ACEmulator</Company>
-    <Version>2.1.5</Version>
+    <Version>3.0.0-alpha0</Version>
     <PackageIcon>acrealms-icon.jpg</PackageIcon>
     <PackageIconUrl />
     <ApplicationIcon>images\acrealms-icon.ico</ApplicationIcon>
     <Product>ACRealms.WorldServer</Product>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Deterministic>False</Deterministic>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Deterministic>False</Deterministic>
   </PropertyGroup>
 
   <ItemGroup>
@@ -254,7 +263,8 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="McMaster.NETCore.Plugins" Version="1.4.0" />
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -264,10 +274,41 @@
     <ProjectReference Include="..\ACE.DatLoader\ACE.DatLoader.csproj" />
     <ProjectReference Include="..\ACE.Entity\ACE.Entity.csproj" />
     <ProjectReference Include="..\ACRealms.JsonSchemaGenerator\ACRealms.JsonSchemaGenerator.csproj" />
-    <ProjectReference Include="..\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer\ACRealms.RoslynAnalyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ACRealms.Rulesets\ACRealms.Rulesets.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />   
   </ItemGroup>
 
+  <PropertyGroup>
+    <RealmPropsLibDir>..\lib\RealmPropsAssembly\$(PlatformTarget)\$(Configuration)\$(TargetFramework)\</RealmPropsLibDir>      
+  </PropertyGroup>
+
   <ItemGroup>
+    <!-- We have to add the reference this way (non-project, renamed) to work around a Visual Studio limitation. Otherwise the generated code is not visible in intellisense. -->
+    <Reference Include="ACRealms.RealmProps">
+      <HintPath>$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    
+    <!-- We have to do this so that the assembly is renamed back to the original name so that it can be found automatically at runtime -->
+    <ContentWithTargetPath Include="$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>ACRealms.RealmProps.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>ACRealms.RealmProps.pdb</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>ACRealms.RealmProps.xml</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.deps.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>ACRealms.RealmProps.deps.json</TargetPath>
+    </ContentWithTargetPath>
+
     <Reference Include="Lifestoned.DataModel">
       <HintPath>..\lib\Lifestoned.DataModel.dll</HintPath>
     </Reference>
@@ -318,18 +359,15 @@
       <None Include="..\..\Database\Custom\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Custom\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Realms\Constants\" />
-  </ItemGroup>
-
+    <!--
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="if not exist &quot;$(ProjectDir)log4net.config&quot; if exist &quot;$(TargetDir)log4net.config&quot; copy &quot;$(TargetDir)log4net.config&quot; &quot;$(ProjectDir)log4net.config&quot;&#xD;&#xA;if exist &quot;$(ProjectDir)log4net.config&quot; copy &quot;$(ProjectDir)log4net.config&quot; &quot;$(TargetDir)log4net.config&quot;" Condition="'$(OS)' == 'Windows_NT'" />
+    <Exec Command="" Condition="'$(OS)' == 'Windows_NT'" />
     <Exec Command="if [ -f &quot;$(ProjectDir)Config.js&quot; ] ; then cp &quot;$(ProjectDir)Config.js&quot; &quot;$(TargetDir)Config.js&quot; ; fi&#xD;&#xA;if [ ! -f &quot;$(ProjectDir)log4net.config&quot; ] &amp;&amp; [ -f &quot;$(TargetDir)log4net.config&quot; ] ; then cp &quot;$(TargetDir)log4net.config&quot; &quot;$(ProjectDir)log4net.config&quot; ; fi&#xD;&#xA;if [ -f &quot;$(ProjectDir)log4net.config&quot; ] ; then cp &quot;$(ProjectDir)log4net.config&quot; &quot;$(TargetDir)log4net.config&quot; ; fi" Condition="'$(OS)' != 'Windows_NT'" />
-  </Target>
+  </Target>-->
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="dotnet $(TargetDir)ACRealms.JsonSchemaGenerator.dll" />
-  </Target>
+  </Target>-->
   <Target Name="GetGitHash" BeforeTargets="WriteGitHash" Condition="'$(BuildHash)' == ''">
     <PropertyGroup>
       <VerFile>$(IntermediateOutputPath)gitver</VerFile>
@@ -342,7 +380,7 @@
       <BuildHash>@(GitVersion)</BuildHash>
     </PropertyGroup>
   </Target>
-  <Target Name="WriteGitHash" BeforeTargets="CoreCompile">
+  <!--<Target Name="WriteGitHash" BeforeTargets="CoreCompile">
     <PropertyGroup>
       <CustomAssemblyInfoFile>$(IntermediateOutputPath)CustomAssemblyInfo.cs</CustomAssemblyInfoFile>
     </PropertyGroup>
@@ -356,5 +394,5 @@
       </AssemblyAttributes>
     </ItemGroup>
     <WriteCodeFragment Language="C#" OutputFile="$(CustomAssemblyInfoFile)" AssemblyAttributes="@(AssemblyAttributes)" />
-  </Target>
+  </Target>-->
 </Project>

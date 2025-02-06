@@ -2,7 +2,11 @@
   "name": "Root",
   "type": "Realm",
   "properties": {
-    "CanBeHomeworld": true
+    "Core": {
+      "Realm": {
+        "CanBeHomeworld": true
+      }
+    }
   },
   "apply_rulesets": [
     "Take Random 3"
