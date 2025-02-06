@@ -19,15 +19,6 @@
     <Using Include="System.Collections.Generic" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\Corvus.JsonSchema\Solutions\Corvus.Json.JsonReference\Corvus.Json\**\*.cs">
-      <Link>Corvus.Json.JsonReference\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\..\..\Corvus.JsonSchema\Solutions\Corvus.Json.ExtendedTypes\Corvus.Json\**\*.cs">
-      <Link>Corvus.Json.ExtendedTypes\%(RecursiveDir)\%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Remove="..\..\..\Corvus.JsonSchema\Solutions\Corvus.Json.JsonReference\Corvus.Json\**\NullableAttributes.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\ACE.Entity\Enum\Properties\**\PropertyInt.cs">
       <Link>ACE.Entity\%(RecursiveDir)\%(Filename)%(Extension)</Link>
     </Compile>
@@ -59,6 +50,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Corvus.Json.SourceGeneratorTools" Version="4.2.4"  PrivateAssets="all" GeneratePathProperty="true" />
+  </ItemGroup>
+    
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <PrivateAssets>all</PrivateAssets>
       <!--<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
@@ -68,21 +63,20 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <!-- Corvus Transitives -->      
+    
+    <!-- Corvus Transitives -->
     <PackageReference Include="System.Text.Json" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="NodaTime" Version="3.2.0" PrivateAssets="all" GeneratePathProperty="true" />    
-    <PackageReference Include="Corvus.UriTemplates" Version="2.2.0" PrivateAssets="all" GeneratePathProperty="true" />      
+    <PackageReference Include="NodaTime" Version="3.2.1" PrivateAssets="all" GeneratePathProperty="true" />    
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" PrivateAssets="all" GeneratePathProperty="true" />  
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" PrivateAssets="all" GeneratePathProperty="true" />  
     <PackageReference Include="System.IO.Pipelines" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />  
     <PackageReference Include="System.Memory" Version="4.5.5" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="System.Reflection.Metadata" Version="8.0.0" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="System.Reflection.Metadata" Version="8.0.1" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="System.Text.Encodings.Web" Version="9.0.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.8" PrivateAssets="all" GeneratePathProperty="true" />
-    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.0" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.11" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -91,6 +85,7 @@
 
   <Target Name="GetDependencyTargetPaths">
     <ItemGroup>
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCorvus_Json_SourceGeneratorTools)\lib\netstandard2.0\Corvus.Json.SourceGeneratorTools.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Json)\lib\netstandard2.0\System.Text.Json.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGNodaTime)\lib\netstandard2.0\NodaTime.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_AsyncInterfaces)\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" IncludeRuntimeDependency="false" />
@@ -103,7 +98,6 @@
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Text_Encodings_Web)\lib\netstandard2.0\System.Text.Encodings.Web.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGSystem_Threading_Tasks_Extensions)\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll" IncludeRuntimeDependency="false" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Extensions_ObjectPool)\lib\netstandard2.0\Microsoft.Extensions.ObjectPool.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGCommunityToolkit_HighPerformance)\lib\netstandard2.0\CommunityToolkit.HighPerformance.dll" IncludeRuntimeDependency="false" />        
     </ItemGroup>
   </Target>
 
