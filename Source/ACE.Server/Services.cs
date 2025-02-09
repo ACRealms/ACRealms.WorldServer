@@ -28,6 +28,7 @@ using Microsoft.Extensions.Logging;
 using System.Runtime;
 using ACE.Common.ACRealms;
 using ACE.Server.Managers.ACRealms;
+using ACE.Common.Extensions;
 
 namespace ACE.Server
 {
@@ -225,7 +226,7 @@ namespace ACE.Server
 
             if (ConfigManager.Config.Offline.PurgeDeletedCharacters)
             {
-                log.Info($"Purging deleted characters, and their possessions, older than {ConfigManager.Config.Offline.PurgeDeletedCharactersDays} days ({DateTime.Now.AddDays(-ConfigManager.Config.Offline.PurgeDeletedCharactersDays)})...");
+                log.Info($"Purging deleted characters, and their possessions, older than {ConfigManager.Config.Offline.PurgeDeletedCharactersDays} days ({DateTime.Now.AddDays(-ConfigManager.Config.Offline.PurgeDeletedCharactersDays).ToCommonString()})...");
                 ShardDatabaseOfflineTools.PurgeCharactersInParallel(ConfigManager.Config.Offline.PurgeDeletedCharactersDays, out var charactersPurged, out var playerBiotasPurged, out var possessionsPurged);
                 log.Info($"Purged {charactersPurged:N0} characters, {playerBiotasPurged:N0} player biotas and {possessionsPurged:N0} possessions.");
             }

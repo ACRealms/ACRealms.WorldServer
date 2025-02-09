@@ -5,6 +5,7 @@ using ACE.Server.Network.GameAction.Actions;
 using ACE.Server.Physics.Common;
 using ACE.Server.Physics.Extensions;
 using ACE.Server.Physics.Util;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace ACE.Server.Realms
 
     public sealed class InstancedPosition : UsablePosition
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public readonly uint Instance;
 
         public InstancedPosition(Position pos, uint instance)
@@ -124,50 +126,61 @@ namespace ACE.Server.Realms
 
         public uint GetCell()
         {
-            var landblock = LScape.get_landblock(LandblockId.Raw, Instance);
-
-            // dungeons
-            // TODO: investigate dungeons that are below actual traversable overworld terrain
-            // ex., 010AFFFF
-            //if (landblock.IsDungeon)
-            if (Indoors)
-                return GetIndoorCell();
-
-            // outside - could be on landscape, in building, or underground cave
-            var cellID = GetOutdoorCell();
-            var landcell = LScape.get_landcell(cellID, Instance) as LandCell;
-
-            if (landcell == null)
-                return cellID;
-
-            if (landcell.has_building())
+            try
             {
-                var envCells = landcell.Building.get_building_cells(Instance);
-                foreach (var envCell in envCells)
-                    if (envCell.point_in_cell(Pos))
-                        return envCell.ID;
-            }
 
-            // handle underground areas ie. caves
-            // get the terrain Z-height for this X/Y
-            Physics.Polygon walkable = null;
-            var terrainPoly = landcell.find_terrain_poly(Pos, ref walkable);
-            if (walkable != null)
-            {
-                Vector3 terrainPos = Pos;
-                walkable.Plane.set_height(ref terrainPos);
+                //var landblock = LScape.get_landblock(p.LandblockId.Raw);
 
-                // are we below ground? if so, search all of the indoor cells for this landblock
-                if (terrainPos.Z > Pos.Z)
+                // dungeons
+                // TODO: investigate dungeons that are below actual traversable overworld terrain
+                // ex., 010AFFFF
+                //if (landblock.IsDungeon)
+                if (Indoors)
+                    return GetIndoorCell();
+
+                // outside - could be on landscape, in building, or underground cave
+                var cellID = GetOutdoorCell();
+                var landcell = LScape.get_landcell(cellID, Instance) as LandCell;
+
+                if (landcell == null)
+                    return cellID;
+
+                if (landcell.has_building())
                 {
-                    var envCells = landblock.get_envcells();
+                    var envCells = landcell.Building.get_building_cells(Instance);
                     foreach (var envCell in envCells)
                         if (envCell.point_in_cell(Pos))
                             return envCell.ID;
                 }
-            }
 
-            return cellID;
+                // handle underground areas ie. caves
+                // get the terrain Z-height for this X/Y
+                Physics.Polygon walkable = null;
+                var terrainPoly = landcell.find_terrain_poly(Pos, ref walkable);
+                if (walkable != null)
+                {
+                    Vector3 terrainPos = Pos;
+                    walkable.Plane.set_height(ref terrainPos);
+
+                    // are we below ground? if so, search all of the indoor cells for this landblock
+                    if (terrainPos.Z > Pos.Z)
+                    {
+                        var landblock = LScape.get_landblock(LandblockId.Raw, Instance);
+                        var envCells = landblock.get_envcells();
+                        foreach (var envCell in envCells)
+                            if (envCell.point_in_cell(Pos))
+                                return envCell.ID;
+                    }
+                }
+                return cellID;
+            }
+            catch (Exception e)
+            {
+                log.ErrorFormat("GetCell() threw an exception: {0}\nposition as LOC => {1}", e.ToString(), ToLOCString());
+                log.Error(e);
+
+                return 0;
+            }
         }
 
         public InstancedPosition InFrontOf(double distanceInFront, bool rotate180 = false)
