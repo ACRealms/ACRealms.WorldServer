@@ -189,6 +189,8 @@ namespace ACE.Server.WorldObjects
 
                 house.ChildLinks.Remove(house.SlumLord);
                 house.ChildLinks.Add(slumlord);
+
+                slumlord.ParentLink = house;
             }
             return house;
         }
