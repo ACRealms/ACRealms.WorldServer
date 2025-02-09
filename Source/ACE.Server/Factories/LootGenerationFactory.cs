@@ -29,15 +29,22 @@ namespace ACE.Server.Factories
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         // Used for cumulative ServerPerformanceMonitor event recording
-        private readonly ThreadLocal<Stopwatch> stopwatch = new ThreadLocal<Stopwatch>(() => new Stopwatch());
+        //private readonly ThreadLocal<Stopwatch> stopwatch = new ThreadLocal<Stopwatch>(() => new Stopwatch());
 
+        /*
+        static LootGenerationFactory()
+        {
+            InitRares();
+            InitClothingColors();
+        }
+        */
 
         public List<WorldObject> CreateRandomLootObjects(TreasureDeath profile)
         {
             if (!PropertyManager.GetBool("legacy_loot_system").Item)
                 return CreateRandomLootObjects_New(profile);
 
-            stopwatch.Value.Restart();
+            //stopwatch.Value.Restart();
 
             try
             {
@@ -154,13 +161,13 @@ namespace ACE.Server.Factories
             }
             finally
             {
-                ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.LootGenerationFactory_CreateRandomLootObjects, stopwatch.Value.Elapsed.TotalSeconds);
+               // ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.LootGenerationFactory_CreateRandomLootObjects, stopwatch.Value.Elapsed.TotalSeconds);
             }
         }
 
         public List<WorldObject> CreateRandomLootObjects_New(TreasureDeath profile)
         {
-            stopwatch.Value.Restart();
+            //stopwatch.Value.Restart();
 
             try
             {
@@ -223,7 +230,7 @@ namespace ACE.Server.Factories
             }
             finally
             {
-                ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.LootGenerationFactory_CreateRandomLootObjects, stopwatch.Value.Elapsed.TotalSeconds);
+                //ServerPerformanceMonitor.AddToCumulativeEvent(ServerPerformanceMonitor.CumulativeEventHistoryType.LootGenerationFactory_CreateRandomLootObjects, stopwatch.Value.Elapsed.TotalSeconds);
             }
         }
 

@@ -8,8 +8,6 @@ namespace ACE.Database.Models.World
 {
     public partial class WorldDbContext : DbContext
     {
-        public bool UsesTransaction { get; set; }
-
         public WorldDbContext()
         {
         }
@@ -84,10 +82,7 @@ namespace ACE.Database.Models.World
 
                 optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder =>
                 {
-                    if (!UsesTransaction)
-                    {
-                        builder.EnableRetryOnFailure(10);
-                    }
+                    builder.EnableRetryOnFailure(10);
                 });
             }
         }
@@ -334,10 +329,10 @@ namespace ACE.Database.Models.World
                     .HasColumnName("parent_GUID")
                     .HasComment("GUID of parent instance");
 
-                entity.HasOne(d => d.ParentGu)
+               /* entity.HasOne(d => d.ParentGu)
                     .WithMany(p => p.LandblockInstanceLink)
                     .HasForeignKey(d => d.ParentGuid)
-                    .HasConstraintName("instance_link");
+                    .HasConstraintName("instance_link");*/
             });
 
             modelBuilder.Entity<PointsOfInterest>(entity =>
@@ -1689,7 +1684,8 @@ namespace ACE.Database.Models.World
 
                 entity.Property(e => e.StackSize)
                     .HasColumnName("stack_Size")
-                    .HasDefaultValueSql("'1'");
+                    .HasDefaultValueSql("'1'")
+                    .HasComment("Stack Size of object to create (-1 = infinite)");
 
                 entity.Property(e => e.TryToBond)
                     .HasColumnName("try_To_Bond")

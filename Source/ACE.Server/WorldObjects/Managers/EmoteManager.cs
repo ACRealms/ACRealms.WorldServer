@@ -487,7 +487,7 @@ namespace ACE.Server.WorldObjects.Managers
                 case EmoteType.InqFellowNum:
 
                     // unused in PY16 - ensure # of fellows between min-max?
-                    var result = EmoteCategory.TestNoFellow;
+                    var result = HasValidTestNoFellow(emote.Message) ? EmoteCategory.TestNoFellow : EmoteCategory.NumFellowsFailure;
 
                     if (player?.Fellowship != null)
                     {
@@ -573,8 +573,12 @@ namespace ACE.Server.WorldObjects.Managers
 
                 case EmoteType.InqNumCharacterTitles:
 
-                    //if (player != null)
-                    //InqCategory(player.NumCharacterTitles != 0 ? EmoteCategory.TestSuccess : EmoteCategory.TestFailure, emote);
+                    if (player != null)
+                    {
+                        var numTitles = player.NumCharacterTitles;
+                        success = numTitles != null && numTitles >= (emote.Min ?? int.MinValue) && numTitles <= (emote.Max ?? int.MaxValue);
+                        ExecuteEmoteSet(success ? EmoteCategory.NumCharacterTitlesSuccess : EmoteCategory.NumCharacterTitlesFailure, emote.Message, targetObject, true);
+                    }
                     break;
 
                 case EmoteType.InqOwnsItems:
@@ -1741,6 +1745,8 @@ namespace ACE.Server.WorldObjects.Managers
         }
 
         public bool HasValidTestNoQuality(string testName) => GetEmoteSet(EmoteCategory.TestNoQuality, testName) != null;
+
+        public bool HasValidTestNoFellow(string testName) => GetEmoteSet(EmoteCategory.TestNoFellow, testName) != null;
 
         /// <summary>
         /// The maximum animation range of the client

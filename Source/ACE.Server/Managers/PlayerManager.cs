@@ -413,7 +413,7 @@ namespace ACE.Server.Managers
 
             AllegianceManager.LoadPlayer(player);
 
-            player.SendFriendStatusUpdates();
+            player.SendFriendStatusUpdates(false, !player.GetAppearOffline());
 
             return true;
         }
@@ -447,7 +447,7 @@ namespace ACE.Server.Managers
                 playersLock.ExitWriteLock();
             }
 
-            player.SendFriendStatusUpdates(false);
+            player.SendFriendStatusUpdates(!player.GetAppearOffline(), false);
             player.HandleAllegianceOnLogout();
 
             return true;

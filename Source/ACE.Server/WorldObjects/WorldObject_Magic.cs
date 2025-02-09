@@ -126,7 +126,7 @@ namespace ACE.Server.WorldObjects
         {
             // fix hermetic void?
             if (!spell.IsResistable && spell.Category != SpellCategory.ManaConversionModLowering || spell.IsSelfTargeted)
-                //if (!spell.IsResistable || spell.IsSelfTargeted)
+            //if (!spell.IsResistable || spell.IsSelfTargeted)
                 return false;
 
             if (spell.MetaSpellType == SpellType.Dispel && spell.Align == DispelType.Negative && !PropertyManager.GetBool("allow_negative_dispel_resist").Item)
@@ -537,7 +537,7 @@ namespace ACE.Server.WorldObjects
                         targetCreature.DamageHistory.Add(this, DamageType.Health, (uint)-boost);
 
                     //if (targetPlayer != null && targetPlayer.Fellowship != null)
-                    //targetPlayer.Fellowship.OnVitalUpdate(targetPlayer);
+                        //targetPlayer.Fellowship.OnVitalUpdate(targetPlayer);
 
                     break;
             }
@@ -791,7 +791,7 @@ namespace ACE.Server.WorldObjects
 
                     //var sourcePlayer = source as Player;
                     //if (sourcePlayer != null && sourcePlayer.Fellowship != null)
-                    //sourcePlayer.Fellowship.OnVitalUpdate(sourcePlayer);
+                        //sourcePlayer.Fellowship.OnVitalUpdate(sourcePlayer);
 
                     break;
             }
@@ -815,7 +815,7 @@ namespace ACE.Server.WorldObjects
 
                     //var destPlayer = destination as Player;
                     //if (destPlayer != null && destPlayer.Fellowship != null)
-                    //destPlayer.Fellowship.OnVitalUpdate(destPlayer);
+                        //destPlayer.Fellowship.OnVitalUpdate(destPlayer);
 
                     break;
             }
@@ -906,19 +906,19 @@ namespace ACE.Server.WorldObjects
 
             if (spell.School == MagicSchool.LifeMagic)
             {
-                if (spell.Name.Contains("Blight"))
+                if (spell.DamageType.HasFlag(DamageType.Mana))
                 {
                     var tryDamage = (int)Math.Round(caster.GetCreatureVital(PropertyAttribute2nd.Mana).Current * spell.DrainPercentage);
                     damage = (uint)-caster.UpdateVitalDelta(caster.Mana, -tryDamage);
                     damageType = DamageType.Mana;
                 }
-                else if (spell.Name.Contains("Tenacity"))
+                else if (spell.DamageType.HasFlag(DamageType.Stamina))
                 {
                     var tryDamage = (int)Math.Round(caster.GetCreatureVital(PropertyAttribute2nd.Stamina).Current * spell.DrainPercentage);
                     damage = (uint)-caster.UpdateVitalDelta(caster.Stamina, -tryDamage);
                     damageType = DamageType.Stamina;
                 }
-                else
+                else if (spell.DamageType.HasFlag(DamageType.Health))
                 {
                     var tryDamage = (int)Math.Round(caster.GetCreatureVital(PropertyAttribute2nd.Health).Current * spell.DrainPercentage);
                     damage = (uint)-caster.UpdateVitalDelta(caster.Health, -tryDamage);
@@ -927,6 +927,11 @@ namespace ACE.Server.WorldObjects
 
                     //if (player != null && player.Fellowship != null)
                     //player.Fellowship.OnVitalUpdate(player);
+                }
+                else
+                {
+                    log.Warn($"Unknown DamageType for LifeProjectile {spell.Name} - {spell.Id}");
+                    return;
                 }
             }
 
@@ -1336,11 +1341,13 @@ namespace ACE.Server.WorldObjects
             gateway.OriginalPortal = portalId;
             gateway.UpdatePortalDestination(portal.Destination);
             gateway.TimeToRot = portalLifetime;
+
             gateway.MinLevel = portal.MinLevel;
             gateway.MaxLevel = portal.MaxLevel;
             gateway.PortalRestrictions = portal.PortalRestrictions;
             gateway.AccountRequirements = portal.AccountRequirements;
             gateway.AdvocateQuest = portal.AdvocateQuest;
+
             gateway.Quest = portal.Quest;
             gateway.QuestRestriction = portal.QuestRestriction;
             if (forceInstanceId.HasValue)

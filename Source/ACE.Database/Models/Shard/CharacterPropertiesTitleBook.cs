@@ -1,15 +1,22 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-#nullable disable
+namespace ACE.Database.Models.Shard;
 
-namespace ACE.Database.Models.Shard
+/// <summary>
+/// TitleBook Properties of Weenies
+/// </summary>
+public partial class CharacterPropertiesTitleBook
 {
-    public partial class CharacterPropertiesTitleBook
-    {
-        public ulong CharacterId { get; set; }
-        public uint TitleId { get; set; }
+    /// <summary>
+    /// Id of the character this property belongs to
+    /// </summary>
+    public ulong CharacterId { get; set; }
 
-        public virtual Character Character { get; set; }
-    }
+    /// <summary>
+    /// Id of Title
+    /// </summary>
+    public uint TitleId { get; set; }
+
+    public virtual Character Character { get; set; }
 }
