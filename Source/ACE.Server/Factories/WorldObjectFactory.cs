@@ -44,109 +44,109 @@ namespace ACE.Server.Factories
                     log.Warn($"CreateWorldObject: {weenie.GetName()} (0x{guid}:{weenie.WeenieClassId}) - WeenieType is Undef, Object cannot be created.");
                     return null;
                 case WeenieType.LifeStone:
-                    return new Lifestone(weenie, guid);
+                    return new Lifestone(weenie, guid, ruleset);
                 case WeenieType.Door:
-                    return new Door(weenie, guid);
+                    return new Door(weenie, guid, ruleset);
                 case WeenieType.Portal:
-                    return new Portal(weenie, guid);
+                    return new Portal(weenie, guid, ruleset);
                 case WeenieType.Book:
-                    return new Book(weenie, guid);
+                    return new Book(weenie, guid, ruleset);
                 case WeenieType.PKModifier:
-                    return new PKModifier(weenie, guid);
+                    return new PKModifier(weenie, guid, ruleset);
                 case WeenieType.Cow:
                     return new Cow(weenie, guid, ruleset);
                 case WeenieType.Creature:
                     return new Creature(weenie, guid, ruleset);
                 case WeenieType.Container:
-                    return new Container(weenie, guid);
+                    return new Container(weenie, guid, ruleset);
                 case WeenieType.Scroll:
-                    return new Scroll(weenie, guid);
+                    return new Scroll(weenie, guid, ruleset );
                 case WeenieType.Vendor:
                     return new Vendor(weenie, guid, ruleset);
                 case WeenieType.Coin:
-                    return new Coin(weenie, guid);
+                    return new Coin(weenie, guid, ruleset);
                 case WeenieType.Key:
-                    return new Key(weenie, guid);
+                    return new Key(weenie, guid, ruleset);
                 case WeenieType.Food:
-                    return new Food(weenie, guid);
+                    return new Food(weenie, guid, ruleset);
                 case WeenieType.Gem:
-                    return new Gem(weenie, guid);
+                    return new Gem(weenie, guid, ruleset);
                 case WeenieType.Game:
-                    return new Game(weenie, guid);
+                    return new Game(weenie, guid, ruleset);
                 case WeenieType.GamePiece:
                     return new GamePiece(weenie, guid, ruleset);
                 case WeenieType.AllegianceBindstone:
-                    return new Bindstone(weenie, guid);
+                    return new Bindstone(weenie, guid, ruleset);
                 case WeenieType.Clothing:
-                    return new Clothing(weenie, guid);
+                    return new Clothing(weenie, guid, ruleset);
                 case WeenieType.MeleeWeapon:
-                    return new MeleeWeapon(weenie, guid);
+                    return new MeleeWeapon(weenie, guid, ruleset);
                 case WeenieType.MissileLauncher:
-                    return new MissileLauncher(weenie, guid);
+                    return new MissileLauncher(weenie, guid, ruleset);
                 case WeenieType.Ammunition:
-                    return new Ammunition(weenie, guid);
+                    return new Ammunition(weenie, guid, ruleset);
                 case WeenieType.Missile:
-                    return new Missile(weenie, guid);
+                    return new Missile(weenie, guid, ruleset);
                 case WeenieType.Corpse:
-                    return new Corpse(weenie, guid);
+                    return new Corpse(weenie, guid, ruleset);
                 case WeenieType.Chest:
-                    return new Chest(weenie, guid);
+                    return new Chest(weenie, guid, ruleset);
                 case WeenieType.Stackable:
-                    return new Stackable(weenie, guid);
+                    return new Stackable(weenie, guid, ruleset);
                 case WeenieType.SpellComponent:
-                    return new SpellComponent(weenie, guid);
+                    return new SpellComponent(weenie, guid, ruleset);
                 case WeenieType.Switch:
-                    return new Switch(weenie, guid);
+                    return new Switch(weenie, guid, ruleset);
                 case WeenieType.AdvocateFane:
-                    return new AdvocateFane(weenie, guid);
+                    return new AdvocateFane(weenie, guid, ruleset);
                 case WeenieType.AdvocateItem:
-                    return new AdvocateItem(weenie, guid);
+                    return new AdvocateItem(weenie, guid, ruleset);
                 case WeenieType.Healer:
-                    return new Healer(weenie, guid);
+                    return new Healer(weenie, guid, ruleset);
                 case WeenieType.Lockpick:
-                    return new Lockpick(weenie, guid);
+                    return new Lockpick(weenie, guid, ruleset);
                 case WeenieType.Caster:
-                    return new Caster(weenie, guid);
+                    return new Caster(weenie, guid, ruleset);
                 case WeenieType.ProjectileSpell:
-                    return new SpellProjectile(weenie, guid);
+                    return new SpellProjectile(weenie, guid, ruleset);
                 case WeenieType.HotSpot:
-                    return new Hotspot(weenie, guid);
+                    return new Hotspot(weenie, guid, ruleset);
                 case WeenieType.ManaStone:
-                    return new ManaStone(weenie, guid);
+                    return new ManaStone(weenie, guid, ruleset);
                 case WeenieType.House:
-                    return new House(weenie, guid);
+                    return new House(weenie, guid, ruleset);
                 case WeenieType.SlumLord:
-                    return new SlumLord(weenie, guid);
+                    return new SlumLord(weenie, guid, ruleset);
                 case WeenieType.Storage:
-                    return new Storage(weenie, guid);
+                    return new Storage(weenie, guid, ruleset);
                 case WeenieType.Hook:
-                    return new Hook(weenie, guid);
+                    return new Hook(weenie, guid, ruleset);
                 case WeenieType.Hooker:
-                    return new Hooker(weenie, guid);
+                    return new Hooker(weenie, guid, ruleset);
                 case WeenieType.HousePortal:
-                    return new HousePortal(weenie, guid);
+                    return new HousePortal(weenie, guid, ruleset);
                 case WeenieType.SkillAlterationDevice:
-                    return new SkillAlterationDevice(weenie, guid);
+                    return new SkillAlterationDevice(weenie, guid, ruleset);
                 case WeenieType.PressurePlate:
-                    return new PressurePlate(weenie, guid);
+                    return new PressurePlate(weenie, guid, ruleset);
                 case WeenieType.PetDevice:
-                    return new PetDevice(weenie, guid);
+                    return new PetDevice(weenie, guid, ruleset);
                 case WeenieType.Pet:
                     return new Pet(weenie, guid, ruleset);
                 case WeenieType.CombatPet:
                     return new CombatPet(weenie, guid, ruleset);
                 case WeenieType.Allegiance:
-                    return new Allegiance(weenie, guid);
+                    return new Allegiance(weenie, guid, ruleset);
                 case WeenieType.AugmentationDevice:
-                    return new AugmentationDevice(weenie, guid);
+                    return new AugmentationDevice(weenie, guid, ruleset);
                 case WeenieType.AttributeTransferDevice:
-                    return new AttributeTransferDevice(weenie, guid);
+                    return new AttributeTransferDevice(weenie, guid, ruleset);
                 case WeenieType.CraftTool:
-                    return new CraftTool(weenie, guid);
+                    return new CraftTool(weenie, guid, ruleset);
                 case WeenieType.LightSource:
-                    return new LightSource(weenie, guid);
+                    return new LightSource(weenie, guid, ruleset);
                 default:
-                    return new GenericObject(weenie, guid);
+                    return new GenericObject(weenie, guid, ruleset);
             }
         }
 

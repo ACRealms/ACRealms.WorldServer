@@ -7,6 +7,7 @@ using ACE.Entity.Models;
 using ACE.Server.Entity;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Physics;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -17,7 +18,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// A new biota be created taking all of its values from weenie.
         /// </summary>
-        public Food(Weenie weenie, ObjectGuid guid) : base(weenie, guid)
+        public Food(Weenie weenie, ObjectGuid guid, AppliedRuleset ruleset) : base(weenie, guid, ruleset)
         {
             SetEphemeralValues();
         }

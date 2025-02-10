@@ -15,6 +15,7 @@ using ACE.Server.Managers;
 using ACE.Server.Network.GameMessages.Messages;
 using ACE.Server.Network.GameEvent.Events;
 using ACE.Server.Network.GameMessages;
+using ACE.Server.Realms;
 
 namespace ACE.Server.WorldObjects
 {
@@ -25,7 +26,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// A new biota be created taking all of its values from weenie.
         /// </summary>
-        public Container(Weenie weenie, ObjectGuid guid) : base(weenie, guid)
+        public Container(Weenie weenie, ObjectGuid guid, AppliedRuleset ruleset) : base(weenie, guid, ruleset)
         {
             InitializePropertyDictionaries();
             SetEphemeralValues(false);
