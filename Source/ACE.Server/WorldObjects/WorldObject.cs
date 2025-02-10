@@ -102,7 +102,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// A new biota will be created taking all of its values from weenie.
         /// </summary>
-        protected WorldObject(Weenie weenie, ObjectGuid guid)
+        protected WorldObject(Weenie weenie, ObjectGuid guid, AppliedRuleset ruleset)
         {
             Weenie = weenie;
             Biota = ACE.Entity.Adapter.WeenieConverter.ConvertToBiota(weenie, guid.Full, false, weenie.CanReferenceCommonProperties);

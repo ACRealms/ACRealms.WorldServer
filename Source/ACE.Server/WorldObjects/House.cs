@@ -56,7 +56,7 @@ namespace ACE.Server.WorldObjects
         /// <summary>
         /// A new biota be created taking all of its values from weenie.
         /// </summary>
-        public House(Weenie weenie, ObjectGuid guid) : base(weenie, guid)
+        public House(Weenie weenie, ObjectGuid guid, AppliedRuleset ruleset) : base(weenie, guid, ruleset)
         {
             InitializePropertyDictionaries();
             SetEphemeralValues();
