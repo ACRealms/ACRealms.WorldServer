@@ -317,6 +317,24 @@ public readonly partial struct PropLong
     }
 
     /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase(PropLong value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator PropLong(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase value)
+    {
+        return value.As<PropLong>();
+    }
+
+    /// <summary>
     /// Operator ==.
     /// </summary>
     /// <param name="left">The lhs of the operator.</param>

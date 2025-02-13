@@ -370,6 +370,60 @@ public readonly partial struct Group
                     }
 
                     /// <summary>
+                    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj"/>.
+                    /// </summary>
+                    /// <param name="value">The value from which to convert.</param>
+                    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj(RequiredDefaultAndEnum value)
+                    {
+                        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj>();
+                    }
+
+                    /// <summary>
+                    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj"/>.
+                    /// </summary>
+                    /// <param name="value">The value from which to convert.</param>
+                    public static explicit operator RequiredDefaultAndEnum(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj value)
+                    {
+                        return value.As<RequiredDefaultAndEnum>();
+                    }
+
+                    /// <summary>
+                    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+                    /// </summary>
+                    /// <param name="value">The value from which to convert.</param>
+                    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase(RequiredDefaultAndEnum value)
+                    {
+                        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase>();
+                    }
+
+                    /// <summary>
+                    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+                    /// </summary>
+                    /// <param name="value">The value from which to convert.</param>
+                    public static explicit operator RequiredDefaultAndEnum(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase value)
+                    {
+                        return value.As<RequiredDefaultAndEnum>();
+                    }
+
+                    /// <summary>
+                    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs"/>.
+                    /// </summary>
+                    /// <param name="value">The value from which to convert.</param>
+                    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs(RequiredDefaultAndEnum value)
+                    {
+                        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs>();
+                    }
+
+                    /// <summary>
+                    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs"/>.
+                    /// </summary>
+                    /// <param name="value">The value from which to convert.</param>
+                    public static explicit operator RequiredDefaultAndEnum(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs value)
+                    {
+                        return value.As<RequiredDefaultAndEnum>();
+                    }
+
+                    /// <summary>
                     /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase"/>.
                     /// </summary>
                     /// <param name="value">The value from which to convert.</param>
@@ -383,24 +437,6 @@ public readonly partial struct Group
                     /// </summary>
                     /// <param name="value">The value from which to convert.</param>
                     public static explicit operator RequiredDefaultAndEnum(ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase value)
-                    {
-                        return value.As<RequiredDefaultAndEnum>();
-                    }
-
-                    /// <summary>
-                    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs"/>.
-                    /// </summary>
-                    /// <param name="value">The value from which to convert.</param>
-                    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs(RequiredDefaultAndEnum value)
-                    {
-                        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs>();
-                    }
-
-                    /// <summary>
-                    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs"/>.
-                    /// </summary>
-                    /// <param name="value">The value from which to convert.</param>
-                    public static explicit operator RequiredDefaultAndEnum(ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs value)
                     {
                         return value.As<RequiredDefaultAndEnum>();
                     }

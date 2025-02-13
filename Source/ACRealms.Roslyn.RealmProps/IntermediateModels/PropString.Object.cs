@@ -258,7 +258,7 @@ public readonly partial struct PropString
     /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? Obsolete
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity? Obsolete
     {
         get
         {
@@ -289,7 +289,7 @@ public readonly partial struct PropString
                         return default;
                     }
 
-                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity>();
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity>();
                 }
             }
 
@@ -326,7 +326,7 @@ public readonly partial struct PropString
         in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? contexts = null,
         in ACRealms.Roslyn.RealmProps.IntermediateModels.StringMultilineFromArray? defaultValue = null,
         in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? defaultFromServerProperty = null,
-        in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? obsolete = null)
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity? obsolete = null)
     {
         var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
 
@@ -511,7 +511,7 @@ public readonly partial struct PropString
     /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
     /// </para>
     /// </remarks>
-    public PropString WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? value)
+    public PropString WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity? value)
     {
         return value.HasValue ? this.SetProperty(JsonPropertyNames.Obsolete, value.Value) : this.RemoveProperty(JsonPropertyNames.Obsolete);
     }

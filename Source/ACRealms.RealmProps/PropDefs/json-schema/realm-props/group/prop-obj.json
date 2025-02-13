@@ -1,12 +1,9 @@
 {
-  "$ref": "../common/prop-base.json",
+  "$ref": "rule-obj.json",
   "description": "An object representing the realm property definition's attributes",
   "allOf": [
     {
-      "$corvusTypeName": "ExtendedUntypedAttrs",
-      "properties": {
-        "description": {
-          "$ref": "../../components/description.json",
-          "description": "The description of the property, or the short description if the containing group defines description_format" } } }
+      "$ref": "../common/prop-base.json"
+    }
   ]
 }

@@ -428,6 +428,24 @@ public readonly partial struct Group
             }
 
             /// <summary>
+            /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator"/>.
+            /// </summary>
+            /// <param name="value">The value from which to convert.</param>
+            public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator(GroupAttrs value)
+            {
+                return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator>();
+            }
+
+            /// <summary>
+            /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator"/>.
+            /// </summary>
+            /// <param name="value">The value from which to convert.</param>
+            public static explicit operator GroupAttrs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator value)
+            {
+                return value.As<GroupAttrs>();
+            }
+
+            /// <summary>
             /// Operator ==.
             /// </summary>
             /// <param name="left">The lhs of the operator.</param>

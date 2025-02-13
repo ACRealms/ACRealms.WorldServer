@@ -213,6 +213,28 @@ public readonly partial struct PropBase
         }
     }
 
+    /// <summary>
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase" />.
+    /// </summary>
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase AsRuleBase
+    {
+        get
+        {
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase>();
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase" />.
+    /// </summary>
+    public bool IsRuleBase
+    {
+        get
+        {
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase>().IsValid();
+        }
+    }
+
     /// <inheritdoc/>
     public bool HasJsonElementBacking
     {
@@ -266,6 +288,24 @@ public readonly partial struct PropBase
     public static implicit operator JsonAny(PropBase value)
     {
         return value.AsAny;
+    }
+
+    /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase(PropBase value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator PropBase(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase value)
+    {
+        return value.As<PropBase>();
     }
 
     /// <summary>
@@ -677,5 +717,16 @@ public readonly partial struct PropBase
     public override string ToString()
     {
         return this.Serialize();
+    }
+
+    /// <summary>
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase" />.
+    /// </summary>
+    /// <param name="result">The result of the conversions.</param>
+    /// <returns><see langword="true" /> if the conversion was valid.</returns>
+    public bool TryGetAsRuleBase(out ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase result)
+    {
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase>();
+        return result.IsValid();
     }
 }

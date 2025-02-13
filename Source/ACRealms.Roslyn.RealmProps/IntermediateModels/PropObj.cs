@@ -231,24 +231,24 @@ public readonly partial struct PropObj
     }
 
     /// <summary>
-    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs" />.
+    /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj" />.
     /// </summary>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs AsExtendedUntypedAttrs
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj AsRuleObj
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs>();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj>();
         }
     }
 
     /// <summary>
-    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs" />.
+    /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj" />.
     /// </summary>
-    public bool IsExtendedUntypedAttrs
+    public bool IsRuleObj
     {
         get
         {
-            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs>().IsValid();
+            return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj>().IsValid();
         }
     }
 
@@ -308,6 +308,60 @@ public readonly partial struct PropObj
     }
 
     /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj(PropObj value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator PropObj(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj value)
+    {
+        return value.As<PropObj>();
+    }
+
+    /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase(PropObj value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator PropObj(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase value)
+    {
+        return value.As<PropObj>();
+    }
+
+    /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs(PropObj value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator PropObj(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs value)
+    {
+        return value.As<PropObj>();
+    }
+
+    /// <summary>
     /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
@@ -321,24 +375,6 @@ public readonly partial struct PropObj
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
     public static explicit operator PropObj(ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase value)
-    {
-        return value.As<PropObj>();
-    }
-
-    /// <summary>
-    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs"/>.
-    /// </summary>
-    /// <param name="value">The value from which to convert.</param>
-    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs(PropObj value)
-    {
-        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs>();
-    }
-
-    /// <summary>
-    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs"/>.
-    /// </summary>
-    /// <param name="value">The value from which to convert.</param>
-    public static explicit operator PropObj(ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs value)
     {
         return value.As<PropObj>();
     }
@@ -768,13 +804,13 @@ public readonly partial struct PropObj
     }
 
     /// <summary>
-    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs" />.
+    /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj" />.
     /// </summary>
     /// <param name="result">The result of the conversions.</param>
     /// <returns><see langword="true" /> if the conversion was valid.</returns>
-    public bool TryGetAsExtendedUntypedAttrs(out ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs result)
+    public bool TryGetAsRuleObj(out ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj result)
     {
-        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs>();
+        result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj>();
         return result.IsValid();
     }
 }

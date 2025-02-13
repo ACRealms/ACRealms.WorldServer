@@ -684,6 +684,7 @@ public readonly partial struct Type
     /// <param name="matchLong">Match 4th item.</param>
     /// <param name="matchString">Match 5th item.</param>
     /// <param name="matchEnum">Match 6th item.</param>
+    /// <param name="matchModulator">Match 7th item.</param>
     /// <param name="defaultMatch">Match any other value.</param>
     /// <returns>An instance of the value returned by the match function.</returns>
     public TOut Match<TIn, TOut>(
@@ -694,6 +695,7 @@ public readonly partial struct Type
         Func<TIn, TOut> matchLong,
         Func<TIn, TOut> matchString,
         Func<TIn, TOut> matchEnum,
+        Func<TIn, TOut> matchModulator,
         Func<TIn, TOut> defaultMatch)
     {
         if (this.Equals(CorvusValidation.Enum1))
@@ -726,6 +728,11 @@ public readonly partial struct Type
             return matchEnum(context);
         }
 
+        if (this.Equals(CorvusValidation.Enum7))
+        {
+            return matchModulator(context);
+        }
+
         return defaultMatch(context);
     }
 
@@ -739,6 +746,7 @@ public readonly partial struct Type
     /// <param name="matchLong">Match 4th item.</param>
     /// <param name="matchString">Match 5th item.</param>
     /// <param name="matchEnum">Match 6th item.</param>
+    /// <param name="matchModulator">Match 7th item.</param>
     /// <param name="defaultMatch">Match any other value.</param>
     /// <returns>An instance of the value returned by the match function.</returns>
     public TOut Match<TOut>(
@@ -748,6 +756,7 @@ public readonly partial struct Type
         Func<TOut> matchLong,
         Func<TOut> matchString,
         Func<TOut> matchEnum,
+        Func<TOut> matchModulator,
         Func<TOut> defaultMatch)
     {
         if (this.Equals(CorvusValidation.Enum1))
@@ -778,6 +787,11 @@ public readonly partial struct Type
         if (this.Equals(CorvusValidation.Enum6))
         {
             return matchEnum();
+        }
+
+        if (this.Equals(CorvusValidation.Enum7))
+        {
+            return matchModulator();
         }
 
         return defaultMatch();

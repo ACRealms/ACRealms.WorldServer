@@ -395,6 +395,60 @@ public readonly partial struct GroupProp
     }
 
     /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj(GroupProp value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator GroupProp(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj value)
+    {
+        return value.As<GroupProp>();
+    }
+
+    /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase(GroupProp value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator GroupProp(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase value)
+    {
+        return value.As<GroupProp>();
+    }
+
+    /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs(GroupProp value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator GroupProp(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj.ExtendedUntypedAttrs value)
+    {
+        return value.As<GroupProp>();
+    }
+
+    /// <summary>
     /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase"/>.
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
@@ -408,24 +462,6 @@ public readonly partial struct GroupProp
     /// </summary>
     /// <param name="value">The value from which to convert.</param>
     public static explicit operator GroupProp(ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase value)
-    {
-        return value.As<GroupProp>();
-    }
-
-    /// <summary>
-    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs"/>.
-    /// </summary>
-    /// <param name="value">The value from which to convert.</param>
-    public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs(GroupProp value)
-    {
-        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs>();
-    }
-
-    /// <summary>
-    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs"/>.
-    /// </summary>
-    /// <param name="value">The value from which to convert.</param>
-    public static explicit operator GroupProp(ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs value)
     {
         return value.As<GroupProp>();
     }

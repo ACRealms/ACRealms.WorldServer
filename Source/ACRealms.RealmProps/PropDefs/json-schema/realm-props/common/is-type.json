@@ -6,6 +6,7 @@
     "typeIsFloat": { "properties": { "type": { "const": "float", "description": "RealmPropertyFloat" } } },
     "typeIsString": { "properties": { "type": { "const": "string", "description": "RealmPropertyString" } } },
     "typeIsBoolean": { "properties": { "type": { "const": "boolean", "description": "RealmPropertyBool" } } },
-    "typeIsEnum": { "properties": { "type": { "const": "enum", "description": "RealmPropertyEnum" } } }
+    "typeIsEnum": { "properties": { "type": { "const": "enum", "description": "RealmPropertyEnum" } } },
+    "typeIsModulator": { "properties": { "type": { "const": "modulator", "description": "Special Modulator Property" } } }
   }
 }

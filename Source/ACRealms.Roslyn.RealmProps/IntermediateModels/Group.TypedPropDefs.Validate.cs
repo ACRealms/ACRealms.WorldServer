@@ -240,6 +240,31 @@ public readonly partial struct Group
                     result = result.MergeChildContext(allOfResult5, level >= ValidationLevel.Detailed);
                 }
 
+                ValidationContext allOfResult6 = childContextBase.CreateChildContext();
+                if (level > ValidationLevel.Basic)
+                {
+                    allOfResult6 = allOfResult6.PushValidationLocationReducedPathModifier(new("#/allOf/6"));
+                }
+
+                allOfResult6 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator>().Validate(allOfResult6, level);
+
+                if (!allOfResult6.IsValid)
+                {
+                    if (level >= ValidationLevel.Basic)
+                    {
+                        result = result.MergeChildContext(allOfResult6, true).PushValidationLocationProperty("allOf").WithResult(isValid: false, "Validation - allOf failed to validate against the schema.").PopLocation();
+                    }
+                    else
+                    {
+                        result = result.MergeChildContext(allOfResult6, false).WithResult(isValid: false);
+                        return result;
+                    }
+                }
+                else
+                {
+                    result = result.MergeChildContext(allOfResult6, level >= ValidationLevel.Detailed);
+                }
+
                 return result;
             }
         }
