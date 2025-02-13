@@ -25,10 +25,6 @@
     <ProjectReference Include="..\ACE.Common\ACE.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />   
-  </ItemGroup>
-
     <ItemGroup>
       <None Include="..\..\LICENSE">
         <Pack>True</Pack>

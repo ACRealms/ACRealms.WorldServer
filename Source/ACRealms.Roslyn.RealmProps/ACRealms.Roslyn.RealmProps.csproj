@@ -50,7 +50,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Corvus.Json.SourceGeneratorTools" Version="4.2.4"  PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Corvus.Json.SourceGeneratorTools" Version="4.2.4" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
     
   <ItemGroup>
