@@ -117,7 +117,7 @@ public readonly partial struct Contexts
                     oneOfChildContext0 = oneOfChildContext0.PushValidationLocationReducedPathModifier(new("#/oneOf/0/$ref"));
                 }
 
-                ValidationContext oneOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity>().Validate(oneOfChildContext0, level);
+                ValidationContext oneOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity>().Validate(oneOfChildContext0, level);
 
                 if (oneOfResult0.IsValid)
                 {
@@ -129,6 +129,132 @@ public readonly partial struct Contexts
                     if (level >= ValidationLevel.Verbose)
                     {
                         result = result.MergeResults(result.IsValid, level, oneOfResult0);
+                    }
+                }
+
+                ValidationContext oneOfChildContext1 = validationContext.CreateChildContext();
+                if (level > ValidationLevel.Basic)
+                {
+                    oneOfChildContext1 = oneOfChildContext1.PushValidationLocationReducedPathModifier(new("#/oneOf/1/$ref"));
+                }
+
+                ValidationContext oneOfResult1 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity>().Validate(oneOfChildContext1, level);
+
+                if (oneOfResult1.IsValid)
+                {
+                    result = result.MergeChildContext(oneOfResult1, level >= ValidationLevel.Verbose);
+                    oneOfFoundValid++;
+                }
+                else
+                {
+                    if (level >= ValidationLevel.Verbose)
+                    {
+                        result = result.MergeResults(result.IsValid, level, oneOfResult1);
+                    }
+                }
+
+                ValidationContext oneOfChildContext2 = validationContext.CreateChildContext();
+                if (level > ValidationLevel.Basic)
+                {
+                    oneOfChildContext2 = oneOfChildContext2.PushValidationLocationReducedPathModifier(new("#/oneOf/2/$ref"));
+                }
+
+                ValidationContext oneOfResult2 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity>().Validate(oneOfChildContext2, level);
+
+                if (oneOfResult2.IsValid)
+                {
+                    result = result.MergeChildContext(oneOfResult2, level >= ValidationLevel.Verbose);
+                    oneOfFoundValid++;
+                }
+                else
+                {
+                    if (level >= ValidationLevel.Verbose)
+                    {
+                        result = result.MergeResults(result.IsValid, level, oneOfResult2);
+                    }
+                }
+
+                ValidationContext oneOfChildContext3 = validationContext.CreateChildContext();
+                if (level > ValidationLevel.Basic)
+                {
+                    oneOfChildContext3 = oneOfChildContext3.PushValidationLocationReducedPathModifier(new("#/oneOf/3/$ref"));
+                }
+
+                ValidationContext oneOfResult3 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity>().Validate(oneOfChildContext3, level);
+
+                if (oneOfResult3.IsValid)
+                {
+                    result = result.MergeChildContext(oneOfResult3, level >= ValidationLevel.Verbose);
+                    oneOfFoundValid++;
+                }
+                else
+                {
+                    if (level >= ValidationLevel.Verbose)
+                    {
+                        result = result.MergeResults(result.IsValid, level, oneOfResult3);
+                    }
+                }
+
+                ValidationContext oneOfChildContext4 = validationContext.CreateChildContext();
+                if (level > ValidationLevel.Basic)
+                {
+                    oneOfChildContext4 = oneOfChildContext4.PushValidationLocationReducedPathModifier(new("#/oneOf/4/$ref"));
+                }
+
+                ValidationContext oneOfResult4 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity>().Validate(oneOfChildContext4, level);
+
+                if (oneOfResult4.IsValid)
+                {
+                    result = result.MergeChildContext(oneOfResult4, level >= ValidationLevel.Verbose);
+                    oneOfFoundValid++;
+                }
+                else
+                {
+                    if (level >= ValidationLevel.Verbose)
+                    {
+                        result = result.MergeResults(result.IsValid, level, oneOfResult4);
+                    }
+                }
+
+                ValidationContext oneOfChildContext5 = validationContext.CreateChildContext();
+                if (level > ValidationLevel.Basic)
+                {
+                    oneOfChildContext5 = oneOfChildContext5.PushValidationLocationReducedPathModifier(new("#/oneOf/5/$ref"));
+                }
+
+                ValidationContext oneOfResult5 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity>().Validate(oneOfChildContext5, level);
+
+                if (oneOfResult5.IsValid)
+                {
+                    result = result.MergeChildContext(oneOfResult5, level >= ValidationLevel.Verbose);
+                    oneOfFoundValid++;
+                }
+                else
+                {
+                    if (level >= ValidationLevel.Verbose)
+                    {
+                        result = result.MergeResults(result.IsValid, level, oneOfResult5);
+                    }
+                }
+
+                ValidationContext oneOfChildContext6 = validationContext.CreateChildContext();
+                if (level > ValidationLevel.Basic)
+                {
+                    oneOfChildContext6 = oneOfChildContext6.PushValidationLocationReducedPathModifier(new("#/oneOf/6/$ref"));
+                }
+
+                ValidationContext oneOfResult6 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity>().Validate(oneOfChildContext6, level);
+
+                if (oneOfResult6.IsValid)
+                {
+                    result = result.MergeChildContext(oneOfResult6, level >= ValidationLevel.Verbose);
+                    oneOfFoundValid++;
+                }
+                else
+                {
+                    if (level >= ValidationLevel.Verbose)
+                    {
+                        result = result.MergeResults(result.IsValid, level, oneOfResult6);
                     }
                 }
 

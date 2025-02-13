@@ -85,7 +85,7 @@ public readonly partial struct PropObj
                 refResult = refResult.PushValidationLocationReducedPathModifier(new("#/$ref"));
             }
 
-            refResult = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase>().Validate(refResult, level);
+            refResult = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleObj>().Validate(refResult, level);
 
             if (!refResult.IsValid)
             {
@@ -107,10 +107,10 @@ public readonly partial struct PropObj
             ValidationContext allOfResult0 = childContextBase.CreateChildContext();
             if (level > ValidationLevel.Basic)
             {
-                allOfResult0 = allOfResult0.PushValidationLocationReducedPathModifier(new("#/allOf/0"));
+                allOfResult0 = allOfResult0.PushValidationLocationReducedPathModifier(new("#/allOf/0/$ref"));
             }
 
-            allOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropObj.ExtendedUntypedAttrs>().Validate(allOfResult0, level);
+            allOfResult0 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase>().Validate(allOfResult0, level);
 
             if (!allOfResult0.IsValid)
             {

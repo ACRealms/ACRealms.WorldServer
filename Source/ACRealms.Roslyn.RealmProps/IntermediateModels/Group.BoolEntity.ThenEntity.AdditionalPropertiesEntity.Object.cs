@@ -337,7 +337,7 @@ public readonly partial struct Group
                 /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
                 /// </para>
                 /// </remarks>
-                public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? Obsolete
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity? Obsolete
                 {
                     get
                     {
@@ -368,7 +368,7 @@ public readonly partial struct Group
                                     return default;
                                 }
 
-                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity>();
+                                return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity>();
                             }
                         }
 
@@ -406,7 +406,7 @@ public readonly partial struct Group
                     in Corvus.Json.JsonAny? defaultValue = null,
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? defaultFromServerProperty = null,
                     in ACRealms.Roslyn.RealmProps.IntermediateModels.Description? description = null,
-                    in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? obsolete = null)
+                    in ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity? obsolete = null)
                 {
                     var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
 
@@ -616,7 +616,7 @@ public readonly partial struct Group
                 /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
                 /// </para>
                 /// </remarks>
-                public AdditionalPropertiesEntity WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? value)
+                public AdditionalPropertiesEntity WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity? value)
                 {
                     return value.HasValue ? this.SetProperty(JsonPropertyNames.Obsolete, value.Value) : this.RemoveProperty(JsonPropertyNames.Obsolete);
                 }

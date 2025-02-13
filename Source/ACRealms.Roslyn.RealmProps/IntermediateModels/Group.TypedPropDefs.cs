@@ -351,6 +351,28 @@ public readonly partial struct Group
             }
         }
 
+        /// <summary>
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator" />.
+        /// </summary>
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator AsMaybeModulator
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator>();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator" />.
+        /// </summary>
+        public bool IsMaybeModulator
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator>().IsValid();
+            }
+        }
+
         /// <inheritdoc/>
         public bool HasJsonElementBacking
         {
@@ -510,6 +532,24 @@ public readonly partial struct Group
         /// </summary>
         /// <param name="value">The value from which to convert.</param>
         public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool value)
+        {
+            return value.As<TypedPropDefs>();
+        }
+
+        /// <summary>
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator(TypedPropDefs value)
+        {
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator>();
+        }
+
+        /// <summary>
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator TypedPropDefs(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator value)
         {
             return value.As<TypedPropDefs>();
         }
@@ -939,6 +979,7 @@ public readonly partial struct Group
         /// <param name="matchMaybeFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat"/>.</param>
         /// <param name="matchMaybeString">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString"/>.</param>
         /// <param name="matchMaybeBool">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool"/>.</param>
+        /// <param name="matchMaybeModulator">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator"/>.</param>
         /// <param name="defaultMatch">Match any other value.</param>
         /// <returns>An instance of the value returned by the match function.</returns>
         public TOut Match<TIn, TOut>(
@@ -949,6 +990,7 @@ public readonly partial struct Group
             Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat, TIn, TOut> matchMaybeFloat,
             Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString, TIn, TOut> matchMaybeString,
             Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool, TIn, TOut> matchMaybeBool,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator, TIn, TOut> matchMaybeModulator,
             Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs, TIn, TOut> defaultMatch)
         {
             ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum matchMaybeEnumValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum>();
@@ -987,6 +1029,12 @@ public readonly partial struct Group
                 return matchMaybeBool(matchMaybeBoolValue, context);
             }
 
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator matchMaybeModulatorValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator>();
+            if (matchMaybeModulatorValue.IsValid())
+            {
+                return matchMaybeModulator(matchMaybeModulatorValue, context);
+            }
+
             return defaultMatch(this, context);
         }
 
@@ -1000,6 +1048,7 @@ public readonly partial struct Group
         /// <param name="matchMaybeFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat"/>.</param>
         /// <param name="matchMaybeString">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString"/>.</param>
         /// <param name="matchMaybeBool">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool"/>.</param>
+        /// <param name="matchMaybeModulator">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator"/>.</param>
         /// <param name="defaultMatch">Match any other value.</param>
         /// <returns>An instance of the value returned by the match function.</returns>
         public TOut Match<TOut>(
@@ -1009,6 +1058,7 @@ public readonly partial struct Group
             Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeFloat, TOut> matchMaybeFloat,
             Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeString, TOut> matchMaybeString,
             Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool, TOut> matchMaybeBool,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator, TOut> matchMaybeModulator,
             Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs, TOut> defaultMatch)
         {
             ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum matchMaybeEnumValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeEnum>();
@@ -1045,6 +1095,12 @@ public readonly partial struct Group
             if (matchMaybeBoolValue.IsValid())
             {
                 return matchMaybeBool(matchMaybeBoolValue);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator matchMaybeModulatorValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator>();
+            if (matchMaybeModulatorValue.IsValid())
+            {
+                return matchMaybeModulator(matchMaybeModulatorValue);
             }
 
             return defaultMatch(this);
@@ -1113,6 +1169,17 @@ public readonly partial struct Group
         public bool TryGetAsMaybeBool(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool result)
         {
             result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeBool>();
+            return result.IsValid();
+        }
+
+        /// <summary>
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator" />.
+        /// </summary>
+        /// <param name="result">The result of the conversions.</param>
+        /// <returns><see langword="true" /> if the conversion was valid.</returns>
+        public bool TryGetAsMaybeModulator(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator result)
+        {
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.TypedPropDefs.MaybeModulator>();
             return result.IsValid();
         }
     }

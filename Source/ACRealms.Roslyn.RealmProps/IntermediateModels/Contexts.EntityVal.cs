@@ -214,6 +214,138 @@ public readonly partial struct Contexts
         }
 
         /// <summary>
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity" />.
+        /// </summary>
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity AsWeenieEntity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity>();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity" />.
+        /// </summary>
+        public bool IsWeenieEntity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity>().IsValid();
+            }
+        }
+
+        /// <summary>
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity" />.
+        /// </summary>
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity AsWeeniePropertyBoolEntity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity>();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity" />.
+        /// </summary>
+        public bool IsWeeniePropertyBoolEntity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity>().IsValid();
+            }
+        }
+
+        /// <summary>
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity" />.
+        /// </summary>
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity AsWeeniePropertyFloatEntity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity>();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity" />.
+        /// </summary>
+        public bool IsWeeniePropertyFloatEntity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity>().IsValid();
+            }
+        }
+
+        /// <summary>
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity" />.
+        /// </summary>
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity AsWeeniePropertyIntEntity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity>();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity" />.
+        /// </summary>
+        public bool IsWeeniePropertyIntEntity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity>().IsValid();
+            }
+        }
+
+        /// <summary>
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity" />.
+        /// </summary>
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity AsWeeniePropertyInt64Entity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity>();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity" />.
+        /// </summary>
+        public bool IsWeeniePropertyInt64Entity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity>().IsValid();
+            }
+        }
+
+        /// <summary>
+        /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity" />.
+        /// </summary>
+        public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity AsWeeniePropertyStringEntity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity>();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity" />.
+        /// </summary>
+        public bool IsWeeniePropertyStringEntity
+        {
+            get
+            {
+                return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity>().IsValid();
+            }
+        }
+
+        /// <summary>
         /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity" />.
         /// </summary>
         public ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity AsWorldObjectEntity
@@ -288,6 +420,114 @@ public readonly partial struct Contexts
         public static implicit operator JsonAny(EntityVal value)
         {
             return value.AsAny;
+        }
+
+        /// <summary>
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity(EntityVal value)
+        {
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity>();
+        }
+
+        /// <summary>
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static implicit operator EntityVal(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity value)
+        {
+            return value.As<EntityVal>();
+        }
+
+        /// <summary>
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity(EntityVal value)
+        {
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity>();
+        }
+
+        /// <summary>
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static implicit operator EntityVal(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity value)
+        {
+            return value.As<EntityVal>();
+        }
+
+        /// <summary>
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity(EntityVal value)
+        {
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity>();
+        }
+
+        /// <summary>
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static implicit operator EntityVal(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity value)
+        {
+            return value.As<EntityVal>();
+        }
+
+        /// <summary>
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity(EntityVal value)
+        {
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity>();
+        }
+
+        /// <summary>
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static implicit operator EntityVal(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity value)
+        {
+            return value.As<EntityVal>();
+        }
+
+        /// <summary>
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity(EntityVal value)
+        {
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity>();
+        }
+
+        /// <summary>
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static implicit operator EntityVal(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity value)
+        {
+            return value.As<EntityVal>();
+        }
+
+        /// <summary>
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity(EntityVal value)
+        {
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity>();
+        }
+
+        /// <summary>
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static implicit operator EntityVal(ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity value)
+        {
+            return value.As<EntityVal>();
         }
 
         /// <summary>
@@ -721,6 +961,211 @@ public readonly partial struct Contexts
         public override string ToString()
         {
             return this.Serialize();
+        }
+
+        /// <summary>
+        /// Matches the value against the composed values, and returns the result of calling the provided match function for the first match found.
+        /// </summary>
+        /// <typeparam name="TIn">The immutable context to pass in to the match function.</typeparam>
+        /// <typeparam name="TOut">The result of calling the match function.</typeparam>
+        /// <param name="context">The context to pass to the match function.</param>
+        /// <param name="matchWeenieEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity"/>.</param>
+        /// <param name="matchWeeniePropertyIntEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity"/>.</param>
+        /// <param name="matchWeeniePropertyInt64Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity"/>.</param>
+        /// <param name="matchWeeniePropertyFloatEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity"/>.</param>
+        /// <param name="matchWeeniePropertyBoolEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity"/>.</param>
+        /// <param name="matchWeeniePropertyStringEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity"/>.</param>
+        /// <param name="matchWorldObjectEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity"/>.</param>
+        /// <param name="defaultMatch">Match any other value.</param>
+        /// <returns>An instance of the value returned by the match function.</returns>
+        public TOut Match<TIn, TOut>(
+            in TIn context,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity, TIn, TOut> matchWeenieEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity, TIn, TOut> matchWeeniePropertyIntEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity, TIn, TOut> matchWeeniePropertyInt64Entity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity, TIn, TOut> matchWeeniePropertyFloatEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity, TIn, TOut> matchWeeniePropertyBoolEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity, TIn, TOut> matchWeeniePropertyStringEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity, TIn, TOut> matchWorldObjectEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal, TIn, TOut> defaultMatch)
+        {
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity matchWeenieEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity>();
+            if (matchWeenieEntityValue.IsValid())
+            {
+                return matchWeenieEntity(matchWeenieEntityValue, context);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity matchWeeniePropertyIntEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity>();
+            if (matchWeeniePropertyIntEntityValue.IsValid())
+            {
+                return matchWeeniePropertyIntEntity(matchWeeniePropertyIntEntityValue, context);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity matchWeeniePropertyInt64EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity>();
+            if (matchWeeniePropertyInt64EntityValue.IsValid())
+            {
+                return matchWeeniePropertyInt64Entity(matchWeeniePropertyInt64EntityValue, context);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity matchWeeniePropertyFloatEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity>();
+            if (matchWeeniePropertyFloatEntityValue.IsValid())
+            {
+                return matchWeeniePropertyFloatEntity(matchWeeniePropertyFloatEntityValue, context);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity matchWeeniePropertyBoolEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity>();
+            if (matchWeeniePropertyBoolEntityValue.IsValid())
+            {
+                return matchWeeniePropertyBoolEntity(matchWeeniePropertyBoolEntityValue, context);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity matchWeeniePropertyStringEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity>();
+            if (matchWeeniePropertyStringEntityValue.IsValid())
+            {
+                return matchWeeniePropertyStringEntity(matchWeeniePropertyStringEntityValue, context);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity matchWorldObjectEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity>();
+            if (matchWorldObjectEntityValue.IsValid())
+            {
+                return matchWorldObjectEntity(matchWorldObjectEntityValue, context);
+            }
+
+            return defaultMatch(this, context);
+        }
+
+        /// <summary>
+        /// Matches the value against the composed values, and returns the result of calling the provided match function for the first match found.
+        /// </summary>
+        /// <typeparam name="TOut">The result of calling the match function.</typeparam>
+        /// <param name="matchWeenieEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity"/>.</param>
+        /// <param name="matchWeeniePropertyIntEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity"/>.</param>
+        /// <param name="matchWeeniePropertyInt64Entity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity"/>.</param>
+        /// <param name="matchWeeniePropertyFloatEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity"/>.</param>
+        /// <param name="matchWeeniePropertyBoolEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity"/>.</param>
+        /// <param name="matchWeeniePropertyStringEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity"/>.</param>
+        /// <param name="matchWorldObjectEntity">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity"/>.</param>
+        /// <param name="defaultMatch">Match any other value.</param>
+        /// <returns>An instance of the value returned by the match function.</returns>
+        public TOut Match<TOut>(
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity, TOut> matchWeenieEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity, TOut> matchWeeniePropertyIntEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity, TOut> matchWeeniePropertyInt64Entity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity, TOut> matchWeeniePropertyFloatEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity, TOut> matchWeeniePropertyBoolEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity, TOut> matchWeeniePropertyStringEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity, TOut> matchWorldObjectEntity,
+            Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.EntityVal, TOut> defaultMatch)
+        {
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity matchWeenieEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity>();
+            if (matchWeenieEntityValue.IsValid())
+            {
+                return matchWeenieEntity(matchWeenieEntityValue);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity matchWeeniePropertyIntEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity>();
+            if (matchWeeniePropertyIntEntityValue.IsValid())
+            {
+                return matchWeeniePropertyIntEntity(matchWeeniePropertyIntEntityValue);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity matchWeeniePropertyInt64EntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity>();
+            if (matchWeeniePropertyInt64EntityValue.IsValid())
+            {
+                return matchWeeniePropertyInt64Entity(matchWeeniePropertyInt64EntityValue);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity matchWeeniePropertyFloatEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity>();
+            if (matchWeeniePropertyFloatEntityValue.IsValid())
+            {
+                return matchWeeniePropertyFloatEntity(matchWeeniePropertyFloatEntityValue);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity matchWeeniePropertyBoolEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity>();
+            if (matchWeeniePropertyBoolEntityValue.IsValid())
+            {
+                return matchWeeniePropertyBoolEntity(matchWeeniePropertyBoolEntityValue);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity matchWeeniePropertyStringEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity>();
+            if (matchWeeniePropertyStringEntityValue.IsValid())
+            {
+                return matchWeeniePropertyStringEntity(matchWeeniePropertyStringEntityValue);
+            }
+
+            ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity matchWorldObjectEntityValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WorldObjectEntity>();
+            if (matchWorldObjectEntityValue.IsValid())
+            {
+                return matchWorldObjectEntity(matchWorldObjectEntityValue);
+            }
+
+            return defaultMatch(this);
+        }
+
+        /// <summary>
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity" />.
+        /// </summary>
+        /// <param name="result">The result of the conversions.</param>
+        /// <returns><see langword="true" /> if the conversion was valid.</returns>
+        public bool TryGetAsWeenieEntity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity result)
+        {
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeenieEntity>();
+            return result.IsValid();
+        }
+
+        /// <summary>
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity" />.
+        /// </summary>
+        /// <param name="result">The result of the conversions.</param>
+        /// <returns><see langword="true" /> if the conversion was valid.</returns>
+        public bool TryGetAsWeeniePropertyBoolEntity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity result)
+        {
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyBoolEntity>();
+            return result.IsValid();
+        }
+
+        /// <summary>
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity" />.
+        /// </summary>
+        /// <param name="result">The result of the conversions.</param>
+        /// <returns><see langword="true" /> if the conversion was valid.</returns>
+        public bool TryGetAsWeeniePropertyFloatEntity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity result)
+        {
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyFloatEntity>();
+            return result.IsValid();
+        }
+
+        /// <summary>
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity" />.
+        /// </summary>
+        /// <param name="result">The result of the conversions.</param>
+        /// <returns><see langword="true" /> if the conversion was valid.</returns>
+        public bool TryGetAsWeeniePropertyIntEntity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity result)
+        {
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyIntEntity>();
+            return result.IsValid();
+        }
+
+        /// <summary>
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity" />.
+        /// </summary>
+        /// <param name="result">The result of the conversions.</param>
+        /// <returns><see langword="true" /> if the conversion was valid.</returns>
+        public bool TryGetAsWeeniePropertyInt64Entity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity result)
+        {
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyInt64Entity>();
+            return result.IsValid();
+        }
+
+        /// <summary>
+        /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity" />.
+        /// </summary>
+        /// <param name="result">The result of the conversions.</param>
+        /// <returns><see langword="true" /> if the conversion was valid.</returns>
+        public bool TryGetAsWeeniePropertyStringEntity(out ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity result)
+        {
+            result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts.WeeniePropertyStringEntity>();
+            return result.IsValid();
         }
 
         /// <summary>

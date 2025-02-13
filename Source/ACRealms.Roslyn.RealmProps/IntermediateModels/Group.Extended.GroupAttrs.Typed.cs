@@ -361,6 +361,28 @@ public readonly partial struct Group
                     }
                 }
 
+                /// <summary>
+                /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator" />.
+                /// </summary>
+                public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator AsModulator
+                {
+                    get
+                    {
+                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator>();
+                    }
+                }
+
+                /// <summary>
+                /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator" />.
+                /// </summary>
+                public bool IsModulator
+                {
+                    get
+                    {
+                        return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator>().IsValid();
+                    }
+                }
+
                 /// <inheritdoc/>
                 public bool HasJsonElementBacking
                 {
@@ -520,6 +542,24 @@ public readonly partial struct Group
                 /// </summary>
                 /// <param name="value">The value from which to convert.</param>
                 public static implicit operator Typed(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Bool value)
+                {
+                    return value.As<Typed>();
+                }
+
+                /// <summary>
+                /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator"/>.
+                /// </summary>
+                /// <param name="value">The value from which to convert.</param>
+                public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator(Typed value)
+                {
+                    return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator>();
+                }
+
+                /// <summary>
+                /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator"/>.
+                /// </summary>
+                /// <param name="value">The value from which to convert.</param>
+                public static implicit operator Typed(ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator value)
                 {
                     return value.As<Typed>();
                 }
@@ -949,6 +989,7 @@ public readonly partial struct Group
                 /// <param name="matchFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Float"/>.</param>
                 /// <param name="matchString">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.String"/>.</param>
                 /// <param name="matchBool">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Bool"/>.</param>
+                /// <param name="matchModulator">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator"/>.</param>
                 /// <param name="defaultMatch">Match any other value.</param>
                 /// <returns>An instance of the value returned by the match function.</returns>
                 public TOut Match<TIn, TOut>(
@@ -959,6 +1000,7 @@ public readonly partial struct Group
                     Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Float, TIn, TOut> matchFloat,
                     Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.String, TIn, TOut> matchString,
                     Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Bool, TIn, TOut> matchBool,
+                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator, TIn, TOut> matchModulator,
                     Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed, TIn, TOut> defaultMatch)
                 {
                     ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Enum matchEnumValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Enum>();
@@ -997,6 +1039,12 @@ public readonly partial struct Group
                         return matchBool(matchBoolValue, context);
                     }
 
+                    ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator matchModulatorValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator>();
+                    if (matchModulatorValue.IsValid())
+                    {
+                        return matchModulator(matchModulatorValue, context);
+                    }
+
                     return defaultMatch(this, context);
                 }
 
@@ -1010,6 +1058,7 @@ public readonly partial struct Group
                 /// <param name="matchFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Float"/>.</param>
                 /// <param name="matchString">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.String"/>.</param>
                 /// <param name="matchBool">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Bool"/>.</param>
+                /// <param name="matchModulator">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator"/>.</param>
                 /// <param name="defaultMatch">Match any other value.</param>
                 /// <returns>An instance of the value returned by the match function.</returns>
                 public TOut Match<TOut>(
@@ -1019,6 +1068,7 @@ public readonly partial struct Group
                     Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Float, TOut> matchFloat,
                     Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.String, TOut> matchString,
                     Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Bool, TOut> matchBool,
+                    Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator, TOut> matchModulator,
                     Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed, TOut> defaultMatch)
                 {
                     ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Enum matchEnumValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Enum>();
@@ -1055,6 +1105,12 @@ public readonly partial struct Group
                     if (matchBoolValue.IsValid())
                     {
                         return matchBool(matchBoolValue);
+                    }
+
+                    ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator matchModulatorValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator>();
+                    if (matchModulatorValue.IsValid())
+                    {
+                        return matchModulator(matchModulatorValue);
                     }
 
                     return defaultMatch(this);
@@ -1123,6 +1179,17 @@ public readonly partial struct Group
                 public bool TryGetAsBool(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Bool result)
                 {
                     result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Bool>();
+                    return result.IsValid();
+                }
+
+                /// <summary>
+                /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator" />.
+                /// </summary>
+                /// <param name="result">The result of the conversions.</param>
+                /// <returns><see langword="true" /> if the conversion was valid.</returns>
+                public bool TryGetAsModulator(out ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator result)
+                {
+                    result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.Extended.GroupAttrs.Typed.Modulator>();
                     return result.IsValid();
                 }
             }

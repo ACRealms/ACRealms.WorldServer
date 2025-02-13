@@ -1,4 +1,4 @@
 {
   "type": "string",
-  "enum": [ "integer", "boolean", "float", "long", "string", "enum" ]
+  "enum": [ "integer", "boolean", "float", "long", "string", "enum", "modulator" ]
 }

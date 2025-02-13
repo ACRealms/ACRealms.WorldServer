@@ -299,6 +299,24 @@ public readonly partial struct PropBool
     }
 
     /// <summary>
+    /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static implicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase(PropBool value)
+    {
+        return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase>();
+    }
+
+    /// <summary>
+    /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase"/>.
+    /// </summary>
+    /// <param name="value">The value from which to convert.</param>
+    public static explicit operator PropBool(ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase value)
+    {
+        return value.As<PropBool>();
+    }
+
+    /// <summary>
     /// Operator ==.
     /// </summary>
     /// <param name="left">The lhs of the operator.</param>

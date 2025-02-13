@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "$comment": "Represents the base schema common for all rule types",
+  "default": { },
+  "properties": {
+    "obsolete": {
+      "type": "string",
+      "description": "If set, the property will be marked obsolete, with this string value specifying the reason or additional context"
+    },
+    "contexts": { "$ref": "../../contexts.json" }
+  }
+}

@@ -26,6 +26,10 @@
     "propBool": {
       "allOf": [ { "$ref": "prop-base.json" } ],
       "properties": { "default": { "$ref": "../../components/primitives/val-bool.json" } }
+    },
+    "propModulator": {
+      "allOf": [ { "$ref": "rule-base.json" } ],
+      "properties": { }
     }
   }
 }

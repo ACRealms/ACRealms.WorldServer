@@ -129,7 +129,7 @@ public readonly partial struct Group
             /// If this JSON property is <see cref="JsonValueKind.Undefined"/> then the value returned will be <see langword="null" />.
             /// </para>
             /// </remarks>
-            public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.BoolEntity? Properties
+            public ACRealms.Roslyn.RealmProps.IntermediateModels.Group.ModulatorEntity? Properties
             {
                 get
                 {
@@ -160,7 +160,7 @@ public readonly partial struct Group
                                 return default;
                             }
 
-                            return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.BoolEntity>();
+                            return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.Group.ModulatorEntity>();
                         }
                     }
 
@@ -193,7 +193,7 @@ public readonly partial struct Group
             /// <summary>
             /// Creates an instance of a <see cref="PropAttrs"/>.
             /// </summary>
-            public static PropAttrs Create(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group.BoolEntity? properties = null)
+            public static PropAttrs Create(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group.ModulatorEntity? properties = null)
             {
                 var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
 
@@ -318,7 +318,7 @@ public readonly partial struct Group
             /// </summary>
             /// <param name="value">The new property value</param>
             /// <returns>The instance with the property set.</returns>
-            public PropAttrs WithProperties(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group.BoolEntity? value)
+            public PropAttrs WithProperties(in ACRealms.Roslyn.RealmProps.IntermediateModels.Group.ModulatorEntity? value)
             {
                 return value.HasValue ? this.SetProperty(JsonPropertyNames.Properties, value.Value) : this.RemoveProperty(JsonPropertyNames.Properties);
             }

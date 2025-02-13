@@ -21,7 +21,10 @@
                 "allOf": [ { "$ref": "common/prop-typed.json#/definitions/propString" }, { "$ref": "group/prop-obj.json" } ], "unevaluatedProperties": false } } } },
 
         "bool": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": {
-                "allOf": [ { "$ref": "common/prop-typed.json#/definitions/propBool" }, { "$ref": "group/prop-obj.json" } ], "unevaluatedProperties": false } } } }
+                "allOf": [ { "$ref": "common/prop-typed.json#/definitions/propBool" }, { "$ref": "group/prop-obj.json" } ], "unevaluatedProperties": false } } } },
+
+        "modulator": { "if": { "$ref": "#/definitions/isObject" }, "then": { "additionalProperties": { "if": { "$ref": "#/definitions/isObject" }, "then": {
+                "allOf": [ { "$ref": "common/prop-typed.json#/definitions/propModulator" }, { "$ref": "group/prop-obj.json" } ], "unevaluatedProperties": false } } } }
       }
     },
     "typedPropDefs": {
@@ -31,7 +34,8 @@
         "long": { "$corvusTypeName": "ExtendedAsLong", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/long" } } } ] },
         "float": { "$corvusTypeName": "ExtendedAsFloat", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/float" } } } ] },
         "string": { "$corvusTypeName": "ExtendedAsString", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/string" } } } ] },
-        "bool": { "$corvusTypeName": "ExtendedAsBool", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/bool" } } } ] }
+        "bool": { "$corvusTypeName": "ExtendedAsBool", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/bool" } } } ] },
+        "modulator": { "$corvusTypeName": "ExtendedAsModulator", "allOf": [ { "properties": { "properties": { "$ref": "#/definitions/props/definitions/modulator" } } } ] }
       },
       "allOf": [
         { "$corvusTypeName": "MaybeEnum", "if": { "$ref": "common/is-type.json#/definitions/typeIsEnum" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/enum" } },
@@ -39,7 +43,8 @@
         { "$corvusTypeName": "MaybeLong", "if": { "$ref": "common/is-type.json#/definitions/typeIsLong" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/long" } },
         { "$corvusTypeName": "MaybeFloat", "if": { "$ref": "common/is-type.json#/definitions/typeIsFloat" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/float" } },
         { "$corvusTypeName": "MaybeString", "if": { "$ref": "common/is-type.json#/definitions/typeIsString" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/string" } },
-        { "$corvusTypeName": "MaybeBool", "if": { "$ref": "common/is-type.json#/definitions/typeIsBoolean" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/bool" } }
+        { "$corvusTypeName": "MaybeBool", "if": { "$ref": "common/is-type.json#/definitions/typeIsBoolean" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/bool" } },
+        { "$corvusTypeName": "MaybeModulator", "if": { "$ref": "common/is-type.json#/definitions/typeIsModulator" }, "then": { "$ref": "#/definitions/typedPropDefs/definitions/modulator" } }
       ]
     },
     "groupPropSelection": {
@@ -72,7 +77,8 @@
                 { "$corvusTypeName": "Long", "if": { "$ref": "common/is-type.json#/definitions/typeIsLong" }, "then": { "$ref": "common/prop-typed.json#/definitions/propLong" }, "else": false },
                 { "$corvusTypeName": "Float", "if": { "$ref": "common/is-type.json#/definitions/typeIsFloat" }, "then": { "$ref": "common/prop-typed.json#/definitions/propFloat" }, "else": false },
                 { "$corvusTypeName": "String", "if": { "$ref": "common/is-type.json#/definitions/typeIsString" }, "then": { "$ref": "common/prop-typed.json#/definitions/propString" }, "else": false },
-                { "$corvusTypeName": "Bool", "if": { "$ref": "common/is-type.json#/definitions/typeIsBoolean" }, "then": { "$ref": "common/prop-typed.json#/definitions/propBool" }, "else": false }
+                { "$corvusTypeName": "Bool", "if": { "$ref": "common/is-type.json#/definitions/typeIsBoolean" }, "then": { "$ref": "common/prop-typed.json#/definitions/propBool" }, "else": false },
+                { "$corvusTypeName": "Modulator", "if": { "$ref": "common/is-type.json#/definitions/typeIsModulator" }, "then": { "$ref": "common/prop-typed.json#/definitions/propModulator" }, "else": false }
               ] }
           ] },
         { "$corvusTypeName": "PropAttrs",

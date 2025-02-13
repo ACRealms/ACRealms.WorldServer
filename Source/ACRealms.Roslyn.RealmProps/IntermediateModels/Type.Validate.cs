@@ -138,6 +138,18 @@ public readonly partial struct Type
         /// as a UTF8 byte array.
         /// </summary>
         public static ReadOnlySpan<byte> EnumUtf8 => CorvusValidation.Enum6Utf8;
+
+        /// <summary>
+        /// Gets the string 'modulator'
+        /// as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.Type"/>.
+        /// </summary>
+        public static Type Modulator { get; } = CorvusValidation.Enum7.As<Type>();
+
+        /// <summary>
+        /// Gets the string 'modulator'
+        /// as a UTF8 byte array.
+        /// </summary>
+        public static ReadOnlySpan<byte> ModulatorUtf8 => CorvusValidation.Enum7Utf8;
     }
 
     /// <summary>
@@ -169,6 +181,10 @@ public readonly partial struct Type
         /// A constant for the <c>enum</c> keyword.
         /// </summary>
         public static readonly JsonString Enum6 = JsonString.ParseValue("\"enum\"");
+        /// <summary>
+        /// A constant for the <c>enum</c> keyword.
+        /// </summary>
+        public static readonly JsonString Enum7 = JsonString.ParseValue("\"modulator\"");
 
         /// <summary>
         /// A constant for the <c>enum</c> keyword.
@@ -194,6 +210,10 @@ public readonly partial struct Type
         /// A constant for the <c>enum</c> keyword.
         /// </summary>
         public static ReadOnlySpan<byte> Enum6Utf8 => "\"enum\""u8;
+        /// <summary>
+        /// A constant for the <c>enum</c> keyword.
+        /// </summary>
+        public static ReadOnlySpan<byte> Enum7Utf8 => "\"modulator\""u8;
 
         /// <summary>
         /// Core type validation.
@@ -258,6 +278,10 @@ public readonly partial struct Type
                 if (!enumFoundValid)
                 {
                     enumFoundValid = value.Equals(CorvusValidation.Enum6);
+                }
+                if (!enumFoundValid)
+                {
+                    enumFoundValid = value.Equals(CorvusValidation.Enum7);
                 }
 
                 if (enumFoundValid)

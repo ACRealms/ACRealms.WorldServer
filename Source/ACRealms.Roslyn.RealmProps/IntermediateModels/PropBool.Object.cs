@@ -258,7 +258,7 @@ public readonly partial struct PropBool
     /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
     /// </para>
     /// </remarks>
-    public ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? Obsolete
+    public ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity? Obsolete
     {
         get
         {
@@ -289,7 +289,7 @@ public readonly partial struct PropBool
                         return default;
                     }
 
-                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity>();
+                    return result.As<ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity>();
                 }
             }
 
@@ -326,7 +326,7 @@ public readonly partial struct PropBool
         in ACRealms.Roslyn.RealmProps.IntermediateModels.Contexts? contexts = null,
         in ACRealms.Roslyn.RealmProps.IntermediateModels.ValBool? defaultValue = null,
         in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.DefaultFromServerPropertyEntity? defaultFromServerProperty = null,
-        in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? obsolete = null)
+        in ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity? obsolete = null)
     {
         var builder = ImmutableList.CreateBuilder<JsonObjectProperty>();
 
@@ -511,7 +511,7 @@ public readonly partial struct PropBool
     /// If set, the property will be marked obsolete, with this string value specifying the reason or additional context
     /// </para>
     /// </remarks>
-    public PropBool WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.PropBase.ObsoleteEntity? value)
+    public PropBool WithObsolete(in ACRealms.Roslyn.RealmProps.IntermediateModels.RuleBase.ObsoleteEntity? value)
     {
         return value.HasValue ? this.SetProperty(JsonPropertyNames.Obsolete, value.Value) : this.RemoveProperty(JsonPropertyNames.Obsolete);
     }

@@ -2,15 +2,24 @@
   "definitions": {
     "entities": {
       "definitions": {
-        "WorldObject": {
-          "description": "Any WorldObject",
-          "const": "WorldObject"
-        }
+        "Weenie": { "description": "A weenie (template defining starting property values for a world object)", "const": "Weenie" },
+        "WeeniePropertyBool": { "description": "A boolean property (weenie or biota)", "const": "WeeniePropertyBool" },
+        "WeeniePropertyFloat": { "description": "A Floating-point (numeric with decimal) property (weenie or biota)", "const": "WeeniePropertyFloat" },
+        "WeeniePropertyInt": { "description": "An Int property (weenie or biota)", "const": "WeeniePropertyInt" },
+        "WeeniePropertyInt64": { "description": "An Int property (weenie or biota)", "const": "WeeniePropertyInt64" },
+        "WeeniePropertyString": { "description": "A string property (weenie or biota)", "const": "WeeniePropertyString" },
+        "WorldObject": { "description": "Any WorldObject", "const": "WorldObject" }
       }
     },
     "entityVal": {
       "type": "string",
       "oneOf": [
+        { "$ref": "#/definitions/entities/definitions/Weenie" },
+        { "$ref": "#/definitions/entities/definitions/WeeniePropertyInt" },
+        { "$ref": "#/definitions/entities/definitions/WeeniePropertyInt64" },
+        { "$ref": "#/definitions/entities/definitions/WeeniePropertyFloat" },
+        { "$ref": "#/definitions/entities/definitions/WeeniePropertyBool" },
+        { "$ref": "#/definitions/entities/definitions/WeeniePropertyString" },
         { "$ref": "#/definitions/entities/definitions/WorldObject" }
       ]
     },
