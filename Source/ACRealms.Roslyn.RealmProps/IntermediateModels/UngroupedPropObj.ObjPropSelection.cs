@@ -423,6 +423,24 @@ public readonly partial struct UngroupedPropObj
         }
 
         /// <summary>
+        /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator(ObjPropSelection value)
+        {
+            return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator>();
+        }
+
+        /// <summary>
+        /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator"/>.
+        /// </summary>
+        /// <param name="value">The value from which to convert.</param>
+        public static explicit operator ObjPropSelection(ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator value)
+        {
+            return value.As<ObjPropSelection>();
+        }
+
+        /// <summary>
         /// Operator ==.
         /// </summary>
         /// <param name="left">The lhs of the operator.</param>

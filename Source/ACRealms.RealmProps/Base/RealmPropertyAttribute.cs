@@ -14,6 +14,14 @@ namespace ACRealms.RealmProps
 {
     internal static class RealmPropertyHelper
     {
+        internal static IReadOnlyDictionary<E, TProto> BuildModulatorPrototypes<E, TProto, TAttribute>()
+            where E : struct, System.Enum
+            where TProto : IRealmPropertyModulatorPrototype
+            where TAttribute : RealmPropertyPrimaryAttribute<TPrimitive>
+        {
+            throw new NotImplementedException();
+        }
+
         internal static FrozenDictionary<E, TProto> BuildPrototypes<E, TProto, TPrimitive, TAttribute>()
             where E : struct, System.Enum
             where TProto : RealmPropertyPrototype<E, TPrimitive, TAttribute>
@@ -108,6 +116,19 @@ namespace ACRealms.RealmProps
         }
 
         public RealmPropertyPrimaryAttribute(TPrimitive defaultValue) : this(null, defaultValue) { }
+    }
+
+    internal class RealmPropertyModulatorPrimaryAttribute : Prototypes.PropertyPrimaryAttribute<IModulatorValue>, IRealmPropertyPrimaryAttribute
+    {
+        public IModulatorValue DefaultValue { get; }
+        public string? DefaultFromServerProperty => null;
+
+        public RealmPropertyModulatorPrimaryAttribute(IModulatorValue defaultValue)
+        {
+            DefaultValue = defaultValue;
+        }
+
+        public RealmPropertyModulatorPrimaryAttribute(string defaultFromServerProperty, IModulatorValue defaultValue, IModulatorValue minValue, IModulatorValue maxValue) : this(null, defaultValue) { }
     }
 
     internal class RealmPropertyPrimaryMinMaxAttribute<TPrimitive> : RealmPropertyPrimaryAttribute<TPrimitive>

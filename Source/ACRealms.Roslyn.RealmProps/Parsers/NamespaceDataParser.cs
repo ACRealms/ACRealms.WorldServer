@@ -303,7 +303,7 @@ namespace ACRealms.Roslyn.RealmProps.Parsers
 
                 PropType type = groupDefaults.PropType;
 
-                string? unformattedDesc = GetUnformattedDescription(prop.AsExtendedUntypedAttrs.Description);
+                string? unformattedDesc = GetUnformattedDescription(prop.AsRuleObj.AsExtendedUntypedAttrs.Description);
                 string desc = groupDefaults?.GetDescriptionFromFormat(shortKey, unformattedDesc) ?? unformattedDesc;
 
                 var propAsEnum = prop.As<PropDefExtensionEnum>();

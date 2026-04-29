@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using System.Runtime.CompilerServices;
 using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACE.Entity.Models;
+using ACRealms.Rulesets;
 
 namespace ACE.Entity.Adapter
 {
     public static class WeenieConverter
     {
-        public static Biota ConvertToBiota(this Weenie weenie, ulong id, bool instantiateEmptyCollections = false, bool referenceWeenieCollectionsForCommonProperties = false)
+        public static Biota ConvertToBiota(this Weenie weenie, ulong id, IRulesetHandle ruleset, bool instantiateEmptyCollections = false, bool referenceWeenieCollectionsForCommonProperties = false)
         {
             var result = new Biota();
 
@@ -162,7 +163,8 @@ namespace ACE.Entity.Adapter
             if (weenie.PropertiesBookPageData != null && (instantiateEmptyCollections || weenie.PropertiesBookPageData.Count > 0))
                 result.PropertiesBookPageData = new List<PropertiesBookPageData>(weenie.PropertiesBookPageData);
 
-
+            ruleset.Modulate(result);
+            
             return result;
         }
     }

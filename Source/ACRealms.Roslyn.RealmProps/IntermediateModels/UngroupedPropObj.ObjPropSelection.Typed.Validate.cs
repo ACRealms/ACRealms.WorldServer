@@ -235,6 +235,27 @@ public readonly partial struct UngroupedPropObj
                         }
                     }
 
+                    ValidationContext oneOfChildContext6 = validationContext.CreateChildContext();
+                    if (level > ValidationLevel.Basic)
+                    {
+                        oneOfChildContext6 = oneOfChildContext6.PushValidationLocationReducedPathModifier(new("#/oneOf/6"));
+                    }
+
+                    ValidationContext oneOfResult6 = value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator>().Validate(oneOfChildContext6, level);
+
+                    if (oneOfResult6.IsValid)
+                    {
+                        result = result.MergeChildContext(oneOfResult6, level >= ValidationLevel.Verbose);
+                        oneOfFoundValid++;
+                    }
+                    else
+                    {
+                        if (level >= ValidationLevel.Verbose)
+                        {
+                            result = result.MergeResults(result.IsValid, level, oneOfResult6);
+                        }
+                    }
+
                     if (oneOfFoundValid == 1)
                     {
                         if (level >= ValidationLevel.Verbose)

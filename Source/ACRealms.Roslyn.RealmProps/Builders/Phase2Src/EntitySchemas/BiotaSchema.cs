@@ -4,7 +4,7 @@ using static ACRealms.Roslyn.RealmProps.Builders.SerializationHelpers;
 
 namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
 {
-    internal static class EntitySchema
+    internal static class BiotaSchema
     {
         internal enum Primitive
         {
@@ -24,7 +24,7 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
             { Primitive.@string, typeof(PropertyString) },
         }.ToFrozenDictionary();
 
-        internal static string GenerateEntitySchemaSourceCode(string entityType)
+        internal static string GenerateEntitySchemaSourceCode()
         {
             Dictionary<Primitive, string[]> propsForPrimitiveType = [];
 

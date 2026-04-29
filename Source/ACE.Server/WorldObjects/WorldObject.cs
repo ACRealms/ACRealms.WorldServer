@@ -105,7 +105,7 @@ namespace ACE.Server.WorldObjects
         protected WorldObject(Weenie weenie, ObjectGuid guid, AppliedRuleset ruleset)
         {
             Weenie = weenie;
-            Biota = ACE.Entity.Adapter.WeenieConverter.ConvertToBiota(weenie, guid.Full, false, weenie.CanReferenceCommonProperties);
+            Biota = ACE.Entity.Adapter.WeenieConverter.ConvertToBiota(weenie, guid.Full, ruleset, false, weenie.CanReferenceCommonProperties);
             Guid = guid;
 
             InitializePropertyDictionaries();

@@ -58,6 +58,8 @@ namespace ACRealms.Rulesets.Loader
             var dobj = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(fileContent);
             DBOld.Realm realm = new DBOld.Realm();
             realm.Name = dobj.name.Value;
+            if (dobj.type.Value == null)
+                throw new InvalidDataException($"'type' property is missing in file {filename}.");
             realm.Type = Enum.Parse<RealmType>(dobj.type.Value);
             realm.PropertyCountRandomized = (ushort?)dobj.properties_random_count?.Value;
 

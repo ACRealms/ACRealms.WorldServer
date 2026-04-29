@@ -17,7 +17,8 @@ namespace ACRealms.Roslyn.RealmProps
         int64,
         @float,
         boolean,
-        @string
+        @string,
+        modulator
     }
 
     enum PrimitiveType
@@ -44,7 +45,18 @@ namespace ACRealms.Roslyn.RealmProps
         public string? RerollRestrictedTo { get; init; }
         public string? ObsoleteReason { get; init; }
         public string? DefaultFromServerProp { get; init; }
-        public string TargetEnumTypeName => PropMap[Type];
+        public string? TargetEnumTypeName
+        {
+            get
+            {
+                if (!NamespaceData.IsRealmPropType(Type))
+                    return null;
+                if (!PropMap.TryGetValue(Type, out var v))
+                    throw new InvalidOperationException($"TargetEnumTypeName: Unknown key {Type}");
+                return v;
+            }
+        }
+       
         public ImmutableArray<PropContext> Contexts { get; init; } = [];
 
         public static readonly FrozenDictionary<PropType, string> PropMap = new Dictionary<PropType, string>()
@@ -54,7 +66,7 @@ namespace ACRealms.Roslyn.RealmProps
             { PropType.boolean, "RealmPropertyBool" },
             { PropType.int64, "RealmPropertyInt64" },
             { PropType.@float, "RealmPropertyFloat" },
-            { PropType.@enum, "RealmPropertyInt" }
+            { PropType.@enum, "RealmPropertyInt" },
         }.ToFrozenDictionary();
 
         public static readonly FrozenDictionary<PropType, PrimitiveType> PrimitiveMap = new Dictionary<PropType, PrimitiveType>()
@@ -67,13 +79,43 @@ namespace ACRealms.Roslyn.RealmProps
             { PropType.@enum, PrimitiveType.@enum }
         }.ToFrozenDictionary();
 
-        public string CoreEnumType => PropMap[Type];
-        public PrimitiveType PrimitiveType => PrimitiveMap[Type];
-        public string PropTypeDecl => PrimitiveType switch
+        public string? CoreEnumType
         {
-            PrimitiveType.@enum => Enum,
-            _ => PrimitiveType.ToString()
-        };
+            get
+            {
+                if (!NamespaceData.IsRealmPropType(Type))
+                    return null;
+                if (!PropMap.TryGetValue(Type, out string v))
+                    throw new InvalidOperationException($"CoreEnumType: Unknown key {Type}");
+                return v;
+            }
+        }
+
+        public PrimitiveType? PrimType
+        {
+            get
+            {
+                if (!NamespaceData.IsRealmPropType(Type))
+                    return null;
+                if (!PrimitiveMap.TryGetValue(Type, out var v))
+                    throw new InvalidOperationException($"PrimType: Unknown key {Type}");
+                return v;
+            }
+        }
+        
+        public string? PropTypeDecl
+        {
+            get
+            {
+                if (PrimType == null)
+                    return null;
+                return PrimType.Value switch
+                {
+                    PrimitiveType.@enum => Enum,
+                    _ => PrimType.Value.ToString()
+                };
+            }
+        }
 
         public string ToNamespacedAliasDeclaration(string spacer)
         {
@@ -112,7 +154,7 @@ namespace ACRealms.Roslyn.RealmProps
 
         private string GetDefaultLiteral()
         {
-            return PrimitiveType switch
+            return PrimType switch
             {
                 PrimitiveType.@bool => "false",
                 PrimitiveType.@double => "0.0",
@@ -147,7 +189,7 @@ namespace ACRealms.Roslyn.RealmProps
 
         private string CorePrimaryAttribute(string aliasedPrimaryAttributeType, string canonicalPrimaryAttributeType)
         {
-            string typeArg = PrimitiveType switch
+            string typeArg = PrimType switch
             {
                 PrimitiveType.@enum => $"<{Enum}>",
                 _ => string.Empty

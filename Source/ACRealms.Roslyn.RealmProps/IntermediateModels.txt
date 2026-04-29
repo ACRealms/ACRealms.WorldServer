@@ -1,0 +1,14 @@
+If editing the schemas in PropDefs/json-schema (but not the prop defs themselves), it is necessary to regenerate the types manually after editing. 
+Typically you won't need to manually edit the json-schema itself unless contributing to the ACRealms compiler itself.
+As of now, editing these schemas is difficult because there's no known way (yet) to automatically verify correctness of the intellisense behavior
+ 
+To install the tool to regenerate the C# types (which reside under IntermediateModels folder):
+ dotnet tool install --global Corvus.Json.JsonSchema.TypeGeneratorTool
+
+To use the tool:
+ cd .\Source\ACRealms.RealmProps\PropDefs\json-schema
+ generatejsonschematypes root.json --rootNamespace ACRealms.Roslyn.RealmProps.IntermediateModels --outputPath=..\..\..\ACRealms.Roslyn.RealmProps\IntermediateModels --disableNamingHeuristic DocumentationNameHeuristic --useImplicitOperatorString true --optionalAsNullable=NullOrUndefined
+
+More info about tool usage:
+ https://github.com/corvus-dotnet/corvus.jsonschema?tab=readme-ov-file#getting-started
+

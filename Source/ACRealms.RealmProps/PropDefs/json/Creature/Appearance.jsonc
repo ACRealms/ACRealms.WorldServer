@@ -1,0 +1,22 @@
+{
+  "$schema_version": 1,
+  "namespace": "Creature.Appearance",
+  "description": "Properties affecting a creature's appearance",
+  "properties": {
+    "ScaleMultiplier": {
+      "type": "float",
+      "default": 1.0,
+      "description": "A creature's scale (size) will be multiplied by this amount",
+      "min_value": 0.01,
+      "max_value": 10,
+      "contexts": [
+        {
+          "entity": "WorldObject",
+          "name": "SpawnedCreature",
+          "required": true,
+          "description": "The creature being spawned"
+        }
+      ]
+    }
+  }
+}

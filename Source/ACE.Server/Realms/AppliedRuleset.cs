@@ -248,7 +248,7 @@ namespace ACE.Server.Realms
     }
 
     //Properties may be changed freely
-    public partial class AppliedRuleset : Ruleset, IAppliedRuleset
+    public partial class AppliedRuleset : Ruleset, IAppliedRuleset, IRulesetHandle
     {
         public Landblock Landblock { get; set; }
         internal RulesetTemplate Template { get; }
@@ -779,6 +779,18 @@ namespace ACE.Server.Realms
         public override string ToString()
         {
             return $"Applied Ruleset {Realm.Name}";
+        }
+
+        public void Modulate(IModulatable target)
+        {
+            if (target is Biota biota)
+                Modulate(biota);
+
+        }
+
+        private void Modulate(Biota biota)
+        {
+            throw new NotImplementedException();
         }
     }
 }

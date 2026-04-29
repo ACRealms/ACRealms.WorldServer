@@ -112,21 +112,37 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(realmPropNamespaces, static (ctx, data) =>
         {
-            if (data != null)
+            try
             {
-                string fileName = string.Join("/", data.NestedClassNames);
-                string sourceCode = NamespacedProps.GenerateNamespacedPropsSourceCode(data);
-                ctx.AddSource($"NamespacedProps/{fileName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
+                if (data != null)
+                {
+                    string fileName = string.Join("/", data.NestedClassNames);
+                    string sourceCode = NamespacedProps.GenerateNamespacedPropsSourceCode(data);
+                    ctx.AddSource($"NamespacedProps/{fileName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
+                }
+            }
+            catch (Exception ex)
+            {
+                Helpers.ReThrowWrappedException("GenerateNamespacedPropsSourceCode", ex);
+                throw;
             }
         });
 
         context.RegisterSourceOutput(realmPropNamespaces, static (ctx, data) =>
         {
-            if (data != null && data.ObjProps.Array.Any())
+            try
             {
-                string fileName = string.Join("/", data.NestedClassNames);
-                string sourceCode = NamespaceJsonSchema.GenerateSchemaSourceCode(data);
-                ctx.AddSource($"GeneratedJsonSchema/realm-properties/{fileName}.json", SourceText.From(sourceCode, Encoding.UTF8));
+                if (data != null && data.ObjProps.Array.Any())
+                {
+                    string fileName = string.Join("/", data.NestedClassNames);
+                    string sourceCode = NamespaceJsonSchema.GenerateSchemaSourceCode(data);
+                    ctx.AddSource($"GeneratedJsonSchema/realm-properties/{fileName}.json", SourceText.From(sourceCode, Encoding.UTF8));
+                }
+            }
+            catch (Exception ex)
+            {
+                Helpers.ReThrowWrappedException("GenerateSchemaSourceCode", ex);
+                throw;
             }
         });
 
@@ -134,14 +150,30 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
         IncrementalValueProvider<ImmutableArray<NamespaceData>> combinedNamespaces = realmPropNamespaces.Where(static (x) => x != null).Collect();
         var namespaceMetadataForRootSchema = combinedNamespaces.Select(static (allNamespaces, cancellationToken) =>
         {
-            return allNamespaces.Select(static x => x.AsStub()).ToImmutableArray();
+            try
+            {
+                return allNamespaces.Select(static x => x.AsStub()).ToImmutableArray();
+            }
+            catch (Exception ex)
+            {
+                Helpers.ReThrowWrappedException("namespaceMetadataForRootSchema", ex);
+                throw;
+            }
         });
 
 
         context.RegisterSourceOutput(namespaceMetadataForRootSchema, static (ctx, data) =>
         {
-            string sourceCode = RootGeneratedPropsSchema.GenerateCombinedSchemaSourceCode(data);
-            ctx.AddSource($"GeneratedJsonSchema/realm-properties/realm-properties-root.json", SourceText.From(sourceCode, Encoding.UTF8));
+            try
+            {
+                string sourceCode = RootGeneratedPropsSchema.GenerateCombinedSchemaSourceCode(data);
+                ctx.AddSource($"GeneratedJsonSchema/realm-properties/realm-properties-root.json", SourceText.From(sourceCode, Encoding.UTF8));
+            }
+            catch (Exception ex)
+            {
+                Helpers.ReThrowWrappedException("GenerateCombinedSchemaSourceCode", ex);
+                throw;
+            }
         });
 
         // And for all the properties combined, regardless of namespace, we create the core enums
@@ -161,7 +193,12 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
                 return x.SelectMany(x => x.ObjProps.Array).Concat(undefProps).ToImmutableArray();
             });
         var types = ObjPropInfo.PropMap.Select(static kvp => ((PropType propType, string enumType))(kvp.Key, kvp.Value)).ToImmutableArray();
-        IncrementalValuesProvider<string> typesProvider = combinedProps.SelectMany(static (_, cancellationToken) => ObjPropInfo.PropMap.Values.Distinct());
+        IncrementalValuesProvider<string> typesProvider =
+            combinedProps.SelectMany(static (_, cancellationToken) =>
+                ObjPropInfo.PropMap
+                //.Where(kvp => NamespaceData.IsRealmPropType(kvp.Key))
+                .Select(x => x.Value)
+                .Distinct());
 
         IncrementalValuesProvider<(string TargetEnumTypeName, ImmutableArray<ObjPropInfo> AllProps)> corePropsSourceUnfiltered = typesProvider.Combine(combinedProps);
         IncrementalValuesProvider<(string TargetEnumTypeName, ImmutableArray<ObjPropInfo> PropsOfType)> corePropsSource = corePropsSourceUnfiltered.Select((data, cancellationToken) =>
@@ -174,20 +211,36 @@ public class NamespacedRealmPropertyGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(corePropsSource, static (ctx, data) =>
         {
-            if (data.PropsOfType.IsEmpty)
-                return;
-            //if (data.TargetEnumTypeName.Contains("Float") && !Debugger.IsAttached)
-            //    Debugger.Launch();
-            string? sourceCode = Builders.Phase1.CoreRealmProperties.GenerateCoreEnumClass(data.TargetEnumTypeName, data.PropsOfType);
-            ctx.AddSource($"CoreProps/{data.TargetEnumTypeName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
+            try
+            {
+                if (data.PropsOfType.IsEmpty)
+                    return;
+                //if (data.TargetEnumTypeName.Contains("Float") && !Debugger.IsAttached)
+                //    Debugger.Launch();
+                string? sourceCode = Builders.Phase1.CoreRealmProperties.GenerateCoreEnumClass(data.TargetEnumTypeName, data.PropsOfType);
+                ctx.AddSource($"CoreProps/{data.TargetEnumTypeName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
+            }
+            catch (Exception ex)
+            {
+                Helpers.ReThrowWrappedException("GenerateCoreEnumClass", ex);
+                throw;
+            }
         });
 
 
         IncrementalValuesProvider<string> entities = combinedProps.SelectMany(static (_, cancellationToken) => EntityToContextEntityMapping.BuildEntityList());
         context.RegisterSourceOutput(entities, static (ctx, entityType) =>
         {
-            string sourceCode = EntitySchema.GenerateEntitySchemaSourceCode(entityType);
-            ctx.AddSource($"GeneratedJsonSchema/entities/{entityType}.json", SourceText.From(sourceCode, Encoding.UTF8));
+            try
+            {
+                string sourceCode = AnyEntitySchema.GenerateEntitySchemaSourceCode(entityType);
+                ctx.AddSource($"GeneratedJsonSchema/entities/{entityType}.json", SourceText.From(sourceCode, Encoding.UTF8));
+            }
+            catch (Exception ex)
+            {
+                Helpers.ReThrowWrappedException("GenerateEntitySchemaSourceCode", ex);
+                throw;
+            }
         });
     }
 }

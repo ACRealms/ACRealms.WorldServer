@@ -41,11 +41,15 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
 
         private static string MakeScopeDef(ObjPropInfo objPropInfo, string entitiesBasePath)
         {
+            
+
             List<string> props = [];
             foreach (var ctx in objPropInfo.Contexts)
             {
+                var entitySchema = EntityToContextEntityMapping.GetCanonicalEntitySchemaNameFromAlias(ctx.Entity);
+
                 List<string> propBuilder = [];
-                AddStringProp(propBuilder, "$ref", $"{entitiesBasePath}{ctx.Entity}.json");
+                AddStringProp(propBuilder, "$ref", $"{entitiesBasePath}{entitySchema}.json");
                 if (ctx.Description != null)
                     AddStringProp(propBuilder, "description", ctx.Description);
                 AddUnwrappedObjectProp(props, ctx.Name, SerializePropsUnwrapped(propBuilder));
@@ -64,9 +68,15 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
 
         private static string MakePropertySchema(NamespaceData data, string entitiesBasePath)
         {
+            List<string> propertyJsonSchema = TransformPropertySchema(data.ObjProps.Array, entitiesBasePath);
+
+            return SerializePropsUnwrapped(propertyJsonSchema);
+        }
+        private static List<string> TransformPropertySchema(ImmutableArray<ObjPropInfo> props, string entitiesBasePath)
+        {
             List<string> propertyJsonSchema = [];
 
-            foreach (var prop in data.ObjProps.Array)
+            foreach (var prop in props)
             {
                 string propSchema;
                 if (prop is { Type: PropType.integer })
@@ -100,13 +110,96 @@ namespace ACRealms.Roslyn.RealmProps.Builders.Phase2Src
                     var defaultVal = prop.AttributeDefault;
                     propSchema = MakeBasicPropSchema(prop, "boolean", defaultVal, entitiesBasePath);
                 }
+                else if (prop is { Type: PropType.modulator })
+                {
+                    propertyJsonSchema.AddRange(TransformPropertySchema(ExpandModulator(prop), entitiesBasePath));
+                    continue;
+                }
                 else
-                    return "";
+                    continue;
 
                 AddProp(propertyJsonSchema, prop.Key, propSchema);
             }
+            return propertyJsonSchema;
 
-            return SerializePropsUnwrapped(propertyJsonSchema);
+
+        }
+
+        private static ObjPropInfo MakeModulatorSubProp(ObjPropInfo superProp, PropType type, string subKey, string? defaultVal, string? minVal = null, string? maxVal = null)
+        {
+            if (type == PropType.modulator)
+                throw new ArgumentException("Modulator may not be passed as a type to this method, or it would create an infinite loop");
+
+            var entityType = GetModulatorEntityType(type, superProp);
+            ImmutableArray<PropContext> contexts = [.. superProp.Contexts, new PropContext()
+            {
+                Description = "The identifier of the property being modulated",
+                Entity = entityType,
+                Name = "PropName",
+                Required = true
+            }];
+            
+            return new ObjPropInfo($"{superProp.NamespaceRaw}", subKey)
+            {
+                Description = superProp.Description,
+                MinValue = minVal,
+                MaxValue = maxVal,
+                Default = defaultVal,
+                ObsoleteReason = superProp.ObsoleteReason,
+                Type = type,
+                Contexts = contexts
+            };
+        }
+
+        private static string GetModulatorEntityType(PropType type, ObjPropInfo superProp)
+        {
+            var baseEntity = superProp.Contexts.SingleOrDefault()?.Entity;
+            if (baseEntity == null)
+                throw new InvalidOperationException($"Modulator definition {superProp.NamespaceRaw}.{superProp.Key} must define exactly one context with an entity type matching a corresponding IModulatable.");
+
+            if (baseEntity == "Weenie")
+            {
+                return type switch
+                {
+                    PropType.integer => "WeeniePropertyInt",
+                    PropType.int64 => "WeeniePropertyInt64",
+                    PropType.boolean => "WeeniePropertyBool",
+                    PropType.@string => "WeeniePropertyString",
+                    PropType.@float => "WeeniePropertyFloat",
+                    _ => throw new NotImplementedException($"Weenie ModulatorEntityType not defined for PropType {type}.")
+                };
+            }
+            else
+                throw new NotImplementedException($"ModulatorEntityType not defined for base entity {baseEntity}");
+        }
+        // A modulator property will expand to a set of pre-defined pseudo-properties
+        private static ImmutableArray<ObjPropInfo> ExpandModulator(ObjPropInfo prop)
+        {
+            if (prop.Type != PropType.modulator)
+                throw new ArgumentException($"Expected type to be modulator for prop {prop.NamespaceRaw}.{prop.Key}. This is likely a bug in the realms compiler itself.");
+
+            List<ObjPropInfo> props = [];
+
+            // Replace
+            props.Add(MakeModulatorSubProp(prop, PropType.integer, "ReplaceInt", "0", int.MinValue.ToString(), int.MaxValue.ToString()));
+            props.Add(MakeModulatorSubProp(prop, PropType.int64, "ReplaceLong", "0", long.MinValue.ToString(), long.MaxValue.ToString()));
+            props.Add(MakeModulatorSubProp(prop, PropType.@float, "ReplaceFloat", "0", float.MinValue.ToString(), float.MaxValue.ToString()));
+            
+            props.Add(MakeModulatorSubProp(prop, PropType.@string, "ReplaceString", null));
+            props.Add(MakeModulatorSubProp(prop, PropType.boolean, "ReplaceBool", "false"));
+
+
+            // Add
+            props.Add(MakeModulatorSubProp(prop, PropType.integer, "AddInt", "0", int.MinValue.ToString(), int.MaxValue.ToString()));
+            props.Add(MakeModulatorSubProp(prop, PropType.int64, "AddLong", "0", long.MinValue.ToString(), long.MaxValue.ToString()));
+            props.Add(MakeModulatorSubProp(prop, PropType.@float, "AddFloat", "0", "-1000000.0", "1000000.0"));
+
+            // Multiply
+            props.Add(MakeModulatorSubProp(prop, PropType.@float, "MultiplyInt", "0", "-1000", "1000"));
+            props.Add(MakeModulatorSubProp(prop, PropType.@float, "MultiplyLong", "0", "-1000", "1000"));
+            props.Add(MakeModulatorSubProp(prop, PropType.@float, "MultiplyFloat", "0", "-1000", "1000"));
+
+            return [.. props];
         }
 
         private static string MakeBasicPropSchema(ObjPropInfo propInfo, string valType, string defaultValLiteral, string entitiesBasePath)

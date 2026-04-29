@@ -8,6 +8,7 @@ using ACE.Entity.Enum;
 using ACE.Entity.Enum.Properties;
 using ACRealms;
 using ACRealms.Prototypes;
+using ACRealms.Rulesets;
 
 namespace ACE.Entity.Models
 {
@@ -16,7 +17,7 @@ namespace ACE.Entity.Models
     /// We do this to conserve memory in ACE.Server
     /// Be sure to check for null first.
     /// </summary>
-    public class Biota : IWeenie<Biota>, IResolvableContext<BiotaPropertyPrototypes, Biota>
+    public class Biota : IWeenie<Biota>, IResolvableContext<BiotaPropertyPrototypes, Biota>, IModulatable
     {
         public ulong Id { get; set; }
         public uint WeenieClassId { get; set; }
@@ -152,6 +153,7 @@ namespace ACE.Entity.Models
             }
             return dict.TryFetchObjectWithUnderlying((ushort)prototype.UntypedRawKey, out result);
         }
+
         #endregion IResolvableContext
     }
 }

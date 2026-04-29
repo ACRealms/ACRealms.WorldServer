@@ -356,6 +356,28 @@ public readonly partial struct UngroupedPropObj
                 }
             }
 
+            /// <summary>
+            /// Gets the instance as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator" />.
+            /// </summary>
+            public ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator AsModulator
+            {
+                get
+                {
+                    return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator>();
+                }
+            }
+
+            /// <summary>
+            /// Gets a value indicating whether the instance is a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator" />.
+            /// </summary>
+            public bool IsModulator
+            {
+                get
+                {
+                    return this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator>().IsValid();
+                }
+            }
+
             /// <inheritdoc/>
             public bool HasJsonElementBacking
             {
@@ -515,6 +537,24 @@ public readonly partial struct UngroupedPropObj
             /// </summary>
             /// <param name="value">The value from which to convert.</param>
             public static implicit operator Typed(ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.String value)
+            {
+                return value.As<Typed>();
+            }
+
+            /// <summary>
+            /// Conversion to <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator"/>.
+            /// </summary>
+            /// <param name="value">The value from which to convert.</param>
+            public static explicit operator ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator(Typed value)
+            {
+                return value.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator>();
+            }
+
+            /// <summary>
+            /// Conversion from <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator"/>.
+            /// </summary>
+            /// <param name="value">The value from which to convert.</param>
+            public static implicit operator Typed(ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator value)
             {
                 return value.As<Typed>();
             }
@@ -944,6 +984,7 @@ public readonly partial struct UngroupedPropObj
             /// <param name="matchFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Float"/>.</param>
             /// <param name="matchBool">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Bool"/>.</param>
             /// <param name="matchString">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.String"/>.</param>
+            /// <param name="matchModulator">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator"/>.</param>
             /// <param name="defaultMatch">Match any other value.</param>
             /// <returns>An instance of the value returned by the match function.</returns>
             public TOut Match<TIn, TOut>(
@@ -954,6 +995,7 @@ public readonly partial struct UngroupedPropObj
                 Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Float, TIn, TOut> matchFloat,
                 Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Bool, TIn, TOut> matchBool,
                 Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.String, TIn, TOut> matchString,
+                Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator, TIn, TOut> matchModulator,
                 Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed, TIn, TOut> defaultMatch)
             {
                 ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Enum matchEnumValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Enum>();
@@ -992,6 +1034,12 @@ public readonly partial struct UngroupedPropObj
                     return matchString(matchStringValue, context);
                 }
 
+                ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator matchModulatorValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator>();
+                if (matchModulatorValue.IsValid())
+                {
+                    return matchModulator(matchModulatorValue, context);
+                }
+
                 return defaultMatch(this, context);
             }
 
@@ -1005,6 +1053,7 @@ public readonly partial struct UngroupedPropObj
             /// <param name="matchFloat">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Float"/>.</param>
             /// <param name="matchBool">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Bool"/>.</param>
             /// <param name="matchString">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.String"/>.</param>
+            /// <param name="matchModulator">Match a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator"/>.</param>
             /// <param name="defaultMatch">Match any other value.</param>
             /// <returns>An instance of the value returned by the match function.</returns>
             public TOut Match<TOut>(
@@ -1014,6 +1063,7 @@ public readonly partial struct UngroupedPropObj
                 Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Float, TOut> matchFloat,
                 Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Bool, TOut> matchBool,
                 Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.String, TOut> matchString,
+                Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator, TOut> matchModulator,
                 Matcher<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed, TOut> defaultMatch)
             {
                 ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Enum matchEnumValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Enum>();
@@ -1050,6 +1100,12 @@ public readonly partial struct UngroupedPropObj
                 if (matchStringValue.IsValid())
                 {
                     return matchString(matchStringValue);
+                }
+
+                ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator matchModulatorValue = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator>();
+                if (matchModulatorValue.IsValid())
+                {
+                    return matchModulator(matchModulatorValue);
                 }
 
                 return defaultMatch(this);
@@ -1118,6 +1174,17 @@ public readonly partial struct UngroupedPropObj
             public bool TryGetAsString(out ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.String result)
             {
                 result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.String>();
+                return result.IsValid();
+            }
+
+            /// <summary>
+            /// Gets the value as a <see cref="ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator" />.
+            /// </summary>
+            /// <param name="result">The result of the conversions.</param>
+            /// <returns><see langword="true" /> if the conversion was valid.</returns>
+            public bool TryGetAsModulator(out ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator result)
+            {
+                result = this.As<ACRealms.Roslyn.RealmProps.IntermediateModels.UngroupedPropObj.ObjPropSelection.Typed.Modulator>();
                 return result.IsValid();
             }
         }

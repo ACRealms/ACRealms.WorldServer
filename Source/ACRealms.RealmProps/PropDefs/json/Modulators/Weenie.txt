@@ -1,0 +1,100 @@
+{
+  "$schema_version": 1,
+  "namespace": "Modulators.XXX",
+  "description": "Modulators that can change a biota's properties as they are created from template weenies",
+  "properties": {
+
+  },
+  /*
+  "groups": [
+    {
+      "type": "modulator",
+      "contexts": [
+        {
+          "name": "Weenie",
+          "entity": "Weenie",
+          "required": true,
+          "description": "The weenie used to create the biota"
+        }
+      ],
+      "properties": {
+        "OverrideInt": {
+          "description": "Sets an int property to this value",
+          "contexts": [
+            {
+              "description": "The property to change",
+              "name": "PropName",
+              "entity": "WeeniePropertyInt",
+              "required": true
+            }
+          ]
+        },
+        "OverrideInt64": {
+          "description": "Sets a long property to this value",
+          "contexts": [
+            {
+              "description": "The property to change",
+              "name": "PropName",
+              "entity": "WeeniePropertyInt64",
+              "required": true
+            }
+          ]
+        },
+        "OverrideFloat": {
+          "description": "Sets a float property to this value",
+          "contexts": [
+            {
+              "name": "PropName",
+              "entity": "WeeniePropertyFloat"
+            }
+          ]
+        },
+        "OverrideBool": {
+          "description": "Sets a bool property to this value",
+          "contexts": [
+            {
+              "name": "PropName",
+              "entity": "WeeniePropertyBool"
+            }
+          ]
+        },
+        "OverrideString": {
+          "description": "Sets a string property to this value",
+          "contexts": [
+            {
+              "name": "PropName",
+              "entity": "WeeniePropertyString"
+            }
+          ]
+        },
+        "AddInt": {
+          "description": "Add this value to a numeric property",
+          "contexts": [
+            {
+              "name": "PropName",
+              "entity": "WeeniePropertyInt"
+            }
+          ]
+        },
+        "AddInt64": {
+          "description": "Add this value to a numeric property",
+          "contexts": [
+            {
+              "name": "PropName",
+              "entity": "WeeniePropertyInt64"
+            }
+          ]
+        },
+        "AddFloat": {
+          "description": "Add this value to a numeric property",
+          "contexts": [
+            {
+              "name": "PropName",
+              "entity": "WeeniePropertyString"
+            }
+          ]
+        }
+      }
+    }
+  ]*/
+}

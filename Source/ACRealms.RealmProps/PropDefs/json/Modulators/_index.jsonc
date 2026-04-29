@@ -1,0 +1,5 @@
+{
+  "$schema_version": 1,
+  "namespace": "Modulators",
+  "description": "A special type of property that interacts with IModulatable objects to modify a wide range of possible properties"
+}

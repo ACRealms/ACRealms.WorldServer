@@ -36,6 +36,8 @@ namespace ACRealms.Roslyn.RealmProps
 
         public NamespaceStub AsStub() => CreateForClone();
 
+        internal static bool IsRealmPropType(PropType type) => type != PropType.modulator;
+
         internal string ToCompilationSource()
         {
             string newline =
@@ -44,7 +46,10 @@ namespace ACRealms.Roslyn.RealmProps
             
             """;
             string declSpacer = new(' ', (NestedClassNames.Length + 1) * 4);
-            IEnumerable<string> declarations = ObjProps.Array.Select(p => p.ToNamespacedAliasDeclaration(declSpacer));
+            IEnumerable<string> declarations =
+                ObjProps.Array
+                .Where(p => IsRealmPropType(p.Type))
+                .Select(p => p.ToNamespacedAliasDeclaration(declSpacer));
             string declarationsText = string.Join(newline, declarations);
 
             string nestedClassDecl = GetNestedClassDecl(declarationsText, new Queue<string>(NestedClassNames), 1);

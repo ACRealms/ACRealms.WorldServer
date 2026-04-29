@@ -14,6 +14,10 @@ using SecondaryDict = System.Collections.Frozen.FrozenDictionary<System.Type, AC
 
 namespace ACRealms.RealmProps
 {
+    internal interface IModulatorValue : IEquatable<IModulatorValue> { }
+    internal interface IModulatorValue<TPrimitive> : IModulatorValue
+        where TPrimitive : IEquatable<TPrimitive>
+    { }
     // These are loaded once at startup, and derived from the generated source attributes of RealmProps
     // This is the warm data representing the metadata about a property (not linked to any ruleset)
     internal static class RealmPropertyPrototypes
@@ -23,6 +27,7 @@ namespace ACRealms.RealmProps
         public static IReadOnlyDictionary<RealmPropertyInt64, RealmPropertyInt64Prototype> Int64 { get; } = RealmPropertyHelper.BuildPrototypes<RealmPropertyInt64, RealmPropertyInt64Prototype, long, RealmPropertyPrimaryMinMaxAttribute<long>>();
         public static IReadOnlyDictionary<RealmPropertyFloat, RealmPropertyFloatPrototype> Float { get; } = RealmPropertyHelper.BuildPrototypes<RealmPropertyFloat, RealmPropertyFloatPrototype, double, RealmPropertyPrimaryMinMaxAttribute<double>>();
         public static IReadOnlyDictionary<RealmPropertyString, RealmPropertyStringPrototype> String { get; } = RealmPropertyHelper.BuildPrototypes<RealmPropertyString, RealmPropertyStringPrototype, string, RealmPropertyPrimaryAttribute<string>>();
+        public static IReadOnlyDictionary<RealmPropertyModulator, IRealmPropertyModulatorPrototype> Modulators { get; } = RealmPropertyHelper.BuildModulatorPrototypes<RealmPropertyModulator, IRealmPropertyModulatorPrototype, IModulatorValue, RealmPropertyPrimaryAttribute<IModulatorValue>>();
         internal static IReadOnlyDictionary<Type, Type> ContextMappings { get; private set; } = FrozenDictionary<Type, Type>.Empty;
 
         static class HostAssemblyContext
@@ -244,4 +249,13 @@ namespace ACRealms.RealmProps
             : base(canonicalName, enumVal, primaryAttribute, secondaryAttributes, hardDefaultValue, scopedWithAttributes) { }
     }
 
+    internal interface IRealmPropertyModulatorPrototype { }
+    internal sealed class RealmPropertyModulatorPrototype<TPrimitive>
+        : RealmPropertyPrototype<RealmPropertyModulator, TPrimitive, RealmPropertyPrimaryAttribute<TPrimitive>>, IRealmPropertyModulatorPrototype
+        where TPrimitive : IEquatable<TPrimitive>
+    {
+        internal RealmPropertyModulatorPrototype(string canonicalName, RealmPropertyModulator enumVal, RealmPropertyPrimaryAttribute<TPrimitive> primaryAttribute, SecondaryDict? secondaryAttributes, bool hardDefaultValue,
+            IEnumerable<IScopedWithAttribute> scopedWithAttributes)
+            : base(canonicalName, enumVal, primaryAttribute, secondaryAttributes, hardDefaultValue, scopedWithAttributes) { }
+    }
 }

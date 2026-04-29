@@ -1,0 +1,19 @@
+{
+  "$schema_version": 1,
+  "namespace": "Modulators.Weenie",
+  "description": "Modulators that can change a biota's properties as they are created from template weenies",
+  "properties": {
+    "TempKey": {
+      "type": "modulator",
+      "description": "Changes the value of a biota property as it is loaded from a weenie property to spawn a new object",
+      "contexts": [
+        {
+          "name": "Weenie",
+          "entity": "Weenie",
+          "required": true,
+          "description": "The weenie used to create the biota"
+        }
+      ]
+    }
+  }
+}
