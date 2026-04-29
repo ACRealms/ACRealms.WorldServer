@@ -31,5 +31,12 @@
       <HintPath>$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.dll</HintPath>
       <Private>False</Private>
     </Reference>
-</ItemGroup>
+	</ItemGroup>
+
+	<Target Name="EnsureRealmPropsBuilt" BeforeTargets="Build">
+		<MSBuild Projects="..\ACRealms.RealmProps\ACRealms.RealmProps.csproj"
+						 Targets="Build"
+						 Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+	</Target>
+
 </Project>

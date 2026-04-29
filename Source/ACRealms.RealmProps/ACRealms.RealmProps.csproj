@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Platforms>x64</Platforms>
@@ -42,10 +42,14 @@
     <WriteLinesToFile File="$(GeneratedJsonOutputDir)%(GeneratedJsonCsFile.RecursiveDir)%(GeneratedJsonCsFile.Filename)" Lines="@(ProcessedJsonLines)" Overwrite="true" />
   </Target>
 
-    
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="mv -fuT $(AssemblyName).dll $(AssemblyName)Assembly.dll&#xD;&#xA;mv -fuT $(AssemblyName).pdb $(AssemblyName)Assembly.pdb&#xD;&#xA;mv -fuT $(AssemblyName).xml $(AssemblyName)Assembly.xml&#xD;&#xA;mv -fuT $(AssemblyName).deps.json $(AssemblyName)Assembly.deps.json" WorkingDirectory="$(OutDir)" />
-  </Target>
+	<Target Name="PostBuild" AfterTargets="Build">
+		<ItemGroup>
+			<FilesToRename Include="$(OutDir)$(AssemblyName).dll" Condition="Exists('$(OutDir)$(AssemblyName).dll')" />
+			<FilesToRename Include="$(OutDir)$(AssemblyName).pdb" Condition="Exists('$(OutDir)$(AssemblyName).pdb')" />
+			<FilesToRename Include="$(OutDir)$(AssemblyName).xml" Condition="Exists('$(OutDir)$(AssemblyName).xml')" />
+		</ItemGroup>
+		<Move SourceFiles="@(FilesToRename)" DestinationFiles="@(FilesToRename->'%(RootDir)%(Directory)%(Filename)Assembly%(Extension)')" />
+	</Target>
    
   <ItemGroup>
     <ProjectReference Include="..\ACRealms.Roslyn.Analyzer\ACRealms.Roslyn.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" />        

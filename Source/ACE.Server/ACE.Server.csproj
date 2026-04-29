@@ -292,7 +292,8 @@
     </Reference>
     
     <!-- We have to do this so that the assembly is renamed back to the original name so that it can be found automatically at runtime -->
-    <ContentWithTargetPath Include="$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.dll">
+		<ContentWithTargetPath Include="$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.dll"
+                       Condition="Exists('$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.dll')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>ACRealms.RealmProps.dll</TargetPath>
     </ContentWithTargetPath>
@@ -303,10 +304,6 @@
     <ContentWithTargetPath Include="$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>ACRealms.RealmProps.xml</TargetPath>
-    </ContentWithTargetPath>
-    <ContentWithTargetPath Include="$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.deps.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>ACRealms.RealmProps.deps.json</TargetPath>
     </ContentWithTargetPath>
 
     <Reference Include="Lifestoned.DataModel">
@@ -359,6 +356,11 @@
       <None Include="..\..\Database\Custom\**" CopyToOutputDirectory="PreserveNewest" LinkBase="DatabaseSetupScripts\Custom\" />
   </ItemGroup>
 
+	<Target Name="EnsureRealmPropsBuilt" BeforeTargets="Build">
+		<MSBuild Projects="..\ACRealms.RealmProps\ACRealms.RealmProps.csproj"
+						 Targets="Build"
+						 Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+	</Target>
     <!--
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="" Condition="'$(OS)' == 'Windows_NT'" />

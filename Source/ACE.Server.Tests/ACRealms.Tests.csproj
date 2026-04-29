@@ -84,10 +84,20 @@
       <Folder Include="Helpers\realm-fixtures\coverage\realm\" />
     </ItemGroup>
 
+		<PropertyGroup>
+			<RealmPropsLibDir>..\lib\RealmPropsAssembly\$(Platform)\$(Configuration)\$(TargetFramework)\</RealmPropsLibDir>
+		</PropertyGroup>
+
     <ItemGroup>
       <Reference Include="ACRealms.RealmProps">
-        <HintPath>..\lib\RealmPropsAssembly\x64\$(Configuration)\net9.0\ACRealms.RealmPropsAssembly.dll</HintPath>
+				<HintPath>$(RealmPropsLibDir)ACRealms.RealmPropsAssembly.dll</HintPath>
       </Reference>
-    </ItemGroup>    
+    </ItemGroup>
+
+	<Target Name="EnsureRealmPropsBuilt" BeforeTargets="Build">
+		<MSBuild Projects="..\ACRealms.RealmProps\ACRealms.RealmProps.csproj"
+						 Targets="Build"
+						 Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+	</Target>
 
 </Project>
